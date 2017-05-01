@@ -1,0 +1,93 @@
+% $Id: sample2.tex,v 1.3 2002/09/13 06:34:25 loreti Exp $
+
+\documentclass[a4paper]{article}
+\usepackage{fancyhdr}
+
+\newcommand{\wb}[2]{\fontsize{#1}{#2}\usefont{U}{webo}{xl}{n}}
+
+% What follows has been elaborated starting from an original
+% post of Piet van Oostrum <piet@cs.uu.nl> on comp.text.tex .
+%
+% A4 pages are 210 mm wide and 297 mm high, i.e. about 595
+% bp wide and 842 bp high.  Allowing a 1 in (72 bp) white
+% margin on all sides (predefined inside TeX), that accounts
+% for a decoration border 451 bp wide and 698 bp high.  If
+% we want to use WeboMints characters in square cells with
+% 12 bp side, we need 37 cells (2 angles and 35 border) in
+% the X direction, for a total of 37*12 = 444 bp; and 58
+% cells in the Y direction, for a total of 58*12 = 696 bp.
+% The two white sides have a real dimension of (595-444)/2 =
+% 75 and (842-696)/2 = 73 bp's.
+
+\fancyhf{} \pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\unitlength}{1bp}
+
+\fancyhead[HL]{\wb{12bp}{12bp}%         Offset (48,-16), found
+  \begin{picture}(0,0)(48,-16)%           by trial and error.
+    \put(0,0){r}%                       Upper left corner
+    \multiput(12,0)(12,0){35}{s}%       Upper border
+    \put(432,0){t}%                     Upper right corner
+    \multiput(0,-12)(0,-12){56}{x}%     Left border
+    \put(0,-684){u}%                    Lower left corner
+    \multiput(12,-684)(12,0){35}{v}%    Lower border
+    \multiput(432,-12)(0,-12){56}{y}%   Right border
+    \put(432,-684){w}%                  Lower right corner
+\end{picture}}
+
+\begin{document}
+Alice was beginning to get very tired of sitting by her
+sister on the bank, and of having nothing to do: once or
+twice she had peeped into the book her sister was reading,
+but it had no pictures or conversations in it, ``and what is
+the use of a book,'' thought Alice, ``without pictures or
+conversation?''
+
+So she was considering in her own mind (as well as she
+could, for the hot day made her feel very sleepy and stupid)
+whether the pleasure of making a daisy-chain would be worth
+the trouble of getting up and picking the daisies, when
+suddenly a White Rabbit with pink eyes ran close to her.
+
+There was nothing so very remarkable in that; nor did Alice
+think it so very much out of the way to hear the Rabbit say
+to itself, ``Oh dear! Oh dear! I shall be too late!'' (when
+she thought it over afterwards, it occurred to her that she
+ought to have wondered at this, but at the time it all
+seemed quite natural); but when the Rabbit actually took a
+watch out of its waist-coat pocket, and looked at it, and
+then hurried on, Alice started to her feet, for it flashed
+across her mind that she had never before seen a rabbit with
+either a waist-coat pocket or a watch to take out of it, and
+burning with curiosity, she ran across the field after it,
+and fortunately was just in time to see it pop down a large
+rabbit-hole under the hedge.
+
+In another moment down went Alice after it, never once
+considering how in the world she was to get out again.
+
+The rabbit-hole went straight on like a tunnel for some way,
+and then dipped suddenly down, so suddenly that Alice had
+not a moment to think about stopping herself before she
+found herself falling down a very deep well.
+
+Either the well was very deep, or she fell very slowly, for
+she had plenty of time as she went down to look about her,
+and to wonder what was going to happen next. First, she
+tried to look down and make out what she was coming to, but
+it was too dark to see anything; then she looked at the
+sides of the well, and noticed that they were filled with
+cupboards and book-shelves: here and there she saw maps and
+pictures hung upon pegs. She took down a jar from one of the
+shelves as she passed; it was labelled ``\textsc{Orange
+  marmalade},'' but to her great disappointment it was
+empty: she did not like to drop the jar for fear of killing
+somebody, so managed to put it into one of the cupboards as
+she fell past it.
+
+``Well!'' thought Alice to herself. ``After such a fall as
+this, I shall think nothing of tumbling downstairs! How
+brave they'll all think me at home! Why, I wouldn't say
+anything about it, even if I fell off the top of the house!''
+(Which was very likely true.)
+\end{document}

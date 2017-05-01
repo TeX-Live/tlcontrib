@@ -1,0 +1,77 @@
+On Tuesday 05 Feb 2002, Walter Schmidt (wal_schmidt@arcormail.de) has
+posted a message on comp.text.tex about a freely downloadable
+PostScript Type-1 font containing various types of ornaments.
+
+The URL is http://www.galapagosdesign.com/download/index.html, and
+contains the following lines:
+
+        Galapagos Design Group is pleased to make available to the
+        Internet community free downloads of original typefaces and
+        clipart.
+        
+        Our first offering is a tasty border and ornament font called
+        Web-O-Mints.  Created by George Ryan, Web-O-Mints contains a
+        rich assortment of typographic decorations inspired by
+        historical sources.
+        
+        The Web-O-Mints font is available in TrueType or PostScript
+        format, for use on PCs or Macs.  Web-O-Mints can be downloaded
+        and used immediately in all environments.  We hope you enjoy
+        using this original collection of images.
+
+This collection includes all the files needed to use this font in
+LaTeX and three small LaTeX examples.
+
+                        Installation instructions
+                        =========================
+
+N.B.: I assume a more-or-less standard TeX file tree; the root of tree
+      may be "texmf", as in the following example, or "temf.local", as
+      in my own setup; and is located under the "share" directory of
+      my teTeX installation ($TETEXDIR/share).  YOUR SETUP MAY BE
+      DIFFERENT.  If you have a teTeX-like installation, you may need
+      to rebuild the file database, running (as root) "texhash"; for
+      different distributions, consult their documentation.
+
+1) Copy WebOMintsGD.tfm to the directory texmf/fonts/tfm/public/misc
+2) Copy WebOMintsGD.pfb to the directory texmf/fonts/type1/public/misc
+3) Copy uwebo.fd to the directory texmf/tex/latex/misc
+4) If you are using dvips or pdfTeX, copy webo.map and config.webo to
+   the directory texmf/dvips/config.  Add the contents of webo.map
+   permanently to the font map or call dvips with the option -Pwebo .
+5) If you are using VTeX/Free, copy webo.ali to the directory
+   texmf/vtex/config; add an entry for webo.ali to the Type1 section
+   of the configuration files pdf.fm and ps.fm,
+
+In order to typeset the examples on Unix, you can simply use the
+included Makefile: just type "make samples".  Otherwise run the files
+manually through LaTeX.  They require the fancyhdr package; in
+addition, the Makefile calls dvips with the option -Pcmz, so the
+configuration file config.cmz should be available on your system.
+
+The supplied .fd file declares a font family named "webo" with the
+encoding being "U" for the Web-O-Mints font.  Take a look at the
+source code of the examples to see how it can be used.
+
+                                                Enjoy!
+
+********* news ********* news *********** news ******** news *********
+
+Important changes have been introduced with the current release of this
+package; these changes were performed by the same Walter Schmidt who
+first named in comp.text.tex these fonts.
+
+The files webo8r.tfm, webo8t.tfm and webo8t.vf were replaced with one
+single file WebOMintsGD.tfm, since the Web-O-Mints font is no longer
+reencoded.  The font map file webo.map has changed accordingly.
+
+Within LaTeX, the font family "webo" is now declared with the encoding
+"U" instead of "T1".  Thus, the new font definition file uwebo.fd
+replaces the former t1webo.fd.
+
+In case you have installed a previous release, please update your TeX 
+system accordingly.
+
+-- 
+Maurizio Loreti                 http://www.pd.infn.it/~loreti/mlo.html
+Univ. of Padova, Dept. of Physics - Padova, Italy    loreti@pd.infn.it

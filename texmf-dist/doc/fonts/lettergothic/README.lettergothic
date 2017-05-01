@@ -1,0 +1,170 @@
+============================================================
+                     URW Letter Gothic
+============================================================
+                                                  2005-02-02
+                                      w-a-schmidt(at)gmx.net
+
+
+This directory provides a set of general-purpose monospaced
+Postscript Type1 fonts which URW has made available for free
+under the Aladdin Free Public License:
+
+  font name:                  files:
+  ----------------------------------------
+                                  
+  LetterGothic Bold           ulgb8a.pfb
+                              ulgb8a.pfm
+                              ulgb8a.afm
+                                  
+  LetterGothic Bold Italic    ulgbi8a.pfb
+                              ulgbi8a.pfm
+                              ulgbi8a.afm
+
+The original distribution site of the font files is
+<http://www.artifex.com/downloads/>.
+
+The fonts are accompanied by the TeX font metrics, virtual
+fonts, font definition and font mapping files to use them
+with the LaTeX typesetting system on the PC or Un*x
+platform.
+
+The "regular" cuts of the LetterGothic family, which are 
+also provided at the original distribution site, are not 
+used with TeX, because they appear to be broken.
+
+The below installation instructions assume a TDS-compliant
+TeX system, such as teTeX, MikTeX or VTeX/Free.  Yet they
+may not exactly fit your particular TeX system; please,
+consult its documentation, too!  
+
+The directory name "texmf" refers to the root directory of a
+TDS directory tree.  In case your TeX systems has more than
+one TDS tree, its documentation should tell you where to
+install additional files.
+
+
+
+Installing the Type1 font files in your TeX system
+--------------------------------------------------
+The Type1 font files
+
+  ulgb8a.pfb
+  ulgbi8a.pfb
+
+are to be copied to the directory
+
+  texmf/fonts/type1/urw/lettrgth
+  
+of your TeX system, and the related .afm files should go
+into
+
+  texmf/fonts/afm/urw/lettrgth
+
+Most likely, you will have to create these directories
+first.
+
+Feel free to use the fonts also with applications other than
+TeX!  The related PFM files are provided for this purpose;
+move them to the same directory as the PFBs.
+
+
+
+
+
+Installing the TeX support files from the archive ulg.zip
+---------------------------------------------------------
+Unpack the ZIP archive ulg.zip in the directory "texmf" of
+your TeX system; thus, all files will be copied to the
+appropriate directories.
+
+
+
+Updating the filename database
+------------------------------
+Many TeX systems require manual updating of a "filename
+database" after adding of new files.  Please, consult the
+documentation of your TeX system!
+
+
+
+Configuring your TeX system
+---------------------------
+The required actions depend on the particular TeX system.
+Particular sets of instructions are provided below for
+
+          * teTeX 2.0 and later,
+          * VTeX/Free 8.x and later.
+
+In case you have a different TeX system, consult its
+documentation how to make it use the additional font map
+file named "ulg.map".  Two copies of this file reside in the
+directories texmf/dvips/config/ and texmf/fonts/map/dvips.
+
+Configuring teTeX:
+Use the shell script "updmap" to add the font map file named
+"ulg.map" to the configuration.  See the documentation of
+your particular teTeX version how to use the script.  With
+teTeX 2.0 and above, execute the following commands:
+
+  texhash
+  updmap --enable Map ulg.map
+
+Configuring VTeX/Free:
+Make VTeX read the additional font map ("aliasing") file
+ulg.ali.  This is usually accomplished by putting a record
+for this file into each of the configuration files
+
+  texmf/vtex/config/pdf.fm
+and
+  texmf/vtex/config/ps.fm
+
+"ulg.ali" is to be added to the TYPE1 section of the
+above-mentioned files:
+
+  TYPE1 {
+    ...
+    ulg.ali
+    }
+
+
+
+Using the URW Letter Gothic fonts with LaTeX
+--------------------------------------------
+See the file lettrgth.txt, which resides in the directory
+texmf/doc/fonts/urw.
+
+
+
+Fontinst sources
+----------------
+The archive file ulgfnst.zip contains the Fontinst script
+and additional mtx files, that were used to create the font
+metrics and virtual fonts for URW Letter Gothic.  You need not
+install this material, if you just want to _use_ the fonts
+with TeX.
+
+
+
+License
+-------
+Distribution and modification of the the URW Letter Gothic
+fonts are subject to the Aladdin Free Public License
+<http://www.artifex.com/downloads/doc/Public.htm>
+
+  Copyright (c) 2000 by (URW)++ Design & Development
+
+
+The TeX font metrics, virtual fonts and font definition
+files for URW Letter Gothic i.e., the files in the archive
+ulg.zip, may be distributed and/or modified under the
+conditions of the LaTeX Project Public License, either
+version 1.3 of this license or (at your option) any later
+version.  The latest version of this license is in
+http://www.latex-project.org/lppl.txt and version 1.3 or
+later is part of all distributions of LaTeX version
+2003/12/01 or later.
+
+  Copyright (c) 2005 Walter Schmidt
+
+
+== finis

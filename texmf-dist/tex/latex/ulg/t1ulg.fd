@@ -1,0 +1,28 @@
+\ProvidesFile{t1ulg.fd}
+   [2005/02/02 scalable font definitions for T1/ulg.]
+
+\expandafter\ifx\csname ulg@Scale\endcsname\relax
+ \let\ulg@@Scale\@empty
+\else
+ \edef\ulg@@Scale{s*[\csname ulg@Scale\endcsname]}%
+\fi
+
+\DeclareFontFamily{T1}{ulg}{}
+
+\DeclareFontShape{T1}{ulg}{m}{n}{
+   <-> \ulg@@Scale ulgb8t
+}{}
+
+\DeclareFontShape{T1}{ulg}{m}{it}{
+   <-> \ulg@@Scale ulgbi8t
+}{}
+
+\DeclareFontShape{T1}{ulg}{m}{sl}{<->ssub * ulg/m/it}{}
+\DeclareFontShape{T1}{ulg}{b}{n}{<->sub * ulg/m/n}{}
+\DeclareFontShape{T1}{ulg}{b}{it}{<->sub * ulg/m/it}{}
+\DeclareFontShape{T1}{ulg}{b}{sl}{<->sub * ulg/m/it}{}
+\DeclareFontShape{T1}{ulg}{bx}{n}{<->sub * ulg/m/n}{}
+\DeclareFontShape{T1}{ulg}{bx}{it}{<->sub * ulg/m/it}{}
+\DeclareFontShape{T1}{ulg}{bx}{slt}{<->sub * ulg/m/it}{}
+
+\endinput

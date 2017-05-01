@@ -1,0 +1,32 @@
+\ProvidesPackage{ulgothic}[2005/02/02 v1.0 (WaS)]
+\RequirePackage{keyval}
+\define@key{Ulg}{scaled}[.85]{%
+  \def\ulg@Scale{#1}}
+\def\ProcessOptionsWithKV#1{%
+  \let\@tempc\relax
+  \let\Ulg@tempa\@empty
+  \@for\CurrentOption:=\@classoptionslist\do{%
+    \@ifundefined{KV@#1@\CurrentOption}%
+    {}%
+    {%
+      \edef\Ulg@tempa{\Ulg@tempa,\CurrentOption,}%
+      \@expandtwoargs\@removeelement\CurrentOption
+        \@unusedoptionlist\@unusedoptionlist
+    }%
+  }%
+  \edef\Ulg@tempa{%
+    \noexpand\setkeys{#1}{%
+      \Ulg@tempa\@ptionlist{\@currname.\@currext}%
+    }%
+  }%
+  \Ulg@tempa
+  \let\CurrentOption\@empty
+}
+\ProcessOptionsWithKV{Ulg}
+\AtEndOfPackage{%
+  \let\@unprocessedoptions\relax
+}
+\renewcommand{\ttdefault}{ulg}
+\endinput
+%%
+%% End of file `ulgothic.sty'.

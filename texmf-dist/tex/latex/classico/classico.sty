@@ -1,0 +1,66 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{classico}
+    [2014/08/28 (Bob Tennent)  Supports URW Classico fonts for all LaTeX engines.]
+
+\RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
+
+\newif\ifclassico@otf 
+\ifxetex
+  \classico@otftrue
+\else\ifluatex
+  \classico@otftrue
+\else  % [pdf]LaTeX
+  \classico@otffalse
+\fi\fi
+
+\newif\ifclassico@default \classico@defaultfalse
+
+\newcommand*{\URWClassico@scale}{1}
+\DeclareOptionX{scaled}{\renewcommand*{\URWClassico@scale}{#1}}
+\DeclareOptionX{scale}{\renewcommand*{\URWClassico@scale}{#1}}
+
+\DeclareOptionX{sfdefault}{\classico@defaulttrue}
+\DeclareOptionX{type1}{\classico@otffalse}
+
+\ProcessOptionsX\relax
+
+\ifclassico@otf
+  \RequirePackage{fontspec}
+\else
+  \RequirePackage{fontenc,fontaxes}
+\fi
+
+\ifclassico@otf
+  \ifxetex\XeTeXtracingfonts=1\fi
+  \defaultfontfeatures{
+        Ligatures = TeX ,
+        Scale     = \URWClassico@scale ,
+        Extension = .otf }
+  \setsansfont
+      [ UprightFont    = *-Regular ,
+        ItalicFont     = *-Italic ,
+        BoldFont       = *-Bold , 
+        BoldItalicFont = *-BoldItalic ]
+      {URWClassico}
+  % grab current family in case of subsequent change:
+  \let\classicofamily\sfdefault  
+  \ifclassico@default\renewcommand*\familydefault{\classicofamily}\fi
+  \newfontfamily\classico
+      [ UprightFont    = *-Regular ,
+        ItalicFont     = *-Italic ,
+        BoldFont       = *-Bold , 
+        BoldItalicFont = *-BoldItalic ]
+      {URWClassico}
+\else % type1
+  \def\classicofamily{URWClassico-LF}
+  \newcommand*\classico{\fontfamily{\classicofamily}\selectfont}
+  \def\sfdefault{\classicofamily}
+  \ifclassico@default\edef\familydefault{\sfdefault}\fi
+\fi
+
+\ifclassico@otf
+% turn off defaults in case other fonts are selected:
+  \defaultfontfeatures{}
+\fi
+
+\endinput

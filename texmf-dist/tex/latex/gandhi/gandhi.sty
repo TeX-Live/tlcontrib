@@ -1,0 +1,157 @@
+\ProvidesPackage{gandhi}[%
+   2017/02/26 (Bob Tennent)  Supports GandhiSerif and GandhiSans fonts for all LaTeX engines. ] 
+
+\RequirePackage{ifxetex,ifluatex,textcomp}
+
+\newif\ifgandhi@otf
+\ifxetex
+  \gandhi@otftrue
+\else\ifluatex
+  \gandhi@otftrue
+\else  % [pdf]LaTeX
+  \gandhi@otffalse
+\fi\fi
+
+\newcommand*{\GandhiSerif@scale}{1}  % not adjustable
+\newcommand*{\GandhiSans@scale}{1}
+\RequirePackage{xkeyval}
+\DeclareOptionX{scaled}{\renewcommand*{\GandhiSans@scale}{#1}}
+\DeclareOptionX{scale}{\renewcommand*{\GandhiSans@scale}{#1}}
+
+\newif\ifgandhi@rm \gandhi@rmfalse
+\newif\ifgandhi@sf \gandhi@sffalse
+\newif\ifgandhi@sfdefault \gandhi@sfdefaultfalse
+\newif\ifgandhi@lining \gandhi@liningfalse
+\newif\ifgandhi@tabular \gandhi@tabularfalse
+
+\DeclareOptionX{sf}{\gandhi@sftrue}
+\DeclareOptionX{rm}{\gandhi@rmtrue}
+\DeclareOptionX{sfdefault}{\gandhi@sftrue\gandhi@sfdefaulttrue}
+\DeclareOptionX{type1}{\gandhi@otffalse}
+\DeclareOptionX{osf}{\gandhi@liningfalse}
+\DeclareOptionX{oldstyle}{\gandhi@liningfalse}
+\DeclareOptionX{lf}{\gandhi@liningtrue}
+\DeclareOptionX{lining}{\gandhi@liningtrue}
+\DeclareOptionX{proportional}{\gandhi@tabularfalse}
+\DeclareOptionX{p}{\gandhi@tabularfalse}
+\DeclareOptionX{tabular}{\gandhi@tabulartrue}
+\DeclareOptionX{t}{\gandhi@tabulartrue}
+
+
+\ProcessOptionsX\relax
+
+\ifgandhi@otf
+  \RequirePackage{fontspec}
+\else
+  \RequirePackage{fontenc,fontaxes}
+\fi
+
+\ifgandhi@rm\else\ifgandhi@sf\else
+  \gandhi@rmtrue\gandhi@sftrue  % both false -> both true
+\fi\fi
+
+\ifgandhi@otf
+  \ifgandhi@lining
+    \def\gandhi@figurestyle{Lining}
+  \else
+    \def\gandhi@figurestyle{OldStyle}
+  \fi
+  \ifgandhi@tabular
+    \def\gandhi@figurealign{Monospaced} 
+  \else
+    \def\gandhi@figurealign{Proportional} 
+  \fi
+
+\else 
+
+  \ifgandhi@lining
+    \def\gandhi@figurestyle{LF} 
+  \else
+    \def\gandhi@figurestyle{OsF} 
+  \fi
+  \ifgandhi@tabular
+    \def\gandhi@figurealign{T} 
+  \else
+    \def\gandhi@figurealign{} 
+  \fi
+
+\fi
+
+
+
+% Set main and/or sans fonts:
+\ifgandhi@otf
+  \ifxetex\XeTeXtracingfonts=1\fi
+  \defaultfontfeatures{
+     Ligatures = TeX ,
+     Extension = .otf ,
+  }
+  \ifgandhi@rm
+    \setmainfont
+        [ Numbers   = {\gandhi@figurestyle,\gandhi@figurealign},
+          UprightFont    = *-Regular ,
+          ItalicFont     = *-Italic ,
+          BoldFont       = *-Bold , 
+          BoldItalicFont = *-BoldItalic ]
+        {GandhiSerif}
+  \fi
+  \ifgandhi@sf
+    \setsansfont
+        [ Numbers   = {\gandhi@figurestyle,\gandhi@figurealign},
+          Scale     = \GandhiSans@scale ,
+          UprightFont    = *-Regular ,
+          ItalicFont     = *-Italic ,
+          BoldFont       = *-Bold , 
+          BoldItalicFont = *-BoldItalic ]  
+        {GandhiSans}
+  \fi
+  % grab the \sfdefault in case it changes subsequently:
+  \let\gandhisffamily\sfdefault
+  \ifgandhi@sfdefault
+     \renewcommand*\familydefault{\gandhisffamily}
+  \fi
+
+  \newfontfamily\gandhi
+      [ Numbers   = {\gandhi@figurestyle,\gandhi@figurealign},
+        UprightFont    = *-Regular ,
+        ItalicFont     = *-Italic ,
+        BoldFont       = *-Bold , 
+        BoldItalicFont = *-BoldItalic ]
+      {GandhiSerif}
+  \newfontfamily\gandhisans
+        [ Numbers   = {\gandhi@figurestyle,\gandhi@figurealign},
+          Scale     = \GandhiSans@scale ,
+          UprightFont    = *-Regular ,
+          ItalicFont     = *-Italic ,
+          BoldFont       = *-Bold , 
+          BoldItalicFont = *-BoldItalic ]  
+        {GandhiSans}
+
+\else % type1
+  \def\gandhifamily{GandhiSerif-\gandhi@figurealign\gandhi@figurestyle}
+  \def\gandhisffamily{GandhiSans-\gandhi@figurealign\gandhi@figurestyle}
+
+  \ifgandhi@rm
+    \renewcommand*\rmdefault{\gandhifamily}
+  \fi
+
+  \ifgandhi@sf
+    \renewcommand*\sfdefault{\gandhisffamily}
+  \fi
+
+  \ifgandhi@sfdefault
+    \renewcommand*\familydefault{\gandhisffamily}
+  \fi
+  
+  \newcommand*\gandhi{\fontfamily{\gandhifamily}\selectfont}
+  \newcommand*\gandhisans{\fontfamily{\gandhisffamily}\selectfont}
+
+\fi
+
+% turn off defaults in case other fonts are selected:
+\ifgandhi@otf
+  \defaultfontfeatures{}
+\fi
+
+\endinput
+

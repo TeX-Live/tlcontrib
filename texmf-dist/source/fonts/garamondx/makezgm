@@ -1,0 +1,37 @@
+#!/bin/bash
+
+shopt -s extglob # enable extended globbing, eg, @(T|LY) matches either T or LY
+cd "~/Google Drive/Fontpkgs/GaramondNo8v3"
+cpy ?ewG8*.pfb ${tmfv}/fonts/type1/public/garamondx
+cpy ?ewG8*.pfb ../garamondx.tds/fonts/type1/public/garamondx
+cpy ?ewG8*.pfb ../garamondxf/garamondx/type1
+cpy zgmosfnums.enc ${tmfv}/fonts/enc/dvips/garamondx
+cpy zgmosfInums.enc ${tmfv}/fonts/enc/dvips/garamondx
+cpy zgmosfnums.enc ../garamondx.tds/fonts/enc/dvips/garamondx
+cpy zgmosfInums.enc ../garamondx.tds/fonts/enc/dvips/garamondx
+cpy zgmosfnums.enc ../garamondxf/garamondx/enc
+cpy zgmosfInums.enc ../garamondxf/garamondx/enc
+afm2tfm newG8-Osf-reg -T zgmosfnums.enc zgmr-digits
+afm2tfm newG8-Osf-reg -T zgmosfInums.enc zgmr-digitsI
+afm2tfm newG8-Osf-bol -T zgmosfInums.enc zgmb-digitsI
+afm2tfm newG8-Osf-bol -T zgmosfnums.enc zgmb-digits
+afm2tfm newG8-Osf-bolita -T zgmosfnums.enc zgmbi-digits
+afm2tfm newG8-Osf-bolita -T zgmosfInums.enc zgmbi-digitsI
+afm2tfm newG8-Osf-ita -T zgmosfInums.enc zgmri-digitsI
+afm2tfm newG8-Osf-ita -T zgmosfnums.enc zgmri-digits
+for f in zgm*-digits*.tfm; do tftopl $f ${f%.*}; done
+cpy zgm*-digits*.tfm ${tmfv}/fonts/tfm/public/garamondx
+cpy zgm*-digits*.tfm ../garamondx.tds/fonts/tfm/public/garamondx
+cpy zgm*-digits*.tfm ../garamondxf/garamondx/tfm
+tex zgm-drv
+for f in zgm*8@(r|y).pl; do pltotf $f ${f%.*}; done
+apply vptovf @(T|LY)1-*.vpl 
+/bin/cp -fp @(T|LY)1*.tfm ${tmfv}/fonts/tfm/public/garamondx
+/bin/cp -fp @(T|LY)1*.vf ${tmfv}/fonts/vf/public/garamondx
+/bin/cp -fp @(T|LY)1*.tfm ../garamondx.tds/fonts/tfm/public/garamondx
+/bin/cp -fp @(T|LY)1*.vf ../garamondx.tds/fonts/vf/public/garamondx
+/bin/cp -fp @(T|LY)1*.tfm ../garamondxf/garamondx/tfm
+/bin/cp -fp @(T|LY)1*.vf ../garamondxf/garamondx/vf
+/bin/cp -fp zgm*8@(c|r|y).tfm ${tmfv}/fonts/tfm/public/garamondx
+/bin/cp -fp zgm*8@(c|r|y).tfm ../garamondx.tds/fonts/tfm/public/garamondx
+/bin/cp -fp zgm*8@(c|r|y).tfm ../garamondxf/garamondx/tfm

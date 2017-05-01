@@ -1,0 +1,66 @@
+%Filename: ly1zgmx.fd
+%Created by: tex zgmy-drv
+%Created using fontinst v1.933
+
+%THIS FILE SHOULD BE PUT IN A TEX INPUTS DIRECTORY
+
+\ProvidesFile{ly1zgmx.fd}
+   [2012/10/29 Fontinst v1.933 font definitions for LY1/zgmx.]
+
+\expandafter\ifx\csname zgm@Scale\endcsname\relax
+ \let\zgm@@Scale\@empty
+\else
+ \edef\zgm@@Scale{s*[\csname zgm@Scale\endcsname]}%
+\fi
+
+\def\zgm@tmp{\ifzgm@swq \def\zgm@@swq{-swq}\fi}
+\let\zgm@@swq\@empty
+\ifdefined\zgm@swqtrue
+  \zgm@tmp
+\fi
+
+
+\DeclareFontFamily{LY1}{zgmx}{}
+
+\DeclareFontShape{LY1}{zgmx}{m}{n}{
+   <-> \zgm@@Scale  LY1-zgm-r-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{m}{sc}{
+   <-> \zgm@@Scale  LY1-zgm-r-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{b}{sc}{
+   <-> \zgm@@Scale  LY1-zgm-b-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{m}{scit}{
+   <-> \zgm@@Scale  LY1-zgm-ri-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{b}{scit}{
+   <-> \zgm@@Scale  LY1-zgm-bi-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{b}{n}{
+   <-> \zgm@@Scale  LY1-zgm-b-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{m}{it}{
+   <-> \zgm@@Scale  LY1-zgm-ri-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{b}{it}{
+   <-> \zgm@@Scale  LY1-zgm-bi-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{LY1}{zgmx}{bx}{sc}{<->ssub * zgmx/b/sc}{}
+\DeclareFontShape{LY1}{zgmx}{bx}{scit}{<->ssub * zgmx/b/scit}{}
+\DeclareFontShape{LY1}{zgmx}{bx}{n}{<->ssub * zgmx/b/n}{}
+\DeclareFontShape{LY1}{zgmx}{m}{sl}{<->ssub * zgmx/m/it}{}
+\DeclareFontShape{LY1}{zgmx}{bx}{it}{<->ssub * zgmx/b/it}{}
+\DeclareFontShape{LY1}{zgmx}{b}{sl}{<->ssub * zgmx/b/it}{}
+\DeclareFontShape{LY1}{zgmx}{bx}{sl}{<->ssub * zgmx/b/sl}{}
+\DeclareFontShape{LY1}{zgmx}{m}{fscn}{<->ssub * zgmx/m/sc}{} % needed with mathdesign[ugm]
+\DeclareFontShape{LY1}{zgmx}{b}{fscn}{<->ssub * zgmx/b/sc}{}
+\endinput

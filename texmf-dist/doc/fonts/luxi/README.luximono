@@ -1,0 +1,187 @@
+===========================================================
+              "LuxiMono" font pack for LaTeX
+============================================================
+                                                  2004-01-26
+                                               WalterSchmidt
+                                         w.a.schmidt@gmx.net
+                                               
+
+This bundle includes the LuxiMono Type1 fonts and all
+required files to use them with LaTeX on the Un*x or PC
+platform.
+
+LuxiMono is a family of general-purpose monospaced
+(typewriter) fonts.  They are original designs by Kris
+Holmes and Charles Bigelow from Bigelow and Holmes Inc., who
+developed the Luxi typeface designs in Ikarus digital
+format.  URW++ Design and Development GmbH converted the
+Ikarus format fonts to TrueType and Type 1 font programs and
+implemented the grid-fitting "hints" and kerning tables in
+the Luxi fonts.
+
+The Luxi fonts include the Euro symbol.  Accessing it
+through the textcompanion encoding and the command \texteuro
+needs at least version 9 of the PSNFSS system.
+
+The below installation instructions assume a TDS-compliant
+TeX system, such as teTeX, MikTeX or VTeX/Free.  Yet they
+may not exactly fit your particular TeX system; please,
+consult its documentation, too!  The directory name "texmf"
+refers to the root directory of a TDS directory tree.  In
+case your TeX systems has more than one directory tree, its
+documentation should tell you where to install new files.
+
+
+What's new?
+-----------
+2004-01-26
+  Package luximono.sty:  minor bug fix, regarding the 
+  implementation of the package option "scaled=...".
+  Changed location of the font map file ul9.ali for VTeX;
+  the file resides now in the directory fonts/map/vtex,
+  rather than vtex/config, so as to comply with TDS 1.0
+  
+  
+2003-03-02
+  fixed the asterisk characters, so that they are vertically
+  centered now
+  
+
+Installing the Type1 font files
+-------------------------------
+The Type1 font files 
+
+  ul9b8a.pfb
+  ul9bo8a.pfb
+  ul9r8a.pfb
+  ul9ro8a.pfb
+
+are to be copied to the directory
+
+  texmf/fonts/type1/public/luxi
+
+of your TeX system, and the related .afm files should go
+into
+
+  texmf/fonts/afm/public/luxi
+
+Most likely, you will have to create these directories
+first.
+
+
+Installing the TeX support files from the archive ul9.zip
+---------------------------------------------------------
+Unpack the ZIP archive ul9.zip in the directory "texmf" of
+your TeX system; thus, all files will be copied to the
+appropriate directories.
+
+
+Updating the filename database
+------------------------------
+Many TeX systems require manual updating of a "filename
+database" after adding of new files.  Please, consult the
+documentation of your TeX system!
+
+
+Configuring your TeX system
+---------------------------
+The following steps vary, according to your TeX system.
+There are different sets of instructions provided for
+
+          * teTeX
+          * VTeX/Free,
+          * other TDS-compliant TeX systems
+
+
+Configuring teTeX
+-----------------
+Use the shell script "updmap" to add the font map file named
+"ul9.map" to the configuration.  See the documentation of
+your particular teTeX version how to use the script.
+
+
+Configuring VTeX/Free (v8.00 and later)
+---------------------------------------
+Make VTeX read the additional font map ("aliasing") file
+ul9.ali.  This is usually accomplished by putting a record
+for ul9.ali into each of the configuration files
+
+  texmf/vtex/config/pdf.fm
+and
+  texmf/vtex/config/ps.fm
+
+The name "ul9.ali" is to be added to the TYPE1 section of
+the above-mentioned files:
+
+TYPE1 {
+  ...
+  ul9.ali
+  }
+
+
+Configuring other TDS-compliant TeX systems
+-------------------------------------------
+After unpacking of the archive file ul9.zip, a font map file
+ul9.map for the LuxiMono fonts resides in the directory
+texmf/dvips/config.  It works for both dvips and pdfTeX.
+|
+| Consult the documentation of your TeX system how to make
+| it use this additional font map file!
+|
+
+If the documentation of your TeX system does _not_ explain
+how to install additional map files, the following steps
+should work in most cases for dvips and pdfTeX.
+
+dvips:  
+Make dvips read the additional font map file ul9.map.  This
+is usually accomplished by adding the line
+
+p +ul9.map
+
+to the dvips configuration file.  With teTeX, fpTeX or
+MikTeX this is texmf/dvips/config/config.ps; with emTeX/TDS
+additions should go into the "local" configuration file
+texmf\dvips\config\dvips.ini (or ..\local\dvips.ini).
+
+pdfTeX:
+Make pdfTeX read the additional font map file ul9.map.  This
+is usually accomplished by adding the line
+
+map +ul9.map
+
+to the pdfTeX configuration file.  With teTeX, fpTeX or
+MikTeX this is texmf/pdftex/config/pdftex.cfg.
+
+Note that configuring other programs such as dvipdfm or the
+DVI viewer is _not_ explained here; the required actions
+vary too much among the TeX systems.
+
+
+Using the LuxiMono fonts with LaTeX
+-----------------------------------
+See the file luximono.txt, which resides in the directory
+texmf/doc/fonts/luxi.
+
+
+Legal notice
+------------
+The license terms for the Luxi fonts are included in
+the file LICENSE.  For further information, please contact
+<design@bigelowandholmes.com> or <info@urwpp.de>, or consult
+the URW++ web site <www.urwpp.de>.
+
+Files luximono,txt, luximono,sty, t1ul9.fd and ts1l9.fd:
+
+  Copyright (c) 2002--2004 Walter Schmidt
+
+The files may be distributed and/or modified under the
+conditions of the LaTeX Project Public License, either
+version 1.2 of this license or (at your option) any later
+version.  The latest version of this license is in
+http://www.latex-project.org/lppl.txt and version 1.2 or
+later is part of all distributions of LaTeX version
+1999/12/01 or later.
+
+  
+== finis

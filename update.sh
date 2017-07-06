@@ -12,7 +12,7 @@
 # use tlmgr key add etc, see manual.
 
 TLCHECKOUT=${TLCHECKOUT:-/home/norbert/Development/TeX/texlive.git}
-TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/preining.info/www/tl-nonfree}
+TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2017}
 
 # we don't do TeX Catalogue updates
 unset TEX_CATALOGUE

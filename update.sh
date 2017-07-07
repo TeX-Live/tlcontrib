@@ -30,7 +30,7 @@ $TLCHECKOUT/Master/tlpkg/bin/tl-update-containers \
 	-master `pwd` \
 	-location $TLNETDEST	\
 	-gpgcmd `pwd`/tl-sign-file \
-	-all -recreate
+	-all # sometimes we need -recreate
 
 grep ^name tlpkg/texlive.tlpdb | grep -v 00texlive | grep -v '\.' | awk '{print$2}' | sort > $TLNETDEST/packages.txt
 

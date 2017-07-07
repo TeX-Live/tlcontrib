@@ -22,11 +22,17 @@ $TLCHECKOUT/Master/tlpkg/bin/tl-update-tlpdb \
 	-with-w32-pattern-warning -from-git \
 	--master=`pwd`
 
+if [ "$1" = "tlpdb" ] ; then 
+  exit 0
+fi
+
 $TLCHECKOUT/Master/tlpkg/bin/tl-update-containers \
 	-master `pwd` \
 	-location $TLNETDEST	\
 	-gpgcmd `pwd`/tl-sign-file \
 	-all -recreate
+
+grep ^name tlpkg/texlive.tlpdb | grep -v 00texlive | grep -v '\.' | awk '{print$2}' | sort > $TLNETDEST/packages.txt
 
 # sometimes -recreate might be necessary to fully rebuild!
 

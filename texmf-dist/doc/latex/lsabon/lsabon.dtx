@@ -1,0 +1,457 @@
+% \iffalse
+% $Id: lsabon.dtx,v 1.6 2015/08/22 19:18:08 boris Exp $
+%
+% Copyright (c) 2012-2015, Boris Veytsman
+%
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met: 
+%
+%    * Redistributions of source code must retain the above copyright
+%    notice, this list of conditions and the following disclaimer. 
+%    * Redistributions in binary form must reproduce the above
+%    copyright notice, this list of conditions and the following
+%    disclaimer in the documentation and/or other materials provided
+%    with the distribution. 
+%    * Neither the name of the original author nor the names of the
+%    contributors may be used to endorse or promote products derived
+%    from this software without specific prior written permission. 
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+% CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+% INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+% BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+% TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+% DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+% ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+% OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+%
+% \fi 
+% \CheckSum{303}
+%
+%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~} 
+%
+%
+% \MakeShortVerb{|}
+% \GetFileInfo{lsabon.dtx}
+% \title{\LaTeX{} Support For Linotype Sabon}
+% \author{Boris Veytsman\thanks{%
+% \href{mailto:borisv@lk.net}{\texttt{borisv@lk.net}},
+% \href{mailto:boris@varphi.com}{\texttt{boris@varphi.com}}}} 
+% \date{\filedate, \fileversion}
+% \maketitle
+% \begin{abstract}
+%   This package provides \LaTeX{} support for the Linotype Sabon
+%   Fonts. It has
+%   everything you need to typeset in this font - except the fonts
+%   themselves.
+% \end{abstract}
+% \tableofcontents
+%
+% \changes{v1.1}{2012/08/26}{Added Small Caps}
+% \changes{v1.2}{2015/08/22}{Added Italic Small Caps}
+%
+%
+% \clearpage
+%
+%
+%\section{Introduction}
+%\label{sec:intro}
+%
+% While such engines as \texttt{xetex} and \texttt{luatex} can use
+% native system fonts, the installation base of \texttt{pdftex} is
+% large enough to justify its continuing support with new fonts.  
+%
+%
+% This package provides support files for the Linotype Sabon font
+% family.  According to the Fontname scheme~\cite{fontname}, this 
+% corresponds to the family |lsb|.  We provide the necessary font
+% files---everything but the fonts.  
+%
+%
+%
+%\section{Installation}
+%\label{sec:install}
+%
+%
+%
+% First, you need to purchase the fonts themselves: the |pfb| files
+% are \emph{not} included in the package.  Check that the names of the fonts
+% are those listes in  Table~\ref{tab:PFB}.  If your \TeX{} system is
+% TDS-compliant, install the files into
+% \path{$TEXMF/fonts/type1/linotype/lsabon}. Download
+% \url{http://ctan.tug.org/install/fonts/psfonts/lsabon.tds.zip}
+% and unzip this file in \path{$TEXMF}.  Add |+lsb.map| to the
+% configuration files of dvips, pdftex and your dvi previewer.
+% Run updmap and texhash programs to update the configuration files
+% and file names database.
+%
+%
+%
+% \begin{table}[tp]
+%   \centering
+%   \caption{PFB Files}
+%   \label{tab:PFB}
+%
+%   \begin{tabular}{ll}
+%     \toprule
+%    File  &  Font \\
+%    \midrule
+% |SabonLTRom.pfb| & Sabon Regular\\
+% |SabonLTIta.pfb| & Sabon Italic \\
+% |SabonLTBol.pfb| & Sabon Bold\\
+% |SabonLTBolIta.pfb| & Sabon Bold Italic\\
+%    \bottomrule
+%   \end{tabular}
+%
+% \end{table}
+%
+%
+% The style |lsabon.sty| provides a number of commands for using the
+% font family (see Section~\ref{sec:lsabon.sty})
+%
+%
+%\section{Using \LaTeX{} Style }
+%\label{sec:lsabon.sty}
+%
+% To use the package, add to the preamble of your document the usual
+% incantation \cmd{\usepackage}\oarg{options}|{lsabon}|.
+%
+%
+% The package supports several options.  The option |rmdefault| makes
+% Sabon your default Roman family.  The option |normdefault|
+% does not do this.  The options |scaled=...| scales Sabon fonts to
+% the given scale.
+%
+% The package provides fonts in four shapes: upright, italic, small
+% caps and italic small caps, and in two weights: medium (|m|) and
+% bold (|b|).  They can be selected by setting font family to |lsb|,
+% e.g. 
+% \begin{verbatim}
+% \fontfamily{lsb}\fontshape{it}\fontseries{b}\selectfont
+% \end{verbatim}
+%
+%
+% \DescribeMacro{\sabonfamily}
+% \DescribeMacro{\textsabon}
+% Alternatively you can use a declaration |\sabonfamily| and a
+% command |\textsabon| to set the family.  
+%
+%
+% \DescribeMacro{\itscshape}%
+% \DescribeMacro{\textitsc}%
+% The small caps shape is ``faked'': it is obtained by combining
+% capitals of different sizes of the upright font.  Italic small caps
+% shape is obtained from the italic font.  This shape is useful for
+% titling.  It can be selected with |\fontshape{itsc}|, or commands
+% \cs{itscshape} and \cs{textitsc}.  
+%
+% \StopEventually{%
+%   \clearpage
+%
+%   \bibliography{lsabon}
+%   \bibliographystyle{unsrt}}
+%
+% \clearpage
+%\section{Implementation}
+%\label{sec:impl}
+%
+%\subsection{Identification}
+%\label{sec:ident}
+%
+% We start with the declaration who we are.  Most |.dtx| files put
+% driver code in a separate driver file |.drv|.  We roll this code into the
+% main file, and use the pseudo-guard |<gobble>| for it.
+%    \begin{macrocode}
+%<style>\NeedsTeXFormat{LaTeX2e}
+%<*gobble>
+\ProvidesFile{lsabon.dtx}
+%</gobble>
+%<style>\ProvidesClass{lsabon}
+%<lsb-drv>\ProvidesFile{lsb-drv.tex}
+%<lsb-map>\ProvidesFile{lsb-map.tex}
+[2015/08/22 v1.2 Using Linotype Sabon Fonta in LaTeX]
+%    \end{macrocode}
+% And the driver code:
+%    \begin{macrocode}
+%<*gobble>
+\documentclass{ltxdoc}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[tableposition=top]{caption}
+\usepackage{hypdoc}
+\PageIndex
+\CodelineIndex
+\RecordChanges
+\EnableCrossrefs
+\begin{document}
+  \DocInput{lsabon.dtx}
+\end{document}
+%</gobble> 
+%    \end{macrocode}
+%
+%
+%
+%\subsection{Fontinst Driver}
+%\label{sec:lsb-drv}
+%
+% This follows~\cite{fontinstallationguide}.
+% 
+% First, the preamble
+%    \begin{macrocode}
+%<*lsb-drv>
+\input fontinst.sty
+\substitutesilent{bx}{b}
+%    \end{macrocode}
+%  
+%
+% Starting recording transforms:
+%    \begin{macrocode}
+\recordtransforms{lsb-rec.tex}
+%    \end{macrocode}
+% A bunch of fonts:
+%    \begin{macrocode}
+\transformfont{lsbr8r}{\reencodefont{8r}{\fromafm{SabonLTRom}}}
+\transformfont{lsbri8r}{\reencodefont{8r}{\fromafm{SabonLTIta}}}
+\transformfont{lsbb8r}{\reencodefont{8r}{\fromafm{SabonLTBol}}}
+\transformfont{lsbbi8r}{\reencodefont{8r}{\fromafm{SabonLTBolIta}}}
+%    \end{macrocode}
+%
+% There is no hook in |fontinst.sty| for writing our own preamble to
+% |.fd| file.  However, we need to add scaling commands to the
+% preamble. OK, we will patch fontinst:
+%    \begin{macrocode}
+\fontinstcc
+\def\fd_family#1#2#3{
+   \a_toks{#3}
+   \edef\lowercase_file{\lowercase{
+     \edef\noexpand\lowercase_file{#1#2.fd}}}
+   \lowercase_file
+   \open_out{\lowercase_file}
+   \out_line{\percent_char~Filename:~\lowercase_file}
+   \out_line{\percent_char~Created~by:~tex~\jobname}
+   \out_line{\percent_char~Created~using~fontinst~v\fontinstversion}
+   \out_line{}
+   \out_line{\percent_char~THIS~FILE~SHOULD~BE~PUT~IN~A~TEX~INPUTS~
+      DIRECTORY}
+   \out_line{}
+   \out_line{\string\ProvidesFile{\lowercase_file}}
+   \out_lline{[
+      \the\year/
+      \ifnum10>\month0\fi\the\month/
+      \ifnum10>\day0\fi\the\day\space
+      Fontinst~v\fontinstversion\space
+      font~definitions~for~#1/#2.
+   ]}
+   \out_line{}
+%    \end{macrocode}
+% Here is our patch:
+%    \begin{macrocode}
+   \out_line{\string\expandafter\string\ifx\string\csname\space
+     LSB@scale\string\endcsname\string\relax}
+   \out_line{\space\string\let\string\LSB@@scale\string\@empty}
+   \out_line{\string\else}
+   \out_line{\space\string\edef\string\LSB@@scale\left_brace_char 
+       s*[\string\csname\space LSB@scale\string\endcsname]
+       \right_brace_char\percent_char}
+   \out_line{\string\fi\percent_char}
+   \out_line{}
+%    \end{macrocode}
+% End of the patch.
+%    \begin{macrocode}
+   \out_line{\string\DeclareFontFamily{#1}{#2}{\the\a_toks}}
+   {
+      \csname #1-#2\endcsname
+      \out_line{}
+      \let\do_shape=\substitute_shape
+      \csname #1-#2\endcsname
+      \let\do_shape=\remove_shape
+      \csname #1-#2\endcsname
+   }
+   \x_cs\g_let{#1-#2}\x_relax
+   \out_line{}
+   \out_line{\string\endinput}
+   \close_out{Font~definitions}
+}
+\normalcc
+%    \end{macrocode}
+% 
+%
+% Now we install the fonts.  First T1
+%    \begin{macrocode}
+\installfonts
+\installfamily{T1}{lsb}{}
+\installfont{lsbr8t}{lsbr8r,newlatin}{t1}{T1}{lsb}{m}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbri8t}{lsbri8r,newlatin}{t1}{T1}{lsb}{m}{it}{
+  <->\string\LSB@@scale} 
+\installfont{lsbb8t}{lsbb8r,newlatin}{t1}{T1}{lsb}{b}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbi8t}{lsbbi8r,newlatin}{t1}{T1}{lsb}{b}{it}{
+  <->\string\LSB@@scale} 
+\installfont{lsbrc8t}{lsbr8r,newlatin}{t1c}{T1}{lsb}{m}{sc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbc8t}{lsbb8r,newlatin}{t1c}{T1}{lsb}{b}{sc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbic8t}{lsbri8r,newlatin}{t1c}{T1}{lsb}{m}{itsc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbic8t}{lsbbi8r,newlatin}{t1c}{T1}{lsb}{b}{itsc}{
+  <->\string\LSB@@scale} 
+\endinstallfonts
+%    \end{macrocode}
+%
+%
+% Then TS1
+%    \begin{macrocode}
+\installfonts
+\installfamily{TS1}{lsb}{}
+\installfont{lsbr8c}{lsbr8r,textcomp}{ts1}{TS1}{lsb}{m}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbri8c}{lsbri8r,textcomp}{ts1}{TS1}{lsb}{m}{it}{
+  <->\string\LSB@@scale} 
+\installfont{lsbb8c}{lsbb8r,textcomp}{ts1}{TS1}{lsb}{b}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbi8c}{lsbbi8r,textcomp}{ts1}{TS1}{lsb}{b}{it}{
+  <->\string\LSB@@scale} 
+\installfontas{lsbrc8c}{TS1}{lsb}{m}{sc}{}
+\installfontas{lsbbc8c}{TS1}{lsb}{b}{sc}{}
+\installfontas{lsbic8c}{TS1}{lsb}{m}{itsc}{}
+\installfontas{lsbbic8c}{TS1}{lsb}{b}{itsc}{}
+\endinstallfonts
+%    \end{macrocode}
+% 
+% 
+% And  OT1
+%    \begin{macrocode}
+\installfonts
+\installfamily{OT1}{lsb}{}
+\installfont{lsbr7t}{lsbr8r,newlatin}{ot1}{OT1}{lsb}{m}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbri7t}{lsbri8r,newlatin}{ot1}{OT1}{lsb}{m}{it}{
+  <->\string\LSB@@scale} 
+\installfont{lsbb7t}{lsbb8r,newlatin}{ot1}{OT1}{lsb}{b}{n}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbi7t}{lsbbi8r,newlatin}{ot1}{OT1}{lsb}{b}{it}{
+  <->\string\LSB@@scale} 
+\installfont{lsbrc7t}{lsbr8r,newlatin}{ot1c}{OT1}{lsb}{m}{sc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbc7t}{lsbb8r,newlatin}{ot1c}{OT1}{lsb}{b}{sc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbic7t}{lsbri8r,newlatin}{ot1c}{OT1}{lsb}{m}{itsc}{
+  <->\string\LSB@@scale} 
+\installfont{lsbbic7t}{lsbbi8r,newlatin}{ot1c}{OT1}{lsb}{b}{itsc}{
+  <->\string\LSB@@scale} 
+\endinstallfonts
+%    \end{macrocode}
+%
+%
+% And the end:
+%    \begin{macrocode}
+\endrecordtransforms
+\bye
+%</lsb-drv>
+%    \end{macrocode}
+%
+%\subsection{Fontmap Generation}
+%\label{sec:fontmap}
+%
+% This is a standard procedure~\cite{fontinstallationguide}
+%    \begin{macrocode}
+%<*lsb-map>
+\input finstmsc.sty
+\resetstr{PSfontsuffix}{.pfb}
+\adddriver{dvips}{lsb.map}
+\input lsb-rec.tex
+\donedrivers
+\bye
+%</lsb-map>
+%    \end{macrocode}
+%
+%
+%
+%\subsection{Style File}
+%\label{sec:style}
+%
+%
+% The scaling code is from the |helvet| package:
+%    \begin{macrocode}
+%<*style>
+\newif\ifLSB@default
+\LSB@defaultfalse
+\RequirePackage{keyval}
+\define@key{LSB}{scaled}[1.00]{%
+  \def\LSB@scale{#1}}
+\define@key{LSB}{rmdefault}[1]{\LSB@defaulttrue}
+\define@key{LSB}{normdefault}[1]{\LSB@defaultfalse}
+\def\ProcessOptionsWithKV#1{%
+  \let\@tempc\relax
+  \let\LSB@tempa\@empty
+  \ifx\@classoptionslist\relax\else
+    \@for\CurrentOption:=\@classoptionslist\do{%
+      \@ifundefined{KV@#1@\CurrentOption}%
+      {}%
+      {%
+        \edef\LSB@tempa{\LSB@tempa,\CurrentOption,}%
+        \@expandtwoargs\@removeelement\CurrentOption
+          \@unusedoptionlist\@unusedoptionlist
+      }%
+    }%
+  \fi
+  \edef\LSB@tempa{%
+    \noexpand\setkeys{#1}{%
+      \LSB@tempa\@ptionlist{\@currname.\@currext}%
+    }%
+  }%
+  \LSB@tempa
+  \let\CurrentOption\@empty
+}
+\ProcessOptionsWithKV{LSB}
+\AtEndOfPackage{%
+  \let\@unprocessedoptions\relax
+}
+\ifLSB@default
+  \renewcommand{\rmdefault}{lsb}
+\fi
+%    \end{macrocode}
+% 
+%
+% Some new commands:
+%    \begin{macrocode}
+\DeclareRobustCommand\sabonfamily{\fontfamily{lsb}\selectfont}
+\DeclareTextFontCommand{\textsabon}{\sabonfamily}
+\DeclareRobustCommand\itscshape{\fontshape{itsc}\selectfont}
+\DeclareTextFontCommand{\textitsc}{\itscshape}
+%</style>
+%    \end{macrocode}
+% 
+%
+%\Finale
+%\clearpage
+%
+%\PrintChanges
+%\clearpage
+%\PrintIndex
+%
+\endinput

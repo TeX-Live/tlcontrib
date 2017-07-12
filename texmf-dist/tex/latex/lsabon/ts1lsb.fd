@@ -1,0 +1,58 @@
+%Filename: ts1lsb.fd
+%Created by: tex lsb-drv
+%Created using fontinst v1.933
+
+%THIS FILE SHOULD BE PUT IN A TEX INPUTS DIRECTORY
+
+\ProvidesFile{ts1lsb.fd}
+   [2015/08/23 Fontinst v1.933 font definitions for TS1/lsb.]
+
+\expandafter\ifx\csname LSB@scale\endcsname\relax
+ \let\LSB@@scale\@empty
+\else
+ \edef\LSB@@scale{s*[\csname LSB@scale\endcsname]}%
+\fi%
+
+\DeclareFontFamily{TS1}{lsb}{}
+
+\DeclareFontShape{TS1}{lsb}{m}{n}{
+    <->\LSB@@scale lsbr8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{m}{it}{
+    <->\LSB@@scale lsbri8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{b}{n}{
+    <->\LSB@@scale lsbb8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{b}{it}{
+    <->\LSB@@scale lsbbi8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{m}{sc}{
+   <-> lsbrc8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{b}{sc}{
+   <-> lsbbc8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{m}{itsc}{
+   <-> lsbic8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{b}{itsc}{
+   <-> lsbbic8c
+}{}
+
+\DeclareFontShape{TS1}{lsb}{m}{sl}{<->ssub * lsb/m/it}{}
+\DeclareFontShape{TS1}{lsb}{bx}{n}{<->ssub * lsb/b/n}{}
+\DeclareFontShape{TS1}{lsb}{bx}{it}{<->ssub * lsb/b/it}{}
+\DeclareFontShape{TS1}{lsb}{b}{sl}{<->ssub * lsb/b/it}{}
+\DeclareFontShape{TS1}{lsb}{bx}{sl}{<->ssub * lsb/b/sl}{}
+\DeclareFontShape{TS1}{lsb}{bx}{sc}{<->ssub * lsb/b/sc}{}
+\DeclareFontShape{TS1}{lsb}{bx}{itsc}{<->ssub * lsb/b/itsc}{}
+
+\endinput

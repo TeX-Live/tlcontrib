@@ -1,0 +1,385 @@
+% \iffalse meta-comment
+%
+%
+% Copyright (C) 2016 by Walter Daems <walter.daems@uantwerpen.be>
+%
+% This work may be distributed and/or modified under the conditions of
+% the LaTeX Project Public License, either version 1.3 of this license
+% or (at your option) any later version.  The latest version of this
+% license is in:
+% 
+%    http://www.latex-project.org/lppl.txt
+% 
+% and version 1.3 or later is part of all distributions of LaTeX version
+% 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is Walter Daems.
+%
+% This work consists of the files verdana.dtx, verdana.ins, multiple
+% tfm files and any derivative file, generated from the dtx file using
+% the ins driver file.
+%
+% \fi
+%
+% \iffalse
+%<t1vna>\ProvidesFile{t1vna.fd}
+%<t1vnax>\ProvidesFile{t1vnax.fd}
+%<package>\ProvidesPackage{verdana}
+%<*driver>
+\ProvidesFile{verdana.dtx}
+%</driver>
+%<*t1vna|t1vnax|package|driver>             [2016/01/08 Verdana font wrapper v1.2b (DMW)]
+\def\fileversion{1.2b}
+\def\filedate{2016/01/08}
+%</t1vna|t1vnax|package|driver>
+%<*driver> 
+\documentclass[11pt]{ltxdoc}
+\usepackage[T1]{fontenc}
+\usepackage{verdana}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\usepackage{makeidx}
+\usepackage{alltt}
+\IfFileExists{tocbibind.sty}{\usepackage{tocbibind}}{}
+\IfFileExists{hyperref.sty}{\usepackage[bookmarksopen]{hyperref}}{}
+
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\begin{document}
+ \DocInput{verdana.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2011/03/08}{Initial version}
+% \changes{v1.1}{2011/03/17}{
+%  - Added comment to documentation on how to install fonts\\
+%  - Made package compliant to CTAN TDS guidelines\\
+%  - Solved ligature problems for more recent Verdana releases}
+% \changes{v1.2}{2015/12/30}{
+%  - Added explicit T1 encoding in example\\
+%  - Added extra note about font installation}
+% \changes{v1.2b}{2016/01/08}{
+%  - Urgent bugfix: avoid typeout stuff in map file}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+% \setlength{\parindent}{0em}
+% \addtolength{\parskip}{0.5\baselineskip}
+%
+% \title{The verdana font package\thanks{This document
+%   corresponds to verdana~\fileversion, dated \filedate.}}
+% \author{Walter Daems (\texttt{walter.daems@uantwerpen.be})}
+%
+% \maketitle
+%
+% \section{Introduction}
+%
+% This package is only useful when using standard \LaTeX. If you use
+% XE\LaTeX or Lua\LaTeX, access to fonts has been greatly simplified.
+% In that case, you don't need this package.
+%
+% 'Verdana' is a common font that can be downloaded from:
+% \url{http://prdownloads.sourceforge.net/corefonts/verdan32.exe?download}
+%
+% The font is readily available on machines with a Microsoft
+% operating system.
+%
+% The wrapper provides a T1 encoded font.
+%
+% The wrapper would be most straightforward weren't it for the
+% ligature problems that Verdana exhibits.
+% The core of the problem is that over the years, 
+% Microsoft removed several glyphs from the font, including the
+% ligatures 'fi' and 'fl' (on the T1 octal positions 34 and 35).
+% The font version 2006 (as it can be downloaded from sourceforge),
+% still has the ligatures. In version 2008 they have been removed. In
+% version 2010, even more glyphs have been removed. The reason for
+% removing these glyphs is unclear to me.
+%
+% To overcome these issues, the wrapper provides an option '|nofligs|'
+% (shorthand for 'no f-ligatures'), that disables the invocation of
+% these ligatures involving f.
+% 
+% If a testpage, or a testfont page generated with
+% \TeX{} shows missing ligatures, then just use the options
+% '|nofligs|'.
+% 
+% Most standard \TeX{} installations do embed fonts in PDF
+% files. However, in case your PDF document does not contain embedded
+% fonts, make sure, when handing over a PDF document
+% containing Verdana to your publishing company, to check wether their
+% version of Verdana contains the fi and fl glyphs. E.g., send them a
+% document generated  without the '|nofligs|' option, containing the
+% sentence: ``the flying fish fled finally'', and ask them to send you
+% a print-out of the document. If it reads ``the ying sh ed nally'',
+% then you'd better turn on the '|nofligs|' option when generating your
+% print-ready PDF (or make sure you create PDFs with embedded fonts).
+%
+% \section{Installation}
+%
+% The following excellent webpages tell you everything there is to
+% know about installing fonts:
+% \url{http://tug.org/fonts/fontinstall.html}. Please, read
+% it (especially section 4). Every step of it is important.
+%
+% You will find a procedure for:
+% \begin{itemize}
+%   \item TeX Live
+%   \item MiKTeX
+%   \item MacTeX
+% \end{itemize}
+%
+% Of course, you have to make sure the Verdana ttf files are available
+% in your \TeX search path. The TDS tree of the package (available in
+% the verdana.tds.zip package) contains an indication of a common
+% place to put your ttf files.
+%
+% \section{Usage}
+%
+% The macro package verdana loads the verdana font for use with
+% \LaTeX. As the font is T1 encoded, we first specify the usage of
+% T1.
+% \begin{verbatim}
+% \usepackage[T1]{fontenc}
+% \usepackage{verdana}
+% \end{verbatim}
+% or one can selectively enable the verdana fonts using:
+% \begin{verbatim}
+% \fontfamily{vna}\selectfont
+% \end{verbatim}
+%
+% In case your Verdana exhibits the f-ligature problems mentioned
+% before, use the option '|nofligs|':
+% \begin{verbatim}
+% \usepackage[nofligs]{verdana}
+% \end{verbatim}
+% or one can selectively enable the verdana fonts without f-ligatures using:
+% \begin{verbatim}
+% \fontfamily{vnax}\selectfont
+% \end{verbatim}
+
+% \section{Demo}
+%
+% Below, one can find the four variants of the verdana font,
+% corresponding to the four ttf flavours.
+% 
+% \newcommand{\fontblurb}{
+% ABCDEFGHIJKLMNOPQRSTUVWXYZ\\
+% abcdefghijklmnopqrstuvwxyz\\
+% 0123456789-\{\}';/.,@\%><\&*()\\
+% Ligature test: ff fi fl ffi ffl - -- ---\\}
+% \newcommand{\loremipsum}{
+% Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+% eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+% minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+% aliquip ex ea commodo consequat. Duis aute irure dolor in
+% reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+% pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+% culpa qui officia deserunt mollit anim id est laborum.}
+%
+% Sans serif:\\\textsf{\fontblurb}
+%
+% Italics:\\\textit{\fontblurb}
+%
+% Boldface:\\\textbf{\fontblurb}
+%
+% Boldface italics:\\\textit{\textbf{\fontblurb}}
+%
+% \loremipsum
+%
+% \section{Implementation}
+%
+% \TeX{} font metric files (.tfm) and Adobe font metric files (.afm),
+% virtual font files and map files have been generated using the
+% simple script below: 
+% \begin{verbatim}
+%<*genfonts>
+#!/bin/bash 
+
+export FONTID='vna'
+export TTFBASE='verdana'
+
+function createtfm {
+    BASE=`basename $1 .ttf`
+    # create TeX Font Metrics (tfm)
+    ttf2tfm ${BASE}.ttf -q -T T1-WGL4.enc $2 ${BASE}.vpl ${BASE}.tfm
+
+    # the tfm files with disabled ligatures have been obtained by
+    # manually editing the vpl files at this moment
+
+    # create virtual fonts (vf)
+    vptovf ${BASE}.vpl ${BASE}.vf ${BASE}.tfm
+
+    # generate the Adobe Font Metrics (afm)
+    ttf2afm -e T1-WGL4.enc -o ${BASE}.afm ${BASE}.ttf
+
+    # store the tfm file under a new name
+    mv ${BASE}.tfm $3.tfm
+    mv ${BASE}.vf  $3.vf
+    mv ${BASE}.afm $3.afm
+}
+
+# generate medium normal font metrics (m)(n)
+createtfm ${TTFBASE}.ttf  '-v' ${FONTID}mn8t
+
+# generate bold normal font metrics (b)(n)
+createtfm ${TTFBASE}b.ttf '-v' ${FONTID}bn8t
+
+# generate medium italics font metrics (m)(it)
+createtfm ${TTFBASE}i.ttf '-v' ${FONTID}mit8t
+
+# generate bold italics font metrics (b)(it)
+createtfm ${TTFBASE}z.ttf '-v' ${FONTID}bit8t
+%</genfonts>
+% \end{verbatim}
+%
+% This script was inspired by the information found on
+% \url{http://www.radamir.com/tex/ttf-tex.htm} by Damir Rakityansky.
+%
+% The file |T1-WGL4.enc| is part of the |ttf2tfm| package.
+%
+% \subsection{Font description}
+%
+% 
+% The font description file is straightforward, but exists in two
+% flavors: one with f-ligatures (t1vna.fd) and one without ligatures
+% (t1nvax.fd).
+%
+% With f-ligatures:
+%    \begin{macrocode}
+%<*t1vna>
+\DeclareFontFamily{T1}{vna}{}
+\DeclareFontShape{T1}{vna}{m} {n} {<-> vnamn8t        }{}
+\DeclareFontShape{T1}{vna}{m} {sc}{<-> ssub * vna/m/n }{}
+\DeclareFontShape{T1}{vna}{m} {sl}{<-> ssub * vna/m/it}{}
+\DeclareFontShape{T1}{vna}{m} {it}{<-> vnamit8t       }{}
+
+
+\DeclareFontShape{T1}{vna}{b} {n} {<-> vnabn8t        }{}
+\DeclareFontShape{T1}{vna}{b} {sc}{<-> ssub * vna/b/n }{}
+\DeclareFontShape{T1}{vna}{b} {sl}{<-> ssub * vna/b/it}{}
+\DeclareFontShape{T1}{vna}{b} {it}{<-> vnabit8t       }{}
+
+
+\DeclareFontShape{T1}{vna}{sb}{n} {<-> ssub * vna/b/n }{}
+\DeclareFontShape{T1}{vna}{sb}{sc}{<-> ssub * vna/b/sc}{}
+\DeclareFontShape{T1}{vna}{sb}{sl}{<-> ssub * vna/b/sl}{}
+\DeclareFontShape{T1}{vna}{sb}{it}{<-> ssub * vna/b/it}{}
+
+\DeclareFontShape{T1}{vna}{bx}{n} {<-> ssub * vna/b/n }{}
+\DeclareFontShape{T1}{vna}{bx}{sc}{<-> ssub * vna/b/n }{}
+\DeclareFontShape{T1}{vna}{bx}{sl}{<-> ssub * vna/b/it}{}
+\DeclareFontShape{T1}{vna}{bx}{it}{<-> ssub * vna/b/it}{}
+
+%</t1vna>
+%    \end{macrocode}
+%
+% Without f-ligatures:
+%    \begin{macrocode}
+%<*t1vnax>
+\DeclareFontFamily{T1}{vnax}{}
+\DeclareFontShape{T1}{vnax}{m} {n} {<-> vnaxmn8t        }{}
+\DeclareFontShape{T1}{vnax}{m} {sc}{<-> ssub * vnax/m/n }{}
+\DeclareFontShape{T1}{vnax}{m} {sl}{<-> ssub * vnax/m/it}{}
+\DeclareFontShape{T1}{vnax}{m} {it}{<-> vnaxmit8t       }{}
+
+
+\DeclareFontShape{T1}{vnax}{b} {n} {<-> vnaxbn8t        }{}
+\DeclareFontShape{T1}{vnax}{b} {sc}{<-> ssub * vnax/b/n }{}
+\DeclareFontShape{T1}{vnax}{b} {sl}{<-> ssub * vnax/b/it}{}
+\DeclareFontShape{T1}{vnax}{b} {it}{<-> vnaxbit8t       }{}
+
+
+\DeclareFontShape{T1}{vnax}{sb}{n} {<-> ssub * vnax/b/n }{}
+\DeclareFontShape{T1}{vnax}{sb}{sc}{<-> ssub * vnax/b/sc}{}
+\DeclareFontShape{T1}{vnax}{sb}{sl}{<-> ssub * vnax/b/sl}{}
+\DeclareFontShape{T1}{vnax}{sb}{it}{<-> ssub * vnax/b/it}{}
+
+\DeclareFontShape{T1}{vnax}{bx}{n} {<-> ssub * vnax/b/n }{}
+\DeclareFontShape{T1}{vnax}{bx}{sc}{<-> ssub * vnax/b/n }{}
+\DeclareFontShape{T1}{vnax}{bx}{sl}{<-> ssub * vnax/b/it}{}
+\DeclareFontShape{T1}{vnax}{bx}{it}{<-> ssub * vnax/b/it}{}
+
+%</t1vnax>
+%    \end{macrocode}
+%
+% \subsection{Map file}
+%
+% The PS/PDF mapping file is also straightforward. It contains two
+% identical sections, for the variants with and without f-ligatures.
+%
+% With f-ligatures:
+%    \begin{macrocode}
+%<*map>
+vnamn8t  Verdana <verdana.ttf  <T1-WGL4.enc
+vnamit8t VerdanaItalic <verdanai.ttf <T1-WGL4.enc
+vnabn8t  VerdanaBold <verdanab.ttf <T1-WGL4.enc
+vnabit8t VerdanaBoldItalic <verdanaz.ttf <T1-WGL4.enc
+%</map>
+%    \end{macrocode}
+%
+% Without f-ligatures:
+%
+%    \begin{macrocode}
+%<*map>
+vnaxmn8t  Verdana <verdana.ttf  <T1-WGL4.enc
+vnaxmit8t VerdanaItalic <verdanai.ttf <T1-WGL4.enc
+vnaxbn8t  VerdanaBold <verdanab.ttf <T1-WGL4.enc
+vnaxbit8t VerdanaBoldItalic <verdanaz.ttf <T1-WGL4.enc
+%</map>
+%    \end{macrocode}
+%
+%
+% \subsection{Macro package}
+%
+% First, we define the |nofligs| option.
+%    \begin{macrocode}
+%<*package>
+\newif\if@nofligs
+\DeclareOption{nofligs}{\@nofligstrue}
+\ProcessOptions
+%</package>
+%    \end{macrocode}
+%
+% The style file makes the sans serif font the family default and
+% loads the appropriate Verdana font as sans serif font, and the
+% computer modern typewriter light font as the typewriter font.
+%
+%    \begin{macrocode}
+%<*package>
+\renewcommand{\familydefault}{\sfdefault}
+\if@nofligs
+  \renewcommand{\sfdefault}{vnax}
+\else
+  \renewcommand{\sfdefault}{vna}
+\fi
+\renewcommand{\ttdefault}{cmtl}
+\endinput
+%</package>
+%    \end{macrocode}
+%
+% \Finale
+\endinput

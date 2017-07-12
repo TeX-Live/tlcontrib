@@ -1,0 +1,125 @@
+%%
+%% This is file `epdfmark.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eforms.dtx  (with options: `copyright,epdfmark')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eForms package,                                      %%
+%% Copyright (C) 2002-2017  D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\Rect#1{\pdf@rect{\textcolor{\@linkcolor}{#1}}}
+\def\noPeek#1#2{\literalps@out{%
+     [ {ThisPage} << \noPeekAction{#1}{#2} >> /PUT pdfmark}}
+\def\eq@choice@driver
+{%
+    \Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+    \literalps@out{%
+    [ \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
+      /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@choiceCode
+    /ANN pdfmark
+    \ifisCalculate[ {corder} {\Fld@name} /APPEND pdfmark\fi
+    }\to@insertStrucTabOrder{Form}\endgroup
+}
+\def\eq@Button@driver
+{%
+    \Hy@pdfstringtrue
+    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@pushButtonCode
+    /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+}
+\def\eq@RadioCheck@driver
+{%
+    \Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@RadioCheckCode
+    /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+}
+\def\eq@l@check@driver
+{%
+    \pdf@rect{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@RadioCheckCode
+    /ANN pdfmark}\endgroup
+}
+\def\eq@TextField{\Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+    \literalps@out{%
+    [ \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
+       /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@TextFieldCode
+    /ANN pdfmark
+    \ifisCalculate[ {corder} {\Fld@name} /APPEND pdfmark\fi
+    }\to@insertStrucTabOrder{Form}\endgroup
+}
+\def\eq@SigField{\Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+        \common@SigFieldCode
+    /ANN pdfmark
+    }\to@insertStrucTabOrder{Form}\endgroup
+}
+\def\convertAToAction/A#1\@nil{\def\eq@A{/Action#1}}
+\def\setLink@driver
+{%
+    \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
+    \@eqBS{}%
+    \pdf@rect{\link@@Box}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \eq@Border
+    \common@LinkCode
+    /Subtype /Link
+    /ANN pdfmark}%
+    \to@insertStrucTabOrder{Link}\endgroup
+}
+\def\setLinkPbox@driver
+{%
+    \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
+    \@eqBS{}%
+    \literalps@out{%
+    [ \eq@objdef/Rect [\par@@Rect]
+    \eq@Border
+    \eq@QuadPoints  % QuadPoints
+    \common@LinkCode
+    /Subtype /Link
+    /ANN pdfmark}%
+    \to@insertStrucTabOrder{Link}\endgroup
+}
+\endinput
+%%
+%% End of file `epdfmark.def'.

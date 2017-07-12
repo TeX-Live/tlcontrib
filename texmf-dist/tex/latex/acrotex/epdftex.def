@@ -1,0 +1,106 @@
+%%
+%% This is file `epdftex.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eforms.dtx  (with options: `copyright,epdftex')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eForms package,                                      %%
+%% Copyright (C) 2002-2017  D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\noPeek#1#2{\global\pdfpageattr=\expandafter{\noPeekAction{#1}{#2}}}
+\def\HyField@@AddToFields#1{%
+  \HyField@AfterAuxOpen{%
+    \if@filesw
+      \write\@mainaux{%
+        \string\HyField@AuxAddToFields{#1}}%
+    \ifisCalculate\write\@mainaux{%
+        \string\HyField@AuxAddToCoFields{}{#1}}\fi
+    \fi
+  }%
+}%
+\def\eq@choice@driver
+{%
+    \Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \hbox{\pdfstartlink user{\common@choiceCode}%
+    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+    \HyField@AddToFields
+    \endgroup
+}
+\def\eq@Button@driver
+{%
+    \Hy@pdfstringtrue
+    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+    \hbox{\pdfstartlink user{ \common@pushButtonCode }%
+    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+    \endgroup
+}
+\def\eq@RadioCheck@driver
+{%
+    \Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+    \hbox{\pdfstartlink user{\common@RadioCheckCode}%
+    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+    \endgroup
+}
+\def\eq@l@check@driver
+{%
+    \pdfstartlink user{\common@RadioCheckCode}%
+    \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
+    \pdfendlink\endgroup
+}
+\def\eq@TextField{\Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \leavevmode
+    \hbox{\pdfstartlink user{\common@TextFieldCode}%
+    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+    \HyField@AddToFields
+    \endgroup
+}
+\def\eq@SigField{\Hy@pdfstringtrue
+    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+    \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
+    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+    \endgroup
+}
+\def\setLink@driver
+{%
+    \@eqBS{}%
+    \leavevmode\pdfstartlink
+    attr {\eq@Border}%
+    user{/Subtype/Link \common@LinkCode}%
+    \Hy@colorlink{\@linkcolor}\link@@Box
+    \close@pdflink
+    \endgroup
+}
+\def\ef@setTabOrder{\ifx\ef@taborder\@empty\else
+    \edef\ef@tmp@toks{\the\pdfpageattr\space/Tabs/\ef@taborder}%
+    \global\pdfpageattr=\expandafter{\ef@tmp@toks}%
+    \fi\endgroup
+}
+\endinput
+%%
+%% End of file `epdftex.def'.

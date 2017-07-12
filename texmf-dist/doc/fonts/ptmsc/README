@@ -1,0 +1,45 @@
+Package ptmsc---Adobe Times Small Caps (commercial)
+Current version: 1.1
+
+The support files in this package are subject to the LaTeX Project Public License. See http://www.ctan.org/license/lppl1.3
+for the details of that license.
+
+This small package is an add-on to the newtx package that permits the substitution of the commercial Adobe Times Small Caps (upright shapes only) for the small caps built-in to newtxtext. The Adobe Small Caps fonts are larger than those in newtxtext, which are in fact petite caps---same xheight as Times, 450em. To use this package, you need to acquire the Adobe fonts and rename the pfb files to ptmrc8a.pfb (regular weight) and ptmbc8a.pfb (bold weight) respectively before installing them in the fonts/type1/adobe/ptmsc folder of the downloaded tds. To use them, add the option adobesc to newtxtext. Eg,
+
+\usepackage[osf,adobesc]{newtxtext}
+
+will load the newtxtext package, enabling the Adobe Small Caps in regular and bold upright shapes and setting the default figure style to oldstyle except in math mode.
+
+Note that there is no .sty to call and no .map to enable. This is as simple as a package can be.
+
+Changes in version 1.1
+The file names and the manner of their generation is very different from version 1.0 , and was governed by the corresponding changes to newtx, version 1.4, which no longer make use of the text fonts in the txfonts package, but are instead based on the TeX-Gyre Termes extension of URW++ Nimbus Roman No 9, a metric clone of Adobe Times. That package has been copied and its small caps modified to be essentially metrically equivalent to Adobe Times Small Caps (upright shapes) with matching sizes in the italic fonts. These changes were effected by FontForge transformations (and manual modifications) of TeX-Gyre Termes small caps glyphs. See the documentation of newtx, versions 1.4 and higher, for further detail.
+
+
+Installation:
+
+Mac OS X: To install, open a Terminal window and cd to inside the downloaded TDS folder.
+
+Method A (recommended): type
+
+sudo /bin/cp -Rfp * /usr/local/texlive/texmf-local
+
+then
+
+sudo mktexlsr
+
+Method B: To installations in your home folder,  use instead
+
+/bin/cp -Rfp * ~/Library/texmf
+
+
+Linux: Very similar to Mac OS X.
+
+MikTeX: Copy the ptmsc.tds.zip to the root of the folder you use for personal additions to the TeX trees, open a command window, chdir to that folder, and type
+
+unzip ptmsc.tds.zip
+initexmf --update-fndb
+
+Please send comments and bug reports or suggestions for improvement to
+
+msharpe at ucsd dot edu

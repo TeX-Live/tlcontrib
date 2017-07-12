@@ -1,0 +1,495 @@
+% \iffalse
+% $Id: thsmc.dtx,v 1.6 2008-03-21 00:21:03 boris Exp $
+%
+% Copyright (c) 2008, Boris Veytsman
+%
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met: 
+%
+%    * Redistributions of source code must retain the above copyright
+%    notice, this list of conditions and the following disclaimer. 
+%    * Redistributions in binary form must reproduce the above
+%    copyright notice, this list of conditions and the following
+%    disclaimer in the documentation and/or other materials provided
+%    with the distribution. 
+%    * Neither the name of the original author nor the names of the
+%    contributors may be used to endorse or promote products derived
+%    from this software without specific prior written permission. 
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+% CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+% INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+% BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+% TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+% DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+% ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+% OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+%
+% \fi 
+% \CheckSum{0}
+%
+%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~} 
+%
+%\iffalse
+% Taken from xkeyval.dtx
+%\fi
+%\makeatletter
+%\def\DescribeOption#1{\leavevmode\@bsphack
+%              \marginpar{\raggedleft\PrintDescribeOption{#1}}%
+%              \SpecialOptionIndex{#1}\@esphack\ignorespaces}
+%\def\PrintDescribeOption#1{\strut\emph{option}\\\MacroFont #1\ }
+%\def\SpecialOptionIndex#1{\@bsphack
+%    \index{#1\actualchar{\protect\ttfamily#1}
+%           (option)\encapchar usage}%
+%    \index{options:\levelchar#1\actualchar{\protect\ttfamily#1}\encapchar
+%           usage}\@esphack}
+%\def\DescribeOptions#1{\leavevmode\@bsphack
+%  \marginpar{\raggedleft\strut\emph{options}%
+%  \@for\@tempa:=#1\do{%
+%    \\\strut\MacroFont\@tempa\SpecialOptionIndex\@tempa
+%  }}\@esphack\ignorespaces}
+%\makeatother
+%
+%
+% \MakeShortVerb{|}
+% \GetFileInfo{thsmc.dtx}
+% \title{\LaTeX{} Support For The Sans Mono Condensed Fonts}
+% \author{Boris Veytsman\thanks{%
+% \href{mailto:borisv@lk.net}{\texttt{borisv@lk.net}},
+% \href{mailto:boris@varphi.com}{\texttt{boris@varphi.com}}}} 
+% \date{\filedate, \fileversion}
+% \maketitle
+% \begin{abstract}
+%   This package provides \LaTeX{} support for The Sans Mono Condensed
+%   Font, designed by Lucas de Groot, 1996 and available from Font
+%   Fabrik.  It has everything you need to typeset in this font -
+%   except the font itself, of course.
+% \end{abstract}
+% \tableofcontents
+%
+% \changes{v1.0}{2008/02/19}{First fully functional version} 
+% \changes{v1.0a}{2008/02/19}{Changed font family to fts from flm} 
+% \changes{v1.0b}{2008/02/21}{Documentation update} 
+% \changes{v1.0c}{2008/02/25}{Installation update} 
+% \changes{v1.0d}{2008/03/20}{Documentation update} 
+% \clearpage
+%
+%
+%\section{Introduction}
+%\label{sec:intro}
+%
+% This package provides support files for The Sans Mono Condensed Font
+% by Lucas de Groot.  It is a new monospaced font originally designed
+% for typesetting program code.  According to the Fontname
+% scheme~\cite{fontname} we use the family name |fts|.
+%
+% The package is written for the set of fonts currently used by
+% \emph{No Starch Press,} \url{http://www.nostarch.com}.  It is
+% possible that other versions of the fonts have slightly different
+% metrics, and package should be changed to accommodate this.  To make
+% this easier, I release the package under BSD-style license.  This is
+% even more appropriate since most of the files is generated following
+% the great course~\cite{fontinstallationguide}.
+%
+% The support is limited to T1 and TS1 encoding.  No VTeX support
+% files are included.
+%
+%
+%\section{Installation}
+%\label{sec:install}
+%
+%
+%
+% First, you need to purchase the fonts themselves: the |pfb| files
+% are \emph{not} included in the package.  If you got the fonts from
+% \emph{No Starch press,} do not rename the |pfb| files.  However, if
+% there are uppercase letters in your file names, downcase them.  If
+% you obtained the files from another source, rename the fonts
+% according to Table~\ref{tab:PFB}.  If your \TeX{} system is
+% TDS-compliant, install the files into
+% \path{$TEXMF/fonts/type1/public/thsmc}. Then download
+% \url{http://ctan.tug.org/install/fonts/psfonts/fontfabrik/thsmc.tds.zip}
+% and unzip the file in \path{$TEXMF}.  Add |+fts.map| to the
+% configuration files of dvips, pdftex and your dvi previewer.
+%
+%  
+% Run updmap and texhash programs to update the configuration files
+% and file names database.
+%
+%
+%
+% \begin{table}[tp]
+%   \centering
+%   \caption{PFB Files}
+%   \label{tab:PFB}
+%
+%   \begin{tabular}{ll}
+%     \toprule
+%    File  &  Font \\
+%    \midrule
+%    |thsmcl21.pfb| &  The Sans Mono Condensed Light\\
+%    |thsmcp25.pfb| &  The Sans Mono Condensed Plain\\
+%    |thsmci29.pfb| &  The Sans Mono Condensed Italic \\
+%    |thsmcb02.pfb| &  The Sans Mono Condensed Bold \\
+%    |thsmcb96.pfb| &  The Sans Mono Condensed Black \\
+%    \bottomrule
+%   \end{tabular}
+%
+% \end{table}
+%
+%
+% The style |thsmc.sty| provides a number of commands for using the
+% font family (see Section~\ref{sec:thsmc.sty})
+%
+%
+%\section{Using \LaTeX{} Style }
+%\label{sec:thsmc.sty}
+%
+% The package |thmsc.sty| makes The Sans Mono your default typewriter
+% family.  The package provides a number of weights: |lc| for Light
+% Condensed, |mc| for Plain Condensed, |bc| for Bold Condensed and
+% |ebc| for Heavy Condensed.  The default substitutions are |mc|
+% for |m|, |bc| for |b| and |bx|, and |ebc| for |eb|. 
+%
+%
+% \DescribeOption{scaled} 
+% If you mix The Mono Sans with other fonts,
+% you may want to scale it to get better blending.  The package option
+% |scaled| can be used for this, for example
+% |\usepackage[scaled=0.95]{thmsc}|.
+% 
+%
+% \StopEventually{
+%   \clearpage
+% \paragraph{Acknowledgement}
+% This package was written for No Starch Press,
+% \url{http://www.nostarch.com}. 
+%
+%   \bibliography{thsmc}
+%   \bibliographystyle{unsrt}}
+%
+% \clearpage
+%\section{Implementation}
+%\label{sec:impl}
+%
+%\subsection{Identification}
+%\label{sec:ident}
+%
+% We start with the declaration who we are.  Most |.dtx| files put
+% driver code in a separate driver file |.drv|.  We roll this code into the
+% main file, and use the pseudo-guard |<gobble>| for it.
+%    \begin{macrocode}
+%<style>\NeedsTeXFormat{LaTeX2e}
+%<*gobble>
+\ProvidesFile{thsmc.dtx}
+%</gobble>
+%<style>\ProvidesClass{thsmc}
+%<fts-drv>\ProvidesFile{fts-drv.tex}
+%<fts-map>\ProvidesFile{fts-map.tex}
+[2008/03/20 v1.0d Using The Mono Sans Condensed Font in LaTeX]
+%    \end{macrocode}
+% And the driver code:
+%    \begin{macrocode}
+%<*gobble>
+\documentclass{ltxdoc}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,
+            pagecolor=black,urlcolor=black,hyperindex=false]{hyperref}
+\PageIndex
+\CodelineIndex
+\RecordChanges
+\EnableCrossrefs
+\begin{document}
+  \DocInput{thsmc.dtx}
+\end{document}
+%</gobble> 
+%    \end{macrocode}
+%
+%
+%\subsection{Fontinst Driver}
+%\label{sec:drv}
+%
+% This follows~\cite{fontinstallationguide}.
+% 
+% First, the preamble
+%    \begin{macrocode}
+%<*fts-drv>
+\input fontinst.sty
+%    \end{macrocode}
+%  
+% We have only condensed fonts, so we need to define substitutions.
+% The only substitution missing here is |{l}{lc}|.  The reason is, if
+% we do define it, the standard substitution |{m}{l}| screens our
+% |{m}{mc}|. Of course, we can use |\installfontas| to override this,
+% but what if somebody has real The Sans Mono in normal width?
+%    \begin{macrocode}
+\substitutesilent{bx}{bc}
+\substitutesilent{b}{bc}
+\substitutesilent{eb}{ebc}
+\substitutesilent{m}{mc}
+\setint{smallcapsscale}{750}
+\setint{slant}{167}
+%    \end{macrocode}
+%
+% Somehow the afm files for this font declare |IsFixedPitch false|,
+% which is bogus.  OK, we correct it:
+%    \begin{macrocode}
+\setint{monowidth}{1}
+%    \end{macrocode}
+%
+%
+%
+% Starting recording transforms:
+%    \begin{macrocode}
+\recordtransforms{fts-rec.tex}
+%    \end{macrocode}
+% A bunch of fonts:
+%    \begin{macrocode}
+\transformfont{ftsl8rc}{\reencodefont{8r}{\fromafm{thsmcl21}}}
+\transformfont{ftsr8rc}{\reencodefont{8r}{\fromafm{thsmcp25}}}
+\transformfont{ftsri8rc}{\reencodefont{8r}{\fromafm{thsmci29}}}
+\transformfont{ftsb8rc}{\reencodefont{8r}{\fromafm{thsmcb02}}}
+\transformfont{ftsc8rc}{\reencodefont{8r}{\fromafm{thsmcb96}}}
+%    \end{macrocode}
+% 
+% Fake oblique fonts
+%    \begin{macrocode}
+\transformfont{ftslo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcl21}}} 
+\transformfont{ftsro8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcp25}}} 
+\transformfont{ftsbo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcb02}}} 
+\transformfont{ftsco8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcb96}}} 
+%    \end{macrocode}
+%
+%
+% There is no hook in |fontinst.sty| for writing our own preamble to
+% |.fd| file.  However, we need to add scaling commands to the
+% preamble. OK, we will patch fontinst:
+%    \begin{macrocode}
+\fontinstcc
+\def\fd_family#1#2#3{
+   \a_toks{#3}
+   \edef\lowercase_file{\lowercase{
+     \edef\noexpand\lowercase_file{#1#2.fd}}}
+   \lowercase_file
+   \open_out{\lowercase_file}
+   \out_line{\percent_char~Filename:~\lowercase_file}
+   \out_line{\percent_char~Created~by:~tex~\jobname}
+   \out_line{\percent_char~Created~using~fontinst~v\fontinstversion}
+   \out_line{}
+   \out_line{\percent_char~THIS~FILE~SHOULD~BE~PUT~IN~A~TEX~INPUTS~
+      DIRECTORY}
+   \out_line{}
+   \out_line{\string\ProvidesFile{\lowercase_file}}
+   \out_lline{[
+      \the\year/
+      \ifnum10>\month0\fi\the\month/
+      \ifnum10>\day0\fi\the\day\space
+      Fontinst~v\fontinstversion\space
+      font~definitions~for~#1/#2.
+   ]}
+   \out_line{}
+%    \end{macrocode}
+% Here is our patch:
+%    \begin{macrocode}
+   \out_line{\string\expandafter\string\ifx\string\csname\space
+     Thsmc@scale\string\endcsname\string\relax}
+   \out_line{\space\string\let\string\Thsmc@@scale\string\@empty}
+   \out_line{\string\else}
+   \out_line{\space\string\edef\string\Thsmc@@scale\left_brace_char 
+       s*[\string\csname\space Thsmc@scale\string\endcsname]
+       \right_brace_char\percent_char}
+   \out_line{\string\fi\percent_char}
+   \out_line{}
+%    \end{macrocode}
+% End of the patch.
+%    \begin{macrocode}
+   \out_line{\string\DeclareFontFamily{#1}{#2}{\the\a_toks}}
+   {
+      \csname #1-#2\endcsname
+      \out_line{}
+      \let\do_shape=\substitute_shape
+      \csname #1-#2\endcsname
+      \let\do_shape=\remove_shape
+      \csname #1-#2\endcsname
+   }
+   \x_cs\g_let{#1-#2}\x_relax
+   \out_line{}
+   \out_line{\string\endinput}
+   \close_out{Font~definitions}
+}
+\normalcc
+%    \end{macrocode}
+% 
+% 
+% Now we install the fonts.  First T1.  There is no point in
+% hyphenating monowidth fonts, so we suppress |\hyphenchar|. 
+%    \begin{macrocode}
+\installfonts
+\installfamily{T1}{fts}{\hyphenchar\font=-1}
+\installfont{ftsl8tc}{ftsl8rc,newlatin}{t1}{T1}{fts}{lc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftslo8tc}{ftslo8rc,newlatin}{t1}{T1}{fts}{lc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsr8tc}{ftsr8rc,newlatin}{t1}{T1}{fts}{mc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsro8tc}{ftsro8rc,newlatin}{t1}{T1}{fts}{mc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsri8tc}{ftsri8rc,newlatin}{t1}{T1}{fts}{mc}{it}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsb8tc}{ftsb8rc,newlatin}{t1}{T1}{fts}{bc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsbo8tc}{ftsbo8rc,newlatin}{t1}{T1}{fts}{bc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsc8tc}{ftsc8rc,newlatin}{t1}{T1}{fts}{ebc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsco8tc}{ftsco8rc,newlatin}{t1}{T1}{fts}{ebc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftslc8tc}{ftsl8rc,newlatin}{t1c}{T1}{fts}{lc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsrc8tc}{ftsr8rc,newlatin}{t1c}{T1}{fts}{mc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsbc8tc}{ftsb8rc,newlatin}{t1c}{T1}{fts}{bc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{ftscc8tc}{ftsc8rc,newlatin}{t1c}{T1}{fts}{ebc}{sc}{
+  <->\string\Thsmc@@scale}
+\endinstallfonts
+%    \end{macrocode}
+% 
+% And then TS1.
+%    \begin{macrocode}
+\installfonts
+\installfamily{TS1}{fts}{\hyphenchar\font=-1}
+\installfont{ftsl8cc}{ftsl8rc,textcomp}{ts1}{TS1}{fts}{lc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftslo8cc}{ftslo8rc,textcomp}{ts1}{TS1}{fts}{lc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsr8cc}{ftsr8rc,textcomp}{ts1}{TS1}{fts}{mc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsro8cc}{ftsro8rc,textcomp}{ts1}{TS1}{fts}{mc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsri8cc}{ftsri8rc,textcomp}{ts1}{TS1}{fts}{mc}{it}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsb8cc}{ftsb8rc,textcomp}{ts1}{TS1}{fts}{bc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsbo8cc}{ftsbo8rc,textcomp}{ts1}{TS1}{fts}{bc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsc8cc}{ftsc8rc,textcomp}{ts1}{TS1}{fts}{ebc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{ftsco8cc}{ftsco8rc,textcomp}{ts1}{TS1}{fts}{ebc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfontas{ftsl8cc}{TS1}{fts}{lc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{ftsr8cc}{TS1}{fts}{mc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{ftsb8cc}{TS1}{fts}{bc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{ftsc8cc}{TS1}{fts}{ebc}{sc}{
+  <->\string\Thsmc@@scale}
+\endinstallfonts
+%    \end{macrocode}
+% 
+% And the end:
+%    \begin{macrocode}
+\endrecordtransforms
+\bye
+%</fts-drv>
+%    \end{macrocode}
+% 
+%
+%
+%\subsection{Fontmap Generation}
+%\label{sec:fontmap}
+%
+% This is a standard procedure~\cite{fontinstallationguide}
+%    \begin{macrocode}
+%<*fts-map>
+\input finstmsc.sty
+\resetstr{PSfontsuffix}{.pfb}
+\adddriver{dvips}{fts.map}
+\input fts-rec.tex
+\donedrivers
+\bye
+%</fts-map>
+%    \end{macrocode}
+%
+%
+%
+%\subsection{Style File}
+%\label{sec:style}
+%
+%
+% The scaling code is from the |helvet| package:
+%    \begin{macrocode}
+%<*style>
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{keyval}
+\define@key{Thsmc}{scaled}[1]{%
+  \def\Thsmc@scale{#1}}
+\def\ProcessOptionsWithKV#1{%
+  \let\@tempc\relax
+  \let\Thsmc@tempa\@empty
+  \ifx\@classoptionslist\relax\else
+    \@for\CurrentOption:=\@classoptionslist\do{%
+      \@ifundefined{KV@#1@\CurrentOption}%
+      {}%
+      {%
+        \edef\Thsmc@tempa{\Thsmc@tempa,\CurrentOption,}%
+        \@expandtwoargs\@removeelement\CurrentOption
+          \@unusedoptionlist\@unusedoptionlist
+      }%
+    }%
+  \fi
+  \edef\Thsmc@tempa{%
+    \noexpand\setkeys{#1}{%
+      \Thsmc@tempa\@ptionlist{\@currname.\@currext}%
+    }%
+  }%
+  \Thsmc@tempa
+  \let\CurrentOption\@empty
+}
+\ProcessOptionsWithKV{Thsmc}
+\AtEndOfPackage{%
+  \let\@unprocessedoptions\relax
+}
+\renewcommand{\ttdefault}{fts}
+%</style>
+%    \end{macrocode}
+%
+%
+%\Finale
+%\clearpage
+%
+%\PrintChanges
+%\clearpage
+%\PrintIndex
+%
+\endinput

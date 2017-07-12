@@ -1,0 +1,188 @@
+%%
+%% This is file `flm-drv.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% thsmc.dtx  (with options: `flm-drv')
+%% Copyright (c) 2008, Boris Veytsman
+%% 
+%% All rights reserved.
+%% 
+%% Redistribution and use in source and binary forms, with or without
+%% modification, are permitted provided that the following conditions
+%% are met:
+%% 
+%%    * Redistributions of source code must retain the above copyright
+%%    notice, this list of conditions and the following disclaimer.
+%%    * Redistributions in binary form must reproduce the above
+%%    copyright notice, this list of conditions and the following
+%%    disclaimer in the documentation and/or other materials provided
+%%    with the distribution.
+%%    * Neither the name of the original author nor the names of the
+%%    contributors may be used to endorse or promote products derived
+%%    from this software without specific prior written permission.
+%% 
+%% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+%% CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+%% INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+%% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+%% BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+%% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+%% TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+%% DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+%% ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+%% OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+%% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+%% POSSIBILITY OF SUCH DAMAGE.
+%% 
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
+\ProvidesFile{flm-drv.tex}
+[2008/02/19 v1.0 Using The Mono Sans Condensed Font in LaTeX]
+\input fontinst.sty
+\substitutesilent{bx}{bc}
+\substitutesilent{b}{bc}
+\substitutesilent{eb}{ebc}
+\substitutesilent{m}{mc}
+\setint{smallcapsscale}{750}
+\setint{slant}{167}
+\setint{monowidth}{1}
+\recordtransforms{flm-rec.tex}
+\transformfont{flml8rc}{\reencodefont{8r}{\fromafm{thsmcl21}}}
+\transformfont{flmr8rc}{\reencodefont{8r}{\fromafm{thsmcp25}}}
+\transformfont{flmri8rc}{\reencodefont{8r}{\fromafm{thsmci29}}}
+\transformfont{flmb8rc}{\reencodefont{8r}{\fromafm{thsmcb02}}}
+\transformfont{flmc8rc}{\reencodefont{8r}{\fromafm{thsmcb96}}}
+\transformfont{flmlo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcl21}}}
+\transformfont{flmro8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcp25}}}
+\transformfont{flmbo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcb02}}}
+\transformfont{flmco8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{thsmcb96}}}
+\fontinstcc
+\def\fd_family#1#2#3{
+   \a_toks{#3}
+   \edef\lowercase_file{\lowercase{
+     \edef\noexpand\lowercase_file{#1#2.fd}}}
+   \lowercase_file
+   \open_out{\lowercase_file}
+   \out_line{\percent_char~Filename:~\lowercase_file}
+   \out_line{\percent_char~Created~by:~tex~\jobname}
+   \out_line{\percent_char~Created~using~fontinst~v\fontinstversion}
+   \out_line{}
+   \out_line{\percent_char~THIS~FILE~SHOULD~BE~PUT~IN~A~TEX~INPUTS~
+      DIRECTORY}
+   \out_line{}
+   \out_line{\string\ProvidesFile{\lowercase_file}}
+   \out_lline{[
+      \the\year/
+      \ifnum10>\month0\fi\the\month/
+      \ifnum10>\day0\fi\the\day\space
+      Fontinst~v\fontinstversion\space
+      font~definitions~for~#1/#2.
+   ]}
+   \out_line{}
+   \out_line{\string\expandafter\string\ifx\string\csname\space
+     Thsmc@scale\string\endcsname\string\relax}
+   \out_line{\space\string\let\string\Thsmc@@scale\string\@empty}
+   \out_line{\string\else}
+   \out_line{\space\string\edef\string\Thsmc@@scale\left_brace_char
+       s*[\string\csname\space Thsmc@scale\string\endcsname]
+       \right_brace_char\percent_char}
+   \out_line{\string\fi\percent_char}
+   \out_line{}
+   \out_line{\string\DeclareFontFamily{#1}{#2}{\the\a_toks}}
+   {
+      \csname #1-#2\endcsname
+      \out_line{}
+      \let\do_shape=\substitute_shape
+      \csname #1-#2\endcsname
+      \let\do_shape=\remove_shape
+      \csname #1-#2\endcsname
+   }
+   \x_cs\g_let{#1-#2}\x_relax
+   \out_line{}
+   \out_line{\string\endinput}
+   \close_out{Font~definitions}
+}
+\normalcc
+\installfonts
+\installfamily{T1}{flm}{\hyphenchar\font=-1}
+\installfont{flml8tc}{flml8rc,newlatin}{t1}{T1}{flm}{lc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmlo8tc}{flmlo8rc,newlatin}{t1}{T1}{flm}{lc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmr8tc}{flmr8rc,newlatin}{t1}{T1}{flm}{mc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmro8tc}{flmro8rc,newlatin}{t1}{T1}{flm}{mc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmri8tc}{flmri8rc,newlatin}{t1}{T1}{flm}{mc}{it}{
+  <->\string\Thsmc@@scale}
+\installfont{flmb8tc}{flmb8rc,newlatin}{t1}{T1}{flm}{bc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmbo8tc}{flmbo8rc,newlatin}{t1}{T1}{flm}{bc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmc8tc}{flmc8rc,newlatin}{t1}{T1}{flm}{ebc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmco8tc}{flmco8rc,newlatin}{t1}{T1}{flm}{ebc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmlc8tc}{flml8rc,newlatin}{t1c}{T1}{flm}{lc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{flmrc8tc}{flmr8rc,newlatin}{t1c}{T1}{flm}{mc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{flmbc8tc}{flmb8rc,newlatin}{t1c}{T1}{flm}{bc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfont{flmcc8tc}{flmc8rc,newlatin}{t1c}{T1}{flm}{ebc}{sc}{
+  <->\string\Thsmc@@scale}
+\endinstallfonts
+\installfonts
+\installfamily{TS1}{flm}{\hyphenchar\font=-1}
+\installfont{flml8cc}{flml8rc,textcomp}{ts1}{TS1}{flm}{lc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmlo8cc}{flmlo8rc,textcomp}{ts1}{TS1}{flm}{lc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmr8cc}{flmr8rc,textcomp}{ts1}{TS1}{flm}{mc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmro8cc}{flmro8rc,textcomp}{ts1}{TS1}{flm}{mc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmri8cc}{flmri8rc,textcomp}{ts1}{TS1}{flm}{mc}{it}{
+  <->\string\Thsmc@@scale}
+\installfont{flmb8cc}{flmb8rc,textcomp}{ts1}{TS1}{flm}{bc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmbo8cc}{flmbo8rc,textcomp}{ts1}{TS1}{flm}{bc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfont{flmc8cc}{flmc8rc,textcomp}{ts1}{TS1}{flm}{ebc}{n}{
+  <->\string\Thsmc@@scale}
+\installfont{flmco8cc}{flmco8rc,textcomp}{ts1}{TS1}{flm}{ebc}{sl}{
+  <->\string\Thsmc@@scale}
+\installfontas{flml8cc}{TS1}{flm}{lc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{flmr8cc}{TS1}{flm}{mc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{flmb8cc}{TS1}{flm}{bc}{sc}{
+  <->\string\Thsmc@@scale}
+\installfontas{flmc8cc}{TS1}{flm}{ebc}{sc}{
+  <->\string\Thsmc@@scale}
+\endinstallfonts
+\endrecordtransforms
+\bye
+\endinput
+%%
+%% End of file `flm-drv.tex'.

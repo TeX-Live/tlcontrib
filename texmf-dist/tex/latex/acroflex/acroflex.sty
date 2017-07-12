@@ -1,0 +1,1109 @@
+%%
+%% This is file `acroflex.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% acroflex.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Acroflex.sty package,                                %%
+%% Copyright (C) 2008 -- 2016  D. P. Story              %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{acroflex}
+ [2016/08/29 v1.6c AcroFLeX: AcroTeX and Adobe Flex (dps)]
+\RequirePackage{rmannot}[2016/02/01]
+\edef\af@subscriptCat{\the\catcode`\_}
+\edef\af@superscriptCat{\the\catcode`\^}
+\def\af@restoreCats{%
+    \catcode`\_=\af@subscriptCat
+    \catcode`\^=\af@superscriptCat
+}
+\catcode`\_=12\relax \catcode`\^=12\relax
+\def\AcroFLeX{%
+    AcroF\kern-.1667em\lower.5ex\hbox{L}\kern-.3eme\kern-.125emX\@}
+\newcommand{\pathToAcroFlex}[1]{\def\af@pathToAcroFlex{#1}%
+    \ifx\af@pathToAcroFlex\@empty
+    \PackageError{acroflex}{%
+        You must specify a full path to AcroFlex.swf}{}\else
+    \saveNamedPath{acroflexWidget}{\af@pathToAcroFlex/AcroFlex.swf}\fi
+}
+\def\af@pathToAcroFlex{}
+\@onlypreamble{\pathToAcroFlex}
+\define@choicekey*+{acroflex.sty}{lang}[\val\nr]{english,german}
+{%
+    \ifcase\nr\relax
+        \def\af@lang@type{afcustom_us.def}
+    \or
+        \def\af@lang@type{afcustom_de.def}
+    \else
+        \def\af@lang@type{afcustom.def}
+    \fi
+}{\PackageWarning{acroflex}{Bad choice for lang, permissible values
+are english and german. No lang key is equivalent to english. Try again}}
+\def\af@lang@type{afcustom.def}
+\ProcessOptionsX
+\InputIfFileExists{acroflex.cfg}{}{}
+\newcommand{\dimScreenGraph}[2]{{%
+    \setlength{\dimen@}{#1}\xdef\hScreenGraph{\the\dimen@}%
+    \setlength{\dimen@}{#2}\xdef\vScreenGraph{\the\dimen@}%
+}}
+\newcommand{\graphName}[1]{\def\afgraphName{#1}}
+\newcommand{\defaultFunction}[1]{\def\af@DefaultFunction{#1}}
+\defaultFunction{x^2}
+\def\defaultDomRng#1#2#3#4{%
+    \def\af@DefaultDomMin{#1}\def\af@DefaultDomMax{#2}%
+    \def\af@DefaultRngMin{#3}\def\af@DefaultRngMax{#4}%
+}
+\def\defaultDomP#1#2{%
+    \def\af@DefaultDomMint{#1}\def\af@DefaultDomMaxt{#2}%
+}
+\defaultDomRng{-2}{2}{0}{4}
+\defaultDomP{0}{2*PI}
+\newcommand{\graphScreen}[3][]{\rmAnnot[#1,%
+    name=afRM\afgraphName]{#2}{#3}{acroflexWidget}}%
+\newcommand{\allowFSFloatGS}{\def\af@passcontext{\@gobble}}
+\newcommand{\defaultFloatGS}{\def\af@passcontext{passcontext}}
+\defaultFloatGS
+\newcommand{\iconFloatGraphScreen}[3][]{%
+    \makebox[0pt][l]{%
+    \resizebox{#2}{#3}{%
+    \graphScreen[#1,windowed,\af@passcontext,deactivated=pageclose
+        ]{\hScreenGraph}{\vScreenGraph}}}%
+    \resizebox{#2}{#3}{%
+        \pushButton[\S{S}\H{N}\autoCenter{n}\W0\BG{}\BC{}
+        \TU{\tt@iconFloatGraphScreen}\A{\JS{%
+            var rm = this.getAnnotRichMedia(%
+                this.pageNum, "afRM\afgraphName");\r
+            rm.activated=!rm.activated;
+        }}]{float\afgraphName Btn-\therm@Cnt}{\hScreenGraph}
+            {\vScreenGraph}}%
+}
+\newcommand{\tticonFloatGraphScreen}[1]{%
+    \def\tt@iconFloatGraphScreen{#1}}
+\tticonFloatGraphScreen{Click to view graphing screen,
+    click again to hide graphing screen.}
+\newcommand{\funcInputField}[3][]{\makebox[0pt][l]{%
+    \textField[%
+        \nuDV{\af@DefaultFunction}\nuV{\af@DefaultFunction}
+        \F{\FHidden}\Ff{\FfReadOnly}
+    ]{\afgraphName theHiddenFunction}{1bp}{1bp}}%
+    \textField[%
+        \BC{0 0 0}\nuDV{\af@DefaultFunction}\nuV{\af@DefaultFunction}
+          \TU{\tt@funcInputField}#1\AA{\AAFormat{%
+            \formatFunctionInput{"\afgraphName theHiddenFunction"}}
+            \AAKeystroke{\keystrokeFunctionInput}
+          }%
+    ]{\afgraphName theFunction}{#2}{#3}%
+}
+\newcommand{\ttfuncInputField}[1]{%
+    \def\tt@funcInputField{#1}}
+\ttfuncInputField{Enter any of the following for expressions:\r
+\space\space1. A function of x of the form f(x);\r
+\space\space2. A polar function of t of the form f(t);\r
+\space\space3. A set of parametric functions of t of the form f(t);g(t)
+\r\space\space\space\space\space(separated by a semi-colon);\r
+\space\space4. A list of points, (a1,b1);(a2,b2);...;(an,bn)\r
+\space\space\space\space\space(separated by semi-colons).
+}
+\let\fileInputField\funcInputField
+\def\formatFunctionInput#1{%
+    try{ formatFunctionInput(#1) } catch(e){};
+}
+\def\keystrokeFunctionInput{%
+    try{ keystrokeFunctionInput() } catch(e){};
+}
+\newcommand{\afCurve}[1]{\def\afcurve{#1 }\def\afcurvei{#1}}
+\afCurve{Curve}
+\newcommand{\afPoint}[1]{\def\afpoint{#1 }\def\afploti{#1}}
+\afPoint{Point}
+\newcommand{\afUnused}[1]{\def\afunused{#1}}
+\afUnused{--unused}
+\@onlypreamble\afCurve
+\@onlypreamble\afPoint
+\@onlypreamble\afUnused
+\newcommand{\initFuncSelect}[1]{\def\af@initializeFuncSelect{#1}}
+\initFuncSelect{%
+    [(\af@DefaultFunction)(\afcurve1)]%
+    [(<\afcurve2\afunused>)(\afcurve2)]%
+    [(<\afcurve3\afunused>)(\afcurve3)]%
+    [(<\afcurve4\afunused>)(\afcurve4)]%
+    [(<\afpoint1\afunused>)(\afpoint1)]%
+    [(<\afpoint2\afunused>)(\afpoint2)]%
+    [(<\afpoint3\afunused>)(\afpoint3)]%
+    [(<\afpoint4\afunused>)(\afpoint4)]}
+\newcommand{\functionSelect}[3][]{%
+    \comboBox[\TU{\tt@functionSelect}#1\Ff{\FfCommitOnSelChange}
+    \nuDV{\af@DefaultFunction}\nuV{\af@DefaultFunction}
+    \AA{\AAKeystroke{%
+    if (!event.willCommit) {\r\t
+        this.getField(
+            "\afgraphName theFunction").value=event.changeEx;\r
+    }}}]{\afgraphName ComboSelect}{#2}{#3}{\af@initializeFuncSelect}%
+}
+\newcommand{\ttfunctionSelect}[1]{%
+    \def\tt@functionSelect{#1}}
+\ttfunctionSelect{Enter a function on \afcurvei1--\afcurvei4, or
+    a list of points on \afploti1--\afploti4.}
+\newcommand{\savedelSelBtn}[3][]{%
+    \pushButton[\TU{\tt@savedelSelBtn}#1
+        \A{\JS{saveDelSelAction("\afgraphName");
+    }}]{\afgraphName savedelSelectBtn}{#2}{#3}%
+}
+\newcommand{\ttsavedelSelBtn}[1]{\def\tt@savedelSelBtn{#1}}
+\ttsavedelSelBtn{Click to save current function to list, shift-click
+    to delete the current function from list}
+\newcommand{\graphBtn}[3][]{%
+    \pushButton
+        [\BC{0 0 0}\CA{Graph It!}\TU{\tt@graphBtn}#1
+        \A{\JS{graphBtnAction("\afgraphName",this.pageNum);
+        }}]{\afgraphName graphIt}{#2}{#3}%
+}
+\newcommand{\ttgraphBtn}[1]{\def\tt@graphBtn{#1}}
+\ttgraphBtn{Press to graph the function}
+\newcommand{\clearGraphJS}{%
+    clearGraph("all","\afgraphName",this.pageNum);}
+\newcommand{\graphClrBtn}[3][]{\pushButton[\BC{0 0 0}\CA{Clear}
+    \A{\JS{\clearGraphJS}}\TU{\tt@graphClrBtn}#1
+    ]{\afgraphName clearIt}{#2}{#3}%
+}
+\newcommand{\ttgraphClrBtn}[1]{\def\tt@graphClrBtn{#1}}
+\ttgraphClrBtn{Click to clear graph, shift-click to deactivate the
+    graphing screen}
+\newcommand{\domMin}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultDomMin}\nuV{\af@DefaultDomMin}
+        \F{\FHidden}\Ff{\FfReadOnly}
+        ]{\afgraphName theHiddenDom.min}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultDomMin}
+    \nuDV{\af@DefaultDomMin}\BC{0 0 0}\TU{\tt@domMin}#1\AA{%
+    \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenDom.min"}}
+        \AAFormat{\formatVarIntervals{"\afgraphName theHiddenDom.min"}}
+    }]{\afgraphName theDom.min}{#2}{#3}%
+}
+\newcommand{\ttdomMin}[1]{\def\tt@domMin{#1}}
+\ttdomMin{Enter the minimum value for the variable x}
+\newcommand{\domMax}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultDomMax}\nuV{\af@DefaultDomMax}
+    \F{\FHidden}\Ff{\FfReadOnly}
+    ]{\afgraphName theHiddenDom.max}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultDomMax}
+    \nuDV{\af@DefaultDomMax}\BC{0 0 0}\TU{\tt@domMax}#1\AA{%
+    \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenDom.max"}}
+    \AAFormat{\formatVarIntervals{"\afgraphName theHiddenDom.max"}}
+    }]{\afgraphName theDom.max}{#2}{#3}%
+}
+\newcommand{\ttdomMax}[1]{\def\tt@domMax{#1}}
+\ttdomMax{Enter the maximum value for the variable x}
+\newcommand{\rngMin}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultRngMin}\nuV{\af@DefaultRngMin}
+    \F{\FHidden}\Ff{\FfReadOnly}
+    ]{\afgraphName theHiddenRng.min}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultRngMin}
+    \nuDV{\af@DefaultRngMin}\BC{0 0 0}\TU{\tt@rngMin}#1\AA{%
+    \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenRng.min"}}
+     \AAFormat{\formatVarIntervals{"\afgraphName theHiddenRng.min"}}
+    }]{\afgraphName theRng.min}{#2}{#3}%
+}
+\newcommand{\ttrngMin}[1]{\def\tt@rngMin{#1}}
+\ttrngMin{Enter the minimum value for the variable y}
+\newcommand{\rngMax}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultRngMax}\nuV{\af@DefaultRngMax}
+    \F{\FHidden}\Ff{\FfReadOnly}
+    ]{\afgraphName theHiddenRng.max}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultRngMax}
+    \nuDV{\af@DefaultRngMax}\BC{0 0 0}\TU{\tt@rngMax}#1\AA{%
+   \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenRng.max"}}
+     \AAFormat{\formatVarIntervals{"\afgraphName theHiddenRng.max"}}
+    }]{\afgraphName theRng.max}{#2}{#3}%
+}
+\newcommand{\ttrngMax}[1]{\def\tt@rngMax{#1}}
+\ttrngMax{Enter the maximum value for the variable y}
+\newcommand{\domMinP}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultDomMint}\nuV{\af@DefaultDomMint}
+        \F{\FHidden}\Ff{\FfReadOnly}
+        ]{\afgraphName theHiddenDom_t.min}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultDomMint}
+    \nuDV{\af@DefaultDomMint}\BC{0 0 0}\TU{\tt@domMinP}#1\AA{%
+    \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenDom_t.min"}}
+    \AAFormat{\formatVarIntervals{"\afgraphName theHiddenDom_t.min"}}
+    }]{\afgraphName theDom_t.min}{#2}{#3}%
+}
+\newcommand{\ttdomMinP}[1]{\def\tt@domMinP{#1}}
+\ttdomMinP{Enter the minimum value for the variable t}
+\newcommand{\domMaxP}[3][]{\makebox[0pt][l]{%
+    \textField[\nuDV{\af@DefaultDomMaxt}\nuV{\af@DefaultDomMaxt}
+    \F{\FHidden}\Ff{\FfReadOnly}
+    ]{\afgraphName theHiddenDom_t.max}{1bp}{1bp}}%
+    \textField[\textSize{0}\nuV{\af@DefaultDomMaxt}
+    \nuDV{\af@DefaultDomMaxt}\BC{0 0 0}\TU{\tt@domMaxP}#1\AA{%
+    \AAKeystroke{\keystrokeDomRng{"\afgraphName theHiddenDom_t.max"}}
+    \AAFormat{\formatVarIntervals{"\afgraphName theHiddenDom_t.max"}}
+    }]{\afgraphName theDom_t.max}{#2}{#3}%
+}
+\newcommand{\ttdomMaxP}[1]{\def\tt@domMaxP{#1}}
+\ttdomMaxP{Enter the maximum value for the variable t}
+\def\formatVarIntervals#1{%
+    try{ formatVarIntervals(#1) } catch(e){};
+}
+\def\keystrokeDomRng#1{%
+    if (event.willCommit) keystrokeDomRng(#1);
+}
+\newcommand{\defaultNumPoints}[1]{%
+    \def\af@defaultNumPoints{#1}}
+\defaultNumPoints{40}
+\newcommand\numPoints[3][]{%
+    \textField[\nuV{\af@defaultNumPoints}\nuDV{\af@defaultNumPoints}
+    \Q1\BC{0 0 0}\TU{\tt@numPoints}#1\AA{%
+    \AAKeystroke{if (event.willCommit) keystrokeNumPoints();}}
+    ]{\afgraphName numNodes}{#2}{#3}%
+}
+\newcommand{\ttnumPoints}[1]{\def\tt@numPoints{#1}}
+\ttnumPoints{Enter the number of points to plot}
+\newcommand{\defaultShiftAmt}[1]{%
+    \def\af@defaultShiftAmt{#1}}
+\defaultShiftAmt{1}
+\newcommand{\amtShift}[3][]{%
+    \textField[\nuV{\af@defaultShiftAmt}\nuDV{\af@defaultShiftAmt}\Q1
+    \BC{0 0 0}\TU{\tt@amtShift}#1\AA{\AAKeystroke{%
+        if (event.willCommit) keystrokeAmtShift();
+    }}]{\afgraphName amtshift}{#2}{#3}%
+}
+\newcommand{\ttamtShift}[1]{\def\tt@amtShift{#1}}
+\ttamtShift{Enter the amount to shift, horizontally or vertically}
+\newcommand{\hShiftL}[2][]{%
+    \setLinkText[#1\A{\JS{%
+        shiftHorVert ("\afgraphName",this.pageNum,"h","-");
+    }}]{#2}%
+}
+\newcommand{\hShiftR}[2][]{%
+    \setLinkText[#1\A{\JS{%
+        shiftHorVert ("\afgraphName",this.pageNum,"h","+");
+    }}]{#2}%
+}
+\newcommand{\vShiftD}[2][]{%
+    \setLinkText[#1\A{\JS{%
+        shiftHorVert ("\afgraphName",this.pageNum,"v","-");
+    }}]{#2}%
+}
+\newcommand{\vShiftU}[2][]{%
+    \setLinkText[#1\A{\JS{%
+        shiftHorVert ("\afgraphName",this.pageNum,"v","+");
+    }}]{#2}%
+}
+\newcommand{\zoomInOut}[3][]{%
+    \pushButton[\BC{0 0 0}\CA{Zoom}\TU{\tt@zoomInOut}#1
+    \A{\JS{%
+        var shiftType = (event.shift) ? "+" : "-";\r
+        zoomInOut ("\afgraphName",this.pageNum,shiftType);
+    }}
+    ]{\afgraphName zoominout}{#2}{#3}%
+}
+\newcommand{\ttzoomInOut}[1]{\def\tt@zoomInOut{#1}}
+\ttzoomInOut{Click to zoom out, shift-click to zoom in}
+\define@choicekey+{afsl}{graph}{c1,c2,c3,c4,p1,p2,p3,p4,%
+    a1,a2,a3,a4}[c1]{\edef\afsl@graph{#1}}{\PackageWarning{acroflex}
+    {Bad choice for the graph key, permissible values are
+    c1, c2, c3,c4, p1, p2, p3, p4, a1, a2, a3, a4. Try again}}
+\define@choicekey+{afsl}{type}{cart,para,polar}[cart]{%
+    \edef\afsl@type{#1}}{\PackageWarning{acroflex}
+    {Bad choice for the type key, permissible values are
+    cart, para, and polar. Try again}}
+\let\afsl@type\@empty
+\define@choicekey+{afsl}{connectwith}{curve,segment}[curve]{%
+    \edef\afsl@form{#1}}{\PackageWarning{acroflex}
+    {Bad choice for the connectwith key, permissible values are
+    curve and segment. Try again}}
+\let\afsl@form\@empty
+\define@choicekey+{afsl}{noquotes}[\val\nr]{true,false}[true]{%
+    \ifcase\nr\relax\def\af@quotes{}\or\def\af@quotes{"}\fi}
+    {\PackageWarning{acroflex}
+    {Bad choice for the noquotes key, permissible values are
+    true and false. Try again}}
+\define@key{afsl}{points}[0]{\edef\afsl@nPoints{#1}}
+\define@key{afsl}{xInterval}[]{\edef\afsl@xInterval{#1}}
+\define@key{afsl}{xPlot}[]{\edef\afsl@xPlot{#1}}
+\define@key{afsl}{yInterval}[]{\edef\afsl@yInterval{#1}}
+\define@key{afsl}{tInterval}[]{\edef\afsl@tInterval{#1}}
+\define@choicekey+{afsl}{populate}{true,false}[true]{%
+    \edef\afsl@populate{#1}}{\PackageWarning{acroflex}
+    {Bad choice for the populate key, permissible values are
+    true and false. Try again}}
+\define@choicekey+{afsl}{wait}{true,false}[true]{%
+    \edef\afsl@wait{#1}}{\PackageWarning{acroflex}
+    {Bad choice for the wait key, permissible values are
+    true and false. Try again}}
+\setkeys{afsl}{graph,points,xInterval,xPlot,yInterval,tInterval,%
+    populate=false,type,connectwith,noquotes=false,wait=false}
+\newcommand{\sgraphLink}[4][]{{%
+    \defineGraphJS{#2}{#3}{\af@sglnkAction}%
+    \setLinkText[#1\A{\JS{\af@sglnkAction}}]{#4}%
+}}
+\newcommand{\defineGraphJS}{\@ifstar{\let\AF@exDEF\edef\af@defineGraphJS}
+    {\let\AF@exDEF\xdef\af@defineGraphJS}}
+\newcommand{\af@defineGraphJS}[3]{{\makeJSspecials
+    \edef\af@tmp@exp{\noexpand\setkeys{afsl}{#1}}\af@tmp@exp
+    \ifx\afsl@xPlot\@empty\let\afsl@xPlot\afsl@xInterval\fi
+    \AF@exDEF#3{Graph_xytJS (\af@quotes#2\af@quotes,"\afsl@xInterval",%
+    "\afsl@yInterval","\afsl@xPlot","\afsl@tInterval","\afsl@graph",%
+    \afsl@populate,\afsl@wait,"\afsl@type","\afsl@form","\afgraphName",%
+    \afsl@nPoints)}%
+}}
+\defineJSStr{\af@badNumberMsg}{%
+    The value input does not appear to be a number, please enter a
+    number, or an expression that evaluates to a number.}
+\defineJSStr{\af@negNumberMsg}{%
+    The number of points is a positive integer, changing to a
+    positive integer.}
+\defineJSStr{\af@zeroNumberMsg}{%
+    The number of points is a positive integer, changing to the
+    default value of \af@defaultNumPoints.}
+\defineJSStr{\af@negShiftMsg}{%
+    The amount of shift is a positive number, changing to a positive
+    number.}
+\defineJSStr{\af@zeroShiftMsg}{%
+    The amount of shift is a positive number, changing to the
+    default value of 1.}
+\defineJSStr{\af@saveDelSelAlerti}{%
+    There is nothing in the function input text field.}
+\defineJSStr{\af@saveDelSelAlertii}{%
+    You have not defined any points to plot}
+\defineJSStr{\af@graphBtnAlerti}{Undefined graph types}
+\begin{insDLJS*}[acroflexLoaded]{afgrfJS}
+\begin{newsegment}{AF: AcroFLeX Graphing Bundle}
+/*
+        Document Level JavaScript
+        AcroFLeX Graphing Bundle
+        D. P. Story copyright 2008-\the\year
+*/
+var acroflexLoaded = true;
+var _mathVars="xt";
+var aGraphData = new Array();
+var ck4PtsRe = /\(.+,.+\)/;
+var badNumberMsg=\af@badNumberMsg;
+var negNumberMsg=\af@negNumberMsg;
+var zeroNumberMsg=\af@zeroNumberMsg;
+var negShiftMsg=\af@negShiftMsg;
+var zeroShiftMsg=\af@zeroShiftMsg;
+var saveDelSelAlerti=\af@saveDelSelAlerti;
+var saveDelSelAlertii=\af@saveDelSelAlertii;
+var graphBtnAlerti=\af@graphBtnAlerti;
+var scratchCounter=0;
+var aTimeOutArray = new Array();
+var afSuffixes = new Array("ComboSelect","theFunction",
+    "amtShift","theDom","theRng", "theDom_t",
+    "Rng_t","numNodes");
+\end{newsegment}
+\begin{newsegment}{AF: Graphing Functions}
+function Graph_xy(graph_props, baseName, pNum)
+{
+    _mathVars="x";
+    var afInteractive = (arguments.length <= 3);
+    if (afInteractive) {
+        var f = this.getField(baseName+"theHiddenFunction").value;
+        if ( !ck4PtsRe.test(f) && (f.indexOf(";")!=-1) ) {
+            var dt = this.getField(baseName+"theDom_t.min");
+            if ( dt == null ) {
+                syntaxError(); return;
+            }
+            Graph_xyt(graph_props, baseName, pNum);
+            return;
+        }
+        f = this.getField(baseName+"theHiddenFunction").value;
+    }
+    createGraphData(baseName);
+    var which_graph=graph_props.graph;
+    var populate = false;
+    graph_props.type="cart";
+    var aWhichGraph=/(c|p|a)(\d)/.exec(which_graph);
+    if ( aWhichGraph==null ) aWhichGraph=["","c","1"];
+    var isGraph = (aWhichGraph[1]=="c" || aWhichGraph[1]=="a");
+    var connectPoints=false;
+    var plotPoints=false;
+    var wait = false;
+    switch(aWhichGraph[1]) {
+        case "p":
+            var which_series="p"+aWhichGraph[2];
+            plotPoints=true;
+            break;
+        case "a":
+            var which_series="a"+aWhichGraph[2];
+            break;
+        default:
+            var which_series="c"+aWhichGraph[2];
+    }
+    graph_props.graph=which_series;
+    if (afInteractive) var oDR = getDomRng (baseName);
+    else {
+        wait=graph_props.wait;
+        populate = graph_props.populate;
+        var oDR = arguments[5];
+        if (populate) populateDomRng(baseName,oDR);
+        for ( var o in oDR ) oDR[o] = EvalParse(oDR[o]);
+    }
+    aGraphData[baseName].aDomRngs = oDR;
+    var rng_x = (typeof oDR.x_u=="undefined") ?
+        (oDR.x_max - oDR.x_min) : (oDR.x_u - oDR.x_l);
+    /* Get the function and calculated the plotted points */
+    if (afInteractive) {
+        var n = Number(this.getField(baseName+"numNodes").value);
+        if ( isNaN(n) || n <=0 ) n = \af@defaultNumPoints;
+    } else {
+        var f = ParseInput(arguments[2+1]);
+        var n = Number(arguments[2+2]);
+        if (populate) {
+            this.getField(baseName+"theFunction").value=arguments[2+1];
+            this.getField(baseName+"numNodes").value=n;
+        }
+        if (isGraph) {
+            connectPoints = ( n <= 0 );
+            if ( connectPoints ) plotPoints = true;
+        // passing points to be plotted, not connected
+        } else plotPoints = true;
+    }
+    if (afInteractive || populate)
+        updateGraphData(graph_props,baseName,f);
+    var plot_x, plot_y;
+    var x = (typeof oDR.x_u=="undefined") ? oDR.x_min : oDR.x_l;
+    var h = rng_x / n;
+    var thismax = (typeof oDR.x_u=="undefined") ? oDR.x_max : oDR.x_u;
+    var cPlotData=<points></points>;
+    var aSearchResults=/(([a-zA-Z])\s*=\s*)/.exec(f);
+    if ( aSearchResults != null) {
+        if ( aSearchResults[2] != "y" && aSearchResults[2] != "r" ) {
+            syntaxError(); return;
+        }
+    }
+    f = f.replace(/(([a-zA-Z])\s*=\s*)/g,"");
+    if ( isGraph && !plotPoints ) {
+        for (var i=0; i<=n; i++)
+        {
+            try { with(Math) {_y = eval(f);} }
+            catch(e) {
+                var paraEqs = "("+f+")*Math.cos(t);("+f+")*Math.sin(t)";
+                graph_props.type="polar";
+                this.getField(baseName
+                    +"theHiddenFunction").value=paraEqs;
+                Graph_xyt(graph_props, baseName, pNum);
+                return;
+            }
+            // If not a number then skip over.
+            if (isFinite(_y))
+            {
+                plot_x = util.printf("\%.10f", x);
+                plot_y = util.printf("\%.10f", _y);
+                cPlotData.points[cPlotData..point.length()]=
+                <point><x>{plot_x}</x><y>{plot_y}</y></point>
+            }
+            x += h;
+        }
+    } else { // prepare to data for plotting
+        var afBegin = (f.indexOf("\(")+1);
+        var afEnd = f.lastIndexOf("\)");
+        cPlotData=f.substring(afBegin,afEnd);
+        var re = /\)\s*;\s*\(/;
+        aPlotData= cPlotData.split(re);
+        var cPlotData=<points></points>;
+        with (Math) {
+            for ( var i=0; i<aPlotData.length; i++) {
+                var cTmp = "["+aPlotData[i]+"]";
+                var aTmp = eval(cTmp);
+                cPlotData.points[cPlotData..point.length()]=
+                <point><x>{aTmp[0]}</x><y>{aTmp[1]}</y></point>
+            }
+        }
+    }
+    cPlotData=cPlotData.toXMLString();
+    var annot = this.getAnnotRichMedia(pNum,"afRM"+baseName);
+    if ( annot )
+    {
+        if (!annot.activated || wait ) {
+            annot.activated=true;
+            afWait4Activation(
+                graph_props,baseName,pNum,oDR,cPlotData,50);
+        }
+        else
+            annot.callAS("getPlotData", graph_props, oDR, cPlotData);
+    }
+}
+function Graph_xyt(graph_props, baseName, pNum)
+{
+    _mathVars="t";
+    var which_graph=graph_props.graph;
+    var populate = false;
+    var afInteractive = (arguments.length <= 3);
+    if (afInteractive) {
+        var f = this.getField(baseName+"theHiddenFunction").value;
+        if ( ck4PtsRe.test(f) || (f.indexOf(";")==-1) ) {
+            Graph_xy(graph_props, baseName, pNum);
+            return;
+        }
+        f = this.getField(baseName+"theHiddenFunction").value;
+    }
+    createGraphData(baseName);
+    if ( graph_props.type!="polar") graph_props.type="para";
+    var aWhichGraph=/(c|p|a)(\d)/.exec(which_graph);
+    if ( aWhichGraph==null ) aWhichGraph=["","c","1"];
+    var isGraph = (aWhichGraph[1]=="c" || aWhichGraph[1]=="a");
+    var connectPoints=false;
+    var plotPoints=false;
+    var wait=false;
+    switch(aWhichGraph[1]) {
+        case "p":
+            var which_series="p"+aWhichGraph[2];
+            plotPoints=true;
+            break;
+        case "a":
+            var which_series="a"+aWhichGraph[2];
+            break;
+        default:
+            var which_series="c"+aWhichGraph[2];
+    }
+    graph_props.graph=which_series;
+    if (afInteractive) {
+        var oDR = getDomRng (baseName);
+        var oDp = getParaDom (baseName);
+    }
+    else {
+        wait=graph_props.wait;
+        populate = graph_props.populate;
+        var oDR = arguments[5];
+        if (populate) populateDomRng(baseName,oDR);
+        for ( var o in oDR ) oDR[o] = EvalParse(oDR[o]);
+        var oDp = arguments[6];
+        if (populate) populateParaDom(baseName,oDp);
+        for ( var o in oDp ) oDp[o] = EvalParse(oDp[o]);
+    }
+    aGraphData[baseName].aDomRngs = oDR;
+    aGraphData[baseName].aDom_P = oDp;
+    var rng_t = oDp.t_max - oDp.t_min;
+    /* Get the function and calculated the plotted points */
+    if (afInteractive) {
+        var n = Number(this.getField(baseName+"numNodes").value);
+        if ( isNaN(n) || n <=0 ) n = \af@defaultNumPoints;
+    } else {
+        var f = arguments[2+1];
+        if ( graph_props.type=="polar") {
+             if(f.indexOf(";")==-1) {
+                f = "("+f+")*cos(t);("+f+")*sin(t)";
+                f = ParseInput(f);
+             }
+        } else
+            f = ParseInput(f);
+        var n = Number(arguments[2+2]);
+        if (populate) {
+            this.getField(baseName+"theHiddenFunction").value=f;
+            this.getField(baseName+"theFunction").value=arguments[2+1];
+            this.getField(baseName+"numNodes").value=n;
+        }
+        if (isGraph) {
+            connectPoints = ( n <= 0 );
+            if ( connectPoints ) plotPoints = true;
+        // passing points to be plotted, not connected
+        } else plotPoints = true;
+    }
+    if (afInteractive || populate)
+        updateGraphData(graph_props,baseName,f);
+    var aFunction = f.split(";");
+    var x_function = aFunction[0];
+    var y_function = aFunction[1];
+    var aSearchResults=/(([a-zA-Z])\s*=\s*)/.exec(x_function);
+    if ( aSearchResults != null && aSearchResults[2] != "x") {
+            syntaxError(); return;
+    }
+    x_function = x_function.replace(/(([a-zA-Z])\s*=\s*)/g,"");
+    aSearchResults=/(([a-zA-Z])\s*=\s*)/.exec(y_function);
+    if ( aSearchResults != null && aSearchResults[2] != "y") {
+            syntaxError(); return;
+    }
+    y_function = y_function.replace(/(([a-zA-Z])\s*=\s*)/,"");
+    var plot_x, plot_y;
+    var t = oDp.t_min;
+    var h = rng_t / n;
+    var thismax = oDp.t_max;
+    var cPlotData=<points></points>;
+    if ( isGraph && !plotPoints ) {
+        for (var i=0; i<=n; i++)
+        {
+            try {
+                with(Math) {
+                    _x = eval(x_function);
+                    _y = eval(y_function);
+               }
+            } catch(e) { syntaxError(); return;}
+            // If not a number then skip over.
+            if (isFinite(_x)&&isFinite(_y))
+            {
+                plot_x = util.printf("\%.10f", _x);
+                plot_y = util.printf("\%.10f", _y);
+                cPlotData.points[cPlotData..point.length()]=
+                <point><x>{plot_x}</x><y>{plot_y}</y></point>
+            }
+            t += h;
+        }
+    } else { // prepare to data for plotting
+        var afBegin = (f.indexOf("\(")+1);
+        var afEnd = f.lastIndexOf("\)");
+        cPlotData=f.substring(afBegin,afEnd);
+        var re = /\)\s*;\s*\(/;
+        aPlotData= cPlotData.split(re);
+        var cPlotData=<points></points>;
+        with (Math) {
+            for ( var i=0; i<aPlotData.length; i++) {
+                var cTmp = "["+aPlotData[i]+"]";
+                var aTmp = eval(cTmp);
+                cPlotData.points[cPlotData..point.length()]=
+                <point><x>{aTmp[0]}</x><y>{aTmp[1]}</y></point>
+            }
+        }
+    }
+    cPlotData=cPlotData.toXMLString();
+    var annot = this.getAnnotRichMedia(pNum,"afRM"+baseName);
+    if ( annot )
+    {
+        if (!annot.activated || wait ) {
+            annot.activated=true;
+            afWait4Activation(
+                graph_props,baseName,pNum,oDR,cPlotData,50);
+        }
+        else
+            annot.callAS("getPlotData", graph_props, oDR, cPlotData);
+    }
+}
+function createGraphData(baseName)
+{
+    if( aGraphData[baseName] == undefined ) {
+        aGraphData[baseName] = new Object();
+        aGraphData[baseName].aDomRngs=new Object();
+        aGraphData[baseName].aDom_P=new Object();
+        aGraphData[baseName].current = new Array();
+    }
+}
+function updateGraphData(graph_props,baseName,f)
+{
+    var which_graph=graph_props.graph;
+    if (aGraphData[baseName].current[which_graph] == undefined)
+        aGraphData[baseName].current[which_graph]=new Object();
+    aGraphData[baseName].current[which_graph].appearFN
+        =this.getField(baseName+"theFunction").value;
+    aGraphData[baseName].current[which_graph].hiddenFN=f;
+    aGraphData[baseName].current[which_graph].graph_props=graph_props;
+}
+\end{newsegment}
+\begin{newsegment}{AF: Supporting Form Fields}
+function clearGraph(graph_opts,baseName, pNum)
+{
+    which_graph=graph_opts.graph;
+    var aWhichGraph=/(c|p|a)(\d)/.exec(which_graph);
+    if ( aWhichGraph==null ) aWhichGraph=["","c","1"];
+    var isGraph = (aWhichGraph[1]=="c" || aWhichGraph[1]=="a");
+    switch(aWhichGraph[1]) {
+        case "p":
+            var which_series="p"+aWhichGraph[2];
+            break;
+        case "a":
+            var which_series="a"+aWhichGraph[2];
+            break;
+        default:
+            var which_series="c"+aWhichGraph[2];
+    }
+    ProcessIt = false;
+    afResetForms = new Array ();
+    for (var i=0; i<afSuffixes.length; i++)
+        afResetForms.push(baseName+afSuffixes[i]);
+    this.resetForm(afResetForms);
+    ProcessIt = true;
+    if ( aGraphData[baseName] == undefined ) return;
+    try { aGraphData[baseName].current = new Array(); } catch(e) {}
+    var oDR = getDomRng (baseName);
+    var annot = this.getAnnotRichMedia(pNum,"afRM"+baseName);
+    if ( annot )
+    {
+        annot.callAS("clearPlotData", {graph:"all"}, oDR);
+    }
+    if (event.shift) annot.activated=false;
+}
+function stripBrackets(aStr) {
+    var afBegin = (aStr.indexOf("[")+1);
+    var afEnd = aStr.lastIndexOf("]");
+    aStr= aStr.substring(afBegin,afEnd);
+    return aStr;
+}
+function EvalParse(str) {
+    return eval(ParseInput(String(str)));
+}
+function getDomRng (baseName)
+{
+    var x_min, x_max, y_min, y_max;
+    if ( baseName == null )
+        return { x_min: \af@DefaultDomMin, y_min: \af@DefaultRngMin,
+        x_max: \af@DefaultDomMax, y_max: \af@DefaultRngMax };
+    var f = this.getField(baseName+"theHiddenDom.min");
+    if ( f == null ) {
+        f = aGraphData[baseName].aDomRngs;
+        if ( f == null )
+            aGraphData[baseName].aDomRngs = {
+                  x_min: \af@DefaultDomMin, y_min: \af@DefaultRngMin,
+                  x_max: \af@DefaultDomMax, y_max: \af@DefaultRngMax };
+    } else {
+        x_min=eval(this.getField(baseName+"theHiddenDom.min").value);
+        x_max=eval(this.getField(baseName+"theHiddenDom.max").value);
+        y_min=eval(this.getField(baseName+"theHiddenRng.min").value);
+        y_max=eval(this.getField(baseName+"theHiddenRng.max").value);
+        aGraphData[baseName].aDomRngs={
+            x_min: x_min, y_min: y_min,
+            x_max: x_max,y_max: y_max };
+    }
+    return aGraphData[baseName].aDomRngs;
+}
+function populateDomRng(baseName,oDR)
+{
+    try{this.getField(baseName+"theDom.min").value=oDR.x_min}catch(e){};
+    try{this.getField(baseName+"theDom.max").value=oDR.x_max}catch(e){};
+    try{this.getField(baseName+"theRng.min").value=oDR.y_min}catch(e){};
+    try{this.getField(baseName+"theRng.max").value=oDR.y_max}catch(e){};
+}
+function getParaDom (baseName)
+{
+    var t_min, t_max;
+    if ( baseName == null )
+        return { t_min: \af@DefaultDomMint, t_max: \af@DefaultDomMaxt };
+    var f = this.getField(baseName+"theHiddenDom_t.min");
+    if ( f == null ) {
+        f = aGraphData[baseName].aDom_P;
+        if ( f == null )
+            aGraphData[baseName].aDom_P = {
+                t_min: \af@DefaultDomMint,
+                t_max: \af@DefaultDomMaxt };
+    } else {
+        t_min=eval(this.getField(baseName+"theHiddenDom_t.min").value);
+        t_max=eval(this.getField(baseName+"theHiddenDom_t.max").value);
+        aGraphData[baseName].aDom_P={ t_min: t_min, t_max: t_max };
+    }
+    return aGraphData[baseName].aDom_P;
+}
+function populateParaDom(baseName,oDp)
+{
+    try{this.getField(baseName+"theDom_t.min").value=oDp.t_min}
+        catch(e){};
+    try{this.getField(baseName+"theDom_t.max").value=oDp.t_max}
+        catch(e){};
+}
+function afWait4Activation (graph_props, baseName, pNum,%
+oDR, cPlotData, delay) {
+    var annotName = "afRM"+baseName;
+    scratchCounter += 1;
+    aTimeOutArray[scratchCounter] = app.setTimeOut(%
+'this.getAnnotRichMedia('+pNum+',"'
+    +annotName+'").callAS("getPlotData",'
+    + 'aTimeOutArray['+scratchCounter+'].graph_props,'
+    + 'aTimeOutArray['+scratchCounter+'].oDR,'
+    + 'aTimeOutArray['+scratchCounter+'].cPlotData)',50);
+    aTimeOutArray[scratchCounter].graph_props=graph_props;
+    aTimeOutArray[scratchCounter].oDR=oDR;
+    aTimeOutArray[scratchCounter].cPlotData=cPlotData;
+}
+function shiftHorVert (baseName,pNum,horVert,posNeg) {
+    var amtShift=baseName+"amtshift";
+    if ( horVert=="h" ) {
+        var LEP = baseName+"theDom.min";
+        var UEP= baseName+"theDom.max";
+    } else {
+        var amtShift=baseName+"amtshift";
+        var LEP = baseName+"theRng.min";
+        var UEP= baseName+"theRng.max";
+    }
+    var amtSft=this.getField(amtShift).value
+    amtSft=EvalParse(amtSft);
+    var gf_l=this.getField(LEP);
+    var gfv_l=Number(EvalParse(gf_l.value));
+    gf_l.value = (posNeg=="+") ?
+        (gfv_l+(Math.abs(amtSft))) : (gfv_l-(Math.abs(amtSft)));
+    gf_u=this.getField(UEP);
+    gfv_u=Number(EvalParse(gf_u.value));
+    gf_u.value = (posNeg=="+") ?
+        (gfv_u+(Math.abs(amtSft))) : (gfv_u-(Math.abs(amtSft)));
+    var g = aGraphData[baseName].aDomRngs;
+    var oPts = this.getField(baseName+"numNodes");
+    var nPts = ( oPts == null ) ? \af@defaultNumPoints : oPts.value;
+    if ( horVert=="h" ) {
+        g.x_min=gf_l.value;g.x_max=gf_u.value;
+    } else {
+        g.y_min=gf_l.value;g.y_max=gf_u.value;
+    }
+    var p = aGraphData[baseName].aDom_P;
+    for ( var o in aGraphData[baseName].current )
+    {
+        var gd = aGraphData[baseName].current[o];
+        gd.graph_props.populate=true;
+        if ( gd.graph_props.type=="cart" ) {
+            Graph_xy(gd.graph_props,baseName,pNum,
+            gd.appearFN,nPts,g);
+        } else { // gd.graph_props.type=="para"
+            Graph_xyt(gd.graph_props,baseName,pNum,
+            gd.appearFN,nPts,g,p);
+        }
+    }
+}
+function zoomInOut (baseName,pNum,posNeg) {
+    var amtShift=baseName+"amtshift";
+    var g = aGraphData[baseName].aDomRngs;
+    var oPts = this.getField(baseName+"numNodes");
+    var nPts = ( oPts == null ) ? \af@defaultNumPoints : oPts.value;
+// Begin horizontal calculations
+    var LEP = baseName+"theDom.min";
+    var UEP= baseName+"theDom.max";
+    var amtSft=this.getField(amtShift).value
+    amtSft=EvalParse(amtSft);
+    var gf_l=this.getField(LEP);
+    var gfv_l=Number(EvalParse(gf_l.value));
+    gf_l.value = (posNeg=="+") ?
+        (gfv_l+(Math.abs(amtSft))) : (gfv_l-(Math.abs(amtSft)));
+    gf_u=this.getField(UEP);
+    gfv_u=Number(EvalParse(gf_u.value));
+    gf_u.value = (posNeg=="+") ?
+        (gfv_u-(Math.abs(amtSft))) : (gfv_u+(Math.abs(amtSft)));
+    g.x_min=gf_l.value;
+    g.x_max=gf_u.value;
+// Begin vertical calculations
+    var LEP = baseName+"theRng.min";
+    var UEP= baseName+"theRng.max";
+    var gf_l=this.getField(LEP);
+    var gfv_l=Number(EvalParse(gf_l.value));
+    gf_l.value = (posNeg=="+") ?
+        (gfv_l+(Math.abs(amtSft))) : (gfv_l-(Math.abs(amtSft)));
+    gf_u=this.getField(UEP);
+    gfv_u=Number(EvalParse(gf_u.value));
+    gf_u.value = (posNeg=="+") ?
+        (gfv_u-(Math.abs(amtSft))) : (gfv_u+(Math.abs(amtSft)));
+    g.y_min=gf_l.value;
+    g.y_max=gf_u.value;
+    var p = aGraphData[baseName].aDom_P;
+    for ( var o in aGraphData[baseName].current )
+    {
+        var gd = aGraphData[baseName].current[o];
+        if ( gd.graph_props.type=="cart" ) {
+            Graph_xy(gd.graph_props,baseName,pNum,
+            gd.appearFN,nPts,g);
+        } else { // gd.graph_props.type=="para"
+            Graph_xyt(gd.graph_props,baseName,pNum,
+            gd.appearFN,nPts,g,p);
+        }
+    }
+}
+function saveDelSelAction (baseName)
+{
+    var f = this.getField(baseName+"theFunction");
+    var s = this.getField(baseName+"ComboSelect");
+    if ( f != null && s != null ) {
+        var nIndx = s.currentValueIndices;
+        var cExportV=s.getItemAt(s.currentValueIndices,true);
+        var cAppearV=s.getItemAt(s.currentValueIndices,false);
+        if (event.shift) {
+            s.deleteItemAt(s.currentValueIndices);
+            s.insertItemAt(cAppearV,("<"+cAppearV+"\afunused>"),nIndx);
+            s.currentValueIndices=nIndx;
+            f.value="<"+cAppearV+"\afunused>";
+        } else {
+            var newFunc = f.value;
+            var newFunc_tmp = newFunc.replace(/\s/g,"");
+            if ( newFunc_tmp == "" ) {
+                app.alert({cTitle:"AcroFLeX Graphing",
+                    cMsg:saveDelSelAlerti});
+            } else { // something there, let's test it
+                if(/\afploti/.test(cAppearV) ) {
+                    if (ck4PtsRe.test(newFunc)) {
+                    // A set of points to plot
+                        s.deleteItemAt(s.currentValueIndices);
+                        s.insertItemAt(cAppearV,newFunc,nIndx);
+                        s.currentValueIndices=nIndx;
+                    } else {/* does not appear to be a point */
+                        app.alert({cTitle:"AcroFLeX Graphing",
+                            cMsg:saveDelSelAlertii});
+                    }
+                } else {/* not plot, must be curve*/
+                    s.deleteItemAt(s.currentValueIndices);
+                    s.insertItemAt(cAppearV,newFunc,nIndx);
+                    s.currentValueIndices=nIndx;
+                }
+            }
+        }
+    }
+}
+function graphBtnAction (baseName,pNum)
+{
+    var s = this.getField(baseName+"ComboSelect");
+    var d;
+    var d, plot_curve="c1";
+    if ( s != null ) {
+        var nIndx = s.currentValueIndices;
+        var cAppearV=s.getItemAt(s.currentValueIndices,false);
+        if ( ( d = /\afploti\s+(\d)/.exec(cAppearV) ) != null ) {
+            plot_curve="p"+d[1];
+        } else {
+            if ( ( d = /\afcurvei\s+(\d)/.exec(cAppearV) ) != null ) {
+                plot_curve="c"+d[1];
+            } else {
+                app.alert({cTitle:"AcroFLeX Graphing",
+                    cMsg:graphBtnAlerti});
+            }
+        }
+    }
+    Graph_xy({graph:plot_curve},baseName,pNum);
+}
+function afsplitInterval(cInterval)
+{
+    var aDomTmp=stripBrackets(cInterval);
+    aDomTmp=aDomTmp.split(",");
+    return { LEP: aDomTmp[0], UEP: aDomTmp[1] };
+}
+\end{newsegment}
+\begin{newsegment}{AF: Keystroke/Formatting Functions}
+function keystrokeDomRng (fname)
+{
+    if (event.willCommit) {
+        var retn = ParseInput(event.value);
+        if ( !retn ) event.rc = false;
+        else {
+            try { eval ( retn ) }
+            catch(e) {
+                app.alert({cTitle:"AcroFLeX Graphing",
+                    cMsg:badNumberMsg});
+                event.rc=false;
+            };
+        }
+    }
+}
+function formatFileInput (fname)
+{
+    this.getField(fname).value = ParseInput(event.value);
+}
+function formatVarIntervals (fname)
+{
+    var val = Number(EvalParse(event.value));
+    this.getField(fname).value = val;
+}
+function formatFunctionInput (fname)
+{
+    var val = ParseInput(event.value);
+    this.getField(fname).value = val;
+}
+function keystrokeFunctionInput ()
+{
+    if (event.willCommit) {
+        var str = event.value.replace(/\s/g,"");
+        if ( str == "" ) {
+            app.alert({cTitle:"AcroFleX Graphing",
+            cMsg:saveDelSelAlerti});
+            event.rc = false;
+        }
+    }
+}
+function keystrokeNumPoints ()
+{
+    try{
+        var val = Number(EvalParse(event.value));
+    } catch(e) {
+        app.alert({cTitle:"AcroFLeX Graphing",
+            cMsg:badNumberMsg});
+         event.rc=false;
+         return;
+    }
+    if ( val < 0 ) {
+        app.alert({cTitle:"AcroFLeX Graphing",
+            cMsg:negNumberMsg});
+    } else {
+        if ( val == 0 ) {
+            app.alert({cTitle:"AcroFLeX Graphing",
+                cMsg:zeroNumberMsg});
+            val = \af@defaultNumPoints;
+        }
+    }
+    event.value = Math.ceil(Math.abs(val));
+}
+function keystrokeAmtShift()
+{
+    try{
+        var val = Number(EvalParse(event.value));
+    } catch(e) {
+        app.alert({cTitle:"AcroFLeX Graphing",
+            cMsg:badNumberMsg});
+         event.rc=false;
+         return;
+    }
+    if ( val < 0 ) {
+        app.alert({cTitle:"AcroFLeX Graphing",
+            cMsg:negShiftMsg});
+    } else {
+        if ( val == 0 ) {
+            app.alert({cTitle:"AcroFLeX Graphing",
+                cMsg:zeroShiftMsg});
+            val = 1;
+        }
+    }
+    event.value = Math.abs(val);
+}
+\end{newsegment}
+\begin{newsegment}{AF: Support for Custom Graphing Problems}
+function Graph_xytJS (func,xI,yI,xP,tI,graph,populate,wait,%
+type,form,gName,nPts) {
+    var oDom = afsplitInterval(xI);
+    var oRng = afsplitInterval(yI);
+    var oPlotD = afsplitInterval(xP);
+    var oP=new Object(), oD=new Object(), oDt=new Object();
+    oP.graph=graph;
+    oP.populate=populate;
+    oP.wait=wait;
+    if (type!="") oP.type=type;
+    if (form!="") oP.form=form;
+    oD={x_min:oDom.LEP,x_max:oDom.UEP,y_min:oRng.LEP,y_max:oRng.UEP,x_l:oPlotD.LEP,x_u:oPlotD.UEP};
+    if ( tI=="") {
+        Graph_xy(oP,gName,this.pageNum,func,nPts,oD);
+    } else {
+        var oDom_t = afsplitInterval(tI);
+        oDt={t_min:oDom_t.LEP,t_max:oDom_t.UEP};
+        Graph_xyt(oP,gName,this.pageNum,func,nPts,oD,oDt);
+    }
+}
+\end{newsegment}
+\end{insDLJS*}
+\begin{defineJS}{\af@WillClose}
+for (var n=0; n<this.numPages; n++) {
+    var rm = this.getAnnotsRichMedia(n);
+    if ( rm != undefined) {
+        for (var i=0; i<rm.length; i++ ) rm[i].activated=false;
+    }
+}
+\end{defineJS}
+\let\af@save@developer@will@Close\developer@will@Close
+\def\developer@will@Close{%
+    \af@save@developer@will@Close
+    \af@WillClose
+}
+\begin{execJS}{afreset}
+var aResetFields=new Array();
+var fname;
+var re=/theFunction|theDom|theRng/;
+for (var i=0; i< this.numFields; i++) {
+    fname = this.getNthFieldName(i);
+    if ( re.test(fname) ) aResetFields.push(fname);
+}
+if (aResetFields.length !=0)
+    try {this.resetForm(aResetFields)} catch(e){};
+\end{execJS}
+\InputIfFileExists{\af@lang@type}{}{%
+    \PackageWarning{acroflex}{Could not find the language file
+    \af@lang@type,\MessageBreak please place this file on the latex
+    search path.}
+}
+\af@restoreCats
+\endinput
+%%
+%% End of file `acroflex.sty'.

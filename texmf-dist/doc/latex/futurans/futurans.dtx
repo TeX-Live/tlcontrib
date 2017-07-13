@@ -1,0 +1,658 @@
+% \iffalse
+% $Id: futurans.dtx,v 1.20 2008-03-21 16:09:46 boris Exp $
+%
+% Copyright (c) 2008, Boris Veytsman
+%
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met: 
+%
+%    * Redistributions of source code must retain the above copyright
+%    notice, this list of conditions and the following disclaimer. 
+%    * Redistributions in binary form must reproduce the above
+%    copyright notice, this list of conditions and the following
+%    disclaimer in the documentation and/or other materials provided
+%    with the distribution. 
+%    * Neither the name of the original author nor the names of the
+%    contributors may be used to endorse or promote products derived
+%    from this software without specific prior written permission. 
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+% CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+% INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+% BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+% TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+% DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+% ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+% OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+%
+% \fi 
+% \CheckSum{499}
+%
+%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~} 
+%
+%\iffalse
+% Taken from xkeyval.dtx
+%\fi
+%\makeatletter
+%\def\DescribeOption#1{\leavevmode\@bsphack
+%              \marginpar{\raggedleft\PrintDescribeOption{#1}}%
+%              \SpecialOptionIndex{#1}\@esphack\ignorespaces}
+%\def\PrintDescribeOption#1{\strut\emph{option}\\\MacroFont #1\ }
+%\def\SpecialOptionIndex#1{\@bsphack
+%    \index{#1\actualchar{\protect\ttfamily#1}
+%           (option)\encapchar usage}%
+%    \index{options:\levelchar#1\actualchar{\protect\ttfamily#1}\encapchar
+%           usage}\@esphack}
+%\def\DescribeOptions#1{\leavevmode\@bsphack
+%  \marginpar{\raggedleft\strut\emph{options}%
+%  \@for\@tempa:=#1\do{%
+%    \\\strut\MacroFont\@tempa\SpecialOptionIndex\@tempa
+%  }}\@esphack\ignorespaces}
+%\makeatother
+%
+%
+% \MakeShortVerb{|}
+% \GetFileInfo{futurans.dtx}
+% \title{\LaTeX{} Support For Futura Fonts From Adobe As Used By No
+% Starch Press}
+% \author{Boris Veytsman\thanks{%
+% \href{mailto:borisv@lk.net}{\texttt{borisv@lk.net}},
+% \href{mailto:boris@varphi.com}{\texttt{boris@varphi.com}}}} 
+% \date{\filedate, \fileversion}
+% \maketitle
+% \begin{abstract}
+%   This package provides \LaTeX{} support for the Futura fonts from
+%   Adobe (the version currently used by No Starch Press).  It has
+%   everything you need to typeset in these fonts - except the font
+%   itself, of course. 
+% \end{abstract}
+% \tableofcontents
+%
+% \changes{v1.0}{2008/02/18}{First fully functional version} 
+% \changes{v1.0a}{2008/02/21}{Documentation update} 
+% \changes{v1.0b}{2008/02/25}{Installation update} 
+% \changes{v1.1}{2008/02/26}{Added light condensed letterspaced, bold
+% compressed and heavy compressed fonts} 
+% \changes{v1.3}{2008/03/20}{Documentation update} 
+% \changes{v1.3}{2008/03/20}{Added medium letterspaced and heavy
+% letterspaced fonts} 
+% \clearpage
+%
+%
+%\section{Introduction}
+%\label{sec:intro}
+%
+% This package provides support files for the Futura Font family from
+% Adobe.  According to the Fontname scheme~\cite{fontname} it
+% corresponds to the family |pfu|.  There is a package on CTAN
+% supporting these fonts~\cite{w-a-schmidt}.  Unfortunately the AFM
+% files provided by it seems to be slightly different from the ones
+% used by \emph{No Starch Press,} \url{http://www.nostarch.com}.  The
+% analysis of the copyright statements shows that Walter Schmidt's
+% fonts are newer than ours (the latter are dated 1987).  To prevent
+% clash with his |pfu| package, I chose the name |pfv| for this
+% release.
+%
+% This package is released under BSD license to make updating the
+% fonts metrics easier.
+%
+% The support is limited to T1 and TS1 encoding.  No VTeX support
+% files are included.
+%
+%
+%\section{Installation}
+%\label{sec:install}
+%
+%
+%
+% First, you need to purchase the fonts themselves: the |pfb| files
+% are \emph{not} included in the package.  If you got the fonts from
+% \emph{No Starch press,} do not rename the |pfb| files.  However, if
+% there are uppercase letters in your file names, downcase them.  If
+% you obtained the files from another source, rename the fonts
+% according to Table~\ref{tab:PFB}.  If your \TeX{} system is
+% TDS-compliant, install the files into
+% \path{$TEXMF/fonts/type1/public/futurans}. Then download
+% \url{http://ctan.tug.org/install/fonts/psfonts/adobe/futurans.tds.zip}
+% and unzip this file in \path{$TEXMF}.  Add |+pfv.map| to the
+% configuration files of dvips, pdftex and your dvi previewer.
+%
+%  
+% Run updmap and texhash programs to update the configuration files
+% and file names database.
+%
+%
+%
+% \begin{table}[tp]
+%   \centering
+%   \caption{PFB Files}
+%   \label{tab:PFB}
+%
+%   \begin{tabular}{lll}
+%     \toprule
+%    File  &  Font & NFSS Code\\
+%    \midrule
+%    |futucl13.pfb| &  Futura Condensed Light & |lc|\\
+%    |futurc83.pfb| &  Futura Condensed Medium & |mc|\\
+%    |futucb18.pfb| &  Futura Condensed Bold  & |bc|\\
+%    |futceb44.pfb| &  Futura Condensed Extra Bold & |ebc|\\
+%    |futurl82.pfb| &  Futura Light & |l|\\
+%    |futura.pfb| &  Futura Medium & |m|\\
+%    |futurb37.pfb| &  Futura Book  & |k|\\
+%    |futurb41.pfb| &  Futura Bold & |b|\\
+%    |futurh79.pfb| &  Futura Heavy & |h|\\
+%    \bottomrule
+%   \end{tabular}
+%
+% \end{table}
+%
+%
+%\section{Using \LaTeX{} Style }
+%\label{sec:futurans.sty}
+%
+% The package supplies a number of fonts.  The series are listed in
+% Table~\ref{tab:PFB}. Each fonts has normal, slanted (oblique) and
+% small caps version. There are additional series necessary to typeset
+% books in \emph{No Starch Press} style.  They were generated using
+% Fontinst~\cite{Jeffrey04:Fontinst}.  These series are available for
+% Roman fonts only and are listed in Table~\ref{tab:addseries}.  To
+% select any font, issue the corresponding NFSS command, for example
+% |\fontfamily{pfv}\fontseries{ebc}\selectfont|.  To use make the font
+% the default sans serif font you may add |\usepackage{futurans}| to
+% your preamble.
+%
+% \begin{table}[tp]
+%   \centering
+%
+%   \caption{Additional Font Series Available}
+%   \label{tab:addseries}
+%   \begin{tabular}{ll}
+%     \toprule
+%     NFSS Code & Font\\
+%     \midrule
+%     |lq|  & Futura Light Letterspaced (10\% spread)\\
+%     |mq|  & Futura Medium Letterspaced (10\% spread)\\
+%     |bq|  & Futura Bold Letterspaced (10\% spread)\\
+%     |hq|  & Futura Heavy Letterspaced (10\% spread)\\
+%     |bp|  & Futura Bold Extra Compressed (110\% stretched Condensed)\\
+%     |hp|  & Futura Heavy Compressed (90\% shrunk Heavy)\\
+%     \bottomrule
+%   \end{tabular}
+%   
+% \end{table}
+%
+%
+% \DescribeOption{scaled}
+% If you mix Futura with other fonts, you may want to scale it to get
+% better blending of Sans Serif with Roman.  The package option |scaled|
+% can be used for this, for example
+% |\usepackage[scaled=0.95]{futurans}|. 
+%
+%
+%
+%
+% \StopEventually{
+%   \clearpage
+% \paragraph{Acknowledgement}
+% This package was written for No Starch Press,
+% \url{http://www.nostarch.com}. 
+%
+%   \bibliography{futurans}
+%   \bibliographystyle{unsrt}}
+%
+% \clearpage
+%\section{Implementation}
+%\label{sec:impl}
+%
+%\subsection{Identification}
+%\label{sec:ident}
+%
+% We start with the declaration who we are.  Most |.dtx| files put
+% driver code in a separate driver file |.drv|.  We roll this code into the
+% main file, and use the pseudo-guard |<gobble>| for it.
+%    \begin{macrocode}
+%<style>\NeedsTeXFormat{LaTeX2e}
+%<*gobble>
+\ProvidesFile{futurans.dtx}
+%</gobble>
+%<style>\ProvidesClass{futurans}
+%<pfv-drv>\ProvidesFile{pfv-drv.tex}
+%<pfv-map>\ProvidesFile{pfv-map.tex}
+%<*!t1q&!ts1q>
+[2008/03/20 v1.3 Using Futura Fonts in LaTeX]
+%</!t1q&!ts1q>
+%    \end{macrocode}
+% And the driver code:
+%    \begin{macrocode}
+%<*gobble>
+\documentclass{ltxdoc}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,
+            pagecolor=black,urlcolor=black,hyperindex=false]{hyperref}
+\PageIndex
+\CodelineIndex
+\RecordChanges
+\EnableCrossrefs
+\begin{document}
+  \DocInput{futurans.dtx}
+\end{document}
+%</gobble> 
+%    \end{macrocode}
+%
+%
+%\subsection{Fontinst Driver}
+%\label{sec:drv}
+%
+% This follows~\cite{fontinstallationguide}.
+% 
+% First, the preamble
+%    \begin{macrocode}
+%<*pfv-drv>
+\input fontinst.sty
+\setint{smallcapsscale}{750}
+\setint{slant}{167}
+\substitutesilent{bx}{b}
+%    \end{macrocode}
+%
+%
+% \begin{macro}{bpscale}
+% \begin{macro}{hpscale}
+% \changes{v1.2}{2008/02/29}{Changed scaling} 
+% We scale condensed bold condensed  and heavy
+% fonts to get compressed fonts:
+%    \begin{macrocode}
+\setint{bpscale}{1100}
+\setint{hpscale}{900}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%
+% \begin{macro}{qspread}
+% \changes{v1.2}{2008/02/29}{Changed letterspacing} 
+% We spread light to get light letterspaced:
+%    \begin{macrocode}
+\setint{qspread}{50}
+%    \end{macrocode}
+% \end{macro}
+% 
+% Starting recording transforms:
+%    \begin{macrocode}
+\recordtransforms{pfv-rec.tex}
+%    \end{macrocode}
+%
+% Standard fonts:
+%    \begin{macrocode}
+\transformfont{pfvl8rc}{\reencodefont{8r}{\fromafm{futucl13}}}
+\transformfont{pfvm8rc}{\reencodefont{8r}{\fromafm{futurc83}}}
+\transformfont{pfvb8rc}{\reencodefont{8r}{\fromafm{futucb18}}}
+\transformfont{pfvx8rc}{\reencodefont{8r}{\fromafm{futceb44}}}
+\transformfont{pfvl8r}{\reencodefont{8r}{\fromafm{futurl82}}}
+\transformfont{pfvm8r}{\reencodefont{8r}{\fromafm{futura}}}
+\transformfont{pfvk8r}{\reencodefont{8r}{\fromafm{futurb37}}}
+\transformfont{pfvb8r}{\reencodefont{8r}{\fromafm{futurb41}}}
+\transformfont{pfvh8r}{\reencodefont{8r}{\fromafm{futurh79}}}
+%    \end{macrocode}
+%
+%
+% Oblique fonts (we do not have original Adobe Oblique fonts, so we
+% fake them):
+%    \begin{macrocode}
+\transformfont{pfvlo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futucl13}}}
+\transformfont{pfvmo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futurc83}}}
+\transformfont{pfvbo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futucb18}}}
+\transformfont{pfvxo8rc}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futceb44}}}
+\transformfont{pfvlo8r}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futurl82}}}
+\transformfont{pfvmo8r}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futura}}}
+\transformfont{pfvko8r}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futurb37}}}
+\transformfont{pfvbo8r}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futurb41}}}
+\transformfont{pfvho8r}{\slantfont{\int{slant}}%
+  \reencodefont{8r}{\fromafm{futurh79}}}
+%    \end{macrocode}
+%
+%
+% Compressed fonts:
+%    \begin{macrocode}
+\transformfont{pfvb8rp}{\xscalefont{\int{bpscale}}%
+  \reencodefont{8r}{\fromafm{futucb18}}}
+\transformfont{pfvh8rp}{\xscalefont{\int{hpscale}}%
+  \reencodefont{8r}{\fromafm{futurh79}}}
+%    \end{macrocode}
+% 
+%
+%
+% There is no hook in |fontinst.sty| for writing our own preamble to
+% |.fd| file.  However, we need to add scaling commands to the
+% preamble. OK, we will patch fontinst:
+%    \begin{macrocode}
+\fontinstcc
+\def\fd_family#1#2#3{
+   \a_toks{#3}
+   \edef\lowercase_file{\lowercase{
+     \edef\noexpand\lowercase_file{#1#2.fd}}}
+   \lowercase_file
+   \open_out{\lowercase_file}
+   \out_line{\percent_char~Filename:~\lowercase_file}
+   \out_line{\percent_char~Created~by:~tex~\jobname}
+   \out_line{\percent_char~Created~using~fontinst~v\fontinstversion}
+   \out_line{}
+   \out_line{\percent_char~THIS~FILE~SHOULD~BE~PUT~IN~A~TEX~INPUTS~
+      DIRECTORY}
+   \out_line{}
+   \out_line{\string\ProvidesFile{\lowercase_file}}
+   \out_lline{[
+      \the\year/
+      \ifnum10>\month0\fi\the\month/
+      \ifnum10>\day0\fi\the\day\space
+      Fontinst~v\fontinstversion\space
+      font~definitions~for~#1/#2.
+   ]}
+   \out_line{}
+%    \end{macrocode}
+% Here is our patch:
+%    \begin{macrocode}
+   \out_line{\string\expandafter\string\ifx\string\csname\space
+     Fns@scale\string\endcsname\string\relax}
+   \out_line{\space\string\let\string\Fns@@scale\string\@empty}
+   \out_line{\string\else}
+   \out_line{\space\string\edef\string\Fns@@scale\left_brace_char 
+       s*[\string\csname\space Fns@scale\string\endcsname]
+       \right_brace_char\percent_char}
+   \out_line{\string\fi\percent_char}
+   \out_line{}
+%    \end{macrocode}
+% End of the patch.
+%    \begin{macrocode}
+   \out_line{\string\DeclareFontFamily{#1}{#2}{\the\a_toks}}
+   {
+      \csname #1-#2\endcsname
+      \out_line{}
+      \let\do_shape=\substitute_shape
+      \csname #1-#2\endcsname
+      \let\do_shape=\remove_shape
+      \csname #1-#2\endcsname
+   }
+   \x_cs\g_let{#1-#2}\x_relax
+   \out_line{}
+   \out_line{\string\endinput}
+   \close_out{Font~definitions}
+}
+\normalcc
+%    \end{macrocode}
+% 
+% 
+% Now we install the fonts.  First T1.  Note the scaling code (taken
+% from PSNFSS packages).  Also, we generate a lot of fake small caps
+% fonts. 
+%    \begin{macrocode}
+\installfonts
+\installfamily{T1}{pfv}{}
+\installfont{pfvl8tc}{pfvl8rc,newlatin}{t1}{T1}{pfv}{lc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvm8tc}{pfvm8rc,newlatin}{t1}{T1}{pfv}{mc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8tc}{pfvb8rc,newlatin}{t1}{T1}{pfv}{bc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvx8tc}{pfvx8rc,newlatin}{t1}{T1}{pfv}{ebc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8t}{pfvl8r,newlatin}{t1}{T1}{pfv}{l}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvm8t}{pfvm8r,newlatin}{t1}{T1}{pfv}{m}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvk8t}{pfvk8r,newlatin}{t1}{T1}{pfv}{k}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8t}{pfvb8r,newlatin}{t1}{T1}{pfv}{b}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvh8t}{pfvh8r,newlatin}{t1}{T1}{pfv}{h}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8tp}{pfvb8rp,newlatin}{t1}{T1}{pfv}{bp}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvh8tp}{pfvh8rp,newlatin}{t1}{T1}{pfv}{hp}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvlo8tc}{pfvlo8rc,newlatin}{t1}{T1}{pfv}{lc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvmo8tc}{pfvmo8rc,newlatin}{t1}{T1}{pfv}{mc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvbo8tc}{pfvbo8rc,newlatin}{t1}{T1}{pfv}{bc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvxo8tc}{pfvxo8rc,newlatin}{t1}{T1}{pfv}{ebc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvlo8t}{pfvlo8r,newlatin}{t1}{T1}{pfv}{l}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvmo8t}{pfvmo8r,newlatin}{t1}{T1}{pfv}{m}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvko8t}{pfvko8r,newlatin}{t1}{T1}{pfv}{k}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvbo8t}{pfvbo8r,newlatin}{t1}{T1}{pfv}{b}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvho8t}{pfvho8r,newlatin}{t1}{T1}{pfv}{h}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvlc8tc}{pfvl8rc,newlatin}{t1c}{T1}{pfv}{lc}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvmc8tc}{pfvm8rc,newlatin}{t1c}{T1}{pfv}{mc}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvbc8tc}{pfvb8rc,newlatin}{t1c}{T1}{pfv}{bc}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvxc8tc}{pfvx8rc,newlatin}{t1c}{T1}{pfv}{ebc}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvlc8t}{pfvl8r,newlatin}{t1c}{T1}{pfv}{l}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvmc8t}{pfvm8r,newlatin}{t1c}{T1}{pfv}{m}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvkc8t}{pfvk8r,newlatin}{t1c}{T1}{pfv}{k}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvbc8t}{pfvb8r,newlatin}{t1c}{T1}{pfv}{b}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvhc8t}{pfvh8r,newlatin}{t1c}{T1}{pfv}{h}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8tlq}{pfvl8r,newlatin}{t1q}{T1}{pfv}{lq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8tmq}{pfvm8r,newlatin}{t1q}{T1}{pfv}{mq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8tbq}{pfvb8r,newlatin}{t1q}{T1}{pfv}{bq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8thq}{pfvh8r,newlatin}{t1q}{T1}{pfv}{hq}{n}{
+  <->\string\Fns@@scale}
+\endinstallfonts
+%    \end{macrocode}
+% 
+% And then TS1
+%    \begin{macrocode}
+\installfonts
+\installfamily{TS1}{pfv}{}
+\installfont{pfvl8cc}{pfvl8rc,textcomp}{ts1}{TS1}{pfv}{lc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvm8cc}{pfvm8rc,textcomp}{ts1}{TS1}{pfv}{mc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8cc}{pfvb8rc,textcomp}{ts1}{TS1}{pfv}{bc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvx8cc}{pfvx8rc,textcomp}{ts1}{TS1}{pfv}{ebc}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8c}{pfvl8r,textcomp}{ts1}{TS1}{pfv}{l}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvm8c}{pfvm8r,textcomp}{ts1}{TS1}{pfv}{m}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvk8c}{pfvk8r,textcomp}{ts1}{TS1}{pfv}{k}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8c}{pfvb8r,textcomp}{ts1}{TS1}{pfv}{b}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvh8c}{pfvh8r,textcomp}{ts1}{TS1}{pfv}{h}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvb8cp}{pfvb8rp,textcomp}{ts1}{TS1}{pfv}{bp}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvh8cp}{pfvh8rp,textcomp}{ts1}{TS1}{pfv}{hp}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvlo8cc}{pfvlo8rc,textcomp}{ts1}{TS1}{pfv}{lc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvmo8cc}{pfvmo8rc,textcomp}{ts1}{TS1}{pfv}{mc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvbo8cc}{pfvbo8rc,textcomp}{ts1}{TS1}{pfv}{bc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvxo8cc}{pfvxo8rc,textcomp}{ts1}{TS1}{pfv}{ebc}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvlo8c}{pfvlo8r,textcomp}{ts1}{TS1}{pfv}{l}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvmo8c}{pfvmo8r,textcomp}{ts1}{TS1}{pfv}{m}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvko8c}{pfvko8r,textcomp}{ts1}{TS1}{pfv}{k}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvbo8c}{pfvbo8r,textcomp}{ts1}{TS1}{pfv}{b}{sl}{
+  <->\string\Fns@@scale}
+\installfont{pfvho8c}{pfvho8r,textcomp}{ts1}{TS1}{pfv}{h}{sl}{
+  <->\string\Fns@@scale}
+\installfontas{pfvl8cc}{TS1}{pfv}{lc}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvm8cc}{TS1}{pfv}{mc}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvb8cc}{TS1}{pfv}{bc}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvx8cc}{TS1}{pfv}{ebc}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvl8c}{TS1}{pfv}{l}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvm8c}{TS1}{pfv}{m}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvk8c}{TS1}{pfv}{k}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvb8c}{TS1}{pfv}{b}{sc}{
+  <->\string\Fns@@scale}
+\installfontas{pfvh8c}{TS1}{pfv}{h}{sc}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8clq}{pfvl8r,textcomp}{ts1q}{TS1}{pfv}{lq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8cmq}{pfvm8r,textcomp}{ts1q}{TS1}{pfv}{mq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8cbq}{pfvb8r,textcomp}{ts1q}{TS1}{pfv}{bq}{n}{
+  <->\string\Fns@@scale}
+\installfont{pfvl8chq}{pfvh8r,textcomp}{ts1q}{TS1}{pfv}{hq}{n}{
+  <->\string\Fns@@scale}
+\endinstallfonts
+%    \end{macrocode}
+% 
+% And the end:
+%    \begin{macrocode}
+\endrecordtransforms
+\bye
+%</pfv-drv>
+%    \end{macrocode}
+% 
+%
+%\subsection{Letterspacing Driver}
+%\label{sec:letterspace}
+%
+% This follows~\cite{Hoenig98:TeXUnbound}.  We need both |T1| and
+% |TS1| files:
+%    \begin{macrocode}
+%<*t1q|ts1q>
+\relax
+\encoding
+\resetint{letterspacing}{\int{qspread}}
+\setcommand\gobblethree#1#2#3{}%
+\let\ligature=\gobblethree
+%<t1q>\inputetx{t1}
+%<ts1q>\inputetx{ts1}
+\endencoding
+%</t1q|ts1q>
+%    \end{macrocode}
+% 
+%
+%\subsection{Fontmap Generation}
+%\label{sec:fontmap}
+%
+% This is a standard procedure~\cite{fontinstallationguide}
+%    \begin{macrocode}
+%<*pfv-map>
+\input finstmsc.sty
+\resetstr{PSfontsuffix}{.pfb}
+\adddriver{dvips}{pfv.map}
+\input pfv-rec.tex
+\donedrivers
+\bye
+%</pfv-map>
+%    \end{macrocode}
+%
+%
+%
+%\subsection{Style File}
+%\label{sec:style}
+%
+%
+% The scaling code is from the |helvet| package:
+%    \begin{macrocode}
+%<*style>
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{keyval}
+\define@key{Futurans}{scaled}[1]{%
+  \def\Fns@scale{#1}}
+\def\ProcessOptionsWithKV#1{%
+  \let\@tempc\relax
+  \let\Fns@tempa\@empty
+  \ifx\@classoptionslist\relax\else
+    \@for\CurrentOption:=\@classoptionslist\do{%
+      \@ifundefined{KV@#1@\CurrentOption}%
+      {}%
+      {%
+        \edef\Fns@tempa{\Fns@tempa,\CurrentOption,}%
+        \@expandtwoargs\@removeelement\CurrentOption
+          \@unusedoptionlist\@unusedoptionlist
+      }%
+    }%
+  \fi
+  \edef\Fns@tempa{%
+    \noexpand\setkeys{#1}{%
+      \Fns@tempa\@ptionlist{\@currname.\@currext}%
+    }%
+  }%
+  \Fns@tempa
+  \let\CurrentOption\@empty
+}
+\ProcessOptionsWithKV{Futurans}
+\AtEndOfPackage{%
+  \let\@unprocessedoptions\relax
+}
+\renewcommand{\sfdefault}{pfv}
+%</style>
+%    \end{macrocode}
+%
+%
+%\Finale
+%\clearpage
+%
+%\PrintChanges
+%\clearpage
+%\PrintIndex
+%
+\endinput

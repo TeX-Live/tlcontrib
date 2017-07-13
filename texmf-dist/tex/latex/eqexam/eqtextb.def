@@ -1,0 +1,765 @@
+%%
+%% This is file `eqtextb.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eqexam.dtx  (with options: `copyright,textbook')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eqexam.sty package,                                  %%
+%% Copyright (C) 2005--2017  D. P. Story                %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License 1.2    %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ProvidesFile{eqtextb.def}
+ [2016/01/18 v4.6 Cmds used by the fortextbook option (dps)]
+\define@boolkey{eqe@tbopts}[is]{instred}[true]{}
+\define@boolkey{eqe@tbopts}[is]{studented}[true]{%
+    \ifisstudented
+    \tbfilterOutEvenNums
+    \fi
+}
+\def\tb@beginexam@code{%
+    \ifisinstred\answerkeytrue\eq@proofingtrue\fi}
+\newcommand{\tbfilterOutEvenNums}{%
+    \def\eqEXt##1##2{\ifodd##1\let\eqe@next\relax\else
+    \def\eqe@next{\gobbletoEndEXt}\fi\eqe@next}%
+}
+\newcommand{\tballowAllNums}{%
+    \let\eqEXt\@gobbletwo
+    \let\endeqEXt\relax
+}
+\define@boolkey{eqe@tbopts}[is]{marginans}[true]{}
+\define@boolkey{eqe@tbopts}[is]{inlineans}[true]{}
+\define@boolkey{eqe@tbopts}[]{marginsonleft}[true]
+    {\@mparswitchfalse\reversemarginpar}
+\define@boolkey{eqe@tbopts}[show]{ssols}[true]{}
+\define@boolkey{eqe@tbopts}[show]{lsols}[true]{%
+    \ifshowlsols\let\tb@soln@choice\tb@showlsols\fi}
+\newcommand{\textbookOpts}[1]{\setkeys{eqe@tbopts}{#1}%
+    \ifisinstred\global\isstudentedfalse\else
+        \ifisstudented\global\isinstredfalse
+    \fi\fi
+    \ifdim\tbmarparboxwidth=1sp\else
+    \expandafter\tbMakeFinalCalcs\fi
+}
+\isstudentedtrue
+\isinstredfalse
+\ismarginansfalse
+\isinlineansfalse
+\@onlypreamble{\textbookOpts}
+\newcommand{\turnOffMarAnsOnAnsInline}{%
+    \global\ismarginansfalse\global\isinlineanstrue
+    \insMidMarg{\global\ismarginansfalse
+        \global\isinlineanstrue}%
+}
+\newcommand{\turnOnMarAnsOffAnsInline}{%
+    \global\ismarginanstrue\global\isinlineansfalse
+    \insMidMarg{\global\ismarginanstrue
+        \global\isinlineansfalse}%
+}
+\newcommand{\toggleInstrAns}{%
+    \ifisinstred\ifismarginans
+        \global\ismarginansfalse\global\isinlineanstrue
+        \insMidMarg{\global\ismarginansfalse
+            \global\isinlineanstrue}%
+    \else
+        \global\ismarginanstrue\global\isinlineansfalse
+        \insMidMarg{\global\ismarginanstrue
+            \global\isinlineansfalse}%
+    \fi\fi
+}
+\newif\ifWithinANSGrp\WithinANSGrpfalse
+\newif\ifftb@isANSListOpen\ftb@isANSListOpenfalse
+\newcommand{\bGrpANS}{%
+    \if\probstar*\else
+        \PackageError{eqexam}{Use of \string\bGrpANS\space
+        only applies\MessageBreak to the problem* environment}{Please
+        remove this \string\bGrpANS.}%
+    \fi
+    \ifWithinANSGrp
+        \global\WithinANSGrpfalse
+        \let\tb@next\relax
+        \PackageError{eqexam}{\string\bGrpANS\space already open}
+        {You issued an earlier \string\bGrpANS,
+         but did not close it.}%
+    \else
+        \global\WithinANSGrptrue
+        \global\ftb@isANSListOpenfalse
+        \def\tb@next{\ANS}%
+    \fi
+    \tb@next
+}
+\newcommand{\eGrpANS}{%
+    \if\probstar*\else
+        \PackageError{eqexam}{Use of \string\eGrpANS\space
+        only applies\MessageBreak to the problem* environment}{Please
+        remove this \string\eGrpANS.}%
+    \fi
+    \ifWithinANSGrp
+        \global\WithinANSGrpfalse
+        \def\tb@next{\ANS}%
+     \else
+        \let\tb@next\relax
+        \PackageError{eqexam}{\string\eGrpANS\space already closed}
+        {You've issued two consecutive \string\eGrpANS\space
+         commands,\MessageBreak either remove this one
+        or the previous one.}%
+     \fi
+    \tb@next
+}
+\newcommand{\ANS}{\@ifstar{\let\tb@istart=1\tb@ANS}
+    {\let\tb@istart=0\tb@ANS}}
+\def\ftb@defineInsSpan#1{\def\ftb@argi{#1}\ifx\ftb@argi\@empty
+    \def\ftb@InsSpan{}\else\ftb@spanPrts{#1}%
+    \def\ftb@InsSpan{\noexpand\hspace{-\labelsep}%
+    \noexpand\textcolor{MRGPARTcolor}{--}\noexpand
+    \makebox[\noexpand\tbmrgpartwdth]{\noexpand
+    \tb@mrgPartFmt{\ftb@EndSpanPrts}}\eqe@hspannerMrg}\fi
+}
+\def\ftb@spanPrts#1{{%
+    \advance\value{partno}by#1\relax
+    \xdef\ftb@EndSpanPrts{\thepartno}}%
+}
+\def\ftb@EqeListPrtsFmt{\noexpand
+    \makebox[\noexpand\tbmrgpartwdth]{\noexpand
+    \tb@mrgPartFmt{\thepartno}}\nobreak
+}
+\def\ftb@OpenEqeListPrts{\noexpand
+   \begin{eqeList}[\tb@wparts@len]{\noexpand
+   \eqedsplyOnlyFrst{\theeqquestionnoi}%
+   {\thepartno}\noexpand\eqe@hspannerMrg\ftb@EqeListPrtsFmt}%
+}
+\def\ftb@CloseEqeList#1{\expandafter\insMidMarg%
+    \expandafter{\eqe@prehold#1\end{eqeList}}%
+}
+\newcommand{\grpANSDelimiter}{\textcolor{MRGPARTcolor}{,}\space}
+\newcommand{\tb@ANS}[2][]{%
+    \ifisinstred
+        \ifisinlineans
+            \if\tb@istart0\ANSFmt{\theeqquestionnoi}{#2}\fi
+        \fi
+        \ifismarginans
+            \ftb@defineInsSpan{#1}%
+            \edef\eqe@prehold{%
+                \if\probstar*%
+                    \ifftb@isANSListOpen
+                       \ftb@EqeListPrtsFmt\noexpand\eqe@hspannerMrg
+                    \else
+                        \noexpand\par\kern0pt\noindent
+                        \ftb@OpenEqeListPrts\ftb@InsSpan
+                    \fi
+                \else
+                   \noexpand\begin{eqeList}%
+                    {\noexpand\tb@mrgDigitFmt{%
+                    \theeqquestionnoi\eqe@decPointMrg}}%
+                \fi
+            }%
+            \ifWithinANSGrp\global\ftb@isANSListOpentrue\fi
+            \ifWithinANSGrp
+                \expandafter\insMidMarg\expandafter
+                    {\eqe@prehold#2\grpANSDelimiter}%
+            \else
+                \expandafter\insMidMarg%
+                \expandafter{\eqe@prehold#2\end{eqeList}}%
+                \global\ftb@isANSListOpenfalse
+            \fi
+        \fi % \ifismarginans
+    \fi %\ifisinstred
+}
+\newenvironment{eqeList}[2][\tb@woparts@len]{\begin{list}{#2}{%
+    \def\argi{#1}\setlength{\labelwidth}{#1}%
+    \ifx\argi\tb@wparts@len
+    \settowidth{\labelsep}{\eqe@prtsepMrg}\else
+    \settowidth{\labelsep}{\eqe@hspannerMrg}\fi
+    \setlength{\leftmargin}{\labelwidth+\labelsep}%
+    \setlength{\parskip}{0pt}\setlength{\partopsep}{0pt}%
+    \setlength{\topsep}{1pt}\setlength{\parsep}{0pt}%
+    \setlength{\itemindent}{0pt}\setlength{\itemsep}{3pt}%
+}\item\relax}{\end{list}}
+\newcommand{\mrgDigitFmt}[1]{\def\tb@mrgDigitFmt##1{#1}}
+\mrgDigitFmt{#1}
+\definecolor{MRGPARTcolor}{named}{black}
+\newcommand{\mrgPartFmt}[1]{\def\tb@mrgPartFmt##1{#1}}
+\mrgPartFmt{\textcolor{MRGPARTcolor}{(\hfil#1\hfil)}}
+\definecolor{ANScolor}{rgb}{0,0,.8}
+\newcommand{\ANSFmt}[2]{\textcolor{ANScolor}{#2}}
+\def\eqe@decPointPrb{.}     % decimal point of prob number
+\def\eqe@prtsepPrb{\ }      % prob with parts, space after part
+\def\eqe@hspannerPrb{\ }    % space after prob number
+\providecommand{\prbDecPt}[1]{\def\eqe@decPointPrb{#1}}
+\providecommand{\prbPrtsep}[1]{\def\eqe@prtsepPrb{#1}}
+\providecommand{\exPrtsep}[1]{\def\eqe@prtsepPrb{#1}}
+\providecommand{\prbNumPrtsep}[1]{\def\eqe@hspannerPrb{#1}}
+\def\eqedecPointSoln{.}    % decimal point of prob number
+\def\eqe@prtsepSoln{\ }     % prob with parts, space after part
+\def\eqe@hspannerSoln{\ }   % space after prob number
+\newcommand{\solDecPt}[1]{\def\eqedecPointSoln{#1}}
+\newcommand{\solPrtsep}[1]{\def\eqe@prtsepSoln{#1}}
+\providecommand{\solNumPrtsep}[1]{\def\eqe@hspannerSoln{#1}}
+\def\eqe@decPointMrg{.}     % decimal point of prob number
+\def\eqe@prtsepMrg{\ }      % prob with parts, space after part
+\def\eqe@hspannerMrg{\ }    % space after prob number
+\newcommand{\mrgDecPt}[1]{\def\eqe@decPointMrg{#1}}
+\newcommand{\mrgPrtsep}[1]{\def\eqe@prtsepMrg{#1}}
+\newcommand{\mrgNumPrtsep}[1]{\def\eqe@hspannerMrg{#1}}
+\newcommand{\setMarIndents}[3][\normalsize\normalfont]{{%
+    \settowidth{\@tempdima}{#1#2\eqe@decPointMrg}%
+    \xdef\tb@woparts@len{\the\@tempdima}%
+    \settowidth{\@tempdima}%
+        {#1#2\eqe@decPointMrg\eqe@hspannerMrg#3}%
+    \xdef\tb@wparts@len{\the\@tempdima}%
+    \settowidth{\@tempdima}{#1#3}%
+    \xdef\tbmrgpartwdth{\the\@tempdima}%
+}}
+\setMarIndents{00}{(d)}
+\newdimen\solnGutter
+\newcommand{\setSolnIndent}[3][\normalsize\normalfont\bfseries]{%
+    {\settowidth{\@tempdima}{#1#2\eqedecPointSoln\eqe@hspannerSoln}%
+    \global\solnGutter\@tempdima
+    \settowidth{\@tempdima}{#1#3}%
+    \xdef\tbsolnpartwdth{\the\@tempdima}%
+}}
+\setSolnIndent{00}{(d)}
+\renewcommand{\setSolnMargins}[1]{%
+    \ifdim\solnGutter=0pt \setlength\eqemargin{#1}\else
+    \setlength\eqemargin{\solnGutter}\fi}
+\newcommand{\defaultSolnIndent}{\global\solnGutter=0pt}
+\defaultSolnIndent
+\renewcommand{\exlabelformat}{%
+    \tbprbNumFmt{\theeqquestionnoi\eqe@decPointPrb}}
+\newcommand{\prbNumFmt}[1]{\def\tbprbNumFmt##1{#1\eqe@hspannerPrb}}
+\prbNumFmt{\textbf{#1}}
+\renewcommand{\exsllabelformat}{\string\tbsolWoPrtsFmt{%
+    \theeqquestionnoi\string\eqedecPointSoln}}
+\renewcommand{\exsllabelformatwp}{\string\tbsolWPrtsFmt%
+    {\string\eqedsplyOnlyFrst{\theeqquestionnoi}{\thepartno}}%
+    {\thepartno}%
+}
+\newcommand{\solWoPrtsFmt}[1]{\def\tbsolWoPrtsFmt##1{%
+    \makebox[0pt][r]{#1\eqe@hspannerSoln}}}
+\solWoPrtsFmt{\textbf{#1}}
+\newcommand{\solWPrtsFmt}[2]{\def\tbsolWPrtsFmt##1##2{%
+    \makebox[0pt][r]{#1\eqe@hspannerSoln}%
+    \makebox[\tbsolnpartwdth][l]{#2}\eqe@prtsepSoln%
+}}
+\solWPrtsFmt{\textbf{#1}}{(\hfil#2\hfil)}
+\newcommand{\solWPrtsFmt@hang}[2]{%
+    \def\tbsolWPrtsFmt##1##2{%
+    \makebox[0pt][r]{#1\eqe@prtsepSoln%
+    \makebox[\tbsolnpartwdth][l]{#2}\eqe@hspannerSoln}%
+}}
+\let\bpartsmrk\relax
+\let\epartsmrk\relax
+\newcommand{\hangSolWPrtsFmt}[2]{%
+    \def\prior@parts@hook{%
+        \ifisleadin\else
+        \writeToSolnFile{^^J\protect\bpartsmrk}\fi}%
+    \def\post@parts@hook{%
+        \writeToSolnFile{\protect\epartsmrk^^J}}%
+    \def\bpartsmrk{\global\firstitemtrue\begin{eqepartsquestions}}%
+    \def\epartsmrk{\end{eqepartsquestions}\global\firstitemfalse}%
+    \let\solWPrtsFmt\solWPrtsFmt@hang
+     \solWPrtsFmt{#1}{#2}%
+}
+\newif\ifexamenv \examenvfalse
+\newif\iffirstemit \firstemittrue
+\newtoks\txtbkt@ks \txtbkt@ks={}
+\newtoks\txtbkt@ksi \txtbkt@ksi={}
+\newbox\txtbkb@xb@t
+\newbox\txtbkb@xt@p
+\newbox\txtbkb@xh@ld
+\let\tbTopMargin\relax
+\let\tbBotMargin\relax
+\long\def\tb@addtoTopMargin#1{\txtbkt@ksi={#1}%
+    \edef\eqe@tmphold{\the\txtbkt@ksi\the\txtbkt@ks}%
+    \global\txtbkt@ks=\expandafter{\eqe@tmphold}%
+}
+\newcommand{\tb@addtoMargin}[1]{%
+    \edef\eqe@tmphold{\the\txtbkt@ks}%
+    \global\txtbkt@ks=\expandafter{\eqe@tmphold#1}%
+}
+\newcommand{\tb@showlsols}{\includecomment{lsol}\excludecomment{ssol}}
+\newcommand{\tb@showssols}{\includecomment{ssol}\excludecomment{lsol}}
+\let\tb@soln@choice\tb@showssols
+\newcommand{\clearTopMargin}{\global\let\tbTopMargin\relax}
+\newcommand{\setTopMargin}[1]{%
+    \gdef\tbTopMargin{\color@begingroup\normalcolor
+        #1\color@endgroup}%
+    \gdef\tbSaveTopMargin{\color@begingroup\normalcolor
+        #1\color@endgroup}}
+\let\tbTopMargin\@empty
+\let\tbSaveTopMargin\@empty
+\newcommand{\clearBotMargin}{\global\let\tbBotMargin\relax}
+\newcommand{\setBotMargin}[1]{\gdef\tbBotMargin{#1}%
+    \gdef\tbSaveBotMargin{#1}}
+\let\tbBotMargin\@empty
+\let\tbSaveBotMargin\@empty
+\newcommand{\restoreLastTopMargin}{\expandafter\setTopMargin
+    \expandafter{\tbSaveTopMargin}}
+\newcommand{\restoreLastBotMargin}{\expandafter\setBotMargin
+    \expandafter{\tbSaveBotMargin}}
+\newcommand{\MarParBoxFmt}{\normalsfcodes
+    \normalfont\normalsize\normalbaselines\parindent0pt
+    \vbadness\@Mi \hbadness5000 \tolerance9999
+    \parskip0pt\raggedright %\spaceskip=0pt\xspaceskip=0pt
+    \setlength{\linewidth}{\tbmarparboxwidth}%
+}
+\newlength\tbmarparboxwidth
+\setlength\tbmarparboxwidth{1sp}
+\definecolor{MidMargcolor}{rgb}{0,0,.8}
+\newcommand{\midMargFmt}[1]{%
+    \def\tb@midMargFmt{\normalfont\normalsize\normalcolor#1}}
+\midMargFmt{\color{MidMargcolor}}
+\def\eqe@MarParBox#1{\lower\footskip\hbox{%
+    \leavevmode\parbox[b][\textheight+\footskip][t]%
+    {\tbmarparboxwidth}{\tb@midMargFmt#1}}} %
+\newcommand{\insMidMarg}[1]{%
+    \let\eqe@margininsert\@empty
+    \expandafter\tb@addtoMargin\expandafter{\eqe@margininsert#1}%
+}
+\newcommand{\tbPreMarginHeader}{\par\penalty0 \kern3pt}
+\newcommand{\tbPostMarginHeader}{\par\nobreak}
+\definecolor{HEADERcolor}{named}{black}
+\newcommand{\cngMargHeadColorTo}[1]{\insMidMarg{\gdef\tb@MHC{#1}}}
+\newcommand{\resetMargHeadColor}{\insMidMarg{\gdef\tb@MHC{HEADERcolor}}}
+\resetMargHeadColor
+\newcommand{\tbMarginHeaderFmt}[1]{\textcolor{\tb@MHC}{\textbf{#1}}}
+\newcommand{\insMargHead}[2][]{% dps
+    \insMidMarg{\tb@marginHeader{#1}{#2}}}
+\newcommand{\insProbHead}[2][]{%
+    \def\tb@argi{#1}\ifx\tb@argi\@empty
+        \protected@xdef\currProbHead{#2 \tbcontinued}\else
+        \protected@xdef\currProbHead{#1}\fi
+    \ifisinstred\ifismarginans
+        \insMidMarg{\tb@marginProbHeader{#1}{#2}}\fi\fi
+}
+\newcommand{\tb@marginProbHeader}[2]{%
+    \def\tb@argi{#1}\ifx\tb@argi\@empty
+    \tb@marginHeader{#2 \tbcontinued}{#2}\else
+    \tb@marginHeader{#1}{#2}\fi
+}
+\newcommand{\tb@marginHeader}[2]{\tbPreMarginHeader
+    \tbMarginHeaderFmt{#2}\def\tb@argi{#1}\ifx\tb@argi\@empty
+    \mark{#2}\else\mark{#1}\fi\tbPostMarginHeader
+}
+\newcommand{\tbcontinued}{(cont.)}
+\newcommand{\marparboxwidth}[1]{%
+    \setlength\tbmarparboxwidth{#1}%
+    \setlength{\marginparwidth}{\tbmarparboxwidth}%
+    \tbMakeFinalCalcs
+}
+\@onlypreamble\marparboxwidth
+\newcommand{\chkmarginboxwidth}{%
+    \ifdim\tbmarparboxwidth=1sp \PackageError{eqexam}%
+    {You have not set the value of\MessageBreak
+        \string\marparboxwidth}%
+    {Define the \string\marparboxwidth\space command}\fi
+}
+\newif\ifmarginsonleft \marginsonleftfalse
+\newcommand{\tbSetupForMargins}{%
+    \ifmarginsonleft
+        \setlength{\oddsidemargin}{\tbmarparboxwidth+\marginparsep}%
+        \setlength{\evensidemargin}{\oddsidemargin}%
+        \setlength{\textwidth}{\paperwidth-2in-\oddsidemargin}%
+    \else
+        \setlength{\oddsidemargin}{0pt}%
+        \setlength{\evensidemargin}{\tbmarparboxwidth+\marginparsep}%
+        \setlength{\textwidth}{%
+            \paperwidth-2in-\oddsidemargin-\evensidemargin}%
+    \fi
+}
+\newcommand{\tbplaceMargins}{{%
+    \setlength{\@tempdima}{%
+        \paperheight-1in-\topmargin-\headheight-\headsep-\textheight}%
+    \xdef\@evenlly{\strip@pt\@tempdima}%
+    \xdef\@oddlly{\@evenlly}%
+    \setlength{\@tempdima}{1in}%
+    \xdef\@evenllx{\strip@pt\@tempdima}%
+    \ifmarginsonleft\else
+        \setlength{\@tempdima}{1in+\textwidth+\marginparsep}\fi
+    \xdef\@oddllx{\strip@pt\@tempdima}%
+}}
+\newcommand{\tbMakeFinalCalcs}{%
+    \tbSetupForMargins
+    \tbplaceMargins
+}
+\newlength\tbminskipbtnlayers
+\setlength{\tbminskipbtnlayers}{6pt}
+\newif\ifiscarryover \iscarryoverfalse
+\newenvironment{carryOverFmt}[1]{#1\let\tb@carryoverFmt\@empty
+    \c@rryoverFmt{#1}}{}
+\def\c@rryoverFmt#1{%
+    \ifx\tb@carryoverFmt\@empty
+        \global\let\tb@carryoverFmt\@empty
+        \xdef\tb@co@page{\thepage}%
+        \gdef\tb@carryoverFmt{\ifnum\thepage>\tb@co@page\relax
+        #1\global\let\tb@carryoverFmt\@empty\fi}%
+    \fi
+}
+\let\tb@carryoverFmt\@empty
+\let\tb@rest@reMarginFmt\relax
+\def\tb@insertCarryOver#1{%
+    \let\tb@rest@reMarginFmt\relax
+    \ifiscarryover\ifx\tb@carryoverFmt\@empty\else
+        \let\tb@rest@reMarginFmt\tb@midMargFmt
+        \tb@carryoverFmt\fi\fi
+    #1 \tb@rest@reMarginFmt
+}
+\newif\iftb@shipoutPermitted \tb@shipoutPermittedtrue
+\newcommand{\turnOnFTBShipout}{\global\tb@shipoutPermittedtrue}
+\newcommand{\turnOffFTBShipout}{\global\tb@shipoutPermittedfalse}
+\newcommand{\eqe@tb@shipout}{\iftb@shipoutPermitted
+    \ifnum\arabic{page}=\tblastpageshipped
+    \let\tb@so@next\relax\else
+    \xdef\tblastpageshipped{\arabic{page}}%
+    \def\tb@so@next{\eqe@tb@ship@ut}\fi
+    \expandafter\tb@so@next\fi
+}
+\def\tblastpageshipped{-100}
+\newcommand{\eqe@tb@ship@ut}{%
+    \fboxsep=0pt\setlength{\unitlength}{1pt}%
+    \global\setbox\txtbkb@xb@t=\vbox\bgroup
+         \color@begingroup
+         \hsize=\tbmarparboxwidth
+         \vsize=\textheight
+         \MarParBoxFmt
+         \csname tbTopMargin\endcsname
+         \vskip\tbminskipbtnlayers
+\set@typeset@protect
+         \the\txtbkt@ks
+         \color@endgroup\vfil
+    \egroup
+    \global\setbox\txtbkb@xt@p=\vsplit\txtbkb@xb@t to\textheight
+    \ifvoid\txtbkb@xb@t\global\iscarryoverfalse
+    \else\global\iscarryovertrue\fi
+    \ifx\tbBotMargin\relax\else
+        \bgroup\setbox2=\vbox{%
+            \color@begingroup\normalcolor
+            \hsize=\tbmarparboxwidth\kern0pt
+            \MarParBoxFmt\csname tbBotMargin\endcsname
+            \color@endgroup
+            \kern0pt
+        }%
+        \dimen0=\textheight
+        \advance\dimen0-\ht\txtbkb@xh@ld
+        \advance\dimen0-\tbminskipbtnlayers
+        \setbox0=\vsplit\txtbkb@xt@p to \dimen0
+        \global\setbox\txtbkb@xb@t=\vbox{%
+            \unvbox\txtbkb@xt@p\unvbox\txtbkb@xb@t}%
+        \global\setbox\txtbkb@xt@p=\vbox{\unvbox0
+            \vfill\vskip\tbminskipbtnlayers
+            \vfil\unvbox2\relax}\egroup
+    \fi
+    \ifodd\value{page}%
+        \put(\@oddllx,\@oddlly){%
+            \eqe@MarParBox{\unvbox\txtbkb@xt@p}}\else
+        \put(\@evenllx,\@evenlly){%
+            \eqe@MarParBox{\unvbox\txtbkb@xt@p}}\fi
+    \global\txtbkt@ks={}\ifvoid\txtbkb@xb@t\else
+    \if!\splitbotmark!\global\let\tb@sbm@exp\relax\else
+        \xdef\tb@sbm@exp{\noexpand\tbPreMarginHeader
+            \noexpand\tbMarginHeaderFmt{\splitbotmark}%
+            \noexpand\tbPostMarginHeader
+            \noexpand\par\kern3pt}%
+    \fi
+        \global\txtbkt@ks=\expandafter{\tb@sbm@exp
+        \tb@insertCarryOver{\unvbox\txtbkb@xb@t}}%
+    \fi
+}
+\newcommand{\insertpageifcarryover}[1][\null]{%
+    \newpage
+    \ifiscarryover\def\eqeifnext{\csname iftrue\endcsname}%
+    \PackageInfo{eqexam}{Carry over of content in margin
+    from page \thepage.\MessageBreak Creating a blank page}\else
+    \def\eqeifnext{\csname iffalse\endcsname}\fi\eqeifnext#1\fi}
+\newcommand{\setFullWidthHeader}{%
+    \setlength{\@tempdima}{%
+        \evensidemargin+\tbmarparboxwidth+\marginparsep}%
+    \edef\@headoffset{\the\@tempdima}%
+    \def\@evenhead{\makebox[0pt]{\makebox[0pt][l]
+        {\thepage}\hspace{\@headoffset}}\hfil\slshape\leftmark}%
+    \ifmarginsonleft
+        \def\@oddhead{\makebox[0pt]{\makebox[0pt][l]
+            {\slshape\rightmark}\hspace{\@headoffset}}\hfil\thepage}%
+    \else
+        \def\@oddhead{{\slshape\rightmark}\hfil\makebox[0pt]
+            {\hspace{\@headoffset}\makebox[0pt][r]{\thepage}}}%
+    \fi
+}
+\newif\ifchapterexercises \chapterexercisesfalse
+\let\chaptersolutions\relax
+\def\tb@EndOfChapterExercises{%
+    \let\include@solutions@chapter\include@solutions
+    \def\includeexersolutions{%
+        \include@solutions@chapter
+          \global\let\include@solutions\relax
+    }%
+    \def\chaptersolutions{%
+        \includeexersolutions
+        \immediate\closeout\ex@solns
+        \newwrite \ex@solns \global\let\quiz@solns\ex@solns
+        \immediate\openout \ex@solns \jobname.sol
+        \ifvspacewithsolns\writeAllAnsAtEnd\fi
+    }%
+}
+\def\writeallsolutions{\let\chaptersolutions\relax}
+\excludecomment{afterChapSolns}
+\def\NewCommentCutFile{\def\CommentCutFile{solnsAtEnd.cut}}
+\def\RestoreCommentCutFile{\def\CommentCutFile{comment.cut}}
+\@ifundefined{BeforeIncludedComment}{%
+\long\def\solnsAtEndcomment
+ #1{\message{Special comment '#1'}%
+    \csarg\def{#1}{\endgroup  \message{Processing '#1' comment.}%
+                   \NewCommentCutFile\SetUpCutFile
+                   % #2 before SetUp, so we can do renaming.
+          \message{Comment '#1' writing to \CommentCutFile.}%
+          \ProcessComment{#1}}%
+    \csarg\def{After#1Comment}{\immediate\closeout\CommentStream
+        \RestoreCommentCutFile\input{solnsAtEnd.cut}\relax}%
+    \CommentEndDef{#1}}
+}{\long\def\solnsAtEndcomment
+ #1{\message{Special comment '#1'}%
+    \csarg\def{After#1Comment}{\immediate\closeout\CommentStream
+    \RestoreCommentCutFile\input{solnsAtEnd.cut}\relax}%
+    \csarg\def{#1}{\NewCommentCutFile\BeforeIncludedComment\relax
+          \ProcessComment{#1}}%
+    \CommentEndDef{#1}}
+ }
+\solnsAtEndcomment{solnsAtEnd}
+\newcommand{\exercisesAtEndOfChapter}{%
+    \ifeq@nosolutions\else
+        \typeout{^^J!!!!!Executing in chapter solutions!!!!!^^J}
+        \chapterexercisestrue\tb@EndOfChapterExercises
+        \ifchapterexercises
+        \csarg\let{solnsAtEnd}\@gobble
+        \excludecomment{solnsAtEnd}%
+        \csarg\let{AftersolnsAtEndComment}\relax
+        \includecomment{afterChapSolns}\else
+        \excludecomment{afterChapSolns}\fi
+    \fi
+}
+\@onlypreamble\exercisesAtEndOfChapter
+\newcommand{\setFullWidthLayout}{%
+    \saveBasicLayoutParams
+    \setlength{\oddsidemargin}{0in}%
+    \setlength{\evensidemargin}{\oddsidemargin}%
+    \setlength{\textwidth}{\paperwidth-2in}%
+    \setlength{\linewidth}{\paperwidth-2in}%
+    \setlength{\columnseprule}{0pt}%
+    \def\@evenhead{\thepage\hfil\slshape\leftmark}%
+    \def\@oddhead{{\slshape\rightmark}\hfil\thepage}%
+}
+\newenvironment{fullwidthtext}{%
+\begin{list}{}{%
+    \setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}%
+    \setlength{\itemindent}{0pt}\setlength{\itemsep}{0pt}%
+    \setlength{\topsep}{0pt}\setlength{\parsep}{0pt}%
+    \setlength{\listparindent}{\parindent}%
+    \setlength{\leftmargin}{0pt}\setlength{\rightmargin}{0pt}
+}\item\relax}{\end{list}}
+\newcommand{\restorePageLayout}{\newpage
+    \setlength{\oddsidemargin}{\tb@osms}
+    \setlength\evensidemargin{\tb@esms}
+    \setlength{\textwidth}{\tb@tws}
+    \setlength{\linewidth}{\tb@lws}
+    \setlength{\columnseprule}{\tb@csr}
+}
+\newcommand{\saveBasicLayoutParams}{%
+    \xdef\tb@osms{\the\oddsidemargin}%
+    \xdef\tb@esms{\the\evensidemargin}%
+    \xdef\tb@tws{\the\textwidth}%
+    \xdef\tb@lws{\the\linewidth}%
+    \xdef\tb@csr{\the\columnseprule}%
+}
+\newcommand{\initChapAfterSolns}{\newpage
+    \clearTopMargin\clearBotMargin
+    \setFullWidthLayout
+}
+\newcommand{\restoreFromChapAfterSolns}{\newpage
+    \restorePageLayout\setFullWidthHeader
+}
+\eqequestopsep{0pt}
+\eqequesparsep{0pt}
+\eqequesitemsep{0pt}
+\eqequeslistparindent{0pt}
+\renewenvironment{eqequestions}{%
+    \begin{list}{}{%
+    \ifwithsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
+    \setlength{\labelwidth}{\eqemargin}%
+    \setlength{\parsep}{\eqeques@parsep}%
+    \setlength{\itemsep}{\eqeques@itemsep}
+    \setlength{\topsep}{\eqeques@topsep}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\listparindent}{\eqeques@listparindent}%dps%
+    \ifwithsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
+    \settowidth{\labelsep}{\eqe@hspannerPrb}\fi
+    \setlength{\leftmargin}{\labelwidth}%
+    }\ifwithsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
+\newcommand{\eqepquestopsep}[1]{\def\eqepques@topsep{#1}}
+\newcommand{\eqepquesparsep}[1]{\def\eqepques@parsep{#1}}
+\newcommand{\eqepquesitemsep}[1]{\def\eqepques@itemsep{#1}}
+\eqepquestopsep{\eqeques@itemsep}
+\eqepquesparsep{\eqeques@parsep}
+\eqepquesitemsep{\eqeques@itemsep}
+\newenvironment{eqepartsquestions}{%
+    \begin{list}{}{%
+    \settowidth{\labelwidth}{\eqe@prtsepSoln\hspace{\tbsolnpartwdth}}
+    \setlength{\parsep}{\eqepques@parsep}%
+    \setlength{\itemsep}{\eqepques@itemsep}%
+    \setlength{\topsep}{\eqepques@topsep}%
+    \setlength{\itemindent}{0pt}%
+    \settowidth{\labelsep}{\eqe@hspannerSoln}
+    \setlength{\leftmargin}{\labelwidth}%
+    }\item\relax}{\end{list}}
+\long\def\gobbletoEndEXt#1\endeqEXt{\@gobbletwo}
+\def\eqExtArg{\theeqquestionnoi}
+\if\load@exerquiz\eqe@NO\DoNotFitItIn\fi
+\let\fillInFormatDefault\@empty
+\def\exerSolnsHeadnToc{}
+\renewcommand{\exerSolnInput}{%
+    \let\webnewpage\relax
+    \ifsolutionsonly\else\immediate\closeout\ex@solns\fi
+    \ifeq@nosolutions\else\newpage % 2012-03-14
+        \iftherearesolutions\eq@solutionshook\eqsolutionshook
+            \ifsolutionsonly\else\newpage\eq@solutionshook
+            \eqsolutionshook\fi
+            \ifx\webnewpage\relax
+                \def\webnewpage{\let\webnewpage\newpage}%
+            \fi
+            \priorexsectitle\exerSolnsHeadnToc\priorexslinput
+            \InputIfFileExists{\jobname.sol}{}{\PackageWarning{exerquiz}
+            {!!! Solutions to exercises not found}}%
+        \fi
+    \fi
+}
+\setcounter{partno}{1}\edef\firstPartLtr{\thepartno}
+\newif\iffrstProbNumShown\frstProbNumShownfalse
+\def\tb@insertDecPoint{\ifwithsoldoc\eqedecPointSoln\else
+    \eqe@decPointMrg\fi}
+\newcommand{\eqedsplyOnlyFrst}[2]{\def\thisPart{#2}%
+    \ifx\thisPart\firstPartLtr\global\frstProbNumShowntrue
+        \tb@mrgDigitFmt{#1}\tb@insertDecPoint\else
+        \iffrstProbNumShown\tb@GenProbNum{#1}\else
+        \global\frstProbNumShowntrue\tb@mrgDigitFmt{#1}%
+        \tb@insertDecPoint\fi\fi\global\eqeGenProbNumfalse
+}
+\newif\ifeqeGenProbNum \eqeGenProbNumfalse
+\newcommand{\displayProbNumOnce}{\global\eqeGenProbNumtrue} %
+\def\tb@GenProbNum#1{\ifeqeGenProbNum#1\tb@insertDecPoint\else
+    \phantom{#1\tb@insertDecPoint}\fi}%
+\def\sq@priorhook{\medskip}
+\def\default@fvsizeskip{.1}
+\aboveexskip{0pt}
+\belowexskip{0pt}
+\renewcommand\belowexsolnskip{{}}
+\renewcommand\exerSolnHeader[3]{%
+    \ifeqforpaper\else\webnewpage\fi%\par
+    \noindent\@ifundefined{hypertarget}
+    {#3}{\hypertarget{#2}{#3}\relax}\solnhspace
+}
+\def\nNumberOfP@rts{0}
+\renewcommand{\preExamSolnHead}{\medbreak\noindent}
+\renewcommand{\examSolnHeadFmt}[1]{\textbf{#1}}
+\renewcommand{\postExamSolnHead}{\smallskip}
+\newcommand{\wrtChapSolnHead}[1]{%
+    \writeToSolnFile{%
+    \protect\preChapSolnHead
+    \protect\chapHeadSolnFmt{\protect\ftbFmtChapter{\thechapter}#1}%
+    \protect\postChapSolnHead
+}}
+\newcommand{\preChapSolnHead}{\bigbreak\noindent}
+\newcommand{\chapHeadSolnFmt}[1]{{\large\textbf{#1}}}
+\newcommand{\postChapSolnHead}{\medbreak}
+\newcommand{\ftbFmtChapter}[1]{\chaptername\space#1.\space\ignorespaces}
+\newcommand{\convertChapHeadToChapters}{%
+    \let\preChapSolnHead\relax
+    \let\chapHeadSolnFmt\chapter
+    \let\ftbFmtChapter\@gobble
+    \let\postChapSolnHead\relax
+}
+\newcommand{\probSet}[1]{Problem Set #1}
+\newcommand{\annotPage}{\protect\annotThePage{\thepage}}
+\newcommand{\annotThePage}[1]{\space(page\protect~#1)}
+\def\noProbHeader{NPH}
+\newenvironment{probset}[2][\probSet{\thesection}]{%
+    \exam[#2]{\autoExamName}\ifx#1\noProbHeader\else
+    \protected@edef\ftb@tmp@exp{\noexpand\insProbHead{#1}}%
+    \ftb@tmp@exp\fi}{\endexam}
+\newcounter{exampleno}[section]
+\renewcommand{\theexampleno}{\arabic{section}.\arabic{exampleno}}
+\newcommand{\examplenoname}{Example}
+\newenvironment{example}{%\medskip
+    \belowexskip{\medskipamount}\aboveexskip{\medskipamount}%
+    \makeRoomForProb{\@nbaselineskip\baselineskip}{}%
+    \renewcommand\exlabel{Example}%
+    \renewcommand\exlabelformat{\textbf{\exlabel~\theexampleno.}}%
+    \let\eq@fititin\eqfititin
+    \renewcommand\exrtnlabelformat{$\square$}%
+    \def\eqexheader@wrapper{\eqexheader}%
+    \SolutionsAfter
+    \begin{exercise}[exampleno]}{\end{exercise}}
+\newenvironment{example*}{%\medskip
+    \belowexskip{\medskipamount}\aboveexskip{\medskipamount}%
+    \makeRoomForProb{\@nbaselineskip\baselineskip}{}%
+    \renewcommand\exlabel{Example}%
+    \renewcommand\exlabelformat{\textbf{\exlabel~\theexampleno.}}%
+    \let\eq@fititin\eqfititin
+    \renewcommand\exrtnlabelformat{$\square$}%
+    \def\eqexheader@wrapper{\eqexheader}%
+    \SolutionsAfter
+    \begin{exercise*}[exampleno]}{\end{exercise*}}
+\setDefaultfvsizeskip{.1}
+\nbaselineskip{4}
+\newcommand{\ftbInputBookAux}[1]{%
+    \filename@parse{#1}\@ifundefined{filename@ext}%
+        {\def\filename@ext{tex}}{}%
+    \xdef\tbBaseName{\filename@base}%
+    \xdef\tbSourceFile{\filename@base.\filename@ext}%
+    \let\save@writefile\@writefile
+    \let\@writefile\@gobbletwo
+    \let\save@setckpt\@setckpt
+    \let\@setckpt\@gobbletwo
+    \makeatletter
+    \InputIfFileExists{\tbBaseName.aux}{%
+        \PackageInfo{eqexam}
+            {Inputting auxiliary files of\MessageBreak\tbSourceFile}%
+        }{%
+        \PackageError{eqexam}
+            {Auxiliary files for \tbSourceFile\space were not found}
+            {Compile the source file \tbSourceFile\space
+                three times\MessageBreak%
+                to create the required auxiliary files.}%
+        }%
+    \makeatother
+    \global\let\ftblabel\label
+    \let\label\@gobble
+    \let\@writefile\save@writefile
+    \let\@setckpt\save@setckpt
+}
+\@onlypreamble\ftbInputBookAux
+\newcommand{\restorelabel}{\global\let\label\ftblabel}
+\newcommand{\gobblelabel}{\let\label\@gobble}
+\newcommand{\ftbInputSolnFiles}[1][\tbBaseName.sol]{%
+    \filename@parse{#1}\@ifundefined{filename@ext}%
+        {\def\filename@ext{sol}}{}%
+    \xdef\tbBaseName{\filename@base}%
+    \xdef\tbSourceFile{\filename@base.\filename@ext}%
+    \InputIfFileExists{\tbBaseName.sol}{%
+        \PackageInfo{eqexam}
+            {Inputting solutions file \tbBaseName.sol\MessageBreak}%
+        }{%
+        \PackageError{eqexam}
+            {Solutions file for \tbSourceFile\space was not found}%
+            {Compile the source files three times}%
+        }%
+}
+\endinput
+%%
+%% End of file `eqtextb.def'.

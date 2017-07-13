@@ -1,0 +1,346 @@
+%%
+%% This is file `aeb_pro.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{aeb_pro}
+ [2017/03/08 v2.8a aeb_pro: A support package (dps)]
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{xkeyval}
+\let\aebp@One=1 \let\aebp@Zero=0
+\let\aebp@YES=y \let\aebp@NO=n
+\def\ap@csarg#1#2{\expandafter#1\csname#2\endcsname}
+\define@key{aebpreq}{req}[]{\def\eq@pkgReq{#1}}
+\def\aebp@setCCOptions#1#2{%#1=package #2=options
+    \ap@csarg\edef{aeb@#1@opts}{#2}}
+\@tfor\aeb@pcks:={web}{exerquiz}{dljslib}%
+{eforms}{insdljs}{eq2db}{aebxmp}{hyperref}{graphicxsp}{rmannot}\do
+{%
+    \ap@csarg\let{aeb@\aeb@pcks @req}\@empty
+    \ap@csarg\let{aeb@\aeb@pcks @opts}\relax
+    \edef\aeb@pack@def{\noexpand
+        \define@key{aeb_pro.sty}{\aeb@pcks}[]{%
+            \noexpand\aebp@setCCOptions{\aeb@pcks}{##1}}%
+    }\aeb@pack@def
+}
+\let\aebp@passDriver\aebp@YES
+\ifpdf\let\aebp@passDriver\aebp@NO\else
+\ifxetex\let\aebp@passDriver\aebp@NO\fi\fi
+\define@choicekey+{aeb_pro.sty}{driver}%
+    {dvipsone,dvips,pdftex,dvipdfm,textures,%
+    dvipdfmx,xetex}{%
+    \def\aeb@driver{#1}\ifx\aeb@driver\@empty\else
+        \PassOptionsToPackage{#1}{web}
+        \PassOptionsToPackage{#1}{exerquiz}
+\def\aebp@PassToHYIns{\PassOptionsToPackage{#1}{hyperref}
+    \PassOptionsToPackage{#1}{insdljs}}
+\ifx\aebp@passDriver\aebp@YES
+    \expandafter\aebp@PassToHYIns\fi
+        \PassOptionsToPackage{#1}{eforms}
+        \PassOptionsToPackage{#1}{graphicxsp}
+    \fi
+}{\PackageError{aeb_pro}{Bad choice for the driver, permissible values
+   \MessageBreak are dvipsone, dvips, pdftex, dvipdfm,
+    textures,\MessageBreak dvipdfmx, and xetex}
+    {Try again with a permissible driver name}}
+\let\aeb@driver\@empty
+
+\newif\if@useacrobat \@useacrobatfalse
+\DeclareOptionX{useacrobat}{\@useacrobattrue}
+\newif\if@gopro \@goprotrue
+\DeclareOptionX{nopro}{\@useacrobattrue\@goprofalse
+    \PassOptionsToPackage{nopro}{insdljs}}
+\def\aeb@InputAeBPro{\InputIfFileExists{aebpro.def}%
+    {\PackageInfo{aeb_pro}{Inputting code for the pro option}}%
+    {\PackageInfo{aeb_pro}{Cannot find aebpro.def.
+        Reinstall or refresh your file name database, as needed.}}}
+\AtEndOfPackage{\aeb@InputAeBPro}
+\let\aebp@uselayers=0
+\DeclareOptionX{uselayers}{%
+    \ifx\aebp@uselayers0\AtEndOfPackage{\aeb@InputAeBLayers}%
+    \global\let\aebp@uselayers=1\fi
+}
+\def\aeb@InputAeBLayers{\InputIfFileExists{aeblayers.def}%
+    {\PackageInfo{aeb_pro}{Inputting code for uselayers option}}%
+    {\PackageInfo{aeb_pro}{Cannot find aeblayers.def.
+        Reinstall or refresh your file name database.}}}
+\DeclareOptionX{gopro}{\PassOptionsToPackage{pro}{web}}
+\DeclareOptionX{attachsource}{\def\aeb@attachsource{#1}}
+\let\aeb@attachsource\@empty
+\DeclareOptionX{attachments}{\def\aeb@attachments{#1}}
+\let\aeb@attachments\@empty
+\newif\ifoptattachments\optattachmentsfalse
+\newif\ifoptattachmentsTaken\optattachmentsTakenfalse
+\DeclareOptionX{optattachments}{%
+    \optattachmentsTakentrue
+    \optattachmentstrue}
+\DeclareOptionX{!optattachments}{%
+    \optattachmentsTakentrue
+    \optattachmentsfalse}
+\def\@aeb@InputUnicodes{\InputIfFileExists{unicodes.def}%
+   {\typeout{aeb_pro: Inputting code for the linktoattachments option}}%
+   {\typeout{aeb_pro: Cannot find unicodes.def.
+       Reinstall or refresh your file name database, as needed.}}}
+\let\aeb@InputUnicodes\@empty
+\DeclareOptionX{linktoattachments}{%
+    \let\aeb@InputUnicodes\@aeb@InputUnicodes}
+\let\aeb@childofInput\@empty
+\let\aeb@childof\@empty
+\DeclareOptionX{childof}{\def\aeb@childof{#1}\def\aeb@childofInput{%
+    \InputIfFileExists{\aeb@childof_xref.cut}{}{}}}
+\def\inputAttachmentRelatedFiles{%
+    \aeb@InputUnicodes
+    \aeb@childofInput
+}
+\AtEndOfPackage{\inputAttachmentRelatedFiles}
+\let\inputCommonAnimeCode\relax
+\DeclareOptionX{ocganime}{%
+    \ifx\aebp@uselayers0\ExecuteOptionsX{uselayers}
+    \global\let\aebp@uselayers=1\fi
+    \ifx\inputCommonAnimeCode\relax
+        \let\inputCommonAnimeCode\aebp@inputCommonAnimeCode
+        \AtEndOfPackage{\inputCommonAnimeCode}\fi
+    \AtEndOfPackage{\inputOcgAnimeCode}
+}
+\DeclareOptionX{btnanime}{%
+    \ifx\inputCommonAnimeCode\relax
+        \let\inputCommonAnimeCode\aebp@inputCommonAnimeCode
+        \AtEndOfPackage{\inputCommonAnimeCode}\fi
+    \AtEndOfPackage{\inputBtnAnimeCode}
+}
+\def\inputBtnAnimeCode{\InputIfFileExists{btnnanime.def}
+    {\PackageInfo{aeb_pro}{inputting btnnanime.def}}
+    {\PackageWarning{aeb_pro}{cannot find btnnanime.def}}}%
+\def\inputOcgAnimeCode{\InputIfFileExists{ocganime.def}
+    {\PackageInfo{aeb_pro}{inputting ocganime.def}}
+    {\PackageWarning{aeb_pro}{cannot find ocganime.def}}}%
+\def\aebp@inputCommonAnimeCode{\InputIfFileExists{anime_support.def}
+    {\PackageInfo{aeb_pro}{inputting anime_support.def}}
+    {\PackageWarning{aeb_pro}{cannot find anime_support.def}}}%
+\let\pathToBtnCtrlIcons\@empty
+\let\ExecuteOptionsXSAVE\ExecuteOptionsX
+\let\ExecuteOptionsX\@gobble
+\InputIfFileExists{aebpro.cfg}{}{}
+\let\ExecuteOptionsX\ExecuteOptionsXSAVE
+\ifpdf\ExecuteOptionsX{driver=pdftex}\else
+    \ifxetex\ExecuteOptionsX{driver=xetex}\else
+    \@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{driver=dvips}}
+            {\ExecuteOptionsX{driver=dvipsone}}\fi\fi
+\ProcessOptionsX
+\edef\ap@restoreCats{%
+    \catcode`\noexpand\"=\the\catcode`\"\relax
+    \catcode`\noexpand\,=\the\catcode`\,\relax
+    \catcode`\noexpand\(=\the\catcode`\(\relax
+    \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\,\@makeother\(\@makeother\!
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}
+\pdfmarkuptrue
+\def\aeb@testdriver{dvips}%
+\ifx\aeb@testdriver\aeb@driver
+    \@useacrobattrue\else
+\def\aeb@testdriver{dvipsone}%
+\ifx\aeb@testdriver\aeb@driver
+    \@useacrobattrue\else
+    \pdfmarkupfalse
+\fi\fi
+\if@gopro\else
+\let\aebp@isattach\aebp@NO
+\ifx\aeb@attachsource\@empty\else\let\aebp@isattach\aebp@YES\fi
+\ifx\aeb@attachments\@empty\else\let\aebp@isattach\aebp@YES\fi
+    \let\aeb@attachsource\@empty
+    \let\aeb@attachments\@empty
+    \optattachmentsfalse\optattachmentsTakenfalse
+    \let\inputAttachmentRelatedFiles\relax
+\ifx\aebp@isattach\aebp@YES
+    \PackageWarningNoLine{aeb_pro}{The various attachment options
+        are not\MessageBreak supported with the nopro option,
+        ignoring them}\fi
+\fi
+\ifpdfmarkup\else
+\if\aebp@uselayers1
+    \def\aeb@InputAeBLayers{\PackageError{aeb_pro}
+    {The uselayers and ocganime options are not supported,\MessageBreak
+     with the useacrobat and nopro options,\MessageBreak
+     ignoring these options}{Remove dependence on layers,
+     or obtain\MessageBreak the full Acrobat product}}
+    \let\texHelpIndicator\@gobble
+    \let\addJStexHelpEnter\@gobble
+    \let\addJStexHelpExit\@gobble
+    \let\texHelp\@gobbletwo
+    \def\xBld#1\eBld{}
+    \let\defineRC\@gobbletwo
+    \let\insertRC\@gobble
+    \let\definePR\@gobbletwo
+    \let\insertPR\@gobble
+    \let\proofRollovers\relax
+    \let\texPHProof\@gobbletwo
+    \newcommand\animeBld[1][]{}
+    \def\DeclareAnime#1#2#3{}
+    \newcommand\backAnimeBtn[3][]{}
+    \newcommand\clearAnimeBtn[3][]{}
+    \newcommand\forwardAnimeBtn[3][]{}
+\fi\fi
+\def\aebp@PkgWarningi#1{\ifpdfmarkup\else\PackageWarningNoLine{aeb_pro}
+    {The #1\space package requires Adobe Distiller,\MessageBreak
+        do not load this package}\fi}
+\def\aebp@PkgWarningii#1{\PackageWarningNoLine{aeb_pro}
+    {The #1\space package requires Adobe Distiller,\MessageBreak
+        ignoring #1\space as an option}}
+\def\aebp@PkgWarningiii#1{\PackageWarningNoLine{aeb_pro}
+    {The #1\space package requires Adobe Distiller or\MessageBreak
+        the useacrobat option (Acrobat required),\MessageBreak
+        ignoring #1\space as an option}}
+\providecommand\getargsii[2]{\def\aeb@argi{#1}\def\aeb@argii{#2}}
+\newcommand\ap@RP[2][]{\def\@rgi{#1}\def\@rgii{#2}%
+    \ifx\@rgi\@empty\else\edef\@rgi{[\@rgi]}\fi
+    \@ifnextchar[%]
+    {\ap@@RP}{\ap@@RP[]}}
+\def\ap@@RP[#1]{\def\@rgiii{#1}%
+    \let\XKV@rm\@empty\let\eq@pkgReq\@empty
+    \@ifundefined{aeb@\@rgii @opts}
+        {\ifx\@rgi\@empty\else
+            \ap@csarg\edef{aeb@\@rgii @req}{#1}\fi
+        }{%
+            \edef\x{\noexpand
+                \setkeys*{aebpreq}{\@nameuse{aeb@\@rgii @opts}}}\x
+            \edef\eq@theseOpts{\XKV@rm}%
+            \ap@csarg\edef{aeb@\@rgii @req}{\eq@pkgReq}%
+            \edef\x{\noexpand
+                \PassOptionsToPackage{\eq@theseOpts}{\@rgii}}\x
+        }%
+    \ifx\@rgiii\@empty
+        \if!\@nameuse{aeb@\@rgii @req}!\else
+        \ap@csarg\edef{aeb@\@rgii @req}{[\@nameuse{aeb@\@rgii @req}]}\fi
+    \else
+        \@ifl@t@r{#1}{\@nameuse{aeb@\@rgii @req}}%
+            {\if!\@nameuse{aeb@\@rgii @req}!\else
+                \ap@csarg\edef{aeb@\@rgii @req}%
+                    {[\@nameuse{aeb@\@rgii @req}]}\fi
+            }{\ap@csarg\edef{aeb@\@rgii @req}{[#1]}}%
+    \fi
+    \edef\x{\noexpand
+        \RequirePackage{\@rgii}\@nameuse{aeb@\@rgii @req}}\x
+}
+\@ifpackageloaded{web}{}
+{%
+    \@ifundefined{aeb@web@opts}{}{\ap@RP{web}}%
+}
+\@ifpackageloaded{exerquiz}{}
+{%
+    \@ifundefined{aeb@exerquiz@opts}{}{\ap@RP{exerquiz}}%
+}
+\@ifpackageloaded{hyperref}{}
+{%
+    \@ifundefined{aeb@hyperref@opts}{}{\ap@RP{hyperref}}%
+}
+\@ifpackageloaded{eq2db}{}
+{%
+    \@ifundefined{aeb@eq2db@opts}{}{\ap@RP{eq2db}}%
+}
+\@ifpackageloaded{dljslib}{}
+{%
+    \@ifundefined{aeb@dljslib@opts}{}{\ap@RP{dljslib}}%
+}
+\@ifpackageloaded{insdljs}{\let\execjs\aebp@YES}
+{%
+    \ap@RP[execJS]{insdljs}[2016/07/31]% incls conv-xkv
+}
+\@ifpackageloaded{eforms}{\let\execjs\aebp@YES}
+{%
+    \@ifundefined{aeb@eforms@opts}{}
+    {\ap@RP[execJS]{eforms}[2017/01/03]}%
+}
+\@ifpackageloaded{aebxmp}{\aebp@PkgWarningi{aebxmp}}
+{%
+    \@ifundefined{aeb@aebxmp@opts}{}
+    {\edef\temp@exp{\ifpdfmarkup
+        \noexpand\ap@RP{aebxmp}\else
+     \if@useacrobat
+        \noexpand\ap@RP{aebxmp}[2016/05/12]\else
+        \noexpand\aebp@PkgWarningiii{aebxmp}\fi\fi}\temp@exp}
+}
+\@ifpackageloaded{graphicxsp}{\aebp@PkgWarningi{graphicxsp}}
+{%
+    \@ifundefined{aeb@graphicxsp@opts}{}
+    {\edef\temp@exp{\ifpdfmarkup
+        \noexpand\ap@RP{graphicxsp}\else
+        \noexpand\aebp@PkgWarningii{graphicxsp}\fi}\temp@exp}
+}
+\@ifpackageloaded{rmannot}{\aebp@PkgWarningi{rmannot}}
+{%
+    \@ifundefined{aeb@rmannot@opts}{}
+    {\edef\temp@exp{\ifpdfmarkup\noexpand\ap@RP{rmannot}\else
+        \noexpand\aebp@PkgWarningii{rmannot}\fi}\temp@exp}
+}
+\let\execjs\aebp@YES
+\RequirePackage{comment}
+\RequirePackage{calc}
+\RequirePackage{eso-pic}
+\ifpdfmarkup\else\if\aebp@uselayers1
+    \excludecomment{printRollover}%
+    \excludecomment{rollover}%
+\fi\fi
+\def\aeb@IWVO{\immediate\write\verbatim@out}
+\newsavebox{\aebsavehelp}
+\newcommand{\pdfHelpIndicator}[1]{#1\thinspace${}^{\mbox
+    {\footnotesize\negthinspace\ding{109}}%
+    \raisebox{.225ex}{\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+\def\pdfHelpCnt{0}
+\newcommand{\pdfHelp}{\@ifstar{{\count0=\pdfHelpCnt\relax
+\advance\count0by1\relax\xdef\pdfHelpCnt{\the\count0 }}%
+    \pdfHelpi{pdfhelp-\pdfHelpCnt}}{\pdfHelpi}}
+\newcommand{\pdfHelpi}[3]{%
+    \let\rollormargstring\texorpdfstring
+    \sbox{\aebsavehelp}{\pdfHelpIndicator{#3}}%
+    \makebox[0pt][l]{\makespecialJS\pushButton[\S{S}\BG{}\BC{}\H{N}
+    \TU{#2}]{#1}{\wd\aebsavehelp}{11bp}}\usebox{\aebsavehelp}%
+    \let\rollormargstring\@gobbletwo
+}
+\newcommand\pdfPHProof[3]{\small\raggedright\texttt{#3}: #2}
+\newcommand\pdfPrintHelp{\@ifstar{{\count0=\pdfHelpCnt\relax
+\advance\count0by1\relax\xdef\pdfHelpCnt{\the\count0}}%
+    \pdfPrintHelpi{pdfhelp-\pdfHelpCnt}}{\pdfPrintHelpi}}
+\newcommand\pdfPrintHelpi[3]{%
+    \let\rollormargstring\texorpdfstring
+    \ifeqforpaper
+        \ifeq@proofing
+            \pdfHelp{#1}{#2}{#3}\marginpar{\Hy@pdfstringfalse
+                \pdfPHProof{#1}{#2}{{\Hy@pdfstringtrue#3}}}\else
+            \pdfHelpIndicator{#3}\fi
+    \else
+        \pdfHelp{#1}{#2}{#3}\ifeq@proofing
+        \marginpar{\Hy@pdfstringfalse
+            \pdfPHProof{#1}{#2}{{\Hy@pdfstringtrue#3}}}\fi
+    \fi
+    \let\rollormargstring\@gobbletwo
+}
+\AtEndOfPackage{\@nameuse{aeb@inputAttachments}}
+\AtBeginDocument{\@nameuse{aeb@setPDFPackage}}
+\@ifpackageloaded{web}{}
+    {\def\aebwritelastpage{%
+    \immediate\write\@auxout{\string\expandafter\string\gdef
+    \string\csname\space aebLastPage\string\endcsname{\arabic{page}}}}
+    \AtEndDocument{\clearpage\addtocounter{page}{-1}\aebwritelastpage
+    \addtocounter{page}{1}}%
+}
+\ap@restoreCats
+\endinput
+%%
+%% End of file `aeb_pro.sty'.

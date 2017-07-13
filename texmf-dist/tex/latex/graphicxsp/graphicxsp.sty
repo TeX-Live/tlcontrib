@@ -1,0 +1,552 @@
+%%
+%% This is file `graphicxsp.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% graphicxsp.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% graphicxsp.sty package,           2007-08-14         %%
+%% Copyright (C) 2007  D. P. Story                      %%
+%%   storyd@owc.edu / dpstory@acrotex.net               %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{graphicxsp}
+ [2016/02/19 v1.0 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
+\@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+\DeclareOption{preview}{\previewtrue}
+\DeclareOption{dvipsone}{\def\gxsp@drivernum{0}}
+\DeclareOption{dvips}{\def\gxsp@drivernum{1}}
+\DeclareOption{showembeds}{\let\gxsp@showembeds=0}
+\let\gxsp@showembeds=1
+\def\gxsp@drivernum{1}
+\DeclareOption{draft}{\spxGin@drafttrue
+    \PassOptionsToPackage{draft}{graphicx}}
+\DeclareOption{final}{\spxGin@draftfalse
+    \PassOptionsToPackage{final}{graphicx}}
+\DeclareOption{shownonames}{\@spx@shownameindraftfalse}
+\newif\if@spx@shownameindraft \@spx@shownameindrafttrue
+\newif\ifspxGin@draft \spxGin@draftfalse
+\InputIfFileExists{graphics.cfg}{}{}
+\ProcessOptions
+\@ifundefined{eq@driver@name}{}{%
+\def\DVIPSONE{dvipsone}\ifx\eq@driver@name\DVIPSONE
+\def\gxsp@drivernum{0}\fi}
+\RequirePackage{graphicx}
+\ifspxGin@draft\Gin@drafttrue\fi
+\RequirePackage{eso-pic}
+\RequirePackage{verbatim}
+\def\grcxsp@hideEPS{\AtBeginDvi{\special{!%
+/product where{%
+pop
+product(Distiller)search{%
+    pop pop pop
+    userdict
+    /?pdfmark /exec load put%
+}{%
+pop
+userdict
+    begin
+    /?pdfmark /pop load def
+    end
+}ifelse%
+}if%
+}}}
+\@ifpackageloaded{hyperref}{\let\grcxsp@hideEPS\relax}{\grcxsp@hideEPS}
+\def\gxsp@literalps@out#1{\special{ps:#1}}
+\ifnum\gxsp@drivernum=1\relax
+\special{!userdict begin
+   /TeXtoPDF {65536 div DVImag mul} def         % sp to pts
+   /PDFtoDvips {72.27 div Resolution mul} def   % points to dots
+   /PDFtoVDvips {72.27 div VResolution mul} def % points to dots
+   /DvipstoPDF {72.27 mul Resolution div} def   % dots to points
+   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def       % sp to dots
+   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def end} % sp to dots
+\special{!userdict begin /cstr {currentpoint translate
+   1 PDFtoDvips DVImag mul -1 PDFtoDvips DVImag mul scale}def end}
+\def\gxsp@setPSCoor{cstr }
+\def\b@grxsp@Literal{userdict begin}
+\def\e@grxsp@Literal{end}
+\else
+\def\gxsp@setPSCoor{undsclx }
+\let\b@grxsp@Literal\@empty
+\let\e@grxsp@Literal\@empty
+\fi
+\special{!\b@grxsp@Literal
+    /currentpage 0 def
+    /graphicxspCnt 0 def
+    /graphicxspStr 10 string def
+    /graphicxspMergeStr {2 copy length exch length add string dup dup
+    4 3 roll 4 index length exch putinterval 3 1 roll exch
+    0 exch putinterval} def
+    /grcxspObjDef {
+        /graphicxspCnt graphicxspCnt 1 add def
+        currentpage graphicxspStr cvs graphicxspMergeStr
+        (-) graphicxspMergeStr
+        graphicxspCnt graphicxspStr cvs
+        graphicxspMergeStr
+    } def \e@grxsp@Literal
+}
+\def\ESO@AeBip@Hook{}
+\newcommand{\AddToEmbeddedEPSs}{\g@addto@macro\ESO@AeBip@Hook}
+\@ifundefined{@ShipoutPicture}{%
+    \ESO@isMEMOIR{%
+      \AtBeginShipout{%
+        \@tempdima=-\trimedge
+        \advance\@tempdima-\paperwidth
+        \advance\@tempdima\stockwidth
+        \if@twoside\ifodd\c@page\else
+          \advance\@tempdima2\trimedge
+          \advance\@tempdima\paperwidth
+          \advance\@tempdima-\stockwidth
+        \fi\fi
+        \@tempdimb=\ESO@yoffsetI
+        \advance\@tempdimb-\trimtop
+        \nointerlineskip
+        \AtBeginShipoutUpperLeft{%
+          \put(\LenToUnit{\@tempdima},\LenToUnit{\@tempdimb}){%
+            \ESO@HookIII\ESO@HookI\ESO@HookII
+            \global\let\ESO@HookII\@empty
+          }%
+        }%
+      }
+    }{%
+      \AtBeginShipout{%
+        \nointerlineskip
+        \AtBeginShipoutUpperLeft{%
+          \put(0,\LenToUnit{\ESO@yoffsetI}){%
+            \ESO@HookIII\ESO@AeBip@Hook\ESO@HookI\ESO@HookII% dps
+            \global\let\ESO@HookII\@empty
+            \global\let\ESO@AeBip@Hook\@empty% dps
+          }%
+        }%
+      }
+    }
+}{%
+    \renewcommand{\@ShipoutPicture}{%
+      \bgroup
+        \@tempswafalse%
+        \ifx\ESO@HookI\@empty\else\@tempswatrue\fi%
+        \ifx\ESO@HookII\@empty\else\@tempswatrue\fi%
+        \ifx\ESO@HookIII\@empty\else\@tempswatrue\fi%
+        \ifx\ESO@AeBip@Hook\@empty\else\@tempswatrue\fi%dps(08/16/07)
+         \if@tempswa%
+          \@tempdima=1in\@tempdimb=-\@tempdima%
+          \advance\@tempdimb\ESO@yoffsetI%
+          \ESO@isMEMOIR{%
+            \advance\@tempdima\trimedge%
+            \advance\@tempdima\paperwidth%
+            \advance\@tempdima-\stockwidth%
+            \if@twoside\ifodd\c@page\else%
+              \advance\@tempdima-2\trimedge%
+              \advance\@tempdima-\paperwidth%
+              \advance\@tempdima\stockwidth%
+            \fi\fi%
+            \advance\@tempdimb\trimtop}%
+          \unitlength=1pt%
+          \global\setbox\@cclv\vbox{%
+            \vbox{\let\protect\relax
+              \pictur@(0,0)(\strip@pt\@tempdima,\strip@pt\@tempdimb)%
+                \ESO@HookIII\ESO@AeBip@Hook\ESO@HookI\ESO@HookII%dps
+                \global\let\ESO@HookII\@empty%
+                \global\let\ESO@AeBip@Hook\@empty%              %dps
+              \endpicture}%
+              \nointerlineskip%
+            \box\@cclv}%
+        \fi
+      \egroup
+    }
+}
+\AddToShipoutPicture{\special{ps: /currentpage \thepage\space def}}
+\def\verbatimwrite{\@bsphack
+    \let\do\@makeother\dospecials
+    \catcode`\^^M\active \catcode`\^^I=12
+    \def\verbatim@processline{%
+        \immediate\write\verbatim@out
+        {\the\verbatim@line}}%
+    \verbatim@start
+}
+\def\endverbatimwrite{\@esphack}
+\def\gxsp@IWVO{\immediate\write\verbatim@out}
+\def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
+\def\e@namedef#1{\expandafter\edef\csname #1\endcsname}
+\newcount\grxsp@cnt \grxsp@cnt=0
+\def\grcxsp@setPictureDimen#1#2#3#4#5{%
+    \x@namedef{#1Gin@llx}{#2}\x@namedef{#1Gin@lly}{#3}%
+    \x@namedef{#1Gin@urx}{#4}\x@namedef{#1Gin@ury}{#5}%
+    \x@namedef{#1BBox}{#2 #3 #4 #5}%
+    \begingroup
+        \@tempdima=#4bp
+        \advance\@tempdima-#2bp
+        \@tempdima=.99626\@tempdima
+        \x@namedef{#1widthOf}{\strip@pt\@tempdima}%
+        \@tempdima=#5bp
+        \advance\@tempdima-#3bp
+        \@tempdima=.99626\@tempdima
+        \x@namedef{#1heightOf}{\strip@pt\@tempdima}%
+    \endgroup
+}
+\def\heightOf#1{\csname#1heightOf\endcsname}
+\def\widthOf#1{\csname#1widthOf\endcsname}
+\def\bboxOf#1{\csname#1BBox\endcsname}
+\def\llxOf#1{\csname#1Gin@llx\endcsname}
+\def\llyOf#1{\csname#1Gin@lly\endcsname}
+\def\urxOf#1{\csname#1Gin@urx\endcsname}
+\def\uryOf#1{\csname#1Gin@ury\endcsname}
+\newcommand{\embedEPS}[3][]{%
+    \@ifundefined{#2Gin@llx}{}{%
+        \PackageError{graphicxsp}%
+        {The name, #2, on line \the\inputlineno\MessageBreak
+        is already defined. All embedded graphics\MessageBreak
+        must be assigned a unique name}
+        {Give this embedded graphic a unique name.}%
+    }%
+    \begingroup
+    \let\Gin@transparencygroup\@empty
+    \let\input@path\Ginput@path
+    \filename@parse{#3.eps}%
+    \Gin@getbase{.eps}%
+    \@ifundefined{Gin@base}{%
+        \PackageError{graphicxsp}%
+        {%
+            Graphics file #3 specified on \the\inputlineno\MessageBreak
+             was not found%
+        }{%
+            Verify the file exists, is an eps file,\MessageBreak
+            is on the latex search path, or is in the\MessageBreak
+            current directory.%
+        }%
+    }{}%
+    \e@namedef{gxsp@Gin@base}{\Gin@base}%
+    \Gread@eps{\gxsp@Gin@base.eps}%
+    \setkeys{Gin}{name=#2,#1}%
+    \grcxsp@setPictureDimen%
+        {\Gin@name}{\Gin@llx}{\Gin@lly}{\Gin@urx}{\Gin@ury}%
+    \def\gxsp@embedSF{1}%
+    \@tempdima=\Gin@urx bp
+    \advance\@tempdima-\Gin@llx bp
+    \ifdim\@tempdima>\paperwidth
+        \Gscale@div\gxsp@embedSF\paperwidth\@tempdima
+        \@tempdima=\Gin@ury bp
+        \advance\@tempdima-\Gin@lly bp
+        \@tempdima=\gxsp@embedSF\@tempdima
+        \ifdim\@tempdima>\paperheight
+          \edef\gxsp@embedSFSave{\gxsp@embedSF}%
+          \Gscale@div\gxsp@embedSF\paperheight\@tempdima
+          \@tempdima=\gxsp@embedSFSave\p@
+          \@tempdima=\gxsp@embedSF\@tempdima
+          \edef\gxsp@embedSF{\strip@pt\@tempdima}%
+        \fi
+    \else
+        \@tempdima=\Gin@ury bp
+        \advance\@tempdima\Gin@lly bp
+        \ifdim\@tempdima>\paperheight
+            \Gscale@div\gxsp@embedSF\paperheight\@tempdima
+        \fi
+    \fi
+    \edef\@tempa{%
+    \noexpand\AddToEmbeddedEPSs{\noexpand\AtPageLowerLeft%
+        {\noexpand\scalebox{\gxsp@embedSF}%
+        {\noexpand\gxsp@embedEPS{\gxsp@Gin@base}{\Gin@name}}}%
+        \noexpand\AtPageCenter{\noexpand\gcxsp@wrapEmbeddedFigure%
+        {\Gin@transparencygroup}{#2}{\Gin@transparency}}}}\@tempa
+    \endgroup
+}
+\@onlypreamble{\embedEPS}
+\def\grcxsp@coverEmbeds{%
+    \AddToEmbeddedEPSs{\AtPageLowerLeft{\colorbox{white}{%
+    \parbox[b][\paperheight]{\paperwidth}{\hfill\vfill}}}}}
+\if\gxsp@showembeds1%
+\AtBeginDocument{\grcxsp@coverEmbeds}
+\else
+\let\grcxsp@coverEmbeds\relax
+\fi
+\def\grcxsp@maxDim{5000}
+\newcommand{\gxsp@embedEPS}[2]{%
+    \gxsp@literalps@out{gsave \gxsp@setPSCoor
+    [ /BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
+      \grcxsp@maxDim\space\grcxsp@maxDim]\space/_objdef {Embedded:#2}
+    /BP pdfmark grestore}%
+    \message{<Embedding #1>}%
+    \includegraphics{#1}%
+    \gxsp@literalps@out{[ /EP pdfmark}%
+}
+\def\gcxsp@wrapEmbeddedFigure#1#2#3{%
+    \def\Gin@transparencygroup{#1}\def\Gin@transparency{#3}%
+    \gxsp@literalps@out{gsave \gxsp@setPSCoor
+    \ifGin@clip
+        [/BBox [\llxOf{#2}\space\llyOf{#2}\space
+         \urxOf{#2}\space\uryOf{#2}]
+    \else
+        [ /BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
+          \grcxsp@maxDim\space\grcxsp@maxDim]
+    \fi\space /_objdef {#2}
+    \ifx\Gin@transparencygroup\@empty\else
+        \ifx\Gin@transparencygroup\Gin@exclamation
+            /Group << /S/Transparency >>%
+        \else
+            /Group << /S/Transparency \Gin@transparencygroup >>%
+        \fi
+    \fi\space
+    /BP pdfmark
+        [ {Embedded:#2} /SP pdfmark
+    [/EP pdfmark
+    grestore}%
+}
+\newcommand{\sp@createImage}[3][]{%
+    \@ifundefined{#3Gin@llx}{}{%
+        \PackageError{graphicxsp}%
+        {The name, #3, on line \the\inputlineno\space\MessageBreak
+        is already defined. All embedded graphics\MessageBreak
+        must be assigned a unique name}
+        {Give this embedded graphic a unique name.}%
+    }%
+   \setkeys{Gin}{#1}\def\Gin@name{#3}%
+    \edef\@gtempa{#2 }%
+   \expandafter\Gread@parse@bb\@gtempa \\%
+   \begingroup\grxcsp@createImage
+}
+\let\postEP\@empty
+\long\def\grxcsp@createImage#1\end#2{%
+    \def\reserved@a{#2}\ifx\reserved@a\@currenvir
+        \end{#2}\else\@badend{#2}\fi
+    \edef\temp@transparencyGroup{%
+    \ifx\Gin@transparencygroup\@empty\else
+        \ifx\Gin@transparencygroup\Gin@exclamation
+            /Group << /S/Transparency >>%
+        \else
+            /Group << /S/Transparency \Gin@transparencygroup >>%
+        \fi
+    \fi}%
+    \grcxsp@setPictureDimen%
+        {\Gin@name}{\Gin@llx}{\Gin@lly}{\Gin@urx}{\Gin@ury}%
+    \edef\@tempa{%
+    \noexpand\AddToEmbeddedEPSs{\noexpand\AtPageLowerLeft{%
+        \noexpand\gxsp@literalps@out{gsave \gxsp@setPSCoor
+        [ /BBox [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
+        /_objdef {\Gin@name} \temp@transparencyGroup\space/BP pdfmark
+        \ifx\Gin@transparency\@empty\else
+        [ \Gin@transparency\space/SetTransparency pdfmark\fi
+        {#1} ?pdfmark
+        [ /EP pdfmark
+        grestore
+        }%
+    }}}\@tempa
+    \endgroup
+}
+\let\createImage\sp@createImage
+\let\endcreateImage\endsp@createImage
+\@onlypreamble{\createImage}
+\def\xsp@sanitize{\catcode`\_=12\relax}
+\newcommand{\insertEPS}{\bgroup\xsp@sanitize
+    \@ifstar
+    {\Gin@cliptrue\let\gcxsp@star*\gcxsp@insertEPS}%
+    {\Gin@clipfalse\let\gcxsp@star\@empty\gcxsp@insertEPS}}
+\newcommand{\gcxsp@insertEPS}[2][]%
+    {\expandafter\includegraphics\gcxsp@star[name=#2,#1]{}\egroup}
+\newif\if@Ginnamed\@Ginnamedfalse
+\define@key{Gin}{name}[]{\def\Gin@name{#1}%
+    \@Ginnamedtrue\let\Ginclude@eps\Ginclude@eps@SP}
+\def\Gin@name{}
+\define@key{Gin}{transparencyGroup}[!]{\def\Gin@transparencygroup{#1}}
+\def\Gin@transparencygroup{}
+\define@key{Gin}{transparency}[]{\def\Gin@transparency{#1}}%
+\def\Gin@transparency{}%
+\define@key{Gin}{SMask}[]{\def\Gin@SMask{#1}}%
+\def\Gin@SMask{}%
+\define@key{Gin}{presp}{\def\Gin@presp{#1}}
+\def\Gin@presp{}
+\define@key{Gin}{postsp}{\def\Gin@postsp{#1}}
+\def\Gin@postsp{}
+\define@key{Gin}{SMask}[]{\def\GinSP@SMask{#1}}
+\def\GinSP@SMask{}
+\define@key{GinSP}{subtype}[Luminosity]{\def\GinSP@subtype{#1}}
+\def\GinSP@subtype{Luminosity}
+\define@key{GinSP}{group}[]{\def\GinSP@group{#1}}
+\def\GinSP@group{}
+\define@key{GinSP}{bc}[]{\def\GinSP@bc{#1}}
+\def\GinSP@bc{}
+\define@key{GinSP}{tr}[]{\def\GinSP@tr{#1}}
+\define@key{GinSP}{None}[None]{\def\SMaskSP@None{#1}}
+\def\GinSP@tr{}
+\def\SMaskSP@None{}
+\def\SMaskSP@Identity{Identity}
+\def\sp@setSMask{%
+        \ifx\GinSP@SMask\SMaskSP@None[ /SMask/None /SetTransparency pdfmark
+        \else
+            [ /SMask << /S/\GinSP@subtype\space
+            \ifx\GinSP@bc\@empty\else/BC\GinSP@bc\space\fi
+            \ifx\GinSP@tr\@empty\else\ifx\GinSP@tr\SMaskSP@Identity%
+                /TR/Identity\else/TR {\GinSP@tr}\space\fi\fi
+            /G {\GinSP@group} >> /SetTransparency pdfmark
+        \fi
+}
+\newcommand{\setSMask}[2][]{%
+        \setkeys{GinSP}{#1}\def\GinSP@group{#2}%
+        \special{ps: \sp@setSMask}%
+}
+\def\Gin@setfile#1#2#3{%
+  \ifx\\#2\\\Gread@false\fi
+  \ifGin@bbox\else
+    \ifGread@
+\if@Ginnamed %dps (08/16/07)
+    \edef\Gin@llx{\csname\Gin@name Gin@llx\endcsname}%
+    \edef\Gin@lly{\csname\Gin@name Gin@lly\endcsname}%
+    \edef\Gin@urx{\csname\Gin@name Gin@urx\endcsname}%
+    \edef\Gin@ury{\csname\Gin@name Gin@ury\endcsname}%
+\else
+      \csname Gread@%
+         \expandafter\ifx\csname Gread@#1\endcsname\relax
+           eps%
+         \else
+           #1%
+         \fi
+      \endcsname{\Gin@base#2}%
+\fi
+    \else
+      \Gin@nosize{#3}%
+    \fi
+  \fi
+  \Gin@viewport@code
+  \Gin@nat@height\Gin@ury bp%
+  \advance\Gin@nat@height-\Gin@lly bp%
+  \Gin@nat@width\Gin@urx bp%
+  \advance\Gin@nat@width-\Gin@llx bp%
+  \Gin@req@sizes
+  \expandafter\ifx\csname Ginclude@#1\endcsname\relax
+    \Gin@drafttrue
+    \expandafter\ifx\csname Gread@#1\endcsname\relax
+      \@latex@error{Can not include graphics of type: #1}\@ehc
+      \global\expandafter\let\csname Gread@#1\endcsname\@empty
+    \fi
+  \fi
+  \leavevmode
+  \ifGin@draft
+      \hb@xt@\Gin@req@width{%
+        \vrule\hss
+        \vbox to \Gin@req@height{%
+           \hrule \@width \Gin@req@width
+           \vss
+           \if@Ginnamed %dps (08/18/07)
+           \if@spx@shownameindraft
+           \rlap{ \ttfamily\Gin@name}\fi
+           \else
+           \edef\@tempa{#3}%
+           \rlap{ \ttfamily\expandafter\strip@prefix\meaning\@tempa}%
+           \fi
+           \vss
+           \hrule}%
+        \hss\vrule}%
+  \else
+\if@Ginnamed\else % dps (08/16/07)
+    \@addtofilelist{#3}%
+    \ProvidesFile{#3}[Graphic file (type #1)]%
+\fi
+    \setbox\z@\hbox{\csname Ginclude@#1\endcsname{#3}}%
+    \dp\z@\z@
+    \ht\z@\Gin@req@height
+    \wd\z@\Gin@req@width
+    \ifpreview{\setlength{\fboxsep}{0pt}\fbox{\box\z@}}\else\box\z@\fi%
+  \fi}
+\def\Gin@getbase#1{%
+  \edef\Gin@tempa{%
+    \def\noexpand\@tempa####1#1\space{%
+      \def\noexpand\Gin@base{####1}}}%
+    \if@Ginnamed
+        \edef\Gin@ext{#1}\edef\Gin@base{\Gin@name}%dps (08/18/07)
+    \else
+        \IfFileExists{\filename@area\filename@base#1}%
+        {\Gin@tempa
+         \expandafter\@tempa\@filef@und
+         \edef\Gin@ext{#1}}{}%
+    \fi
+}%
+\def\Gin@computeSF{%
+    \def\@tempa{!}%
+    \edef\gxsp@scaleFactor@x{\Gin@scalex}%
+    \edef\gxsp@scaleFactor@y{\Gin@scaley}%
+    \ifx\Gin@scaley\@tempa      % proportional height
+        \ifx\Gin@scalex\@tempa  % proportional width
+            \def\gxsp@scaleFactor@x{1}%
+            \def\gxsp@scaleFactor@y{1}%
+        \else                   % specified width
+            \edef\gxsp@scaleFactor@y{\Gin@scalex}%
+        \fi
+    \else                       % specified height
+        \ifx\Gin@scalex\@tempa  % proportional width
+            \edef\gxsp@scaleFactor@x{\Gin@scaley}%
+        \fi
+    \fi
+}
+\def\gxsp@setBBox{%
+    \ifGin@clip
+        [/BBox [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
+    \else
+        [/BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
+                \grcxsp@maxDim\space\grcxsp@maxDim]
+    \fi
+}
+\def\Ginclude@eps@SP#1{%
+  \bgroup
+    \ifx\GinSP@SMask\@empty\else
+        \edef\sp@expand@temp{\noexpand\setkeys{GinSP}{\GinSP@SMask}}%
+        \sp@expand@temp
+        \ifx\SMaskSP@None\@empty\ifx\GinSP@group\@empty
+        \PackageError{graphicxsp}{The group key is required when you
+        specify a SMask.}{Specify a group name for the group key.}%
+    \fi\fi\fi
+    \Gin@computeSF
+    \ifGin@bbox
+    \gxsp@literalps@out{%
+        gsave \gxsp@setPSCoor
+            \ifx\GinSP@SMask\@empty\else\sp@setSMask\fi
+            \gxsp@setBBox\space
+            (\Gin@name:bbox@) grcxspObjDef
+            /graphicxspretn exch cvx cvn def
+            /_objdef {//graphicxspretn} /BP pdfmark
+            \ifx\Gin@transparency\@empty\else
+            [ \Gin@transparency\space/SetTransparency pdfmark\fi
+            [ {\Gin@name} /SP pdfmark
+            [ /EP pdfmark
+            \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
+            -\Gin@llx\space -\Gin@lly\space moveto
+            currentpoint translate
+            \Gin@presp
+            [ {//graphicxspretn} /SP pdfmark
+           \Gin@postsp
+       grestore
+    }%
+    \else
+    \gxsp@literalps@out{%
+        gsave \gxsp@setPSCoor
+            \ifx\GinSP@SMask\@empty\else\sp@setSMask\fi
+            \gxsp@setBBox\space
+            (\Gin@name:grxsp@) grcxspObjDef
+            /graphicxspretn exch cvx cvn def
+            /_objdef {//graphicxspretn} /BP pdfmark
+            \ifx\Gin@transparency\@empty\else
+            [ \Gin@transparency\space/SetTransparency pdfmark\fi
+            [ {\Gin@name} /SP pdfmark
+            [ /EP pdfmark
+            \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
+            \ifx\Gin@viewport@code\relax\else
+             -\Gin@llx\space-\Gin@lly\space moveto
+              currentpoint translate\fi
+            \Gin@presp
+             [ {//graphicxspretn} /SP pdfmark
+            \Gin@postsp
+        grestore
+    }%
+    \fi
+  \egroup}
+\endinput
+%%
+%% End of file `graphicxsp.sty'.

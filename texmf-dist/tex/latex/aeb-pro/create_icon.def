@@ -1,0 +1,156 @@
+%%
+%% This is file `create_icon.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,createicon')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{docassembly}{%
+\execJS{docassembly}
+}{\endexecJS}
+\let\ap@mrk\@empty
+\def\ap@gobtocomma#1,{}
+\providecommand\chngDocObjectTo[2]{%
+    \def#1##1\ap@mrk{#2,\ap@gobtocomma##1}}
+\def\ap@TF{aebTrustedFunctions}
+\def\theDocObject{this}
+\providecommand\DeclareJSHelper[2]{%
+    \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+\DeclareJSHelper{\importIcon}{aebImportIcon}
+\let\predocassemJS\@empty
+\def\aeb@image@cnt{0}
+\define@key{importIcons}{name}[]{\def\importIcons@name{#1}}
+\define@key{importIcons}{path}[]{\def\importIcons@path{#1}}
+\define@key{importIcons}{page}[]{\def\importIcons@page{#1}}
+\define@key{importIcons}{placement}[]{\def\importIcons@placement{#1}}
+\define@boolkey{importIcons}{embedonly}[true]{}
+\define@key{importIcons}{firstpage}[]{\def\importIcons@firstpage{#1}}
+\define@key{importIcons}{lastpage}[]{\def\importIcons@lastpage{#1}}
+\newcommand{\aebp@getFace}[1][0]{%
+    \def\importIcons@face{#1}\aebp@getPlacement}
+\def\aebp@getPlacement#1\@nil{\def\importIcons@fieldname{#1}%
+    \expandafter\ap@strpspcs\importIcons@fieldname\@nil
+    \edef\importIcons@fieldname{\to@nilarg}%
+}
+\newcommand{\declareMultiImages}[1]{%
+    \edef\@tforExp{\noexpand\@tfor\noexpand\@dipArgs:=#1}%
+    \@tforExp\do{%
+        \expandafter\declareImageAndPlacement
+        \expandafter{\@dipArgs}%
+    }%
+}
+\newcommand{\declareImageAndPlacement}[1]{%
+    \edef\@tempexp{\noexpand\setkeys{importIcons}{name,path,page,%
+        placement,embedonly=false,#1}}\@tempexp
+    \ifx\importIcons@name\@empty{\count0=\aeb@image@cnt
+    \advance\count0by1\relax\xdef\aeb@image@cnt{\the\count0}}%
+    \edef\importIcons@name{aebImage\aeb@image@cnt}\fi
+    \ifx\importIcons@path\@empty
+        \PackageError{aeb_pro}{The `path' key is required}
+            {Please give the path of the icon.}\fi
+    \ifx\importIcons@placement\@empty\ifKV@importIcons@embedonly\else
+        \PackageWarningNoLine{aeb_pro}{%
+        The `placement' key was not found for the\MessageBreak
+        image named "\importIcons@name".\MessageBreak
+        Specify this key, or insert the image manually in\MessageBreak
+        the docassembly environment.}\fi\fi
+    \xdef\predocassemJS{\predocassemJS
+            var retn=\importIcon({cName:"\importIcons@name",%
+            cDIPath:"\importIcons@path"%
+            \ifx\importIcons@page\@empty\else,%
+            nPage:\importIcons@page\fi});^^J%
+        if ( retn==-1 ) console.println("The file
+        \string\"\importIcons@path\string\" could not be opened.");^^J%
+        if ( retn==-2 ) console.println("Selected page
+        (page=\importIcons@page) for \string\"\importIcons@path\string\"
+        is invalid.");^^J}%
+    \ifx\importIcons@placement\@empty\else
+        \@for\@fieldname:=\importIcons@placement\do{%
+            \expandafter\aebp@getFace\@fieldname\@nil
+            \xdef\predocassemJS{\predocassemJS
+            var f = this.getField("\importIcons@fieldname");^^J%
+            if ( f == null ) console.println("The field
+                \string\"\importIcons@fieldname\string\"
+                    does not exist.");^^J%
+            try { f.buttonSetIcon(this.getIcon("\importIcons@name"),%
+                \importIcons@face); }
+            catch(e){};^^J}%
+        }%
+    \fi
+}
+\@onlypreamble\declareImageAndPlacement
+\newcommand{\iconNameI}[1]{\def\IconNameI(##1){#1}}
+\iconNameI{#1+"."+i}
+\@onlypreamble\iconNameI
+\newcommand{\embedMultiPageImages}[1]{%
+    \setkeys{importIcons}{name,path,page,placement,%
+        firstpage,lastpage,#1}%
+    \ifx\importIcons@firstpage\@empty
+        \def\importIcons@firstpage{1}\else
+        {\count0=\importIcons@firstpage}\fi
+    \ifx\importIcons@lastpage\@empty
+        \def\importIcons@lastpage{this.numPages}\else
+        {\count0=\importIcons@lastpage}\fi
+    \ifx\importIcons@name\@empty
+        \PackageError{aeb_pro}{The `name' key is required}
+        {Please give the icon family a name.}\fi
+    \ifx\importIcons@path\@empty
+        \PackageError{aeb_pro}{The `path' key is required}
+            {Please give the path of the icon.}\fi
+    \def\r{^^J}\def\t{\space\space\space\space}%
+    \let\predocassemJSPlace\@empty
+    \ifx\importIcons@placement\@empty\else
+        \@for\@fieldname:=\importIcons@placement\do{%
+            \expandafter\aebp@getFace\@fieldname\@nil
+            \edef\predocassemJSPlace{\predocassemJSPlace\t
+            var f = this.getField("\importIcons@fieldname."+i);\r\t
+            if ( f == null ) console.println("The field
+                \string\"\importIcons@fieldname."+i+"\string\"
+                    does not exist.");\r\t
+            try { f.buttonSetIcon(this.getIcon(%
+\IconNameI("\importIcons@name")),%
+                \importIcons@face); }
+            catch(e){};\r}%
+        }%
+    \fi
+    \xdef\predocassemJS{\predocassemJS
+        var l=\importIcons@lastpage-\importIcons@firstpage+1;\r
+        for (var i=0; i<l; i++) {\r\t
+            var retn=\importIcon({%
+                cName:\IconNameI("\importIcons@name"),%
+                cDIPath:"\importIcons@path",%
+                nPage:\importIcons@firstpage+i-1});\r\t
+            if ( retn==-1 ) console.println("The file
+            \string\"\importIcons@path\string\" could not
+                be opened.");\r\t
+            if ( retn==-2 ) console.println("Selected page
+            (page="+(i+1)+") for \string\"\importIcons@path\string\"
+            is invalid.");\r
+            \predocassemJSPlace
+        }\r
+        var oIcon=this.getIcon("nullIcon");\r
+        if ( oIcon == null )
+            this.addIcon("nullIcon", this.createIcon("", 0, 0));\r
+    }%
+}
+\@onlypreamble\embedMultiPageImages
+\newcommand{\insertPreDocAssembly}{\predocassemJS}
+\let\importAndSetImages\insertPreDocAssembly
+\newcommand{\placeImage}[4][]{\pushButton[%
+    \BC{}\BG{}\S{S}\Ff{\FfReadOnly}\autoCenter{n}\FB{true}
+    #1\I{null}\TP{1}]{#2}{#3}{#4}}
+\endinput
+%%
+%% End of file `create_icon.def'.

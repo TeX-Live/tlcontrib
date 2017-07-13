@@ -1,0 +1,493 @@
+%%
+%% This is file `anime_support.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,animecommon')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\placeAnimeCtrlBtnFaces}[3][\pathToBtnCtrlIcons]{\begingroup
+    \toks@={\aep@I{\aep@setAFirst}{animeFirst}%
+            \aep@I{\aep@setASB}{animeSB}%
+            \aep@I{\aep@setAPB}{animePB}%
+            \aep@I{\aep@setAPaus}{animePause}%
+            \aep@I{\aep@setAPF}{animePF}%
+            \aep@I{\aep@setASF}{animeSF}%
+            \aep@I{\aep@setALast}{animeLast}%
+            \aep@I{\aep@setAPlus}{animePlus}%
+            \aep@I{\aep@setAMinus}{animeMinus}}%
+    \def\aep@I##1##2{\let##1\@empty}\the\toks@
+    \def\aep@I##1##2{\edef##1{##1,\aep@thisAnime4BtnCtrl.##2}}%
+    \@for\aep@thisAnime:=#3\do{\the\toks@}%
+    \def\aep@I##1##2{\edef##1{\expandafter\@gobble##1}}\the\toks@
+    \ifx\pathToBtnCtrlIcons\@empty
+    \let\@pathsep\@empty\else\def\@pathsep{/}\fi
+    \declareMultiImages{%
+        {path=#1\@pathsep#2,page=0,placement={\aep@setAFirst}}
+        {path=#1\@pathsep#2,page=2,placement={\aep@setASB}}
+        {path=#1\@pathsep#2,page=4,placement={\aep@setAPB}}
+        {path=#1\@pathsep#2,page=6,placement={\aep@setAPaus}}
+        {path=#1\@pathsep#2,page=5,placement={\aep@setAPF}}
+        {path=#1\@pathsep#2,page=3,placement={\aep@setASF}}
+        {path=#1\@pathsep#2,page=1,placement={\aep@setALast}}
+        {path=#1\@pathsep#2,page=7,placement={\aep@setAPlus}}
+        {path=#1\@pathsep#2,page=8,placement={\aep@setAMinus}}
+    }%
+    \endgroup
+}
+\@onlypreamble\placeAnimeCtrlBtnFaces
+\newcommand{\animeSetup}[1]{%
+    \let\animeSetupPresets\@empty
+    \edef\@tempExp{\noexpand\setkeys{btnAnime}{#1}}\@tempExp
+    \ifx\btnAnimeCtrlBdryColor\@empty\else
+    \edef\@tmpExp{\noexpand\g@addto@macro%
+        \noexpand\animeSetupPresets{%
+        \noexpand\BC{\btnAnimeCtrlBdryColor}}}\@tmpExp
+    \edef\@tmpExp{\noexpand\g@addto@macro%
+        \noexpand\animeSetupPresets{%
+        \noexpand\W{\btnAnimeCtrlBdryWidth}}}\@tmpExp\fi
+    \edef\@btnanimerowsep{\btnanimerowsep}% dps10
+    \setlength{\@tempdima}{%
+        (\btnAnimeCtrlW+2bp)*\numWidgetsFirstRow+%
+        (\btnanimebtnsep*(\numWidgetsFirstRow-1))}%
+    \addtolength{\@tempdima}{\addSpaceBtwnPMBtns}%
+    \edef\widthFirstRow{\the\@tempdima}%
+}
+\newcommand{\insertCtrlButtons}[1][c]{%
+    \parbox[#1][\totalheight+2bp]{\widthFirstRow}{%
+    \offinterlineskip\centering\aep@btn@anime@controls}}
+\newcommand{\setspaceBtwnPMBtns}[1]{{%
+    \settowidth{\@tempdima}{#1\kern2bp}%
+    \xdef\tmp@spaceBtwnPMBtns{\the\@tempdima}}%
+    \edef\@spaceBtwnPMBtns{\tmp@spaceBtwnPMBtns}}
+\setspaceBtwnPMBtns{\space}
+\def\addSpaceBtwnPMBtns{\ifKV@btnAnime@usetworows0bp\else
+    \ifKV@btnAnime@nospeedcontrol0bp\else\@spaceBtwnPMBtns\fi\fi}
+\define@choicekey+{btnAnime}{type}[\val\nr]%
+    {loop,palindrome,stopatboundary}[stopatboundary]{%
+        \edef\aebp@btnAnime@type{\nr}}{}
+\define@key{btnAnime}{fieldName}[]{\gdef\animeBtnFieldName{#1}}
+\define@key{btnAnime}{ocgAnimeName}[]{\gdef\animeBtnFieldName{#1}}
+\define@key{btnAnime}{iconName}[]{\gdef\animeBtnBaseName{#1}}
+\define@key{btnAnime}{speed}[200]{\gdef\animeBtnSpeed{#1}}
+\define@key{btnAnime}{nFrames}[]{\gdef\nFrames{#1}}
+\define@boolkey{btnAnime}{autorun}[true]{}
+\define@boolkey{btnAnime}{autopause}[true]{}
+\define@choicekey+{btnAnime}{autoplayevent}[\val\nr]%
+    {pageopen,pagevisible}[pageopen]{\ifcase\nr\relax
+        \def\aebp@autoplayevent{\AAPageOpen}\or
+        \def\aebp@autoplayevent{\AAPageVisible}\fi}{}%
+\def\aebp@autoplayevent{\AAPageOpen}
+\define@choicekey+{btnAnime}{autopauseevent}[\val\nr]%
+    {pageclose,pageinvisible}[pageclose]{\ifcase\nr\relax
+        \def\aebp@autopauseevent{\AAPageClose}\or
+        \def\aebp@autopauseevent{\AAPageInvisible}\fi}{}%
+\def\aebp@autopauseevent{\AAPageClose}
+\define@choicekey+{btnAnime}{poster}[\val\nr]%
+    {first,last,none}[first]{\edef\aebp@btnAnime@poster{\nr}}{}
+\define@key{btnAnime}{ctrlwidth}[18bp]{\def\btnAnimeCtrlW{#1}}
+\define@key{btnAnime}{ctrlheight}[9bp]{\def\btnAnimeCtrlH{#1}}
+\define@choicekey{btnAnime}{ctrlbdrywidth}[\val\nr]{none,%
+    thin,medium,thick}[thin]{\edef\btnAnimeCtrlBdryWidth{\nr}}
+\define@key{btnAnime}{ctrlbdrycolor}[]{\def\ap@argi{#1}%
+    \ifx\ap@argi\@empty\let\btnAnimeCtrlBdryColor\@empty\else
+    \HyColor@IfXcolor{\HyColor@XZeroOneThreeFour{#1}
+        {\btnAnimeCtrlBdryColor}{}{}}
+        {\edef\btnAnimeCtrlBdryColor{#1}}\fi
+} % PDF color
+\let\animeSetupPresets\@empty
+\newcommand{\@ctrlsbtnsep}{\cgBdry[\btnanimebtnsep]} % dps10
+\newcommand{\btnanimebtnsep}{1bp}
+\newcommand{\vspacectrlsep}{3bp}
+\newcommand{\aep@vspacectrlsep}{\vspacectrlsep}
+\newcommand{\btnanimerowsep}{1bp}
+\newcommand{\btnAnimeSkini}{\ifKV@btnAnime@usetworows
+    \makebox[\linewidth][c]{%
+    \btnAnimeGoToFirst\@ctrlsbtnsep\btnAnimeStepBack
+    \@ctrlsbtnsep\btnAnimePlayBack
+    \@ctrlsbtnsep\btnAnimePause
+    \@ctrlsbtnsep\btnAnimePlayForward
+    \@ctrlsbtnsep\btnAnimeStepForward
+    \@ctrlsbtnsep\btnAnimeGoToLast}\ifKV@btnAnime@nospeedcontrol\else
+    \vcgBdry[\@btnanimerowsep]\makebox[\linewidth][c]{%
+    \btnAnimePlus\@ctrlsbtnsep\btnAnimeMinus}\fi\else
+    \makebox[\linewidth][s]{\hss
+    \btnAnimeGoToFirst
+    \@ctrlsbtnsep\btnAnimeStepBack
+    \@ctrlsbtnsep\btnAnimePlayBack
+    \@ctrlsbtnsep\btnAnimePause
+    \@ctrlsbtnsep\btnAnimePlayForward
+    \@ctrlsbtnsep\btnAnimeStepForward
+    \@ctrlsbtnsep\btnAnimeGoToLast
+    \ifKV@btnAnime@nospeedcontrol\else
+    \kern\@spaceBtwnPMBtns\btnAnimePlus
+    \@ctrlsbtnsep\btnAnimeMinus\fi\hss}\fi}
+\newcommand{\btnAnimeSkinii}{\ifKV@btnAnime@usetworows
+    \makebox[\linewidth][c]{%
+    \btnAnimeGoToFirst
+    \@ctrlsbtnsep\btnAnimePlayBack
+    \@ctrlsbtnsep\btnAnimePause
+    \@ctrlsbtnsep\btnAnimePlayForward
+    \@ctrlsbtnsep\btnAnimeGoToLast}%
+    \ifKV@btnAnime@nospeedcontrol\else\vcgBdry[\@btnanimerowsep]%
+    \makebox[\linewidth][c]{\btnAnimePlus\@ctrlsbtnsep
+    \btnAnimeMinus}\fi\else\makebox[\linewidth][s]{\hss
+    \btnAnimeGoToFirst\@ctrlsbtnsep
+    \btnAnimePlayBack\@ctrlsbtnsep\btnAnimePause%
+    \@ctrlsbtnsep\btnAnimePlayForward\@ctrlsbtnsep
+    \btnAnimeGoToLast\ifKV@btnAnime@nospeedcontrol\else
+    \kern\@spaceBtwnPMBtns\btnAnimePlus
+    \@ctrlsbtnsep\btnAnimeMinus\fi\hss}\fi}
+\newcommand{\btnAnimeSkiniii}{\ifKV@btnAnime@usetworows
+    \makebox[\linewidth][c]{%
+    \btnAnimeGoToFirst\@ctrlsbtnsep\btnAnimePause
+    \@ctrlsbtnsep\btnAnimePlayForward}%
+    \ifKV@btnAnime@nospeedcontrol\else
+    \vcgBdry[\@btnanimerowsep]\makebox[\linewidth][c]{%
+        \btnAnimePlus\@ctrlsbtnsep\btnAnimeMinus}\fi\else
+    \makebox[\linewidth][s]{\hss
+    \btnAnimeGoToFirst\@ctrlsbtnsep\btnAnimePause
+    \@ctrlsbtnsep\btnAnimePlayForward
+    \ifKV@btnAnime@nospeedcontrol\else\kern\@spaceBtwnPMBtns
+    \btnAnimePlus\@ctrlsbtnsep\btnAnimeMinus\fi\hss}\fi}
+\newcommand{\btnAnimeSkiniv}{%
+    \makebox[\linewidth][c]{%
+    \btnAnimeGoToFirst
+    \@ctrlsbtnsep\btnAnimeStepBack
+    \@ctrlsbtnsep\btnAnimeStepForward
+    \@ctrlsbtnsep\btnAnimeGoToLast}}
+\newcommand{\btnAnimeSkinv}{\PackageWarning{aeb_pro}
+    {skin5 is undefined.\MessageBreak You may customize
+     by defining skin5;\MessageBreak meanwhile, using default,
+     skin1}\btnAnimeSkini}
+\newcommand{\btnAnimeSkinvi}{\PackageWarning{aeb_pro}
+    {skin6 is undefined.\MessageBreak You may customize
+    by defining skin6;\MessageBreak meanwhile, using default,
+     skin1}\btnAnimeSkini}
+\newcommand{\aepnumWidgetsFirstRow}[2]{\def\numWidgetsFirstRow{%
+    \ifKV@btnAnime@nospeedcontrol#1\else
+    \ifKV@btnAnime@usetworows#1\else#2\fi\fi}}
+\newcommand{\numWidgetsFirstRowV}{\aepnumWidgetsFirstRow{7}{9}}
+\newcommand{\numWidgetsFirstRowVI}{\aepnumWidgetsFirstRow{7}{9}}
+\define@choicekey+{btnAnime}{controls}[\val\nr]%
+    {none,skin1,skin2,skin3,skin4,skin5,skin6}[skin1]{%
+    \ifcase\nr\relax
+        \let\aep@btn@anime@controls\@empty
+        \def\widthFirstRow{0pt}\or
+        \def\aep@btn@anime@controls{\btnAnimeSkini}%
+            \aepnumWidgetsFirstRow{7}{9}\or
+        \def\aep@btn@anime@controls{\btnAnimeSkinii}%
+            \aepnumWidgetsFirstRow{5}{7}\or
+        \def\aep@btn@anime@controls{\btnAnimeSkiniii}%
+            \aepnumWidgetsFirstRow{3}{5}\or
+        \def\aep@btn@anime@controls{\btnAnimeSkiniv}%
+            \aepnumWidgetsFirstRow{4}{4}\or
+        \def\aep@btn@anime@controls{\btnAnimeSkinv}%
+            \numWidgetsFirstRowV\or
+        \def\aep@btn@anime@controls{\btnAnimeSkinvi}%
+            \numWidgetsFirstRowVI\fi
+    }{}
+\define@boolkey{btnAnime}{usetworows}[true]{}
+\define@boolkey{btnAnime}{nospeedcontrol}[true]{}
+\setkeys{btnAnime}{fieldName,iconName,speed,nFrames,type,poster,
+    controls,usetworows=false,nospeedcontrol=false,ctrlwidth,ctrlheight,
+    ctrlbdrywidth,ctrlbdrycolor}
+\newcommand{\btnAnimePresets}[1]{\def\aeb@btnAnimePresets{#1}}
+\def\aeb@btnAnimePresets{}
+\newcommand{\ctrlButtonsWrapper}[1]{#1}
+\newcommand{\btnAnimeCtrlPresets}[1]{\def\aeb@btnAnimeCtrlPresets{#1}}
+\def\aeb@btnAnimeCtrlPresets{}
+\newcommand{\btnAnimeGoToFirst}{%
+    \pushButton[\TU{Go to first frame}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimeFirstAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animeFirst}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}%
+\newcommand{\btnAnimeStepBack}{%
+    \pushButton[\TU{Step Back}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimeSBAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animeSB}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimePlayBack}{%
+    \pushButton[\TU{Play Backwards}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimePBAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animePB}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimePause}{%
+    \pushButton[\TU{Pause}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimePauseAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animePause}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimePlayForward}{%
+    \pushButton[\TU{Play Forwards}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimePFAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animePF}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimeStepForward}{%
+    \pushButton[\TU{Step Forward}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimeSFAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animeSF}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimeGoToLast}{%
+    \pushButton[\TU{Go to last frame}\S{S}\BC{}
+        \FB{false}\I{null}\TP{1}\presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimeLastAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animeLast}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimePlus}{%
+    \pushButton[\TU{Increase speed\r Shift-click to restore
+        default speed}%\textFont{HeBo}\CA{+}
+        \S{S}\BC{}\FB{false}\I{null}\TP{1}
+        \presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimePlusAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animePlus}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimeMinus}{%
+    \pushButton[\TU{Decrease speed\r Shift-click to restore
+        default speed}%\textFont{HeBo}\uCA{FEFF2212}
+        \S{S}\BC{}\FB{false}\I{null}\TP{1}
+        \presets{\aeb@btnAnimeCtrlPresets}
+        \presets{\animeSetupPresets}\A{\JS{\btnAnimeMinusAction}}]%
+        {\animeBtnFieldName4BtnCtrl.animeMinus}%
+        {\btnAnimeCtrlW}{\btnAnimeCtrlH}}
+\newcommand{\btnAnimeFirstAction}{%
+if (typeof \animeBtnFieldName\space == "object")\r\t
+        btnAnimeFirst(\animeBtnFieldName);
+}
+\newcommand{\btnAnimeSBAction}{%
+    if ( typeof \animeBtnFieldName\space=="undefined")\r\t
+        var \animeBtnFieldName= new Object();\r
+        btnAnimePlay(\animeBtnFieldName,"\animeBtnFieldName",%
+            "\animeBtnBaseName",\animeBtnSpeed,\nFrames,false,%
+            \aebp@btnAnime@type,true);
+}
+\newcommand{\btnAnimePBAction}{%
+    if ( typeof \animeBtnFieldName\space=="undefined")\r\t
+        var \animeBtnFieldName= new Object();\r
+        btnAnimePlay(\animeBtnFieldName,"\animeBtnFieldName",%
+            "\animeBtnBaseName",\animeBtnSpeed,\nFrames,false,%
+            \aebp@btnAnime@type,false);
+}
+\newcommand{\btnAnimePauseAction}{%
+    if ((typeof \animeBtnFieldName\space == "object")&&%
+        \animeBtnFieldName.animeStart)\r\t
+        btnAnimePause(\animeBtnFieldName);
+}
+\newcommand{\btnAnimePFAction}{%
+    if ( typeof \animeBtnFieldName\space=="undefined")\r\t
+        var \animeBtnFieldName= new Object();\r
+    btnAnimePlay(\animeBtnFieldName,"\animeBtnFieldName",%
+        "\animeBtnBaseName",\animeBtnSpeed,\nFrames,true,%
+        \aebp@btnAnime@type,false);
+}
+\newcommand{\btnAnimeSFAction}{%
+    if ( typeof \animeBtnFieldName\space=="undefined")\r\t
+        var \animeBtnFieldName= new Object();\r
+    btnAnimePlay(\animeBtnFieldName,"\animeBtnFieldName",%
+        "\animeBtnBaseName",\animeBtnSpeed,\nFrames,true,%
+        \aebp@btnAnime@type,true);
+}
+\newcommand{\btnAnimeLastAction}{%
+    if (typeof \animeBtnFieldName\space == "object")\r\t
+            btnAnimeLast(\animeBtnFieldName);
+}
+\newcommand{\btnAnimePlusAction}{%
+    if (typeof \animeBtnFieldName\space == "object")\r\t
+            btnAnimePlus(\animeBtnFieldName,\animeBtnSpeed);
+}
+\newcommand{\btnAnimeMinusAction}{%
+    if (typeof \animeBtnFieldName\space == "object")\r\t
+            btnAnimeMinus(\animeBtnFieldName,\animeBtnSpeed);
+}
+\begin{insDLJS}[_loadBtnAnimeCtrls]{btnanime}
+    {AeB Pro: Button and Ocg Anime Controls}
+var _loadBtnAnimeCtrls=true;
+var activeAnimes=new Array();
+function btnAnimePlay(oAnime,fieldName,baseFrameName,%
+nSpeed,nFrames,bForward,type,bStep) {
+    // ocgAnime is characterized by baseFrameName=""
+    if ( oAnime.animeStart && !oAnime.animePause ) return;
+    var callingFieldName=event.target.name;
+    var re=/\.anime(PB|PF)/;
+    var doRebuild=( event.shift && re.test(callingFieldName) );
+    if ( (arguments.length>1) && %
+( (typeof activeAnimes[fieldName] == "undefined")|| doRebuild) ) {
+        activeAnimes[fieldName]=oAnime;
+        oAnime.isOcgAnime=(baseFrameName==""); // ocg change
+        oAnime.fieldName=fieldName;
+        oAnime.baseFrameName=baseFrameName;
+        oAnime.numSecs=nSpeed;
+        oAnime.nFrames=nFrames;
+        oAnime.type=type;
+        oAnime.bStep=bStep;
+        oAnime.aMyIcons = new Array();
+        oAnime.count = 0;
+        if ( !oAnime.isOcgAnime ) {// ocg change
+            for ( var i=0; i < nFrames; i++) {
+                oAnime.aMyIcons[i] = this.getField(fieldName+"."+i);
+                oAnime.aMyIcons[i].display=(i==0)?display.visible:%
+display.hidden;
+            }
+        }
+    }
+    if (arguments.length>1) {
+        oAnime.bForward=bForward;
+        oAnime.bStep=bStep;
+    }
+    if (oAnime.bStep) {
+        this.delay=true
+        if ( oAnime.isOcgAnime ) // ocg change
+            getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=false; // ocg
+        else
+            oAnime.aMyIcons[oAnime.count].display=display.hidden;
+        var currCount=oAnime.count;
+        if (oAnime.bForward) {
+                oAnime.count++;
+                if (oAnime.count==oAnime.nFrames) // hit upper boundary
+                    oAnime.count=(oAnime.type==0)?0:currCount;
+        } else {
+            oAnime.count--;
+            if (oAnime.count<0)
+                oAnime.count=(oAnime.type==0)?(oAnime.nFrames-1):0;
+        }
+        if ( oAnime.isOcgAnime ) // ocg change
+            getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=true; // ocg
+        else
+            oAnime.aMyIcons[oAnime.count].display=display.visible;
+        this.delay=false;
+    } else {
+        var args="\""+oAnime.fieldName+"\","+oAnime.type;
+        oAnime.run = app.setInterval(%
+"btnAnimeNewFrame("+args+")",oAnime.numSecs);
+        oAnime.animeStart=true;
+        oAnime.animePause=false;
+    }
+}
+function btnAnimeFirst(oAnime)
+{
+    try { app.clearInterval(oAnime.run);} catch(e){}
+    oAnime.animeStart=false;
+    oAnime.animePause=false;
+    if ( oAnime.isOcgAnime )
+        getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=false; // ocg
+    else
+        oAnime.aMyIcons[oAnime.count].display=display.hidden;
+    oAnime.count=0;
+    if ( oAnime.isOcgAnime )
+        getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=true; // ocg
+    else
+        oAnime.aMyIcons[0].display=display.visible;
+}
+function btnAnimeLast(oAnime)
+{
+    try { app.clearInterval(oAnime.run);} catch(e){}
+    oAnime.animeStart=false;
+    oAnime.animePause=false;
+    var l = oAnime.nFrames-1;
+    if ( oAnime.isOcgAnime )
+            getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=false; // ocg
+    else
+        oAnime.aMyIcons[oAnime.count].display=display.hidden;
+    oAnime.count=l;
+    if ( oAnime.isOcgAnime )
+            getxBld("anime!!"+oAnime.fieldName+"\#"%
++(l+1)).state=true; // ocg
+    else
+        oAnime.aMyIcons[l].display=display.visible;
+}
+function btnAnimePause(oAnime)
+{
+    try { app.clearInterval(oAnime.run);} catch(e){}
+    oAnime.animePause=true;
+}
+function btnAnimePlus(oAnime,nDefSpeed){
+    var isPlaying=(oAnime.animeStart&&!oAnime.animePause);
+    if (isPlaying) btnAnimePause(oAnime);
+    if ( event.shift ) oAnime.numSecs=nDefSpeed;
+    else oAnime.numSecs -= 50;
+    if (oAnime.numSecs<10) oAnime.numSecs=10
+    if (isPlaying) btnAnimePlay(oAnime);
+}
+function btnAnimeMinus(oAnime,nDefSpeed){
+    var isPlaying=(oAnime.animeStart&&!oAnime.animePause);
+    if (isPlaying) btnAnimePause(oAnime);
+    if ( event.shift ) oAnime.numSecs=nDefSpeed;
+    else oAnime.numSecs += 50;
+    if (isPlaying) btnAnimePlay(oAnime);
+}
+function btnAnimeNewFrame(fieldName, type)
+{
+    var oAnime=activeAnimes[fieldName];
+    this.delay=true
+    if ( oAnime.isOcgAnime ) // ocg change
+        getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=false;
+    else
+        oAnime.aMyIcons[oAnime.count].display=display.hidden;
+    var currCount=oAnime.count;
+    var bBdaryMet=false;
+    if (oAnime.bForward) {
+        oAnime.count++;
+        if (oAnime.count==oAnime.nFrames) {
+            if(type==0) oAnime.count \%= oAnime.nFrames;
+            else if(type==1) {
+                    oAnime.count=currCount;
+                    oAnime.count--;
+                    oAnime.bForward=false;
+                } else {
+                    bBdaryMet=true;
+                    oAnime.count=currCount;
+                }
+        }
+    } else {
+        oAnime.count--;
+        if (oAnime.count<0) {
+            if(type==0) oAnime.count=(oAnime.nFrames-1);
+            else if(type==1) {
+                    oAnime.count=currCount;
+                    oAnime.count++;
+                    oAnime.bForward=true;
+                } else { // stop
+                    bBdaryMet=true;
+                    oAnime.count=currCount;
+                }
+        }
+    }
+    if ( oAnime.isOcgAnime) // ocg change
+        getxBld("anime!!"+oAnime.fieldName+"\#"%
++(oAnime.count+1)).state=true;
+    else
+        oAnime.aMyIcons[oAnime.count].display=display.visible;
+    this.delay=false;
+    if ( type==2 && bBdaryMet ) {
+        try { app.clearInterval(oAnime.run);} catch(e){}
+        // try { app.clearTimeOut(timeout);} catch(e){}
+        oAnime.animeStart=false;
+        oAnime.animePause=false;
+    }
+}
+\end{insDLJS}
+\endinput
+%%
+%% End of file `anime_support.def'.

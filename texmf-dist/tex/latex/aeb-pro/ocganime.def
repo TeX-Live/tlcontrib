@@ -1,0 +1,39 @@
+%%
+%% This is file `ocganime.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,ocganime')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{ocgAnime}[1]{\animeSetup{#1}%
+    \ifx\animeBtnFieldName\@empty\PackageError{aeb_pro}%
+        {The ocgAnimeName key is required}{}\fi
+    \ifx\nFrames\@empty\PackageError{aeb_pro}%
+        {The nFrames key is required}{}\fi
+    \DeclareAnime{\animeBtnFieldName}{\animeBtnSpeed}{\nFrames}%
+}{%
+    \edef\aep@ExpOpts{\noexpand\AA{\ifKV@btnAnime@autorun
+        \aebp@autoplayevent{\noexpand\btnAnimePFAction}\fi
+        \ifKV@btnAnime@autopause\aebp@autopauseevent{%
+        \noexpand\btnAnimePauseAction}\fi}}\smash{\makebox[0pt][l]%
+   {\expandafter\pushButton\expandafter[\aep@ExpOpts\W0\BC{}\BG{}\S{S}]%
+   {\animeBtnFieldName-autorunpause}{0bp}{0bp}}}%
+   \ifx\aep@btn@anime@controls\@empty\else\offinterlineskip
+        \vcgBdry[\vspacectrlsep]\everyPushButton{}%
+        \centering\ctrlButtonsWrapper{\insertCtrlButtons}\fi
+}
+\endinput
+%%
+%% End of file `ocganime.def'.

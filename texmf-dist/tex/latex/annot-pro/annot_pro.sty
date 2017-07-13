@@ -1,0 +1,616 @@
+%%
+%% This is file `annot_pro.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% annot_pro.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% annot_pro package,                                   %%
+%% Copyright (C) 2002-2016  D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{annot_pro}
+ [2016/10/18 v1.1b Provides selected PDF annotation support (dps)]
+\RequirePackage{xkeyval}
+\DeclareOptionX{preview}{\previewtrue}
+\@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+\newif\ifuseAAXdim\useAAXdimtrue
+\DeclareOptionX{useA10Icons}{\useAAXdimtrue}
+\DeclareOptionX{!useA10Icons}{\useAAXdimfalse}
+\DeclareOptionX{useTextBox}{\def\ap@requireRichTextAsNeeded{%
+    \RequirePackage{richtext}[2016/10/03]}}
+\let\ap@requireRichTextAsNeeded\relax
+\ProcessOptionsX\relax
+\RequirePackage{hyperref}
+\RequirePackage{calc}
+\RequirePackage{insdljs}
+\RequirePackage[structure]{taborder}
+\ap@requireRichTextAsNeeded
+\@ifpackageloaded{graphicxsp}{%
+    \let\ap@graphicxsp=1}{\let\ap@graphicxsp=0}
+\@ifpackageloaded{eforms}{}
+    {\newif\ifto@structOrder\to@structOrderfalse}
+\def\ap@csarg#1#2{\expandafter#1\csname#2\endcsname}
+\def\ap@Bbox#1#2{%
+    \edef\bbox@width{#1}\edef\bbox@height{#2}%
+    \hbox{\ifpreview\setlength\fboxrule{0.4pt}\setlength\fboxsep{0pt}%
+    \@tempdima=\bbox@width\advance\@tempdima by-\fboxrule
+    \@tempdimb=\bbox@height\advance\@tempdimb by-\fboxrule
+    \fbox{\parbox[c][\@tempdimb][c]{\@tempdima}{\hfill\vfill}}\else
+    \parbox[c][\bbox@height][c]{\bbox@width}{\hfill\vfill}\fi}%
+}
+\def\ap@Rect{/Rect [pdf@llx pdf@ury pdf@urx pdf@lly]}
+\newcommand{\defineAPath}[1]{\def\ap@ctrl@Name{#1}%
+    \hyper@normalise\ap@defineAPath}
+\def\ap@defineAPath#1{\expandafter\xdef\ap@ctrl@Name{#1}}
+\define@choicekey+{annotpro}{type}[\val\nr]%
+    {text,stamp,fileattachment,textbox}[text]{%
+    \edef\ap@save@type{\nr}%
+    \ifcase\nr\relax
+        \def\ap@type{Text}\or
+        \def\ap@type{Stamp}\or
+        \def\ap@type{FileAttachment}\or
+        \def\ap@type{FreeText}\fi
+}{\PackageWarning{annot_pro}{Bad choice for type, permissible values
+   are text, stamp, fileattachment, textbox. Try again}}
+\def\ap@freetext@type{3}
+\let\ap@type\@empty
+\define@key{annotpro}{name}[]{\def\annotpro@name{#1}}
+\let\annotpro@name\@empty
+\define@choicekey+{annnotprotext}{name}{%
+Comment,Key,Note,Help,NewParagraph,Paragraph,Insert,Check,%
+Circle,Cross,Star,RightArrow,RightPointer,UpArrow,UpLeftArrow,%
+CrossHairs}[Note]{\def\annotpro@@name{#1}}%
+{\PackageWarning{annot_pro}{Bad choice for name, permissible values
+are Comment, Key, Note, Help, NewParagraph, Paragraph, Insert, Check,
+Circle, Cross, Star, RightArrow, RightPointer, UpArrow,
+UpLeftArrow, CrossHairs. Try again}}
+\let\annotpro@@name\@empty
+\define@choicekey+{annnotprostamp}{name}{%
+Approved,AsIs,Confidential,Departmental,Draft,%
+Experimental,Expired,Final,ForComment,%
+ForPublicRelease,NotApproved,NotForPublicRelease,Sold,%
+TopSecret}[Draft]{\def\annotpro@@name{#1}}%
+{\def\ap@custom@name{#1}}
+\let\ap@custom@name\@empty
+\define@key{annotpro}{customStamp}[]{\def\ap@customstamp@name{#1}}
+\let\ap@customstamp@name\@empty
+\define@key{annotpro}{ap}[]{\def\annotpro@ap{#1}}
+\let\annotpro@ap\@empty
+\define@key{annotpro}{width}[]{\def\annotpro@width{#1}}
+\let\annotpro@width\@empty
+\define@key{annotpro}{height}[]{\def\annotpro@height{#1}}
+\let\annotpro@height\@empty
+\define@key{annotpro}{rotate}[]{\def\annotpro@rotate{#1}}
+\let\annotpro@rotate\@empty
+\define@key{annotpro}{scale}[]{\def\annotpro@scale{#1}}
+\let\annotpro@scale\@empty
+\define@key{annotpro}{widthTo}[]{\def\annotpro@widthTo{#1}}
+\let\annotpro@widthTo\@empty
+\define@key{annotpro}{heightTo}[]{\def\annotpro@heightTo{#1}}
+\let\annotpro@heightTo\@empty
+\define@choicekey+{annnotprofileattach}{name}{%
+Graph,Paperclip,PushPin,Tag}[PushPin]{\def\annotpro@@name{#1}}
+{\PackageWarning{annot_pro}{Bad choice for name, permissible values
+are Graph,Paperclip,PushPin,Tag. Try again}}
+\define@key{annotpro}{file}[]{%
+    \edef\annotpro@file{#1}%
+    \ifx\annotpro@file\@empty\else
+    \edef\ap@exp@tmp{\noexpand\filename@parse{#1}}\ap@exp@tmp
+    \edef\ap@thisFileName{\filename@base.\filename@ext}\fi
+}
+\let\annotpro@file\@empty
+\define@key{annotprofreetext}{name}[FreeText]{\def\annotpro@@name{#1}}
+\define@key{annotprofreetext}{defstyle}[]{\def\annotpro@@ds{#1}}
+\let\annotpro@@ds\@empty
+\define@key{annotprofreetext}{richtext}[]{\def\annotpro@@rt{#1}}
+\let\annotpro@@rt\@empty
+\define@key{annotpro}{margin}[0]{%
+    \def\annotpro@margin{0}}
+\let\annotpro@margin\@empty
+\define@key{annotpro}{margintext}[]{%
+    \def\apmargintext{\centering\break
+    \parbox{\linewidth}{\apmargintextformat\strut#1}}}
+\let\apmargintext\@empty
+\newcommand{\margintextformat}[1]{\def\apmargintextformat{#1}}
+\margintextformat{\bfseries\tiny\color{blue}}
+\define@key{annotpro}{presets}[]{\def\annotpro@presets{#1}}
+\let\annotpro@presets\@empty
+\define@key{annotpro}{objdef}[]{\def\eq@objdef{/_objdef {#1}}%
+    \def\eq@objdefName{#1}}
+\let\eq@objdef\@empty
+\define@key{annotpro}{taborder}[]{\def\eq@taborder{#1}}
+\let\eq@taborder\@empty
+\define@choicekey+{annotpro}{open}[\val\nr]{true,false}[true]{%
+    \def\annotpro@open{#1}}{\PackageWarning{annot_pro}{Bad
+    choice for open, permissible values are true and false. Try again}}
+\def\annotpro@open{false}
+\define@key{annotpro}{subject}[]{\def\annotpro@subject{#1}}
+\define@key{annotpro}{title}[]{\def\annotpro@title{#1}}
+\define@key{annotpro}{color}[1 0 0]{\def\annotpro@color{#1}}
+\define@key{annotpro}{bgcolor}[]{\def\annotpro@bgcolor{#1}}
+\def\annotpro@bgcolor{white}
+\define@key{annotpro}{bcolor}[]{\def\annotpro@bcolor{#1}}
+\let\annotpro@bcolor\@empty
+\def\annotpro@def@bcolor{black}
+\def\ap@BE@i{4.08768}
+\def\ap@BE@i@calc{\ap@BE@i\space\ap@bwidthNum\space add}
+\def\ap@BE@ii{8.26857}
+\def\ap@BE@ii@calc{\ap@BE@ii\space add \ap@bwidthNum}
+\define@choicekey+{annotpro}{borderstyle}[\val\nr]{none,solid,%
+    dash1,dash2,dash3,dash4,dash5,dash6,cloud1,cloud2}[solid]{%
+    \ifcase\nr\relax
+        \def\ap@border@code{}\or
+        \def\ap@border@code{/BS <</S/S\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[2.0 2.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[3.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[4.0 3.0 2.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[4.0 3.0 16.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BS <</D[8.0 4.0 4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{/BE<</I 1.0/S/C>>/RD[\ap@BE@i@calc\space\ap@BE@i@calc
+            \space\ap@BE@i@calc\space\ap@BE@i@calc]%
+        \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\or
+        \def\ap@border@code{/BE<</I 2.0/S/C>>/RD[\ap@BE@ii@calc\space\ap@BE@ii@calc
+            \space\ap@BE@ii@calc\space\ap@BE@ii@calc]%
+        \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\fi
+    \def\annotpro@border{#1}}{\PackageWarning{annot_pro}{Bad
+    choice for borderstyle,\MessageBreak permissible values are none, solid,%
+    dash1, dash2, dash3,\MessageBreak dash4, dash5, dash6, cloud1, cloud2. Try again}}
+\def\ap@border@code{/BS <</S/S\ap@bwidth>>}
+\define@choicekey+{annotpro}{borderwidth}[\val\nr]{.5,1,2,3,4,6,8,10}[1]{%
+    \edef\ap@bwidthNum{\val}%
+    \def\ap@bwidth{/W #1}}{\PackageWarning{annot_pro}{Bad
+    choice for borderwidth,\MessageBreak permissible values are .5, 1, 2,\MessageBreak
+    3, 4, 6, 8, 10. Try again}}
+\def\ap@bwidthNum{1}
+\let\ap@bwidth\@empty
+\define@key{annotpro}{readonly}[ 64 add]{\def\ap@readonly{#1}}
+\let\ap@readonly\@empty
+\define@key{annotpro}{nohspace}[]{\def\annotpro@hspace{0pt}}
+\define@key{annotpro}{novspace}[]{\def\annotpro@vspace{0pt}}
+\define@key{annotpro}{nospace}[]{\def\annotpro@hspace{0pt}%
+    \def\annotpro@vspace{0pt}}
+\let\annotpro@hspace\@empty\let\annotpro@vspace\@empty
+\define@key{annotpro}{opacity}[]{%
+    \def\ap@add@ops{[ /ca #1 /SetTransparency pdfmark}%
+    \def\annotpro@opacity{#1}}
+\let\annotpro@opacity\@empty
+\def\getargsiii#1#2#3{\def\ap@argi{#1}\def\ap@argii{#2}%
+    \def\ap@argiii{#3}}
+\ifuseAAXdim
+\@tfor\ap@text@dimen:={{Comment}{18bp}{18bp}}%
+{{Key}{13bp}{18bp}}{{Note}{18bp}{20bp}}{{Help}{20bp}{20bp}}%
+{{NewParagraph}{13bp}{20bp}}{{Paragraph}{20bp}{20bp}}%
+{{Insert}{17bp}{20bp}}{{Check}{20bp}{19bp}}%
+{{Circle}{20bp}{20bp}}{{Cross}{20bp}{19bp}}%
+{{Star}{20bp}{19bp}}{{RightArrow}{20bp}{20bp}}%
+{{RightPointer}{20bp}{17bp}}{{UpArrow}{17bp}{20bp}}%
+{{UpLeftArrow}{17bp}{17bp}}{{CrossHairs}{20bp}{20bp}}\do{%
+    \expandafter\getargsiii\ap@text@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+} \else
+\@tfor\ap@text@dimen:={{Comment}{20bp}{18bp}}%
+{{Key}{18bp}{17bp}}{{Note}{18bp}{20bp}}{{Help}{20bp}{20bp}}%
+{{NewParagraph}{13bp}{20bp}}{{Paragraph}{11bp}{20bp}}%
+{{Insert}{20bp}{17bp}}{{Check}{20bp}{19bp}}%
+{{Circle}{20bp}{20bp}}{{Cross}{20bp}{20bp}}%
+{{Star}{20bp}{19bp}}{{RightArrow}{20bp}{14bp}}%
+{{RightPointer}{20bp}{18bp}}{{UpArrow}{19bp}{20bp}}%
+{{UpLeftArrow}{17bp}{17bp}}{{CrossHairs}{24bp}{24bp}}\do{%
+    \expandafter\getargsiii\ap@text@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+} \fi
+\ifuseAAXdim
+\@tfor\ap@fa@dimen:={{Graph}{20bp}{20bp}}
+ {{Paperclip}{7bp}{17bp}}{{PushPin}{14bp}{20bp}}
+ {{Tag}{20bp}{16bp}}\do{%
+    \expandafter\getargsiii\ap@fa@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\else
+\@tfor\ap@fa@dimen:={{Graph}{18bp}{18bp}}
+ {{Paperclip}{5bp}{15bp}}{{PushPin}{12bp}{18bp}}
+ {{Tag}{18bp}{14bp}}\do{%
+    \expandafter\getargsiii\ap@fa@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+} \fi
+\newcommand{\defaultStampWidth}{50bp}
+\newcommand{\defaultStampHeight}{50bp}
+\newcommand{\standardStampWidth}{245.38bp}
+\newcommand{\standardStampHeight}{64.53bp}
+\@tfor\ap@dimen:={{SBApproved}{163.50bp}{49.50bp}}
+{{SBCompleted}{175.87bp}{49.50bp}}
+{{SBConfidential}{209.62bp}{49.50bp}}
+{{SBDraft}{113.14bp}{49.75bp}}
+{{SBFinal}{97.80bp}{49.75bp}}
+{{SBForComment}{211.87bp}{49.50bp}}
+{{SBForPublicRelease}{290.04bp}{49.55bp}}
+{{SBInformationOnly}{275.00bp}{49.55bp}}
+{{SBNotApproved}{218.62bp}{49.50bp}}
+{{SBNotForPublicRelease}{346.04bp}{49.55bp}}
+{{SBPreliminaryResults}{304.04bp}{49.55bp}}
+{{SBVoid}{91.04bp}{49.75bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\@tfor\ap@dimen:={{SBRejected}{22.68bp}{22.66bp}}
+{{SHAccepted}{23.29bp}{20.45bp}}
+{{SHInitialHere}{99.69bp}{30.34bp}}
+{{SHSignHere}{99.69bp}{30.34bp}}
+{{SHWitness}{99.69bp}{30.34bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\catcode`\#=11\relax
+\@tfor\ap@dimen:={{#DApproved}{255.64bp}{53.83bp}}
+{{#DConfidential}{163.28bp}{57.10bp}}
+{{#DReceived}{255.64bp}{55.11bp}}
+{{#DReviewed}{255.64bp}{55.11bp}}
+{{#DRevised}{127.47bp}{55.85bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\catcode`\#=6\relax
+\newcommand{\stampWidth}[1]{\csname ap@#1Width\endcsname}
+\newcommand{\stampHeight}[1]{\csname ap@#1Height\endcsname}
+\@tfor\ap@dimen:={{WordsAGenuineFind}{120.68bp}{190.83bp}}
+{{WordsBigSavings}{282.84bp}{117.86bp}}
+{{WordsDeals}{345.40bp}{132.55bp}}
+{{WordsHappyBirthday}{326.50bp}{166.32bp}}
+{{WordsHot}{249.64bp}{176.75bp}}
+{{WordsLookWhatsNew}{316.59bp}{229.81bp}}
+{{WordsNeato}{171.12bp}{86.88bp}}
+{{WordsTheBestJustGotBetter}{153.53bp}{153.53bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\@tfor\ap@dimen:={{FacesEcstatic}{223.20bp}{202.80bp}}
+{{FacesElectric}{295.80bp}{280.50bp}}
+{{FacesGrumpy}{289.92bp}{194.64bp}}
+{{FacesHappy}{161.65bp}{161.65bp}}
+{{FacesHurt}{289.50bp}{285.75bp}}
+{{FacesNeutral}{291.04bp}{279.32bp}}
+{{FacesSmirk}{276.75bp}{292.50bp}}
+{{FacesSurprised}{220.08bp}{215.04bp}}
+{{FacesWorried}{298.11bp}{235.12bp}}
+{{FacesWow}{242.32bp}{289.17bp}}
+{{FacesZippy}{290.59bp}{263.81bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\@tfor\ap@dimen:={{PointersBogus}{128.32bp}{53.82bp}}
+{{PointersBug}{128.32bp}{51.94bp}}
+{{PointersDOA}{136.99bp}{51.48bp}}
+{{PointersFYEO}{128.32bp}{48.60bp}}
+{{PointersFix}{145.60bp}{58.11bp}}
+{{PointersNuke}{128.32bp}{52.30bp}}
+{{PointersOptimize}{128.32bp}{48.60bp}}
+{{PointersRedFlag}{128.32bp}{57.12bp}}
+{{PointersValidate}{128.32bp}{48.60bp}}
+{{PointersWarning}{128.32bp}{57.23bp}}
+{{PointersWhen}{128.32bp}{63.79bp}}\do{%
+    \expandafter\getargsiii\ap@dimen
+    \ap@csarg\edef{ap@\ap@argi Width}{\ap@argii}%
+    \ap@csarg\edef{ap@\ap@argi Height}{\ap@argiii}%
+}
+\def\ap@FreeTextWidth{144bp}
+\def\ap@FreeTextHeight{72bp}
+\newcommand{\makeStamp}[3]{%
+\ap@csarg\def{stamp@#2}{%
+    \begin{sp@createImage}{#1}{#2\the\ap@cusstamp@cnt}
+        \ap@add@ops#3
+    \end{sp@createImage}}}
+\let\ap@add@ops\@empty
+\newcommand{\ap@useStamp}[1]{%
+    \global\advance\ap@cusstamp@cnt1\relax
+    \@nameuse{stamp@#1}}
+\newcommand{\setAnnotOptions}[1]{%
+    \setkeys{annotpro}{#1}%
+}
+\begingroup
+\def\withoptz@#1{\ifnum#1<10 0\fi\the#1}
+\edef\ap@pdfdate{\the\year\withoptz@\month\withoptz@\day}
+\count0=\time \count2=\count0
+\divide\count2by60
+\edef\ap@pdfdate{\ap@pdfdate\withoptz@{\count2}}
+\multiply\count2by60 \advance\count0by-\count2
+\xdef\ap@pdfdate{\ap@pdfdate\withoptz@{\count0}00}
+\endgroup
+\newcount\ap@annot@cnt
+\newcount\ap@cusstamp@cnt
+{\catcode`\#=12\gdef\ap@signalCustomAP{#}}
+\def\pStamp#1{\ap@signalCustomAP#1}
+\def\ap@RV@Body{<?xml version="1.0"?><body %
+    xfa:APIVersion="Acrobat:9.5.5" %
+    xfa:contentType="text/html" %
+    xfa:spec="2.0.2" xmlns="http://www.w3.org/1999/xhtml" %
+    xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">}
+\def\ap@RV@endBody{<body>}
+\def\ap@sub#1{\rvorvstring{<span style="vertical-align:-0.0pt;">#1</span>}{#1}}%
+\def\ap@sup#1{\rvorvstring{<span style="vertical-align:+0.0pt;">#1</span>}{#1}}%
+\def\ap@uDec#1{\rt@amp\rt@hashtag#1;}
+\def\ap@uHex#1{\rt@amp\rt@hashtag x#1;}
+\def\ap@afterParaFont{%
+    \rt@formfieldfalse
+}
+\def\ap@afterFont{%
+    \rt@formfieldfalse
+    \let\rt@url\@empty
+}
+\newenvironment{textboxpara}{%
+    \let\rt@sub\ap@sub\let\rt@sup\ap@sup
+    \let\rt@afterParaFont\ap@afterParaFont
+    \let\rt@afterFont\ap@afterFont
+    \def\rt@br{\rvorvstring{\rt@amp\rt@hashtag13;}{\string\r}}%
+    \def\rt@spc{\space}\let\uDec\ap@uDec\let\uHex\ap@uHex
+}{}
+\newcommand{\annotpro}{%
+    \begingroup
+    \let\#\ap@signalCustomAP
+    \@nnotpro
+}
+\newcommand{\@nnotpro}[1][]{%
+    \global\advance\ap@annot@cnt1\relax
+    \setkeys{annotpro}{#1}%
+    \@nn@tpro
+}
+\newcommand{\@nn@tpro}[1]
+{%
+  \ifx\annotpro@presets\@empty\else
+    \edef\ap@exp@tmp{\noexpand\setkeys{annotpro}{\annotpro@presets}}%
+    \ap@exp@tmp\fi
+  \ifx\ap@type\@empty\def\ap@type{Text}\def\ap@save@type{0}\fi
+  \ifcase\ap@save@type\relax
+    \def\annot@subtype{annnotprotext}%
+    \ifx\annotpro@subject\@empty\def\annotpro@subject{Sticky Note}\fi
+    \ifx\annotpro@name\@empty\def\annotpro@name{Note}\fi
+    \def\ap@def@name{Note}\or
+    \ifx\annotpro@subject\@empty\def\annotpro@subject{Rubber Stamp}\fi
+    \def\annot@subtype{annnotprostamp}%
+    \def\ap@def@name{Draft}\or
+    \ifx\annotpro@subject\@empty
+        \def\annotpro@subject{File Attachment}\fi
+    \def\annot@subtype{annnotprofileattach}%
+    \def\ap@def@name{PushPin}\or
+    \ifx\annotpro@subject\@empty
+        \def\annotpro@subject{Text Box}\fi
+    \def\annot@subtype{annotprofreetext}%
+    \def\ap@def@name{FreeText}%
+  \fi
+    \edef\ap@exp@tmp{%
+        \noexpand\setkeys{\annot@subtype}{name=\annotpro@name}}%
+    \ap@exp@tmp\xdef\ap@def@type{\ap@type}%
+  \let\annotpro@enc@contents\@empty
+  \makespecialJS
+\if\ap@save@type\ap@freetext@type
+     \let\eq@RV@Body\ap@RV@Body\let\eq@RV@endBody\ap@RV@endBody
+     \setkeys{annotprofreetext}{#1}%
+     \ifx\annotpro@@ds\@empty
+        \def\ap@defaultstyle{\useDefaultDS}\else
+        \edef\ap@defaultstyle{\noexpand\useDS{\annotpro@@ds}}\fi
+     \ifx\annotpro@@rt\@empty
+        \let\annotpro@RC\@empty\let\annotpro@C\@empty\else
+        \edef\annotpro@RC{\noexpand\useRVContent{\annotpro@@rt}}%
+        \edef\annotpro@C{\noexpand\useVContent{\annotpro@@rt}}\fi
+\else
+  \pdfstringdef\annotpro@enc@contents{#1}%
+\fi
+  \let\annotpro@enc@title\@empty
+  \pdfstringdef\annotpro@enc@title{\annotpro@title}%
+  \let\annotpro@enc@subject\@empty
+  \pdfstringdef\annotpro@enc@subject{\annotpro@subject}%
+  \HyColor@XZeroOneThreeFour{\annotpro@color}%
+    {\annotpro@enc@color}{annotpro}{color}%
+\ifx\annotpro@bgcolor\@empty\else
+  \HyColor@XZeroOneThreeFour{\annotpro@bgcolor}
+    {\annotpro@enc@bgcolor}{annotpro}{bgcolor}\fi
+\ifx\annotpro@bcolor\@empty
+    \edef\annotpro@bcolor{\annotpro@def@bcolor}\fi
+  \HyColor@FieldColor{\annotpro@bcolor}
+    {\annotpro@enc@bcolor}{annotpro}{bcolor}%
+  \let\ap@this@AP\@empty\let\ap@this@FS\@empty\let\ap@this@CA\@empty
+  \let\ap@this@Rotate\@empty
+  \ifx\annotpro@opacity\@empty\else
+        \def\ap@this@CA{/CA \annotpro@opacity}\fi
+  \ifcase\ap@save@type
+     \ifx\annotpro@@name\@empty\edef\annotpro@@name{\ap@def@name}\fi
+      \edef\ap@thisWidth{\ifx\annotpro@hspace\@empty
+        \@nameuse{ap@\annotpro@@name Width}\else
+        \annotpro@hspace\fi}%
+      \edef\ap@thisHeight{\ifx\annotpro@vspace\@empty
+        \@nameuse{ap@\annotpro@@name Height}\else
+      \annotpro@vspace\fi}%
+  \or
+    \ifx\annotpro@@name\@empty
+        \ifx\ap@custom@name\@empty
+            \ifx\ap@customstamp@name\@empty
+                \ifx\annotpro@@name\@empty
+                    \edef\annotpro@@name{\ap@def@name}\fi
+                \edef\ap@thisWidth{\standardStampWidth}%
+                \edef\ap@thisHeight{\standardStampHeight}%
+            \else
+                \if\ap@graphicxsp0\PackageError{annot_pro}%
+                {Specifying a custom name for a stamp requires
+                    the graphicxsp package.}\fi
+                \ifx\annotpro@ap\@empty
+                \PackageError{annot_pro}{You must specify a value
+                    for the ap key}\fi
+                \def\ap@ImageRef{\annotpro@ap\the\ap@cusstamp@cnt}%
+                \expandafter\ap@useStamp\expandafter{\annotpro@ap}%
+                \edef\ap@thisWidth{\widthOf{\ap@ImageRef}bp}%
+                \@tempdima=\ap@thisWidth\advance\@tempdima-2bp
+                \edef\ap@thisWidth{\the\@tempdima}%
+                \edef\ap@thisHeight{\heightOf{\ap@ImageRef}bp}%
+                \@tempdima=\ap@thisHeight\advance\@tempdima-2bp
+                \edef\ap@thisHeight{\the\@tempdima}%
+                \def\ap@this@AP{/AP << /N {\ap@ImageRef} >>}%
+                \edef\annotpro@@name{%
+                    \ap@signalCustomAP\ap@customstamp@name}%
+            \fi
+        \else
+            \edef\annotpro@@name{\ap@custom@name}%
+            \@ifundefined{ap@\ap@custom@name Width}{%
+                \edef\ap@thisWidth{\ifx\annotpro@width\@empty
+                    \defaultStampWidth\else\annotpro@width\fi}%
+                \edef\ap@thisHeight{\ifx\annotpro@height\@empty
+                    \defaultStampWidth\else\annotpro@height\fi}%
+            }{%
+                \edef\ap@thisWidth{\ifx\annotpro@width\@empty
+                    \@nameuse{ap@\annotpro@@name Width}\else
+                    \annotpro@width\fi}%
+                \edef\ap@thisHeight{\ifx\annotpro@height\@empty
+                    \@nameuse{ap@\annotpro@@name Height}\else
+                    \annotpro@height\fi}%
+            }%
+        \fi
+    \else
+        \edef\ap@thisWidth{\standardStampWidth}%
+        \edef\ap@thisHeight{\standardStampHeight}%
+    \fi
+     \ifx\annotpro@scale\@empty
+         \ifx\annotpro@widthTo\@empty
+             \ifx\annotpro@heightTo\@empty\else % heightTo
+                \edef\ap@thisWidth{%
+                    (\ap@thisWidth)*\noexpand
+                     \ratio{\annotpro@heightTo}{\ap@thisHeight}}%
+                \edef\ap@thisHeight{\annotpro@heightTo}%
+             \fi
+         \else % widthTo
+            \edef\ap@thisHeight{%
+                (\ap@thisHeight)*\noexpand
+                 \ratio{\annotpro@widthTo}{\ap@thisWidth}}%
+            \edef\ap@thisWidth{\annotpro@widthTo}%
+         \fi
+     \else %scale
+        \edef\ap@thisWidth{(\ap@thisWidth)*\noexpand
+            \real{\annotpro@scale}}%
+        \edef\ap@thisHeight{(\ap@thisHeight)*\noexpand
+            \real{\annotpro@scale}}%
+     \fi
+     \setlength{\@tempdima}{\ap@thisWidth}%
+     \edef\ap@thisWidth{\the\@tempdima}%
+     \setlength{\@tempdima}{\ap@thisHeight}%
+     \edef\ap@thisHeight{\the\@tempdima}%
+      \ifx\annotpro@rotate\empty\else
+          \def\ap@this@Rotate{/Rotate \annotpro@rotate}%
+          \ap@set@Rotate@BBox
+      \fi
+  \or
+    \ifx\annotpro@@name\@empty\edef\annotpro@@name{\ap@def@name}\fi
+    \ifx\annotpro@file\@empty\PackageError{annot_pro}%
+        {You must specify a path the file to be
+         attached using the file key.}\fi
+    \def\ap@this@FS{/FS {apEmbedFile\the\ap@annot@cnt}}%
+    \edef\ap@thisWidth{\@nameuse{ap@\annotpro@@name Width}}%
+    \edef\ap@thisHeight{\@nameuse{ap@\annotpro@@name Height}}%
+    \ap@EmbedThisFile
+  \or
+     \ifx\annotpro@@name\@empty\edef\annotpro@@name{\ap@def@name}\fi
+     \ifx\annotpro@width\@empty\else
+        \setlength\@tempdima{\annotpro@width}%
+            \def\annotpro@width{\the\@tempdima}\fi
+    \edef\ap@thisWidth{\ifx\annotpro@width\@empty
+        \@nameuse{ap@\annotpro@@name Width}\else
+        \annotpro@width\fi}%
+     \ifx\annotpro@height\@empty\else
+        \setlength\@tempdima{\annotpro@height}%
+            \def\annotpro@height{\the\@tempdima}\fi
+    \edef\ap@thisHeight{\ifx\annotpro@height\@empty
+        \@nameuse{ap@\annotpro@@name Height}\else
+        \annotpro@height\fi}%
+  \fi
+  \ifx\annotpro@margin\@empty\let\apmargintext\@empty
+    \expandafter\relax\else\expandafter\marginpar\fi
+  {\pdf@rect{\ap@Bbox{\ap@thisWidth}{\ap@thisHeight}}\literalps@out{%
+  [ \eq@objdef\ap@Rect
+    /F 4\ap@readonly
+    /Open \annotpro@open
+    /Title (\annotpro@enc@title)
+    /Subj (\annotpro@enc@subject)
+\if\ap@save@type\ap@freetext@type
+    /RC(\eq@RV@Body\annotpro@RC\eq@RV@endBody)
+    /Contents (\annotpro@C)
+    /DS (\ap@defaultstyle)
+    \ifx\annotpro@bgcolor\@empty\else
+    /C [\annotpro@enc@bgcolor]\fi
+    /DA (\annotpro@enc@bcolor\space/Helv 12 Tf)
+    \ap@border@code
+\else
+    /Open \annotpro@open
+    /Contents (\annotpro@enc@contents)
+    /Color [\annotpro@enc@color]
+\fi
+    /Name (\annotpro@@name)
+    /Subtype/\ap@type
+    /NM (annotpro\the\ap@annot@cnt)
+    /M (D:\ap@pdfdate)
+    \ap@this@AP\ap@this@FS\ap@this@CA\ap@this@Rotate
+    /ANN pdfmark}\apmargintext}%
+    \to@insertStrucTabOrder{Annot}\endgroup
+}
+\def\ap@set@Rotate@BBox{%
+    \CalculateSin\annotpro@rotate\CalculateCos\annotpro@rotate
+    \edef\c@cos{\UseCos\annotpro@rotate}%
+    \edef\c@sin{\UseSin\annotpro@rotate}%
+    \@tempdimb=\c@cos pt
+    \@tempdimb=\c@sin\@tempdimb
+    \let\ap@sign\@empty
+    \ifdim\@tempdimb<\z@\def\ap@sign{-}\fi
+    \@tempdima=\ap@sign\ap@thisWidth
+    \@tempdima=\c@cos\@tempdima
+    \@tempdimb=\ap@thisHeight
+    \@tempdimb=\c@sin\@tempdimb
+    \advance\@tempdima by\@tempdimb
+    \edef\ap@temp@thisWidth{\the\@tempdima}%
+    \@tempdima=\ap@thisWidth
+    \@tempdima=\c@sin\@tempdima
+    \@tempdimb=\ap@thisHeight
+    \@tempdimb=\c@cos\@tempdimb
+    \advance\@tempdima by\ap@sign\@tempdimb
+    \@tempdimb=\ap@temp@thisWidth\relax
+    \ifdim\@tempdimb<\z@\@tempdimb=-\the\@tempdimb\fi
+    \ifdim\@tempdima<\z@\@tempdima=-\the\@tempdima\fi
+    \edef\ap@thisWidth{\the\@tempdimb}%
+    \edef\ap@thisHeight{\the\@tempdima}%
+}
+\def\ap@EmbedThisFile{%
+    \literalps@out{%
+    [ /_objdef {apEmbedFile\the\ap@annot@cnt}/type/dict/OBJ pdfmark
+    [ {apEmbedFile\the\ap@annot@cnt} <<
+        /F (\ap@thisFileName)
+        /UF (\ap@thisFileName)
+        /EF << /F {apFileStream\the\ap@annot@cnt} >>
+        /Type/Filespec
+    >> /PUT pdfmark}%
+    \literalps@out{%
+    [ /_objdef {apFileStream\the\ap@annot@cnt}/type/stream/OBJ pdfmark
+    [ {apFileStream\the\ap@annot@cnt} (\annotpro@file)
+        (r) file /PUT pdfmark
+    [ {apFileStream\the\ap@annot@cnt} <<
+        /Type/EmbeddedFile
+    >> /PUT pdfmark
+    [ {apFileStream\the\ap@annot@cnt} /CLOSE pdfmark}%
+}
+\setAnnotOptions{title,subject,open=false,color}
+\endinput
+%%
+%% End of file `annot_pro.sty'.

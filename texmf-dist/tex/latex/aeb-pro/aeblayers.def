@@ -1,0 +1,306 @@
+%%
+%% This is file `aeblayers.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,aeblayers')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newif\ifaeb@ocOn \aeb@ocOntrue
+\ifaeb@ocOn
+\AtBeginDocument{%
+\headerps@out{%
+{/OCProcSet /ProcSet findresource} stopped not
+{/initialize get exec}
+{
+/BeginOC /pop load def
+/EndOC {} def
+/SimpleOC /pop load def
+/SetOCGInitState {pop pop} bind def
+/OCEndPage {} def
+/SetOCGIntent {pop pop} bind def
+/SetOCGUsage {pop pop} bind def
+/AddASEvent {pop pop pop} bind def
+}
+ifelse
+}
+}\fi
+\ifaeb@ocOn
+    \AtEndDocument{\literalps@out{{/OCProcSet /ProcSet findresource
+    /terminate get exec} stopped pop}}
+\fi
+\begin{insDLJS}[getxBld]{aebocg}{AeB Pro: OCG Support}
+var ocgs = this.getOCGs();
+var xBlds = new Array();
+if ( ocgs != null ) {
+    var l = ocgs.length;
+    for ( i=0; i<l; i++ ) {
+        if (ocgs[0].name.substring(0,3) == "xb." )
+            xBlds.push(ocgs.shift());
+        else ocgs.push(ocgs.shift());
+    }
+}
+var assocxLayers = new Array();
+if ( xBlds != null ) {
+    for ( var i=0; i<xBlds.length; i++)
+        assocxLayers[xBlds[i].name]=i;
+}
+function getxBld (name) {
+    var i = assocxLayers["xb."+name];
+    return ( i == undefined ) ? null : xBlds[i];
+}
+function toggleHelp (name)
+{
+    var o = getxBld(name);
+    if ( o != null ) o.state = (event.name.indexOf("Enter") != -1);
+}
+function toggleSetThisLayer(name, bState) {
+    var oLayer = getxBld(name);
+    if ( oLayer != null )
+        oLayer.state = (arguments.length > 1) ? bState : !oLayer.state;
+}
+function getLayerState(name) {
+    var oLayer = getxBld(name);
+    return ( oLayer != null ) ? oLayer.state : null;
+}
+\end{insDLJS}
+\newcommand{\texHelpIndicator}[1]{#1\thinspace${}^{\mbox
+    {\footnotesize\negthinspace\ding{109}}\raisebox{.225ex}
+    {\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+\newcommand{\addJStexHelpEnter}[1]{\def\aebp@addJStexHelpEnter{\r#1}}
+\newcommand{\addJStexHelpExit}[1]{\def\aebp@addJStexHelpExit{\r#1}}
+\newcommand{\resetaddJStexHelp}{%
+    \let\aebp@addJStexHelpEnter\@empty
+    \let\aebp@addJStexHelpExit\@empty
+}
+\resetaddJStexHelp
+\newcommand{\texHelp}[2]{%
+    \let\rollormargstring\texorpdfstring
+    \sbox{\aebsavehelp}{\texHelpIndicator{#2}}%
+    \makebox[0pt][l]{\pushButton[\S{S}\BG{}\BC{}\H{N}
+    \AA{\AAMouseEnter{\JS{toggleHelp("#1");\aebp@addJStexHelpEnter}}%
+    \AAMouseExit{\JS{toggleHelp("#1");\aebp@addJStexHelpExit}}}]{#1}%
+        {\wd\aebsavehelp}{\ht\aebsavehelp+\dp\aebsavehelp}}%
+    \usebox{\aebsavehelp}\resetaddJStexHelp
+    \let\rollormargstring\@gobbletwo
+}
+\newif\ifaeb@SimpleOCOn \aeb@SimpleOCOnfalse
+\newcommand{\@SOC}[2][false]{\global\aeb@SimpleOCOntrue%
+    \ifaeb@ocOn\literalps@out{(#2) SimpleOC (#2) #1 SetOCGInitState}\fi}
+\newcommand{\b@OC}[2][false]{\ifaeb@SimpleOCOn\@aebSimpleNesterror\fi
+    \ifaeb@ocOn\literalps@out{(#2) BeginOC (#2) #1 SetOCGInitState}\fi}
+\newcommand{\e@OC}{\ifaeb@ocOn\literalps@out{EndOC}\fi}
+\newcommand{\xBld}[2][]{%
+    \setkeys{aebpxBld}{false,#1}\b@OC[\aebpxBld@visible]{xb.#2}%
+    \ifx\aebpxBld@print\@empty\else
+        \literalps@out{/Print [/Print] [(xb.#2)] AddASEvent}%
+        \ifAEBP@aebpxBld@print
+            \literalps@out{(xb.#2) << /Print<<
+                /PrintState/ON >> >> SetOCGUsage}%
+        \else
+            \literalps@out{(xb.#2) << /Print<<
+                /PrintState/OFF >> >> SetOCGUsage}%
+        \fi
+        \global\let\aebpxBld@print\@empty
+    \fi
+}
+\let\eBld\e@OC
+\def\@aebSimpleNesterror{\PackageWarning{aeb}
+{The scope of the last \string\Bld\space command
+\MessageBreak includes the scope of the nested Bld.
+\MessageBreak Executing \protect\ocOff\space to correct this.
+\MessageBreak The problem occurs}\ocOff}
+\newif\ifAEBP@aebpxBld@print \AEBP@aebpxBld@printfalse
+\define@choicekey+{aebpxBld}{print}[\val\nr]{true,false,%
+    visible,always,never}[visible]{%
+        \ifcase\nr\relax
+            \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
+            \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\or
+            \let\aebpxBld@print\@empty\or
+            \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
+            \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\fi
+}{\PackageWarning{aeb_pro}{Bad choice for initState, permissible values
+   are true, false, visible, always, and never. Try again}}
+\let\aebpxBld@print\@empty
+\define@key{aebpxBld}{true}[true]{\def\aebpxBld@visible{#1}}
+\define@key{aebpxBld}{false}[false]{\def\aebpxBld@visible{#1}}
+\define@choicekey+{aebpxBld}{initState}[\val\nr]{on,off,%
+    true,false}[false]{%
+    \ifcase\nr\relax
+        \def\aebpxBld@visible{true}\or
+        \def\aebpxBld@visible{false}\or
+        \def\aebpxBld@visible{true}\or
+        \def\aebpxBld@visible{false}\fi
+}{\PackageWarning{aeb_pro}{Bad choice for initState, permissible values
+   are on, off, true and false. Try again}}
+\long\def\defineRC#1#2{\csarg\def{RC#1}{#2}}
+\def\insertRC#1{\@nameuse{RC#1}}
+\long\def\definePR#1#2{%
+    \ifeqforpaper\csarg\def{PR#1}{#2}\else
+    \ifeq@proofing\csarg\def{PR#1}{#2}\else
+    \csarg\let{PR#1}\relax\fi\fi
+}
+\def\insertPR#1{%
+    \ifeq@proofing\@nameuse{PR#1}\else
+    \csarg\let{insertPR}\@gobble\fi
+    \csarg\let{PR#1}\relax
+}
+\@ifundefined{ifeqforpaper}{\newif\ifeqforpaper \eqforpaperfalse}{}
+\@ifundefined{ifeq@proofing}{\newif\ifeq@proofing \eq@proofingfalse}{}
+\providecommand\turnProofingOn{\eq@proofingtrue}
+\providecommand\turnProofingOff{\eq@proofingfalse}
+\def\proofRollovers{%
+    \ifeqforpaper
+        \ifeq@proofing
+            \includecomment{rollover}%
+            \includecomment{printRollover}%
+        \else
+            \excludecomment{printRollover}%
+            \includecomment{rollover}%
+        \fi
+    \else
+        \ifeq@proofing
+            \includecomment{rollover}%
+            \includecomment{printRollover}%
+        \else
+            \excludecomment{printRollover}%
+            \includecomment{rollover}%
+        \fi
+    \fi
+}
+\proofRollovers
+\@onlypreamble\proofRollovers
+\newcommand\texPHProof[2]{\small\raggedright\texttt{#1}: #2}
+\let\rollormargstring\@gobbletwo
+\def\texPrintHelp#1#2{%
+    \let\rollormargstring\texorpdfstring
+    \ifeqforpaper
+        \ifeq@proofing
+            \texHelp{#1}{#2}\marginpar{\Hy@pdfstringfalse
+                \texPHProof{#1}{#2}}\else
+            \texHelpIndicator{#2}\fi
+    \else
+        \texHelp{#1}{#2}\ifeq@proofing\marginpar{\Hy@pdfstringfalse
+            \texPHProof{#1}{#2}}\fi
+    \fi
+    \let\rollormargstring\@gobbletwo
+}
+\newcommand{\animeBld}[1][]{\stepcounter{ocSeq}%
+    \xBld[#1]{\animBldName}}
+\newcounter{ocSeq}
+\newcommand{\animeName}[1]{anime!!#1}%01/01/2010
+\newcommand{\DeclareAnime}[3]
+{%
+    \setcounter{ocSeq}{0}%
+    \xdef\animBaseName{anime!!#1}%01/01/2010
+    \xdef\animSpeed{#2}\xdef\nFrames{#3}%
+    \gdef\animBldName{\animBaseName\#\theocSeq}%
+}
+\newcommand{\backAnimeBtn}[3][]
+{%
+    \pushButton[\textFont{Wingdings3}\uCA{FEFF00C5}\TU{Reverse}#1
+    \A{\JS{%
+        try { aebAnimeTimeOutF.running=false; } catch(e) {}\r
+        try { aebAnimeTimeOutB.running=false; } catch(e) {}\r
+        aebAnimeLayersBackward(\animSpeed,\nFrames,"\animBaseName");
+    }}]{\animBaseName BtnBack}{#2}{#3}%
+}
+\newcommand{\clearAnimeBtn}[3][]
+{%
+    \pushButton[\textFont{Wingdings}\CA{n}\TU{Clear}#1
+    \A{\JS{%
+        try { aebAnimeTimeOutF.running=false; } catch(e) {}\r
+        try { aebAnimeTimeOutB.running=false; } catch(e) {}\r
+        aebAnimeLayersClear(\animSpeed,\nFrames,"\animBaseName");
+    }}]{\animBaseName BtnClear}{#2}{#3}%
+}
+\newcommand{\forwardAnimeBtn}[3][]
+{%
+    \pushButton[\textFont{Wingdings3}\uCA{FEFF00C6}\TU{Graph It!}#1
+    \A{\JS{%
+        try { aebAnimeTimeOutF.running=false; } catch(e) {}\r
+        try { aebAnimeTimeOutB.running=false; } catch(e) {}\r
+        aebAnimeLayersForward(\animSpeed,\nFrames,"\animBaseName");
+    }}]{\animBaseName BtnForward}{#2}{#3}%
+}
+\begin{insDLJS}[_animeLayers]{animelayers}
+    {AeB Pro: JS in Support of Anime}
+var _animeLayers = true;
+var aebAnimeTimeOutF = new Object();
+aebAnimeTimeOutF.running=false;
+var aebAnimeTimeOutB = new Object();
+aebAnimeTimeOutB.running=false;
+var aebAnimeTimeOutC = new Object();
+function aebAnimeLayersForward(animSpeed,nFrames,baseName)
+{
+    var timeinterval = animSpeed;
+    aebAnimeTimeOutF = app.setInterval("aebAnimeTimeOutF.count++;"
+        + "if (aebAnimeTimeOutF.count > "
+        + nFrames + " || !aebAnimeTimeOutF.running )"
+        +" app.clearInterval(aebAnimeTimeOutF);\r"
+        + "else { if (aebAnimeTimeOutF.count == 1 )"
+        +" getxBld('"+baseName+"\#1').state=true;\t"
+        + "else { getxBld('"+baseName+"\#'"
+        + "+(aebAnimeTimeOutF.count-1)).state=false;\t"
+        + "getxBld('"+baseName+"\#'"
+        + "+aebAnimeTimeOutF.count).state=true;}}", timeinterval);
+    aebAnimeTimeOutF.running = true;
+    aebAnimeTimeOutF.start = 1;
+    aebAnimeTimeOutF.count=0;
+}
+function aebAnimeLayersBackward(animSpeed,nFrames,baseName)
+{
+    var timeinterval = animSpeed;
+    aebAnimeTimeOutB = app.setInterval("aebAnimeTimeOutB.count++;\r"
+     + "if (aebAnimeTimeOutB.count > "+nFrames
+     +"|| !aebAnimeTimeOutB.running )"
+     +" app.clearInterval(aebAnimeTimeOutB);\r"
+     + "else { if (aebAnimeTimeOutB.count == "
+     +nFrames+") getxBld('"+baseName+"\#1').state=false;\r"
+     + "else { getxBld('"+baseName+"\#'"
+     + "+(aebAnimeTimeOutB.start-%
+aebAnimeTimeOutB.count+1)).state=false;\r"
+     + "getxBld('"+baseName+"\#'"
+     + "+(aebAnimeTimeOutB.start-%
+aebAnimeTimeOutB.count)).state=true;}}",
+     timeinterval);
+    aebAnimeTimeOutB.running = true;
+    aebAnimeTimeOutB.start = nFrames;
+    aebAnimeTimeOutB.count=0;
+}
+function aebAnimeLayersClear(animSpeed,nFrames,baseName)
+{
+    aebAnimeTimeOutF.running = false;
+    aebAnimeTimeOutB.running = false;
+    clearFrames = app.setTimeOut(
+        "hideAllFrames("+nFrames+",\""+baseName+"\")",animSpeed);
+    var timeinterval = animSpeed;
+    aebAnimeTimeOutC = app.setInterval("aebAnimeTimeOutC.count++;\r"
+     + "if (aebAnimeTimeOutC.count >= "+nFrames
+     +") app.clearInterval(aebAnimeTimeOutC);\r"
+     + "else { getxBld('"+baseName+"\#'"
+     +"+(aebAnimeTimeOutC.start-aebAnimeTimeOutC.count)).state=false;}",
+     timeinterval);
+    aebAnimeTimeOutC.start = nFrames;
+    aebAnimeTimeOutC.count=0;
+}
+function hideAllFrames(n, baseName)
+{
+    for ( var i=1; i <= n ; i++ )
+        getxBld(baseName+"\#"+i).state=false;
+}
+\end{insDLJS}
+\endinput
+%%
+%% End of file `aeblayers.def'.

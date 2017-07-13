@@ -1,0 +1,1237 @@
+%%
+%% This is file `aebpro.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,aebpro')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\@tfor\aeb@windowopts:={{fit}{FitWindow}}{{center}{CenterWindow}}%
+    {{fullscreen}{FullScreen}}{{showtitle}{DisplayDocTitle}}\do
+{%
+    \expandafter\getargsii\aeb@windowopts
+    \edef\temp@expand@def{%
+            \noexpand\define@key{aebWindowOpts}{\aeb@argi}[true]{%
+            \noexpand\def\csname aeb@windowopts\aeb@argii\endcsname{%
+                /\aeb@argii\space##1}%
+        }%
+    }\temp@expand@def
+    \csarg\let{aeb@windowopts\aeb@argii}\@empty
+}
+\newcommand{\setWindowOptions}[1]{\cxkvsetkeys{aebWindowOpts}{#1}}
+\@tfor\aeb@uiopts:={{hidetoolbar}{HideToolbar}}
+    {{hidemenubar}{HideMenubar}}{{hidewindowui}{HideWindowUI}}\do{%
+    \expandafter\getargsii\aeb@uiopts
+    \edef\temp@expand@def{%
+        \noexpand\define@key{aebUIOpts}{\aeb@argi}[true]%
+        {%
+            \noexpand\edef\csname aeb@uiopts\aeb@argii\endcsname{%
+                /\aeb@argii\space##1}%
+        }%
+    }\temp@expand@def
+    \csarg\let{aeb@uiopts\aeb@argii}\@empty
+}
+\newcommand{\setUIOptions}[1]{\cxkvsetkeys{aebUIOpts}{#1}}
+\define@choicekey+{aebLayoutMag}{navitab}{UseNone,UseOutlines,%
+    UseThumbs,FullScreen,UseOC,UseAttachments}[UseNone]{%
+        \def\aeb@layoutMagNaviTab{#1}%
+}{\PackageWarning{aeb}{Bad choice for PageLayout, permissible values
+   are UseNone, UseOutlines, UseThumbs, FullScreen,%
+    UseOC, UseAttachments. Try again}}
+\let\aeb@layoutMagNaviTab\@empty
+\define@choicekey+{aebLayoutMag}{pagelayout}{SinglePage,OneColumn,%
+    TwoColumnLeft,TwoColumnRight,TwoPageLeft,TwoPageRight}[SinglePage]{%
+        \def\aeb@layoutMagPageLayout{#1}%
+}{\PackageWarning{aeb}{Bad choice for PageLayout, permissible values
+   are SinglePage, OneColumn, TwoColumnLeft, TwoColumnRight,
+   TwoPageLeft,TwoPageRight. Try again}}
+\let\aeb@layoutMagPageLayout\@empty
+\define@choicekey+{aebLayoutMag}{mag}[\val\nr]%
+    {ActualSize,FitPage,FitWidth,FitHeight,FitVisible}[FitPage]%
+{%
+    \ifcase\nr\relax
+        \edef\aeb@layoutMagMag{\dl@actualsize}\or
+        \def\aeb@layoutMagMag{\dl@fitpage}\or
+        \def\aeb@layoutMagMag{\dl@fitwidth}\or
+        \def\aeb@layoutMagMag{\dl@fitheight}\or
+        \def\aeb@layoutMagMag{\dl@fitvisible}\fi
+}{\setlength\@tempdima{1pt*\ratio{\val pt}{100pt}}%
+  \edef\aeb@layoutMagMag{\dl@mag{\strip@pt\@tempdima}}}
+\let\aeb@layoutMagMag\@empty
+\define@key{aebLayoutMag}{openatpage}[1]{\def\aeb@openatpageChoice{#1}%
+    \ifpdfmarkup\def\aeb@layoutMagPage{Page#1}\else
+    \def\aeb@layoutMagPage{#1}\fi}
+\let\aeb@openatpageChoice\@empty
+\let\aeb@layoutMagPage\@empty
+\newcommand{\setLayoutMag}[1]{\setkeys{aebLayoutMag}{openatpage=1}%
+    \cxkvsetkeys{aebLayoutMag}{#1}}
+\define@key{aebDeclareInitView}{layoutmag}
+    {\def\aebDeclareInitView@layoutmag{#1}}
+\let\aebDeclareInitView@layoutmag\@empty
+\define@key{aebDeclareInitView}{windowoptions}
+    {\def\aebDeclareInitView@windowoptions{#1}}
+\let\aebDeclareInitView@windowoptions\@empty
+\define@key{aebDeclareInitView}{uioptions}
+    {\def\aebDeclareInitView@uioptions{#1}}
+\let\aebDeclareInitView@uioptions\@empty
+\newcommand{\DeclareInitView}[1]{%
+    \setkeys{aebDeclareInitView}{#1}%
+    \edef\temp@expand@sets{%
+        \noexpand\setLayoutMag{\aebDeclareInitView@layoutmag}%
+        \noexpand\setWindowOptions{\aebDeclareInitView@windowoptions}%
+        \noexpand\setUIOptions{\aebDeclareInitView@uioptions}%
+    }\temp@expand@sets
+}
+\providecommand{\taggedPDF}{\def\aeb@TaggedPDF{true}}
+\let\aeb@TaggedPDF\@empty
+\@onlypreamble\taggedPDF
+\let\aeb@addOpenAction\@empty
+\let\aeb@addActionCode\@empty
+\let\aeb@addOpenActionArg\@empty
+\def\AEB@psMrk{[\space}
+\let\aebpopentoks\@empty
+\let\aebpFA\aebp@NO
+\def\aebp@rightDelimiters{}
+\let\@pdfstartview\@empty
+\let\@pdfstartpage\@empty
+\renewcommand{\addToDocOpen}[1]{%
+    \ifx\aebpFA\aebp@NO
+        \gdef\aeb@addOpenActionArg{#1}%
+        \g@addto@macro\aebpopentoks{#1}%
+        \def\aeb@addActionCode{\bgroup\makeJSspecials\dl@preProcDefns
+\ifpdfmarkup
+        \literalps@out{\AEB@psMrk/_objdef {pubAddToDocOpen}
+            /type/dict /OBJ pdfmark^^J%
+        \AEB@psMrk{pubAddToDocOpen}
+            << \aebpopentoks
+               \ifx\dev@addOpenAction\@empty\else
+               \ifx\aeb@addOpenActionArg\@empty\else^^J%
+                \dev@addOpenAction\fi\fi\aebp@rightDelimiters
+            >> /PUT pdfmark}%
+        \gdef\pubAddToDocOpen{{pubAddToDocOpen}}%
+        \xdef\aeb@addOpenAction{/Next \pubAddToDocOpen}%
+\else\ifpdf
+        \immediate\pdfobj{<< \aebpopentoks
+            \ifx\dev@addOpenAction\@empty\else
+            \ifx\aeb@addOpenActionArg\@empty\else^^J%
+            \dev@addOpenAction\fi\fi\aebp@rightDelimiters
+        >>}\xdef\pubAddToDocOpen{\the\pdflastobj\space 0 R}%
+        \xdef\aeb@addOpenAction{/Next \pubAddToDocOpen}%
+\else\ifxetex
+        \immediate\@pdfm@mark{obj @pubAddToDocOpen << \aebpopentoks
+            \ifx\dev@addOpenAction\@empty\else
+            \ifx\aeb@addOpenActionArg\@empty\else^^J%
+            \dev@addOpenAction\fi\fi\aebp@rightDelimiters >> }%
+        \gdef\pubAddToDocOpen{@pubAddToDocOpen}%
+        \xdef\aeb@addOpenAction{/Next \pubAddToDocOpen}%
+\fi\fi\fi\egroup}%
+        \global\let\aebpFA\aebp@YES
+    \else
+            \edef\aebp@dljstmp{\aebp@rightDelimiters}%
+            \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
+            \g@addto@macro\aebpopentoks{/Next << #1 }%
+    \fi
+}
+\let\additionalOpenAction\addToDocOpen
+\let\dev@addOpenAction\@empty
+\let\dev@addOpenActionArg\@empty
+\let\dev@addActionCode\@empty
+\let\aebpFAP\aebp@NO
+\let\aebpopentoksP\@empty
+\def\aebp@rightDelimitersP{}
+\newcommand{\dev@addToDocOpen}[1]{%
+    \ifx\aebpFAP\aebp@NO
+        \gdef\dev@addOpenActionArg{#1}%
+        \g@addto@macro\aebpopentoksP{#1}%
+        \def\dev@addActionCode{\bgroup\makeJSspecials\dl@preProcDefns
+\ifpdfmarkup
+            \literalps@out{\AEB@psMrk/_objdef {privAddDocOpen}
+                /type/dict /OBJ pdfmark^^J%
+            \AEB@psMrk{privAddDocOpen} << \aebpopentoksP
+              \aebp@rightDelimitersP\space>> /PUT pdfmark}%
+            \gdef\privAddDocOpen{{privAddDocOpen}}%
+            \gdef\dev@addOpenAction{/Next {privAddDocOpen}}%
+\else\ifpdf
+        \immediate\pdfobj{<< \aebpopentoksP
+            \aebp@rightDelimitersP\space>>}%
+        \xdef\privAddDocOpen{\the\pdflastobj\space 0 R}%
+            \xdef\dev@addOpenAction{/Next \privAddDocOpen}%
+\else\ifxetex
+        \immediate\@pdfm@mark{obj @privAddToDocOpen << \aebpopentoksP
+            \aebp@rightDelimitersP\space>> }%
+        \gdef\privAddDocOpen{@privAddToDocOpen}%
+            \gdef\dev@addOpenAction{/Next \privAddDocOpen}%
+\fi\fi\fi\egroup}%
+        \global\let\aebpFAP\aebp@YES
+    \else
+        \edef\aebp@dljstmpP{\aebp@rightDelimitersP}%
+        \xdef\aebp@rightDelimitersP{\aebp@dljstmpP >> }%
+        \g@addto@macro\aebpopentoksP{/Next << #1 }%
+    \fi
+}
+\def\aebp@warnonly{warnonly}
+\newcommand{\aebp@app@title}{AcroTeX Message}
+\newcommand{\requiresVersion}[2][]{\def\aebp@argi{#1}%
+    \def\requiredVersionNumber{#2}\dev@addToDocOpen{\JS{%
+\ifx\aebp@argi\aebp@warnonly
+    var warnOnly=true;
+\else
+    var warnOnly=false;
+\fi
+    var reqVerMsgC=("\aeb@requiredVersionMsg\space")
+        + ((warnOnly) ? ("\aeb@reqVerMsgW") : ("\aeb@reqVerMsgC"));
+    var reqVerMsgR=("\aeb@requiredVersionMsgRedirect\space")
+        + ((warnOnly) ? ("\aeb@reqVerMsgW") : ("\aeb@reqVerMsgR"));
+    if( app.viewerVersion < #2 ) {
+        var viewerPassedReq=false;
+    try {
+        if (this.external) {
+            app.alert({cTitle:"\aebp@app@title", cMsg: reqVerMsgR});
+            if (!warnOnly) {
+                if (app.viewerVersion >= 7.0)
+                    app.launchURL("\aebAlternateDocumentURL");
+                else
+                    this.getURL("\aebAlternateDocumentURL",false);
+            }
+        } else {
+            app.alert({cTitle:"\aebp@app@title", cMsg: reqVerMsgC});
+        if (!warnOnly) this.closeDoc(true);
+        }
+    } catch(e) {}
+    } else {
+        var viewerPassedReq=true;
+        \aeb@ViewerPassedRequirementJS
+    }
+}}}
+\def\requiredVersionNumber{7}
+\newcommand{\alternateDocumentURL}[1]{\def\aebAlternateDocumentURL{#1}}
+\alternateDocumentURL{http://www.acrotex.net/}
+\newcommand{\requiredVersionMsg}[1]{\def\aeb@requiredVersionMsg{#1}}
+\requiredVersionMsg{This document requires Adobe Reader or Acrobat,
+    version \requiredVersionNumber\space or later.}
+\newcommand{\requiredVersionResult}[3]{\def\aeb@reqVerMsgC{#1}%
+    \def\aeb@reqVerMsgR{#2}\def\aeb@reqVerMsgW{#3}}
+\requiredVersionResult{The document is now closing.}
+    {Redirecting browser to an alternate page.}
+    {Some features of this document may not work properly.}
+\newcommand{\requiredVersionMsgRedirect}[1]{%
+    \def\aeb@requiredVersionMsgRedirect{#1}}
+\requiredVersionMsgRedirect{%
+    This document requires Adobe Reader or Acrobat,
+    version \requiredVersionNumber\space or later.}
+\newcommand{\afterRequirementPassedJS}[1]{%
+    \def\aeb@ViewerPassedRequirementJS{#1}}
+\let\aeb@ViewerPassedRequirementJS\@empty
+\def\aeb@SetCatalog{%
+    \ifx\aebpFA\aebp@NO\addToDocOpen{\JS{;}}\fi
+    \ifx\aebpFAP\aebp@YES\dev@addActionCode\fi
+    \aeb@addActionCode
+\def\aeb@CatEntry{/ViewerPreferences<<%
+    \ifx\aeb@windowoptsFitWindow\@empty\else
+        \aeb@windowoptsFitWindow\fi
+    \ifx\aeb@windowoptsCenterWindow\@empty\else
+        \aeb@windowoptsCenterWindow\fi
+    \ifx\aeb@windowoptsDisplayDocTitle\@empty\else
+        \aeb@windowoptsDisplayDocTitle\fi
+    \ifx\aeb@uioptsHideToolbar\@empty\else
+        \aeb@uioptsHideToolbar\fi
+    \ifx\aeb@uioptsHideMenubar\@empty\else
+        \aeb@uioptsHideMenubar\fi
+    \ifx\aeb@uioptsHideWindowUI\@empty\else
+        \aeb@uioptsHideWindowUI\fi
+    \ifx\aeb@layoutMagNaviTab\@empty\else
+        /NonFullScreenPageMode/\aeb@layoutMagNaviTab\fi
+>>%
+    \ifx\aeb@TaggedPDF\@empty\else
+        /MarkInfo<</Marked true>>\fi
+    \ifx\aeb@layoutMagPageLayout\@empty\else
+        /PageLayout/\aeb@layoutMagPageLayout\fi
+    \ifx\aeb@windowoptsFullScreen\@empty
+        \ifx\aeb@layoutMagNaviTab\@empty\else
+            /PageMode/\aeb@layoutMagNaviTab\fi
+    \else/PageMode/FullScreen\fi
+\ifpdfmarkup
+    \ifx\aeb@layoutMagPage\@empty
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction \pubAddToDocOpen
+        \else/OpenAction<</D[{Page1}\aeb@layoutMagMag]%
+             /S/GoTo\aeb@addOpenAction>>\fi
+    \else
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction<</D[{\aeb@layoutMagPage}/Fit]%
+                /S/GoTo\aeb@addOpenAction>>\else
+            /OpenAction<</D[{\aeb@layoutMagPage}\aeb@layoutMagMag]%
+                /S/GoTo\aeb@addOpenAction>>\fi
+    \fi
+\else\ifpdf
+    \ifx\aeb@layoutMagPage\@empty
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction \pubAddToDocOpen
+        \else/OpenAction <<%
+            /D[\pdfpageref1\space\space 0 R\aeb@layoutMagMag]%
+            /S/GoTo\aeb@addOpenAction>>\fi
+    \else
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction<</D[\expandafter
+                \pdfpageref\aeb@layoutMagPage\space\space 0 R/Fit]%
+                /S/GoTo\aeb@addOpenAction>>\else
+            /OpenAction<</D[\expandafter\pdfpageref
+                \aeb@layoutMagPage\space\space 0 R\aeb@layoutMagMag]%
+                /S/GoTo\aeb@addOpenAction>>\fi
+    \fi
+\else\ifxetex
+    \ifx\aeb@layoutMagPage\@empty
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction \pubAddToDocOpen
+        \else/OpenAction<</D[@page1 \aeb@layoutMagMag]%
+             /S/GoTo\aeb@addOpenAction>>\fi
+    \else
+        \ifx\aeb@layoutMagMag\@empty
+            /OpenAction<</D[@page\aeb@layoutMagPage\space/Fit]%
+                /S/GoTo\aeb@addOpenAction>>\else
+            /OpenAction<<%
+                /D[@page\aeb@layoutMagPage\space\aeb@layoutMagMag]%
+                /S/GoTo\aeb@addOpenAction>>\fi
+    \fi
+\fi\fi\fi}%
+    \ifpdfmarkup\literalps@out{\AEB@psMrk{Catalog}
+        <<\aeb@CatEntry>> /PUT pdfmark}\else
+    \ifpdf\pdfcatalog{\aeb@CatEntry}\else
+    \ifxetex\immediate\@pdfm@mark{put @catalog <<\aeb@CatEntry>>}%
+    \fi\fi\fi
+}
+\AtBeginDocument{\aeb@SetCatalog}
+\newcommand{\setDefaultFS}[1]
+{%
+    \setkeys{aebDefFS}{Trans=Replace}\setkeys{aebDefFS}{#1}%
+    \makeatletter
+    \InputIfFileExists{fsprodef.js}{}{\PackageWarning{aeb_pro}
+        {Cannot find fsprodef.js, please run aeb_pro.ins again}}
+    \makeatother
+}
+\@onlypreamble\setDefaultFS
+\def\aeb@NoTransition{NoTransition}
+\define@choicekey+{aebDefFS}{Trans}
+{NoTransition,UncoverLeft,UncoverRight,UncoverDown,UncoverUp,%
+UncoverLeftDown,UncoverLeftUp,UncoverRightDown,UncoverRightUp,%
+CoverLeft,CoverRight,CoverDown,CoverUp,CoverLeftDown,CoverLeftUp,%
+CoverRightDown,CoverRightUp,PushLeft,PushRight,PushDown,PushUp,%
+PushLeftDown,PushLeftUp,PushRightDown,PushRightUp,FlyInRight,%
+FlyInLeft,FlyInDown,FlyInUp,FlyOutRight,FlyOutLeft,FlyOutDown,%
+FlyOutUp,FlyIn,FlyOut,Blend,Fade,Random,Dissolve,%
+GlitterRight,GlitterDown,GlitterRightDown,BoxIn,BoxOut,%
+BlindsHorizontal,BlindsVertical,SplitHorizontalIn,%
+SplitHorizontalOut,SplitVerticalIn,SplitVerticalOut,WipeLeft,%
+WipeRight,WipeDown,WipeUp,WipeLeftDown,WipeLeftUp,%
+WipeRightDown,WipeRightUp,Replace,ZoomInDown,ZoomInLeft,%
+ZoomInLeftDown,ZoomInLeftUp,ZoomInRight,ZoomInRightDown,%
+ZoomInRightUp,ZoomInUp,ZoomOutDown,ZoomOutLeft,ZoomOutLeftDown,%
+ZoomOutLeftUp,ZoomOutRight,ZoomOutRightDown,ZoomOutRightUp,%
+ZoomOutUp,CombHorizontal,CombVertical}[Replace]{%
+    \def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@fsTran\@empty\else
+    \ifx\aeb@arg\aeb@NoTransition
+        \def\aeb@fsTran{app.fs.defaultTransition = "";^^J}
+    \else
+    \def\aeb@fsTran{app.fs.defaultTransition = "#1";^^J}\fi\fi}
+{\PackageWarning{aeb}{Bad choice, try again. Meanwhile,
+    will use the default, Replace}%
+    \def\aeb@fsTran{app.fs.defaultTransition = "Replace";^^J}}
+\define@key{aebDefFS}{bgColor}[]{%
+    \def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@fsBGColor\@empty\else
+    \def\aeb@fsBGColor{app.fs.backgroundColor = #1;^^J}\fi}
+\let\aeb@fsBGColor\@empty
+\define@key{aebDefFS}{timeDelay}[]{%
+    \def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@fstimeDelay\@empty\else
+    \def\aeb@fstimeDelay{app.fs.timeDelay = #1;^^J}\fi}
+\let\aeb@fstimeDelay\@empty
+\define@boolkey{aebDefFS}{loop}[true]{%
+    \def\aeb@fsLoop{app.fs.loop = #1;^^J}}
+\let\aeb@fsLoop\@empty
+\define@choicekey+{aebDefFS}{cursor}{hidden,delay,visible}{%
+    \def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@fscursor\@empty\else
+    \def\aeb@fscursor{app.fs.cursor = cursor.#1;^^J}\fi
+}{\PackageWarning{aeb}{Bad choice for cursor, permissible values
+   are hidden, delay and visible. Try again}}
+\let\aeb@fscursor\@empty
+\define@boolkey{aebDefFS}{escape}[true]{%
+    \def\aeb@fsEscape{app.fs.escapeExits = #1;^^J}}
+\let\aeb@fsEscape\@empty
+\define@boolkey{aebDefFS}{clickAdv}[true]{%
+    \def\aeb@fsclickAdv{app.fs.clickAdvances = #1;^^J}}
+\let\aeb@fsclickAdv\@empty
+\define@boolkey{aebDefFS}{fullscreen}[true]{%
+    \def\aeb@windowoptsFullScreen{true}%
+}
+\let\aeb@fsFS\@empty
+\define@boolkey{aebDefFS}{useTimer}[true]{%
+    \def\aeb@fsuseTimer{app.fs.useTimer = #1;^^J}}
+\let\aeb@fsuseTimer\@empty
+\define@boolkey{aebDefFS}{usePageTiming}[true]{%
+    \def\aeb@fsusePageTiming{app.fs.usePageTiming = #1;^^J}}
+\let\aeb@fsusePageTiming\@empty
+\def\aebp@PageTransCnt{0}
+\def\aebp@Step@PageTransCnt{{\count0=\aebp@PageTransCnt\relax
+    \advance\count0by1\relax
+    \xdef\aebp@PageTransCnt{\the\count0 }}}
+\newcommand{\setPageTransition}[1]{%
+    \begingroup
+    \aebp@Step@PageTransCnt
+    \setkeys{aebTrans}{TransDur,Speed,#1}%
+    \edef\aeb@pagetranschoices{\aeb@Page@Dur
+            /Trans <<\aeb@Trans@Dur\aeb@TranChoice>>}%
+    \csarg{\xdef}{aeb@pagetransCodeL\aebp@PageTransCnt}{%
+        \ifpdfmarkup
+            \noexpand\literalps@out{\AEB@psMrk{ThisPage} <<
+                \aeb@pagetranschoices\space>> /PUT pdfmark}%
+        \else\ifpdf
+            \noexpand\global\noexpand\pdfpageattr=\noexpand\expandafter
+            {\noexpand\the\noexpand\pdfpageattr\aeb@pagetranschoices}%
+        \else\ifxetex
+            \noexpand\immediate\noexpand\@pdfm@mark{put @thispage <<
+                \aeb@pagetranschoices\space >>}
+        \fi\fi\fi
+    }
+    \ifx\aeb@TranChoice\@empty\else
+        \csarg\xdef{aebpP@geTr@nsP@ge\arabic{page}}%
+            {\noexpand\@nameuse{aeb@pagetransCodeL\aebp@PageTransCnt}}%
+    \fi
+    \endgroup
+}
+\newcommand{\setPageTransitionAt}[2]{%
+    \begingroup
+    \aebp@Step@PageTransCnt
+    \setkeys{aebTrans}{#2}%
+    \edef\aeb@pagetranschoices{\aeb@Page@Dur
+            /Trans <<\aeb@Trans@Dur\aeb@TranChoice>>}%
+    \csarg{\xdef}{aeb@pagetransCode\aebp@PageTransCnt}{%
+        \ifpdfmarkup
+            \noexpand\literalps@out{\AEB@psMrk{ThisPage} <<
+                \aeb@pagetranschoices\space>> /PUT pdfmark}%
+        \else\ifpdf
+            \noexpand\global\noexpand\pdfpageattr=\noexpand\expandafter
+             {\noexpand\the\noexpand\pdfpageattr\aeb@pagetranschoices}%
+        \else\ifxetex
+            \noexpand\immediate\noexpand\@pdfm@mark{put @thispage <<
+                \aeb@pagetranschoices\space>>}
+        \fi\fi\fi
+    }
+    \ifx\aeb@TranChoice\@empty\else
+        \expandafter\aebp@rse\expandafter{#1}%
+        \edef\shakeandbake{%
+            \noexpand\@for\noexpand\@mypage:=\the\aeb@parsetoks}%
+        \shakeandbake \do {%
+            \csarg\xdef{aebpP@geTr@nsP@ge\@mypage}%
+             {\noexpand\@nameuse{aeb@pagetransCode\aebp@PageTransCnt}}%
+        }%
+    \fi
+    \endgroup
+}
+\define@choicekey+{aebTrans}{Trans}
+{NoTransition,UncoverLeft,UncoverRight,UncoverDown,UncoverUp,%
+UncoverLeftDown,UncoverLeftUp,UncoverRightDown,UncoverRightUp,%
+CoverLeft,CoverRight,CoverDown,CoverUp,CoverLeftDown,CoverLeftUp,%
+CoverRightDown,CoverRightUp,PushLeft,PushRight,PushDown,PushUp,%
+PushLeftDown,PushLeftUp,PushRightDown,PushRightUp,FlyInRight,%
+FlyInLeft,FlyInDown,FlyInUp,FlyOutRight,FlyOutLeft,FlyOutDown,%
+FlyOutUp,FlyIn,FlyOut,Blend,Fade,Random,Dissolve,%
+GlitterRight,GlitterDown,GlitterRightDown,BoxIn,BoxOut,%
+BlindsHorizontal,BlindsVertical,SplitHorizontalIn,%
+SplitHorizontalOut,SplitVerticalIn,SplitVerticalOut,WipeLeft,%
+WipeRight,WipeDown,WipeUp,WipeLeftDown,WipeLeftUp,%
+WipeRightDown,WipeRightUp,Replace,ZoomInDown,ZoomInLeft,%
+ZoomInLeftDown,ZoomInLeftUp,ZoomInRight,ZoomInRightDown,%
+ZoomInRightUp,ZoomInUp,ZoomOutDown,ZoomOutLeft,ZoomOutLeftDown,%
+ZoomOutLeftUp,ZoomOutRight,ZoomOutRightDown,ZoomOutRightUp,%
+ZoomOutUp,CombHorizontal,CombVertical}[Replace]%
+    {\edef\aeb@TranChoice{\csname aeb@Trans@#1\endcsname}%
+}{\PackageWarning{aeb}{Bad choice, try again}}
+\let\aeb@TranChoice\@empty
+\define@key{aebTrans}{TransDur}[]{\def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@Trans@Dur\@empty\else\def\aeb@Trans@Dur{/D #1}\fi}
+\let\aeb@Trans@Dur\@empty
+\define@choicekey+{aebTrans}{Speed}[\val\nr]%
+    {Slow,Medium,Fast}[Slow]{%dps/change 02/27/07
+    \ifcase\nr\relax
+        \let\aeb@Trans@Speed\@empty\or
+        \def\aeb@Trans@Speed{/D 0.666656}\or
+        \def\aeb@Trans@Speed{/D 0.333328}\fi
+}{\PackageWarning{aeb}{Bad choice for Speed, permissible values
+   are Slow, Medium and Fast. Try again}}
+\let\apb@apbTrans@Speed\@empty
+\define@key{aebTrans}{PageDur}[]{\def\aeb@arg{#1}\ifx\aeb@arg\@empty
+    \let\aeb@Page@Dur\@empty\else\def\aeb@Page@Dur{/Dur #1}\fi}
+\let\aeb@Page@Dur\@empty
+\def\aeb@Trans@NoTransition{}
+\def\aeb@Trans@SplitHorizontalIn{/Dm/H/M/I/S/Split}
+\def\aeb@Trans@SplitHorizontalOut{/Dm/H/M/O/S/Split}
+\def\aeb@Trans@SplitVerticalIn{/Dm/V/M/I/S/Split}
+\def\aeb@Trans@SplitVerticalOut{/Dm/V/M/O/S/Split}
+\def\aeb@Trans@BlindsHorizontal{/Dm/H/S/Blinds}
+\def\aeb@Trans@BlindsVertical{/Dm/V/S/Blinds}
+\def\aeb@Trans@BoxIn{/M/I/S/Box}
+\def\aeb@Trans@BoxOut{/M/O/S/Box}
+\def\aeb@Trans@WipeLeft{/Di 180/S/Wipe}
+\def\aeb@Trans@WipeRight{/Di 0/S/Wipe}
+\def\aeb@Trans@WipeDown{/Di 270/S/Wipe}
+\def\aeb@Trans@WipeUp{/Di 90/S/Wipe}
+\def\aeb@Trans@Dissolve{/S/Dissolve}
+\def\aeb@Trans@GlitterRight{/Di 0/S/Glitter}
+\def\aeb@Trans@GlitterDown{/Di 270/S/Glitter}
+\def\aeb@Trans@GlitterRightDown{/Di 315/S/Glitter}
+\def\aeb@Trans@Replace{/S/R}
+\def\aeb@Trans@FlyInRight{/Di 0/M/I/S/Fly}
+\def\aeb@Trans@FlyInLeft{/Di 180/M/I/S/Fly}
+\def\aeb@Trans@FlyInDown{/Di 270/M/I/S/Fly}
+\def\aeb@Trans@FlyInUp{/Di 90/M/I/S/Fly}
+\def\aeb@Trans@FlyOutRight{/Di 0/M/O/S/Fly}
+\def\aeb@Trans@FlyOutLeft{/Di 180/M/O/S/Fly}
+\def\aeb@Trans@FlyOutDown{/Di 270/M/O/S/Fly}
+\def\aeb@Trans@FlyOutUp{/Di 90/M/O/S/Fly}
+\def\aeb@Trans@FlyIn{/M/I/S/Fly}
+\def\aeb@Trans@FlyOut{/M/O/S/Fly}
+\def\aeb@Trans@PushLeft{/Di 180/S/Push}
+\def\aeb@Trans@PushRight{/Di 0/S/Push}
+\def\aeb@Trans@PushDown{/Di 270/S/Push}
+\def\aeb@Trans@PushUp{/Di 90/S/Push}
+\def\aeb@Trans@CoverLeft{/Di 180/S/Cover}
+\def\aeb@Trans@CoverRight{/Di 0/S/Cover}
+\def\aeb@Trans@CoverDown{/Di 270/S/Cover}
+\def\aeb@Trans@CoverUp{/Di 90/S/Cover}
+\def\aeb@Trans@CoverLeftDown{/Di 225.0/S/Cover}
+\def\aeb@Trans@CoverLeftUp{/Di 135.0/S/Cover}
+\def\aeb@Trans@CoverRightDown{/Di 315.0/S/Cover}
+\def\aeb@Trans@CoverRightUp{/Di 45.0/S/Cover}
+\def\aeb@Trans@UncoverLeft{/Di 180/S/Uncover}
+\def\aeb@Trans@UncoverRight{/Di 0/S/Uncover}
+\def\aeb@Trans@UncoverDown{/Di 270/S/Uncover}
+\def\aeb@Trans@UncoverUp{/Di 90/S/Uncover}
+\def\aeb@Trans@UncoverLeftDown{/Di 225.0/S/Uncover}
+\def\aeb@Trans@UncoverLeftUp{/Di 135.0/S/Uncover}
+\def\aeb@Trans@UncoverRightDown{/Di 315.0/S/Uncover}
+\def\aeb@Trans@UncoverRightUp{/Di 45.0/S/Uncover}
+\def\aeb@Trans@Fade{/S/Fade}
+\def\aeb@Trans@Random{/S/Random}
+\def\aeb@Trans@Blend{/S/Blend}
+\def\aeb@Trans@PushLeftDown{%
+    /S/Push/Directional/BiDir/Di 225.0/Curve/Easy}
+\def\aeb@Trans@PushLeftUp{%
+    /S/Push/Directional/BiDir/Di 135.0/Curve/Easy}
+\def\aeb@Trans@PushRightDown{%
+    /S/Push/Directional/BiDir/Di 315.0/Curve/Easy}
+\def\aeb@Trans@PushRightUp{%
+    /S/Push/Directional/BiDir/Di 45.0/Curve/Easy}
+\def\aeb@Trans@WipeLeftDown{%
+    /S/Wipe/Directional/BiDir/Di 225/Curve/Easy}
+\def\aeb@Trans@WipeLeftUp{%
+    /S/Wipe/Directional/BiDir/Di 135/Curve/Easy}
+\def\aeb@Trans@WipeRightDown%
+    {/S/Wipe/Directional/BiDir/Di 315/Curve/Easy}
+\def\aeb@Trans@WipeRightUp{%
+    /S/Wipe/Directional/BiDir/Di 45/Curve/Easy}
+\def\aeb@Trans@ZoomInDown{%
+    /S/ZoomIn/Directional/BiDir/Di 270.0/Curve/Easy}
+\def\aeb@Trans@ZoomInLeft{%
+    /S/ZoomIn/Directional/BiDir/Di 180.0/Curve/Easy}
+\def\aeb@Trans@ZoomInLeftDown{%
+    /S/ZoomIn/Directional/BiDir/Di 225.0/Curve/Easy}
+\def\aeb@Trans@ZoomInLeftUp{%
+    /S/ZoomIn/Directional/BiDir/Di 135.0/Curve/Easy}
+\def\aeb@Trans@ZoomInRight{%
+    /S/ZoomIn/Directional/BiDir/Di 0.0/Curve/Easy}
+\def\aeb@Trans@ZoomInRightDown{%
+    /S/ZoomIn/Directional/BiDir/Di 315.0/Curve/Easy}
+\def\aeb@Trans@ZoomInRightUp{%
+    /S/ZoomIn/Directional/BiDir/Di 45.0/Curve/Easy}
+\def\aeb@Trans@ZoomInUp{%
+    /S/ZoomIn/Directional/BiDir/Di 90.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutDown{%
+    /S/ZoomOut/Directional/BiDir/Di 270.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutLeft{%
+    /S/ZoomOut/Directional/BiDir/Di 180.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutLeftDown{%
+    /S/ZoomOut/Directional/BiDir/Di 225.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutLeftUp{%
+    /S/ZoomOut/Directional/BiDir/Di 135.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutRight{%
+    /S/ZoomOut/Directional/BiDir/Di 0.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutRightDown{%
+    /S/ZoomOut/Directional/BiDir/Di 315.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutRightUp{%
+    /S/ZoomOut/Directional/BiDir/Di 45.0/Curve/Easy}
+\def\aeb@Trans@ZoomOutUp{%
+    /S/ZoomOut/Directional/BiDir/Di 90.0/Curve/Easy}
+\def\aeb@Trans@CombHorizontal{%
+    /S/Comb/Directional/BiDir/Dm/H/Curve/Easy}
+\def\aeb@Trans@CombVertical{%
+    /S/Comb/Directional/BiDir/Dm/V/Curve/Easy}
+\def\canceleveryPageOpen{\global\@everyPageOpenfalse
+    \global\let\every@PageOpen\@empty}
+\def\canceleveryPageClose{\global\@everyPageClosefalse
+    \global\let\every@PageClose\@empty}
+\newenvironment{everyPageOpen}[1][]
+{\global\@everyPageOpentrue\@defineJS[#1]{\every@PageOpen}}
+{\end@defineJS
+    \ifnum\value{page}=1\relax
+    \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\every@PageOpen}}{}}%
+    \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
+}
+\newenvironment{everyPageClose}[1][]
+{\global\@everyPageClosetrue\@defineJS[#1]{\every@PageClose}}
+{\end@defineJS
+    \ifnum\value{page}=1\relax
+    \gdef\ap@AddtoCloseJS{\thisPageAction{}{\JS{\every@PageClose}}}%
+    \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
+}
+\let\every@PageOpen\@empty
+\let\every@PageClose\@empty
+\newenvironment{addJSToPageOpen}[1][]
+{\@defineJS[#1]{\addJST@PageOpen}}{\end@defineJS
+    \ifnum\value{page}=1\relax
+    \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\addJST@PageOpen}}{}}%
+    \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
+}
+\newenvironment{addJSToPageOpenAt}[2][]
+{\@@defineJS[#1]{addJST@PageOpenAt}{#2}}{\end@@defineJS
+    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+        \thisPageAction{\JS{\@nameuse{addJST@PageOpenAt1}}}{}\fi\fi
+}
+\newenvironment{addJSToPageClose}[1][]
+{\@defineJS[#1]{\addJST@PageClose}}{\end@defineJS
+    \ifnum\value{page}=1\relax
+    \gdef\ap@AddtoCloseJS{%
+        \thisPageAction{}{\JS{\addJST@PageClose}}}%
+    \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
+}
+\newenvironment{addJSToPageCloseAt}[2][]
+{\@@defineJS[#1]{addJST@PageCloseAt}{#2}}{\end@@defineJS
+    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+        \thisPageAction{}{\JS{\@nameuse{addJST@PageCloseAt1}}}\fi\fi
+}
+\let\addJST@PageOpen\@empty
+\let\addJST@PageClose\@empty
+\def\aebp@PageOpenCloseHandler{%
+    \@ifundefined{addJST@PageOpenAt\arabic{page}}%
+        {\global\let\thisOpenPageActionAt\@empty}%
+        {\gdef\thisOpenPageActionAt{%
+            \@nameuse{addJST@PageOpenAt\arabic{page}}}}%
+    \@ifundefined{addJST@PageCloseAt\arabic{page}}%
+        {\global\let\thisClosePageActionAt\@empty}%
+        {\gdef\thisClosePageActionAt{%
+            \@nameuse{addJST@PageCloseAt\arabic{page}}}}%
+    \aebPageAction{\thisOpenPageActionAt\addJST@PageOpen}%
+        {\thisClosePageActionAt\addJST@PageClose}%
+    \global\let\addJST@PageOpen\@empty
+    \global\let\addJST@PageClose\@empty
+}
+\def\aebp@PageTransHandler{\@ifundefined{aebpP@geTr@nsP@ge\arabic{page}}
+    {}{\@nameuse{aebpP@geTr@nsP@ge\arabic{page}}}}
+\AddToShipoutPicture{\aebp@PageOpenCloseHandler
+    \aebp@PageTransHandler}
+\newenvironment{@@defineJS}[3][]
+{%
+    \gdef\argType{#2}\gdef\defineJSArg{#3}\JStoks={}%
+    \def\verbatim@processline
+        {%
+            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
+            \global\JStoks=\expandafter{\JS@temp}%
+        }%
+    \let\do\@makeother\dospecials\catcode`\^^M\active
+    #1%
+    \verbatim@start
+}{%
+    \expandafter\aebp@rse\expandafter{\defineJSArg}%
+    \edef\shakeandbake{%
+        \noexpand\@for\noexpand\@mytoks:=\the\aeb@parsetoks}%
+    \aeb@parsecnt=0 \shakeandbake \do {%
+        \ifnum\aeb@parsecnt=0
+            \edef\firsttok{\@mytoks}%
+            \csarg\xdef{\argType\@mytoks}{\the\JStoks}%
+        \else
+            \edef\letsmakelet{\global\let\expandafter\noexpand
+                \csname\argType\@mytoks\endcsname=\expandafter\noexpand
+                \csname\argType\firsttok\endcsname}%
+            \letsmakelet
+        \fi
+        \advance\aeb@parsecnt1\relax
+    }%
+}
+\newif\ifaeb@PageOpen
+\newif\ifaeb@PageClose
+\newif\if@everyPageOpen\@everyPageOpenfalse
+\newif\if@everyPageClose\@everyPageClosefalse
+\newcommand\aebPageAction[3][ThisPage]{%
+    \let\ispageactions=0\aeb@PageOpenfalse\aeb@PageClosefalse
+    \def\@aebOpen{#2}%
+    \if1\@aebOpen1%
+        \if@everyPageOpen
+            \aeb@PageOpentrue\let\ispageactions=1%
+            \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
+        \fi
+    \else
+        \let\ispageactions=1%
+        \aeb@PageOpentrue
+        \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
+    \fi
+    \def\@aebClose{#3}%
+    \if1\@aebClose1%
+        \if@everyPageClose
+            \aeb@PageClosetrue\let\ispageactions=1%
+            \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
+        \fi
+    \else
+        \let\ispageactions=1%
+        \aeb@PageClosetrue
+        \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
+    \fi
+    \if@everyPageOpen\aeb@PageOpentrue\let\ispageactions=1\fi
+    \if@everyPageClose\@everyPageClosetrue\let\ispageactions=1\fi
+    \if\ispageactions1%
+        \xdef\aebp@PageActionCode{/AA <<
+            \ifaeb@PageOpen\@aebOpen\space\fi
+            \ifaeb@PageClose\@aebClose\space\fi >>}
+        \ifnum\value{page}=1\relax\else
+            \ifpdfmarkup\literalps@out{\AEB@psMrk{#1} <<
+                \aebp@PageActionCode\space >> /PUT pdfmark}\else
+            \ifpdf\global\pdfpageattr=\expandafter
+                {\aebp@PageActionCode}\else
+            \ifxetex\@pdfm@mark{put @thispage <<
+                \aebp@PageActionCode\space>>}\fi\fi\fi
+        \fi
+    \fi
+}
+\def\aeb@exiii{\expandafter\expandafter\expandafter}
+\let\ahrefexafter\aeb@exiii
+\def\atPage#1{\@ifundefined{r@#1}{1}
+    {\aeb@exiii\@secondoffive\csname r@#1\endcsname}}
+\def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
+    {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
+\newtoks\aeb@parsetoks
+\newcount\aeb@parsecnt
+\def\ap@gobtonil#1\@nil{}
+\def\ap@gettonil#1\@nil{\def\to@nilarg{#1}}
+\def\ap@ifspc{\ifx\@let@token\@sptoken
+    \let\ap@next\ap@xifspc\else
+    \let\ap@next\ap@gettonil\fi\ap@next}
+\begingroup
+\def\:{\ap@xifspc}
+\expandafter\gdef\: {\futurelet\@let@token\ap@ifspc}
+\endgroup
+\def\ap@strpspcs{\futurelet\@let@token\ap@ifspc}
+\def\ap@pgrngLabelsInPream{\@ifundefined{aebLastPage}
+    {\PackageWarning{aeb_pro}{The \string\atPage\space
+        command is not supported\MessageBreak in the preamble}}{}}
+\def\aeb@removelastcomma#1,\@nil{\aeb@parsetoks={#1}}
+\def\aebp@rse#1{\global\let\frstPageSpec\aebp@NO
+    \aeb@parsetoks={}\aeb@parse#1,\relax}
+\def\aeb@parse{\@ifnextchar\relax
+    {\expandafter\aeb@removelastcomma\the\aeb@parsetoks\@nil}
+    {\aeb@@parse}}
+\def\aeb@@parse#1,{\aeb@@@parse#1-\@nil}
+\def\aeb@@@parse#1-#2\@nil{%
+    \def\argi{#2}\ifx\argi\@empty\def\aeb@next{\aeb@@@@parse{#1}}\else
+        \def\aeb@next{\aeb@@@@@parse#1-#2}\fi\aeb@next}
+\def\aeb@@@@parse#1{%single page #1
+    \@ifnextchar\atPage{\ap@pgrngLabelsInPream\ap@gobtonil}
+        {\ap@gobtonil}#1\@nil
+    \aeb@parsecnt=#1\relax
+    \edef\edefaeb@parsetoks{\the\aeb@parsetoks\the\aeb@parsecnt,}%
+    \aeb@parsetoks=\expandafter{\edefaeb@parsetoks}%
+    \ifnum\aeb@parsecnt=1\relax\global\let\frstPageSpec\aebp@YES\fi
+    \aeb@parse}
+\def\aeb@@@@@parse#1-#2-{\def\aeb@lowerlimit{#1}\def\aeb@upperlimit{#2}%
+    % range argument from #1 to \csname aebLastPage\endcsname
+    \ifx\aeb@upperlimit\@empty
+        \@ifundefined{aebLastPage}{\aeb@parsecnt=#1}
+            {\expandafter\aeb@parsecnt\expandafter=
+                \csname aebLastPage\endcsname}%
+    \else % page range #1 to #2, switch the two if #2 < #1
+        \aeb@parsecnt=\aeb@lowerlimit\relax
+        \edef\aeb@lowerlimit{\the\aeb@parsecnt}
+        \aeb@parsecnt=\aeb@upperlimit\relax
+        \ifnum\aeb@parsecnt<\aeb@lowerlimit\relax
+            \aeb@parsecnt=\aeb@lowerlimit\relax
+            \def\aeb@lowerlimit{#2}%
+            \def\aeb@upperlimit{#1}%
+        \fi
+    \fi
+    \@ifnextchar\atPage{\ap@pgrngLabelsInPream\ap@gobtonil}
+        {\ap@gobtonil}#1\@nil
+    \@ifnextchar\atPage{\ap@pgrngLabelsInPream\ap@gobtonil}
+        {\ap@gobtonil}#2\@nil
+   \advance\aeb@parsecnt1\relax
+   \edef\aeb@upperlimit{\the\aeb@parsecnt}%
+   \aeb@parsecnt=\aeb@lowerlimit\relax
+    \ifnum\aeb@parsecnt=1\relax\global\let\frstPageSpec\aebp@YES\fi
+    \loop
+        \edef\edefaeb@parsetoks{\the\aeb@parsetoks\the\aeb@parsecnt,}%
+        \aeb@parsetoks=\expandafter{\edefaeb@parsetoks}%
+        \advance\aeb@parsecnt1\relax
+        \ifnum\aeb@parsecnt < \aeb@upperlimit\relax\repeat
+    \aeb@parse}
+\@ifpackageloaded{insdljs}{%
+    \newenvironment{fs@willClose}
+    {\@defineJS{\fs@will@Close}}
+    {\end@defineJS}
+    \let\fs@will@Close\@empty
+}{%
+    \newenvironment{willClose}
+    {\@defineJS{\will@Close}}
+    {\end@defineJS}
+    \let\will@Close\@empty
+    \newenvironment{fs@willClose}
+    {\@defineJS{\fs@will@Close}}
+    {\end@defineJS}
+    \let\fs@will@Close\@empty
+    \newenvironment{willSave}
+    {\@defineJS{\will@Save}}
+    {\end@defineJS}
+    \let\will@Save\@empty
+    \newenvironment{didSave}
+    {\@defineJS{\did@Save}}
+    {\end@defineJS}
+    \let\did@Save\@empty
+    \newenvironment{willPrint}
+    {\@defineJS{\will@Print}}
+    {\end@defineJS}
+    \let\will@Print\@empty
+    \newenvironment{didPrint}
+    {\@defineJS{\did@Print}}
+    {\end@defineJS}
+    \let\did@Print\@empty
+}
+\let\developer@will@Close\@empty
+\let\developer@will@Save\@empty
+\let\developer@did@Save\@empty
+\let\developer@will@Print\@empty
+\let\developer@did@Print\@empty
+\newcommand\@setDocActions{%
+    \edef\test@will@Close{%
+        \fs@will@Close\will@Close\developer@will@Close}%
+    \edef\test@will@Save{\will@Save\developer@will@Save}%
+    \edef\test@did@Save{\did@Save\developer@did@Save}%
+    \edef\test@will@Print{\will@Print\developer@will@Print}%
+    \edef\test@did@Print{\did@Print\developer@did@Print}%
+    \def\aebp@DocActionsCode{/AA << %
+        \ifx\test@will@Close\@empty\else/WC <<
+            \JS{\fs@will@Close\will@Close\developer@will@Close} >>\fi
+        \ifx\test@will@Save\@empty\else/WS <<
+            \JS{\will@Save\developer@will@Save} >>\fi
+        \ifx\test@did@Save\@empty\else/DS <<
+            \JS{\did@Save\developer@did@Save} >>\fi
+        \ifx\test@will@Print\@empty\else/WP <<
+            \JS{\will@Print\developer@will@Print} >>\fi
+        \ifx\test@did@Print\@empty\else/DP <<
+            \JS{\did@Print\developer@did@Print} >>\fi
+        >>
+   }
+    \ifpdfmarkup\literalps@out{\AEB@psMrk{Catalog}
+        << \aebp@DocActionsCode\space>> /PUT pdfmark}\else
+    \ifpdf\pdfcatalog{\aebp@DocActionsCode}\else
+    \ifxetex\immediate
+        \@pdfm@mark{put @catalog <<\aebp@DocActionsCode\space>>}\fi
+    \fi\fi
+}
+\AtBeginDocument{\@setDocActions}
+\def\aref(#1){\csname aeb@aDescript@#1\endcsname}
+\def\aeb@initAttachWrite{%
+    \newwrite \aeb@attachmentswrite
+    \immediate\openout \aeb@attachmentswrite \jobname_attach.cut
+    \let\verbatim@out\aeb@attachmentswrite
+    \aeb@IWVO{\string\begin{execJS}{aebpro_attach}}%
+    {\lccode`P=`\{\lowercase{\aeb@IWVO{try P}}}%
+}
+\newcommand{\prjInputUser}[1]{\input{#1}}
+\newcommand{\prjIncludeUser}[1]{\include{#1}}
+\newcommand{\addtoOptAttachments}[1]{%
+    \g@addto@macro\AP@addtoAttachments{,#1}}
+\newcommand{\getcNameFromFileName}[1]{\@nameuse{descrip4#1}}
+\def\AP@addtoAttachments{}
+\def\jsstrsps{replace(/^\string\s*/, "")}
+\def\jsstrdotsp{replace(/\string\.\string\s*/g, ".")}
+\ifoptattachments
+    \def\AP@writeOptAttach{%
+        \newwrite\AP@OptAttachlist
+            \immediate\openout \AP@OptAttachlist \jobname_oa.cut
+        \immediate\write\AP@OptAttachlist{\string\def\string
+            \APOptAttachments{\AP@addtoAttachments}}
+        \immediate\closeout\AP@OptAttachlist}
+    \AtEndDocument{\AP@writeOptAttach}
+    \def\AP@pathInput#1{%
+        \addtoOptAttachments{#1}\prjInputUser{#1}}
+    \def\AP@pathInclude#1{%
+        \addtoOptAttachments{#1.tex}\prjIncludeUser{#1}}
+    \InputIfFileExists{\jobname_oa.cut}{%
+        \def\AP@next{\edef\aeb@attachments
+            {\aeb@attachments\APOptAttachments}}%
+    }{\let\AP@next\relax}
+    \AP@next
+\else
+    \def\AP@pathInput#1{\prjInputUser{#1}}
+    \def\AP@pathInclude#1{\prjIncludeUser{#1}}
+\fi
+\ifoptattachmentsTaken
+    \def\prjinput{\hyper@normalise\AP@pathInput}
+    \def\prjinclude{\hyper@normalise\AP@pathInclude}
+    \let\AP@includeonly\includeonly
+    \def\includeonly{\hyper@normalise\AP@includeonly}
+\else
+    \def\prjinput{\prjInputUser}
+    \def\prjinclude{\prjIncludeUser}
+\fi
+\ifx\aeb@attachsource\@empty
+    \ifx\aeb@attachments\@empty
+    \else\aeb@initAttachWrite\fi
+\else
+    \@ifundefined{aeb@attachmentswrite}
+    {\aeb@initAttachWrite}{}
+\fi
+\def\ap@cName(#1){\csname aeb@aName@attach#1\endcsname}
+\def\ap@cNamexdef(#1){\expandafter
+    \xdef\csname aeb@aName@attach#1\endcsname}
+\def\ap@cDescript(#1){\csname aeb@aDescript@attach#1\endcsname}
+\def\ap@cDescriptSource(#1){\csname aeb@aDescript@#1\endcsname}
+\def\ap@cDescriptxdef(#1){\expandafter
+    \xdef\csname aeb@aDescript@attach#1\endcsname}
+\def\ap@cDescriptSourcexdef(#1){\expandafter
+    \xdef\csname aeb@aDescript@#1\endcsname}
+\ifx\aeb@attachsource\@empty\else
+    \edef\temp@expand{\noexpand\@for\noexpand\@@tmp:=\aeb@attachsource}
+    \temp@expand\do{%
+        \ifx\@@tmp\@empty\else
+            \expandafter\ap@strpspcs\@@tmp\@nil\edef\@@tmp{\to@nilarg}%
+            \ap@cDescriptSourcexdef(\@@tmp){\jobname.\@@tmp}%
+            \aeb@IWVO{\space\space\space\space
+               var retn=\string\importDataObject({%
+               cName: "\@@tmp",
+                cDIPath: "\jobname.\@@tmp".\jsstrdotsp});}%
+            \aeb@IWVO{\space\space\space\space
+               if ( (app.viewerVersion>7) && retn  )
+                   this.getDataObject("\@@tmp").description=%
+                    "\string\ap@cDescriptSource(\@@tmp)".\jsstrdotsp;}%
+            \expandafter
+            \edef\csname aeb@aName@\@@tmp\endcsname{\jobname.\@@tmp}%
+        \fi
+    }%
+\fi
+\ifx\aeb@attachments\@empty\else
+\typeout{\string\aeb@attachments: \aeb@attachments}%
+    \aeb@parsecnt=0
+    \edef\temp@expand{\noexpand\@for\noexpand\@@tmp:=\aeb@attachments}
+    \temp@expand\do
+    {%
+        \ifx\@@tmp\@empty\else
+            \expandafter\ap@strpspcs\@@tmp\@nil\edef\@@tmp{\to@nilarg}%
+            \advance\aeb@parsecnt1\relax
+            \ap@cNamexdef(\the\aeb@parsecnt){attach\the\aeb@parsecnt}%
+            \ap@cDescriptxdef(\the\aeb@parsecnt)%
+                {AeB Attachment \the\aeb@parsecnt}%
+            \aeb@IWVO{\space\space\space\space
+            var retn=\string\importDataObject({%
+            cName:"\string\ap@cName(\the\aeb@parsecnt)",%
+                cDIPath: "\@@tmp".\jsstrsps});}%
+            \aeb@IWVO{\space\space\space\space
+            if ( (app.viewerVersion>7) && retn )
+            this.getDataObject(%
+                "\string\ap@cName(\the\aeb@parsecnt)").description=%
+                "\string\ap@cDescript(\the\aeb@parsecnt)";}%
+            \expandafter
+            \expandafter\xdef\csname descrip4\@@tmp\endcsname
+                {\noexpand\ap@cName(\the\aeb@parsecnt)}%
+        \fi
+    }
+\fi
+\@ifundefined{aeb@attachmentswrite}{}
+{%
+    {\lccode`P=`\}\def\jsMsg{"Attachments error: "
+        + e.toString()}\lowercase{\aeb@IWVO{P catch(e)
+            { console.println( \jsMsg\space); }}}}%
+    \aeb@IWVO{\string\end{execJS}}
+    \immediate\closeout \aeb@attachmentswrite
+}
+\def\aeb@inputAttachments{\@ifundefined{aeb@attachmentswrite}{}
+    {\InputIfFileExists{\jobname_attach.cut}%
+    {\typeout{Inputting attachments file}}%
+    {\typeout{Cannot find attachments file}}}%
+}
+\define@choicekey+{aebpdfpack}{viewmode}[\val\nr]%
+    {details,tile,layout,hidden}{%
+    \ifcase\nr\relax
+        \def\aeb@pdfpack@viewmode{/D}\or
+        \def\aeb@pdfpack@viewmode{/T}\or
+        \def\aeb@pdfpack@viewmode{/T}\or
+        \def\aeb@pdfpack@viewmode{/H}\fi
+}{}
+\define@key{aebpdfpack}{initview}[]{\def\aeb@pdfpack@initview{#1}}
+\let\aeb@pdfpack@initview\@empty
+\newcommand{\earlyAttachForPkgs}{%
+if (this.collection!=null&&this.collection.initialView == "Hidden")
+var hideto=app.setTimeOut("app.clearTimeOut(hideto);"
+    +"app.execMenuItem('CollectionPreview');",1);
+\if@gopro
+if(typeof _aebpro_attach == "undefined")
+( app.viewerVersion > 8 ) ? %
+aebTrustedFunctions(this,aebImportAnFDF,"aebpro_attach.fdf") : %
+this.importAnFDF("aebpro_attach.fdf");\fi
+\ifisPDFPackage\ifx\aeb@pdfpack@initview\@empty^^J%
+if(app.viewerVersion<15)^^J%
+var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
++"app.execMenuItem('CollectionShowRoot');",5000);\fi\fi}
+\newif\ifisPDFPackage\isPDFPackagefalse
+\newcommand{\makePDFPackage}[1]{\isPDFPackagetrue
+    \setkeys{aebpdfpack}{viewmode=details,#1}%
+    \ifx\aeb@pdfpack@initview\@empty
+        \let\aeb@pdfpackage@initview\@empty
+    \else
+        {\obeyspaces\sanitize@attach\gdef\aeb@pdfpackage@initview%
+{/D<\expandafter\stringiiUnicode\aeb@pdfpack@initview\relax>}}%
+    \fi
+    \def\aeb@PDFPackageCode{/PageMode/UseAttachments%
+        /Collection<</Type/Collection%
+            \aeb@pdfpackage@initview/View\aeb@pdfpack@viewmode>>}%
+    \ifpdfmarkup
+        \def\aeb@setPDFPackage{\literalps@out{\AEB@psMrk{Catalog}
+            <<\aeb@PDFPackageCode>>/PUT pdfmark}}%
+    \else\ifpdf\def\aeb@setPDFPackage{%
+        \pdfcatalog{\aeb@PDFPackageCode}}\else
+    \ifxetex\def\aeb@setPDFPackage{\immediate
+        \@pdfm@mark{put @catalog <<\aeb@PDFPackageCode>>}}\else
+        \let\aeb@setPDFPackage\relax\PackageWarning{aeb_pro}
+            {The \string\makePDFPackage/string\makePDFPortfolio\space
+            is supported for\MessageBreak
+            dvips, pdftex, and xetex only}\fi\fi\fi
+}
+\let\makePDFPortfolio\makePDFPackage
+\@onlypreamble\makePDFPackage
+\let\aebp@attachments\aebp@Zero
+\ifx\aeb@attachsource\@empty\else\let\aebp@attachments\aebp@One\fi
+\ifx\aeb@attachments\@empty\else\let\aebp@attachments\aebp@One\fi
+\ifx\aebp@attachments\aebp@One
+    \dev@addToDocOpen{\JS{\earlyAttachForPkgs}}%
+\fi
+\newenvironment{docassembly}{%
+\execJS{docassembly}
+}{\endexecJS}
+\let\ap@mrk\@empty
+\def\ap@gobtocomma#1,{}
+\providecommand\chngDocObjectTo[2]{%
+    \def#1##1\ap@mrk{#2,\ap@gobtocomma##1}}
+\def\ap@TF{aebTrustedFunctions}
+\def\theDocObject{this}
+\providecommand\DeclareJSHelper[2]{%
+    \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+\DeclareJSHelper{\addWatermarkFromFile}{aebAddWatermarkFromFile}
+\DeclareJSHelper{\importIcon}{aebImportIcon}
+\DeclareJSHelper{\importSound}{aebImportSound}
+\DeclareJSHelper{\appopenDoc}{aebAppOpenDoc}
+\DeclareJSHelper{\docSaveAs}{aebDocSaveAs}
+\DeclareJSHelper{\insertPages}{aebInsertPages}
+\DeclareJSHelper{\createTemplate}{aebCreateTemplate}
+\DeclareJSHelper{\importDataObject}{aebImportDataObject}
+\DeclareJSHelper{\executeSave}{aebSaveAs,"Save"\@gobble}
+\DeclareJSHelper{\extractPages}{aebExtractPages}
+\DeclareJSHelper{\mailDoc}{aebMailDoc}
+\newcommand{\sigInfo}{var oSigInfo=}
+\def\sigFieldObj(#1){var oSigField=this.getField(#1)}
+\def\signatureSetSeedValue#1{%
+    \ap@TF( oSigField, aebSignatureSetSeedValue, }
+\begin{defineJS}[\def\defineJSjsR{^^J}]{\signatureSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+    oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,
+    aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ?
+    aebTrustedFunctions( this, aebAppGetPath,
+        {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert :
+    oSigInfo.path2Cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,
+    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+var oSigField = this.getField(oSigInfo.cSigFieldName);
+oSigInfo.oInfo.password=oSigInfo.password;
+if ( typeof oSigInfo.sv!="undefined" ) {
+    for (var o in oSigInfo.sv )
+        oSigInfo.oInfo[o]=oSigInfo.sv[o];
+}
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+        oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+        oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
+\end{defineJS}
+\begin{defineJS}[\def\defineJSjsR{^^J}]{\certifyInvisibleSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+    oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,
+    aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert=aebTrustedFunctions( this, aebAppGetPath,
+    {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,
+    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+oSigInfo.oInfo.password=oSigInfo.password;
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+        oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+        oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
+\end{defineJS}
+\let\predocassemJS\@empty
+\def\aeb@image@cnt{0}
+\define@key{importIcons}{name}[]{\def\importIcons@name{#1}}
+\define@key{importIcons}{path}[]{\def\importIcons@path{#1}}
+\define@key{importIcons}{page}[]{\def\importIcons@page{#1}}
+\define@key{importIcons}{placement}[]{\def\importIcons@placement{#1}}
+\define@boolkey{importIcons}{embedonly}[true]{}
+\define@key{importIcons}{firstpage}[]{\def\importIcons@firstpage{#1}}
+\define@key{importIcons}{lastpage}[]{\def\importIcons@lastpage{#1}}
+\newcommand{\aebp@getFace}[1][0]{%
+    \def\importIcons@face{#1}\aebp@getPlacement}
+\def\aebp@getPlacement#1\@nil{\def\importIcons@fieldname{#1}%
+    \expandafter\ap@strpspcs\importIcons@fieldname\@nil
+    \edef\importIcons@fieldname{\to@nilarg}%
+}
+\newcommand{\declareMultiImages}[1]{%
+    \edef\@tforExp{\noexpand\@tfor\noexpand\@dipArgs:=#1}%
+    \@tforExp\do{%
+        \expandafter\declareImageAndPlacement
+        \expandafter{\@dipArgs}%
+    }%
+}
+\newcommand{\declareImageAndPlacement}[1]{%
+    \edef\@tempexp{\noexpand\setkeys{importIcons}{name,path,page,%
+        placement,embedonly=false,#1}}\@tempexp
+    \ifx\importIcons@name\@empty{\count0=\aeb@image@cnt
+    \advance\count0by1\relax\xdef\aeb@image@cnt{\the\count0}}%
+    \edef\importIcons@name{aebImage\aeb@image@cnt}\fi
+    \ifx\importIcons@path\@empty
+        \PackageError{aeb_pro}{The `path' key is required}
+            {Please give the path of the icon.}\fi
+    \ifx\importIcons@placement\@empty\ifKV@importIcons@embedonly\else
+        \PackageWarningNoLine{aeb_pro}{%
+        The `placement' key was not found for the\MessageBreak
+        image named "\importIcons@name".\MessageBreak
+        Specify this key, or insert the image manually in\MessageBreak
+        the docassembly environment.}\fi\fi
+    \xdef\predocassemJS{\predocassemJS
+            var retn=\importIcon({cName:"\importIcons@name",%
+            cDIPath:"\importIcons@path"%
+            \ifx\importIcons@page\@empty\else,%
+            nPage:\importIcons@page\fi});^^J%
+        if ( retn==-1 ) console.println("The file
+        \string\"\importIcons@path\string\" could not be opened.");^^J%
+        if ( retn==-2 ) console.println("Selected page
+        (page=\importIcons@page) for \string\"\importIcons@path\string\"
+        is invalid.");^^J}%
+    \ifx\importIcons@placement\@empty\else
+        \@for\@fieldname:=\importIcons@placement\do{%
+            \expandafter\aebp@getFace\@fieldname\@nil
+            \xdef\predocassemJS{\predocassemJS
+            var f = this.getField("\importIcons@fieldname");^^J%
+            if ( f == null ) console.println("The field
+                \string\"\importIcons@fieldname\string\"
+                    does not exist.");^^J%
+            try { f.buttonSetIcon(this.getIcon("\importIcons@name"),%
+                \importIcons@face); }
+            catch(e){};^^J}%
+        }%
+    \fi
+}
+\@onlypreamble\declareImageAndPlacement
+\newcommand{\iconNameI}[1]{\def\IconNameI(##1){#1}}
+\iconNameI{#1+"."+i}
+\@onlypreamble\iconNameI
+\newcommand{\embedMultiPageImages}[1]{%
+    \setkeys{importIcons}{name,path,page,placement,%
+        firstpage,lastpage,#1}%
+    \ifx\importIcons@firstpage\@empty
+        \def\importIcons@firstpage{1}\else
+        {\count0=\importIcons@firstpage}\fi
+    \ifx\importIcons@lastpage\@empty
+        \def\importIcons@lastpage{this.numPages}\else
+        {\count0=\importIcons@lastpage}\fi
+    \ifx\importIcons@name\@empty
+        \PackageError{aeb_pro}{The `name' key is required}
+        {Please give the icon family a name.}\fi
+    \ifx\importIcons@path\@empty
+        \PackageError{aeb_pro}{The `path' key is required}
+            {Please give the path of the icon.}\fi
+    \def\r{^^J}\def\t{\space\space\space\space}%
+    \let\predocassemJSPlace\@empty
+    \ifx\importIcons@placement\@empty\else
+        \@for\@fieldname:=\importIcons@placement\do{%
+            \expandafter\aebp@getFace\@fieldname\@nil
+            \edef\predocassemJSPlace{\predocassemJSPlace\t
+            var f = this.getField("\importIcons@fieldname."+i);\r\t
+            if ( f == null ) console.println("The field
+                \string\"\importIcons@fieldname."+i+"\string\"
+                    does not exist.");\r\t
+            try { f.buttonSetIcon(this.getIcon(%
+\IconNameI("\importIcons@name")),%
+                \importIcons@face); }
+            catch(e){};\r}%
+        }%
+    \fi
+    \xdef\predocassemJS{\predocassemJS
+        var l=\importIcons@lastpage-\importIcons@firstpage+1;\r
+        for (var i=0; i<l; i++) {\r\t
+            var retn=\importIcon({%
+                cName:\IconNameI("\importIcons@name"),%
+                cDIPath:"\importIcons@path",%
+                nPage:\importIcons@firstpage+i-1});\r\t
+            if ( retn==-1 ) console.println("The file
+            \string\"\importIcons@path\string\" could not
+                be opened.");\r\t
+            if ( retn==-2 ) console.println("Selected page
+            (page="+(i+1)+") for \string\"\importIcons@path\string\"
+            is invalid.");\r
+            \predocassemJSPlace
+        }\r
+        var oIcon=this.getIcon("nullIcon");\r
+        if ( oIcon == null )
+            this.addIcon("nullIcon", this.createIcon("", 0, 0));\r
+    }%
+}
+\@onlypreamble\embedMultiPageImages
+\newcommand{\placeImageToBtn}[1]{%
+    \setkeys{importIcons}{name,path,page,placement,#1}%
+    \ifx\importIcons@placement\@empty\else
+        \@for\@fieldname:=\importIcons@placement\do{%
+            \expandafter\aebp@getFace\@fieldname\@nil
+            \xdef\predocassemJS{\predocassemJS
+            var f = this.getField("\importIcons@fieldname");^^J%
+            if ( f == null ) console.println("The field
+                \string\"\importIcons@fieldname\string\"
+                    does not exist.");^^J%
+            try { f.buttonSetIcon(this.getIcon("\importIcons@name"),%
+                \importIcons@face); }
+            catch(e){};^^J}%
+        }%
+    \fi
+}
+\newcommand{\insertPreDocAssembly}{\predocassemJS}
+\let\importAndSetImages\insertPreDocAssembly
+\newcommand{\placeImage}[4][]{\pushButton[%
+    \BC{}\BG{}\S{S}\Ff{\FfReadOnly}\autoCenter{n}\FB{true}
+    #1\I{null}\TP{1}]{#2}{#3}{#4}}
+\endinput
+%%
+%% End of file `aebpro.def'.

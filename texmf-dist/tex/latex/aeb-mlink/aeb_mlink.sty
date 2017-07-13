@@ -1,0 +1,342 @@
+%%
+%% This is file `aeb_mlink.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_mlink.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_mlink.sty package,          2015-10-28           %%
+%% Copyright (C) 2006--2015  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%   storyd@owc.edu                                     %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aeb_mlink}
+ [2016/02/16 v2.0 AeB MLink (dps)]
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\newif\if@ml@dvips \@ml@dvipstrue
+\DeclareOption{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
+    \PassOptionsToPackage{dvipsone}{eforms}
+    \PassOptionsToPackage{dvipsone}{hyperref} %,colorlinks
+}
+\DeclareOption{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
+    \PassOptionsToPackage{dvips}{eforms}
+    \PassOptionsToPackage{dvips}{hyperref} %,colorlinks
+}
+\def\ml@err@msg{This package requires the driver dvips and\MessageBreak
+    Adobe Distiller as the PDF creator}
+\ifpdf\PackageError{aeb_mlink}{\ml@err@msg}\else
+    \ifxetex\PackageError{aeb_mlink}{\ml@err@msg}\else
+        \InputIfFileExists{web.cfg}{}{}
+\fi\fi
+\ProcessOptions
+\RequirePackage{hyperref}
+\RequirePackage{eforms}[2008/03/14]
+\RequirePackage{soul}
+\def\ps@mark{[\space}
+\if@ml@dvips
+\special{!userdict begin
+   /TeXtoPDF {65536 div DVImag mul} def         % sp to pts
+   /PDFtoDvips {72.27 div Resolution mul} def   % points to dots
+   /PDFtoVDvips {72.27 div VResolution mul} def % points to dots
+   /DvipstoPDF {72.27 mul Resolution div} def   % dots to points
+   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def       % sp to dots
+   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def end} % sp to dots
+\def\setQuadBox{%
+    currentpoint DvipstoPDF \aeb@bbox@dp\space TeXtoPDF add
+    neg vsize add 72 sub                                % y1
+    exch DvipstoPDF 72 add exch                         % x1
+    2 copy exch \aeb@bbox@wd\space TeXtoPDF add exch    % x2
+    2 copy \aeb@bbox@ht\space TeXtoPDF add              % y3
+    2 copy exch \aeb@bbox@wd\space TeXtoPDF sub exch    % x4
+}
+\def\par@@Rect
+{%
+    72 neg PDFtoDvips vsize 72 sub PDFtoVDvips
+    hsize 72 sub PDFtoDvips 72 neg PDFtoVDvips
+}
+\else
+\special{!/TeXtoPDF {65536 div mag 1000 div mul} def
+/PDFtoTeX {65536 mul mag 1000 div div} def}
+\def\setQuadBox{%
+   currentpoint \aeb@bbox@dp\space add TeXtoPDF
+   neg PageHeight add 72 sub                            % y1
+   exch TeXtoPDF 72 add  exch                           % x1
+   2 copy exch \aeb@bbox@wd\space TeXtoPDF add exch     % x2
+   2 copy \aeb@bbox@ht\space TeXtoPDF add               % y3
+   2 copy exch \aeb@bbox@wd\space TeXtoPDF sub exch     % x4
+}
+\def\par@@Rect
+{%
+    72 neg PDFtoTeX PageHeight 72 sub PDFtoTeX
+    PageWidth 72 sub PDFtoTeX 72 neg PDFtoTeX
+}
+\fi
+\newbox\aeb@bbox
+\newcount\aeb@arrayIndx \aeb@arrayIndx=0
+\newcount\aeb@mLinkCnt \aeb@mLinkCnt=0
+\def\CurrentBorderColor{\@linkbordercolor}
+\def\ml@nocolorHighlight{I}
+\def\ml@nocolorLineStyle{S}
+\def\ml@nocolorLineWidth{1}
+\def\ml@setnocolorDefaults{%
+\def\ml@nocolor@defaults{\H{\ml@nocolorHighlight}%
+    \S{\ml@nocolorLineStyle}\W{\ml@nocolorLineWidth}%
+    \Color{\CurrentBorderColor}}%
+}
+\ifHy@colorlinks
+    \let\ml@nocolor@defaults\@empty
+\else
+    \ml@setnocolorDefaults
+\fi
+\def\ml@earlyExecProps#1{%
+    \eq@setWidgetProps\relax{#1}%
+}
+\let\mlh@preambleCmdInsert\relax
+\newcommand{\mlhypertext}[1][]{\global\aeb@arrayIndx=0\relax
+    \global\advance\aeb@mLinkCnt1\relax
+    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}
+        /type /array /OBJ pdfmark}%
+    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}%
+        \presets{\ml@nocolor@defaults}%
+        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\endgroup}%
+    \aeb@mlh
+}
+\def\mlh@setQuadSyllable#1{%
+    \setbox\aeb@bbox=\hbox{\strut#1}%
+    {%
+        \count\z@=\ht\aeb@bbox\xdef\aeb@bbox@ht{\the\count\z@}%
+        \count\z@=\wd\aeb@bbox\xdef\aeb@bbox@wd{\the\count\z@}%
+        \dp\aeb@bbox=1pt\relax
+        \count\z@=\dp\aeb@bbox\xdef\aeb@bbox@dp{\the\count\z@}%
+    }%
+    \special{ps: \ps@mark{mLink\the\aeb@mLinkCnt}
+        \the\aeb@arrayIndx\space [\setQuadBox]
+            \space /PUTINTERVAL pdfmark}%
+    \global\advance\aeb@arrayIndx8\relax
+}
+\def\aeb@exiii{\expandafter\expandafter\expandafter}
+\def\aebnameref#1{\@ifundefined{r@#1}{??}
+    {\aeb@exiii\@thirdoffive\csname r@#1\endcsname}}
+\def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
+   {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
+\def\atPage#1{\@ifundefined{r@#1}{1}
+    {\aeb@exiii\@secondoffive\csname r@#1\endcsname}}
+\newcommand\mlhyperlink[3][]{%
+    \mlhypertext[#1\A{/S/GoTo/D (#2)}]{#3}}
+\newcommand\mlhyperref[3][]{%
+    \mlhypertext[#1\A{/S/GoTo/D (\labelRef{#2})}]{#3}}
+\newcommand\mlnameref[2][]{\protected@edef\ml@temp{\aebnameref{#2}}%
+    \def\ml@tempi{\mlhypertext[#1\A{/S/GoTo/D (\labelRef{#2})}]}%
+    \expandafter\ml@tempi\expandafter{\ml@temp}}
+\newcommand\mlNameref[2][]{\let\SOUL@stop\ml@SOUL@stop
+     \protected@edef\ml@temp{`\aebnameref{#2}' on page~\atPage{#2}}%
+    \def\ml@tempi{\mlhypertext[#1\A{/S/GoTo/D (\labelRef{#2})}]}%
+    \expandafter\ml@tempi\expandafter{\ml@temp}}
+\def\ml@hyper@linkurl#1#2{\hyper@chars
+    \let\ef@thislinkcolor\@urlcolor
+    \let\CurrentBorderColor\@urlbordercolor
+    \mlhypertext[\presets{\mlhref@args}\A{/S/URI/URI(#2)}]{#1}%
+    \endgroup
+}%
+\def\ml@hyper@linkfile#1#2#3{%
+    \let\ef@thislinkcolor\@filecolor
+    \let\CurrentBorderColor\@filebordercolor
+    \def\theView{[0 \@pdfstartview]}%
+    \@ifundefined{ifHy@pdfnewwindow}
+    {\ifHy@newwindow}{\ifHy@pdfnewwindow}%
+        \def\isWindow{/NewWindow true}\else
+        \let\isWindow\@empty\fi
+    \mlhypertext[\presets{\mlhref@args}\A{/S/GoToR \isWindow
+        /F (#2) /D \ifx\\#3\\\theView\else(#3)\fi}]{#1}%
+    \endgroup
+}
+\def\ml@hyper@launch run:#1\\#2#3{%
+    \let\ef@thislinkcolor\@filecolor
+    \let\CurrentBorderColor\@runbordercolor
+        \@ifundefined{ifHy@pdfnewwindow}
+    {\ifHy@newwindow}{\ifHy@pdfnewwindow}%
+        \def\isWindow{/NewWindow true}\else
+        \let\isWindow\@empty\fi
+    \mlhypertext[\presets{\mlhref@args}\A{/S/Launch\isWindow
+       /F (#1) \ifx\\#3\\\else /Win << /P (#3) /F (#1) >> \fi}]{#2}%
+    \endgroup
+}
+\let\aeb@saved@href\href
+\newcommand{\mlhref}[1][]{%
+    \begingroup
+        \def\mlhref@args{#1}%
+        \let\hyper@linkurl\ml@hyper@linkurl
+        \let\hyper@linkfile\ml@hyper@linkfile
+        \let\@hyper@launch\ml@hyper@launch
+        \aeb@saved@href
+}
+\newbox\ml@urlbuild
+\setbox\ml@urlbuild\hbox{}
+\def\ml@SOUL@doword{%
+    \global\setbox\ml@urlbuild\hbox{}%
+    \edef\x{\the\SOUL@word}%
+    \ifx\x\empty
+    \else
+        \SOUL@buffer={}%
+        \setbox\z@\vbox{%
+            \SOUL@tt
+            \hyphenchar\font`\-
+            \hfuzz\maxdimen
+            \hbadness\@M
+            \pretolerance\m@ne
+            \tolerance\@M
+            \leftskip\z@
+            \rightskip\z@
+            \hsize1sp
+            \everypar{}%
+            \parfillskip\z@\@plus1fil
+            \hyphenpenalty-\@M
+            \noindent
+            \hskip\z@
+            \relax
+            \the\SOUL@word}%
+        \let\SOUL@errmsg\relax
+        \let\-\relax
+        \count@\m@ne
+        \ml@SOUL@analyze
+        \SOUL@word={}%
+    \fi
+}
+\def\ml@SOUL@analyze{{%
+    \setbox\z@\vbox{%
+        \unvcopy\z@
+        \unskip
+        \unpenalty
+        \global\setbox\@ne=\lastbox}%
+    \ifvoid\@ne
+    \else
+        \setbox\@ne\hbox{\unhbox\@ne}%
+        \global\setbox\ml@urlbuild=\hbox{%
+            \mlh@setQuadSyllable{\unhcopy\@ne}%
+            \hbox{\unhcopy\@ne}\penalty0\unhcopy\ml@urlbuild}%
+        \SOUL@syllgoal=\wd\@ne
+        \advance\count@\@ne
+        \ml@SOUL@analyze
+        \SOUL@syllwidth\z@
+        \SOUL@syllable={}%
+        \ifnum\count@>\z@
+            \advance\SOUL@syllgoal-\SOUL@ttwidth
+            \ml@SOUL@dosyllable
+            \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@hyphkern}%
+                {\SOUL@sethyphenchar}%
+            \SOUL@everyhyphen
+        \else
+            \ml@SOUL@dosyllable
+        \fi
+    \fi
+}}
+\def\ml@SOUL@dosyllable{%
+    \SOUL@gettoken
+    \SOUL@eventuallyexhyphen{\the\SOUL@token}%
+    \edef\x{\the\SOUL@token}%
+    \ifx\x\SOUL@hyphenhintM
+        \let\SOUL@n\ml@SOUL@dosyllable
+    \else\ifx\x\SOUL@lowerthanM
+        \SOUL@gettoken
+        \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@charkern}
+            {\the\SOUL@token}%
+        \SOUL@everylowerthan
+        \SOUL@puttoken
+        \let\SOUL@n\ml@SOUL@dosyllable
+    \else\ifdim\SOUL@syllwidth=\SOUL@syllgoal
+        \SOUL@everysyllable
+        \SOUL@puttoken
+        \let\SOUL@n\relax
+    \else
+    \ifx\x\SOUL@stopM
+        \SOUL@errmsg
+        \global\let\SOUL@errmsg\relax
+        \let\SOUL@n\relax
+    \else
+        \setbox\tw@\hbox{\SOUL@tt\the\SOUL@token}%
+        \advance\SOUL@syllwidth\wd\tw@
+        \global\SOUL@lasttoken=\SOUL@token
+        \SOUL@gettoken
+        \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@charkern}
+            {\the\SOUL@token}%
+        \SOUL@puttoken
+        \global\SOUL@token=\SOUL@lasttoken
+        \SOUL@everytoken
+        \edef\x{\SOUL@syllable={\the\SOUL@syllable\the\SOUL@token}}\x
+        \let\SOUL@n\ml@SOUL@dosyllable
+    \fi\fi\fi\fi
+    \SOUL@n
+}
+\newcommand{\mlurl}{\begingroup\def~{\string~}%
+    \ef@sanitize@toks\mlurl@}
+\newcommand{\mlurl@}[2][]{\urldef\ml@url\nolinkurl{#2}%
+\def\SOUL@mlhpreamble{%\begingroup
+    \mlh@preambleCmdInsert\ef@colorthislink}\hyper@chars
+    \let\ef@thislinkcolor\@urlcolor
+    \let\CurrentBorderColor\@urlbordercolor
+    \let\ml@SOUL@doword@SAVE\SOUL@doword
+    \let\SOUL@doword\ml@SOUL@doword
+    \global\aeb@arrayIndx=0\relax
+    \global\advance\aeb@mLinkCnt1\relax
+    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}%
+        /type /array /OBJ pdfmark}%
+    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}\A{\URI{#2}}%
+        \presets{\ml@nocolor@defaults}
+        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\expandafter
+        \gdef\expandafter\ef@thislinkcolor
+             \expandafter{\ef@thislinkcolor}}%
+    \aeb@mlh\ml@url\ef@colorthislink\unhcopy\ml@urlbuild\endgroup
+}
+\ifHy@colorlinks
+    \def\ef@colorthislink{\color{\ef@thislinkcolor}}
+\else
+    \let\ef@colorthislink\relax
+\fi
+\def\ml@SOUL@stop{\relax}
+\def\SOUL@mlhpreamble{\begingroup
+    \mlh@preambleCmdInsert\ef@colorthislink}
+\def\SOUL@mlheverysyllable{%
+    \mlh@setQuadSyllable{\the\SOUL@syllable}%
+    \the\SOUL@syllable%
+    \SOUL@setkern\SOUL@charkern}%
+\def\SOUL@mlheveryspace#1{#1\space\hskip\spaceskip}%
+\def\SOUL@mlheveryhyphen{%
+    \discretionary{%
+           \unkern
+            \SOUL@setkern\SOUL@hyphkern
+            \SOUL@sethyphenchar
+    }{}{}%
+}
+\def\SOUL@mlheveryexhyphen#1{%
+    \mlh@setQuadSyllable{\SOUL@setkern\SOUL@hyphkern#1}%
+    \SOUL@setkern\SOUL@hyphkern#1%
+    \discretionary{}{}{%
+        \SOUL@setkern\SOUL@charkern
+    }%
+}
+\def\mlh@postambleCmd{\relax}
+\def\SOUL@mlhpostamble{\mlh@postambleCmd}
+\def\SOUL@mlhsetup{\SOUL@setup
+    \let\SOUL@preamble\SOUL@mlhpreamble
+    \let\SOUL@everysyllable\SOUL@mlheverysyllable
+    \let\SOUL@everyspace\SOUL@mlheveryspace
+    \let\SOUL@everyhyphen\SOUL@mlheveryhyphen
+    \let\SOUL@everyexhyphen\SOUL@mlheveryexhyphen
+    \def\SOUL@postamble{\SOUL@mlhpostamble}%
+}
+\DeclareRobustCommand*\aeb@mlh{\SOUL@mlhsetup\SOUL@}
+\endinput
+%%
+%% End of file `aeb_mlink.sty'.

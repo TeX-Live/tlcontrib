@@ -1,0 +1,56 @@
+%%
+%% This is file `btnnanime.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_pro.dtx  (with options: `copyright,btnanime')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2017  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\btnAnime}[3]{\begingroup\animeSetup{#1}%
+    \ifx\animeBtnFieldName\@empty\PackageError{aeb_pro}%
+        {The fieldName key is required}{}\fi
+    \ifx\animeBtnBaseName\@empty\PackageError{aeb_pro}%
+        {The iconName key is required}{}\fi
+    \ifx\nFrames\@empty\PackageError{aeb_pro}%
+        {The nFrames key is required}{}\fi
+    \parbox[t][#3]{#2}{%
+        \everyPushButton{\BC{}\BG{}\S{S}\autoCenter{n}\FB{true}\TP{1}%
+        \Ff{\FfReadOnly}\presets{\aeb@btnAnimePresets}\I{null}}%
+        \edef\termLoop{\nFrames}\edef\firstBtnOpts{%
+        \ifnum\aebp@btnAnime@poster=0 \else\noexpand\F{\FHidden}\fi
+        \noexpand\AA{\ifKV@btnAnime@autorun
+            \aebp@autoplayevent{\noexpand\btnAnimePFAction}\fi
+        \ifKV@btnAnime@autopause
+            \aebp@autopauseevent{\noexpand\btnAnimePauseAction}\fi}}%
+        \makebox[0pt][l]{\expandafter\pushButton
+            \expandafter[\firstBtnOpts]{\animeBtnFieldName.0}{#2}{#3}}%
+        \ifnum\aebp@btnAnime@poster=1
+        \count0=\nFrames\relax\advance\count0by-1
+        \edef\termLoop{\the\count0}\fi\@tempcnta=1
+        \loop\ifnum\@tempcnta<\termLoop\relax
+        \makebox[0pt][l]{\pushButton[\F{\FHidden}]{%
+        \animeBtnFieldName.\the\@tempcnta}{#2}{#3}}%
+        \advance\@tempcnta1\relax\repeat
+        \ifnum\aebp@btnAnime@poster=1\relax\makebox[0pt][l]{%
+            \pushButton{\animeBtnFieldName.\termLoop}{#2}{#3}}%
+        \fi\hfill\ifx\aep@btn@anime@controls\@empty\else
+        \offinterlineskip\vcgBdry[\vspacectrlsep]%
+        \everyPushButton{}\centering
+        \ctrlButtonsWrapper{\insertCtrlButtons}\fi
+    }%parbox
+    \endgroup
+}
+\endinput
+%%
+%% End of file `btnnanime.def'.

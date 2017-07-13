@@ -1,0 +1,446 @@
+%%
+%% This is file `aebxmp.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aebxmp.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aebxmp.sty package,                  2016-05-29      %%
+%% Copyright (C) 2006--2016 D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{aebxmp}
+ [2017/02/17 v2.5a Populate advanced metadata (dps)]
+\RequirePackage{xkeyval}
+\@ifpackageloaded{insdljs}{\let\execjs=y}
+    {\RequirePackage[execJS]{insdljs}[2016/07/31]} % incls conv-xkv
+\newif\if@xmp@several \@xmp@severaltrue
+\def\xmp@testBrace#1{\@ifnextchar\bgroup
+    {\@xmp@severaltrue#1}{\@xmp@severalfalse#1}}
+\newcommand{\xmpLangAndArg}[1][]{%x-default
+    \edef\xmpLang{#1}\xmpGetNextArg}
+\def\xmpGetNextArg#1\@nil{\edef\xmpArg{#1}}
+\edef\xmp@dquoteCat{\the\catcode`\"}
+\catcode`\"=12\relax
+\def\xmp@ProcessArgs#1#2{%
+    \if@xmp@several
+        \@tfor\xmpArg:=#1\do{%
+            \expandafter\xmpLangAndArg\xmpArg\@nil
+            \ifnum\count0=0\relax
+                \xdef#2{#2^^J%
+                \xmp@insItem[\the\count0]="\xmpArg";^^J%
+                \xmp@insItem[\the\count0].@xml::lang="x-default";}%
+                \ifx\xmpLang\@empty\else
+                    \advance\count0by1\relax
+                    \xdef#2{#2^^J%
+                    \xmp@insItem[\the\count0]="\xmpArg";^^J%
+                    \xmp@insItem[\the\count0].@xml::lang="\xmpLang";}%
+                \fi
+            \else
+                \xdef#2{#2^^J%
+                \xmp@insItem[\the\count0]="\xmpArg";^^J%
+                \xmp@insItem[\the\count0].@xml::lang="\xmpLang";}%
+            \fi
+            \advance\count0by1\relax
+        }%
+    \else
+        \@tfor\xmpArg:={#1}\do{%
+            \expandafter\xmpLangAndArg\xmpArg\@nil
+            \xdef#2{#2^^J%
+            \xmp@insItem[\the\count0]="\xmpArg";^^J%
+            \xmp@insItem[\the\count0].@xml::lang="x-default";}%
+            \ifx\xmpLang\@empty\else
+                \advance\count0by1
+                \xdef#2{#2^^J%
+                \xmp@insItem[\the\count0]="\xmpArg";^^J%
+                \xmp@insItem[\the\count0].@xml::lang="\xmpLang";}%
+            \fi
+        \advance\count0by1\relax
+        }%
+    \fi
+}
+\bgroup\obeyspaces
+\gdef\tabiv{    }%
+\egroup
+\let\arrayOfRights\@empty
+\newcommand{\copyrightNotice}[1]{\def\xmpcopyrightNotice{#1}%
+    \xmp@testBrace{\xmp@cont@CopyRightNotice}#1\@nil}%
+\let\xmpcopyrightNotice\@empty
+\def\xmp@cont@CopyRightNotice#1\@nil{%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\xmp@insItem{p.aebdc::rights.aebrdf::Alt.aebrdf::li}%
+    \ifx\xmpcopyrightNotice\@empty\else
+        \xmp@ProcessArgs{#1}{\arrayOfRights}%
+    \fi
+    \endgroup
+}
+\let\arrayOfAuthors\@empty
+\let\xmpAuthors\@empty
+\newcommand{\Authors}[1]{\def\xmpAuthors{#1}%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\insSeqItem{p.aebdc::creator.aebrdf::Seq.aebrdf::li}%
+    \ifx\xmpAuthors\@empty\else
+        \let\arrayOfAuthors\@gobble
+        \@tfor\xmpAuthor:=#1\do{%
+            \xdef\arrayOfAuthors{\arrayOfAuthors^^J%
+            \insSeqItem[\the\count0]="\xmpAuthor";}%
+            \advance\count0by1
+        }%
+    \fi
+    \endgroup
+}
+\def\insertAuthors{\ifx\arrayOfAuthors\@empty\else
+    ^^J\arrayOfAuthors\fi}
+\let\arrayOfTitles\@empty
+\newcommand{\Title}[1]{\edef\xmpTitle{#1}%
+    \xmp@testBrace{\xmp@cont@Title}#1\@nil}
+\def\xmp@cont@Title#1\@nil{%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\xmp@insItem{p.aebdc::title.aebrdf::Alt.aebrdf::li}%
+    \ifx\xmpTitle\@empty\else
+        \xmp@ProcessArgs{#1}{\arrayOfTitles}%
+    \fi
+    \endgroup
+}
+\def\insertTitles{\ifx\arrayOfTitles\@empty\else
+    ^^J\arrayOfTitles\fi}
+\let\arrayOfSubjects\@empty
+\newcommand{\Subject}[1]{\edef\xmpSubject{#1}%
+    \xmp@testBrace{\xmp@cont@Subject}#1\@nil}%
+\def\xmp@cont@Subject#1\@nil{%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\xmp@insItem{p.aebdc::description.aebrdf::Alt.aebrdf::li}%
+    \ifx\xmpSubject\@empty\else
+        \xmp@ProcessArgs{#1}{\arrayOfSubjects}%
+    \fi
+    \endgroup
+}
+\def\insertSubjects{\ifx\arrayOfSubjects\@empty\else
+    ^^J\arrayOfSubjects\fi}
+\let\arrayOfLangs\@empty
+\newcommand{\metaLang}[1]{\def\xmplangOfDoc{#1}%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\insBagItem{p.aebdc::language.aebrdf::Bag.aebrdf::li}%
+    \ifx\xmpLangs\@empty\else
+        \let\arrayOfLangs\@gobble
+        \@for\xmpLang:=#1\do{%
+            \xdef\arrayOfLangs{\arrayOfLangs^^J%
+            \insBagItem[\the\count0]="\xmpLang";}%
+            \advance\count0by1
+        }%
+    \fi
+    \endgroup
+}
+\def\insertLangs{\ifx\arrayOfLangs\@empty\else
+    ^^J\arrayOfLangs\fi}
+\newcommand{\sourceFile}[1]{\let\xmp@bSourcefile=1
+    \def\xmp@sourcefile{#1}}
+\let\xmp@bSourcefile=0
+\let\xmp@sourcefile\@empty
+\def\insertSource{%
+    \if\xmp@bSourcefile0
+    ^^Jp.aebdc::source="\jobname.tex"\else
+    \ifx\xmp@sourcefile\@empty\else
+    ^^Jp.aebdc::source="\xmp@sourcefile"\fi\fi}
+\let\arrayOfKeywords\@empty
+\let\aKeywords\@empty
+\let\xmpKeywords\@empty
+\newcommand{\Keywords}[1]{\def\xmpKeywords{#1}%
+    \begingroup\let\u\relax\count0=0\relax
+    \def\insBagItem{%
+    p.aebdc::subject.aebrdf::Bag.aebrdf::li}%
+    \ifx\xmpKeywords\@empty\else
+        \let\arrayOfKeywords\@gobble
+        \let\aKeywords\@gobbletwo
+        \@for\xmpKeyword:=#1\do{%
+            \xdef\arrayOfKeywords{\arrayOfKeywords^^J%
+            \insBagItem[\the\count0]="\xmpKeyword";}%
+            \xdef\aKeywords{\aKeywords;\space\xmpKeyword}%
+            \advance\count0by1
+        }%
+        \xdef\aKeywords{"\aKeywords"}%
+    \fi
+    \endgroup
+}
+\def\insertKeywords{\ifx\arrayOfKeywords\@empty\else
+    ^^J\arrayOfKeywords\fi}
+\let\xmpInsScript\@empty
+\newcommand{\xmpDoNotInsKWScript}{\let\xmpInsScript\null}
+\newcommand{\copyrightStatus}[1]{%
+    \setkeys{aebxmp}{copyrightstatus=#1}}
+\define@choicekey*+{aebxmp}{copyrightstatus}[\val\nr]%
+    {true,false,unknown}[unknown]{%
+    \ifcase\nr\relax
+        \def\xmpcopyrightStatus{True}\or
+        \def\xmpcopyrightStatus{False}\else
+        \let\xmpcopyrightStatus\@empty\fi
+}{\PackageWarning{aebxmp}{%
+    Bad choice for \string\copyrightStatus,\MessageBreak
+    you entered '#1'.\MessageBreak
+    Permissible values are true, false, or unknown\MessageBreak
+    (or an empty argument). Setting status to 'unknown'.\MessageBreak
+    Try again,}}
+\let\xmpcopyrightStatus\@empty
+\def\insertMarked{\ifx\xmpcopyrightStatus\@empty
+    \else^^Jp.aebxapRights::Marked="\xmpcopyrightStatus";\fi}
+\def\insertCopyrightNotice{\ifx\arrayOfRights\@empty\else
+    \arrayOfRights\fi}
+\newcommand{\copyrightInfoURL}[1]{\def\xmpcopyrightInfoURL{#1}}
+\let\xmpcopyrightInfoURL\@empty
+\def\insertWebStatement{\ifx\xmpcopyrightInfoURL\@empty
+    \else^^Jp.aebxapRights::WebStatement="\xmpcopyrightInfoURL";\fi}
+\let\insertCusProps\@empty
+\newcommand\customProperties[1]{\def\pdfx@cusProps{#1}%
+    \begingroup\let\u\relax
+    \@tfor\thisproperty:=#1\do{%
+    \edef\tmp@exp{\noexpand
+    \cxkvsetkeys{pdfx@cusPropKV}{name,value,\thisproperty}}\tmp@exp
+    \xdef\insertCusProps{\insertCusProps^^J%
+        p.aebpdfx::\pdfx@KName="\pdfx@VValue";}
+    }%
+    \endgroup
+}
+\define@key{pdfx@cusPropKV}{name}[]{\def\pdfx@KName{#1}}
+\define@key{pdfx@cusPropKV}{value}[]{\def\pdfx@VValue{#1}}
+\def\insertCreateDate{^^Jp.@aebxap::CreateDate=createDateStr;%
+^^Jp.@aebxap::ModifyDate=createDateStr;}
+\def\xmpnEOL{\string\n\string\^^J}
+\newcommand{\authortitle}[1]{\def\xmpauthortitle{#1}}
+\let\authorTitle\authortitle
+\let\xmpauthortitle\@empty
+\def\insertAuthorTitle{\ifx\xmpauthortitle\@empty
+    \else^^Jp.aebphotoshop::AuthorsPosition="\xmpauthortitle";\fi}
+\newcommand{\descriptionwriter}[1]{\def\xmpdescriptionwriter{#1}}
+\let\descriptionWriter\descriptionwriter
+\let\xmpdescriptionwriter\@empty
+\def\insertDescriptionWriter{\ifx\xmpdescriptionwriter\@empty
+    \else^^Jp.aebphotoshop::CaptionWriter="\xmpdescriptionwriter";\fi}
+\def\insertKWJS{\ifx\aKeywords\@empty\else
+    this.info.Keywords=\aKeywords;^^J\fi}
+\def\xNNS{new Namespace}
+\def\xAdbNS{http://ns.adobe.com}
+\def\xWiiiNS{http://www.w3.org}
+\begin{execJS}{execXMP}
+var meta=this.metadata;
+var aebXMPData=new XML(meta);
+var aebx=\xNNS("x","adobe:ns:meta/");
+var xmlns=\xNNS("xmlns","\xWiiiNS/2000/xmlns/");
+var xml=\xNNS("xml", "\xWiiiNS/XML/1998/namespace");
+var aebrdf=\xNNS("rdf","\xWiiiNS/1999/02/22-rdf-syntax-ns#");
+var aebdc=\xNNS("dc","http://purl.org/dc/elements/1.1/");
+var aebpdf=\xNNS("pdf","\xAdbNS/pdf/1.3/");
+var aebxap=\xNNS("xmp","\xAdbNS/xap/1.0/");
+var aebxapRights=\xNNS("xmpRights","\xAdbNS/xap/1.0/rights/");
+var aebphotoshop=\xNNS("photoshop","\xAdbNS/photoshop/1.0/");
+var aebpdfx=\xNNS("pdfx","\xAdbNS/pdfx/1.3/");
+var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+if ( p.@aebpdfx::*.toString() == "" ) p.@xmlns::pdfx=aebpdfx.uri;
+p.@xmlns::photoshop=aebphotoshop.uri;
+p.@xmlns::xmpRights=aebxapRights.uri;
+var d=new Date();
+var createDateStr=util.printd("yyyy-mm-ddTHH:MM:ss",d);
+delete p.@aebdc::rights.aebrdf::Alt.aebrdf::li;
+/*
+    Dublin Core Properties
+*/%
+\insertTitles%
+\insertAuthors%
+\insertSubjects%
+\insertKeywords%
+\insertLangs%
+\insertSource%
+\insertCopyrightNotice%
+
+/*
+    XMP Rights Management Properties
+*/
+delete p.@aebxapRights::Marked;
+delete p.@aebxapRights::WebStatement;%
+\insertMarked%
+\insertWebStatement%
+
+delete p.@aebphotoshop::AuthorsPosition;
+delete p.@aebphotoshop::CaptionWriter;
+delete p.@aebxap::CreateDate;
+/*
+    Adobe Photoshop Properties
+*/%
+\insertAuthorTitle%
+\insertDescriptionWriter%
+
+/*
+    Acrobat Custom Properties
+*/%
+\insertCusProps%
+
+/*
+    XMP Core Properties
+*/%
+\insertCreateDate%
+
+/*
+    Convert aebXMPData into an XML String
+    and save is as this.metadata
+*/
+var aebNewXMPStr=aebXMPData.toXMLString();
+try { this.metadata=aebNewXMPStr; }
+    catch(e) {console.println(e.toString());}
+\insertKWJS%
+\end{execJS}
+\ifx\xmpInsScript\@empty
+\begin{insDLJS}{xmpjs}{Access to Title, Subject, and Keywords}
+function getKeywordsXMP(i) {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriDc="http://purl.org/dc/elements/1.1/";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var aebrdf=new Namespace(uriRdf);
+    var aebdc=new Namespace(uriDc);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    return p.aebdc::subject.aebrdf::Bag.aebrdf::li[i];
+}
+var i=0;
+var aKeywords=new Array();
+while ( typeof getKeywordsXMP(i)!="undefined" ) {
+    aKeywords[i]=getKeywordsXMP(i).toString(); i++;
+}
+function getTitleXMP(i) {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriDc="http://purl.org/dc/elements/1.1/";
+    var uriXML="http://www.w3.org/XML/1998/namespace";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var aebrdf=new Namespace(uriRdf);
+    var aebdc=new Namespace(uriDc);
+    var xml=new Namespace("xml",uriXML);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    var retnStr;
+    try { retnStr="[" + p.aebdc::title.aebrdf::Alt.aebrdf::li[i].%
+@xml::lang.toString()+"]: "
+        + p.aebdc::title.aebrdf::Alt.aebrdf::li[i].toString();
+        } catch(e) { retnStr="undefined" };
+    return retnStr;
+}
+var i=0;
+var aTitle=new Array();
+while ( getTitleXMP(i)!="undefined" ) {
+    aTitle[i]=getTitleXMP(i); i++;
+}
+function getSubjectXMP(i) {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriDc="http://purl.org/dc/elements/1.1/";
+    var uriXML="http://www.w3.org/XML/1998/namespace";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var aebrdf=new Namespace(uriRdf);
+    var aebdc=new Namespace(uriDc);
+    var xml=new Namespace("xml",uriXML);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    var retnStr;
+    try { retnStr="[" + p.aebdc::description.aebrdf::Alt.aebrdf::li[i].%
+@xml::lang.toString()+"]: "
+        + p.aebdc::description.aebrdf::Alt.aebrdf::li[i].toString();
+        } catch(e) { retnStr="undefined" };
+    return retnStr;
+}
+var i=0;
+var aSubject=new Array();
+while ( getSubjectXMP(i)!="undefined" ) {
+    aSubject[i]=getSubjectXMP(i); i++;
+}
+function getRightsXMP(i) {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriDc="http://purl.org/dc/elements/1.1/";
+    var uriXML="http://www.w3.org/XML/1998/namespace";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var aebrdf=new Namespace(uriRdf);
+    var aebdc=new Namespace(uriDc);
+    var xml=new Namespace("xml",uriXML);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    var retnStr;
+    try { retnStr="["+ p.aebdc::rights.aebrdf::Alt.aebrdf::li[i]%
+.@xml::lang.toString()+"]: "
+        + p.aebdc::rights.aebrdf::Alt.aebrdf::li[i].toString();
+        } catch(e) { retnStr="undefined" };
+    return retnStr;
+}
+var i=0;
+var aRights=new Array();
+while ( getRightsXMP(i)!="undefined" ) {
+    aRights[i]=getRightsXMP(i); i++;
+}
+function getCopyrightStatus() {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriXAP="http://ns.adobe.com/xap/1.0/rights/";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var xmlns=new Namespace("xmlns","http://www.w3.org/2000/xmlns/");
+    var aebrdf=new Namespace(uriRdf);
+    var aebxapRights=new Namespace("xmpRights",uriXAP);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    p.xmlns::xmpRights=aebxapRights.uri;
+    var copyrightStatus = p.@aebxapRights::Marked;
+    if ( copyrightStatus=="True" )
+        return "Copyrighted";
+    else if ( copyrightStatus=="False" )
+        return "Public Domain";
+    else return "Unknown";
+}
+function getCopyrightInfoURL() {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriXAP="http://ns.adobe.com/xap/1.0/rights/";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var xmlns=new Namespace("xmlns","http://www.w3.org/2000/xmlns/");
+    var aebrdf=new Namespace(uriRdf);
+    var aebxapRights=new Namespace("xmpRights",uriXAP);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    p.xmlns::xmpRights=aebxapRights.uri;
+    var copyrightInfoURL=(p.@aebxapRights::WebStatement.toString()!="")?
+        (p.@aebxapRights::WebStatement):"Not provided";
+    return copyrightInfoURL;
+}
+function getAuthorTitle() {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriPhotoshop="http://ns.adobe.com/photoshop/1.0/";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var xmlns=new Namespace("xmlns","http://www.w3.org/2000/xmlns/");
+    var aebrdf=new Namespace(uriRdf);
+    var aebPhotoshop=new Namespace("photoshop",uriPhotoshop);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    p.xmlns::photoshop=aebPhotoshop.uri;
+    var authorTitle=(p.@aebPhotoshop::AuthorsPosition.toString()!="")?
+        (p.@aebPhotoshop::AuthorsPosition):"Not provided";
+    return authorTitle;
+}
+function getDescriptionWriter() {
+    var uriRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    var uriPhotoshop="http://ns.adobe.com/photoshop/1.0/";
+    var meta=this.metadata;
+    var aebXMPData=new XML(meta);
+    var xmlns=new Namespace("xmlns","http://www.w3.org/2000/xmlns/");
+    var aebrdf=new Namespace(uriRdf);
+    var aebPhotoshop=new Namespace("photoshop",uriPhotoshop);
+    var p=aebXMPData.aebrdf::RDF.aebrdf::Description;
+    p.xmlns::photoshop=aebPhotoshop.uri;
+    var captionWriter=(p.@aebPhotoshop::CaptionWriter.toString()!="")?
+        (p.@aebPhotoshop::CaptionWriter):"Not provided";
+    return captionWriter;
+}
+\end{insDLJS}
+\fi
+\catcode`\"=\xmp@dquoteCat
+\endinput
+%%
+%% End of file `aebxmp.sty'.

@@ -1,0 +1,74 @@
+%%
+%% This is file `taoas.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eq2db.dtx  (with options: `copyright,taoas')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Eq2DB.sty package,             2001-9-01             %%
+%% Copyright (C) 2014  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\eq@insertHiddenFields{%
+    \ifx\basicFieldsSet\eqdb@NO
+        \addHiddenTextField{dbName}{}%
+        \addHiddenTextField{dbTable}{}%
+        \addHiddenTextField{quizName}{}%
+        \addHiddenTextField{UserValid}{false}%
+        \addHiddenTextField{SID}{}%
+        \addHiddenTextField{randomID}{}%
+        \addHiddenTextField{fileName}{\jobname}%
+        \ifeq@noquizsolutions
+            \addHiddenTextField{requestSolutions}{false}%
+        \else
+            \addHiddenTextField{requestSolutions}{true}%
+        \fi
+        \global\let\basicFieldsSet\eqdb@YES
+    \fi
+    \addHiddenTextField{Admin}{}%
+    \addHiddenTextField{\curr@quiz.numCorrect}{}%
+    \addHiddenTextField{\curr@quiz.numQuestions}{\thequestionno}%
+    \addHiddenTextField{\curr@quiz.ptScore}{}%
+    \addHiddenTextField{\curr@quiz.nPointTotal}{\theeqpointvalue}
+    \addHiddenTextField{\curr@quiz.Responses}{}%
+    \eq@addHiddenTextFields
+    \eq@clearHiddenFields
+}
+\def\eq@true{true}
+\def\eq@submitURL{%
+    this.getField("dbName").value=dbName;\jsR\jsT\jsT
+    this.getField("dbTable").value="\db@Table";\jsR\jsT\jsT
+    this.getField("quizName").value="\curr@quiz";\jsR\jsT\jsT
+\ifx\correctionsOn\eq@true
+    this.getField("\curr@quiz.numCorrect").value=Score;\jsR\jsT\jsT
+    this.getField("\curr@quiz.ptScore").value=ptScore;\jsR\jsT\jsT
+\else
+    this.getField("\curr@quiz.numCorrect").value=-1000;\jsR\jsT\jsT
+    this.getField("\curr@quiz.ptScore").value=-1000;\jsR\jsT\jsT
+\fi
+    var aPointType=new Array(\aPointType);\jsR\jsT\jsT
+\ifx\eqdb@tagged\eqdb@YES
+    var cResponses=gatherTaggedQuizData("\currQuiz",%
+        this.documentFileName,\thequestionno);\jsR\jsT\jsT
+\else
+    var cResponses=Responses.toString().substr(1);\jsR\jsT\jsT
+\fi
+    this.getField("\curr@quiz.Responses").value=cResponses;\jsR\jsT\jsT
+    \eq@populateHiddenFields
+    var aSubmitFields=new Array("\curr@quiz","IdInfo",%
+        "randomID","dbName","dbTable","quizName","fileName",%
+        "requestSolutions");\jsR\jsT\jsT
+    \priorSubmitQuiz
+    this.submitForm(submitURL,true,false,aSubmitFields);\jsR\jsT\jsT
+}
+\endinput
+%%
+%% End of file `taoas.def'.

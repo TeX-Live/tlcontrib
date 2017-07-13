@@ -1,0 +1,166 @@
+%%
+%% This is file `eq2db.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eq2db.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Eq2DB.sty package,             2001-9-01             %%
+%% Copyright (C) 2014  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{eq2db}
+ [2016/01/02 v2.0 Save Exerquiz results to a Database, Email, or text file (dps)]
+\RequirePackage{xkeyval}
+\let\eq@optioncode\@empty
+\DeclareOptionX{eqRecord}{\def\eq@optioncode{\input{eqrecord.def}}}
+\DeclareOptionX{eqEmail}{\def\eq@optioncode{\input{eqemail.def}}}
+\DeclareOptionX{eqText}{\def\eq@optioncode{\input{eqtext.def}}}
+\DeclareOptionX{taoas}{\def\eq@optioncode{\input{taoas.def}}}
+\DeclareOptionX{custom}[eq2dbcus]{\def\eq@optioncode{\input{#1.def}}}
+\def\eq@optioncode{\input{eq2dbcus.def}}
+\let\eqdb@YES=y \let\eqdb@NO=n
+\DeclareOptionX{tagged}{\let\eqdb@tagged\eqdb@YES}
+\let\eqdb@tagged\eqdb@NO
+\define@choicekey*+{eq2db.sty}{submitAs}[\val\nr]{FDF,HTML,XML}[FDF]{%
+    \ifcase\nr\relax
+    \def\eqdb@submitType{FDF}\or
+    \def\eqdb@submitType{HTML}\or
+    \def\eqdb@submitType{XML}\else
+    \def\eqdb@submitType{FDF}\fi
+    }{\PackageWarning{eq2db}{Bad choice for submitAs,
+    permissible values are\MessageBreak FDF, HTML, and XML.\MessageBreak
+    Using the default FDF}%
+}
+\def\eqdb@submitType{FDF}
+\ProcessOptionsX
+\RequirePackage{exerquiz}
+\newtoks\addtohidden \addtohidden={}
+\def\eq@addHiddenTextFields{}
+\renewcommand\addHiddenTextField[3][]{%
+    \addtohidden=\expandafter{\eq@addHiddenTextFields
+        \llap{\hiddenTextField[#1]{#2}{#3}}}%
+    \edef\eq@addHiddenTextFields{\the\addtohidden}%
+}
+\newcommand\hiddenTextField[3][]{\textField
+    [\DV{#3}\V{#3}\F2#1]{#2}{10bp}{10bp}}
+\newtoks\populatehiddenfields \populatehiddenfields={}
+\def\eq@populateHiddenFields{}
+\def\eq@initializepopulate{\gdef\eq@populateHiddenFields{}%
+    \global\populatehiddenfields={}}
+\renewcommand\populateHiddenField[2]{%
+    \populatehiddenfields=\expandafter{\eq@populateHiddenFields
+        this.getField("#1").value=#2;\jsR\jsT\jsT}%
+    \edef\eq@populateHiddenFields{\the\populatehiddenfields}%
+}
+\def\eq@clearHiddenFields{\global\let\eq@populateHiddenFields=\@empty
+    \global\let\eq@addHiddenTextFields=\@empty
+}
+\let\basicFieldsSet\eqdb@NO
+\providecommand{\rtnURL}{\definePath{\thisRtnURL}}
+\let\thisRtnURL\@empty
+\eq@optioncode
+\ifx\eqdb@tagged\eqdb@YES
+\begin{insDLJS}[gatherTaggedQuizData]{eqtagged}%
+{Eq2db: Gather Tagged Data}
+function gatherTaggedQuizData(currQuiz,filename,nQuestions) {
+    var hasGroupedResp=false;
+    var xmlResp="";
+    var cResponses="<results id=\""+currQuiz+"\" file=\""+filename%
++"\" n=\""+nQuestions+"\">";
+    var eqCredit;
+    for ( var i=1; i <= nQuestions; i++)
+    {
+        if (typeof RightWrong[i] == "undefined") RightWrong[i]=0;
+        if (typeof Responses[i] == "undefined") { %
+Responses[i]=""; eqCredit=0; }
+        if ( typeof ProbDist[i] == "undefined" )  ProbDist[i]=0;
+        if (typeof ProbType[i] == "undefined") ProbType[i]="na";
+        else eqCredit=ProbDist[i];
+        hasGroupedResp=( (typeof ProbValue[i] == "object") &&  %
+(ProbValue[i][0]==1) );
+        cResponses += "<question n=\"" + i + "\" type=\""
+            + aPointType[i][1]+"\"";
+        cResponses += " ptype=\""+ProbType[i]+"\"";
+        switch ( aPointType[i][1] ) {
+            case "grp":
+                if ( hasGroupedResp ) {
+                    var f=this.getField("grpobj."+currQuiz+"."+i);
+                    var l=f.getArray().length;
+                    RightWrong[i].length=l+1;
+                    Responses[i].length=l+1;
+                    if (hasGroupedResp)
+                        cResponses += %
+" points=\""+ProbValue[i][2] + "\"";
+                    else
+                        cResponses += %
+" points=\""+aPointType[i][0] + "\"";
+                    cResponses += " credit=\""+eqCredit + "\"";
+                    xmlResp="";
+                    for ( var j=1; j < RightWrong[i].length; j++) {
+                        if ( typeof RightWrong[i][j] == "undefined" ) %
+RightWrong[i][j]=0;
+                        xmlResp += %
+( typeof Responses[i][j] == "undefined" ) ? %
+"<grpvalue></grpvalue>" : "<grpvalue>"+Responses[i][j]+"</grpvalue>";
+                }
+                    cResponses += %
+" correct=\"["+RightWrong[i].slice(1)+"]\">";
+                    cResponses += "<value>"+xmlResp+"</value>";
+                } else {
+                    cResponses += " points=\""+aPointType[i][0] + "\"";
+                    cResponses += " credit=\""+eqCredit + "\"";
+                    cResponses += " correct=\""+RightWrong[i]+"\">";
+                    cResponses += "<value>"+Responses[i]+"</value>";
+                }
+                break;
+            case "ms":
+                cResponses += " points=\""+aPointType[i][0] + "\"";
+                cResponses += " credit=\""+eqCredit + "\"";
+                if ( typeof RightWrong[i][2] == "undefined" ) {
+                    cResponses += " correct=\"0\">";
+                    cResponses += "<value></value>";
+                } else {
+                    var f=this.getField("mck."+currQuiz+"."+i);
+                    var l=f.getArray().length;
+                    RightWrong[i][2].length=l+1;
+                    Responses[i].length=l+1;
+                    RightWrong[i][2].shift();
+                    cResponses += %
+" correct=\""+RightWrong[i].toSource()+"\">";
+                    xmlResp="";
+                    for ( var j=1; j < RightWrong[i][2].length; j++) {
+                        if (typeof RightWrong[i][2][j] == "undefined") %
+RightWrong[i][2][j]=0;
+                        xmlResp +=
+( typeof Responses[i][j] == "undefined" ) ? %
+"<msvalue></msvalue>" : "<msvalue>"+Responses[i][j]+"</msvalue>";
+                    }
+                    cResponses += "<value>"+xmlResp+"</value>";
+                }
+                break;
+            default:
+                cResponses += " points=\""+aPointType[i][0] + "\"";
+                cResponses += " credit=\""+eqCredit + "\"";
+                cResponses += " correct=\""+RightWrong[i]+"\">";
+                cResponses += "<value>"+Responses[i]+"</value>";
+        }
+        cResponses += "</question>";
+    }
+    cResponses += "</results>";
+    return cResponses;
+}
+\end{insDLJS}
+\fi
+\endinput
+%%
+%% End of file `eq2db.sty'.

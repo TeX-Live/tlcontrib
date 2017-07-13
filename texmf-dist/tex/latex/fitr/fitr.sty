@@ -1,0 +1,362 @@
+%%
+%% This is file `fitr.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% fitr.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% fitr.sty package,                         2016-04-04 %%
+%% Copyright (C) 2012--2016  D. P. Story                %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{fitr}
+ [2016/04/09 v1.2e Support for FitR destinations (dps)]
+\RequirePackage{xkeyval}
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\@ifundefined{ifpreview}{\newif\ifpreview \previewfalse}{}
+\@ifundefined{ifviewMagWin}{\newif\ifviewMagWin \viewMagWinfalse}{}
+\let\fitr@driver\@empty
+\DeclareOptionX{pdftex}{\gdef\fitr@driver{pdftex}%
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@pdftex@driver{pdftex}
+\DeclareOptionX{dvips}{\gdef\fitr@driver{dvips}%
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@dvips@driver{dvips}
+\DeclareOptionX{dvipsone}{\gdef\fitr@driver{dvipsone}%
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@dvipsone@driver{dvipsone}
+\newif \if@fitr@dvipdfm \@fitr@dvipdfmfalse
+\DeclareOptionX{dvipdfm}{\gdef\fitr@driver{dvipdfm}%
+    \@fitr@dvipdfmtrue
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@dvipdfm@driver{dvipdfm}
+\DeclareOptionX{dvipdfmx}{\gdef\fitr@driver{dvipdfmx}%
+    \@fitr@dvipdfmtrue
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@dvipdfmx@driver{dvipdfmx}
+\DeclareOptionX{xetex}{\gdef\fitr@driver{xetex}%
+    \@fitr@dvipdfmtrue
+    \PassOptionsToPackage{\fitr@driver}{hyperref}%
+    \PassOptionsToPackage{\fitr@driver}{eforms}%
+}
+\def\fitr@xetex@driver{xetex}
+\DeclareOptionX{preview}{\previewtrue}
+\DeclareOptionX{!preview}{\previewfalse}
+\DeclareOptionX{viewMagWin}{\viewMagWintrue}
+\DeclareOptionX{!viewMagWin}{\viewMagWinfalse}
+\@ifpackageloaded{web}{%
+    \ExecuteOptionsX{\eq@driver@name}%
+}{%
+    \ifpdf\ExecuteOptionsX{pdftex}\else
+    \ifxetex\ExecuteOptionsX{xetex}\fi\fi
+}
+\ProcessOptionsX
+\RequirePackage{xcolor}
+\ifx\fitr@driver\@empty
+    \def\fitr@driver{dvips}
+    \def\fitr@loadPkgs{%
+    \RequirePackage[dvips]{hyperref}
+    \RequirePackage[dvips]{eforms}}%
+\else
+    \def\fitr@loadPkgs{%
+    \RequirePackage{hyperref}
+    \RequirePackage{eforms}[2016/04/05]}
+\fi
+\fitr@loadPkgs
+\RequirePackage{calc}
+\RequirePackage{collectbox}
+\newcounter{magCnt}
+\newbox\fitr@bbox
+\newcount\fitr@height \newcount\fitr@width \newcount\fitr@depth
+\newlength\fitr@length
+\def\get@fitr@dimen#1{%
+    \setbox\fitr@bbox=\hbox{#1}%
+    \fitr@height=\ht\fitr@bbox
+        \xdef\fitr@height@l{\the\ht\fitr@bbox}%
+    \fitr@width=\wd\fitr@bbox
+        \xdef\fitr@width@l{\the\wd\fitr@bbox}%
+    \fitr@depth=\dp\fitr@bbox
+        \xdef\fitr@depth@l{\the\dp\fitr@bbox}%
+    \setlength\fitr@length{\ht\fitr@bbox+\dp\fitr@bbox}%
+    \edef\fitr@@height{\the\fitr@length}%
+}
+\def\fitr@urxury@fixup#1#2#3{}
+\ifx\fitr@driver\fitr@dvips@driver
+\headerps@out{/TeXtoPDF {65536 div DVImag mul} def % sp to pts
+/SPtoDvips{TeXtoPDF PDFToDvips} def} % dp to dots
+\def\FitRbboxB#1#2{% Uses \fitr@bbox
+  currentpoint 2 copy DvipsToPDF \the\fitr@depth\space TeXtoPDF add
+  neg vsize add 72 sub #2\space sub exch          % y1
+  DvipsToPDF 72 add #1\space sub exch             % x1
+  4 2 roll exch DvipsToPDF \the\fitr@width\space
+  TeXtoPDF add 72 add #1\space add exch           % x2
+  DvipsToPDF \the\fitr@height \space TeXtoPDF sub
+  neg vsize add 72 sub #2\space add}              % y2
+\else\ifx\fitr@driver\fitr@dvipsone@driver
+\special{!/TeXtoPDF {65536 div mag 1000 div mul} def
+/PDFtoTeX {65536 mul mag 1000 div div} def}
+\def\FitRbboxB#1#2{%
+   currentpoint 2 copy \the\fitr@depth\space add DvipsToPDF
+   neg PageHeight add 72 sub #2\space sub      % y1
+   exch DvipsToPDF 72 add #1\space sub exch    % x1
+   4 2 roll exch \the\fitr@width\space add
+   DvipsToPDF 72 add #1\space add exch         % x2
+   \the\fitr@height\space sub DvipsToPDF neg
+   PageHeight add 72 sub #2\space add}         % y2
+\else\ifx\fitr@driver\fitr@pdftex@driver
+\def\FitRbboxB#1#2{%
+    \fitr@length=#1bp
+    \fitr@length=2\fitr@length
+    \advance\fitr@length\wd\fitr@bbox
+    \edef\fitr@pdftex@view@width{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\ht\fitr@bbox
+    \edef\fitr@pdftex@view@height{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\dp\fitr@bbox
+    \edef\fitr@pdftex@view@depth{\the\fitr@length}%
+}
+\else\if@fitr@dvipdfm
+\def\FitRbboxB#1#2#3{%
+    \smash{\raisebox{-\fitr@depth@l-#2bp}%
+        {\makebox[0pt][l]{\hspace*{-#1bp}%
+    \@pdfm@mark{dest (#3) %
+    [ @thispage /FitR @xpos @ypos @urx#3\space @ury#3\space ]}}}}%
+}
+\def\fitr@urxury@fixup#1#2#3{%
+    \smash{\raisebox{\fitr@height@l+#2bp}%
+    {\makebox[0pt][l]{\hspace*{#1bp}%
+    \@pdfm@mark{obj @urx#3\space @xpos}%
+    \@pdfm@mark{obj @ury#3\space @ypos}}}}%
+}
+\fi\fi\fi\fi
+\def\fitr@defaultbp#1#2{%
+  \afterassignment\fitr@def@bp\dimen@#2bp\relax{#1}{#2}}
+\def\fitr@def@bp#1\relax#2#3{%
+   \if!#1!%
+     \def#2{#3}%
+    \else
+      \dimen@.99626\dimen@
+      \edef#2{\strip@pt\dimen@}%
+    \fi}
+\define@key{fitr}{lift}[0pt]{{\setlength\@tempdima{#1}%
+    \xdef\fitr@temp@length{\the\@tempdima}}%
+    \edef\fitr@@lift{\fitr@temp@length}}
+\def\fitr@@lift{0pt}
+\define@key{fitr}{shift}[0pt]{{\setlength\@tempdima{#1}%
+    \xdef\fitr@temp@length{\the\@tempdima}}%
+    \edef\fitr@@shift{\fitr@temp@length}}
+\def\fitr@@shift{0pt}
+\define@key{fitr}{width}[0pt]{{\setlength\@tempdima{#1}%
+    \xdef\fitr@temp@length{\the\@tempdima}}%
+    \edef\fitr@@width{\fitr@temp@length}}
+\def\fitr@@width{0pt}
+\define@key{fitr}{height}[0pt]{{\setlength\@tempdima{#1}%
+    \xdef\fitr@temp@length{\the\@tempdima}}%
+    \edef\fitr@@height{\fitr@temp@length}}
+\def\fitr@@height{0pt}
+\define@choicekey+{fitr}{ref}[\val\nr]{t,c,b}[t]%
+    {\edef\fitr@@refPt{\val}}{}
+\def\fitr@@refPt{t}
+\define@key{fitr}{adddestw}[0]{%
+    \fitr@defaultbp{\fitr@@adddestw}{#1}}
+\def\fitr@@adddestw{0}
+\define@key{fitr}{adddesth}[0]{%
+    \fitr@defaultbp{\fitr@@adddesth}{#1}}
+\def\fitr@@adddesth{0}
+\define@boolkey{fitr}{button}[true]{}
+\KV@fitr@buttontrue
+\define@choicekey+{fitr}{link}[\val\nr]{jmp,restore}[]
+    {\edef\fitr@@link{\nr}}{}
+\let\fitr@@link\@empty
+\define@boolkey{fitr}{nodest}[true]{}
+\KV@fitr@nodestfalse
+\define@key{fitr}{dest}[]{\def\fitr@@dest{#1}}
+\let\fitr@@dest\@empty
+\define@choicekey+{fitr}{allowFX}[\val\nr]{true,false}[true]%
+    {\edef\fitr@allowFX{\val}}{}
+\def\allowFXDefault{true}
+\let\fitr@allowFX\@empty
+\newcommand{\jdRect}{\begingroup
+    \@ifstar{\let\fitr@istar=1\set@rectjd}%
+        {\let\fitr@istar=0\set@rectjd}}
+\@eqlinktxtcolor{\@linkcolor}
+\newcommand{\fitr@bcode}{\ef@colorthislink}%
+\newcommand{\set@rectjd}[1][]{\def\fitr@jdrect@argi{#1}%
+    \edef\temp@exp{\noexpand\setkeys{fitr}{#1}}\temp@exp
+    \ifx\fitr@@link\@empty\let\fitr@bcode\relax\fi
+    \if\fitr@istar1%
+        \def\fitr@next{\collectbox[\fitr@bcode]{\set@@rectjd}}\else
+    \def\fitr@next{\set@@rectjd}\fi\fitr@next
+}
+\def\set@@rectjd{%
+    \stepcounter{magCnt}\def\fitr@setBL{0pt}%
+    \ifx\fitr@@dest\@empty
+        \def\fitr@namedDest{fitrDestn\the\value{magCnt}}\else
+        \edef\fitr@namedDest{\fitr@@dest}\fi
+    \if\fitr@istar1\def\fitr@@refPt{b}\fi
+    \ifx\fitr@@link\@empty\else\KV@fitr@buttonfalse\fi
+    \if\fitr@istar1%
+        \edef\fitr@@width{\the\wd\collectedbox}%
+        \edef\fitr@setBL{\the\dp\collectedbox}%
+        \setlength{\fitr@length}{\ht\collectedbox+\dp\collectedbox}%
+        \edef\fitr@@height{\the\fitr@length}%
+    \fi
+    \ifx\fitr@@link\@empty
+        \ifKV@fitr@button\let\fitr@FLB@ction\fitr@OverlayJmpBtn\else
+        \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
+        {\let\fitr@FLB@ction\ef@Bbox}\fi
+    \else\def\fitr@FLB@ction{\hfill\vfill\@gobbletwo}\fi
+    \get@fitr@dimen{%
+        \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
+        {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}%
+    }%
+    \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
+        \raisebox{\fitr@@lift-\fitr@setBL}{%
+        \ifKV@fitr@nodest\else\setFitRDest{\fitr@@adddestw}%
+            {\fitr@@adddesth}{\fitr@namedDest}\fi
+        \unhbox\fitr@bbox\ifKV@fitr@nodest\else\fitr@urxury@fixup
+        {\fitr@@adddestw}{\fitr@@adddesth}{\fitr@namedDest}\fi
+    }}}%
+    \setlength{\fboxsep}{0pt}%
+    \ifKV@fitr@nodest\else\ifviewMagWin
+        \fitr@length=\fitr@@adddestw bp
+        \fitr@length=2\fitr@length
+        \addtolength{\fitr@length}{\fitr@@width}%
+        \edef\fitr@@width{\the\fitr@length}%
+        \fitr@length=\fitr@@adddesth bp
+        \fitr@length=2\fitr@length
+        \addtolength{\fitr@length}{\fitr@@height}%
+        \edef\fitr@@height{\the\fitr@length}%
+        \setlength\fitr@length{-\fitr@@adddestw bp}%
+        \addtolength\fitr@length{\fitr@@shift}%
+        \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
+            \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
+            \if\fitr@@refPt b%
+              \addtolength\fitr@length{-\fitr@@adddesth bp}\else
+            \if\fitr@@refPt t%
+              \addtolength\fitr@length{\fitr@@adddesth bp}%
+            \fi\fi
+            \raisebox{\fitr@length}%
+            {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
+            {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
+        }%
+    \fi\fi
+    \if\fitr@@link0\let\fitr@FLB@ction\fitr@OverlayJmpLnk\else
+    \if\fitr@@link1\let\fitr@FLB@ction\fitr@OverlayRestoreLnk\else
+    \let\fitr@FLB@ction\relax\let\fitr@bcode\relax\fi\fi
+    \if\fitr@istar1\gdef\fitr@next{\fitr@FLB@ction{\BOXCONTENT}}\else
+    \let\fitr@next\relax\fi\fitr@next
+    \endgroup}
+\def\setFitRDest#1#2#3{%
+    \if@fitr@dvipdfm
+        \FitRbboxB{#1}{#2}{#3}%
+    \else
+    \ifx\fitr@driver\fitr@pdftex@driver
+        \FitRbboxB{#1}{#2}%
+        \makebox[0pt][l]{\hspace*{-#1bp}%
+            \pdfdest name {#3} fitr
+            width  \fitr@pdftex@view@width\space
+            height \fitr@pdftex@view@height\space
+            depth  \fitr@pdftex@view@depth\space
+        }%
+    \else\literalps@out{%
+        [ /Dest/#3/View [ /FitR \FitRbboxB{#1}{#2} ]/DEST pdfmark}%
+    \fi\fi
+}
+\newcommand{\overlayPresets}{\H{I}\BG{}\BC{}\S{S}}
+\def\fitr@OverlayJmpBtn#1#2{%
+    \ifx\fitr@allowFX\@empty
+        \def\allowFXcode{bAllowFX=\allowFXDefault}\else
+        \def\allowFXcode{bAllowFX=\fitr@allowFX}\fi
+    \pushButton[\presets{\overlayPresets}\F{-\FPrint}\autoCenter{n}
+    \A{\JS{\allowFXcode;\r overlayJmpBtnAction(%
+event,"\fitr@namedDest","\fitr@namedDest");}}]{\fitr@namedDest}{#1}{#2}}
+
+\ifHy@colorlinks\def\overlayJmpLnkPresets{}\else
+    \def\overlayJmpLnkPresets{\Color{\@linkcolor}\W{1}}
+\fi
+\def\fitr@OverlayJmpLnk#1{\setLink[%
+        \presets{\overlayJmpLnkPresets}
+        \A{\JS{overlayJmpLnkAction("\fitr@namedDest");}}]{#1}}
+\def\fitr@OverlayRestoreLnk#1{\setLink[%
+        \presets{\overlayJmpLnkPresets}
+        \A{\JS{overlayRestoreLnkAction("\fitr@namedDest");}}]{#1}}
+\begin{insDLJS}[_fitrLoaded]{fitr}{JS for the fitr Package}
+var _fitrLoaded=true;
+var restoreViewState;
+var savedRestore=false;
+var aSavedRestore=new Array();
+var bAllowFX=true;
+function overlayJmpBtnAction(event,fname,dname) {
+    if (event.shift) shiftRestoreView(fname,dname);
+    else jumpToDest(fname,dname);
+}
+function shiftRestoreView(fname,dname) {
+    var bRestore=restoreView(fname,dname);
+    if (bAllowFX)
+        try { overlayRestoreHook(event,bRestore); } catch(e) {}
+}
+function jumpToDest(fname,dname) {
+    if ( typeof aSavedRestore[fname]=="undefined")
+        aSavedRestore[fname]=[false,{}];
+    else {
+        if (aSavedRestore[fname][0]) {
+            shiftRestoreView(fname,dname)
+            return;
+        }
+    }
+    if (!aSavedRestore[fname][0]){
+        aSavedRestore[fname][1]=this.viewState;
+        aSavedRestore[fname][0]=true;
+    }
+    this.gotoNamedDest(dname);
+    if (bAllowFX) try { overlayJmpHook(event); } catch(e) {}
+}
+function restoreView(fname,dname) {
+    if ( typeof aSavedRestore[fname]=="undefined")
+        aSavedRestore[fname]=[false,{}];
+    if ( aSavedRestore[fname][0]){
+        this.viewState=aSavedRestore[fname][1];
+        aSavedRestore[fname][0]=false;
+        return true;
+    }
+    else return false;
+}
+function overlayJmpLnkAction(dname) {
+    if (!savedRestore){
+        restoreViewState=this.viewState;
+        savedRestore=true;
+    }
+    this.gotoNamedDest(dname);
+}
+function overlayRestoreLnkAction(dname) {
+    if (savedRestore){
+        this.viewState=restoreViewState;
+        savedRestore=false;
+    }
+}
+\end{insDLJS}
+\endinput
+%%
+%% End of file `fitr.sty'.

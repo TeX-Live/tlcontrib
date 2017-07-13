@@ -1,0 +1,698 @@
+%%
+%% This is file `annot3d.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% rmannot.dtx  (with options: `copyright,3Dcode')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% rmannot.sty package,                                 %%
+%% Copyright (C) 2008--2016  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\define@key{rm3DOptsTopLevel}{3DOptions}{%
+    \def\rmiiiDTLOpts{#1}%
+    \setkeys{MXV@user}{#1}%
+}
+\define@key{rm3DOptsTopLevel}{3DResources}{%
+    \def\rmiiiDOptsTLRes{#1}%
+    \setkeys{rm3DOpts}{#1}%
+}
+\def\rma@ckFileForEmbed#1#2{%
+    \edef\rma@fs@expand{rmFileStrm#1}%
+    \@ifundefined{\rma@fs@expand}{%
+        \rm@csarg\xdef{\rma@fs@expand}{%
+            rmfstream\therm@Cnt-#2#1}\def\rma@embed{1}}%
+            {\def\rma@embed{0}}%
+    \edef\rm@irfstrm{\@nameuse{rmFileStrm#1}}%
+}
+\define@key{rm3DOpts}{none}{%
+    \setkeys{rm3DOpts@no}{rName,#1}%
+    \rma@edefexecute{\noexpand
+        \filename@parse{\rma@useNamedPath{\rmiiiDOpts@no@rName}}}%
+    \rma@ckFileForEmbed{\rmiiiDOpts@no@rName}{NONE}%
+    \edef\rma@Instances{\rma@Instances
+        \ps@mark{rmInstances\therm@Cnt} %
+        {rmInstance\therm@Cnt_NONE\rmiiiDOpts@no@rName}%
+        /APPEND pdfmark^^J%
+        \ps@mark/_objdef{rmInstance\therm@Cnt_NONE%
+            \rmiiiDOpts@no@rName}/type/dict/OBJ pdfmark^^J%
+        \ps@mark{rmInstance\therm@Cnt_NONE\rmiiiDOpts@no@rName}<<%
+            /Asset {rmfilespec\therm@Cnt-NONE\rmiiiDOpts@no@rName}%
+            /Type/RichMediaInstance>>/PUT pdfmark^^J%
+        \rm@appendFileSpecs{NONE\rmiiiDOpts@no@rName}%
+            {\filename@area}{\filename@base.\filename@ext}%
+            {\rma@embed}{\rm@irfstrm}{}%
+    }%
+    \edef\rma@appendToNameTree{\rma@appendToNameTree
+        \rm@appendNameTree{NONE\rmiiiDOpts@no@rName}%
+            {\filename@area}{\filename@base.\filename@ext}%
+            {\rma@embed}{\rm@irfstrm}{}%
+    }%
+}
+\define@key{rm3DOpts}{foreground}{%
+    \setkeys{rm3DOpts@fg}{rName,flashvars,#1}%
+    \rma@edefexecute{\noexpand
+        \filename@parse{\rma@useNamedPath{\rmiiiDOpts@fg@rName}}}%
+    \rma@ckFileForEmbed{\rmiiiDOpts@fg@rName}{FG}%
+    \edef\rma@Instances{\rma@Instances
+        \ps@mark{rmInstances\therm@Cnt} %
+        {rmInstance\therm@Cnt_FG\rmiiiDOpts@fg@rName}%
+        /APPEND pdfmark^^J%
+        \ps@mark/_objdef{rmInstance\therm@Cnt_FG%
+            \rmiiiDOpts@fg@rName}/type/dict/OBJ pdfmark^^J%
+        \ps@mark{rmInstance\therm@Cnt_FG\rmiiiDOpts@fg@rName}<<%
+            /Asset {rmfilespec\therm@Cnt-FG\rmiiiDOpts@fg@rName}%
+            /Params <</Binding/Foreground%
+                /FlashVars(\rmiiiDOpts@fg@flashvars)>>%
+            /Type/RichMediaInstance%
+        >>/PUT pdfmark^^J%
+        \rm@appendFileSpecs{FG\rmiiiDOpts@fg@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+    \edef\rma@appendToNameTree{\rma@appendToNameTree
+        \rm@appendNameTree{FG\rmiiiDOpts@fg@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+}
+\define@key{rm3DOpts}{background}{%
+    \setkeys{rm3DOpts@bg}{rName,flashvars,#1}%
+    \rma@edefexecute{\noexpand
+        \filename@parse{\rma@useNamedPath{\rmiiiDOpts@bg@rName}}}%
+    \rma@ckFileForEmbed{\rmiiiDOpts@bg@rName}{BG}%
+    \edef\rma@Instances{\rma@Instances
+        \ps@mark{rmInstances\therm@Cnt} %
+        {rmInstance\therm@Cnt_BG\rmiiiDOpts@bg@rName}%
+        /APPEND pdfmark^^J%
+        \ps@mark/_objdef{rmInstance\therm@Cnt_BG%
+            \rmiiiDOpts@bg@rName}/type/dict/OBJ pdfmark^^J%
+        \ps@mark{rmInstance\therm@Cnt_BG\rmiiiDOpts@bg@rName}<<%
+            /Asset {rmfilespec\therm@Cnt-BG\rmiiiDOpts@bg@rName}%
+            /Params <</Binding/Background%
+                /FlashVars(\rmiiiDOpts@bg@flashvars)>>%
+            /Type/RichMediaInstance%
+        >>/PUT pdfmark^^J%
+        \rm@appendFileSpecs{BG\rmiiiDOpts@bg@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+    \edef\rma@appendToNameTree{\rma@appendToNameTree
+        \rm@appendNameTree{BG\rmiiiDOpts@bg@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+}
+\define@key{rm3DOpts}{material}{%
+    \setkeys{rm3DOpts@mat}{rName,mName,flashvars,#1}%
+    \rma@edefexecute{\noexpand
+        \filename@parse{\rma@useNamedPath{\rmiiiDOpts@mat@rName}}}%
+    \rma@ckFileForEmbed{\rmiiiDOpts@mat@rName}{MAT}%
+    \edef\rma@Instances{\rma@Instances
+        \ps@mark{rmInstances\therm@Cnt} %
+        {rmInstance\therm@Cnt_MAT\rmiiiDOpts@mat@rName}%
+        /APPEND pdfmark^^J%
+        \ps@mark/_objdef{rmInstance\therm@Cnt_MAT%
+            \rmiiiDOpts@mat@rName}/type/dict/OBJ pdfmark^^J%
+        \ps@mark{rmInstance\therm@Cnt_MAT\rmiiiDOpts@mat@rName}<<%
+            /Asset {rmfilespec\therm@Cnt-MAT\rmiiiDOpts@mat@rName}%
+            /Params <</Binding/Material%
+                /BindingMaterialName(\rmiiiDOpts@mat@mName)%
+                /FlashVars(\rmiiiDOpts@mat@flashvars)>>%
+            /Type/RichMediaInstance%
+        >>/PUT pdfmark^^J%
+        \rm@appendFileSpecs{MAT\rmiiiDOpts@mat@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+    \edef\rma@appendToNameTree{\rma@appendToNameTree
+        \rm@appendNameTree{MAT\rmiiiDOpts@mat@rName}{\filename@area}%
+            {\filename@base.\filename@ext}{\rma@embed}%
+            {\rm@irfstrm}{}%
+    }%
+}
+\define@key{rm3DOpts@no}{rName}[]{\def\rmiiiDOpts@no@rName{#1}}
+\define@key{rm3DOpts@fg}{rName}[]{\def\rmiiiDOpts@fg@rName{#1}}
+\define@key{rm3DOpts@fg}{flashvars}[]{\def\rmiiiDOpts@fg@flashvars{#1}}
+\define@key{rm3DOpts@bg}{rName}[]{\def\rmiiiDOpts@bg@rName{#1}}
+\define@key{rm3DOpts@bg}{flashvars}[]{\def\rmiiiDOpts@bg@flashvars{#1}}
+\define@key{rm3DOpts@mat}{rName}[]{\def\rmiiiDOpts@mat@rName{#1}}
+\define@key{rm3DOpts@mat}{mName}[]{\def\rmiiiDOpts@mat@mName{#1}}
+\define@key{rm3DOpts@mat}{flashvars}[]{%
+    \def\rmiiiDOpts@mat@flashvars{#1}}
+\newread\@MXV@@viewsfile% file handle for views file
+\newboolean{@MXV@eof}%
+\newcount\@MXV@viewscount%counter for number of 3D views per inclusion
+\newboolean{@MXV@viewsprovided}%3d views file provided?
+\newboolean{@MXV@defaultviewprovided}%default 3D view provided?
+\newcount\@MXV@nodecount% number of node dicts
+\newcount\@MXV@cscount% number of cross section dicts
+\def\@MXV@aac{30}% aperture angle of camera
+\def\@MXV@roll{0}% camera roll angle
+\def\@MXV@defaultbg{1 1 1}%
+\def\@MXV@background{/BG<</CS/DeviceRGB/C[1 1 1]>>}%
+\def\@MXV@defaultlights{}%
+\def\@MXV@lights{}%
+\def\@MXV@defaultrender{Solid}%
+\def\@MXV@render{/RM <</Subtype/Solid>>}%
+\def\@MXV@naentry{}% %takes array of Node dicts
+\def\@MXV@saentry{}% %takes array of cross section  dicts
+\let\@MXV@jscriptiiid\@empty
+\let\rma@rmAnnot@iiiDjs\@empty
+\let\@MXV@varray\@empty
+\let\additional@Instances\@empty
+\def\@MXV@defaultview{}
+\def\@MXV@coo{0 0 0}% centre of orbit
+\def\@MXV@ctoc{0 -1 0}% centre of orbit to camera vector
+\def\@MXV@roo{0}% radius of orbit
+\def\@MXV@viewsfileii{}%file of views of the 3D object (new format)
+\setboolean{@MXV@viewsprovided}{false}%
+\setboolean{@MXV@defaultviewprovided}{false}%
+\def\@MXV@iiidview{}%
+\def\@MXV@ciiwmatrix#1 #2 #3 #4 #5 #6 #7 #8 {%
+    \FPupn\@MXV@viewx{#4 neg}%
+    \FPupn\@MXV@viewy{#5 neg}%
+    \FPupn\@MXV@viewz{#6 neg}%
+    \FPupn\@MXV@modulo{\@MXV@viewx{} copy mul %
+      \@MXV@viewy{} copy mul + %
+      \@MXV@viewz{} copy mul + 2 swap root%
+    }%
+    \FPupn\@MXV@viewx{\@MXV@viewx{} \@MXV@modulo{} div}%
+    \FPupn\@MXV@viewy{\@MXV@viewy{} \@MXV@modulo{} div}%
+    \FPupn\@MXV@viewz{\@MXV@viewz{} \@MXV@modulo{} div}%
+    \FPupn\@MXV@sinroll{#8 180.0 div \FPpi{} mul sin}%
+    \FPupn\@MXV@cosroll{#8 180.0 div \FPpi{} mul cos}%
+    \FPupn\@MXV@leftx{-1.0}%
+    \FPupn\@MXV@lefty{0.0}%
+    \FPupn\@MXV@leftz{0.0}%
+    \FPifneg\@MXV@viewz% top view
+      %up-vector
+      \FPupn\@MXV@upx{0.0}%
+      \FPupn\@MXV@upy{1.0}%
+      \FPupn\@MXV@upz{0.0}%
+    \else% bottom view
+      %up-vector
+      \FPupn\@MXV@upx{0.0}%
+      \FPupn\@MXV@upy{-1.0}%
+      \FPupn\@MXV@upz{0.0}%
+    \fi%
+    \FPupn\@MXV@sumxy{\@MXV@viewx{} abs \@MXV@viewy{} abs add}%
+    \FPifeq\@MXV@sumxy{0}\else% other views than top and bottom
+      %up-vector = up_world - (up_world dot view) view
+      \FPupn\@MXV@upx{\@MXV@viewz{} \@MXV@viewx{} mul neg}%
+      \FPupn\@MXV@upy{\@MXV@viewz{} \@MXV@viewy{} mul neg}%
+      \FPupn\@MXV@upz{\@MXV@viewz{} \@MXV@viewz{} mul neg 1.0 add}%
+      %normalize up-vector
+      \FPupn\@MXV@modulo{\@MXV@upx{} copy mul \@MXV@upy{} copy %
+        mul + \@MXV@upz{} copy mul + 2 swap root}%
+      \FPupn\@MXV@upx{\@MXV@upx{} \@MXV@modulo{} div}%
+      \FPupn\@MXV@upy{\@MXV@upy{} \@MXV@modulo{} div}%
+      \FPupn\@MXV@upz{\@MXV@upz{} \@MXV@modulo{} div}%
+      %left vector = up x view
+      \FPupn\@MXV@leftx{\@MXV@viewz{} \@MXV@upy{} mul %
+        \@MXV@viewy{} \@MXV@upz{} mul sub}%
+      \FPupn\@MXV@lefty{\@MXV@viewx{} \@MXV@upz{} mul %
+        \@MXV@viewz{} \@MXV@upx{} mul sub}%
+      \FPupn\@MXV@leftz{\@MXV@viewy{} \@MXV@upx{} mul %
+        \@MXV@viewx{} \@MXV@upy{} mul sub}%
+      %normalize left vector
+      \FPupn\@MXV@modulo{\@MXV@leftx{} copy mul \@MXV@lefty{} %
+        copy mul + \@MXV@leftz{} copy mul + 2 swap root}%
+      \FPupn\@MXV@leftx{\@MXV@leftx{} \@MXV@modulo{} div}%
+      \FPupn\@MXV@lefty{\@MXV@lefty{} \@MXV@modulo{} div}%
+      \FPupn\@MXV@leftz{\@MXV@leftz{} \@MXV@modulo{} div}%
+    \fi%
+    \FPupn\@MXV@leftxprime{\@MXV@leftx{} \@MXV@cosroll{} mul %
+        \@MXV@upx{} \@MXV@sinroll{} mul +}%
+    \FPupn\@MXV@leftyprime{\@MXV@lefty{} \@MXV@cosroll{} mul %
+        \@MXV@upy{} \@MXV@sinroll{} mul +}%
+    \FPupn\@MXV@leftzprime{\@MXV@leftz{} \@MXV@cosroll{} mul %
+        \@MXV@upz{} \@MXV@sinroll{} mul +}%
+    \FPupn\@MXV@upxprime{\@MXV@upx{} \@MXV@cosroll{} mul %
+        \@MXV@leftx{} \@MXV@sinroll{} mul sub}%
+    \FPupn\@MXV@upyprime{\@MXV@upy{} \@MXV@cosroll{} mul %
+        \@MXV@lefty{} \@MXV@sinroll{} mul sub}%
+    \FPupn\@MXV@upzprime{\@MXV@upz{} \@MXV@cosroll{} mul %
+        \@MXV@leftz{} \@MXV@sinroll{} mul sub}%
+    \FPupn\@MXV@leftx{\@MXV@leftxprime}%
+    \FPupn\@MXV@lefty{\@MXV@leftyprime}%
+    \FPupn\@MXV@leftz{\@MXV@leftzprime}%
+    \FPupn\@MXV@upx{\@MXV@upxprime}%
+    \FPupn\@MXV@upy{\@MXV@upyprime}%
+    \FPupn\@MXV@upz{\@MXV@upzprime}%
+    \FPupn\@MXV@roo{#7 abs}%
+    \FPifeq\@MXV@roo{0}\FPupn\@MXV@roo{0.0000001}\fi%
+    \FPupn\@MXV@transx{#1 \@MXV@roo{} \@MXV@viewx{} mul sub}%
+    \FPupn\@MXV@transy{#2 \@MXV@roo{} \@MXV@viewy{} mul sub}%
+    \FPupn\@MXV@transz{#3 \@MXV@roo{} \@MXV@viewz{} mul sub}%
+    \xdef\@MXV@matrix{%
+        \@MXV@leftx\space\@MXV@lefty\space\@MXV@leftz\space%
+        \@MXV@upx\space\@MXV@upy\space\@MXV@upz\space%
+        \@MXV@viewx\space\@MXV@viewy\space\@MXV@viewz}%
+    \xdef\@MXV@matrix{%
+      \@MXV@matrix\space\@MXV@transx\space%
+        \@MXV@transy\space\@MXV@transz%
+    }%
+}% end of \@MXV@ciiwmatrix
+\newcommand{\@MXV@parseline}[6][]{%
+    \pdfstringdef\@MXV@xname{#1}% name of the view (optional)
+    \ifthenelse{\equal{#2}{}}{%
+      \xdef\@MXV@coo{0 0 0}%
+    }{%
+      \xdef\@MXV@coo{#2}%
+    }%
+    \ifthenelse{\equal{#3}{}}{%
+      \xdef\@MXV@ctoc{0 -1 0}%
+    }{%
+      \xdef\@MXV@ctoc{#3}%
+    }%
+    \ifthenelse{\equal{#4}{}}{%
+      \xdef\@MXV@roo{0}%
+    }{%
+      \xdef\@MXV@roo{#4}%
+    }%
+    \ifthenelse{\equal{#5}{}}{%
+      \xdef\@MXV@roll{0}%
+    }{%
+      \xdef\@MXV@roll{#5}%
+    }%
+    \ifthenelse{\equal{#6}{}}{%
+      \xdef\@MXV@aac{30}%
+    }{%
+      \xdef\@MXV@aac{#6}%
+    }%
+}
+\define@key{MXV@view}{VIEW}[]{%
+    \ifnum\@MXV@cursection<\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        A VIEW section cannot be nested into another section}{}%
+    \fi%
+    \def\@MXV@cursection{0}%
+    \pdfstringdef\@MXV@xname{#1}% name of the view (optional)
+    %default camera settings
+    \gdef\@MXV@coo{0 0 0}%
+    \gdef\@MXV@ctoc{0 -1 0}%
+    \gdef\@MXV@roo{0}%
+    \gdef\@MXV@roll{0}%
+    \gdef\@MXV@aac{30}%
+    %default background, lights, render mode
+    \xdef\@MXV@background{/BG <</CS/DeviceRGB/C [\@MXV@defaultbg]>>}%
+    \xdef\@MXV@lights{/LS <</Subtype/\@MXV@defaultlights>>}%
+    \gdef\@MXV@render{/RM <</Subtype/\@MXV@defaultrender>>}%
+    %initialise array of node dicts
+    \gdef\@MXV@naarray{}%
+    \global\@MXV@nodecount=\z@
+    %initialise array of crosssection dicts
+    \gdef\@MXV@saarray{}%
+    \global\@MXV@cscount=\z@
+}
+\define@key{MXV@view}{COO}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        COO entry not allowed here; must go into a VIEW section}{}%
+    \fi%
+    \xdef\@MXV@coo{#1}%
+}
+\define@key{MXV@view}{C2C}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        C2C entry not allowed here; must go into a VIEW section}{}%
+    \fi\xdef\@MXV@ctoc{#1}%
+}
+\define@key{MXV@view}{ROO}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        ROO entry not allowed here; must go into a VIEW section}{}%
+    \fi\xdef\@MXV@roo{#1}%
+}
+\define@key{MXV@view}{AAC}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        AAC entry not allowed here; must go into a VIEW section}{}%
+    \fi\xdef\@MXV@aac{#1}%
+}
+\define@key{MXV@view}{ROLL}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        ROLL entry not allowed here; must go into a VIEW section}{}%
+    \fi\xdef\@MXV@roll{#1}%
+}
+\define@key{MXV@view}{BGCOLOR}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        BGCOLOR entry not allowed here; must go into a VIEW section}{}%
+    \fi\def\@MXV@background{/BG<</CS/DeviceRGB/C[#1]>>}%
+}
+\define@key{MXV@view}{LIGHTS}{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        LIGHTS entry not allowed here; must go into a VIEW section}{}%
+    \fi\def\@MXV@lights{/LS <</Subtype/#1>>}%
+}
+\define@key{MXV@view}{RENDERMODE}{%
+    \ifnum\@MXV@cursection=\z@
+      \def\@MXV@render{/RM <</Subtype/#1>>}%
+    \else%
+      \ifnum\@MXV@cursection=\@ne
+        \def\@MXV@nrender{/RM <</Subtype/#1>>}%
+      \else%
+        \PackageError{rmannot}{%
+          File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+            RENDERMODE entry not allowed here; must go into %
+            either a VIEW or a PART section}{}%
+      \fi%
+    \fi%
+}
+\define@key{MXV@view}{PART}[]{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        PART not allowed here; must be a sub-section of %
+        a VIEW section}{}%
+    \fi%
+    \ifthenelse{\equal{#1}{}}{%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        You must provide a valid PART name (PART=<part name>), as
+        shown in the model tree of the 3D object %
+        (go to `View'->`Navigation Panels'->`Model Tree' %
+        in Adobe Reader)}{}%
+    }{}%
+    \def\@MXV@cursection{1}%
+    \pdfstringdef\@MXV@partname{#1}% name of the part
+    \gdef\@MXV@nopacity{}%
+    \gdef\@MXV@nvisibility{}%
+    \gdef\@MXV@nrender{}%
+    \gdef\@MXV@ntransform{}%
+}
+\define@key{MXV@view}{CROSSSECT}[]{%
+    \ifnum\@MXV@cursection=\z@\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        CROSSSECT not allowed here; must be a sub-section of %
+        a VIEW section}{}%
+    \fi%
+    \ifthenelse{\equal{#1}{}}{}{%
+      \PackageWarning{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        CROSSECT does not take a value%
+      }%
+    }%
+    \def\@MXV@cursection{2}%
+    \gdef\@MXV@cscenter{0 0 0}%
+    \gdef\@MXV@csorient{null 0 0}%
+}
+\define@key{MXV@view}{OPACITY}{%
+    \ifnum\@MXV@cursection=\@ne\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        OPACITY entry not allowed here; must go into a PART section}{}%
+    \fi%
+    \gdef\@MXV@nopacity{/O #1}%
+}
+\define@key{MXV@view}{VISIBLE}{%
+    \ifnum\@MXV@cursection=\@ne\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        VISIBLE entry not allowed here; must go into a PART section}{}%
+    \fi%
+    \gdef\@MXV@nvisibility{/V #1}%
+}
+\define@key{MXV@view}{MATRIX}{%
+    \ifnum\@MXV@cursection=\@ne\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        MATRIX entry not allowed here; must go into a PART section}{}%
+    \fi%
+    \gdef\@MXV@ntransform{/M [#1]}%
+}
+\define@key{MXV@view}{CENTER}{%
+    \ifnum\@MXV@cursection=2\relax\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: CENTER %
+        entry not allowed here; must go into a CROSSECT section}{}%
+    \fi%
+    \gdef\@MXV@cscenter{#1}%
+}
+\define@key{MXV@view}{ORIENTATION}{%
+    \ifnum\@MXV@cursection=2\relax\else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: ORIENT %
+        entry not allowed here; must go into a CROSSECT section}{}%
+    \fi%
+    \gdef\@MXV@csorient{#1}%
+}
+\define@key{MXV@view}{END}[]{%
+    \ifcase\@MXV@cursection%
+      %END VIEW
+      \edef\@MXV@args{%
+        \@MXV@coo\space\@MXV@ctoc\space\@MXV@roo\space%
+        \@MXV@roll\space}%
+      \expandafter\@MXV@ciiwmatrix\@MXV@args% build C2W matrix
+      \global\advance\@MXV@viewscount by \@ne%
+      \ifthenelse{\equal{\@MXV@xname}{}}{% default view name
+        \pdfstringdef\@MXV@xname{View \the\@MXV@viewscount}%
+      }{}%
+      \ifthenelse{\equal{\@MXV@naarray}{}}{}{%
+        \gdef\@MXV@naentry{/NR true/NA [\@MXV@naarray]}%
+      }%
+      \ifthenelse{\equal{\@MXV@saarray}{}}{}{%
+        \gdef\@MXV@saentry{/SA [\@MXV@saarray]}%
+      }%
+      \@MXV@viewobj% create pdf object of 3D view
+      %append current view obj ref to VA array
+      \xdef\@MXV@varray{\@MXV@varray\space\@MXV@@viewobj}%
+      \global\@MXV@viewsprovidedtrue%
+      \def\@MXV@cursection{-1}%
+    \or%
+      %END PART
+      \global\advance\@MXV@nodecount by \@ne
+      \@MXV@nodeobj% create pdf object of 3D node dict
+      %append it to node array
+      \xdef\@MXV@naarray{\@MXV@naarray\space\@MXV@@nodeobj}%
+      \def\@MXV@cursection{0}%
+    \or%
+      %END CROSSSECT
+      \global\advance\@MXV@cscount by \@ne
+      \@MXV@csobj% create pdf object of 3D cross section dict
+      %append it to cross section array
+      \xdef\@MXV@saarray{\@MXV@saarray\space\@MXV@@csobj}%
+      \def\@MXV@cursection{0}%
+    \else%
+      \PackageError{rmannot}{%
+        File \@MXV@viewsfileii, line \the\@MXV@inputlineno: %
+        There is nothing to be ENDed here}{}%
+    \fi%
+}%
+\def\@MXV@procinputline#1{\setkeys{MXV@view}{#1}}
+\newcount\@MXV@inputlineno
+\def\@MXV@buildva{%
+    \global\@MXV@viewscount=0%
+    \xdef\@MXV@varray{}% empty varray
+    \edef\@MXV@args{%
+      \@MXV@coo\space\@MXV@ctoc\space\@MXV@roo\space%
+      \@MXV@roll\space}%
+    \expandafter\@MXV@ciiwmatrix\@MXV@args% build C2W matrix
+    \pdfstringdef\@MXV@xname{Default}%
+    \if@MXV@defaultviewprovided%
+      \@MXV@viewobj% create pdf object of 3D view
+      \edef\@MXV@defaultview{\@MXV@@viewobj}%
+    \fi%
+    \def\@MXV@cursection{-1}% views file is divided in sections
+    \IfFileExists{\@MXV@viewsfileii}{%
+      \begingroup%
+      \endlinechar=-1% suppress trailing space at input line end
+      \@MXV@inputlineno=\z@%
+      \openin\@MXV@@viewsfile=\@MXV@viewsfileii%
+      \read\@MXV@@viewsfile to \@MXV@inputline%
+      \ifeof\@MXV@@viewsfile\setboolean{@MXV@eof}{true}\else%
+        \setboolean{@MXV@eof}{false}\fi%
+      \whiledo{\NOT\boolean{@MXV@eof}}{%
+        \advance\@MXV@inputlineno by \@ne%
+        %process input line
+        \edef\@MXV@@inputline{{\@MXV@inputline}}%
+        \expandafter\@MXV@procinputline\@MXV@@inputline%
+        \read\@MXV@@viewsfile to \@MXV@inputline%
+        \ifeof\@MXV@@viewsfile%
+          \setboolean{@MXV@eof}{true}%
+        \else%
+          \setboolean{@MXV@eof}{false}%
+        \fi%
+      }%
+      \closein\@MXV@@viewsfile%
+      \endgroup%
+    }{}%
+    \ifthenelse{\NOT\boolean{@MXV@defaultviewprovided}%
+      \AND\boolean{@MXV@viewsprovided}}{%
+      \xdef\@MXV@defaultview{/F}%
+    }{}%
+    \ifthenelse{\NOT\boolean{@MXV@defaultviewprovided}%
+      \AND\NOT\boolean{@MXV@viewsprovided}}{%
+      \@MXV@viewobj% create pdf object of 3D view
+      \edef\@MXV@defaultview{\@MXV@@viewobj}%
+    }{}%
+}
+\def\@MXV@viewobj{\literalps@out{%
+  %projection dict
+  \ps@mark/_objdef {pdict\therm@Cnt_\the\@MXV@viewscount}%
+        /type/dict/OBJ pdfmark^^J%
+  \ps@mark{pdict\therm@Cnt_\the\@MXV@viewscount} <<%
+        /Subtype/P/FOV \@MXV@aac/PS/Min>>/PUT pdfmark^^J%
+  \ps@mark/_objdef {viewobj\therm@Cnt_\the\@MXV@viewscount}%
+        /type/dict/OBJ pdfmark^^J%
+  \ps@mark{viewobj\therm@Cnt_\the\@MXV@viewscount} <<%
+        /MS/M%
+        /CO \@MXV@roo%
+        /P {pdict\therm@Cnt_\the\@MXV@viewscount}%
+        /C2W[\@MXV@matrix]%
+        /XN(\@MXV@xname)%
+/IN(\@MXV@xname)%
+        \@MXV@background%
+        \@MXV@lights%
+        \@MXV@render%
+        \@MXV@naentry%
+        \@MXV@saentry%
+      >>%
+    /PUT pdfmark
+  }%
+  \xdef\@MXV@@viewobj{{viewobj\therm@Cnt_\the\@MXV@viewscount}}%
+}%
+\def\@MXV@nodeobj{\literalps@out{%
+    \ps@mark/type/dict%
+      /_objdef {nodeobj\therm@Cnt_\the\@MXV@viewscount_%
+        \the\@MXV@nodecount}/OBJ pdfmark^^J%
+    \ps@mark{nodeobj\therm@Cnt_\the\@MXV@viewscount_%
+        \the\@MXV@nodecount}<<%
+            /Type/3DNode%
+            /N (\@MXV@partname)%
+            \@MXV@nopacity\@MXV@nvisibility\@MXV@ntransform%
+                \@MXV@nrender%
+      >>/PUT pdfmark
+  }%
+  \xdef\@MXV@@nodeobj{%
+    {nodeobj\therm@Cnt_\the\@MXV@viewscount_%
+            \the\@MXV@nodecount}}%
+}%
+\def\@MXV@csobj{\literalps@out{%
+    \ps@mark/type/dict%
+        /_objdef {csobj\therm@Cnt_\the\@MXV@viewscount_%
+        \the\@MXV@cscount}/OBJ pdfmark^^J%
+    \ps@mark{csobj\therm@Cnt_\the\@MXV@viewscount_%
+        \the\@MXV@cscount}<<%
+            /Type/3DCrossSection%
+            /C [\@MXV@cscenter]%
+            /O [\@MXV@csorient]%
+        >>/PUT pdfmark
+  }%
+  \xdef\@MXV@@csobj{%
+    {csobj\therm@Cnt_\the\@MXV@viewscount_\the\@MXV@cscount}}%
+}%
+\define@key{MXV@user}{3Dbg}[1 1 1]{%
+    \def\@MXV@defaultbg{#1}%
+    \def\@MXV@background{/BG<</CS/DeviceRGB/C[#1]>>}%
+}
+\define@key{MXV@user}{3Djscript}{%
+    \def\rma@rmAnnot@iiiDjs{#1}%
+    \ifx\rma@rmAnnot@iiiDjs\@empty\let\rma@addResources\@empty
+    \let\rma@addFileSpecs\@empty\else
+        \rma@toks={}\def\rmiiid@addToScriptsArray{}%
+        \@for\rma@arg:=\rma@rmAnnot@iiiDjs\do{%
+            \rma@edefexecute{\noexpand
+                \filename@parse{\rma@useNamedPath{\rma@arg}}}%
+            \@ifundefined{filename@ext}{%
+              \rma@PkEr@iii{\rma@useNamedPath{\rma@arg}}}{}%
+            \edef\rmiiid@addToScriptsArray{\rmiiid@addToScriptsArray
+                \ps@mark{jscriptiiid\therm@Cnt}%
+                {rmfilespec\therm@Cnt-JS\rma@arg}%
+                /APPEND pdfmark^^J%
+            }%
+            \edef\rma@fs@expand{rmFileStrm\rma@arg}%
+            \@ifundefined{\rma@fs@expand}{%
+            \rm@csarg\xdef{\rma@fs@expand}%
+              {rmfstream\therm@Cnt-JS\rma@arg}%
+              \def\rma@embed{1}}{\def\rma@embed{0}}%
+            \edef\rma@tmp@exp{\the\rma@toks%
+              \noexpand\\{JS\rma@arg}%
+              {\filename@area}{\filename@base.\filename@ext}%
+              {\rma@embed}{\csname\rma@fs@expand\endcsname}%
+              {\rm@csarg\noexpand{rma@mt@\rma@arg}}}%
+            \rma@toks=\expandafter{\rma@tmp@exp}%
+        }%
+        \let\\\rm@appendNameTree
+        \expandafter\xdef\expandafter\rma@addResources%
+            \expandafter{\the\rma@toks}%
+        \let\\\rm@appendFileSpecs
+        \expandafter\xdef\expandafter\rma@addFileSpecs%
+            \expandafter{\the\rma@toks}%
+    \fi
+}
+\define@key{MXV@user}{3Dcoo}{%
+    \def\@MXV@coo{#1}%
+    \setboolean{@MXV@defaultviewprovided}{true}%
+}
+\define@key{MXV@user}{3Dc2c}{%
+    \def\@MXV@ctoc{#1}%
+    \setboolean{@MXV@defaultviewprovided}{true}%
+}
+\define@key{MXV@user}{3Droo}{%
+    \def\@MXV@roo{#1}%
+    \setboolean{@MXV@defaultviewprovided}{true}%
+}
+\define@key{MXV@user}{3Daac}{%
+    \def\@MXV@aac{#1}%
+    \setboolean{@MXV@defaultviewprovided}{true}%
+}
+\define@key{MXV@user}{3Droll}{%
+    \def\@MXV@roll{#1}%
+    \setboolean{@MXV@defaultviewprovided}{true}%
+}
+\define@key{MXV@user}{3Dviews}{%
+    \IfFileExists{#1}{%
+      \def\@MXV@viewsfileii{#1}%
+    }{%
+      \PackageError{rmannot}{3D views  file `#1' cannot be opened%
+      }{%
+        Make sure file `#1' exists and is readable!%
+      }%
+    }%
+}
+\define@choicekey+{MXV@user}{3Dlights}%
+    {None,White,Day,Night,Hard,Primary,Blue,%
+        Red,Cube,CAD,Headlamp}[Cube]{%
+    \gdef\@MXV@defaultlights{#1}%
+    \gdef\@MXV@lights{/LS <</Subtype/#1>>}%
+}{\PackageWarning{rmannot}{Bad choice for 3Dlights, permissible
+    values are None, White, Day, Night, Hard, Primary, Blue,
+        Red, Cube, CAD, HeadLamp. Try again}}
+\define@choicekey+{MXV@user}{3Drender}%
+    {Solid,SolidWireframe,Transparent,TransparentWireframe,%
+     BoundingBox,TransparentBoundingBox,TransparentBoundingBoxOutline,%
+     Wireframe,ShadedWireframe,HiddenWireframe,Vertices,ShadedVertices,%
+     SolidOutline,Illustration,ShadedIllustration}[Solid]{%
+    \gdef\@MXV@defaultrender{#1}%
+    \gdef\@MXV@render{/RM <</Subtype/#1>>}%
+}{\PackageWarning{rmannot}{Bad choice for 3Dlights, permissible
+    values are Solid, SolidWireframe, Transparent, TransparentWireframe,
+     BoundingBox, TransparentBoundingBox, TransparentBoundingBoxOutline,
+     Wireframe, ShadedWireframe, HiddenWireframe, Vertices,
+     ShadedVertices, SolidOutline, Illustration, ShadedIllustration.
+     Try again}}
+\endinput
+%%
+%% End of file `annot3d.def'.

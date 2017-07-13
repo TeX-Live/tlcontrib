@@ -1,0 +1,200 @@
+%%
+%% This is file `artthreads.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% artthreads.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% artthreads.sty package,                   2016-04-09 %%
+%% Copyright (C) 2016  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{artthreads}
+ [2016/04/09 v1.1 Support for article threads (dps)]
+\RequirePackage{xkeyval}
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
+\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\DeclareOptionX{pdftex}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{dvips}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{dvipsone}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{dvipdfm}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{dvipdfmx}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{xetex}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{preview}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{!preview}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{viewMagWin}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{!viewMagWin}
+    {\PassOptionsToPackage{\CurrentOption}{fitr}}
+\ProcessOptionsX
+\RequirePackage{fitr}[2016/04/04]
+\newif\ifnewarticle
+\newcounter{artthrdcnt}
+\def\CntArt{0}\def\CntArtInfo{0}
+\def\inc@CntMacro#1{{\@tempcnta#1\relax\advance\@tempcnta1\relax
+    \xdef#1{\the\@tempcnta}}}
+\def\artM@rk{[\space}
+\define@key{artthrd}{title}[]{\def\threadTitle{#1}}
+    \let\threadTitle\@empty
+\define@key{artthrd}{author}[]{\def\threadAuthor{#1}}
+    \let\threadAuthor\@empty
+\define@key{artthrd}{keywords}[]{\def\threadKeywords{#1}}
+    \let\threadKeywords\@empty
+\define@key{artthrd}{subject}[]{\def\threadSubject{#1}}
+    \let\threadSubject\@empty
+\newcommand{\setThreadInfo}[1]{\inc@CntMacro\CntArtInfo
+    \let\threadTitle\@empty\let\threadAuthor\@empty
+    \let\threadKeywords\@empty\let\threadSubject\@empty
+    \setkeys{artthrd}{#1}\ifx\threadTitle\@empty
+        \def\threadTitle{thread-\CntArtInfo}\fi
+}
+\def\bArtErrMsg{When starting a new article thread
+    (\string\cArticle)\MessageBreak
+    first use \string\setThreadInfo\space to set the title,\MessageBreak
+    author, subject, and keywords}
+\define@key{@rtthrd}{addtow}[0]{%
+    \fitr@defaultbp{\artthrd@@addtow}{#1}}
+\def\artthrd@@addtow{0}
+\define@key{@rtthrd}{addtoh}[0]{%
+    \fitr@defaultbp{\artthrd@@addtoh}{#1}}
+\def\artthrd@@addtoh{0}
+\newcommand{\setAddToBorder}[1]{\setkeys{@rtthrd}{#1}}
+\newcommand{\bArticle}{\begingroup\inc@CntMacro\CntArt
+    \ifnum\CntArt=\CntArtInfo\relax\else
+    \PackageError{artthreads}{\bArtErrMsg}{See package documentation
+    for \string\setThreadInfo}\fi
+    \newarticletrue\set@rectart
+}
+\newcommand{\cArticle}{\begingroup\newarticlefalse\set@rectart}
+\newcommand{\set@rectart}[1]{\def\fitr@artrect@argi{#1}%
+    \edef\temp@exp{\noexpand\setkeys{fitr}{#1}}\temp@exp
+    \set@@rectart}
+\def\set@@rectart{\def\fitr@setBL{0pt}%
+    \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
+        {\let\fitr@FLB@ction\ef@Bbox}%
+    \get@fitr@dimen{%
+        \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
+        {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}%
+    }%
+    \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
+        \raisebox{\fitr@@lift-\fitr@setBL}{%
+        \setThre@d{\artthrd@@addtow}{\artthrd@@addtoh}%
+        \unhbox\fitr@bbox
+        \fitr@urxury@fixup{\artthrd@@addtow}{\artthrd@@addtoh}{}%
+    }}}\setlength{\fboxsep}{0pt}%
+    \ifviewMagWin
+        \fitr@length=\artthrd@@addtow bp
+        \fitr@length=2\fitr@length
+        \addtolength{\fitr@length}{\fitr@@width}%
+        \edef\fitr@@width{\the\fitr@length}%
+        \fitr@length=\artthrd@@addtoh bp
+        \fitr@length=2\fitr@length
+        \addtolength{\fitr@length}{\fitr@@height}%
+        \edef\fitr@@height{\the\fitr@length}%
+        \setlength\fitr@length{-\artthrd@@addtow bp}%
+        \addtolength\fitr@length{\fitr@@shift}%
+        \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
+            \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
+            \if\fitr@@refPt b%
+              \addtolength\fitr@length{-\artthrd@@addtoh bp}\else
+            \if\fitr@@refPt t%
+              \addtolength\fitr@length{\artthrd@@addtoh bp}%
+            \fi\fi
+            \raisebox{\fitr@length}%
+            {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
+            {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
+        }%
+    \fi
+\endgroup}
+\if@fitr@dvipdfm
+\def\ThrBbox#1#2{%
+    \fitr@length=#1bp
+    \fitr@length=2\fitr@length
+    \advance\fitr@length\wd\fitr@bbox
+    \edef\fitr@xetex@view@width{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\ht\fitr@bbox
+    \edef\fitr@xetex@view@height{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\dp\fitr@bbox
+    \edef\fitr@xetex@view@depth{\the\fitr@length}%
+}\else\ifx\fitr@driver\fitr@pdftex@driver
+\def\ThrBbox#1#2{%
+    \fitr@length=#1bp
+    \fitr@length=2\fitr@length
+    \advance\fitr@length\wd\fitr@bbox
+    \edef\fitr@pdftex@view@width{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\ht\fitr@bbox
+    \edef\fitr@pdftex@view@height{\the\fitr@length}%
+    \fitr@length=#2bp
+    \advance\fitr@length\dp\fitr@bbox
+    \edef\fitr@pdftex@view@depth{\the\fitr@length}%
+}\else\ifx\fitr@driver\fitr@dvipsone@driver
+\def\ThrBbox#1#2{%
+   currentpoint 2 copy %
+   \the\fitr@depth\space add #2\space PDFtoTeX add      % y1
+   exch #1\space PDFtoTeX sub exch                      % x1
+   4 2 roll exch
+   \the\fitr@width\space add #1\space PDFtoTeX add exch % x2
+   \the\fitr@height\space sub #2\space PDFtoTeX sub}    % y2
+\else\ifx\fitr@driver\fitr@dvips@driver
+\def\ThrBbox#1#2{% Uses \fitr@bbox
+    currentpoint 2 copy %
+    \the\fitr@depth\space SPtoDvips add
+        #2\space BPToDvips add                  % y1
+    exch #1\space BPToDvips sub exch            % x1
+    4 2 roll exch
+    \the\fitr@width\space SPtoDvips add
+        #1\space BPToDvips add exch             % x2
+    \the\fitr@height \space SPtoDvips sub
+    #2\space BPToDvips sub}                     % y2
+\fi\fi\fi\fi
+\def\setThre@d#1#2{%
+    \fitr@defaultbp{\aWd}{#1}\fitr@defaultbp{\aHt}{#2}%
+    \edef\tmp@exp{\noexpand\set@rtThrd{\aWd}{\aHt}}\tmp@exp
+}
+\if@fitr@dvipdfm
+\def\set@rtThrd#1#2{\ThrBbox{#1}{#2}%
+    \smash{\raisebox{-\fitr@xetex@view@height+#2bp}%
+        {\makebox[0pt][l]{\hspace*{-#1bp}%
+    \@pdfm@mark{thread @artthrd\CntArt\space
+    width \fitr@xetex@view@width\space
+    height \fitr@xetex@view@height\space
+    depth \fitr@xetex@view@depth\space
+    << /Title (\threadTitle)
+\ifnewarticle
+    /Author (\threadAuthor)
+    /Subject (\threadSubject)
+    /Keywords (\threadKeywords)
+\fi >>}}}}}\else\ifx\fitr@driver\fitr@pdftex@driver
+\def\set@rtThrd#1#2{\ThrBbox{#1}{#2}%
+    \makebox[0pt][l]{\hspace*{-#1bp}%
+    \pdfthread
+        width  \fitr@pdftex@view@width\space
+        height \fitr@pdftex@view@height\space
+        depth  \fitr@pdftex@view@depth\space
+     name {\threadTitle}}}\else
+\def\set@rtThrd#1#2{\literalps@out{\artM@rk
+    /Rect [\ThrBbox{\artthrd@@addtow}{\artthrd@@addtoh}]
+    /Title (\threadTitle)
+\ifnewarticle
+    /Author (\threadAuthor)
+    /Subject (\threadSubject)
+    /Keywords (\threadKeywords)
+\fi
+    /ARTICLE pdfmark}}
+\fi\fi
+\endinput
+%%
+%% End of file `artthreads.sty'.

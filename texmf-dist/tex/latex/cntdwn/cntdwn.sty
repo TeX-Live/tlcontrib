@@ -1,0 +1,84 @@
+%%
+%% This is file `cntdwn.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cntdwn.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% cntdwn package,            2010-8-2                  %%
+%% Copyright (C) 2010  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cntdwn}
+ [2014/11/26 v.6 countdown support (dps)]
+\RequirePackage{xkeyval}
+\def\cntdwn@defaultcode{\makeatletter
+    \InputIfFileExists{shrtcnt.def}{}\makeatother}
+\DeclareOptionX{shortcount}{%
+    \def\cntdwn@shrtcnt{\cntdwn@defaultcode}%
+}
+\let\cntdwn@shrtcnt\@empty
+\DeclareOptionX{longcount}{%
+    \def\cntdwn@lngcnt{\makeatletter
+        \InputIfFileExists{lngcnt.def}{}\makeatother}%
+}
+\let\cntdwn@lngcnt\@empty
+\ProcessOptionsX
+\ifx\cntdwn@shrtcnt\@empty
+    \ifx\cntdwn@lngcnt\@empty\AtEndOfPackage{\cntdwn@defaultcode}\else
+    \AtEndOfPackage{\cntdwn@lngcnt}\fi
+\else
+    \AtEndOfPackage{\cntdwn@defaultcode}
+    \ifx\cntdwn@lngcnt\@empty\else\AtEndOfPackage{\cntdwn@lngcnt}\fi
+\fi
+\@namedef{Time@timername}{Time}
+\def\cntdwn@namegdef#1{\expandafter\gdef\csname #1\endcsname}
+\def\cntdwn@namexdef#1{\expandafter\xdef\csname #1\endcsname}
+\let\cntdwnlTimers\@empty
+\let\cntdwnaTimers\@empty
+\newcommand{\cntdwnYear}{year}
+\newcommand{\cntdwnYears}{years}
+\newcommand{\cntdwnDay}{day}
+\newcommand{\cntdwnDays}{days}
+\newcommand{\cntdwnHour}{hour}
+\newcommand{\cntdwnHours}{hours}
+\newcommand{\cntdwnMinute}{minute}
+\newcommand{\cntdwnMinutes}{minutes}
+\newcommand{\cntdwnSecond}{second}
+\newcommand{\cntdwnSeconds}{seconds}
+\begin{insDLJS*}[_timerObjsLoaded]{cntdwncom}
+\begin{newsegment}{CntDwn: DLJS for the cntdwn Package}
+/*
+        Document Level JavaScript for cntdwn
+        D. P. Story copyright 2010
+*/
+var _timerObjsLoaded=true;
+\end{newsegment}
+\begin{newsegment}{CntDwn: Timer Objects}
+var _oTime = new Object;
+    _oTime.second=1000;
+    _oTime.minute=60*_oTime.second;
+    _oTime.hour=60*_oTime.minute;
+    _oTime.day=24*_oTime.hour;
+    _oTime.year = 365*_oTime.day;
+\cntdwnlTimers
+var aTimers = new Array();
+\cntdwnaTimers
+\end{newsegment}
+\end{insDLJS*}
+\begingroup
+\catcode`\_12
+\gdef\CDO{_o}
+\endgroup
+\endinput
+%%
+%% End of file `cntdwn.sty'.

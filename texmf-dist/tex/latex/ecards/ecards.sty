@@ -1,0 +1,560 @@
+%%
+%% This is file `ecards.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ecards.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ecards.sty package,                                  %%
+%% Copyright (C) 1999-2016  D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{ecards}
+  [2016/09/03 v2.0e eCards: An electronic flash cards package (dps)]
+\let\ec@YES=y \let\ec@NO=n
+\DeclareOption{memLogo}{\let\@memLogo\ec@YES}
+\let\@memLogo\ec@NO
+\DeclareOption{listing}{\ecListingtrue}
+\newif\ifecListing \ecListingfalse
+\DeclareOption{custom}{\let\@ecCustom\ec@YES}
+\let\@ecCustom\ec@NO
+\DeclareOption{nohints}{\def\opts@ecNoHints{nohint}%
+\def\defaultecNoHints{\useNoHints}\defaultecNoHints}
+\newif\ifisQues \isQuesfalse
+\def\useNoHints{\ifecListing\else\newpage\fi\ecUseNoHints}
+\def\ecUseNoHints{\ifisQues
+    \expandafter\def\else\expandafter\gdef\fi\opts@ecNoHints{nohint}%
+    \global\let\@ecNoHints\ec@YES
+    \gdef\hintDest{ex\exnoCard}\gdef\solnDest{ex\exnoCard.s}%
+    \gdef\hintDestJS{ex.\exnoCard}\gdef\quesDestJS{ex.\exnoCard}%
+}
+\def\useHints{\ifecListing\else\newpage\fi\ecUseHints}
+\def\ecUseHints{\ifisQues
+    \expandafter\def\else\expandafter\gdef\fi\opts@ecNoHints{hint}%
+    \global\let\@ecNoHints\ec@NO
+    \gdef\hintDest{ex\exnoCard}\gdef\solnDest{ex\exnoCard.s}%
+    \gdef\hintDestJS{ex.\exnoCard}\gdef\quesDestJS{qex.\exnoCard}%
+}
+\def\opts@ecNoHints{hint}
+\def\defaultecNoHints{\useHints}
+\defaultecNoHints
+\DeclareOption{notrandomized}{\def\israndomized{false}
+    \def\cbInitState{Off}}
+\def\israndomized{true}
+\def\cbInitState{randomOrder}
+\ProcessOptions
+\RequirePackage{web}
+\RequirePackage{exerquiz}[2016/04/18]
+\newcommand{\cardsFinishedMsg}[1]{\def\CARDSFINISHED{#1}}
+\cardsFinishedMsg{You've seen all the cards!}
+\textBgColor{cornsilk}
+\def\cardColor#1{\def\@cardColor{#1}}
+\def\hintColor#1{\def\@hintColor{#1}}
+\def\solnColor#1{\def\@solnColor{#1}}
+\cardColor{vlightblue}
+\hintColor{cornsilk}
+\solnColor{webyellow}
+\let\exnoCard\the@exno
+\let\web@rightheader\@empty
+\def\io#1{\immediate\write\@auxout{#1}}
+\def\endsolnexerhookaux{%
+    \ifnum\@panelconfig=0\relax
+        \immediate\write\verbatim@out
+            {\string\insNaviBar*{\hfil\string\NextCard\string\ %
+             \string\PrevCard\string\ \string\ToggleOrder\hfil}}%
+    \fi
+}
+\def\include@solutions{%
+    \let\webnewpage\relax
+    \immediate\closeout\ex@solns
+    \ifeq@nosolutions\else
+        \iftherearesolutions\newpage\markright{\exsecrunhead}%
+            \ifx\webnewpage\relax
+                \def\webnewpage{\let\webnewpage\newpage}%
+            \fi
+            \eqsolutionshook
+            \addcontentsline{toc}{section}
+                {\protect\numberline{}\exsectitle}%
+            \input{\jobname.sol}%
+        \fi
+    \fi
+}
+\AtEndDocument{\io{\string\gdef\string\totalCards{\exnoCard}}\clearpage}
+\def\theNumCards{\csname totalCards\endcsname}
+\let\ec@Zero=0 \let\ec@One=1 \let\ec@Two=2
+\def\ec@Ques{0}\def\ec@Hint{1}\def\ec@Soln{2}
+\def\nMarkerSet#1{\gdef\nMarker{#1}}
+\nMarkerSet\ec@Ques
+\def\ReturnTo#1#2{\eq@fititin#2}
+\renewcommand\exsecrunhead{}
+\renewcommand\exlabel{}
+\renewcommand\exsectitle{}
+\newcommand{\leadAnsFmtForPaper}{\textbf{Ans:\thinspace[}}
+\newcommand{\trailAnsFmtForPaper}{\textbf{]}}
+\def\math@correctAnswer{\unskip\ifeqforpaper\leadAnsFmtForPaper\fi
+    {\ttfamily\color{\@proofingsymbolColor}\spaceskip=2pt\xspaceskip=2pt
+    \expandafter\gobbleMacro\meaning\eqCorrectAns}%
+    \ifeqforpaper\trailAnsFmtForPaper\fi
+}
+\def\txt@correctAnswer{\unskip\ifeqforpaper\textbf{Ans:\thinspace[}\fi
+    {\ttfamily\color{\@proofingsymbolColor}%
+    \spaceskip=2pt\xspaceskip=2pt
+    \expandafter\gobbleTxt\meaning\rbTxtAlt}\ifeqforpaper\textbf{]}\fi
+}
+\newenvironment{multiChoice}[1]{\par
+    \if\nMarker\ec@Ques
+        \def\sqWrongRespJS{app.alert(\eqsqwgmsg,3);
+            this.gotoNamedDest("\hintDestJS");}%
+    \fi
+    \vskip-\baselineskip % dps
+    \begin{oQuestion}{\if\nMarker\ec@Ques\hintDest
+        \ifisHint.h\fi\else\solnDest\fi}%
+        \begin{answers}[\solnDest]{#1}%
+}{%
+        \end{answers}
+    \end{oQuestion}
+}
+\ifecListing
+    \ifeq@proofing
+        \everyRespBoxTxt{\Ff\FfReadOnly\BG{}\BC{}}
+        \everyRespBoxMath{\Ff\FfReadOnly\BG{}\BC{}}\else
+        \everyRespBoxTxt{\BG{1 1 1}}\everyRespBoxMath{\BG{1 1 1}}\fi
+\else
+    \everyRespBoxTxt{\BG{1 1 1}}\everyRespBoxMath{\BG{1 1 1}}
+\fi
+\newenvironment{fillIn}{%
+    \def\RespBoxTxtOnBlur{ecOnBlurRespBox(retn, \exnoCard, \nMarker);}%
+    \begin{oQuestion}{\if\nMarker\ec@Ques\hintDest\else\solnDest\fi}%
+}{\end{oQuestion}}
+\def\ec@isHint{hint}
+\def\ec@isNoHint{nohint}
+\def\ec@HintsWarning{\PackageWarning{ecards}
+    {The use of \string\useHints\space and \string\useNoHints
+    \MessageBreak is prohibited, ignoring this use}}
+\def\ec@BadArgWarning{\PackageWarning{ecards}
+    {The argument `\ec@rgi' is not an acceptable option.\MessageBreak
+    Will use `hint' instead}}
+\def\ecInfoToSolns{\string\def\string\exnoCard{\exnoCard}%
+    \string\def\string\solndest{\solnDest}%
+    \expandafter\string\ec@thisHintOpt
+    \string\nMarkerSet{\ec@Hint}\string\defineSoln}
+\newenvironment{card}[1][\opts@ecNoHints]{\newpage\isQuestrue
+    \let\useHints\ec@HintsWarning\let\useNoHints\ec@HintsWarning
+    \edef\ec@rgi{#1}\ifx\ec@rgi\ec@isHint
+        \def\ec@thisHintOpt{\ecUseHints}\else
+        \ifx\ec@rgi\ec@isNoHint
+            \def\ec@thisHintOpt{\ecUseNoHints}\else
+            \def\ec@thisHintOpt{\ecUseHints}%
+            \ec@BadArgWarning
+        \fi
+    \fi
+    \xdef\ecLoc@lSt@te{\ec@rgi}%
+    \ec@thisHintOpt\nMarkerSet\ec@Ques
+    \def\eqexheader{\noindent}%
+        \renewcommand\exsllabelformat{\protect\noindent}%
+    \renewcommand\exrtnlabelformat{}%
+    \renewcommand\exsecrunhead{}%
+    \let\afterlabelhskip\@empty
+    \def\exersolnheadhook{\ecInfoToSolns}%
+    \begin{exercise}
+        \textBgColor{\@cardColor}%
+        \headCard
+}{%
+        \tailCard
+    \end{exercise}%
+    \ifnum\@panelconfig=0\relax\aftergroup\cardNaviBar\fi
+}
+\def\ecAfterQuesSkip#1{{\setlength{\@tempdima}{#1}%
+    \xdef\ec@fterQuesSkip{\the\@tempdima}}}
+\ecAfterQuesSkip{.25in}
+\def\ecQuesWidth#1{\def\ec@QuesWidth{#1}}
+\ecQuesWidth{.85\linewidth}
+\def\ecSetQuesWidth{\setlength{\@tempdima}{\ec@QuesWidth}%
+    \edef\ec@QuesWidth{\the\@tempdima}}
+\newcommand{\ecQUESTION}{\textbf{QUESTION}}
+\newcommand{\headCard}{%
+    \vspace*{\stretch{.1}}%
+    \begin{center}\ecSetQuesWidth
+    \Large\ecQUESTION\par\vspace*{\ec@fterQuesSkip}%
+    \begin{minipage}{\ec@QuesWidth}%
+        \large\noindent\ignorespaces
+}
+\newcommand{\tailCard}{%
+    \end{minipage}
+    \end{center}
+    \par\vspace{\stretch{2}}%
+}
+\newenvironment{response}{\solnexer@woparts[]} %dps
+    {\endsolnexer@woparts}
+\newif\ifisHint \isHintfalse
+\newenvironment{hint}{%
+    \isHinttrue
+    \if\@ecNoHints\ec@YES\textBgColor{\@hintColor}\headHint
+    \centering\noHintProvided\tailHint\expandafter\ec@comment@hint
+    \else\expandafter\ec@hint\fi}{%
+    \if\@ecNoHints\ec@YES\expandafter\endec@comment@hint
+    \else\expandafter\endec@hint\fi}
+\newcommand{\noHintProvided}{No hint provided for this question.}
+\newenvironment{ec@comment@hint}{\comment}{%
+    \endcomment
+    \ifnum\@panelconfig=0\relax
+        \insNaviBar{\hfill\hintSoln\ \hintNextCard\ %
+        \PrevCard\ \ToggleOrder\hfill}\fi
+    \newpage\nMarkerSet{\ec@Soln}\noindent\hypertarget{\solndest}{}%
+}
+\newenvironment{ec@hint}{%
+    \textBgColor{\@hintColor}%
+    \headHint
+}{%
+    \tailHint
+    \ifnum\@panelconfig=0\relax
+        \insNaviBar{\hfill\hintSoln\ \hintNextCard\ %
+        \PrevCard\ \ToggleOrder\hfill}\fi
+    \newpage\nMarkerSet{\ec@Soln}\noindent\hypertarget{\solndest}{}%
+}
+\def\ecAfterHintSkip#1{{\setlength{\@tempdima}{#1}%
+    \xdef\ec@fterHintSkip{\the\@tempdima}}}
+\ecAfterHintSkip{.25in}
+\def\ecHintWidth#1{\def\ec@HintWidth{#1}}
+\ecHintWidth{.85\linewidth}
+\def\ecSetHintWidth{\setlength{\@tempdima}{\ec@HintWidth}%
+    \edef\ec@HintWidth{\the\@tempdima}}
+\newcommand{\ecHINT}{\textbf{HINT}}
+\newcommand{\headHint}{%
+    \vspace*{\stretch{.1}}%
+    \begin{center}\ecSetHintWidth
+        \Large\ecHINT\par\vspace*{\ec@fterHintSkip}%
+        \begin{minipage}{\ec@HintWidth}%
+        \large\noindent\ignorespaces
+}
+\newcommand{\tailHint}{%
+        \end{minipage}
+    \end{center}
+    \par\vspace{\stretch{2}}%
+}
+\newenvironment{answer}{%
+    \textBgColor{\@solnColor}%
+    \headAnswer
+}{\tailAnswer}
+\def\ecAfterAnsSkip#1{{\setlength{\@tempdima}{#1}%
+    \xdef\ec@fterAnsSkip{\the\@tempdima}}}
+\ecAfterAnsSkip{.25in}
+\def\ecAnsWidth#1{\def\ec@AnsWidth{#1}}
+\ecAnsWidth{.85\linewidth}
+\def\ecSetAnsWidth{\setlength{\@tempdima}{\ec@AnsWidth}%
+    \edef\ec@AnsWidth{\the\@tempdima}}
+\newcommand{\ecANS}{\textbf{ANSWER}}
+\newcommand{\headAnswer}{%
+    \vspace*{\stretch{.1}}%
+    \begin{center}\ecSetAnsWidth
+        \Large\ecANS\par\vspace*{\ec@fterAnsSkip}%
+        \begin{minipage}[t]{\ec@AnsWidth}%
+        \large\noindent\ignorespaces}
+\newcommand{\tailAnswer}{%
+        \end{minipage}
+    \end{center}
+    \vspace*{\stretch{2}}
+}
+\newcommand\iconWidth{40pt}\newcommand\iconHeight{15pt}
+\def\ecHomePage{\hyper@normalise\ec@HomePage}
+\def\ec@HomePage#1{\def\@ecHomePage{#1}}
+\ecHomePage{http://www.math.uakron.edu/~dpstory/acrotex.html}
+\def\ecLogo#1{\def\@ecLogo{#1}}
+\ecLogo{\includegraphics[scale=.4]{graphics/uakron}}
+\def\ecLogoLink{\hyper@normalise\ec@LogoLink}
+\def\ec@LogoLink#1{\def\@ecLogoLink{#1}}
+\let\@ecLogoLink\@empty
+\newcommand{\randomizedMsg}{The cards will be delivered
+    to you in random order.}
+\newcommand{\nonrandomizedMsg}{The cards will be delivered
+    to you in their natural order.}
+\newcommand{\toggleRandomizeTU}{%
+    Click to toggle between random and natural order.}
+\def\makeesc#1{\catcode`#1=0\relax}
+\begin{defineJS}{\fsJS}
+if (app.viewerVersion < 5.0)
+    app.fullscreen = !app.fullscreen
+else {
+    app.fs.cursor = cursor.visible;
+    app.fs.defaultTransition = "";
+    app.fs.useTimer = false;
+    app.fs.isFullScreen = !app.fs.isFullScreen;
+}
+\end{defineJS}
+\newcommand\noHintJSAction{}
+\def\NaviIconActionJS#1{\ifecListing
+    \if\nMarker\ec@Ques\else
+        this.gotoNamedDest("\quesDestJS");\fi
+    \else
+        #1;
+    \fi
+}
+\def\ec@defineLabel#1#2#3{\def#1{#2 #3}}
+\newcommand{\ecSolnLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@SolnLabel{#1}{#2}}
+\ecSolnLabel{Soln}
+\newcommand{\ecHintLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@HintLabel{#1}{#2}}
+\ecHintLabel{Hint}
+\newcommand{\ecNextLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@NextLabel{#1}{#2}}
+\ecNextLabel{Next}
+\newcommand{\ecPrevLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@PrevLabel{#1}{#2}}
+\ecPrevLabel{Prev}
+\newcommand{\ecHintNextLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@HintNextLabel{#1}{#2}}
+\ecHintNextLabel{Next}
+\newcommand{\ecHintSolnLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@HintSolnLabel{#1}{#2}}
+\ecHintSolnLabel{Soln}
+\newcommand{\ecBeginLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@BeginLabel{#1}{#2}}
+\ecBeginLabel{Begin}
+\newcommand{\ecHomeLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@HomeLabel{#1}{#2}}
+\ecHomeLabel{Home}
+\newcommand{\ecFinHomeLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@FinHomeLabel{#1}{#2}}
+\ecFinHomeLabel{Home}
+\newcommand{\ecFSLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@FSLabel{#1}{#2}}
+\ecFSLabel{FS}
+\newcommand{\ecCloseLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@CloseLabel{#1}{#2}}
+\ecCloseLabel{Close}
+\newcommand{\ecRandomLabel}[2][\footnotesize]
+    {\ec@defineLabel\ec@RandomLabel{#1}{#2}}
+\ecRandomLabel{Random}
+\newNaviIcon[j]{\Soln}\iconWidth\iconHeight{\ec@SolnLabel}
+    {\NaviIconActionJS{this.gotoNamedDest("\solnDest")}}
+\newNaviIcon[j]{\Hint}\iconWidth\iconHeight{\ec@HintLabel}
+    {\if\@ecNoHints\ec@YES\noHintJSAction\else
+        \NaviIconActionJS{this.gotoNamedDest("\hintDestJS")}\fi} % dps
+\newNaviIcon[j]{\NextCard}\iconWidth\iconHeight{\ec@NextLabel}
+    {\NaviIconActionJS{getNextCard()}}
+\newNaviIcon[j]{\PrevCard}\iconWidth\iconHeight{\ec@PrevLabel}
+    {\NaviIconActionJS{getPrevCard()}}
+\newNaviIcon[j]{\hintNextCard}\iconWidth\iconHeight
+    {\ec@HintNextLabel}{getNextCard();}
+\newNaviIcon[j]{\hintSoln}\iconWidth\iconHeight{\ec@HintSolnLabel}
+    {\NaviIconActionJS{this.gotoNamedDest("\solndest")}}
+\newNaviIcon[j]{\Begin}\iconWidth\iconHeight
+    {\ec@BeginLabel}{beginECards();}
+\newNaviIcon[l]{\Home}\iconWidth\iconHeight{\ec@HomeLabel}
+    {\ifnum\arabic{page}=1\relax\def\ec@next{\href{\@ecHomePage}}\else
+    \def\ec@next{\hyperlink{page.1}}\fi\ec@next}
+\newNaviIcon[j]{\Finished}\iconWidth\iconHeight{\ec@FinHomeLabel}
+    {resetToFirstPage();}
+\newNaviIcon[j]{\FullScreen}\iconWidth\iconHeight
+    {\ec@FSLabel}{\fsJS}
+\newNaviIcon[j]{\Close}\iconWidth\iconHeight{\ec@CloseLabel}
+    {closeCards=true; app.execMenuItem("Close")}
+\def\ec@CB@toggleOrder{%
+    \checkBox[\A{\JS{toggleOrder();}}\DV{\cbInitState}\V{\cbInitState}%
+    \TU{\toggleRandomizeTU}\textSize{0}\textColor{1 0 0}
+    \BC{0 0 .8}]{eccbtoggleorder}{9bp}{9bp}{randomOrder}}
+\providecommand{\nopNaviIcon}[4]{%
+    \def#1{{\setlength{\fboxsep}{0pt}%
+        \web@colorbox@w@transparency{\@menuBgColor}%
+        {\parbox[c][#3][c]{#2}%
+        {\normalsize\centering\color{\@menucolor}#4}}%
+    }}%
+}
+\nopNaviIcon{\fpToggleOrder}\iconWidth\iconHeight
+    {\ec@RandomLabel\space\ec@CB@toggleOrder}
+\nopNaviIcon{\ToggleOrder}\iconWidth\iconHeight
+    {\footnotesize\ec@CB@toggleOrder}
+\edef\@@Logo{\if\@memLogo\ec@YES\relax
+    \noexpand\unhcopy\noexpand\Logo\else\noexpand\@ecLogo\fi}
+\newcommand\iconWidthPanel{28pt}
+\newcommand\panelGrpWidth{57pt}
+\ifnum\@panelconfig>0\relax
+    \renewcommand\panelNaviGroup {%
+        \def\iconWidth{\iconWidthPanel}%
+        \ifnum\thepage=1\relax
+            \parbox[c]{\panelGrpWidth}
+            {%
+                \Begin\hfill\FullScreen\\
+                \Close\hfill\Home\\
+                \let\iconWidth\linewidth
+                \fpToggleOrder
+            }%
+            \else
+            \parbox[c]{\panelGrpWidth}
+            {%
+                {\ifecListing\else\if\nMarker\ec@Ques
+                    \if\@ecNoHints\ec@YES
+                        \navibarTextColor{lightblue}\fi
+                 \else
+                    \navibarTextColor{lightblue}\fi\fi\Hint}\hfill
+                {\if\nMarker\ec@Soln
+                    \navibarTextColor{lightblue}\fi\Soln}\\
+                \NextCard\hfill\PrevCard\\
+                \ToggleOrder\hfill\Finished
+            }%
+        \fi
+    }
+    \newbox\Logo
+    \if\@memLogo\ec@YES\relax
+        \AtBeginDocument{\global\setbox\Logo=\hbox{\@ecLogo}}%
+    \fi
+\def\raiseLogoBy#1{{\setlength\@tempdima{#1}%
+    \xdef\r@iseLogoBy{\the\@tempdima}}}\raiseLogoBy{0pt}
+    \buildpanel{\raisebox{\r@iseLogoBy}{\ifx\@ecLogoLink\@empty\@@Logo
+        \else\href{\@ecLogoLink}{\@@Logo}\fi}%
+        \par\vspace{\stretch{1}}%
+        \rotatebox{-90}{\aebLogo}%
+        \par\vspace{\stretch{1}}%
+        \panelNaviGroup
+    }
+    \def\defineSoln{\newNaviIcon[j]{\Soln}\iconWidth\iconHeight
+        {\ec@SolnLabel}{%
+        \NaviIconActionJS{this.gotoNamedDest("\solndest")}}%
+        \def\sqWrongRespJS{app.alert(\eqsqwgmsg,3);
+            this.gotoNamedDest("\solndest");}%
+    }
+\else
+    \def\cardNaviBar{\insNaviBar{\hfill
+        \if\@ecNoHints\ec@NO\Hint\ \fi\Soln\ \NextCard\
+            \PrevCard\ \ToggleOrder\ \Home\hfill}}
+    \def\defineSoln{\newNaviIcon[j]{\Soln}\iconWidth\iconHeight
+        {\ec@SolnLabel}{%
+        \NaviIconActionJS{this.gotoNamedDest("\solndest")}}%
+        \def\sqWrongRespJS{app.alert(\eqsqwgmsg,3);
+            this.gotoNamedDest("\solndest");}%
+    }
+\fi
+\newcommand{\pressBeginMsg}{Press the \eqbs\eqbs"Begin\eqbs\eqbs"
+    button to begin viewing the cards.}
+\ifecListing\else
+\thisPageAction{\JS{}}{\JS{if (!closeCards&&!beginPressed){\jsR\jsT
+    var b=app.setTimeOut("this.pageNum=0;
+        app.alert(pressBeginMsg);",50);\jsR}}}
+\fi
+\let\importdljs=y
+\begin{insDLJS}[isCardloaded]{flashcrd}{Flash Card JS}
+var isCardloaded=true;
+var closeCards=false;
+var beginPressed=false;
+var maxNumberCards = Math.pow(10,Math.ceil(%
+Math.LOG10E*Math.log(\theNumCards)));
+var aCardsNaturalOrder=new Array();
+var aCardsRandomOrder=new Array();
+var aCardsViewOrder;
+var ptrCards=0;
+var cardsFinished = "\CARDSFINISHED";
+var pressBeginMsg = "\pressBeginMsg";
+var isRandomized=\israndomized;
+function getNextCard() {
+    numCards = \theNumCards;
+    if ( ptrCards == numCards ) {
+        app.alert(cardsFinished,3);
+        resetToFirstPage();
+    } else {
+        ptrCards+=1;
+        this.gotoNamedDest("qex."+aCardsViewOrder[ptrCards]);
+    }
+}
+function getPrevCard() {
+    if ( ptrCards <= 1 ) {
+        resetToFirstPage();
+    } else {
+        ptrCards-=1;
+        this.gotoNamedDest("qex."+aCardsViewOrder[ptrCards]);
+    }
+}
+function ecOnBlurRespBox (retn, exnoCard, nMarker) {
+    if (retn != null) {
+        if (retn) {
+            app.alert(\eqsqrtmsg,3);
+            var dest = "ex" + exnoCard + ".s"; // dps
+            this.gotoNamedDest(dest);
+        } else {
+            app.alert(\eqsqwgmsg,3);
+            if (nMarker==0) {
+                var dest = "ex." + exnoCard; // dps
+                this.gotoNamedDest(dest);
+            }
+            else {
+                var dest = "ex" + exnoCard + ".s"; // dps
+                this.gotoNamedDest(dest);
+            }
+        }
+    } else {
+        var str = event.target.value.toString();
+        if (str.replace(/\s/g,"") == "")
+        event.target.strokeColor = \defaultColorJSDef; // dps
+    }
+}
+function beginECards() {
+    PrepareViewingOrder();
+    beginPressed=true;
+    getNextCard();
+    var f, g, bState;
+    f=this.getField("eccbtoggleorder");
+    bState=f.isBoxChecked(0);
+    this.resetForm();
+    f.checkThisBox(0,bState);
+    for (var card=1; card<=\theNumCards; card++) {// dps
+        f = this.getField("obj.ex"+card);
+        if ( f != null ) {
+            g = f.getArray();
+            for (var i = 0; i < g.length; i++)
+                g[i].strokeColor  = \defaultColorJSDef; // dps
+        }
+    }
+}
+function PrepareViewingOrder() {
+    ptrCards=0;
+    var i, rand;
+    for (i=0; i<=\theNumCards; i++) {
+        aCardsNaturalOrder[i]=i;
+        aCardsRandomOrder[i]=i;
+    }
+    for (i=1; i<=\theNumCards; i++) {
+        var rand = Math.random();
+        rand *= maxNumberCards;
+        rand = Math.ceil(rand);
+        rand = rand \% \theNumCards;
+        rand += 1;
+        temp = aCardsRandomOrder[i];
+        aCardsRandomOrder[i]=aCardsRandomOrder[rand];
+        aCardsRandomOrder[rand]=temp;
+    }
+    aCardsViewOrder=(isRandomized)?aCardsRandomOrder:aCardsNaturalOrder;
+}
+function toggleOrder() {
+    isRandomized=!isRandomized;
+    if (aCardsNaturalOrder.length==0) PrepareViewingOrder();
+    if (isRandomized) {
+        for (var i=1; i<=\theNumCards; i++)
+            if (aCardsRandomOrder[i]==ptrCards) break;
+        ptrCards=i;
+        aCardsViewOrder=aCardsRandomOrder;
+        app.alert("\randomizedMsg");
+    } else {
+        ptrCards=aCardsViewOrder[ptrCards];
+        aCardsViewOrder=aCardsNaturalOrder;
+        app.alert("\nonrandomizedMsg");
+    }
+}
+function resetToFirstPage() {
+    this.gotoNamedDest("page.1");
+    beginPressed=false;
+}
+\end{insDLJS}
+\ifecListing\input{ecardslist.def}\fi
+\if\@ecCustom\ec@YES\InputIfFileExists{ecard.cus}{}{}\fi
+\endinput
+%%
+%% End of file `ecards.sty'.

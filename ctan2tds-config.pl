@@ -11,5 +11,6 @@ $special{'verdana'}     = '&donormal';
 $special{'lucidabr'}    = '&donormal';
 $special{'lucold'}      = '&MAKEflatten';
 $special{'futurans'}    = '&donormal';
+$special{'pcarl'}       = '&donormal';
 $special{'mathstone'}   = '&MAKEflatten';
 

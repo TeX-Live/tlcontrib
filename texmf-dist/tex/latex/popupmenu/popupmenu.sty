@@ -1,0 +1,83 @@
+%%
+%% This is file `popupmenu.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% popupmenu.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% popupmenu.sty package,           2009-10-15          %%
+%% Copyright (C) 2009  D. P. Story                      %%
+%%   dpstory@acrotex.net                                %%
+%%   storyd@nwfsc.edu                                   %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{popupmenu}
+ [2010/09/18 v1.0 Provides support for popup menus (dps)]
+\RequirePackage{xkeyval}
+\define@key{menustruct}{title}[]{\def\menustruct@title{#1}}
+\define@boolkey{menustruct}{marked}[true]{}
+\define@boolkey{menustruct}{enabled}[true]{}
+\define@key{menustruct}{return}[]{\def\menustruct@return{#1}}
+\let\pum@holdtoks\@empty
+\newcommand{\@AddToMenuToks}{\g@addto@macro\pum@holdtoks}
+\newcount\pum@cnt
+\def\pum@updateindex{\global\advance\pum@cnt\@ne
+   \edef\pum@rc{\pum@topindex[\the\pum@cnt]}\edef\itemindex{'\pum@rc'}}
+\def\pum@initIndexMenu#1{\global\pum@cnt=-1\relax\edef\pum@rc{#1}%
+   \edef\pum@topindex{\pum@rc}}
+\newenvironment{popupmenu}[1]{\pum@initIndexMenu{}%
+    \let\pum@holdtoks\@empty
+    \toks@={\pum@mytab}\@makeother\~
+    \gdef\msarg{#1}\@AddToMenuToks{\@gobble}%
+    \let\item\pum@item
+}{%
+    \expandafter\xdef\csname\msarg\endcsname{%
+        var \msarg\space = [ \pum@holdtoks^^J];}%
+}
+\newcommand{\pum@item}[1]{\pum@updateindex
+    \edef\tmp@exp{\noexpand
+    \setkeys{menustruct}{title,marked=false,enabled,return,#1}}\tmp@exp
+    \edef\tmp@exp{,^^J\the\toks@
+        {cName: "\menustruct@title"%
+        \ifKV@menustruct@marked, bMarked: true\fi%
+     \ifKV@menustruct@enabled\else, bEnabled: false\fi%
+     \ifx\menustruct@return\@empty\else,
+     cReturn: "\menustruct@return"\fi}}%
+     \expandafter\@AddToMenuToks\expandafter{\tmp@exp}%
+}
+\begingroup
+\catcode`<=1 \catcode`\>=2 \@makeother\{ \@makeother\}
+\gdef\pum@lbrace<{>\gdef\pum@rbrace<}>
+\endgroup
+\def\pum@mytab{\space\space\space\space}
+\newenvironment{submenu}[1]{\pum@updateindex
+    \xdef\saved@pum@cnt{\the\pum@cnt}%
+    \pum@initIndexMenu{\pum@rc.oSubMenu}\edef\temp@toks{\the\toks@}%
+    \toks@=\expandafter{\temp@toks\pum@mytab}%
+    \setkeys{menustruct}{title,marked=false,enabled,return,#1}%
+    \edef\tmp@exp{,^^J\the\toks@
+        \noexpand\pum@lbrace cName: "\menustruct@title"%
+        \ifKV@menustruct@marked, bMarked: true\fi%
+        \ifKV@menustruct@enabled\else, bEnabled: false\fi,
+        oSubMenu:^^J\the\toks@[}%
+     \expandafter\@AddToMenuToks\expandafter{\tmp@exp\@gobble}%
+}{%
+    \edef\tmp@exp{^^J\the\toks@ ]\pum@rbrace}%
+    \expandafter\@AddToMenuToks\expandafter{\tmp@exp}%
+    \global\pum@cnt\saved@pum@cnt
+}
+\def\popUpMenu(#1){app.popUpMenuEx.apply( app, #1 )}
+\providecommand{\urlPath}[1]{\def\pum@urlName{#1}%
+    \hyper@normalise\pum@urlPath}
+\def\pum@urlPath#1{\expandafter\xdef\pum@urlName{#1}}
+\endinput
+%%
+%% End of file `popupmenu.sty'.

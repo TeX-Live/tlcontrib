@@ -1,0 +1,366 @@
+%%
+%% This is file `richtext.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% richtext.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% richtext package,                                    %%
+%% Copyright (C) 2016  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{richtext}
+ [2016/10/03 v1.0c richtext: create rich text strings (dps)]
+\RequirePackage{xkeyval}
+\RequirePackage{ifxetex}[2006/08/21]
+\newif\ifrt@formfield \rt@formfieldtrue
+\newif\ifrt@needsbody\rt@needsbodyfalse
+\@ifpackageloaded{eforms}%
+    {\ifxetex\let\@eqV\@eqnuV\fi}{\rt@needsbodytrue}
+\providecommand\eq@RV@Body{<?xml version="1.0"?><body %
+    xfa:APIVersion="Acroform:2.7.0.0" %
+    xfa:contentType="text/html" %
+    xfa:spec="2.1" xmlns="http://www.w3.org/1999/xhtml" %
+    xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">}
+\providecommand\eq@RV@endBody{</body>}
+\def\rt@bBody{\ifrt@needsbody\eq@RV@Body\fi}
+\def\rt@eBody{\ifrt@needsbody\eq@RV@endBody\fi}
+\newif\ifrtfontstyle\rtfontstylefalse
+\define@key{rtFont}{font}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@font\@empty\else\rtfontstyletrue
+        \def\rf@font{font-family:#1}\fi}
+\define@key{rtFont}{size}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@size\@empty\else\rtfontstyletrue\def\rf@size@num{#1}%
+        \def\rf@size@pt{#1pt}\def\rf@size{font-size:#1pt}\fi}
+\def\rf@size@num{12}\def\rf@size@pt{12pt}
+\define@key{rtFont}{raise}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@raise\@empty\else\rtfontstyletrue
+        \def\rf@raise{vertical-align:#1pt}\fi}
+\define@choicekey+{rtFont}{ulstyle}[\val\nr]%
+    {none,ul,2ul,wul,2wul}[none]{%
+    \ifcase\nr\relax
+        \def\rf@ul{none}\or
+        \def\rf@ul{underline}\or
+        \def\rf@ul{double}\or
+        \def\rf@ul{word}\or
+        \def\rf@ul{double word}\fi
+    \rtfontstyletrue
+}{}
+\def\rt@r{r}\let\rt@One=1 \let\rt@Zero=0
+\def\rt@parseColor#1(#2\@nil{\def\rt@argi{#2}\ifx\rt@argi\@empty
+\let\rt@rgbdec\rt@Zero\else\let\rt@rgbdec\rt@One\fi}
+\def\rt@gobbletonil#1\@nil{}
+\bgroup\@makeother\#\@makeother\&%
+\gdef\rt@hashtag{#}\gdef\rt@amp{&}\egroup
+\define@key{rtFont}{color}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@color\@empty\else\rtfontstyletrue
+    \rt@parseColor#1(\@nil
+    \if\rt@rgbdec\rt@One
+        \def\rf@color{color:#1}\else
+        \def\rf@color{color:\rt@hashtag#1}\fi
+\fi}
+\let\rf@color\@empty
+\define@key{rtFont}{url}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rt@url\@empty\else\rtfontstyletrue\def\rt@url{#1}\fi}
+\define@choicekey+{rtFontStyle}{bold}[\val\nr]{normal,bold}[bold]%
+    {\edef\rfS@bold{\val}}{}
+\define@choicekey+{rtFontStyle}{italic}[\val\nr]{normal,italic}[italic]%
+    {\edef\rfS@italic{\val}}{}
+\define@key{rtFontStyle}{strikeit}[]{\def\rfS@strikeit{line-through}}
+\let\rfS@normal\@empty\let\rfS@bold\@empty
+\let\rfS@italic\@empty\let\rfS@strikeit\@empty
+\define@key{rtFont}{style}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@style\@empty\else\rtfontstyletrue\def\rf@style{#1}\fi}
+\define@key{rtFont}{raw}[]{\def\rt@argi{#1}\ifx\rt@argi\@empty
+    \let\rf@raw\@empty\else\rtfontstyletrue\def\rf@raw{#1}\fi}
+\def\resetRtFontKeys{% rtFont family
+    \let\rf@font\@empty\let\rf@size\@empty
+    \let\rf@raise\@empty\let\rf@ul\@empty
+    \let\rf@color\@empty\let\rf@style\@empty\let\rt@url\@empty
+    \let\rf@raw\@empty
+    % rtFontStyle family
+    \let\rfS@normal\@empty\let\rfS@bold\@empty
+    \let\rfS@italic\@empty\let\rfS@strikeit\@empty
+    \rtfontstylefalse}
+\resetRtFontKeys
+\newcommand{\@AddToRichText}{\g@addto@macro\rt@RichText}
+\newcommand{\@AddToPlainText}{\g@addto@macro\rt@PlainText}
+\def\rt@excl{!}
+\def\rt@csarg#1#2{\expandafter#1\csname#2\endcsname}
+\newcommand{\useRV}[1]{\@nameuse{#1-ri}}
+\newcommand{\useV}[1]{\@nameuse{#1-pl}}
+\newif\if@rvstring \@rvstringfalse
+\def\rvorvstring{\if@rvstring
+     \expandafter\@firstoftwo
+   \else
+     \expandafter\@secondoftwo
+   \fi
+}
+\def\rt@sub#1{\rvorvstring{<sub>#1</sub>}{#1}}
+\def\rt@sup#1{\rvorvstring{<sup>#1</sup>}{#1}}
+\def\rt@br{\rvorvstring{<br />}{\string\r}}
+\def\rt@bf#1{\rvorvstring{<b>#1</b>}{#1}}
+\def\rt@it#1{\rvorvstring{<i>#1</i>}{#1}}
+\def\rt@spc{\rvorvstring{<span style="xfa-spacerun:yes">\rt@amp
+        \rt@hashtag160\rt@SC</span>}{ }}
+\def\rt@SC{;}\def\rt@CN{:}\def\rt@fs{font-style}\def\rt@fw{font-weight}
+\def\rt@td{text-decoration}
+\def\rt@remove@span#1#2{#2}
+\def\rt@StyleAttr{\ifx\rf@font\@empty\else\rf@font\rt@SC\fi
+    \ifx\rf@size\@empty\else\rf@size\rt@SC\fi
+    \ifrt@formfield\ifx\rf@raise\@empty\else\rf@raise\rt@SC\fi\fi
+    \ifx\rf@ul\@empty\ifx\rfS@strikeit\@empty\else
+        \rt@td\rt@CN\rfS@strikeit\rt@SC\fi
+    \else\rt@td\rt@CN\rf@ul\ifx\rfS@strikeit\@empty\else\space
+        \rfS@strikeit\fi\rt@SC\fi
+    \ifx\rfS@bold\@empty\else\rt@fw\rt@CN\rfS@bold\rt@SC\fi
+    \ifx\rfS@italic\@empty\else\rt@fs\rt@CN\rfS@italic\rt@SC\fi
+    \ifx\rf@color\@empty\else\rf@color\rt@SC\fi
+    \ifx\rf@raw\@empty\else\rf@raw\fi}
+\let\rt@afterFont\relax
+\newcommand\rt@span[2]{\resetRtFontKeys
+    \edef\x{\noexpand\setkeys{rtFont}{#1}}\x\rt@afterFont
+    \edef\x{\noexpand\setkeys{rtFontStyle}{\rf@style}}\x
+    \edef\rt@Style@ttr{\rt@StyleAttr}%
+    \ifx\rt@url\@empty
+        \ifx\rt@StyleAttr\@empty\def\x{#2}\else
+        \edef\x{<span\ifrtfontstyle\space
+        style="\rt@Style@ttr"\fi>#2</span>}\fi
+    \else
+        \ifx\rt@StyleAttr\@empty\edef\x{<a href="\rt@url">#2</a>}\else
+        \edef\x{<a href="\rt@url"
+        \ifrtfontstyle style="\rt@Style@ttr">#2</a>\fi}\fi
+    \fi
+}
+\define@choicekey+{rtPara}{halign}[\val\nr]%
+    {left,center,right,justify}[left]{%
+    \ifcase\nr\relax
+        \def\rt@halign{text-align:left}\or
+        \def\rt@halign{text-align:center}\or
+        \def\rt@halign{text-align:right}\or
+        \def\rt@halign{text-align:justify}\fi
+    \rtfontstyletrue
+}{}
+\define@choicekey+{rtPara}{valign}[\val\nr]{top,middle,bottom}[top]{%
+    \ifcase\nr\relax
+        \def\rt@valign{text-valign:top}\or
+        \def\rt@valign{text-valign:middle}\or
+        \def\rt@valign{text-valign:bottom}\fi
+    \rtfontstyletrue
+}{}
+\let\rt@halign\@empty\let\rt@valign\@empty
+\define@key{rtPara}{margleft}{\def\rt@margleft{margin-left:#1pt}}
+\define@key{rtPara}{margright}{\def\rt@margright{margin-right:#1pt}}
+\define@choicekey+{rtPara}{indent}[\val\nr]{none,first,hanging}[none]{%
+    \edef\rt@indenttype{\nr}%
+}{}
+\define@key{rtPara}{indentby}[12]{\def\rt@indentby{#1pt}}
+\let\rt@margleft\@empty\let\rt@margright\@empty
+\def\rt@indenttype{0}\def\rt@indentby{12pt}
+\define@key{rtPara}{margtop}[0]{\def\rt@margtop{#1pt}}
+\define@key{rtPara}{margbottom}[0]{\def\rt@margbottom{#1pt}}
+\def\rt@margtop{0pt}\def\rt@margbottom{0pt}
+\define@choicekey{rtPara}{linespacing}[\val\nr]%
+    {single,oneandhalf,double,exact}[single]{%line-height
+        \edef\rt@linespacingtype{\nr}%
+        \ifcase\nr
+            \let\rt@linesp\@empty\or
+            \setlength{\@tempdima}{1.8pt*\rf@size@num}%
+            \edef\rt@linesp{\the\@tempdima}\or
+            \setlength{\@tempdima}{2.4pt*\rf@size@num}%
+            \edef\rt@linesp{\the\@tempdima}\or
+            \def\rt@linesp{\rf@size@pt}\fi
+}{}
+\let\rt@linesp\@empty\def\rt@linespacingtype{0}
+\define@key{rtPara}{lineheight}[]{\def\rt@lineheight{#1pt}}
+\let\rt@lineheight\@empty
+\def\rtp@ti{text-indent}\def\rtp@mt{margin-top}
+\def\rtp@mb{margin-bottom}\def\rtp@lh{line-height}
+\def\rt@ParaAttr{%
+    \ifx\rt@halign\@empty\else\rt@halign\rt@SC\fi
+\ifrt@formfield
+    \ifx\rt@valign\@empty\else\rt@valign\rt@SC\fi
+    \ifx\rt@margleft\@empty\else\rt@margleft\rt@SC\fi
+    \ifx\rt@margright\@empty\else\rt@margright\rt@SC\fi
+    \ifcase\rt@indenttype\space\or
+        \rtp@ti\rt@CN\rt@indentby\rt@SC\or
+        \rtp@ti\rt@CN-\rt@indentby\rt@SC\fi
+    \rtp@mt\rt@CN\rt@margtop\rt@SC\rtp@mb\rt@CN\rt@margbottom\rt@SC
+    \ifx\rt@linesp\@empty\else
+        \if\rt@linespacingtype3%
+            \ifx\rt@lineheight\@empty
+                \rtp@lh\rt@CN\rt@linesp\rt@SC
+            \else
+                \rtp@lh\rt@CN\rt@lineheight\rt@SC
+            \fi
+        \else
+            \rtp@lh\rt@CN\rt@linesp\rt@SC
+        \fi
+    \fi
+\fi
+}
+\begingroup
+\catcode`\@=0 @catcode`@\=12
+@gdef@rtbs{\}
+@endgroup
+\def\rt@cs#1{\rvorvstring{\rtbs\rtbs#1}{\string\134#1}}
+\let\rt@afterParaFont\relax
+\def\rt@dir{ dir="ltr"}
+\newcommand\rtpara[2][]{\begingroup
+    \setkeys{rtPara,rtFont}{#1}\rt@afterParaFont
+    \edef\rt@Para@ttr{\rt@ParaAttr\rt@StyleAttr}%
+    \global\let\rt@RichText\@empty
+    \global\let\rt@PlainText\@empty
+    \def\rt@ctrlName{#2}%
+    \def\{{\string\{}\def\}{\string\}}%
+    \def\1{\string\1}\def\2{\string\2}\def\3{\string\3}%
+    \@makeother\$\@makeother\#\@makeother\^\@makeother\_\@makeother\~%
+    \@makeother\&\def\&{\rvorvstring{\string&amp;}{\string&}}% req
+    \@makeother\<\def\<{\rvorvstring{\string&lt;}{\string<}}% req
+    \@makeother\>\def\>{\rvorvstring{\string&gt;}{\string>}}%
+    \@makeother\'\def\'{\rvorvstring{\string&apos;}{\string'}}%
+    \@makeother\"\def\"{\rvorvstring{\string&quot;}{\string"}}%
+    \let\cs\rt@cs
+    \rtpara@cont}
+\def\rtpara@cont#1{%
+    \let\sup\rt@sup\let\sub\rt@sub
+    \let\br\rt@br\let\bf\rt@bf\let\it\rt@it
+    \let\spc\rt@spc
+    \let\span\rt@remove@span
+    \@rvstringfalse
+    \edef\x{#1}\expandafter\@AddToPlainText\expandafter{\x}%
+    \let\span\relax
+    \@rvstringtrue
+    \rtpara@i#1\span!;\endgroup}
+\def\rtpara@i#1\span#2;{\def\argii{#2}%
+    \g@addto@macro\rt@RichText{#1}%
+    \ifx\argii\rt@excl
+        \rt@csarg\xdef{\rt@ctrlName-ri}%
+            {%
+                <p\rt@dir\ifx\rt@Para@ttr\@empty\else\space
+                    style="\rt@Para@ttr"\fi>\rt@RichText</p>%
+             }%
+        \rt@csarg\xdef{\rt@ctrlName-pl}{\rt@PlainText}%
+        \let\rt@next\relax
+    \else
+        \def\rt@next{\rtpara@ii#2;}%
+    \fi
+\rt@next}
+\def\rtpara@ii#1#2#3;{\def\argii{#2}%
+    \ifx\argii\rt@excl
+        \let\rt@next\relax
+    \else
+        \let\span\rt@span
+        \let\br\rt@br\let\bf\rt@bf\let\it\rt@it
+        \@rvstringtrue
+        \span{#1}{#2}\edef\rt@tmp{\noexpand\g@addto@macro
+            \noexpand\rt@RichText{\x}}\rt@tmp
+        \rt@csarg\xdef{\rt@ctrlName-ri}%
+            {%
+                <p\rt@dir\ifx\rt@Para@ttr\@empty\else\space
+                    style="\rt@Para@ttr"\fi>\rt@RichText</p>%
+             }%
+        \rt@csarg\xdef{\rt@ctrlName-pl}{\rt@PlainText}%
+        \let\span\relax
+    \def\rt@next{\rtpara@i#3;}%
+    \fi\rt@next}
+\rt@csarg\def{par-ri}{}\rt@csarg\def{par-pl}{\string\r}
+\rt@csarg\def{skipline-ri}%
+    {<p><span style="xfa-spacerun:yes">\rt@amp
+        \rt@hashtag160;</span></p>}
+\rt@csarg\def{skipline-pl}{\string\r\space}
+\def\rt@skipline{skipline}
+\rt@csarg\def{br-ri}{}\rt@csarg\def{br-pl}{\string\r}
+\def\rt@DSAttr{\ifx\rf@font\@empty\else\rf@font\rt@SC\fi
+    \ifx\rf@size\@empty\else\rf@size\rt@SC\fi
+    \ifx\rf@raise\@empty\else\rf@raise\rt@SC\fi
+    \ifx\rf@ul\@empty\ifx\rfS@strikeit\@empty\else
+        \rt@td\rt@CN\rfS@strikeit\rt@SC\fi
+    \else\rt@td\rt@CN\rf@ul\ifx\rfS@strikeit\@empty\else\space
+        \rfS@strikeit\fi\rt@SC\fi
+    \ifx\rfS@bold\@empty\else\rt@fw\rt@CN\rfS@bold\rt@SC\fi
+    \ifx\rfS@italic\@empty\else\rt@fs\rt@CN\rfS@italic\rt@SC\fi
+    \ifx\rf@color\@empty\else\rf@color\rt@SC\fi}
+\newcommand\useDefaultDS{font-family:Helvetica,sans-serif;%
+    font-size:12.0pt;font-style:normal;font-weight:normal;%
+    text-align:left;color:\rt@hashtag000000}
+\newcommand{\setDefaultStyle}[2]{\begingroup
+    \edef\x{\noexpand\setkeys{rtFont}{#2}}\x
+    \edef\x{\noexpand\setkeys{rtFontStyle}{\rf@style}}\x
+    \ifx\rf@ul\@empty\else
+        \let\rt@ul\@empty\PackageWarning{richtext}{%
+            The ul key is not supported within\MessageBreak
+            \string\setDefaultStyle. Ignoring it}\fi
+    \ifx\rf@raise\@empty\else
+        \let\rt@raise\@empty\PackageWarning{richtext}{%
+            The raise key is not supported within\MessageBreak
+            \string\setDefaultStyle. Ignoring it}\fi
+    \ifx\rt@url\@empty\else\let\rf@url\@empty
+        \PackageWarning{richtext}{%
+            The url key is not supported within\MessageBreak
+            \string\setDefaultStyle. Ignoring it}\fi
+     \ifx\rf@font\@empty
+        \def\rf@font{font-family:Helvetica,sans-serif}\fi
+     \ifx\rf@size\@empty\def\rf@size{font-size:\rf@size@pt}\fi
+     \ifx\rf@color\@empty\def\rf@color{color:\rt@hashtag000000}\fi
+    \rt@csarg\xdef{#1-DS}{\rt@DSAttr}%
+\endgroup}
+\newcommand{\useDS}[1]{\@nameuse{#1-DS}}
+\newif\ifrt@firsttok \rt@firsttoktrue
+\newif\ifrt@itsskipline \rt@itsskiplinefalse
+\def\rt@addtoRVV#1{%
+    \toks4={\useRV{#1}}\edef\rt@tmpRV{\the\toks0\the\toks4}%
+    \toks4={\useV{#1}}\edef\rt@tmpV{\the\toks2\the\toks4}%
+    \toks0=\expandafter{\rt@tmpRV}\toks2=\expandafter{\rt@tmpV}%
+}
+\def\rt@testifbgroup{\@ifnextchar\bgroup
+    {\let\rt@nultiargs=1\rt@gobbletonil}
+    {\let\rt@nultiargs=0\rt@gobbletonil}}
+\newcommand{\setRVVContent}[2]{\begingroup
+    \rt@firsttoktrue \rt@itsskiplinefalse
+    \rt@testifbgroup#2\@nil
+    \def\contName{#1}\toks0={}\toks2={}\toks4={}%
+    \if\rt@nultiargs1\def\rt@next{\setRVVContent@i#2;}\else
+    \def\rt@next{\setRVVContent@i{#2};}\fi\rt@next}
+\def\setRVVContent@i#1{\def\rt@argi{#1}%
+    \ifx\rt@argi\rt@SC
+        \rt@csarg\xdef{\contName-vcont}{\the\toks0}%
+        \rt@csarg\xdef{\contName-pcont}{\the\toks2}%
+        \let\rt@next\endgroup
+    \else
+        \expandafter\ifx\csname #1-ri\endcsname\relax
+            \PackageWarning{richtext}
+            {The name '#1' is not declared,\MessageBreak
+            will ignore it. Check the spelling}%
+            \def\rt@next{\setRVVContent@i}%
+        \else
+            \ifrt@firsttok\rt@firsttokfalse\else
+                \ifx\rt@argi\rt@skipline
+                    \rt@itsskiplinetrue
+                \else
+                    \ifrt@itsskipline
+                        \rt@addtoRVV{br}\rt@itsskiplinefalse
+                    \else
+                        \rt@addtoRVV{par}%
+                    \fi
+                \fi
+            \fi
+            \rt@addtoRVV{#1}%
+            \def\rt@next{\setRVVContent@i}%
+        \fi
+    \fi\rt@next
+}
+\def\useRVContent#1{\@nameuse{#1-vcont}}
+\def\useVContent#1{\@nameuse{#1-pcont}}
+\endinput
+%%
+%% End of file `richtext.sty'.

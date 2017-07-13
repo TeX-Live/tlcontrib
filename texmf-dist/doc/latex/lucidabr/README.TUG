@@ -1,0 +1,135 @@
+To install the Lucida font distribution from TUG:
+
+1) download the zip file from TUG via the url given to you after ordering.
+
+2) change directories to a suitable texmf hierarchy; your "local texmf"
+   tree is the best choice.  More info below(*).
+
+3) unzip the archive as retrieved.  It unpacks into subdirectories
+   fonts/, tex/, and so on.  These directories will probably already
+   exist if you already have a local texmf tree; that's ok.  You must
+   use an unzip program or settings which does *not* create any
+   top-level directory of its own (such as "lucida-complete/"), but just
+   unpacks what is in the zip file.
+
+4) remake the so-called "filename database", unless you unpacked in a
+    personal directory, such as ~/Library/texmf on MacOSX.
+   Under Unix, this is generally done by running the command mktexlsr.
+   Under MiKTeX, it is generally done in the MiKTeX program:
+     Start > Programs > MiKTeX > MiKTeX Options > General
+       > Refresh Now (the file name database).
+     (or from a DOS command line, if you prefer: initexmf --update-fndb)
+
+5) enable the Lucida "map files", if necessary.
+   Under Unix, this is generally done by running the command
+updmap-sys --enable Map lucida.map
+   (on MacOSX, typically as root, so:  sudo updmap-sys ...)
+   For MiKTeX, the procedure is more complicated; see below(**).
+   
+   Some distributions already have the map file enabled.  You can tell
+   by running the sample document mentioned below on your system.  If it
+   starts calling programs like mktexpk, and fonts are unable to be
+   loaded, and you don't get any actual Lucida in the output, then you
+   need to enable the map file.  If the output is fine, you're all set.
+
+6) remake the filename database again; this is not always necessary,
+   depending on your setup, but should never hurt.
+
+7) the document doc/fonts/lucidabr/lucida-sample.pdf explains the basic
+   usage of the fonts in LaTeX, and is itself typeset using Lucida.  The
+   LaTeX source is also included (lucida-sample.tex) so that you can see
+   how it was produced.  Running this file through LaTeX yourself is a
+   good test of the installation.(***)  Some additional documentation and
+   samples are included in doc/fonts/lucidabr and doc/fonts/lucida.
+
+If you have questions or problems regarding installation or use, please
+email lucida@tug.org; this is an open and publicly archived list for
+Lucida discussion, and you can subscribe via
+http://tug.org/mailman/listinfo/lucida.  Questions or problems related
+to ordering or licensing should go to lucida-admin@tug.org.
+
+The TUG Lucida home page is http://tug.org/lucida. 
+Happy typesetting!
+
+--
+(*) Finding and/or creating your texmf-local tree:
+
+TeX systems have thousands of files, arranged in one or more
+"trees" of directories.  Your system can quickly look through
+the trees that it knows about.
+
+When you install TeX, you may have noticed or set up a "local" tree,
+used for your own macros and other files.  The advantage of a local tree
+is that if you install an new version of your TeX system then these
+local materials will not be overwritten.  A local tree is the best place
+to install the Lucida fonts.
+
+Typical names for local trees are "C:\Local TeX Files" on Windows or
+"/usr/local/texlive/texmf-local" on Unix.  They might be entirely empty.
+How to find any local trees that you have depends on your system:
+
+  MiKTeX
+    From inside MiKTeX click on "MiKTeX Settings" and go to the Roots
+    tab.  Some paths shown there have a "Description" such as UserConfig
+    or UserData; these are not local paths.  For your local path you can
+    use any path without a Description.
+
+    If you see only paths that have a description then you can create a new
+    local path by clicking on "Add" (for more info, see the MiKTeX page
+    http://docs.miktex.org/manual/localadditions.html).
+
+  TeX Live and MacTeX
+    From a system terminal (aka command prompt and shell window) enter the
+    command
+      kpsewhich --var-value TEXMFLOCAL
+    to see the directory name.
+
+
+(**) Enabling the Lucida map file under MiKTeX:
+
+1. Edit the map configuration file updmap.cfg.  In a DOS Window/Command
+Prompt window, run:
+initexmf --edit-config-file updmap
+   You'll want to edit this in a text editor such as Notepad.  If the
+   file or any of the leading directories do not exist, create them.
+
+2. Add this one line to updmap.cfg and save it.
+Map lucida.map
+
+3. Back at the DOS prompt, run 
+initexmf --mkmaps
+   (Ignore any error messages.)
+
+Hopefully that is it.  Resume above at step 5.
+
+
+(***) Potential problems:
+
+1. If when you run a Lucida document you get complaints about missing
+   fonts, mktexpk could not make bitmaps, etc., most likely you need to
+   enable the Lucida map file.  See step 4 above.
+
+2. If you do try latex-ing lucida-sample.tex and get an error at the line:
+  \DeclareEncodingSubset{TS1}{hlh}{1}  % including \oldstylenums
+Please check your version of the textcomp.sty style file against 
+the current release, available at:
+  http://www.ctan.org/tex-archive/macros/latex/unpacked/textcomp.sty
+
+
+--
+Legal: the Lucida fonts are made available only under an end-user or
+site license, which you must have agreed to when you ordered the fonts.
+The license text is available in the distribution files
+doc/fonts/lucidabr/lucida-license-*.txt, or online at
+http://tug.org/store/lucida.  (This README.TUG file itself may be freely
+used, modified and/or distributed.)
+
+The Lucida typeface family was designed by Charles Bigelow and Kris Holmes.  
+(R) Lucida is a trademark of Bigelow & Holmes Inc.
+registered in the U.S. Patent & Trademark Office and other
+jurisdictions.
+
+TUG gratefully acknowledges Y&Y for the original Lucida TeX distribution,
+Walter Schmidt for creating and updating the TeX font support files,
+PCTeX for sponsoring him and allowing his work to be redistributed, and
+Morten Hoegholm for working on the samples and other TeXnical help.

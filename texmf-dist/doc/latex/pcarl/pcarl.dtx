@@ -1,0 +1,439 @@
+% \iffalse
+% $Id: pcarl.dtx,v 1.6 2011-01-11 17:43:26 boris Exp $
+%
+% Copyright (c) 2011, Boris Veytsman
+%
+% All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met: 
+%
+%    * Redistributions of source code must retain the above copyright
+%    notice, this list of conditions and the following disclaimer. 
+%    * Redistributions in binary form must reproduce the above
+%    copyright notice, this list of conditions and the following
+%    disclaimer in the documentation and/or other materials provided
+%    with the distribution. 
+%    * Neither the name of the original author nor the names of the
+%    contributors may be used to endorse or promote products derived
+%    from this software without specific prior written permission. 
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+% CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+% INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+% MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+% DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+% BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+% TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+% DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+% ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+% OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+% OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+% POSSIBILITY OF SUCH DAMAGE.
+%
+% \fi 
+% \CheckSum{178}
+%
+%
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~} 
+%
+%\iffalse
+% Taken from xkeyval.dtx
+%\fi
+%\makeatletter
+%\def\DescribeOption#1{\leavevmode\@bsphack
+%              \marginpar{\raggedleft\PrintDescribeOption{#1}}%
+%              \SpecialOptionIndex{#1}\@esphack\ignorespaces}
+%\def\PrintDescribeOption#1{\strut\emph{option}\\\MacroFont #1\ }
+%\def\SpecialOptionIndex#1{\@bsphack
+%    \index{#1\actualchar{\protect\ttfamily#1}
+%           (option)\encapchar usage}%
+%    \index{options:\levelchar#1\actualchar{\protect\ttfamily#1}\encapchar
+%           usage}\@esphack}
+%\def\DescribeOptions#1{\leavevmode\@bsphack
+%  \marginpar{\raggedleft\strut\emph{options}%
+%  \@for\@tempa:=#1\do{%
+%    \\\strut\MacroFont\@tempa\SpecialOptionIndex\@tempa
+%  }}\@esphack\ignorespaces}
+%\makeatother
+%
+%
+% \MakeShortVerb{|}
+% \GetFileInfo{pcarl.dtx}
+% \title{\LaTeX{} Support for Adobe Caslon Open Face}
+% \author{Boris Veytsman\thanks{%
+% \href{mailto:borisv@lk.net}{\texttt{borisv@lk.net}},
+% \href{mailto:boris@varphi.com}{\texttt{boris@varphi.com}}}} 
+% \date{\filedate, \fileversion}
+% \maketitle
+% \begin{abstract}
+%   This package provides \LaTeX{} support for Adobe Caslon Open Face
+%   font. 
+% \end{abstract}
+% \tableofcontents
+%
+% \changes{v1.0a}{2011/01/11}{Documentation cleanup} 
+%
+% \section{Introduction}
+% \label{sec:intro}
+%  
+% Caslon Open Face font was desgined by Barnhart Brothers and Spindler
+% in 1915.  It was initially colled College Oldstyle and based on
+% \emph{Le Moreau de Jeune} from G.~Peignot
+% foundry~\cite{Adobe:CaslonOpenFace07}.  Its realtion to the
+% classical Caslon font family is rather distant.  Neverteless it is a
+% nice titling and display font.
+%
+% Adobe sells OTF version of this font, but other versions, including
+% Type~1 are still available from other vendors, including
+% \url{http://www.fonts.com}.  Note that there are many ``free''
+% variants of this font available for downloading on various sites; I
+% chose not to use them because of unclear license status.
+%
+% While modern engines like Xe\TeX{} and Lua\TeX{} can use system
+% fonts directly, the installation base of the other systems is huge,
+% so it might be worthwile to release support files.
+%
+% The name |pcarl| follows the standard Fontname
+% scheme~\cite{fontname} for Adobe Caslon Open Face.  
+%
+%\section{User Guide}
+%\label{sec:userguide}
+%
+%
+%\subsection{Installation}
+%\label{sec:install}
+%
+% First, you need the buy the font itself.  This package assumes that
+% the font is in Type~1 format (on many sites this is mislabeled
+% ``Windows PostScript'').  The file should be named |ca______.pfb|.
+% Put it in \path{$TEXMF/fonts/type1/adobe/pcarl/ca______.pfb}.  Note
+% that this package does \emph{not} require you to rename the file to,
+% say, |pcarl8a.pfb| (however, on a Unix-like system you may need to
+% downcase the file name if you downloaded it as, say,
+% |ca______.PFB|). 
+%
+% Download the file 
+% \url{http://ctan.tug.org/install/fonts/psfonts/pcarl.tds.zip} 
+% and unzip it in the \path{$TEXMF} directory. For \TeX Live it is
+% probably \path{/usr/local/texlive/texmf-local}, or
+% \path{/usr/local/share/texmf-local}, or \path{~/texmf}, or
+% \path{C:\Program Files\texlive\texmf-local}, etc.  For Mik\TeX{} it
+% is probably \path{C:\miktex\texmf} or \path{C:\miktex\localtexmf}.
+% Run |texhash| to update the database of file names.  
+% 
+% Now you need to add the map file |pcarl.map| to the configuration files
+% of |dvips| and |pdftex|.  This again depends on your
+% distribution. For \TeX Live you create a file
+% \path{$TEXMF/updmap.d/50pcarl.cfg} with just the line
+% \begin{verbatim}
+% Map pcarl.map
+% \end{verbatim}
+% and then run |texhash| and |updmap|.  If you use Debian or Ubuntu,
+% the system-wide |updmap.d| directory is located in |/etc|, and you
+% need to create the file |pcarl.list| in
+% \path{/var/lib/tex-common/fontmap-cfg/} with the line
+% \begin{verbatim}
+% 50pcarl
+% \end{verbatim}
+%
+%
+% If you use Mik\TeX2.6, run
+% \begin{verbatim}
+% initexmf --edit-config-file updmap  
+% \end{verbatim}
+% Add to the config file
+% \begin{verbatim}
+%  Map pcarl.map
+% \end{verbatim}
+% save, exit and run |updmap|. 
+% 
+% If you use Mik\TeX2.5 or earlier, edit
+% \path{localtexmf\web2c\updmap.cfg}, adding the line
+% \begin{verbatim}
+% Map pcarl.map
+% \end{verbatim}
+% and run |updmap|.
+%
+% Refer to your distribution documentation for the details.
+%
+%
+%\subsection{Usage}
+%\label{sec:usage}
+%
+%
+%
+% If your installation have been successful, you can use the font with
+% a NFSS-compatible format with the commands like
+% \begin{verbatim}
+% \def\Pcarl@scale{1} % Set scaling of the font
+% \fontfamily{pcarl}\selectfont
+% \end{verbatim}
+%  
+%
+% \DescribeMacro{\offamily}
+% \DescribeMacro{\textof}
+% In \LaTeX{} you may want to add to the preamble of your document 
+% \begin{quote}
+% |\usepackage|\oarg{options}|{pcarl}|
+% \end{quote}
+% This will enable the commands |\offamily| and |\textof|, which
+% switch the current font to the Open Face variant.
+%
+% \DescribeOption{scaled}
+% The package has the option |scaled=...|.  The font is uniformly
+% scaled  according to the numerical value of the option.  The default
+% is |scaled=1|, i.e. no scaling.
+% 
+% 
+%
+%
+% \StopEventually{
+%   \clearpage
+% \paragraph{Acknowledgements}
+%
+% This package was commssioned by \emph{Annals of
+% Mathematics}~\url{http://annals.princeton.edu/}. 
+%
+%
+%   \bibliography{pcarl}
+%   \bibliographystyle{unsrt}}
+%
+% \clearpage
+%\section{Implementation}
+%\label{sec:impl}
+%
+%\subsection{Identification}
+%\label{sec:ident}
+%
+% We start with the declaration who we are.  Most |.dtx| files put
+% driver code in a separate driver file |.drv|.  We roll this code into the
+% main file, and use the pseudo-guard |<gobble>| for it.
+%    \begin{macrocode}
+%<style>\NeedsTeXFormat{LaTeX2e}
+%<*gobble>
+\ProvidesFile{pcarl.dtx}
+%</gobble>
+%<style>\ProvidesClass{pcarl}
+%<drv>\ProvidesFile{drv.tex}
+%<map>\ProvidesFile{map.tex}
+%<*style|drv|map>
+[2011/01/11 v1.0a LaTeX Support for Adobe Caslon Open Face]
+%</style|drv|map>
+%    \end{macrocode}
+% And the driver code:
+%    \begin{macrocode}
+%<*gobble>
+\documentclass{ltxdoc}
+\usepackage{booktabs}
+\usepackage[tableposition=top]{caption}
+\usepackage{url}
+\usepackage[breaklinks,colorlinks,linkcolor=black,citecolor=black,
+            pagecolor=black,urlcolor=black,hyperindex=false]{hyperref}
+\PageIndex
+\CodelineIndex
+\RecordChanges
+\EnableCrossrefs
+\begin{document}
+  \DocInput{pcarl.dtx}
+\end{document}
+%</gobble> 
+%    \end{macrocode}
+%
+%\subsection{Fontinst Driver}
+%\label{sec:pnb-drv}
+%
+% This follows~\cite{fontinstallationguide}.
+% 
+% First, the preamble
+%    \begin{macrocode}
+%<*drv>
+\input fontinst.sty
+%    \end{macrocode}
+%
+%
+% Starting recording transforms:
+%    \begin{macrocode}
+\recordtransforms{rec.tex}
+%    \end{macrocode}
+%
+% Create the virtual fonts:
+%    \begin{macrocode}
+\transformfont{pcarl8r}{\reencodefont{8r}{\fromafm{ca______}}}
+%    \end{macrocode}
+% 
+%
+% There is no hook in |fontinst.sty| for writing our own preamble to
+% |.fd| file.  However, we need to add scaling commands to the
+% preamble. OK, we will patch fontinst:
+%    \begin{macrocode}
+\fontinstcc
+\def\fd_family#1#2#3{
+   \a_toks{#3}
+   \edef\lowercase_file{\lowercase{
+     \edef\noexpand\lowercase_file{#1#2.fd}}}
+   \lowercase_file
+   \open_out{\lowercase_file}
+   \out_line{\percent_char~Filename:~\lowercase_file}
+   \out_line{\percent_char~Created~by:~tex~\jobname}
+   \out_line{\percent_char~Created~using~fontinst~v\fontinstversion}
+   \out_line{}
+   \out_line{\percent_char~THIS~FILE~SHOULD~BE~PUT~IN~A~TEX~INPUTS~
+      DIRECTORY}
+   \out_line{}
+   \out_line{\string\ProvidesFile{\lowercase_file}}
+   \out_lline{[
+      \the\year/
+      \ifnum10>\month0\fi\the\month/
+      \ifnum10>\day0\fi\the\day\space
+      Fontinst~v\fontinstversion\space
+      font~definitions~for~#1/#2.
+   ]}
+   \out_line{}
+%    \end{macrocode}
+% Here is our patch:
+%    \begin{macrocode}
+   \out_line{\string\expandafter\string\ifx\string\csname\space
+     Pcarl@scale\string\endcsname\string\relax}
+   \out_line{\space\string\let\string\Pcarl@@scale\string\@empty}
+   \out_line{\string\else}
+   \out_line{\space\string\edef\string\Pcarl@@scale\left_brace_char 
+       s*[\string\csname\space Pcarl@scale\string\endcsname]
+       \right_brace_char\percent_char}
+   \out_line{\string\fi\percent_char}
+   \out_line{}
+%    \end{macrocode}
+% End of the patch.
+%    \begin{macrocode}
+   \out_line{\string\DeclareFontFamily{#1}{#2}{\the\a_toks}}
+   {
+      \csname #1-#2\endcsname
+      \out_line{}
+      \let\do_shape=\substitute_shape
+      \csname #1-#2\endcsname
+      \let\do_shape=\remove_shape
+      \csname #1-#2\endcsname
+   }
+   \x_cs\g_let{#1-#2}\x_relax
+   \out_line{}
+   \out_line{\string\endinput}
+   \close_out{Font~definitions}
+}
+\normalcc
+%    \end{macrocode}
+% 
+% Now we are ready to install fonts. 
+%
+% First, |OT1|:
+%    \begin{macrocode}
+\installfonts
+\installfamily{OT1}{pcarl}{}
+\installfont{pcarl7t}{pcarl8r,newlatin}{ot1}{OT1}{pcarl}{m}{n}{
+  <->\string\Pcarl@@scale}
+%    \end{macrocode}
+% 
+% Then |T1|
+%    \begin{macrocode}
+\installfamily{T1}{pcarl}{}
+\installfont{pcarl8t}{pcarl8r,newlatin}{t1}{T1}{pcarl}{m}{n}{
+  <->\string\Pcarl@@scale}
+%    \end{macrocode}
+%
+% Then |TS1|
+%    \begin{macrocode}
+\installfamily{TS1}{pcarl}{}
+\installfont{pcarl8c}{pcarl8r,textcomp}{ts1}{TS1}{pcarl}{m}{n}{
+  <->\string\Pcarl@@scale}
+%    \end{macrocode}
+%
+%
+%
+% And the end:
+%    \begin{macrocode}
+\endinstallfonts
+\endrecordtransforms
+\bye
+%</drv>
+%    \end{macrocode}
+% 
+%\subsection{Fontmap Generation}
+%\label{sec:fontmap}
+%
+% This is a standard procedure~\cite{fontinstallationguide}.  
+%    \begin{macrocode}
+%<*map>
+\input finstmsc.sty
+\resetstr{PSfontsuffix}{.pfb}
+\adddriver{dvips}{pcarl.map}
+\input rec.tex
+\donedrivers
+\bye
+%</map>
+%    \end{macrocode}
+%
+%\subsection{Style File}
+%\label{sec:style}
+%
+% First, define the option:
+%    \begin{macrocode}
+%<*style>
+\RequirePackage{xkeyval}
+\DeclareOptionX{scaled}{\gdef\Pcarl@scale{#1}}
+\ExecuteOptionsX{scaled=1}
+\ProcessOptionsX
+%    \end{macrocode}
+%
+% \begin{macro}{\offamilydefault}
+%   This is the open face family we use:
+%    \begin{macrocode}
+\def\offamilydefault{pcarl}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\offamily}
+%   Switch the text to the open family.  Note that we reset shape and
+%   series here:
+%    \begin{macrocode}
+\def\offamily{%
+    \fontfamily{\offamilydefault}\fontseries{m}\fontshape{n}\selectfont}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\textof}
+%   And the command version
+%    \begin{macrocode}
+\DeclareTextFontCommand{\textof}{\offamily}
+%    \end{macrocode}
+%   
+% \end{macro}
+%
+%    \begin{macrocode}
+%</style>
+%    \end{macrocode}
+%
+%
+% 
+%\Finale
+%\clearpage
+%
+%\PrintChanges
+%\clearpage
+%\PrintIndex
+%
+\endinput

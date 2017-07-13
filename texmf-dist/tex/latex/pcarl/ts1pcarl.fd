@@ -1,0 +1,23 @@
+%Filename: ts1pcarl.fd
+%Created by: tex drv
+%Created using fontinst v1.927
+
+%THIS FILE SHOULD BE PUT IN A TEX INPUTS DIRECTORY
+
+\ProvidesFile{ts1pcarl.fd}
+   [2011/01/11 Fontinst v1.927 font definitions for TS1/pcarl.]
+
+\expandafter\ifx\csname Pcarl@scale\endcsname\relax
+ \let\Pcarl@@scale\@empty
+\else
+ \edef\Pcarl@@scale{s*[\csname Pcarl@scale\endcsname]}%
+\fi%
+
+\DeclareFontFamily{TS1}{pcarl}{}
+
+\DeclareFontShape{TS1}{pcarl}{m}{n}{
+    <->\Pcarl@@scale pcarl8c
+}{}
+
+
+\endinput

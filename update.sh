@@ -18,14 +18,35 @@ TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 # we don't do TeX Catalogue updates
 #unset TEX_CATALOGUE
 
+do_tlpdb=false
+do_container=false
+do_collection=false
 if [ "$1" = "container" ] ; then
   do_container=true
-  do_tlpdb=false
-fi
-if [ "$1" = "tlpdb" ] ; then
+elif [ "$1" = "tlpdb" ] ; then
   do_tlpdb=true
-  do_container=false
+elif [ "$1" = "collection" ] ; then
+  do_collection=true
+else
+  do_tlpdb=true
+  do_container=true
+  do_collection=true
 fi
+
+
+col=tlpkg/tlpsrc/collection-contrib.tlpsrc
+echo "category Collection" > $col
+echo "shortdesc tlcontrib packages" >> $col
+echo "longdesc collections of all packages in contrib.texlive.info" >> $col
+for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
+  bn=`basename $i .tlpsrc`
+  if [ "$bn" = "00texlive.autopatterns" -o "$bn" = "00texlive.config" -o "$bn" = 00texlive.installation \
+     -o "$bn" = collection-contrib ] ; then
+    continue
+  fi
+  echo "depend $bn" >> $col
+done
+
 
 if $do_tlpdb ; then
   # update tlpdb

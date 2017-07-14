@@ -47,6 +47,19 @@ for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
   echo "depend $bn" >> $col
 done
 
+git add $col
+if ! git diff --cached --exit-code >/dev/null ; then 
+  # something is staged
+  echo "collection contrib is updated, diff is as following:"
+  git diff --cached
+  echo ""
+  echo -n "Do you want to commit these changes (y/N): "
+  read REPLY <&2
+  case $REPLY in
+    y*|Y*) git commit -m "collection-contrib updated" ;;
+    *) echo "Ok, leave it for now!" ;;
+  esac
+fi
 
 if $do_tlpdb ; then
   # update tlpdb

@@ -33,32 +33,33 @@ else
   do_collection=true
 fi
 
+if $do_collection ; then
+  col=tlpkg/tlpsrc/collection-contrib.tlpsrc
+  echo "category Collection" > $col
+  echo "shortdesc tlcontrib packages" >> $col
+  echo "longdesc collections of all packages in contrib.texlive.info" >> $col
+  for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
+    bn=`basename $i .tlpsrc`
+    if [ "$bn" = "00texlive.autopatterns" -o "$bn" = "00texlive.config" -o "$bn" = 00texlive.installation \
+       -o "$bn" = collection-contrib ] ; then
+      continue
+    fi
+    echo "depend $bn" >> $col
+  done
 
-col=tlpkg/tlpsrc/collection-contrib.tlpsrc
-echo "category Collection" > $col
-echo "shortdesc tlcontrib packages" >> $col
-echo "longdesc collections of all packages in contrib.texlive.info" >> $col
-for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
-  bn=`basename $i .tlpsrc`
-  if [ "$bn" = "00texlive.autopatterns" -o "$bn" = "00texlive.config" -o "$bn" = 00texlive.installation \
-     -o "$bn" = collection-contrib ] ; then
-    continue
+  git add $col
+  if ! git diff --cached --exit-code >/dev/null ; then 
+    # something is staged
+    echo "collection contrib is updated, diff is as following:"
+    git diff --cached
+    echo ""
+    echo -n "Do you want to commit these changes (y/N): "
+    read REPLY <&2
+    case $REPLY in
+      y*|Y*) git commit -m "collection-contrib updated" ;;
+      *) echo "Ok, leave it for now!" ;;
+    esac
   fi
-  echo "depend $bn" >> $col
-done
-
-git add $col
-if ! git diff --cached --exit-code >/dev/null ; then 
-  # something is staged
-  echo "collection contrib is updated, diff is as following:"
-  git diff --cached
-  echo ""
-  echo -n "Do you want to commit these changes (y/N): "
-  read REPLY <&2
-  case $REPLY in
-    y*|Y*) git commit -m "collection-contrib updated" ;;
-    *) echo "Ok, leave it for now!" ;;
-  esac
 fi
 
 if $do_tlpdb ; then

@@ -1,0 +1,170 @@
+%% $Id: lucida-otf-doc.tex 556 2017-09-18 06:22:29Z herbert $
+% Copyright 2012-2015 TeX Users Group.
+% 
+% Copying and distribution of this file, with or without modification,
+% are permitted in any medium, without royalty.
+
+\listfiles
+\documentclass[11pt]{article}
+\usepackage{geometry}
+
+\usepackage%[usefilenames,]
+  {spark-otf}  % support opentype math fonts
+
+\usepackage{biblatex}
+\addbibresource{\jobname.bib}
+\usepackage{array}
+\usepackage{metalogo} % for \XeTeX logo
+\usepackage{booktabs} % for examples
+\usepackage{listings} % for code
+\usepackage{dtk-logos} % for Wikipedia W
+
+\pagestyle{headings}
+
+\usepackage[colorlinks,hyperfootnotes=false]{hyperref}
+% define \code for url-like breaking of typewriter fragments.
+\ifx\nolinkurl\undefined \let\code\url \else \let\code\nolinkurl \fi
+
+% Define \cs to prepend a backslash, and be unbreakable:
+\DeclareRobustCommand\cs[1]{\mbox{\texttt{\char`\\#1}}}
+
+% An environment like quote, but less space above and more below:
+\newenvironment{demoquote}
+   {\tabularx{\dimexpr\linewidth+\marginparwidth}{@{} X >{\ttfamily}l @{}}}
+   {\endtabularx}
+
+
+\title{Support for the Spark OpenType fonts}
+\author{Herbert Voß}
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+A sparkline is a very small line chart, typically drawn without axes or coordinates. 
+It presents the general shape of the variation (typically over time) in some measurement, 
+such as temperature or stock market price, in a simple and highly condensed way. 
+Sparklines are small enough to be embedded in text, or several sparklines may be 
+grouped together as elements of a small multiple. Whereas the typical chart is 
+designed to show as much data as possible, and is set off from the flow of text, 
+sparklines are intended to be succinct, memorable, and located where they are discussed.
+
+
+\section{The fonts}
+
+The fonts are available from \url{https://github.com/aftertheflood/spark} and should be saved
+either in \path{Library/fonts/} (MAC OSX), \path{c:\Windows\Fonts} (Windows) or
+\path{/usr/local/share/fonts} (Linux)  or any other location where
+the fonts will be found by the system.
+
+\begin{verbatim}
+-rw-r--r-- 1 voss voss 24708 Sep 15 11:20 Spark - Bar - Medium.otf
+-rw-r--r-- 1 voss voss 24696 Sep 15 11:20 Spark - Bar - Narrow.otf
+-rw-r--r-- 1 voss voss 24680 Sep 15 11:20 Spark - Bar - Thin.otf
+-rw-r--r-- 1 voss voss 22140 Sep 15 11:20 Spark - Dot-line - Medium.otf
+-rw-r--r-- 1 voss voss 24616 Sep 15 11:20 Spark - Dot - Medium.otf
+-rw-r--r-- 1 voss voss 24580 Sep 15 11:20 Spark - Dot - Small.otf
+\end{verbatim}
+
+
+The package defines the following families:
+
+\small
+\begin{verbatim}
+\newfontfamily\sparkBarMedium{SparkBar-Medium}[RawFeature=+calt,\spark@DefaultFeatures]
+\newfontfamily\sparkBarNarrow{SparkBar-Narrow}[RawFeature=+calt,\spark@DefaultFeatures]
+\newfontfamily\sparkBarThin{SparkBar-Thin}[RawFeature=+calt,\spark@DefaultFeatures]
+%
+\newfontfamily\sparkDotLine{Spark-Dot-lineMedium}[RawFeature=+calt,\spark@DefaultFeatures]
+%
+\newfontfamily\sparkDotMedium{Spark-DotMedium}[RawFeature=+calt,\spark@DefaultFeatures]
+\newfontfamily\sparkDotSmall{Spark-DotSmall}[RawFeature=+calt,\spark@DefaultFeatures]
+\end{verbatim}
+
+\normalsize
+
+\section{The macros}
+
+\begin{verbatim}
+\sparkBar[<Type>][<No>]{values}[<No>]
+\sparkDot[<Type>][<No>]{values}[<No>]
+\end{verbatim}
+
+If \texttt{[<Type>]} is missing, \texttt{Medium} is assumed. The type is mandatory if you use
+the first \texttt{[<No>]} argument!
+
+
+
+\section{Text examples}
+
+\footnotesize
+\begin{verbatim}
+\begin{description}
+\item[Bar-Medium] Text \sparkBar{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92} Text
+\item[Bar-Medium] Text \sparkBar[Medium]{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92} Text
+\item[Bar-Narrow] Text \sparkBar[Narrow]{19,32,93,4,95,46,13,23,50,86,94,68,58,41,89,57,74,8} Text
+\item[Bar-Thin] Text \sparkBar[Thin]{13,15,59,73,42,1,41,51,4,97,35,55,37,24,89,21,30,22} Text
+\item[Bar-Medium] Text \sparkBar[Medium][14]{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92}[92] Text
+\item[Bar-Narrow] Text \sparkBar[Narrow][19]{19,32,93,4,95,46,13,23,50,86,94,68,58,41,89,57,74,8}[8] Text
+\item[Bar-Thin] Text \sparkBar[Thin][13]{13,15,59,73,42,1,41,51,4,97,35,55,37,24,89,21,30,22}[22] Text
+\end{description}
+\end{verbatim}
+
+\normalsize
+\begin{description}
+\item[Bar-Medium] Text \sparkBar{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92} Text
+\item[Bar-Medium] Text \sparkBar[Medium]{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92} Text
+\item[Bar-Narrow] Text \sparkBar[Narrow]{19,32,93,4,95,46,13,23,50,86,94,68,58,41,89,57,74,8} Text
+\item[Bar-Thin] Text \sparkBar[Thin]{13,15,59,73,42,1,41,51,4,97,35,55,37,24,89,21,30,22} Text
+\item[Bar-Medium] Text \sparkBar[Medium][14]{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92}[92] Text
+\item[Bar-Narrow] Text \sparkBar[Narrow][19]{19,32,93,4,95,46,13,23,50,86,94,68,58,41,89,57,74,8}[8] Text
+\item[Bar-Thin] Text \sparkBar[Thin][13]{13,15,59,73,42,1,41,51,4,97,35,55,37,24,89,21,30,22}[22] Text
+\end{description}
+
+
+\footnotesize
+\begin{verbatim}
+\begin{description}
+\item[Dot-Medium] Text \sparkDot{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1} Text
+\item[Dot-Medium] Text \sparkDot[Medium]{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1} Text
+\item[Dot-Small] Text \sparkDot[Small]{1,79,88,46,54,77,91,24,70,22,27,29,40,33,31,95,26,76} Text
+\item[Dot-Line] Text \sparkDot[Line]{9,4,2,1,6,7,3,8,3,7,1,4,9,2,8,5,1,8} Text
+\item[Dot-Medium] Text \sparkDot[Medium][54]{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1}[1] Text
+\item[Dot-Small] Text \sparkDot[Small][1]{1,79,88,46,54,77,91,24,70,22,27,29,40,33,31,95,26,76}[76] Text
+\item[Dot-Line] Text \sparkDot[Line][9]{9,4,2,1,6,7,3,8,3,7,1,4,9,2,8,5,1,8}[8] Text
+\end{description}
+\end{verbatim}
+
+\normalsize
+\begin{description}
+\item[Dot-Medium] Text \sparkDot{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1} Text
+\item[Dot-Medium] Text \sparkDot[Medium]{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1} Text
+\item[Dot-Small] Text \sparkDot[Small]{1,79,88,46,54,77,91,24,70,22,27,29,40,33,31,95,26,76} Text
+\item[Dot-Line] Text \sparkDot[Line]{9,4,2,1,6,7,3,8,3,7,1,4,9,2,8,5,1,8} Text
+\item[Dot-Medium] Text \sparkDot[Medium][54]{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1}[1] Text
+\item[Dot-Small] Text \sparkDot[Small][1]{1,79,88,46,54,77,91,24,70,22,27,29,40,33,31,95,26,76}[76] Text
+\item[Dot-Line] Text \sparkDot[Line][9]{9,4,2,1,6,7,3,8,3,7,1,4,9,2,8,5,1,8}[8] Text
+\end{description}
+
+
+\nocite{*}
+\printbibliography
+
+
+\end{document}
+
+
+<p class=spark-bar-medium>{14,95,68,9,19,41,91,1,81,97,79,45,96,76,17,65,8,92}</p>
+
+<p class=spark-bar-narrow>{19,32,93,4,95,46,13,23,50,86,94,68,58,41,89,57,74,8}</p>
+
+<p class=spark-bar-thin>{13,15,59,73,42,1,41,51,4,97,35,55,37,24,89,21,30,22}</p>
+
+<p class=spark-dot-medium>{54,39,26,65,29,58,36,99,16,56,76,69,71,77,7,40,79,1}</p>
+
+<p class=spark-dot-small>{1,79,88,46,54,77,91,24,70,22,27,29,40,33,31,95,26,76}</p>
+
+<p class=spark-line-medium>{9,4,2,1,6,7,3,8,3,7,1,4,9,2,8,5,1,8}</p>
+\NewDocumentCommand\spark{omo}{{\sparklinesbarmedium
+		\IfValueT{#1}{#1}\string{#2\string}\IfValueT{#3}{#3}}}

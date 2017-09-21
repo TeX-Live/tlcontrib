@@ -13,4 +13,4 @@ $special{'lucold'}      = '&MAKEflatten';
 $special{'futurans'}    = '&donormal';
 $special{'pcarl'}       = '&donormal';
 $special{'mathstone'}   = '&MAKEflatten';
-
+$special{'spark-otf'}   = '&MAKEflatten';

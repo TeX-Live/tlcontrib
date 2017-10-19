@@ -55,6 +55,19 @@ if [ ! -r "$plugin" ] ; then
   exit 1
 fi
 
+# check whether the .jar md5sum is fine, but don't make this an error
+myjarmd=`cat "$KetCdyJar" | md5sum`
+sysjarmd=`cat "$plugin" | md5sum`
+if [ ! "$myjarmd" = "$sysjarmd" ]
+then
+  echo "The installed version of the plugin in"
+  echo "  $plugin"
+  echo "differs from the version shipped in"
+  echo "  $KetCdyJar"
+  echo "You might need to update the former one with the later one!"
+fi
+
+
 mkdir -p ~/ketcindy
 
 exec "$cinderella" "$TempCdy"

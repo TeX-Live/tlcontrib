@@ -1,13 +1,17 @@
 ketfilesdir=loaddirectory;
 use("KetCindyPlugin"); 
 ketcindydir=ketfilesdir + "..";
-if(isexists(plugindirectory,"dirhead.txt"),
-  setdirectory(plugindirectory);
-  import("dirhead.txt");
+if(isexists(gethome(),"ketcindyhead.txt"),
+  setdirectory(gethome());
+  import("ketcindyhead.txt");
 ,
-  Dirhead=getdirhead();
+  if(isexists(plugindirectory,"dirhead.txt"),
+    setdirectory(plugindirectory);
+    import("dirhead.txt");
+  ,
+    Dirhead=getdirhead();
+  );
 );
-Shellfile="";
 setdirectory(ketcindydir);
 import("setketcindy.txt");
 setdirectory(ketcindydir);

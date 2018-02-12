@@ -13,7 +13,7 @@ public class KetCindyPlugin extends CindyScriptPlugin {
 
     @CindyScript("ketjavaversion")
     public String ketjavaversion() {
-        return "Ketjava 2017.09.06";
+        return "Ketjava 2017.11.08";
     }
 
 	public String getName() {
@@ -52,6 +52,12 @@ public class KetCindyPlugin extends CindyScriptPlugin {
     @CindyScript("gethome")
     public String gethome() {
         return System.getProperty("user.home");
+    }
+
+	@CindyScript("getname")
+    // 17.10.08
+    public String getname() {
+        return System.getProperty("user.name");
     }
 	
     @CindyScript("iswindows")

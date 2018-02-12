@@ -16,10 +16,51 @@
 
 #########################################
 
-# source("/Rfiles/ketpic5_2_3.r")
+ThisVersion<- "KeTpic for R  v5_2_3(18.02.02)" 
 
-ThisVersion<- "KeTpic for R  v5_2_3(17.10.08)" 
-
+# 2018.02.02
+#   Enclosing2 changed ( for distant curves, startpt option removed )
+# 2018.02.01
+#   Intersectline,Intersectseg,...,Intersectcuves added
+#   Quicksort added
+#   Enclosing2 added (incomplete)
+# 2018.01.29
+#   Length added
+# 2017.12.24
+#   Objpolyhedron added
+# 2017.12.23
+#   Objsymb, symb3data added
+#   Objrecs, Objpolygon debugged
+#   Objthicksurf added
+# 2017.12.22
+#   Openobj,Closeobj,Writeobjpoint,Printobjstr,Objname,Objsurf added
+#   Crossprod added
+#   Objjoin, Objcurve, Objrecs, Objpolygon, Objsymb added
+#   Spacecurve  debugged
+# 2017.12.17
+#   Setunitlen debugged  ( MEMORI )
+# 2017.12.13
+#   ReadOutData debugged
+# 2017.12.11
+#   Enclosing debugged  ( appendrow -> Appendrow )
+# 2017.11.29
+#   Anglemark, Arrowhead, Ovaldata debugged ( Circldeta included )
+# 2017.11.27
+#   Anglemark changed ( Scilab 16.12.29)
+#   Plotdata,Paramplot,Spacecurve changed ( Scilab 16.12.13)
+#   Enclosing changed ( Scilab 16.10.09)
+#   Arrowhead,Arrowline changed ( Scilab 15.06.11)
+#   Definecolor added ( Scilab 15.05.04)
+# 2017.11.26
+#   Exprrot, Letterrot debugged  ( `)
+# 2017.11.24
+#  Deqplot debugged (Looprange)
+# 2017.11.20
+#  InWindow debugged (for length=1)
+# 2017.10.28
+#  Openfile changed (Creator)
+# 2017.10.23
+#  ReadOutData greatly changed
 # 2017.10.11
 #  Drwpt debugged  (Flattenlist )
 # 2017.10.08
@@ -420,6 +461,17 @@ Datalength<-function(Data)
   if (mode(Data)=="list") return(length(Data))
 }
 
+Crossprod<- function (a,b){ # 17.12.22
+  if(length(a)==3){
+    Tmp1=a[2]*b[3]-a[3]*b[2]
+    Tmp2=a[3]*b[1]-a[1]*b[3]
+    Tmp3=a[1]*b[2]-a[2]*b[1]
+    Out=c(Tmp1,Tmp2,Tmp3)
+  }else{
+    Out=a[1]*b[2]-a[2]*b[1]
+  }
+}
+
 Dotprod<-function(a,b)
 {
   Tmp=crossprod(a,b)
@@ -497,6 +549,34 @@ return(c())
 Stripblanks<- function(Ch){
   Tmp<- gsub(" ","",Ch,fixed=TRUE)
   return(Tmp)
+}
+
+Quicksort<- function(seqL,key){ #18.02.01
+  if(length(seqL)<2){
+    out=seqL
+  }else{
+    tmp1=Op(1,seqL)
+    tmp2=Op(2,seqL)
+    if(Op(key,tmp1)>=Op(key,tmp2)){
+      pivot = tmp1
+    }else{
+      pivot=tmp2
+    }
+    left = list()
+    right = list()
+    for(ii in 1:length(seqL)){
+      tmp=Op(ii,seqL)
+      if(Op(key,tmp)< Op(key,pivot)){
+        left=c(left,list(tmp))
+      }else{
+        right=c(right,list(tmp))
+      }
+    }
+    left = Quicksort(left,key)
+    right = Quicksort(right,key)
+    out=c(left,right)
+  }
+  return(out)
 }
 
 Derivative<- function(...)
@@ -581,7 +661,11 @@ Anglemark<- function(...)
   if (Nargs>=4){
     r<-  varargin[[4]]*r  
   }
-  Cir<- Circledata(PB,r)
+  Out=c()
+  if(r>min(Norm(PA-PB),Norm(PC-PB))){
+    return(Out)
+  }
+  Cir<- Circledata(c(PB,r)) #17.11.29
   Tmp<- IntersectcrvsPp(Cir,Listplot(PA,PB))
   P1<- Op(2,Op(1,Tmp))
   Tmp<- IntersectcrvsPp(Cir,Listplot(PC,PB))
@@ -715,7 +799,7 @@ Arrowhead<-function(...)
     Tmp<-Nearestpt(P,Houkou)
     A<-Tmp[[1]]
     I<-floor(Tmp[[2]])
-    G<-Circledata(P,Ookisa*cos(Theta),N=10)
+    G<-Circledata(c(P,Ookisa*cos(Theta)),N=10) #17.11.29
     Flg<- 0  # 13.11.13
     JL<-seq(I,1,by=-1)
     for (J in JL){
@@ -757,7 +841,9 @@ Arrowhead<-function(...)
     Tmp<- Listplot(list(A,P,B,C,A))   # 12.01.07
     Tmp1<- Unscaling(Tmp)
     Shade(Tmp1)
-    Drwline(Tmp1,1)
+    Tmp=Listplot(c(A,P,B,C,A,P))  # 15.6.20
+    Tmp1=Unscaling(Tmp)
+    Drwline(Tmp1,0.1)  # 15.06.11, 15.06.14
   }
 }
 
@@ -806,7 +892,7 @@ Arrowheaddata<- function(...)
     Tmp<-Nearestpt(P,Houkou)
     A<-Tmp[[1]]
     I<-floor(Tmp[[2]])
-    G<-Circledata(P,Ookisa*cos(Theta),N=10)
+    G<-Circledata(c(P,Ookisa*cos(Theta)),N=10) #17.11.29
     Flg<- 0  # 13.11.13
     JL<-seq(I,1,by=-1)
     for (J in JL){
@@ -886,7 +972,8 @@ Arrowline<- function(...)
     }
   }
   R<- P+Yapos*(Q-P)
-  Drwline(Listplot(c(P,Q)),Futosa)
+  Tmp=Q-Unscaling(0.2*Ookisa/2*(Q-P)/Norm(Q-P)) # 15.10.24
+  Drwline(Listplot(c(P,Tmp)),Futosa)
   Arrowhead(R,Q-P,Ookisa,Hiraki,Futosa,Cutstr,Str)
 }
 
@@ -1112,15 +1199,15 @@ Beginpicture<-function(ul)
       }
     }
     else{
-      Unit<-substring(Ucode,I,I+1);
-      Str<-substring(Ucode,Is,I-1);
+      Unit<-substring(Ucode,I,I+1)
+      Str<-substring(Ucode,Is,I-1)
       VL<-paste(VL,Str,sep="")
       break;
     }
   }
-  Valu<-eval(parse(text=VL));
+  Valu<-eval(parse(text=VL))
   Str<-as.character(Valu);
-  ULEN<<- paste(Str,Unit,sep="");
+  ULEN<<- paste(Str,Unit,sep="")
   if (Unit=="cm") MilliIn<<-1000/2.54*Valu
   if (Unit=="mm") MilliIn<<-1000/2.54*Valu/10
   if (Unit=="in") MilliIn<<-1000*Valu
@@ -1131,22 +1218,22 @@ Beginpicture<-function(ul)
   if (Unit=="cc") MilliIn<<-1000/1238/1157/72.27*12*Valu;
   if (Unit=="sp") MilliIn<<-1000/72.27/65536*Valu/10
   MARKLEN<<- MARKLENNow*1000/2.54/MilliIn;
-  Str<-paste("{\\unitlength=",ULEN,"%\n",sep="");
-  cat(Str,file=Wfile,append=TRUE);
-  cat("\\begin{picture}%\n",file=Wfile,append=TRUE);
-  Str<-"(";
-  Tmp<-as.character(round(Dx,digits=6));
-  Str<-paste(Str,Tmp,",",sep="");
-  Tmp<-as.character(round(Dy,digits=6));
-  Str<-paste(Str,Tmp,")(",sep="");
-  Tmp<-as.character(round(Xm,digits=6));
-  Str<-paste(Str,Tmp,",",sep="");
-  Tmp<-as.character(round(Ym,digits=6));
-  Str<-paste(Str,Tmp,")%\n",sep="");
-  cat(Str,file=Wfile,append=TRUE);
-  Str<-paste("\\special{pn ",as.character(PenThickInit),"}%\n",sep="");
-  cat(Str,file=Wfile,append=TRUE);
-  cat("%\n",file=Wfile,append=TRUE);
+  Str<-paste("{\\unitlength=",ULEN,"%\n",sep="")
+  cat(Str,file=Wfile,append=TRUE)
+  cat("\\begin{picture}%\n",file=Wfile,append=TRUE)
+  Str<-"("
+  Tmp<-as.character(round(Dx,digits=6))
+  Str<-paste(Str,Tmp,",",sep="")
+  Tmp<-as.character(round(Dy,digits=6))
+  Str<-paste(Str,Tmp,")(",sep="")
+  Tmp<-as.character(round(Xm,digits=6))
+  Str<-paste(Str,Tmp,",",sep="")
+  Tmp<-as.character(round(Ym,digits=6))
+  Str<-paste(Str,Tmp,")%\n",sep="")
+  cat(Str,file=Wfile,append=TRUE)
+  Str<-paste("\\special{pn ",as.character(PenThickInit),"}%\n",sep="")
+  cat(Str,file=Wfile,append=TRUE)
+  cat("%\n",file=Wfile,append=TRUE)
 }
 
 #################################################
@@ -1548,6 +1635,31 @@ Dashline<- function(...)
       Makehasen(Figdata,Sen,Gap,0)
     }
   }
+}
+
+##############################################
+#  17.11.27
+
+Definecolor<- function(Name,Data){
+  Tmp1=length(Data)
+  if((Tmp1<3) || (Tmp1>4)){
+    cat("Size of data should be 3 or 4.")
+    return()
+  }
+  if(Tmp1==4){
+    Tp="cmyk"
+  }else{
+    Tp="rgb"
+  }
+  Tmp=""
+  for(J in 1:Tmp1){
+    Tmp=paste(Tmp, as.character(Data[J]),sep="")
+    if(J<Tmp1){
+      Tmp=paste(Tmp,",",sep="")
+    }
+  }
+  Tmp=paste("\\definecolor{",Name,"}{",Tp,"}{",Tmp,"}",sep="")
+  Texcom(Tmp)
 }
 
 ##############################################
@@ -2088,6 +2200,7 @@ Drwxy<-function(...)
 
 Enclosing<- function(...)
 {
+  Eps=10^(-7) # Scilab 16.12.05
   varargin<- list(...)
   Nargs<- length(varargin)
   P<- varargin[[1]]
@@ -2096,9 +2209,14 @@ Enclosing<- function(...)
     if (mode(Tmp)!="numeric" || length(Tmp)>1){
       AnsL<- EnclosingS(...)
 	  AnsL<- Joincrvs(AnsL)  # 10.12.04
-      return(AnsL)
     }
   }
+  Tmp1=Op(1,AnsL) # Scilab 16.12.05from
+  Tmp2=Op(nrow(AnsL),AnsL)
+  if(Norm(Tmp2-Tmp1)>Eps){
+    AnsL=Appendrow(AnsL,Tmp1)
+  }
+  return(AnsL)
 }
 
 #########################################
@@ -2364,7 +2482,7 @@ Exprrot<- function(...)
   if (mode(Tmp)=="numeric"){
     Nmov<- Tmp; N<- N+1
   }
-  Mojiretu<- paste("$",varargin[[N]],"$",sep="")
+  Mojiretu<- paste("$",Assign(varargin[[N]]),"$",sep="") # 2017.11.26
   Tv<- 1/Norm(V)*V
   Nv<- c(-Tv[2],Tv[1])
   P<- P+MEMORI*Tmov*Tv+MEMORI*Nmov*Nv
@@ -3209,12 +3327,16 @@ Invert<- function(Pd)
 InWindow<-function(PA)
 {
   Eps<-10.0^(-6);
-  X<-PA[1]; Y<-PA[2];
-  if (X>XMIN-Eps && X<XMAX+Eps && Y>YMIN-Eps && Y<YMAX+Eps)
-    Rx<-"i"
-  else
-    Rx<-"o"
-  return(Rx);
+  if((length(PA)==2)&(is.numeric(PA))){ # 17.11.20
+    X<-PA[1]; Y<-PA[2];
+    if (X>XMIN-Eps && X<XMAX+Eps && Y>YMIN-Eps && Y<YMAX+Eps)
+      Rx<-"i"
+    else
+      Rx<-"o"
+    return(Rx)
+  }else{
+    return("o")
+  }
 }
 
 #######################################
@@ -3605,7 +3727,7 @@ Kyoukai<- function(...)
 {
   varargin<- list(...)
   Nargs<- length(varargin)
-  Eps0<- 10^(-5)
+  Eps0<- 10^(-7)
   DataL<-list()
   for (I in 1:Nargs){
     Tmp<- varargin[[I]]
@@ -3860,7 +3982,7 @@ Letterrot<- function(...)
   if (mode(Tmp)=="numeric"){
     Nmov<- Tmp; N<- N+1
   }
-  Mojiretu<- varargin[[N]]
+  Mojiretu<- Assign(varargin[[N]]) #2017.11.26
   Tv<- 1/Norm(V)*V
   Nv<- c(-Tv[2],Tv[1])
   P<- P+MEMORI*Tmov*Tv+MEMORI*Nmov*Nv
@@ -4459,62 +4581,50 @@ Naigai<- function(A,Bdy)
 
 ########################################
 
-Nearestpt<-function(...)
-{
-  varargin<-list(...)
-  Nargs<-length(varargin)
-  PL1<-varargin[[1]]
-  if (!is.matrix(PL1))
-  {
-    Tmp<-matrix(PL1);
-    PL1<-t(Tmp)
+Nearestpt<- function(...){
+  varargin<- list(...)
+  Nargs<- length(varargin)
+  PL1<- varargin[[1]]
+  if (!is.matrix(PL1)){
+    Tmp<- matrix(PL1);
+    PL1<- t(Tmp)
   }
   if (Nrow(PL1)==1) Flg=0
   else Flg=1
-  Eps<-10.0^(-6)
-  PL<-varargin[[2]]
-  Ans<-list(PL1[1,],1,PL[1,],1,Norm(PL1[1,]-PL[1,]))
-  for (N in 1:Nrow(PL1))
-  {
-    PA<-PL1[N,]
-    Pm<-PL[1,]
-    Im<-1
-    Sm<-Norm(Pm-PA)
-    for (I in 1:(Nrow(PL)-1))
-    {
-      A1<-PL[I,1]; A2<-PL[I,2]
-      B1<-PL[I+1,1]; B2<-PL[I+1,2]
-      V1<-B1-A1; V2<-B2-A2
-      X1<-PA[1]; X2<-PA[2]
+  Eps<- 10.0^(-6)
+  PL<- varargin[[2]]
+  Ans<- list(PL1[1,],1,PL[1,],1,Norm(PL1[1,]-PL[1,]))
+  for(N in Looprange(1,Nrow(PL1))){
+    PA<- PL1[N,]
+    Pm<- PL[1,]
+    Im<- 1
+    Sm<- Norm(Pm-PA)
+    for(I in Looprange(1,Nrow(PL)-1)){
+      A1<- PL[I,1]; A2<-PL[I,2]
+      B1<- PL[I+1,1]; B2<-PL[I+1,2]
+      V1<- B1-A1; V2<-B2-A2
+      X1<- PA[1]; X2<-PA[2]
       Tmp<-V2^2+V1^2
       if (abs(Tmp)<Eps) next
-      T<-(-A2*V2-V1*A1+V1*X1+X2*V2)/Tmp
-      if (T< -Eps)
-      {
-        P<-c(A1,A2)
-      }
-      else
-      {
-        if (T>1+Eps)
-        {
-          P<-c(B1,B2)
-        }
-        else
-        {
-          P<-c(A1+T*V1,A2+T*V2)
+      T<- (-A2*V2-V1*A1+V1*X1+X2*V2)/Tmp
+      if (T< -Eps){
+        P<- c(A1,A2)
+      }else{
+        if (T>1+Eps){
+          P<- c(B1,B2)
+        }else{
+          P<- c(A1+T*V1,A2+T*V2)
         }
       }
-      S<-Norm(P-PA)
-      if (S<Sm-Eps)
-      {
-        Tmp<-Paramoncrv(P,I,PL)
-        Pm<-P; Im<-Tmp; Sm<-S
+      S<- Norm(P-PA)
+      if (S<Sm-Eps){
+        Tmp<- Paramoncrv(P,I,PL)
+        Pm<- P; Im<- Tmp; Sm<- S
       }
     }
-    if (Sm<Ans[[5]]) Ans<-list(PA,N,Pm,Im,Sm)
-    if (Flg==0)
-    {
-      Ans<-Ans[3:5]
+    if (Sm<Op(5,Ans)) Ans<- list(PA,N,Pm,Im,Sm)
+    if (Flg==0){
+      Ans<- Ans[3:5]
     }
   }
   return(Ans)
@@ -4537,6 +4647,13 @@ Newlength<- function()
 Numptcrv<-function(Fig)
 {
   return(Nrow(Fig))
+}
+
+# 2018.01.29
+Length<- function(Data){
+  if(is.matrix(Data)){return(nrow(Data))}
+  if(is.character(Data)){return(nchar(Data))}
+  return(length(Data))
 }
 
 #########################################
@@ -4588,48 +4705,34 @@ Op<-function(N,Data)
 
 Openfile<-function(...)
 {
-  varargin<- list(...)                          # 2013.05.20 from
+  varargin<- list(...) 
   File<- varargin[[1]]
   Bflg<- 0
   Wfile<<- File
   Creator<- ""
   Cflg<- 0
   Nargs<- length(varargin)
-  if(Nargs>1){
-    for(N in 2:Nargs){
-      Tmp<- varargin[[N]]
-      Tmp1<- strsplit(Tmp,"=",fixed=TRUE)
-      Tmp1<- Tmp1[[1]]
-      if(length(Tmp1)>1){
-        Creator<- Tmp1[2]
-        Cflg<- 1
-      }
-      else{
-        Unitstr<- Tmp
-        Bflg<- 1
-      }
+  for(N in Looprange(2,Nargs)){
+    Tmp<- varargin[[N]]
+    Tmp1<- strsplit(Tmp,"=",fixed=TRUE)
+    Tmp1<- Tmp1[[1]]
+    if(length(Tmp1)>1){
+      Creator<- Tmp1[2]
+      Cflg<- 1
+    }
+    else{
+      Unitstr<- Tmp
+      Bflg<- 1
     }
   }
   Recentf<- "" 
   Fv<- list.files()
   Nv<- grep("\\.r$", Fv)
   Rfiles<-  Fv[Nv]
-#  if(length(Rfiles)>0){
-#    Finfo<- file.info(Rfiles)
-#    Tmp1<- as.POSIXlt(Finfo$ctime)
-#    Tmp2<- order(Tmp1,decreasing=TRUE)
-#    Recentf<- Rfiles[Tmp2[1]] 
-#  }
-#  Tmp<- sprintf("%s",Sys.time())
-  StrW<- paste("%%% ",File,"   ",Tmp,sep="")
-  StrC<- paste("%%% ",Creator,sep="")
+  StrW<- paste("%%% ",File,sep="") #17.10.28
+  StrC<- paste("%%% Generator=",Creator,sep="")
   if(Cflg==0){
-#    if(nchar(Recentf)>0){
-#	  Tmp1<- file.info(Recentf)
-#	  Tmp2<- sprintf("%s",Tmp1$ctime)
-#      StrC<- paste(StrC,Recentf,"   ",Tmp2,sep="")
-#    }
-  }	                                            # 2013.12.15 upto
+  }	
   cat(StrW,"\n",file=Wfile)
   cat(StrC,"\n",file=Wfile,append=TRUE)
   if(Bflg==1){
@@ -4746,7 +4849,7 @@ Ovaldata<- function(...) #17.09.11
   }
   Out<- c()
   P<- C+c(Dx-Rc,Dy-Rc)
-  Tmp1<- Circledata(P,Rc,"R=c(0,pi/2)","N=10")
+  Tmp1<- Circledata(c(P,Rc),"R=c(0,pi/2)","N=10") #17.11.29
   Tmp2<- Listplot(C+c(Dx-Rc,Dy),C+c(0,Dy))
   Tmp3<- Listplot(C+c(Dx,0),C+c(Dx,Dy-Rc))
   G<- Joincrvs(Tmp3,Tmp1,Tmp2)
@@ -4826,20 +4929,8 @@ Paramplot<- function(...)
   varargin<- list(...)
   Eps<- 10^(-5)
   Nargs<- length(varargin)
-#  if type(varargin(1))==13
-#    Fnflg=1;
-#    Fnx=varargin(1);
-#    Fny=varargin(2); Is=3;
-#    if type(varargin(Is))==13
-#      Fnflg=Fnflg+1;
-#      Fnargx=varargin(Is);
-#      Fnargy=varargin(Is+1);
-#      Is=Is+2;
-#    end;
-#  else
-    Fnflg<- 0
-    Fnstr<- varargin[[1]]; Is=2
-#  end;
+  Fnflg<- 0
+  Fnstr<- varargin[[1]]; Is=2
   Rgstr<- varargin[[Is]]; Is<- Is+1
   Range<- c(0,2*pi)
   N<- 50      # Numpoints
@@ -4874,6 +4965,11 @@ Paramplot<- function(...)
    if (Fnflg==0)
   {
     Str<-  gsub(Vname,"t",Fnstr)
+  }
+  if(abs(Dt)<Eps){ # 16.12.13
+    t=T1
+    P=eval(parse(text=Str))
+    return(P)
   }
   P<-c()
   if (length(E)>0)
@@ -5084,6 +5180,11 @@ Plotdata<- function(...)
   dx<- (X2-X1)/N # 17.09.22
   if (Fnflg==0){
     Str<-  gsub(Vname,"x",Fnstr,fixed=TRUE)
+  }
+  if(abs(dx)<Eps){  # Scilab 16.12.13
+    x=X1
+    P=c(X1,eval(parse(text=Str)))
+    return(P)
   }
   Exfun<- gsub(Vname,"x",Exfun,fixed=TRUE)
   P<-c()
@@ -6028,9 +6129,8 @@ WriteOutData<- function(...){
   cat("//","\n",sep="",file=Fname,append=TRUE) # 15.11.05
 }
 
-##########################################
+######  Old  ####################################
 #  2015.10.23
-
 ReadOutData<- function(...){
   varargin<- list(...)
   Nargs<- length(varargin)
@@ -6083,6 +6183,65 @@ ReadOutData<- function(...){
   }
 #  print(varL)
   outdt
+}
+
+####################################################
+
+ReadOutData<- function(...){ #2017.10.23
+  varargin<- list(...)
+  Nargs<- length(varargin)
+  Fname=varargin[[1]]
+  cmdall=readLines(Fname)
+  cmdall=gsub("//","",cmdall,fixed=TRUE)
+  varname=""#17.12.13 cmdall[1]
+  outdt=list()
+  varL=c()
+  ptL=list()
+  flg=0
+  for(cmd in cmdall){
+    if(nchar(cmd)>0){
+      if((cmd=="start") | cmd=="end" | substring(cmd,1,1)=="["){
+        if(cmd=="start"){
+          tmp=paste(varname,"<<- c(",varname,",list(c()))",sep="")
+          eval(parse(text=tmp))
+          Ctr=Ctr+1
+        }
+        if(cmd=="end"){
+        }
+        if(substring(cmd,1,1)=="["){
+          tmp1=paste(",",substring(cmd,2,nchar(cmd)-1),sep="")
+          tmp1=strsplit(tmp1,"]",fixed=TRUE)
+          tmp1=tmp1[[1]]
+          tmp1=gsub(",[","c(",tmp1,fixed=TRUE)
+		  for(st in tmp1){
+            tmp=paste(varname,"[[",as.character(Ctr),"]]",sep="")
+            tmp=paste(tmp,"<<- rbind(",tmp,",",st,"))",sep="")#
+            eval(parse(text=tmp))
+          }
+        }
+      }
+      else{
+          # 17.12.13from
+          if(nchar(varname)>0){
+            tmp=paste("if(length(",varname,")==1){",varname,"<<- ",varname,"[[1]]}",sep="")
+            eval(parse(text=tmp))
+          }
+          # 17.12.13upto
+        varname=cmd
+        tmp=paste(varname,"<<- list()",sep="")
+        eval(parse(text=tmp))
+        Ctr=0
+        if(flg==0){  # 17.10.07from
+          flg=1
+        }else{
+        }  # 17.10.07upto
+      }
+    }
+  }
+  # 17.12.13from
+  tmp=paste("if(length(",varname,")==1){",varname,"<<- ",varname,"[[1]]}",sep="")
+  eval(parse(text=tmp))
+  # 17.12.13upto
 }
 
 ####################################################
@@ -6492,7 +6651,8 @@ Setunitlen<-function(...)
   if (Unit=="dd2") MilliIn<<-1000/1238/1157/72.27*Valu
   if (Unit=="cc") MilliIn<<-1000/1238/1157/72.27*12*Valu
   if (Unit=="sp") MilliIn<<-1000/72.27/65536*Valu/10
-  MARKLEN<<-MARKLENNow*1000/2.54/MilliIn;
+  MARKLEN<<-MARKLENNow*1000/2.54/MilliIn
+  MEMORI<<-MEMORINow*1000/2.54/MilliIn  #17.12.17
 }
 
 #########################################
@@ -7742,7 +7902,7 @@ Cancoordpers<- function(P){
 
 #######################################
 
-Embed <- function(...){
+Embed<- function(...){
   varargin<- list(...)
   Nargs<- length(varargin)
   Pd3<- varargin[[1]]
@@ -9861,7 +10021,7 @@ Spacecurve<- function(...){
     StrV<- StrV[[1]]
     Tmp1<- toupper(StrV[1])
     Lhs<- substr(Tmp1,1,1) 
-    Str<- paste(Lhs,"=",StrV[2]) 
+    Str<- paste(Lhs,"=",StrV[2],sep="") 
     eval(parse(text=Str)) 
   }
   StrV<-  strsplit(Rgstr,"=",fixed=TRUE)
@@ -9877,6 +10037,13 @@ Spacecurve<- function(...){
   T1<- Rng[1]; T2<- Rng[2]
   Dt<- (T2-T1)/N #17.09.22
   Str<- gsub(Vname,"t",Fnstr)
+  Str=gsub("[","c(",Str,fixed=TRUE) #17.12.22(2lines)
+  Str=gsub("]",")",Str,fixed=TRUE)
+  if(abs(Dt)<Eps){ # 16.12.13
+    t=T1
+    P=eval(parse(text=Str))
+    return(P)
+  }
   P<- c()
 #  E<- sort(E,decreasing=FALSE)
   E<- c(E,Inf)
@@ -11278,7 +11445,7 @@ Deqdata=function(deq,rng,initt,initf,Num){
   tt=initt
   X0=initf
   pdL=c(tt,X0)
-  for(J in 1:(floor((t2-initt)/dt))){
+  for(J in Looprange(1,floor((t2-initt)/dt))){
     kl1=dt*funP(tt,X0)
     kl2=dt*funP(tt+dt/2,X0+kl1/2)
     kl3=dt*funP(tt+dt/2,X0+kl2/2)
@@ -11291,7 +11458,7 @@ Deqdata=function(deq,rng,initt,initf,Num){
   }
   tt=initt
   X0=initf
-  for(J in 1:(floor((initt-t1)/dt))){
+  for(J in Looprange(1,floor((initt-t1)/dt))){
     kl1=dt*funN(tt,X0)
     kl2=dt*funN(tt+dt/2,X0+kl1/2)
     kl3=dt*funN(tt+dt/2,X0+kl2/2)
@@ -11325,3 +11492,1169 @@ Deqplot=function(...){
   pdL=Deqdata(deq,rng,initt,initf,Num)
   pdL=pdL[,SeL]
 }
+
+
+############## obj ###############
+
+Openobj<- function(Fnm){
+  OBJFMT<<- "%7.4f"
+  NPOINT<<- 0
+  NNORM<<- 0
+  OBJSCALE<<- 1
+  OBJFIGNO<<- 0
+  OBJJOIN<<- 0
+  Wfile<<- Fnm
+  Tmp=grep(".obj",Fnm,fixed=TRUE)
+  if(length(Tmp)==0){
+    if(nchar(Fnm)>0){
+      Wfile<<- paste(Fnm,".obj",sep="")
+    }
+  }
+  cat("",file=Wfile,sep="")
+  Wfile
+}
+
+Closeobj<- function(){
+  Wfile=""
+}
+
+Writeobjpoint<- function(P){
+  X=sprintf(OBJFMT,P[1]*OBJSCALE)
+  Y=sprintf(OBJFMT,P[2]*OBJSCALE)
+  Z=sprintf(OBJFMT,P[3]*OBJSCALE)
+  Str=paste("v",X,Y,Z,sep=" ")
+  Printobjstr(Str)
+  NPOINT<<- NPOINT+1
+  return(NPOINT)
+}
+
+Printobjstr<- function(Str){
+  cat(Str,"\n",sep="",file=Wfile,append=TRUE)
+}
+
+Objname<- function(){
+  if(OBJJOIN==0){
+    OBJFIGNO<<- OBJFIGNO+1
+    Gname=paste("ketfig",as.character(OBJFIGNO),sep="")
+    Printobjstr(paste("# ",Gname,sep=""))
+    Printobjstr(paste("g ",Gname,sep=""))
+  }
+}
+
+Objjoin<- function(...){
+  varargin=list()
+  if(length(varargin)>0){
+    OBJJOIN<<- abs(sign(varargin[[1]]))
+  }
+  OBJJOIN
+}
+
+Objsurf<- function(...){ #17.12.18
+  Args<- list(...)
+  Nargs<- length(Args)
+  Sel=Args[[Nargs]]; Nargs=Nargs-1
+  Rf=Args[[1]]
+  N=2
+  Mg=0; Ng=0
+  if(is.numeric(Args[[N]])){
+    if(length(Args[[N]])>2){
+      U=Args[[N]]
+      Mg=length(U)-1
+      N=N+1
+    }else if(length(Args[[N]])==2){
+      Intab=Args[[N]]
+      Ag=Intab[1]; Bg=Intab[2]
+      N=N+1
+    }else{
+      Ag=Args[N]; Bg=Args[N+1]
+      N=N+2
+   }
+  }else{
+    Tmp0=Args[[N]]
+    Tmp=grep("=",Tmp0,fixed=TRUE)
+    if(length(Tmp)>0){
+      Tmp1=strsplit(Tmp0,"=")
+      Tmp0=Tmp1[[1]][2]
+    }
+    Intab=eval(parse(text=Tmp0))
+    Ag=Intab[1]; Bg=Intab[2]
+    N=N+1
+  }
+  if(is.numeric(Args[[N]])){
+    if(length(Args[[N]])>2){
+      V=Args[[N]]
+      Ng=length(V)-1
+      N=N+1
+    }else if(length(Args[[N]])==2){
+      Intab=Args[[N]]
+      Cg=Intab[1]; Dg=Intab[2]
+      N=N+1
+    }else{
+      Cg=Args[[N]]; Dg=Args[[N+1]]
+      N=N+2
+    }
+  }else{ # the case of is.character(Args[[N]])
+    Tmp0=Args[[N]]
+    Tmp=grep("=",Tmp0,fixed=TRUE)
+    if(length(Tmp)>0){
+      Tmp2=strsplit(Tmp0,"=")
+      Tmp0=Tmp2[[1]][2]
+    }
+    Intab=eval(parse(text=Tmp0))
+    Cg=Intab[1]; Dg=Intab[2]
+    N=N+1
+  }  
+  if(Mg==0){
+    Mg=Args[[N]]
+    N=N+1
+	U=c()
+    for(J in Looprange(1,Mg+1)){
+      U=c(U,Ag+(J-1)/Mg*(Bg-Ag))
+    }
+  }
+  if(Ng==0){
+    Ng=Args[[N]]
+    V=c()
+    for(K in Looprange(1,Ng+1)){
+      V=c(V,Cg+(K-1)/Ng*(Dg-Cg))
+    }
+  }
+  Objname()
+  PL=list()
+  for(J in Looprange(1,Mg+1)){
+    for(K in Looprange(1,Ng+1)){
+      P=Rf(U[J],V[K])
+      Np=Writeobjpoint(P)
+      PL=c(PL,list(c(P,Np)))
+    }
+  }
+  Idx=1+(Ng+1)*(0:Mg)
+  Pus=PL[Idx]
+  Idx=(Ng+1)*(1:(Mg+1))
+  Pue=PL[Idx]
+  Idx=1:(Ng+1)
+  Pvs=PL[Idx]
+  Idx=((Ng+1)*Mg+1):((Ng+1)*(Mg+1))
+  Pve=PL[Idx]
+  Printobjstr("vt 0 0")
+  Printobjstr("vt 1 0")
+  Printobjstr("vt 1 1")
+  Printobjstr("vt 0 1")
+  for(J in Looprange(1,Mg)){
+    for(K in Looprange(1,Ng)){
+      P1=sprintf("%1d",Op(4,PL[[(Ng+1)*(J-1)+K]]))
+      P2=sprintf("%1d",Op(4,PL[[(Ng+1)*J+K]]))
+      P3=sprintf("%1d",Op(4,PL[[(Ng+1)*J+K+1]]))
+      P4=sprintf("%1d",Op(4,PL[[(Ng+1)*(J-1)+K+1]]))
+      N1=""; N2=""; N3=""; N4=""
+      if(Sel=="+"){
+        Str=paste("f ",P1,"/1/",N1," ",P2,"/2/",N2," ",sep="")
+        Str=paste(Str,P3,"/3/",N3," ",P4,"/4/",N4,sep="")
+      }else{
+        Str=paste("f ",P1,"/1/",N1," ",P4,"/4/",N4," ",sep="")
+        Str=paste(Str,P3,"/3/",N3," ",P2,"/2/",N2,sep="")
+      }
+      Printobjstr(Str)
+    }
+  }
+  list(U,V,Pus,Pue,Pvs,Pve)
+}
+
+Objthicksurf<- function(...){
+  Args=list(...)
+  Nargs=length(Args)
+  Sel=Args[[Nargs]]; Nargs=Nargs-1
+  Selsurf=substring(Sel,1,1)
+  Selside=c("0","0","0","0")
+  Tmp=grep("w",Sel,fixed=TRUE)
+  if(length(Tmp)>0){
+    Selside[1]="w"
+  }
+  Tmp=grep("e",Sel,fixed=TRUE)
+  if(length(Tmp)>0){
+    Selside[2]="e"
+  }
+  Tmp=grep("s",Sel,fixed=TRUE)
+  if(length(Tmp)>0){
+    Selside[3]="s"
+  }
+  Tmp=grep("n",Sel,fixed=TRUE)
+  if(length(Tmp)>0){
+    Selside[4]="n"
+  }
+  Nfth=Args[[Nargs-2]]
+  Thick1=Args[[Nargs-1]]
+  Thick2=Args[[Nargs]]
+  Nargs=Nargs-3
+  Rfth=Args[[1]]
+  N=2
+  Mg=0; Ng=0
+  if(is.numeric(Args[[N]])){
+    if(length(Args[[N]])>2){
+      U=Args[[N]]
+      Mg=length(U)-1
+      N=N+1
+    }else if(length(Args[[N]])==2){
+      Intab=Args[[N]]
+      Ag=Intab[1]; Bg=Intab[2]
+      N=N+1
+    }else{
+      Ag=Args[[N]]; Bg=Args[[N+1]]
+      N=N+2
+    }
+  }else{
+    Tmp0=Args[[N]]
+    Tmp=strsplit(Tmp0,"=",fixe=TRUE)
+    if(length(Tmp)>0){
+      Tmp0=Tmp[[1]][2]
+    }
+    Intab=eval(parse(text=Tmp0))
+    Ag=Intab[1]; Bg=Intab[2]
+    N=N+1
+  }
+  if(is.numeric(Args[[N]])){
+    if(length(Args[[N]])>2){
+      V=Args[[N]]
+      Ng=length(V)-1
+      N=N+1
+    }else if(length(Args[[N]])==2){
+      Intab=Args[[N]]
+      Cg=Intab[1]; Dg=Intab[2]
+      N=N+1
+    }else{
+      Cg=Args[[N]]; Dg=Args[[N+1]]
+      N=N+2
+    }
+  }else{
+    Tmp0=Args[[N]]
+    Tmp=strsplit(Tmp0,"=",fixed=TRUE)
+    if(length(Tmp)>0){
+      Tmp0=Tmp[[1]][2]
+    }
+    Intab=eval(parse(text=Tmp0))
+    Cg=Intab[1]; Dg=Intab[2]
+    N=N+1
+  }
+  if(Mg==0){
+    Mg=Args[[N]]
+    N=N+1
+	U=c()
+    for(J in Looprange(1,Mg+1)){
+      U=c(U,Ag+(J-1)/Mg*(Bg-Ag))
+    }
+  }
+  if(Ng==0){
+    Ng=Args[[N]]
+    V=c()
+    for(K in Looprange(1,Ng+1)){
+      V=c(V,Cg+(K-1)/Ng*(Dg-Cg))
+    }
+  }
+  Objname()
+  Join=OBJJOIN
+  OBJJOIN<<- 1
+  F1=function(u,v){
+    Rfth(u,v)+Thick1*Nfth(u,v)
+  }
+  F2=function(u,v){
+    Rfth(u,v)+Thick2*Nfth(u,v)
+  }
+  Dt1=Objsurf(F1,U,V,Selsurf)
+  if(Selsurf=="+"){
+    Tmp="-"
+  }else{
+    Tmp="+"
+  }
+  Dt2=Objsurf(F2,U,V,Tmp);
+  Out=list(Dt1,Dt2);
+
+  if(Selside[1]!="0"){
+    Dt=Objrecs(Op(3,Dt1),Op(3,Dt2),Selside[1])
+    Out=c(Out,list(Dt))
+  }
+  if(Selside[2]!="0"){
+    Dt=Objrecs(Op(4,Dt1),Op(4,Dt2),Selside[2])
+    Out=c(Out,list(Dt))
+  }
+  if(Selside[3]!="0"){
+    Dt=Objrecs(Op(5,Dt1),Op(5,Dt2),Selside[3])
+    Out=c(Out,list(Dt))
+  }
+  if(Selside[4]!="0"){
+    Dt=Objrecs(Op(6,Dt1),Op(6,Dt2),Selside[4])
+    Out=c(Out,list(Dt))
+  }
+  OBJJOIN<<- Join
+}
+
+Objrecs<- function(...){
+  Eps=10^(-6)
+  Args=list(...)
+  Nargs=length(Args)
+  Tmp=Args[[1]]
+  PtL=Flattenlist(Tmp)
+  for(J in Looprange(1,length(PtL))){ #17.12.23from
+    Tmp=PtL[[J]]
+    if(!is.matrix(Tmp)){ 
+      PtL[[J]]=matrix(Tmp,nrow=1)
+    }
+  }  #17.12.23upto
+  PL1=list()
+  for(J in Looprange(1,length(PtL))){
+    Tmp=PtL[[J]]
+    for(K in Looprange(1,nrow(Tmp))){
+      PL1=c(PL1,list(Tmp[K,]))
+    }
+  }
+  Sel=Args[[Nargs]]; Nargs=Nargs-1
+  Objname()
+  for(J in Looprange(1,length(PL1))){
+    P=PL1[[J]]
+    if((length(P)<4) || (P[4]==0)){
+      Np=Writeobjpoint(P)
+      PL1[[J]]=c(P[1:3],Np)
+    }
+  }
+  Tmp=Args[[2]]
+  if((is.numeric(Tmp)) && (length(Tmp)==1)){
+    Drv=Tmp
+    Len=Norm(Drv)
+    PL2=list()
+    for(J in Looprange(1,length(PL1))){
+      Tmp=PL1[[J]]
+      P=Tmp[1:3]+Drv
+      Np=Writeobjpoint(P)
+      PL2=c(PL2,list(c(P[1:3],Np)))
+      if(J<length(PL1)){
+        Vec=PL1[[J+1]]-PL1[[J]]
+        if(Norm(Vec)>Eps){
+          Tmp1=Crossprod(Drv,Vec)
+          Tmp2=Crossprod(Tmp1,Vec)
+          Tmp3=Dotprod(Tmp2,Drv)
+          if(Tmp3<-Eps){
+            Tmp2=-Tmp2
+          }
+          Drv=Len/Norm(Tmp2)*Tmp2
+        }
+      }
+    }
+  }else{
+    PtL=Flattenlist(Tmp)
+    for(J in Looprange(1,length(PtL))){ #17.12.23from
+      Tmp=PtL[[J]]
+      if(!is.matrix(Tmp)){ 
+        PtL[[J]]=matrix(Tmp,nrow=1)
+      }
+    }  #17.12.23upto
+    PL2=list()
+    for(J in Looprange(1,length(PtL))){
+      Tmp=PtL[[J]]
+      for(K in Looprange(1,nrow(Tmp))){
+          PL2=c(PL2,list(Tmp[K,]))
+      }
+    }
+    for(J in Looprange(1,length(PL2))){
+      P=PL2[[J]]
+      if((length(P)<4) || (P[4]==0)){
+         Np=Writeobjpoint(P)
+         PL2[[J]]=c(P[1:3],Np)
+      }
+    }
+  }
+  Printobjstr("vt 0 0")
+  Printobjstr("vt 1 0")
+  Printobjstr("vt 1 1")
+  Printobjstr("vt 0 1")
+  for(J in Looprange(2,length(PL1))){
+    P1=sprintf("%1d",Op(4,PL1[[J-1]]))
+    P2=sprintf("%1d",Op(4,PL2[[J-1]]))
+    P3=sprintf("%1d",Op(4,PL2[[J]]))
+    P4=sprintf("%1d",Op(4,PL1[[J]]))
+    N1=""; N2=""; N3=""; N4=""
+	if(Sel=="+"){
+      Str=paste("f ",P1,"/1/",N1," ",P2,"/2/",N2," ",sep="")
+      Str=paste(Str,P3,"/3/",N3," ",P4,"/4/",N4,sep="")
+    }else{
+      Str=paste("f ",P1,"/1/",N1," ",P4,"/4/",N4," ",sep="")
+      Str=paste(Str,P3,"/3/",N3," ",P2,"/2/",N2,sep="")
+    }
+    Printobjstr(Str)
+  }
+  list(PL1,PL2)
+}
+
+Objpolygon<- function(...){
+  Eps=10^(-6)
+  Args=list(...)
+  Nargs=length(Args)
+  Tmp=Args[[1]]
+  PtL=Flattenlist(Tmp)
+  for(J in Looprange(1,length(PtL))){ #17.12.23from
+    Tmp=PtL[[J]]
+    if(!is.matrix(Tmp)){ 
+      PtL[[J]]=matrix(Tmp,nrow=1)
+    }
+  }  #17.12.23upto
+  PL=list()
+  for(J in Looprange(1,length(PtL))){
+    Tmp=PtL[[J]]
+    for(K in Looprange(1,nrow(Tmp))){
+       PL=c(PL,list(Tmp[K,]))
+    }
+  }
+  Sel=Args[[Nargs]]; Nargs=Nargs-1
+  Objname()
+  for(J in Looprange(1,length(PL))){
+    P=PL[[J]]
+    if((length(P)<4) || (P(4)==0)){
+       Np=Writeobjpoint(P)
+       PL[[J]]=c(P[1:3],Np)
+    }
+  }
+  if(Nargs==1){
+    Tmp=PL[[1]]
+    Cen=Tmp[1:3]
+	Nc=Tmp[4]
+  }else{
+    Tmp=Args[[2]]
+    if(length(Tmp)==1){
+      Tmp1=PL[[Tmp]]
+      Cen=Tmp1[1:3]
+      Nc=Tmp[4]
+    }else{
+      Cen=Tmp
+      Nc=Writeobjpoint(Cen)
+    }
+  }
+  for(J in Looprange(1,length(PL))){
+    if(J<length(PL)){
+     Je=J+1
+    }else{
+      Je=1
+    }
+    Pt1=Cen
+    PLj=PL[[J]]; PLje=PL[[Je]]
+    Pt2=PLj[1:3]; Pt3=PLje[1:3]
+    if(Norm(Crossprod(Pt2-Pt1,Pt3-Pt1))<Eps){
+     next
+    }
+    P1=sprintf("%1d",Nc)
+    P2=sprintf("%1d",PLj[4])
+    P3=sprintf("%1d",PLje[4])
+	if(Sel=="+"){
+      Str=paste("f",P1,P2,P3,"",sep=" ")
+    }else{
+      Str=paste("f",P1,P3,P2,"",sep=" ")
+    }
+    Printobjstr(Str)
+  }
+  PL
+}
+
+Objpolyhedron<- function(Vertex,Face){
+  OBJFIGNO<<- OBJFIGNO+1
+  Ninit=NPOINT
+  Objname()
+  for(N in Looprange(1,length(Vertex))){
+    P=Vertex[[N]]
+    Np=Writeobjpoint(P)
+    Vertex[[N]]=c(P[1:3],Np)
+  }
+  for(N in Looprange(1,length(Face))){
+    F=Face[[N]]+Ninit
+    Face[[N]]=F
+    Str="f"
+    for(J in Looprange(1,length(F))){
+      P=sprintf("%1d",F[J])
+      Str=paste(Str,P,sep=" ")
+    }
+    Printobjstr(Str)
+  }
+  list(Vertex,Face)
+}
+
+Objcurve<- function(...){
+  Eps=10^(-6)
+  Args=list(...)
+  Nargs=length(Args)
+  Tmp=Args[[1]]
+  PtL=Flattenlist(Tmp)
+  for(J in Looprange(1,length(PtL))){ #17.12.23from
+    Tmp=PtL[[J]]
+    if(!is.matrix(Tmp)){ 
+      PtL[[J]]=matrix(Tmp,nrow=1)
+    }
+  }  #17.12.23upto
+  PL=list()
+  for(J in Looprange(1,length(PtL))){
+    Tmp=PtL[[J]]
+    for(K in Looprange(1,nrow(Tmp))){
+       PL=c(PL,list(Tmp[K,]))
+    }
+  }
+  Closed=Norm(PL[[length(PL)]]-PL[[1]])<Eps
+  Pstr="xy"
+  Tmp=Args[[Nargs]]
+  if(is.character(Tmp)){
+    Pstr=Tmp
+    Nargs=Nargs-1
+  }
+  Sz=0.1
+  Np=4
+  if(Nargs>=2){
+    Sz=Args[[2]]
+  }
+  if(Nargs>=3){
+    Np=Args[[3]]
+  }
+  Assign("Sz",Sz)
+  if(Pstr=="xy"){
+    Vz=c(0,0,1)
+    Fs=Assign("c(Sz*cos(t),Sz*sin(t),0)")
+  }
+  if(Pstr=="yz"){
+    Vz=c(1,0,0)
+    Fs=Assign("c(0,Sz*cos(t),Sz*sin(t))")
+  }
+  if(Pstr=="zx"){
+    Vz=c(0,1,0)
+    Fs=Assign("c(Sz*sin(t),0,Sz*cos(t))")
+  }
+  Gc0=Spacecurve(Fs,"t=c(0,2*pi)",paste("Num=",as.character(Np),sep=""))
+  P=PL[[1]]; Q=PL[[2]]; R=PL[[length(PL)-1]]
+  PQ1=Q-P
+  if(!Closed){
+    PQ2=PQ1
+  }else{ 
+    PQ2=P-R
+  }
+  Vp=PQ1/Norm(PQ1)+PQ2/Norm(PQ2)
+  Vp1=Vp/Norm(Vp)
+  Theta=acos(min(Dotprod(Vz,Vp1),1));
+  Vj=Crossprod(Vz,Vp1)
+  if(Norm(Vj)<Eps){
+    Vj=Vz
+  }
+  Gc1=Rotate3data(Gc0,Vj,Theta)
+  CL=list(Translate3data(Gc1,P))
+  for(J in Looprange(2,length(PL)-1)){
+    P=PL[[J]]; Q=PL[[J+1]]
+    PQ2=Q-P
+    if(Norm(PQ2)<Eps){
+      next
+    }
+    Vp=PQ1/Norm(PQ1)+PQ2/Norm(PQ2)
+    Vp2=Vp/Norm(Vp)
+    Theta=acos(min(Dotprod(Vp1,Vp2),1))
+    Vj=Crossprod(Vp1,Vp2)
+    if(Norm(Vj)<Eps){
+      Vj=Vp1
+    }
+    Gc2=Rotate3data(Gc1,Vj,Theta)
+    CL=c(CL,list(Translate3data(Gc2,P)))
+    PQ1=PQ2
+    Vp1=Vp2
+    Gc1=Gc2
+  }
+  if(!Closed){
+    Vp2=(Q-P)/Norm(Q-P)
+    Theta=acos(min(Dotprod(Vp1,Vp2),1))
+    Vj=Crossprod(Vp1,Vp2)
+    if(Norm(Vj)<Eps){
+      Vj=Vp1
+    }
+    Gc3=Rotate3data(Gc1,Vj,Theta)
+    CL=c(CL,list(Translate3data(Gc3,Q)))
+  }
+  Objname()
+  Join=Objjoin();
+  Objjoin(1)
+  GL1=CL[[1]]
+  for(J in Looprange(2,length(CL))){
+    GL2=CL[[J]]
+    Dt=Objrecs(GL1,GL2,"-")
+    GL1=Dt[[2]]
+    if(J==2){
+      GL0=Dt[[1]]
+    }
+  }
+  if(!Closed){
+    Objpolygon(CL[[1]],"-")
+    N=length(CL)
+    Objpolygon(CL[[N]],"+")
+  }else{
+     Objrecs(GL1,GL0,"-")
+  }
+  Out=CL
+  OBJJOIN<<- Join
+}
+
+Objsymb<- function(Symb,Thick,Face,Dir){
+  for(J in Looprange(1,length(Symb))){
+    Objcurve(Op(J,Symb),Thick,Face,Dir)
+  }
+}
+
+Symb3data<- function(Moji,Size,Kaiten,NV,Pos){
+  if(is.character(Moji)){
+    #Tmp=Symbdata(Moji)
+    #    GY1=Tmp(2)
+  }else{
+      GY1=Moji
+  }
+  GY1=Scaledata(GY1,Size,Size)
+  GY1=Rotatedata(GY1,Kaiten*pi/180)
+  A=NV[1]; B=NV[2]; C=NV[3]
+  if(A^2+B^2==0){
+    E1=c(1,0,0)
+    E2=c(0,1,0)
+  }else{
+    E1=c(B,-A,0)
+    E2=c(-A*C,-B*C,A^2+B^2)
+    Tmp=matrix(c(E1,E2,NV),3,3)
+    D=det(Tmp)
+    if(D<0){
+      E1=-E1
+    }
+    E1=E1/Norm(E1)
+    E2=E2/Norm(E2)
+  }
+  Em<- function(X,Y){
+    c(E1[1]*X+E2[1]*Y,E1[2]*X+E2[2]*Y,E1[3]*X+E2[3]*Y)
+  }
+  GY1=Embed(GY1,Em)
+  GY1=Translate3data(GY1,Pos)
+  Flattenlist(GY1)
+}
+
+############## New Intersect 18.02.01 #############
+
+Intersectline<- function(p1,v1,p2,v2){
+  Eps=10^(-5)
+  tmp=Dotprod(v1,v2)
+  tmp1=c(tmp,Norm(v1)^2)
+  tmp2=c(-Norm(v2)^2,-tmp)
+  tmp3=c(Dotprod(p2-p1,v2),Dotprod(p2-p1,v1))
+  d=Crossprod(tmp1,tmp2)
+  tmp=abs(Crossprod(v1,v2))
+  if(tmp>Eps){
+    dt=Crossprod(tmp3,tmp2)
+    ds=Crossprod(tmp1,tmp3)
+    t=dt/d
+    s=ds/d
+    pt=p1+v1*t
+    out=list(pt,t,s)
+  }else{
+    tmp1=Crossprod(p2-p1,v1)/Norm(v1)
+    out=list(abs(tmp1))
+  }
+  return(out)
+}
+
+Intersectseg<- function(...){
+  varargin=list(...)
+  Nargs=length(varargin)
+  Eps=10^(-4)
+  Eps1=0.01
+  seg1=varargin[[1]]
+  seg2=varargin[[2]]
+  if(Nargs>2){Eps1=varargin[[3]]}
+  p1=Op(1,seg1); q1=Op(2,seg1)
+  p2=Op(1,seg2); q2=Op(2,seg2)
+  if((Norm(q1-p1)<Eps)||(Norm(q2-p2)<Eps)){
+    out=list(-1)
+  }else{
+    tmp=Intersectline(p1,q1-p1,p2,q2-p2)
+    if(length(Op(1,tmp))>1){
+      pt=Op(1,tmp); t=Op(2,tmp); s=Op(3,tmp)
+      if((t*(t-1)<Eps)&&(s*(s-1)<Eps)){
+        out=list(0,pt,t,s)
+      }else{
+        t=min(max(t,0),1)
+        s=min(max(s,0),1)
+        tmp3=c(Norm(p1-p2),Norm(p1-q2),Norm(p2-p1),Norm(p2-q1))
+        tmp1=c(Op(2,q2-p2),-Op(1,q2-p2))
+        tmp=Intersectline(p1,tmp1,p2,q2-p2)
+        if(length(Op(1,tmp))>1){
+          if(Op(3,tmp)*(Op(3,tmp)-1)<Eps){
+            tmp3=c(tmp3,Norm(Op(1,tmp)-p1))
+          }
+        }
+        tmp=Intersectline(q1,tmp1,p2,q2-p2)
+        if(length(Op(1,tmp))>1){
+          if(Op(3,tmp)*(Op(3,tmp)-1)<Eps){
+            tmp3=c(tmp3,Norm(Op(1,tmp)-q1))
+          }
+        }
+        tmp1=c(Op(2,q1-p1),-Op(1,q1-p1))
+        tmp=Intersectline(p2,tmp1,p1,q1-p1);
+        if(length(Op(1,tmp))>1){
+          if(Op(3,tmp)*(Op(3,tmp)-1)<Eps){
+            tmp3=c(tmp3,Norm(Op(1,tmp)-p2))
+          }
+        }
+        if(length(Op(1,tmp))>1){
+          if(Op(3,tmp)*(Op(3,tmp)-1)<Eps){
+            tmp3=c(tmp3,Norm(Op(1,tmp)-q2))
+          }
+        }
+        out=list(min(tmp3),pt,t,s)
+      }
+    }else{
+      dist=tmp[[1]]
+      tmp1=q1-p1
+      n=c(tmp1[2],-tmp1[1])/Norm(tmp1)
+      pts=list()
+      tmp=Intersectline(p1,n,p2,q2-p2)
+      if(tmp[[3]]*(tmp[[3]]-1)<Eps){
+        tmp1=(1-tmp[[3]])*p2+tmp[[3]]*q2
+        pts=c(pts,list(list(tmp1,0,tmp[[3]])))
+      }
+      tmp=Intersectline(q1,n,p2,q2-p2)
+      if(tmp[[3]]*(tmp[[3]]-1)<Eps){
+        tmp1=(1-tmp[[3]])*p2+tmp[[3]]*q2
+        pts=c(pts,list(list(tmp1,1,tmp[[3]])))
+      }
+      tmp=Intersectline(p2,n,p1,q1-p1)
+      if(tmp[[3]]*(tmp[[3]]-1)<Eps){
+        tmp1=(1-tmp[[3]])*p1+tmp[[3]]*q1
+        pts=c(pts,list(list(tmp1,tmp[[3]],0)))
+      }
+      tmp=Intersectline(q2,n,p1,q1-p1)
+      if(tmp[[3]]*(tmp[[3]]-1)<Eps){
+        tmp1=(1-tmp[[3]])*p1+tmp[[3]]*q1
+        pts=c(pts,list(list(tmp1,tmp[[3]],2)))
+      }
+      if(length(pts)==0){
+        tmp1=min(Norm(p2-p1),Norm(q2-p1),Norm(p2-q1),Norm(q2-q1))
+        out=list(tmp1)
+      }else{
+        if(dist>Eps1){
+          out=list(dist)
+        }else{
+          tmp=c();
+          for(j in 1:length(pts)){
+            tmp=Appendrow(tmp,Op(1,pts[[j]]))
+          }
+          tmp1=sum(tmp[,1])/(length(pts))
+          tmp2=sum(tmp[,2])/(length(pts))
+          tmp3=c(tmp1,tmp2)
+          tmp=Nearestpt(tmp3,seg1)
+          tmp1=tmp[[2]]
+          tmp=Nearestpt(tmp3,seg2)
+          tmp2=tmp[[2]]
+          out=list(dist,tmp3,tmp1,tmp2)
+        }
+      }
+    }
+  }
+  return(out)
+}
+
+Osplineseg<- function(...){
+  varargin=list(...)
+  Nargs=length(varargin)
+  Eps=10^(-2)
+  Eps0=10^(-6)
+  list=varargin[[1]]
+  Numstr="Num=20"
+  if(Nargs>1){
+    Numstr=varargin[[2]]
+  }
+  p0=Op(1,list); p1=Op(2,list); p2=Op(3,list); p3=Op(4,list)
+  tmp=Norm(p2-p0)*Norm(p3-p1)
+  tmp=1+sqrt((1+Dotprod(p2-p0,p3-p1)/tmp)/2)
+  cc=4*Norm(p2-p1)/3/(Norm(p2-p0)+Norm(p3-p1))/tmp
+  pQ=p1+cc*(p2-p0)
+  pR=p2+cc*(p1-p3)
+  ctrL=list(c(pQ,pR))
+  out=Bezier(list(p1,p2),ctrL,Numstr)
+  return(out)
+}
+
+Intersectpartseg<- function(...){
+  varargin=list(...)
+  Nargs=length(varargin)
+  crv1=varargin[[1]]
+  crv2=varargin[[2]]
+  ii=varargin[[3]]
+  jj=varargin[[4]]
+  Eps1=varargin[[5]]
+  Eps2=varargin[[6]]
+  Dist=10*Eps2
+  if(Nargs>6){Dist=varargin[[7]]}
+  Eps=10^(-4)
+  out=list()
+  seg1=Listplot(Op(ii,crv1),Op(ii+1,crv1))
+  seg2=Listplot(Op(jj,crv2),Op(jj+1,crv2))
+  tmp1=Op(2,seg1)-Op(1,seg1)
+  tmp2=Op(2,seg2)-Op(1,seg2)
+  snang=abs(Crossprod(tmp1,tmp2))/(Norm(tmp1)*Norm(tmp2))
+  tmp=Intersectseg(seg1,seg2,Eps1)
+  dst=Op(1,tmp)
+  if(dst<Eps){
+    out=list(Op(2,tmp),ii+Op(3,tmp),jj+Op(4,tmp),dst,snang)
+  }else{
+    if(dst<Eps2){
+      if((Length(crv1)==2)||(Norm(Op(2,seg1)-Op(1,seg1))>Dist-Eps)){
+        os1=seg1
+      }else{
+        p1=Op(1,seg1); p2=Op(2,seg1)
+        if(ii==1){
+          p3=Op(3,crv1)
+          tmp=p2-p1
+          tmp=(p1+p2)/2+c(Op(2,tmp),-Op(1,tmp))
+          p0=Reflectdata(p3,c((p1+p2)/2,tmp))
+        }else{
+          if(ii==Length(crv1)-1){
+            p0=Op(ii-1,crv1)
+            tmp=p2-p1
+            tmp=(p1+p2)/2+c(Op(2,tmp),-Op(1,tmp))
+            p3=Reflectdata(p0,c((p1+p2)/2,tmp))
+          }else{
+            p0=Op(ii-1,crv1); p3=Op(ii+2,crv1)
+          }
+        }
+        os1=Osplineseg(list(p0,p1,p2,p3))
+      }
+      if((Length(crv2)==2)||(Norm(Op(2,seg2)-Op(1,seg2))>Dist-Eps)){
+        os2=seg2
+      }else{
+        p1=Op(1,seg2); p2=Op(2,seg2)
+        if(jj==1){
+          p3=Op(3,crv2)
+          tmp=p2-p1
+          tmp=(p1+p2)/2+c(Op(2,tmp),-Op(1,tmp))
+          p0=Reflectdata(p3,c((p1+p2)/2,tmp))
+        }else{
+          if(jj==Length(crv2)-1){
+            p0=Op(jj-1,crv2)
+            tmp=p2-p1
+            tmp=(p1+p2)/2+c(Op(2,tmp),-Op(1,tmp))
+            p3=Reflectdata(p0,c((p1+p2)/2,tmp))
+          }else{
+            p0=Op(jj-1,crv2); p3=Op(jj+2,crv2)
+          }
+        }
+        os2=Osplineseg(list(p0,p1,p2,p3))
+      }
+      tmp2=list()
+      for(kk in Looprange(1,Length(os1)-1)){
+        for(II in Looprange(1,Length(os2)-1)){
+          seg1=Listplot(Op(kk,os1),Op(kk+1,os1))
+          seg2=Listplot(Op(II,os2),Op(II+1,os2))
+          tmp=Intersectseg(seg1,seg2,Eps1)
+          if(Op(1,tmp)<Eps1){
+            if(Op(1,tmp)<dst+Eps){
+              dst=Op(1,tmp)
+              tmp3=list()
+              for( nn in Looprange(1,length(tmp2))){
+                if(Op(1,tmp2[[nn]])<dst){
+                  tmp3=c(tmp3,list(tmp2[[n]]))
+                }
+              }
+              tmp2=c(tmp3,list(list(dst,Op(2,tmp))))
+            }
+          }
+        }
+      }
+      if(length(tmp2)>0){
+        tmp1=c()
+        for(nn in Looprange(1,length(tmp2))){
+          tmp1=Appendrow(tmp1,Op(2,tmp2[[nn]]))
+        }
+        tmp=sum(tmp1[,1])/length(tmp2)
+        tmp=c(tmp,sum(tmp1[,2])/length(tmp2))
+        out=list(tmp)
+        p1=Op(ii,crv1); p2=Op(ii+1,crv1)
+        tmp=c(Op(2,p2-p1),-Op(1,p2-p1))
+        tmp=Intersectline(Op(1,out),tmp,p1,p2-p1)
+        tmp=min(max(Op(3,tmp),0),1)
+        out=list(tmp1,ii+tmp)
+        p1=Op(jj,crv2); p2=Op(jj+1,crv2)
+        tmp=c(Op(2,p2-p1),-Op(1,p2-p1))
+        tmp=Intersectline(Op(1,out),tmp,p1,p2-p1)
+        tmp=min(max(Op(3,tmp),0),1)
+        out=c(out,list(jj+tmp,dst,snang))
+      }
+    }
+  }
+  return(out)
+}
+
+Collectnear<- function(ptdL,Eps2){
+  Eps=10^(-4);
+  gL=list(Op(1,ptdL))
+  rL=ptdL[2:(length(ptdL))]
+  flg=0
+  for( ii in Looprange(1,length(ptdL)-1)){
+    if(flg==0){
+      numL=c()
+      for(jj in Looprange(1,length(rL))){
+        tmp1=100
+        for(kk in Looprange(1,length(gL))){
+          tmp=Norm(Op(1,gL[[kk]])-Op(1,rL[[jj]]))
+          if(tmp<tmp1){tmp1=tmp}
+        }
+        if(tmp1<Eps2){numL=c(numL,jj)}
+      }
+      if(length(numL)==0){
+        flg=1
+      }else{
+        gL=c(gL,rm[numL])
+        tmp=setdiff(1:(length(rL)),numL)
+        rL=rL[tmp]
+      }
+    }
+  }
+  return(list(gL,rL))
+}
+
+IntersectcurvesPp<- function(...){
+  varargin=list(...)
+  Nargs=length(varargin)
+  Eps=10^(-4)
+  Eps1=0.01
+  Eps2=0.1
+  Dist=10*Eps2
+  if(Nargs>2){Eps1=varargin[[3]]}
+  if(Nargs>3){Eps2=varargin[[4]]}
+  if(Nargs>4){Dist=varargin[[5]]}  
+  tmp1=varargin[[1]]
+  crv1=matrix(Op(1,tmp1),nrow=1)
+  for(ii in Looprange(2,Length(tmp1))){
+    tmp=Op(Length(crv1),crv1)
+    if(Norm(tmp-Op(ii,tmp1))>Eps){
+      crv1=Appendrow(crv1,Op(ii,tmp1))
+    }
+  }
+  tmp2=varargin[[2]]
+  crv2=matrix(Op(1,tmp2),nrow=1)
+  for(ii in Looprange(2,Length(tmp2))){
+    tmp=Op(Length(crv2),crv2)
+    if(Norm(tmp-Op(ii,tmp2))>Eps){
+      crv2=Appendrow(crv2,Op(ii,tmp2))
+    }
+  }
+  if(Length(crv1)!=Length(crv2)){
+    self=0
+  }else{
+    self=1
+    for(ii in Looprange(1,Length(crv1))){
+      if(Norm(Op(ii,crv1)-Op(ii,crv2))>0){
+        self=0
+        break
+      }
+    }
+  }
+  out=list()
+  for(ii in Looprange(1,Length(crv1)-1)){
+    if(self==0){
+      loopL=Looprange(1,Length(crv2)-1)
+    }else{
+      loopL=Looprange(ii+2,Length(crv2)-1)
+    }
+    for(jj in loopL){
+      tmp=Intersectpartseg(crv1,crv2,ii,jj,Eps1,Eps2,Dist)
+      if(length(tmp)>0){
+        if(length(out)==0){
+          out=list(tmp)
+        }else{
+          tmp1=Op(length(out),out)
+          if(Norm(Op(1,tmp1)-Op(1,tmp))>Eps1){
+            out=c(out,list(tmp))
+          }
+        }
+        if(self==1){
+          tmp=list(Op(1,tmp),Op(3,tmp),Op(2,tmp),Op(4,tmp),Op(5,tmp))
+          out=c(out,list(tmp))
+        }
+      }
+    }
+  }
+  tmp2=out
+  out=list()
+  tmp1=tmp2
+  flg=0
+  for(ii in Looprange(1,length(tmp2))){
+    if(flg==0){
+      tmp=Collectnear(tmp1,Eps2)
+      out=c(out,list(Op(1,tmp)))
+      if(length(Op(2,tmp))==0){
+        flg=1
+      }else{
+        tmp1=Op(2,tmp)
+      }
+    }
+  }
+  for(ii in Looprange(1,length(out))){
+    tmp1=Op(ii,out)
+    if(length(tmp1)==1){
+      out[[ii]]=Op(1,tmp1)
+    }else{
+      tmp=c()
+      for(jj in Looprange(1,length(tmp1))){
+        tmp=c(tmp,Op(4,tmp1[[jj]]))
+      }
+      dst=min(tmp)
+      tmp=list()
+      for(jj in Looprange(1,length(tmp1))){
+        if(Op(4,tmp1[[jj]])<dst+Eps){
+          tmp=c(tmp,list(tmp1[[jj]]))
+        }
+      }
+      tmp1=tmp
+      tmp=c()
+      for(jj in Looprange(1,length(tmp1))){
+        tmp=c(tmp,Op(1,tmp1[[jj]]))
+      }
+      tmp=sum(tmp)/length(tmp1);
+      tmp2=list(tmp)
+      tmp=Nearestpt(Op(1,tmp2),crv1)
+      tmp2=c(tmp2,list(Op(2,tmp)))
+      tmp=Nearestpt(Op(1,tmp2),crv2)
+      tmp2=c(tmp2,list(Op(2,tmp)))
+      tmp2=c(tmp2,list(list(dst,Op(5,tmp1[[1]]))))
+      out[[ii]]=tmp2
+    }
+  }
+  return(out)
+}
+
+Intersectcurves<- function(...){
+  tmp=IntersectcurvesPp(...)
+  out=list()
+  for(ii in Looprange(1,length(tmp))){
+    out=c(out,list(Op(1,tmp[[ii]])))
+  }
+  return(out)
+}
+
+############## end of New Intersect  #############
+
+############## New Enclosing2 #############
+
+Enclosing2<- function(...){
+  varargin=list(...)
+  Nargs=length(varargin)
+  plist=varargin[[1]]
+  Eps=10^(-5)
+  Eps1=0.01
+  Eps2=0.1
+  Start=c()
+  flg=0
+  for(ii in Looprange(2,Nargs)){
+    tmp=varargin[[ii]]
+    if(length(tmp)>1){
+#      Start=tmp
+    }else{
+     if(flg==0){Eps1=tmp}
+     if(flg==1){Eps2=tmp}
+     flg=flg+1
+    }
+  }
+  flg=0
+  AnsL=c()
+  if(length(plist)==1){
+    Fdata=plist[[1]]
+    tmp1=Op(1,Fdata)
+    tmp2=Op(Length(Fdata),Fdata)
+    if(Norm(tmp1-tmp2)<Eps){
+      AnsL=Fdata
+    }else{
+      AnsL=Appendrow(Fdata,tmp1)
+    }
+    flg=1
+  }
+  if(flg==0){
+    Fdata=Op(1,plist)
+    Gdata=Op(length(plist),plist)
+    KL=IntersectcurvesPp(Fdata,Gdata)
+    if(length(KL)==0){
+      tmp1=Op(Length(Gdata),Gdata)
+      tmp2=Op(1,Fdata)
+      tmp=Listplot(tmp1,tmp2)
+      plist=c(plist,list(tmp))
+      Start=tmp2
+      tst=1
+#      flg=1
+    }else{
+      if(length(KL)==1){
+        tmp=Op(1,KL)
+        tst=Op(2,tmp)
+        Start=Pointoncrv(tst,Fdata)
+      }
+      if(length(KL)>1){
+        KL=Quicksort(KL,2)
+        if(length(Start)==0){
+          tmp=Op(1,KL)
+          tst=Op(2,tmp)
+          Start=Pointoncrv(tst,Fdata)
+        }else{
+          tmp=c()
+          for(ii in Looprange(1,length(KL))){
+            tmp=c(tmp,Norm(Op(1,KL[[ii]]-Start)))
+          }
+          tmp=min(tmp)
+          tmp1=list()
+          for(ii in Looprange(1,length(KL))){
+            tmp2=Op(1,KL[[ii]])
+            if(Norm(tmp2-Start)==tmp){
+              tmp1=c(tmp1,list(tmp2))
+            }
+          }
+          tmp=Op(1,tmp1)
+          tst=Op(2,tmp)
+          Start=Pointoncrv(tst,Fdata)
+        }
+      }
+    }
+  }
+  if(flg==0){
+    t1=tst
+    for(nn in Looprange(1,length(plist))){
+      Fdata=Op(nn,plist)
+      if(nn==length(plist)){
+        nxtno=1
+      }else{
+        nxtno=nn+1
+      }
+      Gdata=Op(nxtno,plist)
+      KL=IntersectcurvesPp(Fdata,Gdata)
+      if(length(KL)==0){
+        tmp=matrix(Op(Length(Fdata),Fdata),nrow=1) #18.02.02from
+        Gdata=Appendrow(tmp,Gdata)
+        plist[[nxtno]]=Gdata
+        t2=Length(Fdata)
+        ss=1 #18.02.02upto
+      }else{
+        tmp=Op(1,KL)
+        t2=Op(2,tmp)
+        ss=Op(3,tmp)
+        if(abs(t2-t1)<Eps){
+          if(length(KL)>1){
+            tmp=Op(2,KL)
+            t2=Op(2,tmp)
+            ss=Op(3,tmp)
+          }else{
+#            println(text(nn)+" and "+text(nn+1)+" not intersect");
+#            flg=1
+          }
+        }
+      }
+      if(flg==0){
+        tmp=Partcrv(t1,t2,Fdata)
+        if(nn==1){
+          AnsL=tmp
+        }else{
+          tmp=tmp[2:Length(tmp),]
+          AnsL=Appendrow(AnsL,tmp)
+        }
+        t1=ss
+      }
+    }
+  }
+  return(AnsL)
+}
+
+############## end of Enclosing2 #############

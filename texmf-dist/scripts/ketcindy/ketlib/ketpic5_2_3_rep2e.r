@@ -16,8 +16,10 @@
 
 #########################################
 
-ThisVersion<- "2ev5_2_3(17.10.07)" 
+ThisVersion<- "2ev5_2_3(17.10.28)" 
 
+# 2017.10.28
+#    Drwpt debugged  ( Flattenlist )
 # 2017.10.07
 #  
 
@@ -255,6 +257,7 @@ Drwpt<-function(...)
   Mojisu=0
   for (II in Looprange(1,All)){
     MS<- varargin[[II]]
+    MS=Flattenlist(MS) #17.10.28
     if (mode(MS)=="numeric"){
       MS<- list(MS)
     }

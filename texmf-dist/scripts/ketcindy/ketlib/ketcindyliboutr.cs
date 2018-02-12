@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 //
 
-println("ketcindyout(2017.10.12) loaded");
+println("ketcindyout(2018.02.01) loaded");
 
 //help:start();
 
@@ -655,10 +655,10 @@ CalcbyR(name,Arg1,Arg2):=(
   );
 );
 CalcbyR(name,path,cmd,optionorg):=(
-//help:CalcbyR("Pr",cmd);
-//help:CalcbyR(options=["m/r","Wait=2","Cat=yes","File=result" ]);
+//help:CalcbyR(name,cmd);
+//help:CalcbyR(options=["m/r","Wait=2","Out=yes","Pre=yes","File=result" ]);
   regional(options,tmp,tmp1,tmp2,tmp3,realL,strL,eqL,
-       cat,dig,flg,wflg,file,nc,arg,cmdR,cmdlist,wfile,ext,waiting);
+       cat,dig,preflg,flg,wflg,file,nc,arg,cmdR,cmdlist,wfile,waiting);
   options=optionorg;
   tmp=divoptions(options);
   eqL=tmp_5;
@@ -667,13 +667,13 @@ CalcbyR(name,path,cmd,optionorg):=(
   dig=5;
   cat="Y";
   wfile="";
-  ext=".txt";
-  waiting=2;
+  preflg=1;
+  waiting=5;
   forall(eqL,
     tmp=indexof(#,"=");
     tmp1=Toupper(substring(#,0,1));
     tmp2=substring(#,tmp,length(#));
-    if(tmp1=="C",
+    if((tmp1=="C")%(tmp1=="O"),
       cat=Toupper(substring(tmp2,0,1));
       options=remove(options,[#]);
     );
@@ -681,8 +681,10 @@ CalcbyR(name,path,cmd,optionorg):=(
       waiting=parse(tmp2);
       options=remove(options,[#]);
     );
-    if(tmp1=="E",
-      if(indexof(tmp2,".")==0,ext="."+tmp2,ext=tmp2);
+    if(tmp1=="P", //18.01.27
+      tmp2=substring(Toupper(tmp2),0,1);
+      if(tmp2=="Y",preflg=1);
+      if(tmp2=="N",preflg=0);
       options=remove(options,[#]);
     );
     if(tmp1=="D",
@@ -696,9 +698,9 @@ CalcbyR(name,path,cmd,optionorg):=(
   );
   if(wfile=="",
     if(cat=="Y",
-      wfile=Fhead+name+ext;
+      wfile=Fhead+name+".txt";
     ,
-      wfile="resultR"+ext;
+      wfile="resultR.txt";
     );
   );
   wflg=0;
@@ -720,8 +722,11 @@ CalcbyR(name,path,cmd,optionorg):=(
     );
   );
   file=Fhead+name;
-//  cmdR=flatten(cmd);
-  cmdR=cmd;
+  cmdR=[];
+  if(preflg==1, //18.01.27from
+    cmdR=MkprecommandR();
+  );
+  cmdR=concat(cmdR,cmd); //18.01.27upto
   cmdlist=[];
   if(dig>5, //16.10.28from
     cmdlist=append(cmdlist,"options(digits="+text(dig+2)+");");
@@ -758,6 +763,20 @@ CalcbyR(name,path,cmd,optionorg):=(
     );
     cmdlist=append(cmdlist,tmp1);
   );
+  tmp1=cmdlist_(length(cmdlist));
+  if(indexof(tmp1,"=")==0,
+    tmp1=tokenize(tmp1,"::");
+    if(length(tmp1)==1,
+      tmp2=name+"="+tmp1_1;
+    ,
+      tmp2=name+"=list(";
+      forall(tmp1,
+        tmp2=tmp2+#+",";
+      );
+      tmp2=substring(tmp2,0,length(tmp2)-1)+")";
+    );
+    cmdlist_(length(cmdlist))=tmp2;
+  );
   if(CONTINUED==1,
     ComOutList=concat(ComOutList,cmdlist);
   ,
@@ -766,20 +785,45 @@ CalcbyR(name,path,cmd,optionorg):=(
       cmdlist=append(cmdlist,tmp);
       tmp="sharps=paste(sharp,sharp,'\n',sep='')";
       cmdlist=append(cmdlist,tmp);
+      tmp="if(Length("+name+")==0){"+name+"='nodata'}"; //18.01.29
+      cmdlist=append(cmdlist,tmp);
       cmdlist=append(cmdlist,"if(is.matrix("+name+")){");
-      cmdlist=append(cmdlist,"  "+name+"=as.data.frame("+name+")");
-      cmdlist=append(cmdlist,"}");
+      cmdlist=append(cmdlist,"  tmp=list()");//18.02.01from
+      cmdlist=append(cmdlist,"  for(ii in 1:Length("+name+")){");
+      cmdlist=append(cmdlist,"    tmp=c(tmp,list(Op(ii,ans)))");
+      cmdlist=append(cmdlist,"  }");
+      cmdlist=append(cmdlist,"  ans=tmp");
+      cmdlist=append(cmdlist,"}");//18.02.01upto
       cmdlist=append(cmdlist,"if(is.list("+name+")){");
-      tmp="  cat(names("+name+"),file='"+wfile+"',sep=',')";
+//      tmp="  cat(names("+name+"),file='"+wfile+"',sep=',')"; //18.01.27deleted
+//      cmdlist=append(cmdlist,tmp);
+//      tmp="  cat(sharps,file='"+wfile+"',append=TRUE)";
+//      cmdlist=append(cmdlist,tmp);
+      cmdlist=append(cmdlist,"  for(ii in Looprange(1,length("+name+"))){");
+      cmdlist=append(cmdlist,"    if(is.list("+name+"[[ii]])){");
+      tmp="      cat('[',file='"+wfile+"',sep='',append=TRUE)";
       cmdlist=append(cmdlist,tmp);
-      tmp="  cat(sharps,file='"+wfile+"',append=TRUE)";
+      tmp="      cat(sharps,file='"+wfile+"',sep='',append=TRUE)";
       cmdlist=append(cmdlist,tmp);
-      cmdlist=append(cmdlist,"  for(ii in 1:length("+name+")){");
-      tmp="    cat("+name+"[[ii]],file='"+wfile+"',";
+      tmp="      for(jj in Looprange(1,length(ans[[ii]]))){";
+      cmdlist=append(cmdlist,tmp);
+      tmp="        cat("+name+"[[ii]][[jj]],file='"+wfile+"',sep=',',append=TRUE)";
+      cmdlist=append(cmdlist,tmp);
+      tmp="        cat(sharps,file='"+wfile+"',append=TRUE)";
+      cmdlist=append(cmdlist,tmp);
+      cmdlsit=append(cmdlist,"      }");
+      cmdlist=append(cmdlist,"      }");
+      tmp="      cat(']',file='"+wfile+"',sep=',',append=TRUE)";
+      cmdlist=append(cmdlist,tmp);
+      tmp="      cat(sharps,file='"+wfile+"',append=TRUE)";
+      cmdlist=append(cmdlist,tmp);
+      cmdlist=append(cmdlist,"    }else{");
+      tmp="      cat("+name+"[[ii]],file='"+wfile+"',";
       tmp=tmp+"sep=',',append=TRUE)";
       cmdlist=append(cmdlist,tmp);
-      tmp="    cat(sharps,file='"+wfile+"',append=TRUE)";
+      tmp="      cat(sharps,file='"+wfile+"',append=TRUE)";
       cmdlist=append(cmdlist,tmp);
+      cmdlist=append(cmdlist,"    }");
       cmdlist=append(cmdlist,"  }");
       cmdlist=append(cmdlist,"}else{");
       tmp="  cat("+name+",file='"+wfile+"',sep=',')";
@@ -858,18 +902,39 @@ CalcbyR(name,path,cmd,optionorg):=(
         tmp1=tmp1_(1..(length(tmp1)-1));
         tmp2=[];
         forall(tmp1,tmp3,
-          if(!isstring(tmp3),tmp3=format(tmp3,dig));
-          tmp=tokenize(tmp3,",");
-          tmp=apply(tmp,if(isstring(#),Dq+#+Dq,format(#,dig)));
+          if(!isstring(tmp3),
+            tmp=format(tmp3,dig);
+          ,
+            if(indexof(tmp3,",")==0,
+              tmp=tmp3;
+            ,
+             tmp=tokenize(tmp3,",");
+             tmp=textformat(tmp,dig);
+            );
+          );
           tmp2=append(tmp2,tmp);
         );
         if(length(tmp2)==1,
           tmp2=tmp2_1;
-          if(length(tmp2)==1,tmp2=tmp2_1);//16.10.24
+          if(length(tmp2)==1,tmp2=tmp2_1);
+          if(isstring(tmp2),
+            if(indexof(tmp2,"nodata")>0,tmp2=[]);
+          );
+          tmp=name+"="+textformat(tmp2,dig);
         ,
-          tmp2=[tmp2_1,tmp2_(2..(length(tmp2)))];
+          tmp3="";
+          forall(tmp2,
+            if(length(#)==0,
+              tmp3=tmp3+"[],";
+            ,
+              tmp3=tmp3+#+",";
+            );
+          );
+          tmp3="["+substring(tmp3,0,length(tmp3)-1)+"]";
+          tmp3=replace(tmp3,"[,","[");
+          tmp3=replace(tmp3,",]","]");
         );
-        tmp=name+"="+text(tmp2); //16.10.23upto
+        tmp=name+"="+tmp3;
         parse(tmp);
       );
     );
@@ -1119,17 +1184,10 @@ Hatchdata(nm,iostr,pltlist):=Hatchdata(nm,iostr,pltlist,[]);
 Hatchdata(nm,iostr,pltlist,optionorg):=( //17.09.18
 //help:Hatchdata("1","ii",[["gr1"],["gr2","n"]]);
 //help:Hatchdata(options=["Wait=5"]);
-  regional(options,name,fun,eqL,reL,strL,
+  regional(options,name,eqL,reL,strL,
      plt,fname,options,tmp,tmp1,tmp2,tmp3,flg,wflg,waiting);
   name="ha"+nm;
   fname=Fhead+name+".txt";
-  fun=fnorg;
-  tmp=indexof(fun,"=");
-  if(tmp>0,
-    tmp1=substring(fun,0,tmp-1);
-    tmp2=substring(fun,tmp,length(fun));
-    fun=tmp1+"-("+tmp2+")";
-  );
   options=optionorg;
   tmp=Divoptions(options);
   eqL=tmp_5;
@@ -3242,6 +3300,37 @@ Mxload(file):=( //17.06.16
   out;
 );
 
+Maxima2Cindydata(str):=( //17.10.24
+  regional(out,numstr,eL,nn,ne,flg,tmp);
+  numstr="-0123456789";
+  eL=Indexall(str,"e");
+  if(length(eL)==0,
+    out=str;
+  ,
+    out=substring(str,0,eL_1-1);
+    forall(1..(length(eL)),nn,
+      ne=eL_nn;
+      flg=0;
+      forall(1..5,
+        if(flg==0,
+          tmp=substring(str,ne+#-1,ne+#);
+          if(indexof(numstr,tmp)==0,
+            flg=#;
+            tmp=substring(str,ne,ne+flg-1);
+            out=out+"*10^("+tmp+")";
+          );
+        );
+      );
+      if(nn<length(eL),
+        out=out+substring(str,ne+flg-1,eL_(nn+1)-1);
+      ,
+        out=out+substring(str,ne+flg-1,length(str));
+      );
+    );
+  );
+  parse(out);
+);
+
 kcV3(fname):=kcV3(Dirwork,fname);
 kcV3(path,fname):=(
 //help:kcV3(path,"ex.obj");
@@ -3287,10 +3376,18 @@ kcV3(path,fname):=(
   );
 );
 
-Changeobjscale(fname):=Changeobjscale(ULEN,fname,fname,[]);
+Changeobjscale(fname):=(
+  regional(fout);
+  fout=replace(fname,".obj","");
+  fout=fout+"out.obj";
+  Changeobjscale(ULEN,fname,fout,[]);
+);
 Changeobjscale(fname,Arg):=(
+  regional(fout);
   if(islist(Arg),
-    Changeobjscale(ULEN,fname,fname,Arg);
+    fout=replace(fname,".obj","");
+    fout=fout+"out.obj";
+    Changeobjscale(ULEN,fname,fout,Arg);
   ,
     Changeobjscale(ULEN,fname,Arg,[]);
   );
@@ -3303,10 +3400,10 @@ Changeobjscale(Arg1,Arg2,Arg3):=(
   );
 );
 Changeobjscale(unitlen,fnameorg,foutorg,optionorg):=(
-//help:Changeobjscale("20mm",fnamei,fmediate);
+//help:Changeobjscale("20mm",fname,fnameout);
 //help:Changeobjscale(options=["Unit=mm",[0,0,0]]);
   regional(fname,fout,fmd,unit,val,options,eqL,reL,
-    origin,outunit,sc,stL,nn,tmp,tmp1,tmp2);
+      origin,outunit,sc,stL,nn,tmp,tmp1,tmp2);
   options=optionorg;
   tmp=Divoptions(options);
   eqL=tmp_5;
@@ -3355,24 +3452,27 @@ Changeobjscale(unitlen,fnameorg,foutorg,optionorg):=(
   fout=foutorg;
   if(indexof(fout,".")==0,fout=fout+".obj");
   tmp1=Textformat(origin,4);
-  tmp1=replace(tmp1,",",";");
+  tmp1=RSform(tmp1);
   cmdL=[
-    "Origin="+tmp1+";",[],
-    "Sc="+format(sc,6)+";",[],
-    "Stv=mgetl",[Dq+fname+Dq],
-    "for nn=1:size(Stv,1),Tmp=Stv(nn);",[],
-    "  if part(Tmp,1:2)=='v ' then,Tmp=tokens(Tmp,' ');",[],
-    "    Tmp=evstr(Tmp(2:4));",[],
-    "    Tmp=Origin+Sc*(Tmp-Origin);",[],
-    "    Tmp='v '+msprintf('%7.4f %7.4f %7.4f',Tmp(1),Tmp(2),Tmp(3));",[],
-    "    Stv(nn,1)=Tmp;",[],
-    "  end;",[],
-    "end;",[],
-    "mputl",["Stv",Dq+fout+Dq],
-    "mputl",["['finished////']",Dq+fmd+Dq]
+    "Origin="+tmp1,[],
+    "Sc="+format(sc,6),[],
+    "Stv=readLines",[Dq+fname+Dq],
+    "cat('',file="+Dq+fout+Dq+")",[],
+    "for(nn in Looprange(1,length(Stv))){",[],
+    "  if(substring(Stv[nn],1,2)=='v '){",[],
+    "    Tmp1=paste('c(',substring(Stv[nn],3),')',sep='')",[],
+    "    Tmp1=gsub(' ',',',Tmp1,fixed=TRUE)",[],
+    "    Tmp1=gsub(',,',',',Tmp1,fixed=TRUE)",[],
+    "    Tmp1=gsub('(,','(',Tmp1,fixed=TRUE)",[],
+    "    Tmp=eval(parse(text=Tmp1))",[],
+    "    Tmp=Origin+Sc*(Tmp-Origin)",[],
+    "    Stv[nn]=paste('v ',sprintf('%8.5f %8.5f %8.5f',Tmp[1],Tmp[2],Tmp[3]),sep='')",[],
+    "  }",[],
+    "  cat(Stv[nn],'\n',sep='',file="+Dq+fout+Dq+",append=TRUE)",[],
+    "}",[]
   ];
   options=concat(["Wait=3","Cat=n","File="+fmd],options); // 16.06.26
-  CalcbyS("cs",cmdL,options);
+  CalcbyR("cs",cmdL,options);
   println("Scale of "+fname+" changed");
 );
 
@@ -3463,7 +3563,7 @@ Mkviewobj(pathorg,fnameorg,cmdLorg,optionorg):=(
   );
   if(make==1,
     if(isstring(cmdL_1),
-      cmdlist=MkprecommandS(); // 16.04.23
+      cmdlist=MkprecommandR();
       cmdlist=concat(cmdlist,["Openobj",[Dq+path+fname+Dq]]);
       cmdlist=concat(cmdlist,cmdL);
       tmp=["Closeobj()",[],"ans="+Dq+"||||"+Dq,[]];//16.12.26
@@ -3474,7 +3574,7 @@ Mkviewobj(pathorg,fnameorg,cmdLorg,optionorg):=(
       if(length(tmp1)==0,
         tmp=append(tmp,"Wait=5");
       );// 16.04.23upto
-      CalcbyS("ans",cmdlist,tmp);
+      CalcbyR("ans",cmdlist,tmp);
       wait(WaitUnit*100); // 16.03.18
     ,
       vtx=cmdL_1;
@@ -3520,15 +3620,21 @@ SetObj(str):=Objname(str,["m","v"]); //17.01.12
 SetObj(str,options):=Objname(str,options); //17.01.12
 Objnameoptions(str,options):=Objname(str,options);// 16.11.29
 Objname(str):=Objname(str,["m","v"]); // 16.11.29
-Objname(str,options):=(
+Objname(str,optionsorg):=(
 //help:Objname("sample");
 //help:Objname(options=["m","v"]);
 //help:Setobj("sample");
 //help:Setobj(options=["m","v"]);
+  regional(options);
   if(length(str)>0,
     OCNAME=str;
   );
-  OCOPTION=options;
+  options=select(optionsorg,length(#)>0); //17.12.23from
+  if(length(options)>0,
+    OCOPTION=options;
+  ,
+    OCOPTION=["m","v"];
+  ); //17.12.23upto
   println([OCNAME,OCOPTION]);
 );
 
@@ -3557,15 +3663,15 @@ Mkobjcmd(nm,fd,options):=(
   side="'"+side+"'";
   ffd=Fullformfunc(fd);
   tmp=indexof(ffd_5,"=");
-  tmp1=substring(ffd_5,0,tmp-1);
-  tmp2=substring(ffd_5,tmp,length(ffd_5));
+  tmp1=RSform(substring(ffd_5,0,tmp-1));
+  tmp2=RSform(substring(ffd_5,tmp,length(ffd_5)));
   tmp=indexof(ffd_6,"=");
-  tmp3=substring(ffd_6,0,tmp-1);
-  tmp4=substring(ffd_6,tmp,length(ffd_6));
-  out=["function Out=Fun"+nm+"("+tmp1+","+tmp3+")",[]];
-  tmp="  Out=["+ffd_2+","+ffd_3+","+ffd_4+"]";
+  tmp3=RSform(substring(ffd_6,0,tmp-1));
+  tmp4=RSform(substring(ffd_6,tmp,length(ffd_6)));
+  out=["Fun"+nm+"<- function("+tmp1+","+tmp3+"){",[]];
+  tmp="  Out=c("+ffd_2+","+ffd_3+","+ffd_4+")";
   out=concat(out,[tmp,[]]);
-  out=concat(out,["endfunction",[]]);
+  out=concat(out,["}",[]]);
   tmp1=["Objsurf",
      ["Fun"+nm,tmp2,tmp4,div1,div2,side]];
   out=concat(out,tmp1);
@@ -3738,35 +3844,34 @@ Mkobjthickcmd(nm,fd,fnrm,optionorg):=(
   ffd=Fullformfunc(fd);
   tmp=indexof(ffd_5,"=");
   tmp1=substring(ffd_5,0,tmp-1);
-  tmp2=substring(ffd_5,tmp,length(ffd_5));
+  tmp2=RSform(substring(ffd_5,tmp,length(ffd_5)));
   tmp=indexof(ffd_6,"=");
   tmp3=substring(ffd_6,0,tmp-1);
-  tmp4=substring(ffd_6,tmp,length(ffd_6));
+  tmp4=RSform(substring(ffd_6,tmp,length(ffd_6)));
   fst=text(ffd_(2..4));
   tmp=indexof(ffd_5,"=");
   xst=substring(ffd_5,0,tmp-1);
   tmp=indexof(ffd_6,"=");
   yst=substring(ffd_6,0,tmp-1);
-  out=["function Out=Fun"+nm+"("+tmp1+","+tmp3+")",[]];
-  tmp="  Out=["+ffd_2+","+ffd_3+","+ffd_4+"]";
+  out=["Fun"+nm+"<- function("+tmp1+","+tmp3+"){",[]];
+  tmp="  c("+ffd_2+","+ffd_3+","+ffd_4+")";
   out=concat(out,[tmp,[]]);
-  out=concat(out,["endfunction",[]]);
-  tmp=["function Out=Fnrm"+nm+"("+xst+","+yst+")",[]];
+  out=concat(out,["}",[]]);
+  tmp=["Fnrm"+nm+"<- function("+xst+","+yst+"){",[]];
   out=concat(out,tmp);
   if(fnrm=="",
     tmp=Mkobjnrm(nm,fd,options);
-    tmp1="Out="+tmp; // 16.05.17 
+    tmp1=RSform(tmp);
     tmp="Fnrmden"+nm+"("+xst+","+yst+"):="+tmp_2;
     parse(tmp);
   ,
-//    tmp1="  Out="+fnrm; // 16.04.30
-    tmp1=fnrm; // 16.04.30
-    if(indexof(tmp1,"Out=")==0,  // 16.05.09from
-      tmp1="Out="+tmp1;
-    ); // 16.05.09upto
+    tmp1=RSform(fnrm);
+//    if(indexof(tmp1,"Out=")==0,  // 16.05.09from
+//      tmp1="Out="+tmp1;
+//    ); // 16.05.09upto
   );
   out=concat(out,[tmp1,[]]);
-  out=concat(out,["endfunction",[]]);
+  out=concat(out,["}",[]]);
   tmp1=["Objthicksurf",
      ["Fun"+nm,tmp2,tmp4,div1,div2,"Fnrm"+nm,thick1,thick2,side]];
   out=concat(out,tmp1);
@@ -3837,7 +3942,9 @@ Mkobjpolycmd(nm,pd,optionorg):=(
       face_#=reverse(face_#);
     );
   );
-  out=["Objpolyhedron",[vtx,face]];
+  tmp1=RSform(textformat(vtx,5),2);//17.12.24from
+  tmp2=RSform(textformat(face,5),2);
+  out=["Objpolyhedron",[tmp1,tmp2]];//17.12.24upto
   tmp2=[]; // 16.06.10from
   forall(out,tmp1,
     if(islist(tmp1),
@@ -3859,7 +3966,7 @@ Mkobjplatecmd(nm,pdorg,optionorg):=( // 16.06.18
 //help:Mkobjplatecmd("1",vtxlist);
 //help:Mkobjplatecmd(options1=[0.05,-0.05]);
   regional(pd,options,cmd,out,thick1,thick2,nn,pdn,
-     reL,vtx,face,nv,npttmp,tmp1,tmp2,tmp3);
+     reL,vtx,face,nv,npttmp,tmp1,tmp2,tmp3,tmp4);
   pd=pdorg;
   if(MeasureDepth(pd)==1,pd=[pd]);
   if(MeasureDepth(pd)==2,pd=[pd]);//16.10.04from
@@ -3907,7 +4014,9 @@ Mkobjplatecmd(nm,pdorg,optionorg):=( // 16.06.18
       tmp2=concat(tmp2,tmp);
       tmp=[npt,npt+npt,1+npt,1];
       tmp2=append(tmp2,tmp);
-      out=concat(out,["Objpolyhedron",[vtx,tmp2]]);
+      tmp3=RSform(textformat(vtx,5),2);//17.12.24from
+      tmp4=RSform(textformat(tmp2,5),2);
+      out=concat(out,["Objpolyhedron",[tmp3,tmp4]]);//17.12.24upto
     );
   );
   tmp3="["; // 16.06.10from
@@ -3971,7 +4080,7 @@ Mkobjcrvcmd(nm,pstorg,options):=(
   if(flg==1,  // 16.04.23upto
     if(!isstring(tmp1_1),
       forall(1..length(tmp1),
-        tmp=["Objcurve",[pst+"("+text(#)+")",thick,poly,dir]];
+        tmp=["Objcurve",[pst+"[["+text(#)+"]]",thick,poly,dir]];//17.12.22
         out=concat(out,tmp);
        );
     ,
@@ -4013,7 +4122,7 @@ Mkobjsymbcmd(path,symborg,size,rot,dir,pos,optionorg):=(
 //help:Mkobjsymbcmd("x",0.5,0,V3d,A3d);
 //help:Mkobjsymbcmd("P",0.5,0,V3d,A3d);
 //help:Mkobjsymbcmd(options=[0.05,4,"'yz'"]);
-  regional(symb,options,opbez,eqL,reL,stL,dtL,dt,
+  regional(symb,options,opbez,eqL,reL,stL,dtLstr,dtL,dt,
       alpha,Alpha,out,mx,Mx,my,My,center,tmp,tmp1,tmp2);
   alpha="abcdefghijklmnopqrstuvwxyz";
   Alpha=Toupper(alpha);
@@ -4036,12 +4145,14 @@ Mkobjsymbcmd(path,symborg,size,rot,dir,pos,optionorg):=(
   if(length(stL)==0,
     options=concat(options,[tmp1_3]);
   );
+  out=[];
   tmp=parse(symb);
-  if(islist(tmp),
-    tmp1=select(GLIST,substring(#,0,length(symb))==symb);
-    tmp1=tmp1_1;
-    out=[tmp1,[]];
-    dtL=symb;
+  if((islist(symb)) % (islist(tmp)), //17.12.24from
+    if(islist(tmp),
+      dtL=[symb];
+    ,
+      dtL=symb;
+    ); //17.12.24upto
   ,
     tmp=substring(symb,0,1);
     if(tmp>="a" & tmp<="z",tmp1=tmp+"s");
@@ -4058,21 +4169,22 @@ Mkobjsymbcmd(path,symborg,size,rot,dir,pos,optionorg):=(
       );
     );
     if(length(symb)==2,symb=tmp1+substring(symb,1,2));
-    out=[];
     if(length(path)>0,  // 16.04.23from
       setdirectory(path);
     ,
-//      tmp=Dirhead+"/ketsample/samples/s13meshlab/fontF";
       tmp=Dirhead+"/data/fontF";  // 16.05.10
       setdirectory(tmp);
     ); // 16.04.23upto
     dtL=Readbezier(symb,opbez);
+    dtLstr=dtL; //17.12.23
 	setdirectory(Dirwork);
     forall(dtL,dt,
       tmp=dt+"=";
       tmp1=select(GLIST,indexof(#,tmp)>0);
-      tmp1=tmp1_1;
-      out=concat(out,[tmp1,[]]);    
+      if(length(tmp1)>0,//17.12.23from
+        tmp1=tmp1_1;
+        out=concat(out,[tmp1,[]]);
+      ); //17.12.23upto  
     );
     mx=100;Mx=-100;my=100;My=-100;
     forall(dtL,dt,
@@ -4086,7 +4198,7 @@ Mkobjsymbcmd(path,symborg,size,rot,dir,pos,optionorg):=(
     center=[(mx+Mx)/2,(my+My)/2];
     tmp1=[];
     forall(dtL,dt,
-      Rotatedata(dt,dt,rot,[center,"nodisp"]); // 16.04.23
+      Rotatedata(dt,dt,rot,[center,"nodisp"]);
       Translatedata(dt,"rt"+dt,-center,["nodisp"]);
       tmp1=append(tmp1,"tr"+dt);
     );
@@ -4094,14 +4206,21 @@ Mkobjsymbcmd(path,symborg,size,rot,dir,pos,optionorg):=(
     forall(dtL,dt,
       tmp=dt+"=";
       tmp1=select(GLIST,indexof(#,tmp)>0);
-      tmp1=tmp1_1;
-      out=concat(out,[tmp1,[]]);    
+      if(length(tmp1)>0,  //17.12.23from
+        tmp1=tmp1_1;
+        out=concat(out,[tmp1,[]]);
+      ); //17.12.23upto
     );
   );
   tmp1=text(options);
   tmp1=substring(tmp1,1,length(tmp1)-1);
+  tmp2=""; //17.12.23from
+  forall(dtL,
+    tmp2=tmp2+","+#;
+  );
+  tmp2="list("+substring(tmp2,1,length(tmp2))+")"; //17.12.23upto
   out=concat(out,[
-    "Sd=Symb3data",[dtL,size,0,dir,pos], // 16.04.23
+    "Sd=Symb3data",[tmp2,size,0,dir,pos], //17.12.23
     "Objsymb(Sd,"+tmp1+")",[]
   ]);
   tmp2=[]; // 16.06.10from
@@ -4481,7 +4600,7 @@ Frifun(name,fun,argL,optionorg):=(
   parse(nm);
 );
 
-Mkketcindyjs():=Mkketcindyjs("ketcindylib"); //16.10.07,11.06
+Mkketcindyjs():=Mkketcindyjs("ketcindylib"); 
 Mkketcindyjs(Arg):=(
   if(isstring(Arg),
     Mkketcindyjs(Arg,[])
@@ -4489,7 +4608,7 @@ Mkketcindyjs(Arg):=(
     Mkketcindyjs("ketcindylib",Arg)
   );
 );
-Mkketcindyjs(libname,options):=(
+Mkketcindyjs(libname,options):=( //17.11.18
 //help:Mkketcindyjs();
 //help:Mkketcindyjs(options="Tex=y","Net=y"]);
   regional(texflg,netflg,tmp,tmp1,tmp2);
@@ -4506,73 +4625,102 @@ Mkketcindyjs(libname,options):=(
       netflg=Toupper(substring(tmp1,tmp,tmp+1));
     );
   );
-  SCEOUTPUT = openfile(Fhead+".sce");
-  println(SCEOUTPUT,"cd('"+Dirhead+"/CindyJS');");
-  println(SCEOUTPUT,"Dtket=mgetl('"+libname+".txt');");
-  println(SCEOUTPUT,"cd('"+Dirwork+"');");
-  println(SCEOUTPUT,"Dtjs=mgetl('"+Fhead+".html');");
-  println(SCEOUTPUT,"Qt=char(34);");
-  // 17.09.10from
+  if(isexists(Dirwork,Fhead+".html"),
+    SCEOUTPUT = openfile(Fhead+".r");
+    println(SCEOUTPUT,"Looprange<- function(a,b){");
+    println(SCEOUTPUT,"  if (a<=b) return(a:b)");
+    println(SCEOUTPUT,"  return(c())");
+    println(SCEOUTPUT,"}");
+    println(SCEOUTPUT,"setwd('"+Dirfile+"/CindyJS')");
+    println(SCEOUTPUT,"Dtket=readLines('"+libname+".txt')");
+    println(SCEOUTPUT,"setwd('"+Dirwork+"')");
+    println(SCEOUTPUT,"Dtjs=readLines('"+Fhead+".html')");
+    println(SCEOUTPUT,"Qt=rawToChar(as.raw(34))");
+    println(SCEOUTPUT,
+     "Dtinit=c(paste('<script id=',Qt,'csinit',Qt,' type=',Qt,'text/x-cindyscript',Qt,'>',sep=''))");
+    println(SCEOUTPUT,"Dtinit=c(Dtinit,Dtket,'</script>')");
+    println(SCEOUTPUT,"Dthead=c()");
+    println(SCEOUTPUT,"for(I in Looprange(1,length(Dtjs))){");
+    println(SCEOUTPUT,"  if(length(grep('<script id=',Dtjs[I],fixed=TRUE))==0){");
+    println(SCEOUTPUT,"    Tmp=Dtjs[I]");
+    if(netflg=="N",
+      println(SCEOUTPUT,
+        "    if(length(grep('link rel=',Tmp,fixed=TRUE))>0){");
+      println(SCEOUTPUT,
+        "      Tmp1='file:///"+Dirfile+"/CindyJS/CindyJS.css'");
+      println(SCEOUTPUT,
+        "      Tmp=paste('    <link rel=',Qt,'stylesheet',Qt,' href=',Qt,Tmp1,Qt,'>',sep='')");
+      println(SCEOUTPUT,
+        "    }");
+      println(SCEOUTPUT,
+        "    Tmp1=length(grep('script type=',Tmp,fixed=TRUE))");
+      println(SCEOUTPUT,
+        "    Tmp1=Tmp1*length(grep('Cindy.js',Tmp,fixed=TRUE))");
+      println(SCEOUTPUT,
+        "    if(Tmp1>0){");
+      println(SCEOUTPUT,
+        "      Tmp1='file:///"+Dirfile+"/CindyJS/Cindy.js'");
+      println(SCEOUTPUT,
+        "      Tmp=paste('    <script type=',Qt,'text/javascript',Qt,' src=',Qt,Tmp1,Qt,'>',sep='')");
+      println(SCEOUTPUT,
+        "      Tmp=paste(Tmp,'</script>',sep='')");
+      println(SCEOUTPUT,
+        "    }");
+    );
+    println(SCEOUTPUT,
+      "    Dthead=c(Dthead,Tmp)");
+    println(SCEOUTPUT,
+      "  }else{");
+    println(SCEOUTPUT,
+      "     Is=I; break");
+    println(SCEOUTPUT,
+      "  }");
+    println(SCEOUTPUT,
+        "}");
+    println(SCEOUTPUT,"Dt=c()");
+    println(SCEOUTPUT,"for(I in Looprange(Is,length(Dtjs))){");
+    println(SCEOUTPUT,"  Dt=c(Dt,Dtjs[I])");
+    println(SCEOUTPUT,"  if(length(grep('</script>',Dtjs[I],fixed=TRUE))>0){");
+    println(SCEOUTPUT,"    if(length(grep('draw',Dt[1],fixed=TRUE))>0){Dtdraw=Dt}");
+    println(SCEOUTPUT,"    if(length(grep('keytyped',Dt[1],fixed=TRUE))>0){Dtkey=Dt}");
+    println(SCEOUTPUT,"    Dt=c()");
+    println(SCEOUTPUT,"    if(length(grep('<script id=',Dtjs[I+1],fixed=TRUE))==0){");
+    println(SCEOUTPUT,"      Ie=I+1;break");
+    println(SCEOUTPUT,"    }");
+    println(SCEOUTPUT,"  }");
+    println(SCEOUTPUT,"}");
+    println(SCEOUTPUT,"Dt=c(Dthead,Dtdraw,Dtkey,Dtinit)");
+    println(SCEOUTPUT,"for(I in Looprange(Ie,length(Dtjs))){");
+    println(SCEOUTPUT,
+       "  if(length(grep('Button',Dtjs[I],fixed=TRUE))>0){");
+    println(SCEOUTPUT,
+       "    if(length(grep(paste(Qt,'Figure',sep=''),Dtjs[I],fixed=TRUE))>0){next}");
+    println(SCEOUTPUT,
+       "    if(length(grep(paste(Qt,'Exekc',sep=''),Dtjs[I],fixed=TRUE))>0){next}");
+    println(SCEOUTPUT,
+       "    if(length(grep(paste(Qt,'Parent',sep=''),Dtjs[I],fixed=TRUE))>0){next}");
+    println(SCEOUTPUT,
+       "    if(length(grep(paste(Qt,'KeTJS',sep=''),Dtjs[I],fixed=TRUE))>0){next}");
   println(SCEOUTPUT,
-    "Dtinit=['<script id='+Qt+'csinit'+Qt+' type='+Qt+'text/x-cindyscript'+Qt+'>'];");
-  println(SCEOUTPUT,"Dtinit=[Dtinit;Dtket;'</script>'];");
-  println(SCEOUTPUT,"Dthead=[];");
-  println(SCEOUTPUT,"for I=1:size(Dtjs,1)");
-  println(SCEOUTPUT,"  if length(strindex(Dtjs(I,1),'<script id='))==0 then");
-  println(SCEOUTPUT,"    Tmp=Dtjs(I,:);");
-  if(netflg=="N",
-    println(SCEOUTPUT,
-      "  if length(strindex(Tmp,'link rel='))>0 then");
-    println(SCEOUTPUT,
-      "    Tmp='    <link rel='+Qt+'stylesheet'+Qt+' href='+Qt+'CindyJS.css'+Qt+'>';");
-    println(SCEOUTPUT,
-      "  end;");
-    println(SCEOUTPUT,
-      "  if length(strindex(Tmp,['script type=','Cindy.js']))>1 then");
-    println(SCEOUTPUT,
-      "    Tmp='    <script type='+Qt+'text/javascript'+Qt+' src='+Qt+'Cindy.js'+Qt+'>';");
-    println(SCEOUTPUT,
-      "    Tmp=Tmp+'</script>';");
-    println(SCEOUTPUT,
-      "  end;");
+         "  }");
+    println(SCEOUTPUT,"  Dt=c(Dt,Dtjs[I])");
+    if(texflg=="Y",
+      println(SCEOUTPUT,
+        "  if(length(grep(paste(Qt,'cs*',Qt,sep=''),Dtjs[I],fixed=TRUE))>0){");
+      println(SCEOUTPUT,
+        "    Dt=c(Dt,paste('  use: [',Qt,'katex',Qt,'],',sep=''))");
+      println(SCEOUTPUT,
+        "  }");
+    );
+    println(SCEOUTPUT,"}");
+    println(SCEOUTPUT,"writeLines(Dt,'"+Fhead+"ketcindy.html',sep='\n')");
+    println(SCEOUTPUT,"quit()");
+    closefile(SCEOUTPUT);
+    kcR(PathR,Fhead+".r",["m"]);
+  ,
+    drawtext(mouse().xy-[0,1],"First export to CindyJS",size->24,color->[1,0,0]);
+    wait(3000);
   );
-  println(SCEOUTPUT,"    Dthead=[Dthead;Tmp];");
-  println(SCEOUTPUT,"  else");
-  println(SCEOUTPUT,"    Is=I;break");
-  println(SCEOUTPUT,"  end;");
-  println(SCEOUTPUT,"end;");
-  println(SCEOUTPUT,"Dt=[];");
-  println(SCEOUTPUT,"for I=Is:size(Dtjs,1)");
-  println(SCEOUTPUT,"  Dt=[Dt;Dtjs(I,1)];");
-  println(SCEOUTPUT,"  if length(strindex(Dtjs(I,1),'</script>'))>0 then");
-  println(SCEOUTPUT,"    if length(strindex(Dt(1,1),'draw'))>0 then Dtdraw=Dt,end;");
-  println(SCEOUTPUT,"    if length(strindex(Dt(1,1),'keytyped'))>0 then Dtkey=Dt,end;");
-  println(SCEOUTPUT,"    Dt=[];");
-  println(SCEOUTPUT,"    if length(strindex(Dtjs(I+1,1),'<script id='))==0 then");
-  println(SCEOUTPUT,"      Ie=I+1;break;");
-  println(SCEOUTPUT,"    end;");
-  println(SCEOUTPUT,"  end;");
-  println(SCEOUTPUT,"end;");
-  println(SCEOUTPUT,"Dt=[Dthead;Dtdraw;Dtkey;Dtinit];");
-  println(SCEOUTPUT,"for I=Ie:size(Dtjs,1)");
-  println(SCEOUTPUT,"  Tmp=strindex(Dtjs(I,1),['Button',Qt+'Figure']);");
-  println(SCEOUTPUT,"  if length(Tmp)>1 then continue,end;");
-  println(SCEOUTPUT,"  Tmp=strindex(Dtjs(I,1),['Button',Qt+'Exekc']);");
-  println(SCEOUTPUT,"  if length(Tmp)>1 then continue,end;");
-  println(SCEOUTPUT,"  Tmp=strindex(Dtjs(I,1),['Button',Qt+'Parent']);");
-  println(SCEOUTPUT,"  if length(Tmp)>1 then continue,end;");
-  println(SCEOUTPUT,"  Dt=[Dt;Dtjs(I,1)];");
-  if(texflg=="Y",
-    println(SCEOUTPUT,"  if length(strindex(Dtjs(I,1),Qt+'cs*'+Qt))>0 then");
-    println(SCEOUTPUT,"    Dt=[Dt;'  use: ['+Qt+'katex'+Qt+'],'];");
-    println(SCEOUTPUT,"  end;");
-  );
-  println(SCEOUTPUT,"end;");
-  println(SCEOUTPUT,"mputl(Dt,'"+Fhead+"ketcindy.html');");
-  // 17.09.10upto
-  println(SCEOUTPUT,"quit()");
-  closefile(SCEOUTPUT);
-  kcS(PathS,Fhead+".sce",["m"]);
 );
 
 Cheader():=Cheader(FdC,FheadC+"header.h");

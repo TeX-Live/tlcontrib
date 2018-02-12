@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>
 //
 
-println("ketcindybasic2(2017.10.13) loaded");
+println("ketcindybasic2(2017.12.24) loaded");
 
 //help:start();
 
@@ -77,7 +77,7 @@ Scalepoint(point,ratio,center):=(
 Reflectpoint(point,symL):=(
 //help:Reflectpoint(A,B);
 //help:Reflectpoint(A,[[2,3]]);
-//help:Reflectpoint(A,[C,E]);\\
+//help:Reflectpoint(A,[C,E]);
   regional(X1,X2,Y1,Y2,Us,Vs,Pt1,Pt2,Cx,Cy,tmp);
   tmp=Lcrd(point);
   X1=tmp_1; Y1=tmp_2;
@@ -124,6 +124,7 @@ Rotatedata(nm,plist,angle,options):=(
   PdL=[];
   forall(pdata,Njj,
     if(isstring(Njj),Kj=parse(Njj),Kj=Njj);
+    if(MeasureDepth(Kj)==0,Kj=[Kj]); //17.11.24
     if(MeasureDepth(Kj)==1,Kj=[Kj]);
     tmp2=[];
     forall(Kj,Nj,
@@ -150,12 +151,10 @@ Rotatedata(nm,plist,angle,options):=(
     if(length(tmp1)==1,tmp1=tmp1_1);
     tmp=name+"="+textformat(tmp1,5);
     parse(tmp);
-//    tmp1=textformat(plist,5);
-    tmp1=text(plist); // 15.10.15
-    tmp1=replace(tmp1,"[","list(");
-    tmp1=replace(tmp1,"]",")");
+    tmp1=text(plist); 
+    tmp1=RSform(tmp1);// 17.12.23(2lines)
     tmp=name+"=Rotatedata("+tmp1+","
-	  +textformat(angle,5)+","+textformat(Pt,5)+")";
+	  +textformat(angle,5)+","+RSform(textformat(Pt,5))+")"; //17.12.23
     GLIST=append(GLIST,tmp);
   );
   if(Noflg<2,
@@ -213,11 +212,9 @@ Translatedata(nm,plist,mov,options):=(
     if(length(tmp1)==1,tmp1=tmp1_1);
     tmp=name+"="+textformat(tmp1,5);
     parse(tmp);
-//    tmp1=textformat(plist,5);
-    tmp1=text(plist); // 15.10.15
-    tmp1=replace(tmp1,"[","list(");
-    tmp1=replace(tmp1,"]",")");
-    tmp=name+"=Translatedata("+tmp1+","+textformat(mov,5)+")";
+    tmp1=text(plist); 
+    tmp1=RSform(tmp1);// 17.12.23
+    tmp=name+"=Translatedata("+tmp1+","+RSform(textformat(mov,5))+")";
     GLIST=append(GLIST,tmp);
   );
   if(Noflg<2,
@@ -293,11 +290,10 @@ Scaledata(nm,plist,rx,ry,options):=(
     if(length(tmp1)==1,tmp1=tmp1_1);
     tmp=name+"="+textformat(tmp1,5);
     parse(tmp);
-    tmp1=text(plist);  // 15.10.15
-    tmp1=replace(tmp1,"[","list(");
-    tmp1=replace(tmp1,"]",")");
+    tmp1=text(plist); 
+    tmp1=RSform(tmp1); // 17.12.23
     tmp=name+"=Scaledata("+tmp1+","
-	  +textformat(rx,5)+","+textformat(ry,5)+","+textformat(Pt,5)+")";
+	  +textformat(rx,5)+","+textformat(ry,5)+","+RSform(textformat(Pt,5))+")";
     GLIST=append(GLIST,tmp);
   );
   if(Noflg<2,
@@ -371,11 +367,9 @@ Reflectdata(nm,plist,symL,options):=(
     if(length(tmp1)==1,tmp1=tmp1_1);
 	tmp=name+"="+textformat(tmp1,5);
     parse(tmp);
-//    tmp1=textformat(plist,5);
-    tmp1=text(plist); // 15.10.15
-    tmp1=replace(tmp1,"[","list(");
-    tmp1=replace(tmp1,"]",")");
-    tmp=name+"=Reflectdata("+tmp1+","+textformat(symL,5)+")";
+    tmp1=text(plist); 
+    tmp1=RSform(tmp1);// 17.12.23
+    tmp=name+"=Reflectdata("+tmp1+","+RSform(textformat(symL,5))+")";//17.12.23
     GLIST=append(GLIST,tmp);
   );
   if(Noflg<2,
@@ -427,14 +421,14 @@ Mkcircles(options):=(
   );
 );
 
-Makesciarg(arglist):=(
+MakeRarg(arglist):=(
   regional(str,tmpstr);
   str="";
   forall(arglist,
     if(isstring(#),
-      tmpstr=Dq+#+Dq;
+      tmpstr=Dq+RSslash(#)+Dq;
     ,
-      tmpstr=textformat(#,5);
+      tmpstr=textformat(#,6);
     );
     str=str+tmpstr+",";
   );
@@ -446,7 +440,7 @@ Setax(arglist):=(
 //help:Setax(["l","x","e","y","n","O","sw"]);
 //help:Setax([7,"nw"]);
   regional(tmp);
-  tmp=Makesciarg(arglist);
+  tmp=MakeRarg(arglist);
   Com1st("Setax("+tmp+")");
 );
 
@@ -454,14 +448,14 @@ Htickmark(arglist):=(
 //help:Htickmark([1,"1",2,"sw","2"]);
   regional(tmp);
   tmp="";
-  tmp=Makesciarg(arglist);
+  tmp=MakeRarg(arglist);
   Com2nd("Htickmark("+tmp+")");
 );
 
 Vtickmark(arglist):=(
 //help:Vtickmark([1,"1",2,"sw","2"]);
   regional(tmp);
-  tmp=Makesciarg(arglist);
+  tmp=MakeRarg(arglist);
   Com2nd("Vtickmark("+tmp+")");
 );
 
@@ -633,6 +627,7 @@ Letter(list,options):=(
         if(Ymv==0,Ymv=-4);//16.10.08
         aln="mid"; // 16.09.30upto
       );
+      Str=list_(Nj+2);  //17.10.17
       drawtext(Pcrd(Pos),Str,offset->[Off+Xmv,Off+Ymv],
          size->sz,color->clr,align->aln,bold->bld,italics->ita);//16.10.09
     );
@@ -662,8 +657,10 @@ Letterrot(pt,dir,movstr,str):=(
   Letterrot(pt,dir,tmov,nmov,str);
 );
 Letterrot(pt,dir,tmov,nmov,str):=(
+  regional(tmp);
   Letter([pt,"c",str],["notex"]);
-  Com2nd("Letterrot("+pt+","+dir+","+tmov+","+nmov+",'"+str+"')");
+  tmp=replace(str,"\","\\"); //17.10.18
+  Com2nd("Letterrot("+pt+","+dir+","+tmov+","+nmov+",'"+tmp+"')");
 );
 
 Exprrot(pt,dir,str):=Exprrot(pt,dir,0,0,str);
@@ -688,8 +685,10 @@ Exprrot(pt,dir,movstr,str):=(
   Exprrot(pt,dir,tmov,nmov,str);
 );
 Exprrot(pt,dir,tmov,nmov,str):=(
+  regional(tmp);
   Expr([pt,"c",str],["notex"]);
-  Com2nd("Exprrot("+pt+","+dir+","+tmov+","+nmov+",'"+str+"')");
+  tmp=replace(str,"\","\\"); //17.10.18
+  Com2nd("Exprrot("+pt+","+dir+","+tmov+","+nmov+",'"+tmp+"')");
 );
 
 Putslider(ptstr,p1,p2):=Slider(ptstr,p1,p2);
@@ -820,9 +819,9 @@ BezierCurve(nm,ptlistorg,ctrlistorg,options):=(
     tmp=name+"="+textformat(out,5);
     parse(tmp);
     tmp1=textformat(ptlist,5);
-    tmp1="list("+substring(tmp1,1,length(tmp1)-1)+")";
+    tmp1=RSform(tmp1,2); //17.12.23
     tmp2=textformat(ctrlist,5);
-    tmp2="list("+substring(tmp2,1,length(tmp2)-1)+")";
+    tmp2=RSform(tmp2,3); //17.12.23
     GLIST=append(GLIST,name+"=Bezier("+tmp1+","+tmp2+opstr+")");
   );
   if(Noflg<2,
@@ -2273,6 +2272,7 @@ Sciform(list):=(
 
 RSform(str):=RSform(str,3);
 RSform(str,listfrom):=(
+//help:RSform(string,listfrom);
   regional(posL,mxlv,rep1,rep2,rep3,prev,out,
     tmp,tmp1,tmp2);
   rep1="c("; rep2="c("; rep3="list(";
@@ -2372,137 +2372,108 @@ Defvar(name,value):=(
   VLIST=prepend([name,value],VLIST);
 );
 
-IftoR(strorg):=( // 17.09.16
-  regional(str,ifL,ppL,cpL,kk,Lv,no,out,prev,
-      tmp,tmp1,tmp2);
-  str=replace(strorg,LFmark,"");
-  ifL=Indexall(str,"if(");
-  ifL=apply(ifL,#+2);
-  if(length(ifL)>0,
+IftoR(strorg):=(
+  regional(str,pre,post,sub,ppL,ifstr,out,tmp,tmp1,tmp2);
+  str=strorg;
+  ifstr=indexof(str,"if(");
+  if(ifstr==0,
+    out=replace(str,",","}else{");
+  ,
+    pre=substring(str,0,ifstr-1)+"if(";
     ppL=Bracket(str,"()");
-    tmp2=[];
-    forall(ifL,kk,
-      tmp=select(ppL,#_1==kk);
-      tmp1=select(ppL,#_2==-tmp_1_2);
-      tmp2=append(tmp2,[kk,tmp1_1_1,tmp_1_2]);
-    );
-    ifL=tmp2;
-    cpL=[];
-    forall(1..(length(str)),kk,
-      if(substring(str,kk-1,kk)==",",
-        tmp1=select(ifL,#_1<kk & kk<#_2);
-        Lv=max(apply(tmp1,#_3));
-        tmp=select(cpL,#_2==Lv);
-        no=length(tmp)+1;
-        cpL=append(cpL,[kk,Lv,no]);
-      );
-      if(contains(ifL,kk),
-        tmp1=select(ifL,#_1<kk & kk<#_2);
-        Lv=max(apply(tmp1,#_3));
-        tmp=select(cpL,#_2==Lv);
-        no=length(tmp)+1;
-        cpL=append(cpL,[kk,Lv,no]);
-      );
-    );
-    forall(ifL,
-      str_(#_2)="}";
-    );
-    out="";
-    prev=0;
-    forall(cpL,
-      out=out+substring(str,prev,#_1-1);
-      prev=#_1;
-      if(#_3==1,out=out+"){");
-      if(#_3==2,out=out+"}else{");
-    );
-    out=out+substring(str,prev,length(str));
+    tmp1=ifstr+2;
+    tmp=select(ppL,#_1==tmp1);
+    tmp=select(ppL,#_2==-tmp_1_2);
+    tmp2=tmp_1_1;
+    sub=substring(str,tmp1,tmp2-1);
+    post="}"+substring(str,tmp2,length(str));
+    tmp=indexof(sub,",");
+    tmp1=substring(sub,0,tmp-1);
+    tmp2=substring(sub,tmp,length(sub));
+    sub=tmp1+"){"+tmp2;
+    tmp=IftoR(sub);
+    out=pre+tmp+"}";
   );
+  out;
 );
 
-FortoR(strorg):=( // 17.09.16
-  regional(str,frL,ppL,cpL,kk,Lv,no,out,prev,
-      tmp,tmp1,tmp2);
-  str=replace(strorg,LFmark,"");
-  frL=Indexall(str,"forall(");
-  frL=apply(frL,#+6);
-  if(length(frL)>0,
+FortoR(strorg):=(
+  regional(str,pre,post,sub,ppL,forstr,out,tmp,tmp1,tmp2);
+  str=strorg;
+  forstr=indexof(str,"forall(");
+  if(forstr==0,
+    out=str;
+  ,
+    pre=substring(str,0,forstr-1)+"for(";
     ppL=Bracket(str,"()");
-    tmp2=[];
-    forall(frL,kk,
-      tmp=select(ppL,#_1==kk);
-      tmp1=select(ppL,#_2==-tmp_1_2);
-      tmp2=append(tmp2,[kk,tmp1_1_1,tmp_1_2]);
-    );
-    frL=tmp2;
-    cpL=[];
-    forall(1..(length(str)),kk,
-      if(substring(str,kk-1,kk)==",",
-        tmp1=select(frL,#_1<kk & kk<#_2);
-        Lv=max(apply(tmp1,#_3));
-        tmp=select(cpL,#_2==Lv);
-        no=length(tmp)+1;
-        cpL=append(cpL,[kk,Lv,no]);
-      );
-      if(contains(frL,kk),
-        tmp1=select(frL,#_1<kk & kk<#_2);
-        Lv=max(apply(tmp1,#_3));
-        tmp=select(cpL,#_2==Lv);
-        no=length(tmp)+1;
-        cpL=append(cpL,[kk,Lv,no]);
-      );
-    );
-    forall(frL,
-      str_(#_2)="}";
-    );
-    out="";
-    prev=0;
-    forall(cpL,
-      if(#_3==1,
-        tmp1=substring(str,prev,#_1-1);
-        tmp=indexof(tmp1,"(");
-        tmp1=substring(tmp1,tmp,length(tmp1));
-        tmp1=replace(tmp1,"..",":");
-      );
-      if(#_3==2,
-        tmp2=substring(str,prev,#_1-1);
-        out=out+"for("+tmp2+" in "+tmp1+"){";
-      );
-      prev=#_1;
-    );
-    out=out+substring(str,prev,length(str));
+    tmp1=forstr+6;
+    tmp=select(ppL,#_1==tmp1);
+    tmp=select(ppL,#_2==-tmp_1_2);
+    tmp2=tmp_1_1;
+    sub=substring(str,tmp1,tmp2-1);
+    post="}"+substring(str,tmp2,length(str));
+    tmp=indexof(sub,",");
+    tmp1=substring(sub,0,tmp-1);
+    tmp2=substring(sub,tmp,length(sub));
+    sub=tmp1+"){"+tmp2;
+    tmp1=indexof(sub,"{");
+    tmp2=indexof(sub,",");
+    tmp=substring(sub,tmp1,tmp2-1);
+    pre=pre+tmp+" in "+substring(sub,0,tmp1-1)+"{";
+    sub=substring(sub,tmp2,length(sub));
+    tmp=FortoR(sub);
+    out=pre+tmp+"}";
   );
+  out=replace(out,"..",":");
+  out;
 );
 
 Deffun(name,bodylist):=(
 //help:Deffun("f(x)",["regional(y)","y=x^2*(x-3)","y"]);
-  regional(funstr,tmp,tmp1,str,Pos);
+  regional(funstr,str,Pos,nbody,bdy,ppL,bpL,excma,tmp,tmp1,tmp2);
   funstr=name+":=(";
   forall(bodylist,
     funstr=funstr+#+";";
   );
   funstr=funstr+");";
   parse(funstr);
-  tmp=indexof(name,"("); // 17.09.15from
+  tmp=indexof(name,"("); 
   str=substring(name,0,tmp-1)+"<-function(";
   str=str+substring(name,tmp,length(name))+"{";
-  forall(1..(length(bodylist)-1),
-    tmp1=bodylist_#;
-    tmp1=replace(tmp1,LFmark,"");
-    tmp1=replace(tmp1," ","");
-    Pos=indexof(tmp1,"regional")+indexof(tmp1,"local");
+  forall(1..(length(bodylist)-1),nbody,
+    bdy=bodylist_nbody;
+    Pos=indexof(bdy,"regional")+indexof(bdy,"local");
     if(Pos==0,
-      tmp=RSform(tmp1);
-      if(indexof(tmp,"if(")>0,
-        tmp=iftoR(tmp);
+      bdy=replace(bdy,LFmark,"");
+      bdy=replace(bdy," ","");
+      ppL=Bracket(bdy,"()");
+      bpL=Bracket(bdy,"[]");
+      tmp1=select(bpL,#_2==1);
+      tmp2=select(bpL,#_2==-1);
+      excma=[];
+      forall(1..(length(tmp1)),
+        excma=append(excma,[tmp1_#_1,tmp2_#_1]);
       );
-      if(indexof(tmp,"forall(")>0, 
-        tmp=FortoR(tmp);
-      ); 
-      str=str+tmp+";";
+      tmp1=Indexall(bdy,",");
+      forall(tmp1,cma,
+        tmp=select(excma,(#_1<cma)&(cma<#_2));
+        if(length(tmp)>0,
+          bdy=substring(bdy,0,cma-1)+"'"+substring(bdy,cma,length(bdy));
+        );
+      );
+      tmp=indexof(bdy,"forall");
+      if(tmp>0,
+        bdy=FortoR(bdy);
+      );
+      tmp=indexof(bdy,"if(");
+      if(tmp>0,
+        bdy=IftoR(bdy);
+      );
+      bdy=RSform(replace(bdy,"'",","));
+      str=str+bdy+";";
     );
   );
   str=str+"return("+bodylist_(length(bodylist))+")}";
-  //17.09.15upto
   FUNLIST=append(FUNLIST,str);
 );
 
@@ -2581,6 +2552,7 @@ Windispg(pltdata):=(
   layer(0);
 );
 
+WritetoSci():=WritetoRS(); //17.12.19
 WritetoRS():=WritetoRS(FnameR);// 17.09.17from
 WritetoRS(Arg):=(
   regional(string,filename,shch,tmp1,tmp2);
@@ -2639,7 +2611,7 @@ WritetoRS(filename,shchoice):=(
     println(SCEOUTPUT,"source('"+tmp+".r')");
   ); 
   println(SCEOUTPUT,"Ketinit()");
-  println(SCEOUTPUT,"cat('KETpic',ThisVersion,'\n')"); 
+  println(SCEOUTPUT,"cat(ThisVersion,'\n')"); 
   println(SCEOUTPUT,"Fnametex='"+Fnametex+"'");
   println(SCEOUTPUT,"FnameR='"+FnameR+"'");
   println(SCEOUTPUT,"Fnameout='"+Fnameout+"'");
@@ -2709,8 +2681,11 @@ WritetoRS(filename,shchoice):=(
   println(SCEOUTPUT,"");
   println(SCEOUTPUT,"if(1==1){");
   println(SCEOUTPUT,"");
-  tmp=replace(Dirwork,"\","/"); //17.09.24(2lines)
-  println(SCEOUTPUT,"Openfile('"+tmp+"/"+Fnametex+"','"+ULEN+"')");
+  tmp=replace(Dirwork,"\","/"); //17.10.28(3lines)
+  tmp="Openfile('"+tmp+pathsep()+Fnametex+"','"+ULEN+"'";
+  tmp=tmp+",'Cdy="+loaddirectory+text(curkernel());
+  tmp=replace(tmp,"\","\\");
+  println(SCEOUTPUT,tmp+"')");
   forall(COM2ndlist,
     if(indexof(#,"Texcom")==0, //17.09.22
       println(SCEOUTPUT,RSform(#));
@@ -3025,7 +3000,7 @@ Makeshell(texmainfile,flow):=(
     println(SCEOUTPUT,tmp);
   );
   if(tex=="xelatex", 
-    tmp="export PATH=$"+path+":${PATH}";
+    tmp="export PATH="+path+":${PATH}";
     println(SCEOUTPUT,tmp); 
     tmp="xelatex"+" "+texmainfile+".tex";
     println(SCEOUTPUT,tmp); 
@@ -3220,16 +3195,26 @@ Viewtex():=(
       println(SCEOUTPUT,"\usepackage{pict2e}");//16.12.16
       println(SCEOUTPUT,"\usepackage{luatexja}");//16.12.18
     );
-    println(SCEOUTPUT,"\usepackage{ketpic2e,ketlayer2e}");// 17.04.07from
-//    tmp=replace(Dirhead+"/ketpicstyle","\","/");
-//    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic2e}");
-//    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer2e}");
+    tmp=replace(Dirhead,"\","/"); //17.10.30from
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      println(SCEOUTPUT,"\usepackage{ketpic2e,ketlayer2e}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic2e}");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer2e}");
+    );
   ,
-    println(SCEOUTPUT,"\usepackage{ketpic,ketlayer}");
-//    tmp=replace(Dirhead+"/ketpicstyle","\","/");
-//    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic}");
-//    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer}");
-  );//17.04.07upto
+    tmp=replace(Dirhead,"\","/");
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      println(SCEOUTPUT,"\usepackage{ketpic,ketlayer}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic}");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer}");
+    );
+  );//17.10.30upto
   println(SCEOUTPUT,"\usepackage{amsmath,amssymb}");
   println(SCEOUTPUT,"\usepackage{graphicx}");
   println(SCEOUTPUT,"\usepackage{color}");
@@ -3437,43 +3422,42 @@ Figpdf(fnameorg,optionorg):=(
 //  if(iswindows(),sep="\",sep="/");//17.04.08
 //  sep="/";
   FigPdfList=append(FigPdfList,tmp1);
-  if(indexof(PathT,"pdflatex")>0 ,//16.11.23
-    Libname=Dirlib+"/ketpic2esciL5";//16.11.23
+  if(indexof(PathT,"pdflatex")+indexof(PathT,"lualatex")>0, //17.11.05from
     FigPdfList=append(FigPdfList,
-      "\usepackage[pdftex]{pict2e}");//16.11.24
-    tmp=replace(Dirhead+"/ketpicstyle","\","/");
-    FigPdfList=concat(FigPdfList, // 17.04.08from
-//      "\usepackage{ketpic2e,ketlayer2e}");
-      ["\usepackage{"+tmp+"/ketpic2e}",
-        "\usepackage{"+tmp+"/ketlayer2e}"]
+      "\usepackage{pict2e}");
+    tmp=replace(Dirhead,"\","/");
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      FigPdfList=append(FigPdfList,
+         "\usepackage{ketpic2e,ketlayer2e}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      FigPdfList=concat(FigPdfList, 
+        ["\usepackage{"+tmp+"/ketpic2e}",
+         "\usepackage{"+tmp+"/ketlayer2e}"]);
     );
   ,
-    tmp=replace(Dirhead+"/ketpicstyle","\","/");
-    FigPdfList=concat(FigPdfList,
-//      "\usepackage{ketpic,ketlayer}");
-      ["\usepackage{"+tmp+"/ketpic}",
-        "\usepackage{"+tmp+"/ketlayer}"]
-    );// 17.04.08upto
-  );//16.11.22from
+    tmp=replace(Dirhead,"\","/");
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      FigPdfList=append(FigPdfList,
+         "\usepackage{ketpic,ketlayer}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      FigPdfList=concat(FigPdfList,
+        ["\usepackage{"+tmp+"/ketpic}",
+         "\usepackage{"+tmp+"/ketlayer}"]);
+    );
+  );//17.11.05upto
   FigPdfList=append(FigPdfList,
     "\usepackage{amsmath,amssymb}");
   FigPdfList=append(FigPdfList,
     "\usepackage{graphicx,color}");
   forall(ADDPACK, // 16.05.16from
-//    if(indexof(#,"[")==0,  // 16.09.05from
-//      tmp1="\usepackage{"+#+"}";
-//    ,
-      tmp1="\usepackage"+#; //17.07.10
-//    );
+    tmp1="\usepackage"+#; //17.07.10
     FigPdfList=append(FigPdfList,tmp1);  // 16.09.05upto
   );
   FigPdfList=append(FigPdfList,"");
-//  FigPdfList=append(FigPdfList, // deleted 2016.11.27
-//    "\def\ketcindy{{K\kern-.20em%");
-//  tmp="\lower.5ex\hbox{E}\kern-.125em";
-//  tmp=tmp+"{TCindy}}}";
-//  FigPdfList=append(FigPdfList,tmp);
-//  FigPdfList=append(FigPdfList,"");
   FigPdfList=append(FigPdfList,
     "\setmargin{0}{0}{0}{0}");
   FigPdfList=append(FigPdfList,"");
@@ -3676,21 +3660,18 @@ Helpkey(str1,str2):=(
 Slidework():=Slidework(Dirwork); // 16.06.10
 Slidework(dirorg):=(
 //help:Slidework(directory);
-  regional(dir,tmp,sep);  // 16.06.25
+  regional(dir,tmp);  // 16.06.25
   dir=replace(dirorg,unicode("000a"),""); // 16.06.25
-  sep="/"; //17.04.16from
-  if(iswindows(),
-    dir=replace(dir,"/","\");
-    sep="\";
-  ); //17.04.16upto
+  dir=replace(dir,"/",pathsep());//17.11.20from
+  dir=replace(dir,"\",pathsep());
+  tmp=length(dir);
+  if(substring(dir,tmp-1,tmp)==pathsep(),
+    dir=substring(dir,0,tmp-1);
+  );//17.11.20upto
   if(isexists(dir,""), // 16.12.20
     Changework(dir);
-    if(!isexists(Dirwork,"fig"), // 16.12.18
-      cmdL=["createdir",[Dq+dir+sep+"fig"+Dq]];//16.12.27,17.04.16
-      CalcbyS("crdr",cmdL,["m"]);
-      println(dir+sep+"fig  generated");  //17.04.16
-    );
-    tmp=dir+sep+"fig";  //17.04.16from
+    println(makedir(dir,"fig"));//17.11.23
+    tmp=dir+pathsep()+"fig";  //17.04.16from
     Changework(tmp);// 17.02.19upto
   ,
     println(dir+ " not exists");
@@ -3789,49 +3770,71 @@ Setslidebody(str,style,density):=( // 16.12.22,17.01.06,01.08
   ThinDense=density;//17.01.08
 );
 
-Setslidehyper():=Setslidehyper(["cl=true,lc=blue,fc=blue",125,70,1]);
-// 16.12.31from
+Setslidehyper():=( 17.12.16from
+  Setslidehyper(["cl=true,lc=blue,fc=blue",125,70,1]);
+);
 Setslidehyper(Arg):=(
   if(isstring(Arg),
-    if(length(Arg)==0, //17.01.29from
-      Setslidehyper();
-    ,
-      Setslidehyper(Arg,[]);
-    );//17.01.29upto
-  ,  
-    Setslidehyper("dvipdfmx",Arg);
+    Setslidehyper(Arg,["cl=true,lc=blue,fc=blue",125,70,1]);
+  ,
+    Setslidehyper("",Arg);
   );
 );
-Setslidehyper(driver,options):=(
+Setslidehyper(driverorg,options):=(
 //help:Setslidehyper();
-//help:Setslidehyper("dvipdfmx",["cl=true,lc=blue,fc=blue",125,70,1]);
-  regional(reL,stL,tmp,tmp1,tmp2,str,reL);
-  str="";
-  reL=[];
-  forall(options,
-    if(isstring(#),
-      str=#
-    ,
-      reL=append(reL,#);
+//help:Setslidehyper("dvipdfmx",["cl=true,lc=blue,fc=blue","Pos=[125,70]","Size=1"]);
+  regional(driver,eqL,reL,stL,,str,tmp,tmp1,tmp2);
+  driver=driverorg;
+  if(length(driver)==0,
+    if(indexof(PathT,"pdflatex")+indexof(PathT,"lualatex")==0,
+      driver="dvipdfmx";
     );
   );
-  if(length(str)>0,str=","+str);
-  tmp1="";
-  if(length(driver+str)>0,
-    tmp1="["+driver+str+"]";
+  tmp=Divoptions(options);
+  eqL=tmp_5;
+  reL=tmp_6;
+  stL=tmp_7;
+  if(length(stL)>0,
+    str=stL_1;
+  ,
+    str="";
+  );
+  if(length(str)==0,
+    str="cl=true,lc=blue,fc=blue";
+  );
+  if(length(driver)==0,
+    tmp1="["+str+"]";
+  ,
+    tmp1="["+driver+","+str+"]";
   );
   tmp1=replace(tmp1,"cl=","colorlinks=");
   tmp1=replace(tmp1,"lc=","linkcolor=");
   tmp1=replace(tmp1,"fc=","filecolor=");
   tmp1=replace(tmp1,"uc=","urlcolor=");
+  ADDPACK=select(ADDPACK,indexof(#,"hyperref")==0);
   Addpackage(tmp1+"{hyperref}");
   LinkPosH=125;
   LinkPosV=70;
   LinkSize=1;
-  if(length(reL)>0,LinkPosH=reL_1);
-  if(length(reL)>1,LinkPosV=reL_2);
-  if(length(reL)>2,LinkSize=max(reL_3,0.1)); // 17.07.31
-);
+  if(length(reL)>0,
+    LinkPosH=reL_1;
+    if(length(reL)>1,LinkPosV=reL_2);
+    if(length(reL)>2,LinkSize=max(reL_3,0.1));
+  );
+  forall(eqL,
+    tmp=indexof(#,"=");
+    tmp1=Toupper(substring(#,0,1));
+    tmp2=substring(#,tmp,length(#));
+    tmp2=parse(tmp2);
+    if(tmp1=="P",
+      LinkPosH=tmp2_1;
+      LinkPosV=tmp2_2;
+    );
+    if(tmp1=="S",
+      LinkSize=max(tmp2,0.1);
+    );
+  );
+); //17.12.16upto
 
 Settitle(cmdL):=Settitle("slide0",cmdL,[]);
 Settitle(Arg1,Arg2):=(
@@ -3930,13 +3933,16 @@ Maketitle(name):=(
   println(SCEOUTPUT,tmp);
   tmp="\special{papersize=\the\paperwidth,\the\paperheight}";
   println(SCEOUTPUT,tmp);
-//  if(iswindows(),sep="\",sep="/"); // 17.04.08from
-//  sep="/";
-  //println(SCEOUTPUT,"\usepackage{ketpic,ketlayer,ketslide}");
-  tmp=replace(Dirhead+"/ketpicstyle","\","/");
-  println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic}");
-  println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer}");
-  println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide}");
+  tmp=replace(Dirhead,"\","/");//17.11.01from
+  tmp=replace(tmp,"scripts","tex/latex");
+  if(isexists(tmp,""),
+    println(SCEOUTPUT,"\usepackage{ketpic,ketlayer,ketslide}");
+  ,
+    tmp=replace(Dirhead+"/ketpicstyle","\","/");
+    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic}");
+    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer}");
+    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide}");
+  );//17.11.01upto
   println(SCEOUTPUT,"\usepackage{amsmath,amssymb}");
   println(SCEOUTPUT,"\usepackage{bm,enumerate}");
   if((indexof(PathT,"pdflatex")>0)%(indexof(PathT,"lualatex")>0),
@@ -4152,25 +4158,37 @@ Presentation(texfile,txtfile):=(
       println(SCEOUTPUT,"\usepackage{luatexja}");
     );
     println(SCEOUTPUT,"\usepackage{pict2e}");
-//    println(SCEOUTPUT,"\usepackage{ketpic2e,ketlayer2e}");// 17.04.08from
-    tmp=replace(Dirhead+"/ketpicstyle","\","/");
-    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic2e}");
-    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer2e}");
+    println(SCEOUTPUT,"\usepackage{ketpic2e,ketlayer2e}");// 17.04.08from
   ,
     println(SCEOUTPUT,"\special{papersize=\the\paperwidth,\the\paperheight}");
-  //println(SCEOUTPUT,"\usepackage{ketpic,ketlayer}");
+  );// 17.04.08upto
+  tmp=replace(Dirhead,"\","/");//17.11.01from
+  tmp=replace(tmp,"scripts","tex/latex");
+  if(isexists(tmp,""),
+    println(SCEOUTPUT,"\usepackage{ketpic,ketlayer}");
+  ,
     tmp=replace(Dirhead+"/ketpicstyle","\","/");
     println(SCEOUTPUT,"\usepackage{"+tmp+"/ketpic}");
     println(SCEOUTPUT,"\usepackage{"+tmp+"/ketlayer}");
-  );// 17.04.08upto
+  );
   if(length(wall)==0,
-    //println(SCEOUTPUT,"\usepackage{ketslide}");//17.04.08from
-    tmp=replace(Dirhead+"/ketpicstyle","\","/");//17.04.16
-    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide}");
+    tmp=replace(Dirhead,"\","/");//17.11.01from
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      println(SCEOUTPUT,"\usepackage{ketslide}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide}");
+    );
   ,
-    tmp=replace(Dirhead+"/ketpicstyle","\","/");//17.04.16
-    //println(SCEOUTPUT,"\usepackage{ketslide2}");
-    println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide2}");
+    tmp=replace(Dirhead,"\","/");
+    tmp=replace(tmp,"scripts","tex/latex");
+    if(isexists(tmp,""),
+      println(SCEOUTPUT,"\usepackage{ketslide2}");
+    ,
+      tmp=replace(Dirhead+"/ketpicstyle","\","/");
+      println(SCEOUTPUT,"\usepackage{"+tmp+"/ketslide2}");
+    );
   );//17.04.08upto
   println(SCEOUTPUT,"\usepackage{amsmath,amssymb}");
   println(SCEOUTPUT,"\usepackage{bm,enumerate}");
@@ -4726,7 +4744,11 @@ Mkslides():=(
     if(iswindows(),
       tmp2=Batparent;
       parent=replace(Dirwork+Batparent,sep+"fig","");// 16.05.29
-      Makebat(Texparent,"tv"); // 16.07.21
+      if(indexof(Pathpdf,"Adobe")>0, //17.12.09from
+        Makebat(Texparent,"ttv");
+      ,
+        Makebat(Texparent,"tv");
+      ); //17.12.09upto
       kc():=(
         println("kc : "+kc(parent,Dirlib,Fnametex)); // 16.06.10, 17.02.19
       );
@@ -4736,7 +4758,11 @@ Mkslides():=(
       tmp2=Shellparent;
       parent=replace(Dirwork+Shellparent,sep+"fig","");// 16.05.29
       Shellparent=replace(Shellparent,sep+"fig","");
-      Makeshell(Texparent,"tv"); // 16.07.21
+      if(indexof(Pathpdf,"Adobe")>0, //17.12.09from
+        Makeshell(Texparent,"ttv");
+      ,
+        Makeshell(Texparent,"tv");
+      ); //17.12.09upto
       kc():=(
         println("kc : "+kc(parent,Mackc+Dirlib,Fnametex)); // 16.06.10
       );
@@ -4744,64 +4770,64 @@ Mkslides():=(
       Shellparent=tmp2;
     );
   );
-  Dirwork=Dirwork+sep+"fig";
+  Dirwork=Dirwork+pathsep()+"fig"; //17.10.16
   setdirectory(Dirwork);
   Fhead=tmp4;
   Texparent=texparentorg;//17.04.10
 );
 
-Mkslidesummary():=( // 17.04.10revised
+Mkslidesummary():=( // 17.10.26 for R
   regional(texparentorg);
   texparentorg=Texparent;
   if(isstring(Slidename),
     Texparent=Slidename;
   );
-  Mkslidesummary(Texparent,Texparent+"sum",["m","Wait=3"]);
-  Texparent=texparentorg;//17.04.10
+  Mkslidesummary(Texparent,Texparent+"digest",["m","Wait=3"]);
+  Texparent=texparentorg;
 );
 Mkslidesummary(fin,fout):= 
    Mkslidesummary(fin,fout,["m","Wait=3"]);
 Mkslidesummary(inputfile,outputfile,options):=(
 //help:Mkslidesummary(fin,fout,options);
-  regional(fin,fout,out,sep,figflg,dirworkorg,dirtop,tmp);
+  regional(fin,fout,out,figflg,dirworkorg,dirtop,tmp);
   dirworkorg=Dirwork;//17.04.10from
-  if(iswindows(),sep="\",sep="/");
-  dirtop=replace(Dirwork,sep+"fig","");
+  dirtop=replace(Dirwork,pathsep()+"fig","");
   Changework(dirtop);//17.04.10uptp
   fin=inputfile;
   if(indexof(fin,".")==0,fin=fin+".tex");
   fout=outputfile;
   if(indexof(fout,".")==0,fout=fout+".tex");
   cmdL=[
-   "Dt=mgetl('"+fin+"');",[],
-   "Tmp=find((strstr(Dt,'\hypertarget')=='')
-       &(strstr(Dt,'\hyperlink')==''))",[],
-   "Dt=Dt(Tmp)",[],
-   "Smain=strstr(Dt,'\mainslide')",[],
-   "Snew=strstr(Dt,'\newslide')",[],
-   "Ssame=strstr(Dt,'\sameslide')",[],
-   "Nnew=[]",[],
-   "Nsame=[]",[],
-   "for J=1:size(Dt,1),
-      if (length(Snew(J))>0)|(length(Smain(J))>0),
-        Nnew=[Nnew,J],
-      end;
-      if length(Ssame(J))>0,
-        Nsame=[Nsame,J],
-      end;
-    end",[],
-   "Out=Dt(1:Nnew(1))",[],
-   "for J=2:length(Nnew),
-      Tmp=find(Nsame<Nnew(J));
-      Tmp=max(Tmp);
-      Tmp=max([Nsame(Tmp),Nnew(J-1)])+1;
-      Out=[Out;Dt(Tmp:Nnew(J))],
-    end",[],
-   "Tmp=max([Nsame($),Nnew($)])+1",[],
-   "Out=[Out;Dt(Tmp:size(Dt,1))]",[],
-   "mputl(Out,'"+fout+"');",[]
+   "Dt=readLines('"+fin+"')",[],
+   "num=grep('\\hypertarget',Dt,fixed=TRUE)",[],
+   "Dt=Dt[setdiff(1:length(Dt),num)]",[],
+   "Smain=c();Snew=c();Ssame=c()",[],
+   "for(J in 1:length(Dt)){",[],
+   "  Tmp=length(grep('\\mainslide',Dt[J],fixed=TRUE))",[],
+   "  if(Tmp>0){Smain=c(Smain,1)}else{Smain=c(Smain,0)}",[],
+   "  Tmp=length(grep('\\newslide',Dt[J],fixed=TRUE))",[],
+   "  if(Tmp>0){Snew=c(Snew,1)}else{Snew=c(Snew,0)}",[],
+   "  Tmp=length(grep('\\sameslide',Dt[J],fixed=TRUE))",[],
+   "  if(Tmp>0){Ssame=c(Ssame,1)}else{Ssame=c(Ssame,0)}",[],
+   "}",[],
+   "Nnew=c();Nsame=c()",[],
+   "for(J in 1:length(Dt)){",[],
+   "  if((Snew[J]==1)|(Smain[J]==1)){Nnew=c(Nnew,J)}",[],
+   "  if(Ssame[J]==1){Nsame=c(Nsame,J)}",[],
+   "}",[],
+   "Out=Dt[1:Nnew[1]]",[],
+   "for(J in 2:length(Nnew)){",[],
+    "  Tmp=max(Nsame[Nsame<Nnew[J]])",[],
+    "  Tmp=max(c(Nsame[Tmp],Nnew[J-1]))+1",[],
+    "  Out=c(Out,Dt[Tmp:Nnew[J]])",[],
+   "}",[],
+   "Tmp=max(c(Nsame[-1],Nnew[-1]))+1",[],
+   "Out=c(Out,Dt[Tmp:length(Dt)])",[],
+   "writeLines(Out,'"+fout+"',sep='\n')",[],
+   "cat('////',file='resultR.txt',sep='')",[],
+   "quit()",[]
   ];
-  CalcbyS("out",cmdL,options);
+  CalcbyR("out",cmdL,append(options,"Cat=n"));
   wait(1000);
   Changework(dirtop);//17.04.10
   tmp=replace(fout,".tex","");

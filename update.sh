@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2016-2017 Norbert Preining
+# (c) 2016-2018 Norbert Preining
 # License: GPLv3+
 #
 # USAGE:
@@ -17,6 +17,12 @@ TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 
 # we don't do TeX Catalogue updates
 #unset TEX_CATALOGUE
+
+do_sign=true
+if [ "$1" = "-no-sign" ] ; then
+  do_sign=false
+  shift
+fi
 
 do_tlpdb=false
 do_container=false
@@ -70,11 +76,16 @@ if $do_tlpdb ; then
 	--master=`pwd`
 fi
 
+if $do_sign ; then
+  gpgcmd="-gpgcmd `pwd`/tl-sign-file"
+else
+  gpgcmd=-no-sign
+fi
 if $do_container ; then
   $TLCHECKOUT/Master/tlpkg/bin/tl-update-containers \
 	-master `pwd` \
 	-location $TLNETDEST	\
-	-gpgcmd `pwd`/tl-sign-file \
+  $gpgcmd \
 	-all # sometimes we need -recreate
 
   grep ^name tlpkg/texlive.tlpdb | grep -v 00texlive | grep -v '\.' | awk '{print$2}' | sort > $TLNETDEST/packages.txt

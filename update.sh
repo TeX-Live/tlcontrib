@@ -15,6 +15,9 @@ TLCHECKOUT=${TLCHECKOUT:-/home/norbert/Development/TeX/texlive.git}
 TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2017}
 TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 
+# how to sign
+export TL_GNUPGOPTS="--local-user 0xEC00B8DAD32266AA"
+
 # we don't do TeX Catalogue updates
 #unset TEX_CATALOGUE
 
@@ -76,16 +79,17 @@ if $do_tlpdb ; then
 	--master=`pwd`
 fi
 
+
 if $do_sign ; then
-  gpgcmd="-gpgcmd `pwd`/tl-sign-file"
+  gpgcmd=
 else
   gpgcmd=-no-sign
 fi
 if $do_container ; then
   $TLCHECKOUT/Master/tlpkg/bin/tl-update-containers \
 	-master `pwd` \
-	-location $TLNETDEST	\
   $gpgcmd \
+	-location $TLNETDEST	\
 	-all # sometimes we need -recreate
 
   grep ^name tlpkg/texlive.tlpdb | grep -v 00texlive | grep -v '\.' | awk '{print$2}' | sort > $TLNETDEST/packages.txt

@@ -50,7 +50,7 @@ if $do_collection ; then
   for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
     bn=`basename $i .tlpsrc`
     if [ "$bn" = "00texlive.autopatterns" -o "$bn" = "00texlive.config" -o "$bn" = 00texlive.installation \
-       -o "$bn" = collection-contrib ] ; then
+       -o "$bn" = collection-contrib -o "$bn" = "ketcindy" ] ; then
       continue
     fi
     echo "depend $bn" >> $col

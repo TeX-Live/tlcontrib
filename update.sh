@@ -12,7 +12,7 @@
 # use tlmgr key add etc, see manual.
 
 TLCHECKOUT=${TLCHECKOUT:-/home/norbert/Development/TeX/texlive.git}
-TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2017}
+TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2018}
 TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 
 # how to sign

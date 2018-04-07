@@ -1,21 +1,20 @@
-%% $Id: lucida-otf.sty 442 2017-04-19 10:26:52Z herbert $
+%% $Id: lucida-otf.sty 750 2018-03-29 12:29:53Z herbert $
 %%
 %% This file is distributed under the terms of the LaTeX Project Public
 %% License from CTAN archives in directory  macros/latex/base/lppl.txt.
 %% Either version 1.3 or, at your option, any later version.
 %%
-%
-% Copyright 2017 Herbert Voss hvoss@tug.org
-%
+% Copyright 2018 Herbert Voss hvoss@tug.org
 %%
 \ProvidesPackage{lucida-otf}[%
-  2017/07/02 v. 0.04 (Herbert Voss) Supports Lucida OpenType for lualatex/xelatex.] 
+  2018/03/31 v. 0.08 (Herbert Voss) Supports Lucida OpenType for lualatex/xelatex.] 
+%
 \RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
 \RequirePackage{unicode-math}  % support opentype math fonts
                                % loads itself fontspec
 %
 \newif\ifLucida@usefilenames \Lucida@usefilenamesfalse
-\DeclareOptionX{usefilenames}[true]{\@nameuse{Lucida@filenames#1}}
+\DeclareOptionX{usefilenames}[true]{\@nameuse{Lucida@usefilenames#1}}
 %
 \providecommand\lucidaRM@features{Scale=0.92}%  Roman
 \providecommand\lucidaSS@features{Scale=0.92}%  SansSerif
@@ -40,18 +39,34 @@
 \DeclareOptionX{HW}{\renewcommand*{\lucidaHW@features}{#1}}
 \DeclareOptionX{DefaultFeatures}{\def\lucida@DefaultFeatures{#1}}
 
+\newif\ifLucida@useKerning \Lucida@useKerningtrue
+\DeclareOptionX{useKerning}[true]{\@nameuse{Lucida@useKerning#1}}
+
 \ProcessOptionsX\relax
+
+\def\Lucida@RawFeatures{}\def\Lucida@MathRawFeatures{}
+\ifLucida@useKerning
+  \ifluatex 
+    \RequirePackage{luacode}
+    \typeout{loading lucida-otf-kern.tex ... }%
+    \input{lucida-otf-kern.tex}% 
+    \def\Lucida@RawFeatures{+lucidaletterkerning,+lucidanumberkerning}
+    \def\Lucida@MathRawFeatures{+lucidanumberkerning}
+  \fi
+\fi
 
 \defaultfontfeatures{Ligatures=TeX,\lucida@DefaultFeatures}% default in fontspec
 %
 \ifLucida@usefilenames
+\typeout {Using file names for the Lucida font}%
 %-----------------------------------------  file names ----------------------------
 \setmainfont{LucidaBrightOT}[% main rm
        Extension = .otf,
   \lucidaRM@features,
       ItalicFont = *-Italic,
         BoldFont = *-Demi,
-  BoldItalicFont = *-DemiItalic
+  BoldItalicFont = *-DemiItalic,
+      RawFeature = {\Lucida@RawFeatures},
 ]
 %
 \setsansfont{LucidaSansOT}[% main sans
@@ -69,13 +84,22 @@
         BoldFont = *-Bold,
   BoldItalicFont = *-BoldOblique
 ]
+\newfontfamily\lucidaSLshape{LucidaBrightOT}[
+       FakeSlant = 0.2,
+       Extension = .otf,
+    \lucidaRM@features,
+        BoldFont = *-Demi,
+  BoldItalicFont = *-DemiItalic
+]
+%\renewcommand\sldefault{\lucidaSLshape}
+\let\slshape\lucidaSLshape
 %
 % Setting math
 % First we have to expand the feature macros:
 %\expandafter\setmathfont\expandafter[\lucidaMM@features]{LucidaBrightMathOT}
 %\expandafter\setmathfont\expandafter[\lucidaMMbold@features,version=bold]{LucidaBrightMathOT-Demibold}
 
-\edef\Set@Math{\noexpand\setmathfont{Lucida Bright Math OT}[\lucidaMM@features,version=normal]%
+\edef\Set@Math{\noexpand\setmathfont{Lucida Bright Math OT}[\lucidaMM@features, RawFeature = {\Lucida@MathRawFeatures}]%
                \noexpand\setmathfont{Lucida Bright Math OT Demibold}[\lucidaMMbold@features,version=bold]}
 \Set@Math
 %
@@ -83,10 +107,10 @@
 \newfontface\LucidaBlackletter{LucidaBlackletterOT}[
   Extension = .otf,
   \lucidaBL@features]
-\newfontface\LucidaCalligraphy{LucidaCalligraphyOT-Italic}[
+\newfontface\LucidaCalligraphy{LucidaCalligraphyOT}[
   Extension = .otf,
   \lucidaCAL@features]
-\newfontface\LucidaHandwriting{LucidaHandwritingOT-Italic}[
+\newfontface\LucidaHandwriting{LucidaHandwritingOT}[
   Extension = .otf,
   \lucidaHW@features]
 %
@@ -108,11 +132,13 @@
   BoldItalicFont = *-BoldItalic
 ]
 \else
+\typeout {Using symbolic names for the Lucida font}%
 %-----------------------------------------  symbolic names ----------------------------
 \setmainfont{Lucida Bright OT}[% main rm
   \lucidaRM@features,
         BoldFont = * Demibold,
-  BoldItalicFont = * Demibold Italic
+  BoldItalicFont = * Demibold Italic,
+      RawFeature = {\Lucida@RawFeatures}
 ]
 %
 \setsansfont{Lucida Sans OT}[% main sans
@@ -124,13 +150,22 @@
 \setmonofont{Lucida Sans Typewriter OT}[% main typewriter
   \lucidaTT@features,
 ]
+\newfontfamily\lucidaSLshape{Lucida Bright OT}[
+        FakeSlant = 0.2,
+%       Extension = .otf,
+    \lucidaRM@features,
+        BoldFont = * Demibold,
+  BoldItalicFont = * Demibold Italic
+]
+%\renewcommand\sldefault{\lucidaSLshape}
+\let\slshape\lucidaSLshape
 %
 % Setting math
 % First we have to expand the feature macros:
 %\expandafter\setmathfont\expandafter[\lucidaMM@features]{LucidaBright Math OT}
 %\expandafter\setmathfont\expandafter[\lucidaMMbold@features,version=bold]{LucidaBright Math OT-Demibold}
 
-\edef\Set@Math{\noexpand\setmathfont{Lucida Bright Math OT}[\lucidaMM@features,version=normal]%
+\edef\Set@Math{\noexpand\setmathfont{Lucida Bright Math OT}[\lucidaMM@features, RawFeature = {\Lucida@MathRawFeatures}]%
                \noexpand\setmathfont{Lucida Bright Math OT Demibold}[\lucidaMMbold@features,version=bold]}
 \Set@Math
 %

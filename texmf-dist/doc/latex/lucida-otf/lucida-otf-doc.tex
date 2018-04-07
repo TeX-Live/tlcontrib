@@ -1,4 +1,4 @@
-%% $Id: lucida-otf-doc.tex 443 2017-04-19 10:28:05Z herbert $
+%% $Id: lucida-otf-doc.tex 750 2018-03-29 12:29:53Z herbert $
 % Copyright 2012-2015 TeX Users Group.
 % 
 % Copying and distribution of this file, with or without modification,
@@ -8,12 +8,19 @@
 \documentclass[11pt]{article}
 \usepackage{geometry}
 
-\usepackage[%usefilenames,
+\usepackage{fontspec}
+\newfontface\Lucida{LucidaBrightOT}
+\usepackage{xcolor}
+
+\usepackage[useKerning,
             TT={Scale=0.88,FakeStretch=0.9},
             SS={Scale=0.9},
             RM={Scale=0.9},
             DefaultFeatures={Ligatures=TeX}]{lucida-otf}  % support opentype math fonts
 
+\newfontface\LucidaKern{LucidaBrightOT}[RawFeature=+lucidaletterkerning]
+
+\newcommand\sK[1]{\textcolor{red}{\rlap{\Lucida\large#1}}\textcolor{blue}{\LucidaKern\large#1}}
 \usepackage{biblatex}
 \addbibresource{\jobname.bib}
 \usepackage{array}
@@ -22,6 +29,7 @@
 \usepackage{ltablex} % for examples
 \usepackage{listings} % for code
 \usepackage{dtk-logos} % for Wikipedia W
+
 
 \pagestyle{headings}
 
@@ -188,6 +196,37 @@ extension \texttt{.otf} and the filename of the fonts:
 ]
 \end{verbatim}
 
+\section{Kerning}
+
+For Lua\LaTeX\ 
+the package uses by default a kerning table (Kerning table \texttt{lucida-otf.kern} was created 
+by Bruno Bischoffberger (\url{https://github.com/whilealive/LaTexStyles}) and extended by the original
+kernings from YandY (\url{http://tug.org/yandy}).
+
+An example (Blue is  \emph{with} kerning):
+
+
+
+\noindent
+\sK{AC}, \sK{AG}, \sK{AJ}, \sK{AO}, \sK{AQ}, \sK{AS}, \sK{AT}, \sK{AU}, \sK{AV}, \sK{AW}, 
+\sK{Aa}, \sK{Ac}, \sK{Ae}, \sK{Ao}, \sK{Ap}, \sK{Aq}, \sK{At}, 
+\sK{Av}, \sK{Ay}, \sK{Az}, \sK{Ce}, \sK{Co}, \sK{Cw}, \sK{Cy}, \sK{Da}, \sK{De}, \sK{Do},
+	\sK{Fa}, \sK{Fe}, \sK{Fy}, \sK{Ha}, \sK{He}, \sK{Ib}, \sK{Io}, \sK{Iq}, \sK{Ja}, 
+	\sK{Je}, 
+	\sK{Jo}, \sK{Ka}, \sK{Ke}, \sK{Ko}, \sK{Ku}, \sK{Ky},
+	\sK{Ly}, \sK{Na}, \sK{Ni}, \sK{No}, \sK{Oa}, \sK{Og}, \sK{Oh}, \sK{Ok}, \sK{Ol}, 
+	\sK{Ot}, \sK{Pa}, \sK{Po}, \sK{Pv}, \sK{Pw},
+	\sK{Ra}, \sK{Rd}, \sK{Re}, \sK{Rj}, \sK{Ro}, \sK{Ru}, \sK{Rw}, \sK{Ry}, \sK{Ta}, 
+	\sK{Td}, \sK{Te}, \sK{To}, \sK{Tr}, \sK{Ts}, \sK{Tu}, \sK{Tw}, \sK{Ty}, \sK{Tz},
+	\sK{Va}, \sK{Ve}, \sK{Vo}, \sK{Vs}, \sK{Wa}, \sK{We}, \sK{Wo}, \sK{Wy}, \sK{Ya}, 
+	\sK{Ye}, \sK{Yi}, \sK{Yo}, \sK{Yp}, \sK{Ys}, \sK{Yu},
+	\sK{Za}, \sK{Ze}, \sK{Zo}, \sK{Zu}, \sK{Zü}, \sK{Zy}
+
+
+If you do not want to use the kerning table, then load the package with the optional argument \texttt{useKerning=false}.
+
+
+
 \section{Text examples}
 
 \newcommand\demotext{%
@@ -205,7 +244,9 @@ extension \texttt{.otf} and the filename of the fonts:
 
 The basic text family is \code{LucidaBrightOT}, with the usual four
 variants---\allowbreak regular, italic, bold, and bold italic, all with
-oldstyle figures; small caps are available in the upright shapes:
+oldstyle figures; small caps are available in the upright shapes.
+
+
 
 \noindent
 \begin{tabularx}{\dimexpr\linewidth+\marginparwidth}{@{} >{\raggedright}X >{\ttfamily}l @{}}
@@ -288,6 +329,18 @@ And now bold math:
 \unboldmath
 Euro and copyright symbols are available: \texteuro\ \textcopyright.
 
+
+\begin{verbatim}
+And now more bold math:
+\[ 
+  \symbf{\phi(x)}=\int_{-\infty}^{x} e^{-x^{2}/2} 
+\]
+\end{verbatim}
+
+And now more bold math:
+\[ 
+  \symbf{\phi(x)}=\int_{-\infty}^{x} e^{-x^{2}/2} 
+\]
 
 \section{Closing}
 

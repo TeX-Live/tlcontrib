@@ -1,0 +1,276 @@
+%\iffalse
+% makeindex -s gglo.ist -o qrcstamps.gls qrcstamps.glo
+% makeindex -s gind.ist -o qrcstamps.ind qrcstamps.idx
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% qrcstamps.sty package,                                %%
+%% Copyright (C) 2017                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+%<package>\ProvidesPackage{qrcstamps}
+%<package> [2018/06/02 v1.0 qrcstamps: Create QR codes using stamps]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+%\usepackage{qrcstamps}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\gdef\brpr#1{\texttt{\char123\relax#1\char125\relax}}
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+%\def\cs#1{\texttt{\bslash#1}}
+\DeclareRobustCommand{\tmspace}[3]{%
+  \ifmmode\mskip#1#2\else\kern#1#3\fi\relax}
+\renewcommand{\,}{\tmspace+\thinmuskip{.1667em}}
+\let\thinspace\,
+\renewcommand{\!}{\tmspace-\thinmuskip{.1667em}}
+\let\negthinspace\!
+\renewcommand{\:}{\tmspace+\medmuskip{.2222em}}
+\let\medspace\:
+\newcommand{\negmedspace}{\tmspace-\medmuskip{.2222em}}
+\renewcommand{\;}{\tmspace+\thickmuskip{.2777em}}
+\let\thickspace\;
+\newcommand{\negthickspace}{\tmspace-\thickmuskip{.2777em}}
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewenvironment{quote}[1][]
+   {\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
+    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \item\relax}
+   {\endlist}
+\makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{qrcstamps}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{qrcstamps}{aebdocfmt.def cannot be found}}
+\begin{document}
+\def\CMD#1{\textbackslash#1}
+  \GetFileInfo{qrcstamps.sty}
+  \title{\textsf{qrcstamps}: Create QR codes using stamps}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \let\Email\texttt
+  \DocInput{qrcstamps.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o qrcstamps.ind qrcstamps.idx}\\on the command line and recompile
+    \texttt{qrcstamps.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o qrcstamps.gls qrcstamps.glo}\\on the command line and recompile
+    \texttt{qrcstamps.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+%
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%    \section{Description}
+%    This package attempts to create barcodes, at least the ones supported by Acrobat: PDF417,
+%    QR Code, Data Matrix. Acrobat has a barcode field that can be created in the standard way using
+%    \pkg{eforms}, but it does  not work because the barcode renderer is never called to create the image
+%    for the barcode. Bummer.
+%
+%    The approach we take was suggested to me by Thom Parker, through personal communication, through
+%    \href{https://acrobatusers.com/tutorials/print/dynamic_stamp_secrets}{his article} on \href{https://acrobatusers.com/}{AcrobatUser.com}
+%    and his book on \href{https://www.pdfscripting.com/public/All-About-PDF-Stamps-in-Acrobat-and-Paperless-Workflows-The-Book.cfm}{PDF Stamps}.
+%    The idea is to create \emph{dynamic stamps} whose appearances are barcodes, such as a QR symbol.
+%
+%    In this version, we concentrate of the QR Code symbology. Whereas PDF417 and Data Matrix symbology may
+%    be created in the same way, there seems no need for either of these two. A QR Code symbology can be
+%    read by the scanners available on most mobile phones today. In that context, the symbology often contains
+%    an URL that can be scanned by a persons mobile, after which time, he (or she) may visit that web site without
+%    having to physically type in the URL address.
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+%    \end{macrocode}
+%    \section{Documentation and Code}
+%    The \IndexOpt{scandoc}\opt{scandoc} option calls some doc assembly JavaScript to scan the document
+%    for barcode stamps, this may not be necessary, depending on the version of Acrobat you have.
+%    \begin{macrocode}
+\DeclareOptionX{scandoc}{\let\grc@InputScanDoc\qr@scanDoc}
+%    \end{macrocode}
+%    During document development, you don't what to scan the newly created PDF after you build it to,
+%    perhaps, edit the text. In this case, use the \IndexOpt{!scandoc}\opt{!scandoc} option. You want to scan the document when you build the document for the last time
+%    before publishing it. Be sure to save the document using the SaveAs menu item. This saves the
+%    stamp appearances (symbology in this case) as part of the document.
+%    \begin{macrocode}
+\DeclareOptionX{!scandoc}{\let\grc@InputScanDoc\relax}
+%    \end{macrocode}
+%    The default is not to scan the document. Remember, the final document must be scanned; that is,
+%    it must be build with the \opt{scandoc} option in effect.
+%    \begin{macrocode}
+\let\grc@InputScanDoc\relax
+\def\qr@scanDoc{\InputIfFileExists{scandoc-grc.def}{\PackageInfo{qrcstamps}
+    {Inputting the scandoc-grc.def file}}
+    {\PackageWarning{qrcstamps}{Cannot find the file scandoc-grc.def}}}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{basename}\hspace{-\marginparsep}\texttt{=\ameta{name}} sets the base name of the barcode annotation.
+%    The form of the name is \texttt{\ameta{basename}\_\ameta{size}}. The default value
+%    of \opt{basename} is \texttt{basename=AeBQRC}. This option need never be specified unless
+%    a package developer creates his own custom barcode fields and stamps. To reference these new
+%    stamps, the \texttt{basename} would have to be specified, unique that collection of stamps.
+%    \begin{macrocode}
+\DeclareOptionX{basename}{\def\QRBase{#1}}
+\def\QRBase{AeBQRC}
+%    \end{macrocode}
+%    \begin{macrocode}
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{insdljs}}
+%    \end{macrocode}
+%    \begin{macrocode}
+\ProcessOptionsX
+%    \end{macrocode}
+%    The package used here is \pkg{annot\_pro}, version dated 2017/06/06. I made a minor
+%    modification of \pkg{annot\_pro} to accommodate \cs{qrcstamps}.
+%    \begin{macrocode}
+\RequirePackage{annot_pro}[2017/06/06]
+\ifx\grc@InputScanDoc\relax\else\let\execjs=y\fi
+%    \end{macrocode}
+%    \subsection{The \texorpdfstring{\protect\cs{qrCode}}{\textbackslash{qrCode}} command}
+%    We develop the stamp annotation for a QR barcode.
+%    The command \cs{qrCode}, defined below, uses \cs{annotpro} from \pkg{annot\_pro}, and
+%    as such, its optional argument takes the same options as \cs{annotpro}. However,
+%    we add two new options, available only within the options list of \cs{qrCode}.
+%    modification of \pkg{annot\_pro} to accommodate \cs{qrcstamps}.\medskip
+%
+%    \noindent The \IndexKey{size}\texttt{size} key takes one of three values
+%    \texttt{small}, \texttt{medium}, and \texttt{large}.
+%    \begin{itemize}
+%       \item \texttt{size=small} produces a stamp that holds at most 75 characters
+%       \item \texttt{size=medium} produces a stamp that holds at most 250 characters
+%       \item \texttt{size=small} produces a stamp that holds at most 500 characters
+%    \end{itemize}
+%    The choice of \texttt{size} should be the best fit for the data you provide \cs{qrCode}.
+%    \begin{macrocode}
+\define@choicekey+{annotprostampQR}{size}[\val\nr]{%
+small,medium,large}[small]{\ifcase\nr\relax
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}\or
+    \def\apstamp@@size{Med}\def\qrc@def@W{1.5in}\or
+    \def\apstamp@@size{Large}\def\qrc@def@W{2in}\else
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}\fi}%
+{\PackageWarning{qrcstamps}{Invalid choice of `size=#1'\MessageBreak
+    Permissible values are small, medium, large}}
+\def\apstamp@@size{Small}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{allowresize}\hspace{-\marginparsep}\texttt{=\ameta{\upshape{true\string|false}}}
+%    The \texttt{allowresize} allows you to resize and move the stamp.
+%    By default, the stamp (qr code symbology) cannot be resized or moved.
+%    \begin{macrocode}
+\define@boolkey{annotprostampQR}{allowresize}[true]{}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{basename}\hspace{-\marginparsep}\texttt{=\ameta{name}}
+%    The \texttt{basename} key allows you to give a \ameta{name} to the stamp you want to use
+%    \emph{locally}. It's unlikely you are using more than one barcode stamp collection, so this option
+%    is normally not used, but just in case, it is here. Specifying a value for the key \texttt{basename}
+%    overrides the choice for the option \texttt{basename}.
+%    \begin{macrocode}
+\define@key{annotprostampQR}{basename}[\QRBase]{\edef\QRBase{#1}}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{contents}\hspace{-\marginparsep}\texttt{=\ameta{text}}
+%    It's unlikely you'll want to include a text message as part of your stamp, but just in
+%    case, we previde the \texttt{contents} key.
+%    \begin{macrocode}
+\define@key{annotprostampQR}{contents}[]{\long\def\qrc@contents{#1}}
+\let\qrc@contents\@empty
+%    \end{macrocode}
+%    \begin{macro}{\qrCode}\hspace{-\marginparsep}\,\texttt{[\ameta{options}]\darg{\ameta{content}}}
+%    The \cs{qrCode} command is the one that produces the QR Code stamp symbol, not as a barcode field,
+%    but as an annotation stamp. For printed material, the stamps are flattened and appear as you expect
+%    them. The \ameta{options} may be any option for a stamp annotation as produced by \cs{annotpro}
+%    plus the options \texttt{size} and \texttt{allowresize}. The required argument \ameta{content}
+%    is the text you want the qr barcode symbology to represent. Usually its an URL.
+%    \begin{macrocode}
+\newcommand\qrCode[2][]{\begingroup\def\n{\string\n}%
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}%
+    \setkeys*{annotprostampQR}{#1}%
+    \annotpro*[widthTo=\qrc@def@W,#1,type=stamp,
+    \ifKV@annotprostampQR@allowresize\else readonly\fi,
+    title=QRC,subject={#2},%
+    name=\#\QRBase_\apstamp@@size]{\qrc@contents}\endgroup}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+%</package>
+%<*scandoc>
+%    \end{macrocode}
+%    \subsection{Document assembly}
+%    The document assembly code is executed when the \texttt{scandoc} option is used. It is executed
+%    then the document is first opened.
+%    \begin{macrocode}
+\begin{execJS}{scan4qrc}
+var aBCStamps=new Array();
+if (typeof scancomplete=="undefined") {
+    var scancomplete=false,annots,isStamp,isHashtag;
+    this.syncAnnotScan();
+    for (var p=0; p<this.numPages; p++) {
+         annots=this.getAnnots(p);
+         if (annots!=null) {
+            for (var i=0; i<annots.length; i++) {
+%    \end{macrocode}
+%    At this time, we search only for annots of type \texttt{"Stamp"} and ones whose \texttt{AP} key
+%    has an entry beginning with `\texttt{\#}'. Once found, we push it (the page number)
+%    onto the \texttt{aBCStamps} array.
+%    \begin{macrocode}
+                isStamp=(annots[i].type=="Stamp");
+                isHashtag=(annots[i].AP.indexOf("\#")==0);
+                if ( isStamp  &&  isHashtag ) {
+                    aBCStamps.push(p);
+                    break;
+                }
+            }
+        }
+    }
+}
+QRCscrollPage.index=0;
+function QRCscrollPage() {
+%    \end{macrocode}
+%    We go to the page where each stamp of the type we are interested in. Opening the page
+%    causes \app{Acrobat} to create an appearance for the stamp.
+%    \begin{macrocode}
+    if (QRCscrollPage.index<aBCStamps.length) {
+         this.pageNum=aBCStamps[QRCscrollPage.index];
+         QRCscrollPage.index+=1;
+    } else {
+        app.clearInterval(qrcTO);
+        scancomplete=true;
+        this.pageNum=0;
+    }
+}
+if (aBCStamps.length>0)
+    var qrcTO=app.setInterval("QRCscrollPage()", 5);
+\end{execJS}
+%</scandoc>
+%<*package>
+%    \end{macrocode}
+%    Input the \texttt{scandoc-grc.def} code, if the option \texttt{scandoc} is in effect.
+%    \begin{macrocode}
+\grc@InputScanDoc
+%</package>
+%    \end{macrocode}
+\endinput

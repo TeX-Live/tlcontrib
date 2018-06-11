@@ -1,0 +1,59 @@
+%%
+%% This is file `qrcstamps.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% qrcstamps.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% qrcstamps.sty package,                                %%
+%% Copyright (C) 2017                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{qrcstamps}
+ [2018/06/02 v1.0 qrcstamps: Create QR codes using stamps]
+\RequirePackage{xkeyval}
+\DeclareOptionX{scandoc}{\let\grc@InputScanDoc\qr@scanDoc}
+\DeclareOptionX{!scandoc}{\let\grc@InputScanDoc\relax}
+\let\grc@InputScanDoc\relax
+\def\qr@scanDoc{\InputIfFileExists{scandoc-grc.def}{\PackageInfo{qrcstamps}
+    {Inputting the scandoc-grc.def file}}
+    {\PackageWarning{qrcstamps}{Cannot find the file scandoc-grc.def}}}
+\DeclareOptionX{basename}{\def\QRBase{#1}}
+\def\QRBase{AeBQRC}
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{insdljs}}
+\ProcessOptionsX
+\RequirePackage{annot_pro}[2017/06/06]
+\ifx\grc@InputScanDoc\relax\else\let\execjs=y\fi
+\define@choicekey+{annotprostampQR}{size}[\val\nr]{%
+small,medium,large}[small]{\ifcase\nr\relax
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}\or
+    \def\apstamp@@size{Med}\def\qrc@def@W{1.5in}\or
+    \def\apstamp@@size{Large}\def\qrc@def@W{2in}\else
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}\fi}%
+{\PackageWarning{qrcstamps}{Invalid choice of `size=#1'\MessageBreak
+    Permissible values are small, medium, large}}
+\def\apstamp@@size{Small}
+\define@boolkey{annotprostampQR}{allowresize}[true]{}
+\define@key{annotprostampQR}{basename}[\QRBase]{\edef\QRBase{#1}}
+\define@key{annotprostampQR}{contents}[]{\long\def\qrc@contents{#1}}
+\let\qrc@contents\@empty
+\newcommand\qrCode[2][]{\begingroup\def\n{\string\n}%
+    \def\apstamp@@size{Small}\def\qrc@def@W{1in}%
+    \setkeys*{annotprostampQR}{#1}%
+    \annotpro*[widthTo=\qrc@def@W,#1,type=stamp,
+    \ifKV@annotprostampQR@allowresize\else readonly\fi,
+    title=QRC,subject={#2},%
+    name=\#\QRBase_\apstamp@@size]{\qrc@contents}\endgroup}
+\grc@InputScanDoc
+\endinput
+%%
+%% End of file `qrcstamps.sty'.

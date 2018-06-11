@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage[forcolorpaper]{web}
+\usepackage[scandoc]{qrcstamps}
+
+\title{Create QR Code Symbols using Stamps}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\subject{Creating QR Code symbols using Acrobat annotation stamps and LaTeX}
+\keywords{stamp annotations, QR Code, LaTeX, PDF, AcroTeX}
+
+\useFullWidthForPaper
+\previewOff
+
+\def\cs#1{\texttt{\char`\\#1}}
+
+\parindent0pt\parskip6pt
+
+\begin{document}
+
+\makeinlinetitle
+
+\textbf{Small}
+
+\defineAPath{\UADPStory}{http://www.math.uakron.edu/~dpstory}
+\qrCode{http://www.acrotex.net} \url{http://www.acrotex.net}\qquad
+\qrCode{mailto:dpstory@acrotex.net} \url{mailto:dpstory@acrotex.net}
+
+\qrCode{Home of AcroTeX.Net Blog\n
+http://www.acrotex.net/blog} \parbox{2in}{Home of Acro\negthinspace\TeX.Net Blog\\
+\url{http://www.acrotex.net/blog}}\hfill\parbox{3.25in}{You can format the
+line of a text message, as is done in the QR symbol to the left, by using
+\cs{n} (new line) within the required argument of \cs{qrCode}.}
+
+
+\textbf{Medium}
+
+%https://theqrplace.wordpress.com/2011/05/02/qr-code-tech-info-mecard-format/
+\qrCode[size=medium]{MECARD:N:Story,Don;NICKNAME:Dr. D. P. Story;
+ADR:1475 AcroTeX Drive, Niceville, FL 32578;TEL:9999999999;EMAIL:dpstory@acrotex.net;
+MEMO:Founder of AcroTeX.Net;
+URL:http://www.acrotex.net;;} (MECARD)
+
+\textbf{Large}
+
+\def\TEXT{%
+Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.
+%Now is the time for all good men to come to the aid of their country.
+Now is the time for all good men to come to the aid of their country.}
+
+\qrCode[size=large,widthTo=2in,allowresize]{\TEXT} (Now is the time\dots)\hfill
+\parbox{3in}{This is an example of a QR symbol containing text. This paragraph
+is near the limit of 500 characters. If you recompile after un-commenting the
+one line that is commented out, you'll be over the 500 character limit. See
+what happens when you compile. This example as well as others were used in
+the development of the package to check whether there truly is a 500
+character limit.}
+
+\end{document}

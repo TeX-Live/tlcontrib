@@ -1,0 +1,142 @@
+\documentclass{article}
+\usepackage[web=forcolorpaper,eforms]{aeb_pro}
+\usepackage[scandoc]{qrcstamps}
+%\usepackage{lucidbry}
+
+\previewOff
+
+\title{\texorpdfstring{Modify a QR symbol stamp and (optionally) save it to an Image file}
+    {Modify a QR Symbol and save as Image}}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\subject{Methodology and problems with creating dynamic QR barcode stamps}
+\keywords{stamp, QRCode, stamps}
+\setWindowOptions{showtitle}
+
+\def\cs#1{\texttt{\char`\\#1}}
+
+\useFullWidthForPaper
+
+\parindent0pt\parskip6pt
+
+\chngDocObjectTo{\oDoc}{oDoc}
+%
+% Methodology: When user presses 'Make Image', the page of the doc that contains the stamp
+% is extracted and saved as \jobname_tmp.pdf. It is then attached to the current doc, with
+% annotation name (NM key) of "_qrcpage". The attachment is opened (hidden from user), the page is cropped
+% around the annotation and saved in the desired file format under the specified name. The
+% attachment is then closed and removed.
+%
+\begin{insDLJS}{myqrcjs}{Document JS to support QRC}
+var _oDoc,oDoc;
+function saveQrcAsImage(annotname) {
+    if ( arguments.length > 1) {
+        var f=this.getField(arguments[1]);
+        var i=f.currentValueIndices
+        var faceV=f.getItemAt(i,false) // face
+        var fileExt="."+faceV.toLowerCase();
+        var expV=(faceV=="PDF")?"":f.getItemAt(i,true);  // export value
+    } else {
+        var faceV="PNG";
+        var fileExt=".png";
+        expV="com.adobe.acrobat.png";
+    }
+    var annot=this.getAnnot({nPage:this.pageNum,cName:annotname});
+    var props=annot.getProps();
+    var Rect=props.rect;
+    var Page=this.pageNum;
+    var pos=this.path.lastIndexOf("/");
+    var _path=this.path.substring(0,pos);
+% Extract the page the targeted qrc is on, and save it to a tmp file
+    \extractPages({nStart:Page, cPath:"\jobname_tmp.pdf"});
+% Now, attach it to the current document
+    \importDataObject({cName:"_qrcpage", cDIPath:"\jobname_tmp.pdf"});
+% Open the attachment, oDoc is the doc object of this doc
+    oDoc=this.openDataObject("_qrcpage");
+    var basename=app.response({cQuestion:"Enter the name of the file to be saved as a "+faceV+" image",
+        cDefault: "qrcode", cLabel: "Save as "+faceV+":"});
+    if (basename.toLowerCase()=="\jobname".toLowerCase()) {
+        basename=null;
+        app.alert("Selecting \"\jobname\" is not permitted, try another name for the saved image.");
+    }
+    if (basename!=null) {
+%
+% We extracted a single page, the annot lies on page 0
+%
+        oDoc.setPageBoxes({cBox:"Crop",nStart:0,rBox:Rect});
+%
+% From experience, we learn that the page must be flattened before we save to EPS
+% In the case of PDF, unless we flatten, the resultant PDF file will be a stamp
+%
+        if (faceV=="EPS"||faceV=="PDF") oDoc.flattenPages();
+        \docSaveAs\oDoc({cPath:_path+"/"+basename+fileExt,cConvID:expV});
+        oDoc.closeDoc(true);
+        this.removeDataObject("_qrcpage");
+        this.dirty=false;
+    }
+}
+function qrcKeyboard(annotname) {
+    if (event.willCommit) {
+        if (!/^\\s*$/.test(event.value)) {
+            var annot=this.getAnnot({nPage:this.pageNum,cName:annotname});
+            var props=annot.getProps();
+            props.author="QRC";
+            props.subject=event.value;
+            annot.setProps(props);
+            delete props.APCosObj;
+            annot.setProps(props);
+        }
+    }
+}
+\end{insDLJS}
+
+
+
+\begin{document}
+
+\makeinlinetitle
+
+We initially create a QR symbol for the url \url{http://www.acrotex.net}. This QR symbol can be modified
+by entering text in the input box (the field allows a maximum of 75 characters). After you've committed your data, the
+QR symbol will update. The new wrinkle is the ability to save this symbol to an image file (PNG). Do this
+by pressing the \textsf{Make Image} button and entering a file name (or just take the default name). If things
+go as planned, the PNG image of the QR symbol is saved to the folder this PDF was opened from.
+
+\qrCode{http://www.acrotex.net}\space
+\textField[\MaxLen{75}\AA{\AAKeystroke{qrcKeyboard("\currentAnnotName");}}]{txtFld1}{2in}{11bp}\olBdry
+\pushButton[\CA{Make Image}\A{\JS{saveQrcAsImage("\currentAnnotName");}}]{btn1}{}{11bp}
+
+But why stop at PNG files? In the demonstration below, use the dropdown menu to select a graphics format.
+Pressing the \textsf{Make Image} button then saves the QR Code symbol to a graphics file.
+
+\qrCode[allowresize]{http://www.acrotex.net}\space
+\textField[\MaxLen{75}\AA{\AAKeystroke{qrcKeyboard("\currentAnnotName");}}]{txtFld2}{2in}{11bp}\olBdry
+\comboBox[\DV{pdf}\V{pdf}]{cb2}{.6in}{11bp}{%
+[(pdf)(PDF)][(com.adobe.acrobat.jpeg)(JPEG)]
+[(com.adobe.acrobat.png)(PNG)]
+[(com.adobe.acrobat.tiff)(TIFF)]
+[(com.adobe.acrobat.eps)(EPS)]}\olBdry
+\pushButton[\CA{Make Image}\A{\JS{saveQrcAsImage("\currentAnnotName","cb2");}}]{btn2}{}{11bp}
+
+\paragraph*{Requirements for this file} Even more amazing than \texttt{qrc-demo2.pdf}! For this QR Code symbol stamp
+to update and image saved, the user must (1) be viewing this document in
+\textsf{Acrobat} and (2) the stamp file \texttt{qrc-stamps.pdf}, which comes
+with this distribution, must be installed in the user \texttt{Stamps} folder
+of \textsf{Acrobat}. This file and these techniques work only for you, my dear
+AeB Pro users; and as an AeB Pro user, you have installed in the correct
+location on your computer the files \texttt{aeb.js} and \texttt{aeb\_pro.js};
+these are silently used.
+
+\paragraph*{Auxiliary file generated} The method (the action of the \textsf{Make Image} button) creates the PDF
+file \cs{jobname\_tmp.pdf} in the source folder. The file can be later
+deleted.
+
+\paragraph*{Applications} What can you do with the save images? Anything you want. Some suggestions:
+(1) import them into another {\LaTeX} source file using \cs{includegraphics}
+(should you be adverse to using stamps in your document), perhaps you are
+creating a business card;\footnote{I don't need on, I'm retired.} (2) put
+them on your web page, the QR symbol might contain a web address, email, or
+other contact info; and (3) other stuff too numerous to mention.
+
+\end{document}
+

@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage[forcolorpaper]{web}
+\usepackage{eforms}
+\usepackage[scandoc]{qrcstamps}
+
+
+\title{Creating a QR Code Symbol Stamp Interactively}
+\author{D. P. Story}
+\subject{Creating QR Code symbols using Acrobat annotation stamps and LaTeX interactively}
+\email{dpstory@acrotex.net}
+\keywords{stamp, QRCode, stamps}
+
+\useFullWidthForPaper
+
+\parindent0pt\parskip6pt
+
+\begin{document}
+
+\makeinlinetitle
+
+This file demonstrates that it is possible to create QR Code symbols
+interactively. Enter some text into the field below then click on the white
+space outside the field (or press the \texttt{TAB} key) to commit the data.
+The QR Code symbol stamp will be updated appropriately.
+
+\qrCode[size=medium]{http://www.acrotex.net}\space\textField[
+    \TU{Maximum of 250 characters allowed, enter a URL, a mailto, or simply text.}
+    \MaxLen{250}\Ff{\FfMultiline}\AA{\AAKeystroke{%
+if (event.willCommit) {\r\t
+    if (!/^\\s*$/.test(event.value)) {\r
+        var annot=this.getAnnot({nPage:this.pageNum,cName:"\currentAnnotName"});\r\t
+        var props=annot.getProps();\r\t
+        props.author="QRC";\r\t
+        props.subject=event.value;\r\t
+        annot.setProps(props);\r\t
+        delete props.APCosObj;\r\t
+        annot.setProps(props);\r
+    }\r
+}}}]{txtFld}{3in}{11bp*6}
+
+Ignore the JavaScript code, it is somewhat obscure, but it works.
+
+\paragraph*{Requirements for this file} For this QR Code symbol stamp to
+update as designed, the user must (1) be viewing this document in
+\textsf{Acrobat} and (2) the stamp file \texttt{qrc-stamps.pdf}, which comes
+with this distribution, must be installed in the user \texttt{Stamps} folder
+of \textsf{Acrobat}. This file and these techniques work only for you, my dear
+AeB Pro users.
+
+By the way, if you also have Acrobat Reader, try this file in that
+application to see what happens.
+
+\end{document}

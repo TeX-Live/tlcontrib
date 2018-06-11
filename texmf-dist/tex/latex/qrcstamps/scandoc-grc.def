@@ -1,0 +1,55 @@
+%%
+%% This is file `scandoc-grc.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% qrcstamps.dtx  (with options: `copyright,scandoc')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% qrcstamps.sty package,                                %%
+%% Copyright (C) 2017                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{execJS}{scan4qrc}
+var aBCStamps=new Array();
+if (typeof scancomplete=="undefined") {
+    var scancomplete=false,annots,isStamp,isHashtag;
+    this.syncAnnotScan();
+    for (var p=0; p<this.numPages; p++) {
+         annots=this.getAnnots(p);
+         if (annots!=null) {
+            for (var i=0; i<annots.length; i++) {
+                isStamp=(annots[i].type=="Stamp");
+                isHashtag=(annots[i].AP.indexOf("\#")==0);
+                if ( isStamp  &&  isHashtag ) {
+                    aBCStamps.push(p);
+                    break;
+                }
+            }
+        }
+    }
+}
+QRCscrollPage.index=0;
+function QRCscrollPage() {
+    if (QRCscrollPage.index<aBCStamps.length) {
+         this.pageNum=aBCStamps[QRCscrollPage.index];
+         QRCscrollPage.index+=1;
+    } else {
+        app.clearInterval(qrcTO);
+        scancomplete=true;
+        this.pageNum=0;
+    }
+}
+if (aBCStamps.length>0)
+    var qrcTO=app.setInterval("QRCscrollPage()", 5);
+\end{execJS}
+\endinput
+%%
+%% End of file `scandoc-grc.def'.

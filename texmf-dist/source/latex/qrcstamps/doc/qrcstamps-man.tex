@@ -1,0 +1,335 @@
+% All About PDF Stamps In Acrobat® & Paperless Workflows
+% NM - the annotation name, unique on page (this is the annot.name property
+% Name - name of the icon (this is the annot.AP property in JS)
+% a=this.getAnnots(0)
+% p=a[0].getProps()
+% for (var o in p) console.println(o+": "+p[o])
+%
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,tight*,latextoc,pro},
+    eforms,aebxmp
+]{aeb_pro}
+\usepackage{graphicx,array,fancyvrb}
+\usepackage{aeb_mlink}
+\usepackage[scandoc]{qrcstamps}
+%\usepackage{myriadpro}
+%\usepackage{calibri}
+\usepackage[altbullet]{lucidbry}
+
+\previewOff
+
+\def\hardspace{{\fontfamily{cmtt}\selectfont\symbol{32}}}
+
+\usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\urlstyle{tt}
+\renewcommand\LayoutTextField[2]{#2}
+
+\let\uif\textsf
+
+%\normalmarginpar
+\setlength{\marginparsep}{1bp}
+\setlength{\marginparwidth}{1in}
+
+
+%\def\tutpath{doc/tutorial}
+%\def\tutpathi{tutorial}
+%\def\expath{../examples}
+
+\def\STRUT{\rule{0pt}{14pt}}
+
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={Creating QR Codes\texorpdfstring{\\[1em]}{:}
+      The \textsf{qrcstamps} package},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject=Documentation for the qrcstamps
+        and the make-qrc packages,
+    talksite={\url{www.acrotex.net}},
+    version={1.0, 2018/06/02},
+    Keywords={LaTeX, form field, QR Code, Stamps, AcroTeX},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The qrcstamps Package";
+var manualfilename="Manual_BG_Print_qrc.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+//    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+//\executeSave();
+\end{docassembly}
+
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+%\previewtrue
+
+\section{Introduction}
+
+The difficulty with the barcode field of PDF forms is that it cannot be
+created properly except through the user-interface of the \app{Acrobat}
+application. An alternative method is therefore necessary.
+
+The idea of using dynamic stamp annotations to represent barcodes comes from
+Thom Parker through personal communication, through
+\href{https://acrobatusers.com/tutorials/print/dynamic_stamp_secrets}{his
+article} on \href{https://acrobatusers.com/}{AcrobatUser.com}, and from
+his book
+\textsl{\mlhref{https://www.pdfscripting.com/public/All-About-PDF-Stamps-in-Acrobat-and-Paperless-Workflows-The-Book.cfm}
+{All About PDF Stamps In Acrobat${}^{\circledR}$ \& Paperless
+Workflows}}, which is highly recommended if you have interest in dynamic
+stamps.
+
+%\marginpar{\hfill\raisebox{.25in}{\qrCode[widthTo=0.75in]{http://www.acrotex.net}}}%, scan the barcode
+
+
+The \pkg{qrcstamps} package is used to insert QR Code Symbology onto a
+dynamic stamp annotation, \`a la Parker, into a PDF file from a {\LaTeX}
+source. The main command for doing this is
+\cs{qrCode}\qrCode[margin,margprior=\hfill,widthTo=0.75in]{http://www.acrotex.net}.
+The command creates a dynamic stamp annotation (a PDF construct) using the
+\pkg{annot\_pro} package whose appearance is the QR Code symbol. The QR Code
+can be scanned over a monitor or from a printed page using a scanning app
+found on most smartphones.
+As a demonstration of the \cs{qrCode} command, we place a QR Code in the
+margin to obtain the url \url{http://www.acrotex.net}.
+
+%Step up!\qrCode[margin,margintext={\hfill\makebox[0.75in][c]{Hi There!}},margprior=\hfill,widthTo=0.75in]{http://www.acrotex.net}
+
+\section{Requirements and Installation}
+
+\paragraph*{Required packages.} It is assumed the document author already has installed {\AEB} (acrotex) and
+the \pkg{annot\_pro}. If not, these should be in place first.
+
+\paragraph*{Document creation.} This package requires a workflow of \textsf{dvips $+$ Adobe Distiller $+$
+Adobe Acrobat} or \textsf{dvips $+$ ps2pdf $+$ Adobe Acrobat} to produce a
+document in which the QR symbols are inserted as designed. Note that though
+\app{ps2pdf} can be used to produce the PDF, it is necessary to first open the document
+using \app{Acrobat}, then save it. This is because post-PDF-creation JavaScript executes the
+first time the document is opened in \app{Acrobat}.
+
+\paragraph*{Viewing the document.} Once the document is built and saved, the document can be distributed to
+others who can view it in any conforming PDF viewer.
+
+\paragraph*{Installing the QR stamps.} After the distribution is installed, locate \texttt{qrc-stamps.pdf}
+at the end of the path
+\texttt{qrcstamps\string\stamps\string\qrc-stamps.pdf} and copy it to the
+\app{Acrobat} user's \texttt{Stamps} folder. That folder may be found by executing
+\[
+    \text{\texttt{app.getPath("user","stamps");}}\quad\pushButton[\CA{getPath}\A{\JS{console.show();\r
+    console.println('app.getPath("user","stamps");');}}]{gp}{}{11bp}
+\]
+in the console window. Press the button above, place your mouse cursor at the
+end of the line in the console window, and press \textsf{Ctrl+Enter} (\textsf{Cmd+Enter} for Mac
+OS). The executing code should return the path to the \texttt{Stamps} folder. This is where
+the stamp file \texttt{qrc-stamps.pdf} is copied.
+
+\section{The \textsf{qrcstamps} package}
+
+This package has two options and one command.
+
+\subsection{Package options}
+
+There are two options for this package.
+%, the first two of which are used most frequently, while the third is rather technical.
+\begin{description}
+    \item[\opt{scandoc}] The correct coding of the QR symbol does not occur
+        until the page that contains the symbol is visited. When the
+        \opt{scandoc} option is taken, \app{Acrobat} will automatically
+        visit each page when the document is first opened following PDF
+        creating with \app{Acrobat Distiller} or \app{ps2pdf}.
+    \item[\opt{!scandoc}] The document may be built many times before you
+        are satisfied as to its content. The \opt{!scandoc} option is a
+        convenience option for turning off the scanning process. The
+        default is not to scan. However, when the document is ready for
+        publishing, build the document with the \opt{scandoc} option in
+        effect; \emph{this is important!}
+%   \item[\opt{basename=\ameta{base-name}}] The \opt{basename} key
+%        sets the appearance base name of the barcode annotation. The
+%        QR Code annotation name is
+%        \texttt{\ameta{base-name}\_\ameta{size}}. The default value of
+%        \opt{basename} is \texttt{basename=AeBQRC}. This option need never
+%        be specified unless a package developer creates his own custom
+%        barcode fields and stamps. To reference these new stamps, the
+%        \texttt{basename} would have to be specified, unique that
+%        collection of stamps.
+\end{description}
+
+\subsection{The \texorpdfstring{\protect\cs{qrCode}}{\textbackslash{qrCode}} command}
+
+The one and only command of this package is \cs{qrCode}.
+\bVerb\takeMeasure{\string\qrCode[\ameta{options}]\darg{\ameta{content}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\qrCode[!ameta(options)]{!ameta(content)}
+\end{dCmd}
+\eVerb The required \ameta{content} argument is the content of the stamp, a
+URL, a email address, text, and so on. The \cs{qrCode} command uses the
+\cs{annotpro} command to create the stamp. Any of the options for the stamp
+annotation may be used (except for \texttt{type=stamp}, which is already
+supplied for you); refer to the documentation of \pkg{aeb\_pro} for details.
+In addition to the \ameta{options}, these are a few special options, these are
+\opt{size}, \opt{allowresize}, \opt{basename}, and \opt{contents}.
+\begin{description}
+    \item[\texttt{size=small|medium|large}] The stamps come in three sizes.
+        We describe each of these in turn.
+    \begin{itemize}
+            \item \texttt{size=small}: The QR symbol is allowed to
+                contain at most 75
+                characters\marginpar{\raggedleft\small75 chars
+                max\hspace*{6pt}}. The default size of the barcode is
+                \texttt{1in}\marginpar{\raggedleft\small1\,in
+                (dimen)\hspace*{6pt}}, though this can be changed using
+                the key \texttt{widthTo}; for example,
+                \texttt{widthTo=0.75in} sets the symbol to
+                \texttt{0.75in} square. When making the symbol smaller
+                than its default, you should test the symbol to see if
+                your scanner (perhaps on your smartphone) can read the
+                smaller symbology.
+            \item \texttt{size=medium}: The QR symbol is allowed to
+                contain at most 250
+                characters\marginpar{\raggedleft\small250 chars max\hspace*{6pt}}.
+                The default size of the barcode is
+                \texttt{1.5in}\marginpar{\raggedleft\small1.5\,in
+                (dimen)\hspace*{6pt}}, though this can be changed using
+                the key \texttt{widthTo}, as illustrated above.
+            \item \texttt{size=large}: The QR symbol is allowed to
+                contain at most 500
+                characters\marginpar{\raggedleft\small500 chars max\hspace*{6pt}}.
+                The default size of the barcode is
+                \texttt{2in}\marginpar{\raggedleft\small2\,in
+                (dimen)\hspace*{6pt}}, though this can be changed using
+                the key \texttt{widthTo}, as illustrated above.
+    \end{itemize}
+    When your \ameta{content} exceeds the size, the console window opens
+    informing you of such a matter. For example, your content has 300
+    characters yet you are inserting it into
+    \cs{qrCode[size=medium]\darg{\ameta{content}}}. In such a situation, you'll be
+    informed at the time you build the document of the error.
+
+    When you change the dimension of a barcode stamp to one that is \emph{smaller}
+    than the default dimension, be sure to test the smaller QR symbol to be
+    sure it can still be read by a QR Code scanner, on the screen and on
+    paper.
+
+    When \texttt{size} is not specified, it is assumed that \texttt{size=small,widthTo=1in}.
+
+    \item[\texttt{allowresize=true|false}] When \texttt{allowresize=true}
+        (or just \texttt{allowresize}), after the document has been build,
+        the document consumer is allowed to resize the barcode or to move
+        it around on the page. The default is \texttt{allowresize=false},
+        the user cannot move or resize the stamp.
+
+%\item[\texttt{basename=\ameta{base-name}}] By passing a value of
+%    \ameta{base-name} for the \texttt{basename} key, you can locally set
+%    the appearance base name of the stamp, different the default base name
+%    (possibly set through the \texttt{basename} option. This option is used
+%    only when you have developed multiple collections of barcode stamps
+%    with a different base name. (Recall, the name of a barcode stamp (at
+%    least in so far as this package is concerned) has the form
+%    \texttt{\ameta{base-name}\_\ameta{size}}.
+
+%\previewtrue
+
+\item[\texttt{contents=\ameta{text}}] For barcodes, I prefer my stamps to have no popup message
+attached to it; however, I include the \texttt{contents} key to pass a text message. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\normalsize]
+\qrCode[contents={This is my home website, go there,
+    everyone does!\n\n
+    D. P. Story}]{http://www.acrotex.net}
+\end{Verbatim}
+Notice the use of \cs{n} to force a new line. The result are shown in the margin.%
+\qrCode[margin,margprior=\hfill\raisebox{2.5\baselineskip},widthTo=0.75in,contents={This is my home website, go there, everyone does.\n\n
+D. P. Story}]{http://www.acrotex.net}
+\end{description}
+
+\subsection{Examples of QR Code symbols} %\previewtrue
+
+We present several examples of various sizes and content. Other examples are
+found in the sample file \texttt{qrc-demo1.tex}.
+\bVerb\def\sz{1in}\takeMeasure{\string\qrCode\darg{http://www.acrotex.net}}%
+\noindent\begin{minipage}[t]{\sz+2bp}\kern0pt
+\qrCode{http://www.acrotex.net}
+\end{minipage}\hfill\begin{minipage}[t]{\linewidth-\sz-6pt-2bp}\kern0pt
+\textbf{A URL to a web page}
+\begin{Verbatim}[commandchars=!()]
+\qrCode{http://www.acrotex.net}
+\end{Verbatim}
+No \texttt{size} key is given, so this is a small, a maximum of 75 characters, its dimension
+is 1in.
+\end{minipage}\eVerb
+\bVerb\def\sz{1in}\takeMeasure{\string\qrCode\darg{mailto:dpstory@acrotex.net}}%
+\noindent\begin{minipage}[t]{\sz+2bp}\kern0pt\centering
+\qrCode[size=small,widthTo=0.75in]{mailto:dpstory@acrotex.net}
+\end{minipage}\hfill\begin{minipage}[t]{\linewidth-\sz-6pt-2bp}\kern0pt
+\textbf{An email address}
+\begin{Verbatim}[commandchars=!(),fontsize=\small]
+\qrCode[size=small,widthTo=.75in]{mailto:dpstory@acrotex.net}
+\end{Verbatim}
+\medskip
+The \texttt{size} key is explicitly set to \texttt{small} (optional), a
+maximum of 75 characters, its dimension is 0.75in.
+\end{minipage}\eVerb\smallskip
+
+In addition to \texttt{qrc-demo1.tex}, there are two `advanced' files \texttt{qrc-demo2.tex} and
+\texttt{qrc-demo3.tex}, which I'm sure you'll enjoy.
+
+
+\section{My retirement}
+
+
+\newtopic
+Now, I simply must get back to it. \dps
+
+\end{document}

@@ -1,0 +1,42 @@
+%%
+%% This is file `spdef.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% spdef.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% spdef.sty package,           2012-01-22              %%
+%% Copyright (C) 2012  D. P. Story                      %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{spdef}
+ [2012/08/20 v1.2 Defines a switch for smartphone]
+\RequirePackage{kvoptions}[2009/07/21]
+\newif\ifsmartphone  \smartphonefalse
+\DeclareVoidOption{ph}{\smartphonetrue}
+\DeclareVoidOption{pa}{\smartphonefalse}
+\DeclareVoidOption{!ph}{\smartphonefalse}
+\DeclareVoidOption{!pa}{\smartphonetrue}
+\define@key{spdef}{use}{\@ifundefined{#1}{%
+    \expandafter\newif\csname if#1\endcsname}{}\csname#1true\endcsname}
+\define@key{spdef}{!use}{\@ifundefined{#1}{%
+    \expandafter\newif\csname if#1\endcsname}{}\csname#1false\endcsname}
+\ProcessKeyvalOptions{spdef}
+\def\ifsp@default#1#2{\ifsmartphone
+    \expandafter\def\csname sp@next\endcsname{#1}\else
+    \expandafter\def\csname sp@next\endcsname{#2}\fi\sp@next}
+\def\ifsp@expand#1#2{\ifsmartphone#1\else#2\fi}
+\let\ifsp\ifsp@default
+\newcommand{\expexe}[1]{\edef\sp@expexe{\noexpand#1}\sp@expexe}
+\endinput
+%%
+%% End of file `spdef.sty'.

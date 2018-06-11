@@ -1,0 +1,74 @@
+%%
+%% This is file `opacity-pro.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% opacity-pro.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% opacity-pro.sty package,                             %%
+%% Copyright (C) 2008--2018                             %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% tje License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{opacity-pro}
+ [2018/05/13 v1.1 Provides support for transparency (dps)]
+\DeclareOption{dvips}{\def\op@driver{0}}
+\DeclareOption{dvipsone}{\def\op@driver{1}}
+\def\op@driver{0}
+\@ifundefined{l@tex@@@@driver}{\ExecuteOptions{dvips}}
+  {\ExecuteOptions{dvipsone}}
+\ProcessOptions
+\let\op@YES=y \let\op@NO=n \def\op@mark{[\space}%]
+\def\settransparency@env{settransparency}
+\def\settransparency@envs{settransparency*}
+\let\op@isEnv\op@NO
+\let\op@isStar\op@NO
+\newenvironment{settransparency}{%
+  \@ifstar{\let\op@isStar\op@YES\settransparency@next}
+  {\let\op@isStar\op@NO\settransparency@next}%
+}{\special{ps:grestore}}
+\newenvironment{settransparency*}{\let\op@isStar\op@YES
+  \settransparency@next}{\endsettransparency}
+\newcommand{\settransparency@next}[3][Normal]{%
+  \@ifnextchar[%]
+    {\settransparencyi{#1}{#2}{#3}}%
+    {\settransparencyi{#1}{#2}{#3}[]}}%
+\long\def\settransparencyi#1#2#3[#4]{%
+    \ifx\@currenvir\settransparency@env
+      \let\op@next\settransparencyii@env\else
+    \ifx\@currenvir\settransparency@envs
+      \let\op@next\settransparencyii@env\else
+    \let\op@next\settransparencyii\fi\fi\op@next{#1}{#2}{#3}{#4}%
+}
+\def\settransparencyii#1#2#3#4#5{\op@ck@defs{#2}{#3}\leavevmode
+    \special{ps:gsave \op@mark\op@ca\op@CA/BM/#1#4/SetTransparency
+    pdfmark}#5\special{ps:grestore}%
+}
+\def\settransparencyii@env#1#2#3#4{\op@ck@defs{#2}{#3}\leavevmode
+    \special{ps:gsave \op@mark\op@ca\op@CA/BM/#1#4/SetTransparency
+    pdfmark}%
+}
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+  \ifx\op@argii\@empty
+  \let\op@CA\@empty\else\def\op@CA{/CA #2}\fi
+  \ifx\op@argi\@empty\let\op@ca\@empty
+  \else\def\op@ca{/ca #1}%
+    \ifx\op@isStar\op@NO
+      \if\op@driver0\relax
+        \ifx\op@argii\@empty\else
+        \def\op@ca{/ca #2}\fi
+      \fi
+    \fi
+  \fi
+}
+\endinput
+%%
+%% End of file `opacity-pro.sty'.

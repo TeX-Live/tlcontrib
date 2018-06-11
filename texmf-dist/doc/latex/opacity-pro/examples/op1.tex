@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{opacity-pro}
+
+\thispagestyle{empty}
+\addtolength{\textwidth}{20pt}
+
+\parindent0pt
+
+\begin{document}
+\begin{center}\large
+  An \texttt{opacity-pro} Demo File\\[3pt]D. P. Story
+\end{center}
+
+The \textsf{opacity-pro} pretty much needs distiller with
+the \textsf{Adobe PDF Settings} set to process the transparency
+operator. For your convenience, the \textsf{Adobe PDF Settings} file
+\texttt{Standard\_transparency.joboptions} is included in the
+distribution. Place this file wherever distiller looks for the
+\texttt{.joboptions} files.\footnote{Go to \texttt{Settings > Edit
+Adobe PDF Settings ...} in the Distiller application window, then
+click the \texttt{SaveAs} button. A \textsf{Save Adobe PDF Settings
+As} dialog box opens, and you can then see where Distiller likes to
+save its \texttt{.joboptions} file. Copy the provided
+\texttt{.joboptions} to the folder and restart Distiller, the
+\texttt{Standard\_transparency} should now be visible in the drop
+down \textsf{Default Settings} list.}
+
+\bigskip
+
+\makebox[0pt][l]{\smash{\rotatebox[origin=lb]{-45}{\colorbox{yellow}{\parbox[c][.5in]{5in}{\hfill\vfill}}}}}%
+\hspace{1in}\smash{\rotatebox[origin=lb]{-45}{\colorbox{blue}{\parbox[c][.5in]{5in}{\hfill\vfill}}}}
+\begin{center}\sffamily\Huge\bfseries
+\begin{settransparency}{.5}{.5}\relax
+  \includegraphics{digis/adobedon}
+\end{settransparency}\\[3pt]
+\settransparency*{.3}{.3}{D. P. Story}
+\end{center}
+\begin{settransparency}[Lighten]{.4}{.4}
+\makebox[0pt][l]{\smash{\rotatebox[origin=lb]{45}{\colorbox{green}{\parbox[c][.5in]{5in}{\hfill\vfill}}}}}%
+\hspace{1in}\smash{\rotatebox[origin=lb]{45}{\colorbox{magenta}{\parbox[c][.5in]{5in}{\hfill\vfill}}}}
+\end{settransparency}
+
+\vspace{30pt}\noindent
+The yellow and blue boxes are under the picture, which has opacity
+of 0.5 and the text which has opacity of 0.3, and blend type
+\texttt{Normal}, the default. The green and magenta boxes are on top
+the picture with opacity of 0.4 and blend type of \texttt{Lighten}.
+
+
+\bigskip\noindent
+This demo file uses only the most basic of packages: \textsf{color},
+\textsf{graphicx} and \textsf{opacity-pro}. The other demo files
+assume the use of the \textsf{web} package, some use the
+\textsf{graphicxsp} package. Be sure to download all the latest
+versions of these.
+
+\end{document}

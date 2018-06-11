@@ -1,0 +1,283 @@
+% \iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% opacity-pro.sty package,                             %%
+%% Copyright (C) 2008--2018                             %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% tje License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesPackage{opacity-pro}
+%<package> [2018/05/13 v1.1 Provides support for transparency (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\pdfstringdefDisableCommands{\let\\\textbackslash}%
+\def\CMD#1{\textbackslash{#1}}\def\EXCL{!}
+\let\opt\texttt \let\app\textsf \let\pkg\textsf \let\env\texttt
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\bgroup\ttfamily
+\gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{opacity-pro}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{opacity-pro}{aebdocfmt.def cannot be found}}
+\begin{document}
+  \GetFileInfo{opacity-pro.sty}
+  \title{\texorpdfstring{\protect\pkg{opacity-pro}\\}{opacity-pro: }as suggested by J\"{u}rgen Gilg}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \DocInput{opacity-pro.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here. Execute\\[3pt]\null\qquad
+    \texttt{makeindex -s gind.ist -o opacity-pro.ind opacity-pro.idx}\\[3pt]
+    on the command line and recompile \texttt{opacity-pro.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here. Execute\\[3pt]\null\qquad
+    \texttt{makeindex -s gglo.ist -o opacity-pro.gls opacity-pro.glo}\\[3pt]
+    on the command line and recompile \texttt{opacity-pro.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{opacity-pro}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{opacity-pro}{cannot find aebdonotindex.def}}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+% This is a short package that provides one command and one
+% environment: \cs{settransparency} and \texttt{settransparency}.
+% They are used to set the opacity and blend of an object. The reader
+% interested in transparency should read Chapter 7 of the \textsl{PDF
+% Reference, Sixth Edition} for Version 1.7. The techniques used in
+% this package were derived from the \textsl{pdfmark Reference}
+% (Adobe Acrobat 8.0 SDK), pages 38--43.
+%
+% As the suffix ``\texttt{pro}'' might suggest, this package is for
+% those who use distiller version 6.0 or greater to produce PDFs. The
+% \textsf{opacity-pro} uses distiller with the \textsf{Adobe PDF
+% Settings} set to process the transparency operator. For your
+% convenience, the \textsf{Adobe PDF Settings} file
+% \texttt{Standard\_transparency.joboptions} is included in the
+% distribution. Place this file wherever distiller looks for the
+% \texttt{.joboptions} files.\footnote{Go to \texttt{Settings > Edit
+% Adobe PDF Settings ...} in the Distiller application window, then
+% click the \texttt{SaveAs} button. A \textsf{Save Adobe PDF Settings
+% As} dialog box opens, and you can then see where Distiller likes to
+% save its \texttt{.joboptions} file. Copy the provided
+% \texttt{.joboptions} to the folder and restart Distiller, the
+% \texttt{Standard\_transparency} should now be visible in the drop
+% down \textsf{Default Settings} list.}
+%
+% The package doesn't really require other packages, but normally, it
+% is used with the color or the graphicx packages. It does require
+% that a .dvi to .ps converter be used that recognizes the special
+% \verb!\special{ps: ...}!.  This includes, of course,
+% \textsf{dvips}.
+% %
+% \section{Package Options}
+%
+%    \begin{macrocode}
+\DeclareOption{dvips}{\def\op@driver{0}}
+\DeclareOption{dvipsone}{\def\op@driver{1}}
+\def\op@driver{0}
+\@ifundefined{l@tex@@@@driver}{\ExecuteOptions{dvips}}
+  {\ExecuteOptions{dvipsone}}
+\ProcessOptions
+%    \end{macrocode}
+% \section{Some documentation}
+% There is a command and an environment version for setting
+% transparency. Use the environment when the content contains
+% verbatim text, for example; otherwise, the content is taken in as one of the
+% parameters. The syntax of these two are,
+%\begin{flushleft}\ttfamily
+%\qquad\string\settransparency*[\ameta{BM\,}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]\darg{\ameta{content}}\\[6pt]
+%\qquad\string\begin\darg{settransparency}[\ameta{BM\,}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]\\
+% \qquad\quad\ameta{contents}\\
+%\qquad\string\end\darg{settransparency}\\[3pt]
+%\qquad\string\begin\darg{settransparency*}[\ameta{BM\,}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]\\
+% \qquad\quad\ameta{contents}\\
+%\qquad\string\end\darg{settransparency*}
+%\end{flushleft}
+%The parameters are
+%\begin{quote}
+%\begin{enumerate}
+% \item[\texttt*] (optional) If present, the PDF entries \textbf{ca} and \textbf{CA}
+%     are set as \texttt{/ca \ameta{ca}} and \texttt{/CA \ameta{CA}};
+%     otherwise, the algorithm for setting the \textbf{ca} and \textbf{CA}
+%     entries into the PDF is used. The algorithm is described in the
+%     paragraph \textbf{\nameref{algorithm}} below.
+% \item[\ameta{BM\,}:] Current blend mode. Names recognized are \texttt{Normal}, \texttt{Multiply},
+% \texttt{Screen}, \texttt{Overlay}, \texttt{Darken},
+% \texttt{Lighten}, \texttt{ColorDodge}, \texttt{ColorBurn},
+% \texttt{HardLight}, \texttt{SoftLight}, \texttt{Difference},
+% \texttt{Exclusion}, \texttt{Hue}, \texttt{Color}, \texttt{Saturation}  and
+% \texttt{Luminosity}. See the accompanying file \texttt{blend\-modes.tex} for a description
+%                      of each.
+% \item[\ameta{ca}:] Current alpha constant, specifying the constant
+%      shape or constant opacity value to be used for \emph{non-stroking operations}.
+%      A number between 0 and 1, inclusive. Default is 1.0.
+% \item[\ameta{CA}:] Current stroking alpha constant, specifying the constant
+%      shape or constant opacity value to be used for \emph{stroking operations}.
+%      A number between 0 and 1, inclusive. Default is 1.0.
+% \item[\ameta{PDFKVs}]  (optional) These pairs can be inserted using the optional
+%    fourth parameter (see page 38 of the \textsl{pdfmark Reference, Version
+%    8.0}, for a listing of these other key-value pairs).
+% \item[\ameta{contents}]  The target object, this can be text, pictures, color boxes, and so on.
+% \ameta{contents} is either the fifth argument of the command version, or the contents of the environment
+% version.
+%\end{enumerate}
+%\end{quote}
+% In the environment case, the last parameter
+% is optional, so {\LaTeX} will be looking for a left brace `\texttt{[}', if the contents
+% of the environment begin with a command, that command will get expanded while {\LaTeX} looks for
+% a left brace; if this is a potential problem. As a workaround, simply put an empty optional argument `\texttt{[]}'
+% to make {\LaTeX} happy.
+%
+% \section{The main code}
+% Below you will find the code for this package.
+%    \begin{macrocode}
+\let\op@YES=y \let\op@NO=n \def\op@mark{[\space}%]
+\def\settransparency@env{settransparency}
+\def\settransparency@envs{settransparency*}
+\let\op@isEnv\op@NO
+\let\op@isStar\op@NO
+%    \end{macrocode}
+%    \begin{macro}{\settransparency}
+%    The command sets transparency for its fifth argument \ameta{contents}
+%    \begin{environment}{settransparency}
+%    When the content to be operated on is large, or contains verbatim text, use
+%    the environment version.
+%    \begin{environment}{settransparency*}
+%    When the star-option is present for the command, or the \env{settransparency*} environment is used,
+%    the algorithm (\textbf{\nameref{algorithm}}) is bypassed.
+%    \begin{macrocode}
+\newenvironment{settransparency}{%
+  \@ifstar{\let\op@isStar\op@YES\settransparency@next}
+  {\let\op@isStar\op@NO\settransparency@next}%
+}{\special{ps:grestore}}
+\newenvironment{settransparency*}{\let\op@isStar\op@YES
+  \settransparency@next}{\endsettransparency}
+\newcommand{\settransparency@next}[3][Normal]{%
+  \@ifnextchar[%]
+    {\settransparencyi{#1}{#2}{#3}}%
+    {\settransparencyi{#1}{#2}{#3}[]}}%
+\long\def\settransparencyi#1#2#3[#4]{%
+    \ifx\@currenvir\settransparency@env
+      \let\op@next\settransparencyii@env\else
+    \ifx\@currenvir\settransparency@envs
+      \let\op@next\settransparencyii@env\else
+    \let\op@next\settransparencyii\fi\fi\op@next{#1}{#2}{#3}{#4}%
+}
+\def\settransparencyii#1#2#3#4#5{\op@ck@defs{#2}{#3}\leavevmode
+    \special{ps:gsave \op@mark\op@ca\op@CA/BM/#1#4/SetTransparency
+    pdfmark}#5\special{ps:grestore}%
+}
+\def\settransparencyii@env#1#2#3#4{\op@ck@defs{#2}{#3}\leavevmode
+    \special{ps:gsave \op@mark\op@ca\op@CA/BM/#1#4/SetTransparency
+    pdfmark}%
+}
+%    \end{macrocode}
+%\paragraph*{Algorithm for assigning \textbf{ca} and \textbf{CA} entries}\label{algorithm}
+% Recall that $\mbox{\texttt{ca}} = \mbox{filling}$ (non-stroking) and $\mbox{\texttt{CA}} = \mbox{stroking}$. The \app{dvipsone} strokes some paths that
+% \app{dvips} fills. If the star-option is not taken, as a workaround, we always assure that $\mbox{\texttt{ca}} = \mbox{\texttt{CA}}$,
+% provided the \app{dvips} driver is used.
+%    \begin{macrocode}
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+  \ifx\op@argii\@empty
+  \let\op@CA\@empty\else\def\op@CA{/CA #2}\fi
+  \ifx\op@argi\@empty\let\op@ca\@empty
+  \else\def\op@ca{/ca #1}%
+%    \end{macrocode}
+%     If the star-option is taken, we skip this part; otherwise, we apply the algorithm
+%     only if the driver is \app{dvips}.
+%    \begin{macrocode}
+    \ifx\op@isStar\op@NO
+      \if\op@driver0\relax
+        \ifx\op@argii\@empty\else
+        \def\op@ca{/ca #2}\fi
+      \fi
+    \fi
+  \fi
+}
+%    \end{macrocode}
+%    \end{environment}
+%    \end{environment}
+%    \end{macro}
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%  \Finale
+\endinput
+
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+    \ifx\op@argii\@empty
+    \let\op@CA\@empty\else\def\op@CA{/CA #2}\fi
+    \ifx\op@argi\@empty\let\op@ca\@empty
+    \else\def\op@ca{/ca #1}\fi
+}
+
+
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+  \def\op@ca{\@empty}\def\op@CA{\@empty}%
+    \ifx\op@argii\@empty
+    \else
+      \def\op@CA{/CA #2}%
+    \fi
+    \if\op@driver0\relax
+      \ifx\op@argi\@empty
+        \edef\op@ca{\noexpand\def\noexpand\op@ca{\op@CA}}%
+        \lowercase\expandafter{\op@ca}% ca = CA
+      \else
+        % ca nonempty
+        \ifx\op@argii\@empty
+          \def\op@ca{/ca #1}%
+          \def\op@CA{/CA #1}% CA = ca
+        \else % CA nonempty
+          % in this case, we set ca = CA, even though
+          % there is a value for ca
+          \def\op@ca{/ca #2}% ca = CA
+        \fi
+      \fi
+    \else
+      \def\op@ca{/ca #1}%
+    \fi
+}
+
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+  \ifx\op@argii\@empty
+    \let\op@CA\@empty\else
+    \def\op@CA{/CA #2}\fi
+  \ifx\op@argi\@empty
+    \let\op@ca\@empty\else
+    \def\op@ca{/ca #1}\fi
+}
+\def\op@ck@defs#1#2{%
+    \def\op@argii{#2}\ifx\op@argii\@empty
+    \let\op@CA\@empty\else\def\op@CA{/CA #2}\fi
+    \def\op@argi{#1}%
+    \ifx\op@argi\@empty\let\op@ca\op@CA\else
+      \if\op@driver0\relax
+        \ifx\op@argii\@empty\else
+        \def\op@ca{/ca #2}\fi
+      \else
+        \def\op@ca{/ca #1}\fi
+    \fi
+}

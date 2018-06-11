@@ -1,0 +1,153 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{array,longtable}
+
+\begin{document}
+
+\noindent The following list of blend modes  is taken verbatim from section
+7.2.4 of the \textsl{PDF Reference}, Sixth Edition (Version 1.7).
+
+\noindent\hfill\begin{longtable}{>{\ttfamily}lp{3.5in}}
+Normal    & Selects the source color, ignoring the backdrop.
+%            $$B(c_b,c_s)=c_s$$
+\\[3pt]
+Multiply  &  Multiplies the backdrop and source color values: The
+            result color is always at least as dark as either of the two
+            constituent colors. Multiplying any color with black produces black;
+            multiplying with white leaves the original color unchanged. Painting
+            successive overlapping objects with a color other than black or
+            white produces progressively darker colors.
+%            $$B(c_b,c_s)=c_b\times c_s$$
+\\[3pt]
+
+Screen    & Multiplies the complements of the backdrop and source
+            color values, then complements the result: The result color is
+            always at least as light as either of the two constituent colors.
+            Screening any color with white produces white; screening with black
+            leaves the original color unchanged. The effect is similar to
+            projecting multiple photographic slides simultaneously onto a single
+            screen.
+%            $$
+%                B(c_b,c_s) = 1 - [ (1 - c_b) \times (1 - c_s) ]
+%                    = c_b + c_s - (c_b\times c_s)
+%            $$
+\\[3pt]
+Overlay   & Multiplies or screens the colors, depending on the
+            backdrop color value. Source colors overlay the backdrop while
+            preserving its highlights and shadows. The backdrop color is not
+            replaced but is mixed with the source color to reflect the lightness
+            or darkness of the backdrop.
+%            $$B(c_b,c_s)=\operatorname{HardLight}(c_b,c_s)$$
+\\[3pt]
+
+Darken    & Selects the darker of the backdrop and source colors:
+            The backdrop is replaced with the source where the
+            source is darker; otherwise, it is left unchanged.
+%            $$B(c_b,c_s)=\min(c_b,c_s)$$
+\\[3pt]
+
+Lighten   & Selects the lighter of the backdrop and source colors:
+            The backdrop is replaced with the source where the
+            source is lighter; otherwise, it is left unchanged.
+%            $$B(c_b,c_s)=\max(c_b,c_s)$$
+\\[3pt]
+
+ColorDodge &Brightens the backdrop color to reflect the source
+            color. Painting with black produces no changes.
+%            $$
+%                B(c_b,c_s)=\begin{cases}
+%                \min(1,c_b/(1-c_s)) & \text{if $ c_s < 1$}\\[3pt]
+%                1             & c_s = 1
+%            \end{cases}
+%            $$
+\\[3pt]
+
+ColorBurn & Darkens the backdrop color to reflect the source color.
+            Painting with white produces no change.
+%            $$
+%                B(c_b,c_s)=\begin{cases}
+%                \min(1,(1-c_b)/c_s) & \text{if $ c_s > 0$}\\[3pt]
+%                0             & c_s = 0
+%            \end{cases}
+%            $$
+\\[3pt]
+
+
+HardLight & Multiplies or screens the colors, depending on the
+            source color value. The effect is similar to shining a harsh
+            spotlight on the backdrop.
+%            $$
+%                B(c_b,c_s)=\begin{cases}
+%                \operatorname{Multiply}(c_b,2\times c_s) & \text{if $ c_s \le 0.5$}\\[3pt]
+%                \operatorname{Screen}(c_b,2\times c_s -1)             & c_s > 0.5
+%            \end{cases}
+%            $$
+\\[3pt]
+
+SoftLight & Darkens or lightens the colors, depending on the source
+            color value. The effect is similar to shining a diffused spotlight
+            on the backdrop.
+%            $$
+%                B(c_b,c_s)=\begin{cases}
+%                c_b - (1 - 2\times c_s)\times c_b\times (1-c_b) & \text{if $ c_s < 0.5$}\\[3pt]
+%                c_b + (2 \times c_s - 1) \times (\operatorname{D}(c_b)-c_b)  & c_s > 0.5
+%            \end{cases}
+%            $$
+%            where
+%            $$
+%                D(x)=\begin{cases}
+%                ((16\times x -12) \times x + 4) \times x & \text{if $ x < 0.25$}\\[3pt]
+%                \sqrt{x}  & c_s > 0.25
+%            \end{cases}
+%            $$
+\\[3pt]
+
+Difference &Subtracts the darker of the two constituent colors from
+            the lighter color: Painting with white inverts the backdrop color;
+            painting with black produces no change.
+%            $$
+%                B(c_b,c_s) = | c_b - c_s |
+%            $$
+\\[3pt]
+
+Exclusion & Produces an effect similar to that of the \texttt{Difference}
+            mode but lower in contrast. Painting with white inverts the backdrop
+            color; painting with black produces no change.
+%            $$
+%                B(c_b,c_s) = c_b + c_s - 2\times c_b \times c_s
+%            $$
+\\[3pt]
+Hue & Creates a color with the hue of the source color and the
+            saturation and luminosity of the backdrop color.
+%            $$
+%                B(C_b,C_s)=\operatorname{SetLum}(\operatorname{SetSat}(C_s,\operatorname{Sat}(C_b)),\operatorname{Lum}(C_b))
+%            $$
+\\[3pt]
+
+Saturation & Creates a color with the saturation of the source color
+            and the hue and luminosity of the backdrop color. Painting with this
+            mode in an area of the backdrop that is a pure gray (no saturation)
+            produces no change.
+%            $$
+%                B(C_b,C_s)=\operatorname{SetLum}(\operatorname{SetSat}(C_b,\operatorname{Sat}(C_s)),\operatorname{Lum}(C_b))
+%            $$
+\\[3pt]
+
+Color & Creates a color with the hue and saturation of the source
+            color and the luminosity of the backdrop color. This preserves the
+            gray levels of the backdrop and is useful for coloring monochrome
+            images or tinting color images.
+%            $$
+%                B(C_b,C_s)=\operatorname{SetLum}(C_s,\operatorname{Lum}(C_b))
+%            $$
+\\[3pt]
+Luminosity & Creates a color with the luminosity of the source color
+            and the hue and saturation of the backdrop color. This produces an
+            inverse effect to that of the \texttt{Color} mode.
+%            $$
+%                B(C_b,C_s)=\operatorname{SetLum}(C_b,\operatorname{Lum}(C_s))
+%            $$
+\\[3pt]
+\end{longtable}
+\end{document}

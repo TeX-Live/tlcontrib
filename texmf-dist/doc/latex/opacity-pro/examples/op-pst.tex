@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage[usetemplates]{web}
+\usepackage{opacity-pro}
+\usepackage{anyfontsize}
+
+\usepackage{pstricks-add}
+
+\thispagestyle{empty}
+\margins{.25in}{.25in}{24pt}{.25in}
+\setScreensizeFromGraphic[scale=1.5,hiresbb]{digis/adobedon}
+\template[hiresbb]{digis/adobedon}
+
+\parindent0pt
+
+\begin{document}
+
+\begin{center}\setlength{\fboxrule}{2pt}
+    \settransparency{.5}{.5}{\fcolorbox{webblue}{webyellow}%
+        {\sffamily\bfseries\Huge\color{webblue} Hello World!}}%
+\end{center}
+\begin{center}
+    \settransparency{.5}{.5}{\colorbox{webyellow}
+        {\sffamily\bfseries\Huge\color{blue}$\displaystyle\mathbf{\int f(x) dx}$}}
+\end{center}
+\begin{center}
+  \rotatebox{45}{\sffamily\fontsize{60}{60}\bfseries\settransparency{.4}{.4}
+  {\textcolor{red}{D}\textcolor{webgreen}{P}\textcolor{blue}{S}}}
+\end{center}
+
+%
+% Here we use pstricks to create objects and give them transparency
+% using opacity-pro. Pstricks strokes the boundary and fills the disk
+% so we use the * version of \settransparency.
+%
+\hspace*{1\psunit}\begin{settransparency*}{.1}{.2}
+    \pscircle[fillstyle=solid,fillcolor=blue](0,2){1}%
+    \pscircle[fillstyle=solid,fillcolor=red](0,2){.5}%
+\end{settransparency*}\hskip.5\psunit
+\settransparency*{.3}{.4}{\pscircle[fillstyle=solid,fillcolor=green](0,2){1}}%
+\settransparency*{.5}{.6}{\pscircle[fillstyle=solid,fillcolor=yellow](0,2){.5}}%
+\end{document}

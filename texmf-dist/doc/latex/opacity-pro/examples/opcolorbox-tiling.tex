@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{graphicxsp}
+\usepackage[tight,designiv,usetemplates,usesf]{web}
+\usepackage{aeb_tilebg}
+\usepackage{digicap-pro}
+
+\title{The \textsf{Opacity Pro} Package
+    \texorpdfstring{\\\cs{opcolorbox}, Transparency, Tiling}
+        {: \textbackslash{opcolorbox}, Transparency, Tiling}}
+\author{D. P. Story}
+\subject{Test file for digicap-ro}
+\keywords{LaTeX, Web package, tiled backgrounds, Adobe Acrobat, opacity-pro}
+\university{Acro\negthinspace\TeX.Net}
+\email{dpstory@acrotex.net}
+\def\webversion{\textcolor{webbrown}{www.acrotex.net}}
+\revisionLabel{Prepared:}
+\versionLabel{}
+
+\graphicspath{{./digis}}
+
+\embedEPS[transparencyGroup]{cle_ind_back}{bg_cle_tile}
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\parindent0pt\parskip\medskipamount
+
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\setTileBgGraphic[hiresbb,scale=.4,name=cle_ind_back]{\null}
+
+\null\vskip-\baselineskip\vfil
+
+\begin{center}
+    \opcolorbox[%
+      borderwidth=4pt,
+      fboxsep=10pt,
+      width=0.75\linewidth,
+      bordercolor=blue,      % bordercolor=named color | nocolor, default blue
+      bgcolor=white,         % bgcolor=named color | nocolor, default white
+      borderop=.5,
+      bgop=.4,
+    ]{%
+        \parskip6pt\bfseries Someone asked me if the border could be
+        made transparent. On first blush, I said, ``No! Not at this
+        time.'' The latter phrase I threw in to cover myself in case
+        the answer is ``Yes!''
+     }
+\end{center}
+
+\end{document}

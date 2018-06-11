@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{opacity-pro}
+\usepackage[usetemplates]{web}
+\usepackage{anyfontsize}
+
+% In this demo, we use the optional argument <PDFKVs>, these are PDF key values
+% that are entered in the proper form, for a PDF. Here we use the knockout entry
+% /TK <true|false>. Read about it in the PDF Reference
+%
+% We also demonstrate the settransparency environment on page 3
+
+\textBgColor{webyellow}
+
+\pagestyle{empty}
+
+\margins{.25in}{.25in}{24pt}{.25in}
+\setScreensizeFromGraphic[hiresbb,scale=3]{digis/grandcanyon}
+\template[hiresbb]{digis/grandcanyon}
+
+\everymath{\displaystyle}
+
+\begin{document}
+
+\vspace*{0pt}\vfil
+
+\fontsize{50}{50}\bfseries
+\noindent\settransparency{.5}{.5}[/TK false]
+{%
+    \put(0,60){\color{blue}Hello 3D World!}
+    \put(4,64){\color{red}Hello 3D World!}
+    \put(8,68){\color{green}Hello 3D World!}
+}%
+\settransparency{.5}{.5}[/TK false]
+{%
+    \put(40,-68){\color{blue}$\mathbf{\int\limits_0^5 f(x) dx}$}
+    \put(44,-64){\color{red}$\mathbf{\int\limits_0^5 f(x) dx}$}
+    \put(48,-60){\color{green}$\mathbf{\int\limits_0^5 f(x) dx}$}
+}
+
+\vfill
+{\large\sffamily\bfseries With text knockout false (\texttt{/TK false}).}
+\newpage
+
+\vspace*{0pt}\vfil
+%
+% Same page but without the text knockout
+%
+\noindent\settransparency{.5}{.5}
+{%
+    \put(0,60){\color{blue}Hello 3D World!}
+    \put(4,64){\color{red}Hello 3D World!}
+    \put(8,68){\color{green}Hello 3D World!}
+}%
+\settransparency{.5}{.5}
+{%
+    \put(40,-68){\color{blue}$\displaystyle\mathbf{\int\limits_0^5 f(x) dx}$}
+    \put(44,-64){\color{red}$\displaystyle\mathbf{\int\limits_0^5 f(x) dx}$}
+    \put(48,-60){\color{green}$\displaystyle\mathbf{\int\limits_0^5 f(x) dx}$}
+}
+\vfill
+{\large\sffamily\bfseries With text knockout true (\texttt{/TK true}), the default.}
+\newpage
+
+\begin{quote}\Large
+When the content to be made transparent has verbatim text,
+use the environment version.
+\end{quote}
+
+\vspace{.5in}
+
+\begin{center}\sffamily\fontsize{60}{60}\bfseries\color{yellow}
+\begin{settransparency}{.3}{}
+\verb!%^$&#{!
+\end{settransparency}
+\end{center}
+\end{document}

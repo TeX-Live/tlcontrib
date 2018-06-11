@@ -1,0 +1,364 @@
+% makeindex < aebpro_man.idx > aebpro_man.ind
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,usetemplates,designv,
+        forcolorpaper,latextoc,extended},
+    eforms,uselayers,graphicxsp={showembeds},aebxmp
+]{aeb_pro}
+\usepackage{opacity-pro}
+
+\usepackage{array}
+%\usepackage[usecmtt]{myriadpro}
+
+\usepackage[altbullet]{lucidbry}
+
+%\usepackage{makeidx}
+%\makeindex
+
+\usepackage{acroman}
+
+%\usepackage[active]{srcltx}
+
+
+\urlstyle{rm}
+\let\pkg\textsf
+\let\app\textsf
+\let\env\texttt
+
+\def\tutpath{doc/tutorial}
+\def\tutpathi{tutorial}
+\def\expath{../examples}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={ \texorpdfstring{Opacity-Pro\\[1em]}
+        {Opacity-Pro: }Support for transparency},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Documentation for AeB Pro from AcroTeX},
+    talksite={\url{www.acrotex.net}},
+    version={1.1, 2018/05/13},
+    keywords={AeB, Adobe Acrobat, JavaScript, transparency},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+%\pagestyle{empty}
+%\parindent0pt\parskip\medskipamount
+
+\reversemarginpar
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The Opacity Pro Manual";
+var manualfilename="Manual_BG_Print_opacity.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+
+
+\section{Introduction}
+
+The \pkg{opacity-pro} package defines one command and one environment that are
+used to set the \emph{opacity} and \emph{blend} of an object. The reader interested in
+transparency should read Chapter 7 of the \textsl{PDF Reference, Sixth
+Edition} for Version 1.7. The techniques used in this package were derived
+from the \textsl{pdfmark Reference}.
+
+As the suffix ``\texttt{pro}'' might suggest, this package is for
+those who use distiller version 6.0 or greater to produce PDFs. The
+\textsf{opacity-pro} uses distiller with the \textsf{Adobe PDF
+Settings} set to process the transparency operator. For your
+convenience, the \textsf{Adobe PDF Settings} file
+\texttt{Standard\_transparency.joboptions} is included in the
+distribution. Place this file wherever distiller looks for the
+\texttt{.joboptions} files.\footnote{Go to \texttt{Settings > Edit
+Adobe PDF Settings ...} in the Distiller application window, then
+click the \texttt{SaveAs} button. A \textsf{Save Adobe PDF Settings
+As} dialog box opens, and you can then see where Distiller likes to
+save its \texttt{.joboptions} file. Copy the provided
+\texttt{.joboptions} to the folder and restart Distiller, the
+\texttt{Standard\_transparency} should now be visible in the drop
+down \textsf{Default Settings} list.}
+
+The package doesn't really require other packages, but normally, it
+is used with the color or the graphicx packages. It does require
+that a .dvi to .ps converter be used that recognizes the special
+\verb!\special{ps: ...}!.  This includes, of course,
+\textsf{dvips}.
+
+\section{Requirements and Options}
+
+This package belongs to the high-class family of \textsf{\textcolor{blue}{AeB~Pro}}, hence,
+the major requirement of this package is that the PDF be created using \textbf{Acrobat Distiller},
+see Section~\ref*{ss:PDFCreator} for details.
+
+\subsection{{\LaTeX} Package Requirements}
+
+A minimal example can be successfully compiled using the \pkg{opacity-pro} package alone.
+
+
+\subsection{Package options}
+
+There are two options \opt{dvips} and \opt{dvipsone}\marginpar{\small \raggedleft\opt{dvips}\\\opt{dvipsone}} corresponding
+to the two converter
+utilities \app{dvips.exe} and \app{dvipsone.exe}. The \opt{dvips} option is the default so
+it need not be specified.
+
+\subsection{PDF Creator Requirements}\label{ss:PDFCreator}
+
+The big restriction on this package is the requirement to
+use \app{Acrobat Distiller} (version 5.0, or
+version 6.0 for transparency). The package was developed using Acrobat
+Distiller 8.1. The package supports the creation of Postscript using
+\app{dvips} and \app{dvipsone}. These ``drivers'' are defined through the
+required package \app{aeb\_pro}.
+
+\subsection{Transparency Requirements}
+
+To get the transparency effect\marginpar{\small\raggedleft\app{Distiller} required}, \app{Acrobat Distiller} version 6.0 or
+later is required. The default setting of the distiller does not
+support the \textbf{SetTransparency} pdfmark; it is necessary to
+edit the \texttt{.joboptions} file.
+
+The procedure for editing \texttt{.joboptions} to support transparency is as follows:
+\begin{enumerate}
+    \item Start \textbf{Acrobat Distiller}
+    \item From the Default Settings list, select the setting you want to edit,
+    usually, this will be the \texttt{Standard} job options.
+    \item Select \texttt{Settings} \texttt{>} \texttt{Edit Adobe PDF Settings} \texttt{(Ctrl+E)} from the
+    distiller menu.
+    \item Click the \texttt{SaveAs} button at the bottom of the \texttt{Adobe PDF Settings}
+    dialog box. Save your .jobsettings file under a new name,
+    say \texttt{Standard\_transparency} and make a note of where
+    the distiller saves this file.
+    \item With your favorite text editor, navigate to the folder where you saved your new
+    \texttt{.job\-options} file, and open it in your editor.
+    \item Look for the line that says
+    \texttt{/AllowTransparency false}, and change this to read \texttt{/AllowTransparency true}.
+    Save the changes and close the file.
+    \item Use this \texttt{.joboptions} file, \texttt{Standard\_transparency} for example,
+    whenever you distill with transparency pdfmarks.  If your {\LaTeX} file uses transparency,
+    and you are using a \texttt{.joboptions} file with \texttt{/AllowTransparency false}, distillation
+    will fail and the distiller log should say
+\begin{Verbatim}[fontsize=\small]
+%%[Error: The PostScript contains Transparency pdfmark, job aborted.]%%
+%%[ /AllowTransparency is false in job option settings.]%%
+%%[ Error: undefined; OffendingCommand: pdfmark;
+    ErrorInfo: Transparency Group ]%%
+\end{Verbatim}
+This suggests that you should use your \texttt{.joboptions} file that supports transparency!
+
+\newtopic \textbf{Note:} The \pkg{opacity-pro} package comes with a \app{Distiller} job options file named
+\texttt{Standard\_transparency.joboptions}. Instead of going through the
+above instructions you can simply drop this file in a
+place where Distiller expects to find \texttt{.joboptions}
+files.\footnote{Go to \texttt{Settings > Edit Adobe PDF Settings ...} in
+the Distiller application window, then click the \texttt{SaveAs} button. A
+\textbf{Save Adobe PDF Settings As} dialog box opens, and you can then see
+where Distiller likes to save its \texttt{.joboptions} file. Copy the
+provided \texttt{.joboptions} to the folder and restart Distiller, the
+\texttt{Standard\_transparency} should now be visible in the drop down
+\textsf{Default Settings} list.}
+
+\end{enumerate}
+
+
+\section{Setting transparency}
+
+In this section we present the \cs{settransparency} command and the
+\env{settransparency} environment.
+
+\bVerb\takeMeasure{\cs{settransparency}*[\ameta{BM}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]\darg{\ameta{content}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\settransparency*[!ameta(BM)]{!ameta(ca)}{!ameta(CA)}[!ameta(PDFKVs)]{!ameta(content)}
+\end{dCmd}
+\eVerb The syntax for the environment is,
+\bVerb\takeMeasure{\string\begin\darg{settransparency}[\ameta{BM}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{settransparency}[!ameta(BM)]{!ameta(ca)}{!ameta(CA)}[!ameta(PDFKVs)]
+!quad!ameta(content)
+\end{settransparency}
+\end{dCmd}
+\eVerb There is a star-version as well.
+\bVerb\takeMeasure{\string\begin\darg{settransparency*}[\ameta{BM}]\darg{\ameta{ca}}\darg{\ameta{CA}}[\ameta{PDFKVs}]}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{settransparency*}[!ameta(BM)]{!ameta(ca)}{!ameta(CA)}[!ameta(PDFKVs)]
+!quad!ameta(content)
+\end{settransparency*}
+\end{dCmd}
+\eVerb The parameters are,
+\begin{enumerate}
+ \item[\texttt{*}] (optional) If present, the PDF entries \textbf{ca} and \textbf{CA}
+     are set as \texttt{/ca \ameta{ca}} and \texttt{/CA \ameta{CA}};
+     otherwise, the algorithm for setting the \textbf{ca} and \textbf{CA}
+     entries into the PDF is used. The algorithm is described in the
+     paragraph \textbf{\nameref{para:limits}} below.
+ \item[\ameta{BM}] Current blend mode. Names recognized are \texttt{Normal}, \texttt{Multiply},
+ \texttt{Screen}, \texttt{Overlay}, \texttt{Darken},
+ \texttt{Lighten}, \texttt{ColorDodge}, \texttt{ColorBurn},
+ \texttt{HardLight}, \texttt{SoftLight}, \texttt{Difference},
+ \texttt{Exclusion}, \texttt{Hue}, \texttt{Color}, \texttt{Saturation}  and
+ \texttt{Luminosity}. See the accompanying file \texttt{blend\-modes.tex} for a description
+                      of each.
+ \item[\ameta{ca}] Current alpha constant, specifying the constant
+      shape or constant opacity value to be used for \emph{non-stroking operations}, which
+      includes filling paths. A number between 0 and 1, inclusive. Default is 1.0.
+ \item[\ameta{CA}] Current stroking alpha constant, specifying the constant
+      shape or constant opacity value to be used for \emph{stroking operations}.
+      A number between 0 and 1, inclusive. Default is 1.0.
+\item[\ameta{PDFKVs}] (optional) These pairs can be inserted using the optional
+    fourth parameter (see page 38 of the \textsl{pdfmark Reference, Version
+    8.0}, for a listing of these other key-value pairs).
+\end{enumerate}
+ In the environment case, the last parameter is optional, so {\TeX} will be
+ looking for a left brace `\texttt{[}', if the \ameta{content} of the environment
+ begins with a command, that command will get expanded while {\TeX} looks for
+ a left brace; if this is a problem, simply put an empty optional argument
+ `\texttt{[]}' to make {\TeX} happy.
+
+The target object, \ameta{contents},\footnote
+{These can be text, pictures, color boxes, and so on.} is either the fifth argument, or
+the content of the environment.
+
+Refer to the examples provided by this distribution to see the command and
+environment in action.
+
+\paragraph*{Limitations of \app{dvips}.}\label{para:limits} A background,
+such as one created by \cs{colorbox} or \cs{fcolorbox} may be stroked
+(\ameta{ca}) as \app{dvipsone} does, or filled (\ameta{CA}) as \app{dvips}
+does. Text is usually filled (\ameta{ca}). Because \app{dvips} fills a
+background and text, it creates a problem when trying to have text overlay a
+colorful background, where the text and background have different opacity
+values (both set by \ameta{ca}).
+
+\subparagraph*{An algorithm.} For \app{dvips}, we implement the following
+algorithm: The value of \ameta{ca} is taken from the value of \ameta{CA}, if
+the value of \ameta{CA} is specified. In this way, for \app{dvips} we always
+have $\mbox{\ameta{ca}}=\mbox{\ameta{CA}}$. We do it this way because of the
+\pkg{digicap-pro} package; the user sets the \texttt{textop} key
+(corresponding to \ameta{CA}) and the \texttt{bgop} key (\ameta{ca}).
+
+\subparagraph*{Bypassing the algorithm with \texttt{*}.} When the star-option
+is taken, the algorithm is bypassed; as a result we set \texttt{/ca
+\ameta{ca}} and \texttt{/CA \ameta{CA}}. This is useful in instances where
+paths are stroked. See the sample file \texttt{op-pst.tex} for an example of
+the use of the star-option.
+
+%\begin{flushleft}
+%\quad\settransparency{.2}{}{\colorbox{yellow}{\settransparency{.2}{}{Some text}}}
+%\end{flushleft}
+\subparagraph*{Recommendations.} The setting of \ameta{CA} should be small
+enough to get discernable transparency, but not so much that the text is
+difficult to read. Recommendation: set \ameta{ca} to .7 or thereabouts.
+
+\paragraph*{Contrasting background and text using different opacities}\leavevmode
+\begin{description}
+\item[\bfseries\textsf{dvips}] The first item below illustrates that \textsf{dvips} does not obey
+the second argument. The second item show a workaround.\footnote{The effects illustrated for this
+case are simulated as the author uses the \textsf{dvipsone} driver.}
+  \begin{itemize}
+    \item \settransparency{.7}{.7}{\colorbox{yellow}{\textbf{Some text}}}\\[3pt]
+        {\small\verb~\settransparency{.7}{.2}{\colorbox{yellow}{\textbf{Some text}}}~}\\[3pt]
+        In the above yellow box, both the background yellow and the
+        foreground text have opacity .7 because \app{dvips} fills both
+        background and text.
+    \item \settransparency{.2}{.2}{\colorbox{yellow}{\settransparency{.7}{.7}{\textbf{Some text}}}}\\[3pt]
+        {\small\verb~\settransparency{.2}{.2}{\colorbox{yellow}~\\
+        \null\qquad\verb~{\settransparency{.7}{.7}{\textbf{Some text}}}}~}\\[3pt]
+        That is, we enclose the yellow background in a transparency value of .2 (the first argument is read only)
+        and within the \cs{colorbox} argument, we use a transparency value of .7 (first argument is read only).
+
+        For \app{dvips} users, the second argument can be empty, because, again, only the first argument has
+        any effect on filled objects.
+  \end{itemize}
+\item[\bfseries\textsf{dvipsone}] \settransparency{.7}{.2}{\colorbox{yellow}{\textbf{Some text}}}\\[3pt]
+        {\small\verb~\settransparency{.7}{.2}{\colorbox{yellow}{\textbf{Some text}}}~}\\[3pt]
+       For the \textsf{dvipsone} driver,\footnote{very few users of
+       \textsf{dvipsone} remain on earth, I am one.} the second parameter
+       has an effect.
+\end{description}
+
+\newtopic\noindent
+That's all for now, I simply must get back to my retirement. \dps
+
+\end{document}
+% ca = text, CA=background dvips obeys only ca, so we want to
+% set CA = ca wherever possible
+\def\op@ck@defs#1#2{\def\op@argi{#1}\def\op@argii{#2}%
+  \def\op@ca{\@empty}\def\op@CA{\@empty}%
+    \ifx\op@argii\@empty
+    \else
+      \def\op@CA{/CA #2}%
+    \fi
+    \if\op@driver0\relax
+      \ifx\op@argi\@empty
+        \edef\op@ca{\noexpand\def\noexpand\op@ca{\op@CA}}%
+        \lowercase\expandafter{\op@ca}% ca = CA
+      \else
+        % ca nonempty
+        \ifx\op@argii\@empty
+          \def\op@ca{/ca #1}%
+          \def\op@CA{/CA #1}% CA = ca
+        \else % CA nonempty
+          % in this case, we set ca = CA, even though
+          % there is a value for ca
+          \def\op@ca{/ca #2}% ca = CA
+        \fi
+      \fi
+    \else
+      \def\op@ca{/ca #1}%
+    \fi
+}

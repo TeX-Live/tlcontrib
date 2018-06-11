@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2017  D. P. Story                %%
+%% Copyright (C) 2006--2018  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{aeb_pro}
- [2017/03/08 v2.8a aeb_pro: A support package (dps)]
+ [2018/02/17 v2.9b aeb_pro: A support package (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{xkeyval}
@@ -93,13 +93,15 @@
 \DeclareOptionX{!optattachments}{%
     \optattachmentsTakentrue
     \optattachmentsfalse}
-\def\@aeb@InputUnicodes{\InputIfFileExists{unicodes.def}%
-   {\typeout{aeb_pro: Inputting code for the linktoattachments option}}%
-   {\typeout{aeb_pro: Cannot find unicodes.def.
-       Reinstall or refresh your file name database, as needed.}}}
+\def\@aeb@InputUnicodes{\InputIfFileExists{linkto.def}%
+  {\PackageInfo{aeb_pro}{Inputting code for the linktoattachments
+  option}}{\PackageWarning{aeb_pro}{Cannot find linkto.def.
+    Reinstall or refresh your file name database, as needed.}}}
 \let\aeb@InputUnicodes\@empty
-\DeclareOptionX{linktoattachments}{%
-    \let\aeb@InputUnicodes\@aeb@InputUnicodes}
+\DeclareOptionX{linktoattachments}{% dps23
+    \let\aeb@InputUnicodes\@aeb@InputUnicodes
+}
+\def\ap@RequireUnicode{\RequirePackage{forms16be}} % dps23
 \let\aeb@childofInput\@empty
 \let\aeb@childof\@empty
 \DeclareOptionX{childof}{\def\aeb@childof{#1}\def\aeb@childofInput{%
@@ -164,10 +166,10 @@
 \let\aebp@isattach\aebp@NO
 \ifx\aeb@attachsource\@empty\else\let\aebp@isattach\aebp@YES\fi
 \ifx\aeb@attachments\@empty\else\let\aebp@isattach\aebp@YES\fi
-    \let\aeb@attachsource\@empty
-    \let\aeb@attachments\@empty
-    \optattachmentsfalse\optattachmentsTakenfalse
-    \let\inputAttachmentRelatedFiles\relax
+\let\aeb@attachsource\@empty
+\let\aeb@attachments\@empty
+\optattachmentsfalse\optattachmentsTakenfalse
+\let\inputAttachmentRelatedFiles\relax
 \ifx\aebp@isattach\aebp@YES
     \PackageWarningNoLine{aeb_pro}{The various attachment options
         are not\MessageBreak supported with the nopro option,
@@ -293,15 +295,20 @@
 \RequirePackage{comment}
 \RequirePackage{calc}
 \RequirePackage{eso-pic}
+\ifx\aeb@InputUnicodes\@empty\else\expandafter
+\ap@RequireUnicode\fi% dps23
 \ifpdfmarkup\else\if\aebp@uselayers1
     \excludecomment{printRollover}%
     \excludecomment{rollover}%
 \fi\fi
 \def\aeb@IWVO{\immediate\write\verbatim@out}
 \newsavebox{\aebsavehelp}
+\definecolor{webblue}{rgb}{0,0,.8}
+\newcommand{\pdfHelpIndicatorColor}{webblue}
 \newcommand{\pdfHelpIndicator}[1]{#1\thinspace${}^{\mbox
     {\footnotesize\negthinspace\ding{109}}%
-    \raisebox{.225ex}{\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+    \raisebox{.225ex}{\llap{\color{\pdfHelpIndicatorColor}%
+    \tiny?\hspace{1.3ex}}}}$}
 \def\pdfHelpCnt{0}
 \newcommand{\pdfHelp}{\@ifstar{{\count0=\pdfHelpCnt\relax
 \advance\count0by1\relax\xdef\pdfHelpCnt{\the\count0 }}%

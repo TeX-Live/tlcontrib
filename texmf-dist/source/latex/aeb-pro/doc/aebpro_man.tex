@@ -36,7 +36,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for {\AEBP} from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={v2.8a, 2017/03/08},
+    version={v2.9b, 2018/02/17},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -3169,9 +3169,10 @@ a text field using unicode characters.
 The technique uses a combination of a recently introduced command \Com{labelName}
 and a new command \Com{unicodeStr}.
 \settowidth{\aebdimen}{\ttfamily\string\labelName\darg{\meta{label}}\darg{\meta{string}}}%
-\begin{dCmd}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
-\labelName{!meta(label)}{!meta(string)}
-\unicodeStr{!meta(label)}
+\begin{dCmd}[commandchars={!@^}]{\aebdimen+2\fboxsep+2\fboxrule}
+\labelName{!meta@label^}{!meta@string^}
+\defUniStr{!meta@label^}{!meta@string^}
+\unicodeStr(!meta@label^)
 \end{dCmd}
 
 \PD The parameter \meta{label} is a {\LaTeX}-type of label name, and \meta{string}
@@ -3195,20 +3196,21 @@ before the creation of the text field.
 Then we can define a text field with this value as its initial value
 and its default value like so,\labelName{myCoolIV}{\u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022}
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-    \textField[\textSize{10}\textFont{MyriadPro-Regular}
-        \uDV{\unicodeStr(myCoolIV)}
-        \uV{\unicodeStr(myCoolIV)}
-    ]{myCoolIV}{1.5in}{12bp}
+\textField[\textSize{10}\textFont{MyriadPro-Regular}
+  \DV{\unicodeStr(myCoolIV)}\V{\unicodeStr(myCoolIV)}
+]{myCoolIV}{1.5in}{12bp}
 \end{Verbatim}
-\par\smallskip
 The result is the field
     \textField[\textSize{10}\textFont{MyriadPro-Regular}
-        \uDV{\unicodeStr(myCoolIV)}\uV{\unicodeStr(myCoolIV)}]{myCoolIV}{1.5in}{12bp}
+        \DV{\unicodeStr(myCoolIV)}\V{\unicodeStr(myCoolIV)}]{myCoolIV}{1.5in}{12bp}
     \pushButton[\textSize{10}\textFont{MyriadPro-Regular}\CA{Reset}\A{\JS{this.resetForm(["myCoolIV"])}}]{reset}{}{12bp}
 
-The technique uses special keys as optional arguments of
-the command \cs{textField} (defined in the eforms package). The keys \cs{uDV} and \cs{uV} signal
-to the eforms package that the string is given in unicode.
+For version~2.9 of \pkg{aeb\_pro}, the package \pkg{forms16be} is included
+when the option \opt{linktoattachments} is specified. The package gives
+support to initializing form fields, as just described. In that package,
+\cs{defUniStr} is defined and may be used instead of \cs{labelName}. See the
+documentation and sample files of \pkg{forms16be} for more information on the
+topic of initializing fields using unicode.
 
 \exPDFSrc{aebpro_ex8} The support document \texttt{aebpro\_ex8} is a short tutorial
 on these topics, including additional examples on creating a button and combo box that
@@ -3301,6 +3303,13 @@ provides help to the document consumer.
 \exPDFSrc{aebpro_ex4} These topics are illustrated in the support
 file \texttt{aebpro\_ex4}.
 
+\exAeBBlogPDF{tag=rollovers} Additional examples of \emph{rollover animation} using \cs{texHelp} can be found
+at the \mlhref{\urlAcroTeXBlog}{{\AcroTeX} Blog} web site.
+
+
+%See also \url{http://www.acrotex.net/blog/?p=1359}
+%and \url{http://www.acrotex.net/blog/?p=1363}
+%\url{http://www.acrotex.net/blog/?tag=rollovers}
 
 \subsection{Using the form field tool tip feature}
 

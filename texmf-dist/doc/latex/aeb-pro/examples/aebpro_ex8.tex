@@ -1,13 +1,10 @@
-% Acrobat required
-% use useacrobat option with pdftex and xetex if you have acrobat
 \documentclass{article}
 \usepackage[
+    nopro, % this file does not use any features of aeb_pro except for the AeB Control Center
     web={designv,forcolorpaper,pro,tight,usesf},
-    eforms,
-    linktoattachments,
-    attachsource={tex},
-    aebxmp,
+    eforms
 ]{aeb_pro}
+\usepackage{forms16be}
 
 \DeclareDocInfo
 {
@@ -27,14 +24,14 @@
 
 
 \newcommand{\cs}[1]{\texttt{\char`\\#1}}
-\newcommand{\cS}[2]{\textField[\Ff\FfReadOnly\textSize{10}\textFont{Arial}\uDV{FEFF#2}\uV{FEFF#2}\BC{}]{#1}{20bp}{11bp}}
+\newcommand{\cS}[2]{\textField[\Ff\FfReadOnly\textSize{10}\textFont{Arial}\DV{\unicodeStr(#2)}\V{\unicodeStr(#2)}\BC{}]{#1}{20bp}{11bp}}
 
 \parskip6pt
 \parindent0pt
 
-\labelName{coolDPS}{Donald \u20AC. Story}
-\labelName{myCoolIV}{\u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022}
-\labelName{Reset myCoolIV}{Reset the \u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022 field}
+\defUniStr{coolDPS}{Donald \u20AC. Story}
+\defUniStr{myCoolIV}{\u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022}
+\defUniStr{Reset myCoolIV}{Reset the \u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022 field}
 
 \begin{document}
 
@@ -54,7 +51,7 @@ preamble above.
 The first step is to use the \cs{labelName} command to define your unicode string
 and associate a label with it. In the preamble, the following definition can be found.
 \begin{verbatim}
-\labelName{coolDPS}{Donald \u20AC. Story}
+\defUniStr{coolDPS}{Donald \u20AC. Story}
 \end{verbatim}
 The string can be a combination of characters from Basic Latin. As
 described in the AeB Pro manual, the string can be entered using
@@ -80,8 +77,8 @@ in matching parentheses, like so
 \end{verbatim}
 The result of the above code is
 
-\textField[\Ff\FfReadOnly\textSize{10}\textFont{Arial}\W0
-    \uDV{\unicodeStr(coolDPS)}\uV{\unicodeStr(coolDPS)}\BC{}
+\textField[\Ff\FfReadOnly\textSize{10}\textFont{Arial}
+    \DV{\unicodeStr(coolDPS)}\V{\unicodeStr(coolDPS)}\BC{}
 ]{dps}{1in}{11bp}
 
 
@@ -93,33 +90,18 @@ encoded strings into a form field.
 The above field is set to read only, the one below is not:
 
 \textField[\textSize{10}\textFont{Arial}
-    \uDV{\unicodeStr(myCoolIV)}\uV{\unicodeStr(myCoolIV)}
-]{myCoolIV}{1.5in}{12bp}\pushButton[\textSize{10}\textFont{Arial}\uCA{FEFF20AC}
-    \uAC{FEFF20AA}\uRC{FEFF00A5}\uTU{\unicodeStr(Reset myCoolIV)}\A{\JS{this.resetForm(["myCoolIV"])}}]{reset}{.5in}{12bp}
+    \DV{\unicodeStr(myCoolIV)}\V{\unicodeStr(myCoolIV)}
+]{myCoolIV}{1.5in}{12bp}\pushButton[\textSize{10}\textFont{Arial}\CA{\unicodeStr(20AC)}
+    \AC{\unicodeStr(20AA)}\uRC{\unicodeStr(00A5)}\TU{\unicodeStr(Reset myCoolIV)}
+    \A{\JS{this.resetForm(["myCoolIV"])}}]{reset}{.5in}{12bp}
 
 Edit the box above, then click on the reset button. (Notice the
 tooltip for the reset button.)
 
 The eforms uses an optional first argument to change the appearance
 of a form field, add in action (usually JavaScript action) or to
-initialize the field value. In the above form fields, several
-unicode counterparts to the standard keys were used.
-\begin{itemize}
-    \item \cs{uV} and \cs{uDV} were used instead of \cs{V} and
-    \cs{DV} for giving the field a value and a default value,
-    respectively. The ``u'' versions are used when the string is in
-    unicode.
+initialize the field value.
 
-    \item Button face text for the reset button was entered with
-    \cs{uCA}, \cs{uAC} and \cs{uRC} rather than \cs{CA}, \cs{AC} and
-    \cs{RC}. You can mix these two types together. The normal face
-    caption could be defined by \cs{uCA} and the others defined by
-    \cs{AC} and \cs{RC}.
-
-    \item The ``tooltip'', as used in the reset button, normally uses
-    the \cs{TU} key. When the string is meant to be unicode, use the
-    \cs{uTU} key.
-\end{itemize}
 
 \section{More Advanced}
 
@@ -128,29 +110,26 @@ complicated. In the example below, we define a combo box. First,
 define the appearance values of the combo box (the string that is
 seen listed in the combo box).
 \begin{verbatim}
-\labelName{myEuro}{\u20AC (Euro)}
-\labelName{myYen}{\u00A5 (Yen)}
-\labelName{mySheqel}{\u20AA (Sheqel)}
-\labelName{myPound}{\u00A3 (Pound)}
-\labelName{myFranc}{\u20A3 (Franc)}
+\defUniStr{myEuro}{\u20AC (Euro)}
+\defUniStr{myYen}{\u00A5 (Yen)}
+\defUniStr{mySheqel}{\u20AA (Sheqel)}
+\defUniStr{myPound}{\u00A3 (Pound)}
+\defUniStr{myFranc}{\u20A3 (Franc)}
 \end{verbatim}
 
-\labelName{myEuro}{\u20AC (Euro)}
-\labelName{myYen}{\u00A5 (Yen)}
-\labelName{mySheqel}{\u20AA (Sheqel)}
-\labelName{myPound}{\u00A3 (Pound)}
-\labelName{myFranc}{\u20A3 (Franc)}
+\defUniStr{myEuro}{\u20AC (Euro)}
+\defUniStr{myYen}{\u00A5 (Yen)}
+\defUniStr{mySheqel}{\u20AA (Sheqel)}
+\defUniStr{myPound}{\u00A3 (Pound)}
+\defUniStr{myFranc}{\u20A3 (Franc)}
 
 Then we can define our combo box.  According to the PDF file format,
 unicode strings should be enclosed in angle brackets
 \verb!<XXXXXXXXXXXX>!. In initializing the combo box below, the
 \cs{unicodeStr} command is used, but this time it is enclosed in
-angle brackets. (That is all the ``u'' versions of the keys do above
-is to automatically insert the angle brackets for you. Here we have
-to do it ourselves. (I suppose one could have a helper command, but
-you can handle it.)
+angle brackets.
 \begin{verbatim}
-\comboBox[\Ff\FfEdit\DV{1}\V{Euro}\textFont{Arial}
+\comboBox[\Ff\FfEdit\DV{Euro}\V{Euro}\textFont{Arial}
 \BG{0.98 0.92 0.73}\BC{0 .6 0}]{myCombo}{1in}{11bp}
 {*{[(Euro)<\unicodeStr(myEuro)>]%
     [(Yen)<\unicodeStr(myYen)>]%
@@ -164,7 +143,7 @@ passing of a raw form of the value options of a combo or list box; it is
 defined in \textsf{eforms}.
 
 The result is
-\comboBox[\Ff\FfEdit\DV{1}\V{Euro}\textFont{Arial}
+\comboBox[\Ff\FfEdit\DV{Euro}\V{Euro}\textFont{Arial}
 \BG{0.98 0.92 0.73}\BC{0 .6 0}]{myCombo}{1in}{11bp}
 {*{[(Euro)<\unicodeStr(myEuro)>]%
     [(Yen)<\unicodeStr(myYen)>]%
@@ -186,20 +165,9 @@ For the purpose of the table below, the following definition was given in the pr
 \newcommand{\cS}[2]{%
     \textField[
         \Ff\FfReadOnly\BC{}\textSize{10}\textFont{Arial}
-        \uDV{FEFF#2}\uV{FEFF#2}
+        \DV{\unicodeStr(#2)}\V{\unicodeStr(#2)}
     ]{#1}{20bp}{11bp}}
 \end{verbatim}
-Again the \cs{uDV} and \cs{uV} keys are used but without
-\cs{unicodeStr}. In this case, we must do it ourselves. As was
-mentioned earlier, the ``u'' versions of these keys automatically
-insert the angle brackets. Inside the angle brackets is the raw
-unicode hex code. What wasn't mentioned before is that the first
-four hex digits must be \texttt{FEFF} to signal the beginning of
-unicode. Here, we insert these digits ourselves, followed, through
-parameter replacement, by the unicode hex digits of the characters
-desired. The result is the table you see below. (Again the field is
-readonly, the table is the one that appears in manual of usage for the
-JJ\_Game class (\texttt{jjg\_man.pdf}).
 
 \begin{center}
 \begin{tabular}{lll||lll}

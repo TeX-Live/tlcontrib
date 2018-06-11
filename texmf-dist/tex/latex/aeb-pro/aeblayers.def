@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2017  D. P. Story                %%
+%% Copyright (C) 2006--2018  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -75,9 +75,11 @@ function getLayerState(name) {
     return ( oLayer != null ) ? oLayer.state : null;
 }
 \end{insDLJS}
+\newcommand{\texHelpIndicatorColor}{webblue}
 \newcommand{\texHelpIndicator}[1]{#1\thinspace${}^{\mbox
     {\footnotesize\negthinspace\ding{109}}\raisebox{.225ex}
-    {\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+    {\llap{\color{\texHelpIndicatorColor}%
+    \tiny?\hspace{1.3ex}}}}$}
 \newcommand{\addJStexHelpEnter}[1]{\def\aebp@addJStexHelpEnter{\r#1}}
 \newcommand{\addJStexHelpExit}[1]{\def\aebp@addJStexHelpExit{\r#1}}
 \newcommand{\resetaddJStexHelp}{%
@@ -85,12 +87,15 @@ function getLayerState(name) {
     \let\aebp@addJStexHelpExit\@empty
 }
 \resetaddJStexHelp
-\newcommand{\texHelp}[2]{%
+\newif\iftexhelptoggleOff \texhelptoggleOfftrue
+\newcommand{\texHelp}{\@ifstar{\texhelptoggleOfffalse\texHelp@i}
+  {\texhelptoggleOfftrue\texHelp@i}}
+\newcommand{\texHelp@i}[2]{%
     \let\rollormargstring\texorpdfstring
     \sbox{\aebsavehelp}{\texHelpIndicator{#2}}%
     \makebox[0pt][l]{\pushButton[\S{S}\BG{}\BC{}\H{N}
     \AA{\AAMouseEnter{\JS{toggleHelp("#1");\aebp@addJStexHelpEnter}}%
-    \AAMouseExit{\JS{toggleHelp("#1");\aebp@addJStexHelpExit}}}]{#1}%
+    \AAMouseExit{\JS{\iftexhelptoggleOff toggleHelp("#1");\fi\aebp@addJStexHelpExit}}}]{#1}%
         {\wd\aebsavehelp}{\ht\aebsavehelp+\dp\aebsavehelp}}%
     \usebox{\aebsavehelp}\resetaddJStexHelp
     \let\rollormargstring\@gobbletwo

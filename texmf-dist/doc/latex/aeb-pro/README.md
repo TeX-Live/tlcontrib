@@ -1,6 +1,6 @@
 The AeB Pro Package
 Author: D. P. Story
-Dated: 2017-03-08
+Dated: 2018-02-17
 
 The AeB Pro Package complements and extends AcroTeX eDucation Bundle.
 
@@ -37,6 +37,9 @@ me at dpstory@uakron.edu or dpstory@acrotex.net
 The AcroTeX Blog (http://blog.acrotex.net/) lists the distribution files at
 http://www.acrotex.net/blog/?page_id=835, all demo files that use AeB Pro
 are listed at http://www.acrotex.net/blog/?tag=aeb-pro.
+
+What's New (2018-02-17) Added a star-option to \texHelp, added demo files to 
+illustrate rollover animation techniques (http://www.acrotex.net/blog/?tag=rollovers). 
 
 Now, I simply must get back to my retirement.
 

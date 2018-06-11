@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2017  D. P. Story                %%
+%% Copyright (C) 2006--2018  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{aeb_pro}
-%<package> [2017/03/08 v2.8a aeb_pro: A support package (dps)]
+%<package> [2018/02/17 v2.9b aeb_pro: A support package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -64,6 +64,8 @@
 % Begin package segment
 %<*package>
 %    \end{macrocode}
+% \changes{v2.9}{2017/08/25}{Extracted some of the code from unicode.def to create a new package, forms16be.
+% This package now includes forms16be.}
 % \changes{v1.9}{2016/03/03}{Allow users of pdftex and xetex to access JavaScript related
 % methods provided they use \string\textsf{Acrobat} as their PDF reader.}
 % \changes{v2.5}{2016/08/31}{Revised \string\texttt{aeb\_pro.js} to include
@@ -280,18 +282,20 @@
 % The option \texttt{linktoattachments}\IndexOpt{linktoattachments} is a
 % general routine for linking to attached PDF files.
 %    \begin{macrocode}
-\def\@aeb@InputUnicodes{\InputIfFileExists{unicodes.def}%
-   {\typeout{aeb_pro: Inputting code for the linktoattachments option}}%
-   {\typeout{aeb_pro: Cannot find unicodes.def.
-       Reinstall or refresh your file name database, as needed.}}}
+\def\@aeb@InputUnicodes{\InputIfFileExists{linkto.def}%
+  {\PackageInfo{aeb_pro}{Inputting code for the linktoattachments
+  option}}{\PackageWarning{aeb_pro}{Cannot find linkto.def.
+    Reinstall or refresh your file name database, as needed.}}}
 \let\aeb@InputUnicodes\@empty
 %    \end{macrocode}
 % \changes{v1.7k}{2015/08/06}{Added code so that the childof is read after linktoattachments}
 % (2015/08/06) Added code so that the childof is read after linktoattachments
 % \changes{v2.4}{2016/08/03}{Removed the \string\texttt{latin1} option as unworkable across some workflows}
 %    \begin{macrocode}
-\DeclareOptionX{linktoattachments}{%
-    \let\aeb@InputUnicodes\@aeb@InputUnicodes}
+\DeclareOptionX{linktoattachments}{% dps23
+    \let\aeb@InputUnicodes\@aeb@InputUnicodes
+}
+\def\ap@RequireUnicode{\RequirePackage{forms16be}} % dps23
 \let\aeb@childofInput\@empty
 \let\aeb@childof\@empty
 \DeclareOptionX{childof}{\def\aeb@childof{#1}\def\aeb@childofInput{%
@@ -409,10 +413,10 @@
 \let\aebp@isattach\aebp@NO
 \ifx\aeb@attachsource\@empty\else\let\aebp@isattach\aebp@YES\fi
 \ifx\aeb@attachments\@empty\else\let\aebp@isattach\aebp@YES\fi
-    \let\aeb@attachsource\@empty
-    \let\aeb@attachments\@empty
-    \optattachmentsfalse\optattachmentsTakenfalse
-    \let\inputAttachmentRelatedFiles\relax
+\let\aeb@attachsource\@empty
+\let\aeb@attachments\@empty
+\optattachmentsfalse\optattachmentsTakenfalse
+\let\inputAttachmentRelatedFiles\relax
 \ifx\aebp@isattach\aebp@YES
     \PackageWarningNoLine{aeb_pro}{The various attachment options
         are not\MessageBreak supported with the nopro option,
@@ -569,6 +573,12 @@
 \RequirePackage{comment}
 \RequirePackage{calc}
 \RequirePackage{eso-pic}
+%    \end{macrocode}
+%     Input \pkg{forms16be} if \opt{linktoattachments} is taken.
+%     \changes{v2.9}{2017/08/25}{require \string\pkg{forms16be} as needed}
+%    \begin{macrocode}
+\ifx\aeb@InputUnicodes\@empty\else\expandafter
+\ap@RequireUnicode\fi% dps23
 \ifpdfmarkup\else\if\aebp@uselayers1
     \excludecomment{printRollover}%
     \excludecomment{rollover}%
@@ -584,11 +594,15 @@
 % which uses layers.
 % \changes{v2.1}{2016/05/15}{Moved \string\cs{pdfHelp} from \texttt{aeblayers} to
 % \texttt{package} to support non-Distiller workflows.}
+% \changes{v2.9a}{2017/10/08}{Added \string\cs{pdfHelpIndicatorColor}}
 %    \begin{macrocode}
 \newsavebox{\aebsavehelp}
+\definecolor{webblue}{rgb}{0,0,.8}
+\newcommand{\pdfHelpIndicatorColor}{webblue}
 \newcommand{\pdfHelpIndicator}[1]{#1\thinspace${}^{\mbox
     {\footnotesize\negthinspace\ding{109}}%
-    \raisebox{.225ex}{\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+    \raisebox{.225ex}{\llap{\color{\pdfHelpIndicatorColor}%
+    \tiny?\hspace{1.3ex}}}}$}
 \def\pdfHelpCnt{0}
 \newcommand{\pdfHelp}{\@ifstar{{\count0=\pdfHelpCnt\relax
 \advance\count0by1\relax\xdef\pdfHelpCnt{\the\count0 }}%
@@ -701,10 +715,13 @@ function getLayerState(name) {
 % package, and slightly modified.
 % \changes{v1.3f}{2012/06/01}{Added controls for adding JS code to a
 % rollover; used for starting and stopping an anime.}
+% \changes{v2.9a}{2017/10/08}{Added \string\cs{texHelpIndicatorColor}}
 %    \begin{macrocode}
+\newcommand{\texHelpIndicatorColor}{webblue}
 \newcommand{\texHelpIndicator}[1]{#1\thinspace${}^{\mbox
     {\footnotesize\negthinspace\ding{109}}\raisebox{.225ex}
-    {\llap{\color{webblue}\tiny?\hspace{1.3ex}}}}$}
+    {\llap{\color{\texHelpIndicatorColor}%
+    \tiny?\hspace{1.3ex}}}}$}
 \newcommand{\addJStexHelpEnter}[1]{\def\aebp@addJStexHelpEnter{\r#1}}
 \newcommand{\addJStexHelpExit}[1]{\def\aebp@addJStexHelpExit{\r#1}}
 \newcommand{\resetaddJStexHelp}{%
@@ -712,12 +729,19 @@ function getLayerState(name) {
     \let\aebp@addJStexHelpExit\@empty
 }
 \resetaddJStexHelp
-\newcommand{\texHelp}[2]{%
+\newif\iftexhelptoggleOff \texhelptoggleOfftrue
+%    \end{macrocode}
+%     Added a star option to \cs{texHelp}, when present the layer is not closed on exit from the target word.
+%     \changes{v2.9b}{2018/02/17}{Added star option to \string\cs{texHelp}}
+%    \begin{macrocode}
+\newcommand{\texHelp}{\@ifstar{\texhelptoggleOfffalse\texHelp@i}
+  {\texhelptoggleOfftrue\texHelp@i}}
+\newcommand{\texHelp@i}[2]{%
     \let\rollormargstring\texorpdfstring
     \sbox{\aebsavehelp}{\texHelpIndicator{#2}}%
     \makebox[0pt][l]{\pushButton[\S{S}\BG{}\BC{}\H{N}
     \AA{\AAMouseEnter{\JS{toggleHelp("#1");\aebp@addJStexHelpEnter}}%
-    \AAMouseExit{\JS{toggleHelp("#1");\aebp@addJStexHelpExit}}}]{#1}%
+    \AAMouseExit{\JS{\iftexhelptoggleOff toggleHelp("#1");\fi\aebp@addJStexHelpExit}}}]{#1}%
 %    \end{macrocode}
 %\changes{v1.3h}{2012/11/25}{Changed height calculation in \cs{texHelp}}
 % Changed height calculation in \cs{texHelp} to allow a rollover of more
@@ -2911,10 +2935,10 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{open}[\val\nr]{userpref,new,existing}
 {%
-    \ifcase\nr\relax
-        \let\ahref@open@keyvalue\@empty\or
-        \def\ahref@open@keyvalue{/NewWindow true }\or
-        \def\ahref@open@keyvalue{/NewWindow false }\fi
+  \ifcase\nr\relax
+    \let\ahref@open@keyvalue\@empty\or
+    \def\ahref@open@keyvalue{/NewWindow true }\or
+    \def\ahref@open@keyvalue{/NewWindow false }\fi
 }{}
 \let\ahref@open@keyvalue\@empty
 %    \end{macrocode}
@@ -2922,11 +2946,11 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{border}[\val\nr]{visible,invisible}
 {%
-    \ifcase\nr\relax
-        \def\ahref@border{0 0 1}%
-        \def\ahef@invisible@border{1}\or
-       \def\ahref@border{0 0 0}% W = 0 also?
-       \let\ahef@invisible@border\@empty\fi
+  \ifcase\nr\relax
+    \def\ahref@border{0 0 1}%
+    \def\ahef@invisible@border{1}\or
+    \def\ahref@border{0 0 0}% W = 0 also?
+    \let\ahef@invisible@border\@empty\fi
 }{}
 %    \end{macrocode}
 % The \texttt{highlight}\IndexKey{highlight} key takes values of \texttt{none},
@@ -2934,11 +2958,11 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{highlight}[\val\nr]{none,invert,outline,insert}
 {%
-    \ifcase\nr\relax
-        \let\ahref@highlight\@empty\or
-        \def\ahref@highlight{/H/I}\or
-        \def\ahref@highlight{/H/O}\or
-        \def\ahref@highlight{/H/P}\fi
+  \ifcase\nr\relax
+    \let\ahref@highlight\@empty\or
+    \def\ahref@highlight{/H/I}\or
+    \def\ahref@highlight{/H/O}\or
+    \def\ahref@highlight{/H/P}\fi
 }{}
 %    \end{macrocode}
 % The \texttt{bordercolor}\IndexKey{bordercolor} key\par\medskip\noindent
@@ -2946,10 +2970,10 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \changes{v2.8a}{2017/03/08}{\string\cs{ahref@bordercolor} can be a named color}
 %    \begin{macrocode}
 \define@key{ahref}{bordercolor}[]{\def\ap@argi{#1}\ifx\ap@argi\@empty
-    \let\ahref@bordercolor\@empty\else
-    \HyColor@IfXcolor{\HyColor@XZeroOneThreeFour{#1}
-        {\ahref@bordercolor}{}{}}
-        {\edef\ahref@bordercolor{#1}}\fi
+  \let\ahref@bordercolor\@empty\else
+  \HyColor@IfXcolor{\HyColor@XZeroOneThreeFour{#1}
+    {\ahref@bordercolor}{}{}}
+    {\edef\ahref@bordercolor{#1}}\fi
 } % PDF color
 \let\ahref@bordercolor\@empty
 %    \end{macrocode}
@@ -2958,10 +2982,10 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{linestyle}[\val\nr]{solid,dashed,underlined}
 {%
-    \ifcase\nr\relax
-        \def\ahref@linestyle@keyvalue{/S/S}\or
-        \def\ahref@linestyle@keyvalue{/S/D}\or % Dashed [0 0 1[3.0]]
-        \def\ahref@linestyle@keyvalue{/S/U}\fi
+  \ifcase\nr\relax
+    \def\ahref@linestyle@keyvalue{/S/S}\or
+    \def\ahref@linestyle@keyvalue{/S/D}\or % Dashed [0 0 1[3.0]]
+    \def\ahref@linestyle@keyvalue{/S/U}\fi
 }
 \def\ahref@dashedlinetyle{/S/D}
 %    \end{macrocode}
@@ -2970,10 +2994,10 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{linewidth}[\val\nr]{thin,medium,thick}
 {%
-    \ifcase\nr\relax
-        \def\ahref@linewidth{1}\or
-        \def\ahref@linewidth{2}\or
-        \def\ahref@linewidth{3}\fi
+  \ifcase\nr\relax
+    \def\ahref@linewidth{1}\or
+    \def\ahref@linewidth{2}\or
+    \def\ahref@linewidth{3}\fi
 }
 %    \end{macrocode}
 % The \texttt{goto}\IndexKey{goto} key takes values of \texttt{p2c},
@@ -2981,10 +3005,10 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 %    \begin{macrocode}
 \define@choicekey{ahref}{goto}[\val\nr]{p2c,c2p,c2c}
 {%
-    \ifcase\nr\relax
-        \global\let\targetDictionary\targetDictionary@pc\or
-        \global\let\targetDictionary\targetDictionary@cp\or
-        \global\let\targetDictionary\targetDictionary@cc\fi
+  \ifcase\nr\relax
+    \global\let\targetDictionary\targetDictionary@pc\or
+    \global\let\targetDictionary\targetDictionary@cp\or
+    \global\let\targetDictionary\targetDictionary@cc\fi
 }{}
 %    \end{macrocode}
 % The \texttt{launch}\IndexKey{launch} key takes values of \texttt{save},
@@ -3012,8 +3036,8 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 % \cs{aref(\#1)} to \texttt{\#1} in \cs{targetDictionary@pc}
 % and \cs{targetDictionary@cc}.
 %    \begin{macrocode}
-\def\targetDictionary@pc#1{%
-/T<</N<\expandafter\stringiiUnicode#1\relax>/R/C>>}
+\def\targetDictionary@pc#1{/T<</N<\expandafter
+  \stringiiUnicode#1\relax>/R/C>>}
 \def\targetDictionary@cp#1{/T<</R/P>>}
 \def\targetDictionary@cc#1{%
 /T<</R/P/T<</N<\expandafter\stringiiUnicode#1\relax>/R/C>>>>}
@@ -3047,70 +3071,68 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 % dated as (2015/07/01) are the changes needed.
 %    \begin{macrocode}
 \def\aeb@initahref#1{%
-    \edef\expand@setkeys{%
-    \noexpand\setkeys{ahref}{\factory@ahyperref@defaults}}%
-    \expand@setkeys
-    \ifx\aeb@setahyperrefDefaults\@empty\else
+  \edef\expand@setkeys{%
+  \noexpand\setkeys{ahref}{\factory@ahyperref@defaults}}%
+  \expand@setkeys
+  \ifx\aeb@setahyperrefDefaults\@empty\else
 %    \end{macrocode}
 % For the \cmd{\setahyperrefDefaults} we do not allow \texttt{dest}, \texttt{goto},
 % \texttt{page}, or \texttt{preset}.
 %    \begin{macrocode}
-        \edef\expand@setkeys{\noexpand\setkeys{ahref}%
-            [dest,goto,page,preset]{\aeb@setahyperrefDefaults}}%
-        \expand@setkeys
-    \fi
-    \setkeys{ahref}{#1}%
-    \ifx\ahref@preset\@empty\else
-    \edef\expand@setkeys{%
-        \noexpand\setkeys{ahref}{\ahref@preset}}\expand@setkeys\fi
-    \let\ahref@dasharray\@empty
-    \ifx\ahref@linestyle@keyvalue\ahref@dashedlinetyle
-        \def\aeb@border@parameters{0 0 \ahref@linewidth[3.0]}%
-        \def\ahref@dasharray{/D[3.0]}%
-    \else
-        \edef\aeb@border@parameters{\ahref@border}%
-    \fi
-    \ifx\ahef@invisible@border\@empty\def\ahref@linewidth{0}\fi
-    \def\ahref@BS@Dict{/BS<<%
-        \ahref@dasharray\ahref@linestyle@keyvalue/W \ahref@linewidth>>
-    \ifx\ahref@bordercolor\@empty\else
-        /C[\ahref@bordercolor]\fi\ahref@highlight}%
+      \edef\expand@setkeys{\noexpand\setkeys{ahref}%
+          [dest,goto,page,preset]{\aeb@setahyperrefDefaults}}%
+      \expand@setkeys
+  \fi
+  \setkeys{ahref}{#1}%
+  \ifx\ahref@preset\@empty\else
+  \edef\expand@setkeys{\noexpand
+    \setkeys{ahref}{\ahref@preset}}\expand@setkeys\fi
+  \let\ahref@dasharray\@empty
+  \ifx\ahref@linestyle@keyvalue\ahref@dashedlinetyle
+    \def\aeb@border@parameters{0 0 \ahref@linewidth[3.0]}%
+    \def\ahref@dasharray{/D[3.0]}%
+  \else
+    \edef\aeb@border@parameters{\ahref@border}%
+  \fi
+  \ifx\ahef@invisible@border\@empty\def\ahref@linewidth{0}\fi
+  \def\ahref@BS@Dict{/BS<<%
+    \ahref@dasharray\ahref@linestyle@keyvalue/W \ahref@linewidth>>
+  \ifx\ahref@bordercolor\@empty\else
+    /C[\ahref@bordercolor]\fi\ahref@highlight}%
 }
-\newcommand{\ahyperref}[3][]{%
-    \begingroup
-    \dl@preProcDefns
-    \def\u{\string\\u}%
-    \aeb@initahref{#1}%
-    \ifx\ahref@dest\@empty
-        \def\ahref@dest@keyvalue{%
-            /D[\ahref@page\space\ahref@view@keyvalue]}%
-    \else
-        \edef\ahref@dest@keyvalue{/D(\labelRef{\ahref@dest})}%
-    \fi
-    \aeb@ahref@setlink{#2}{#3}%
+\newcommand{\ahyperref}[3][]{\begingroup
+  \dl@preProcDefns
+  \def\u{\string\\u}%
+  \aeb@initahref{#1}%
+  \ifx\ahref@dest\@empty
+    \def\ahref@dest@keyvalue{%
+      /D[\ahref@page\space\ahref@view@keyvalue]}%
+  \else
+    \edef\ahref@dest@keyvalue{/D(\labelRef{\ahref@dest})}%
+  \fi
+  \aeb@ahref@setlink{#2}{#3}%
 }
-\newcommand{\ahyperlink}[3][]{%
-    \begingroup
-    \dl@preProcDefns
-    \def\u{\string\\u}%
-    \aeb@initahref{#1}%
-    \ifx\ahref@dest\@empty
-        \def\ahref@dest@keyvalue{%
-            /D[\ahref@page\space\ahref@view@keyvalue]}%
-    \else
-        \def\ahref@dest@keyvalue{/D(\ahref@dest)}%
-    \fi
-    \aeb@ahref@setlink{#2}{#3}%
+\newcommand{\ahyperlink}[3][]{\begingroup
+  \dl@preProcDefns
+  \def\u{\string\\u}%
+  \aeb@initahref{#1}%
+  \ifx\ahref@dest\@empty
+    \def\ahref@dest@keyvalue{%
+      /D[\ahref@page\space\ahref@view@keyvalue]}%
+  \else
+    \def\ahref@dest@keyvalue{/D(\ahref@dest)}%
+  \fi
+  \aeb@ahref@setlink{#2}{#3}%
 }
 \def\aeb@ahref@setlink#1#2{%
-    \ifx\ahrefcolor\@empty
-        \@eqlinktxtcolor{}\let\ahypercolor\@empty\else
-        \def\ahypercolor{\textcolor{\ahrefcolor}}\fi
-    \setLink[\Border{\aeb@border@parameters}%
-    \rawPDF{\ahref@BS@Dict}%
-    \A{\ahref@dest@keyvalue/S/GoToE%
-    \ahref@open@keyvalue\targetDictionary{#1}}]{\ahypercolor{#2}}%
-    \endgroup
+  \ifx\ahrefcolor\@empty
+    \@eqlinktxtcolor{}\let\ahypercolor\@empty\else
+    \def\ahypercolor{\textcolor{\ahrefcolor}}\fi
+  \setLink[\Border{\aeb@border@parameters}%
+  \rawPDF{\ahref@BS@Dict}%
+  \A{\ahref@dest@keyvalue/S/GoToE%
+  \ahref@open@keyvalue\targetDictionary{#1}}]{\ahypercolor{#2}}%
+  \endgroup
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -3120,212 +3142,25 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 % to simple view the document, to save and view, or simply to save. The
 % \texttt{open} key determines the resulting action.
 %    \begin{macrocode}
-\newcommand{\ahyperextract}[3][]
-{%
-    \begingroup\dl@preProcDefns
-    \def\u{\string\\u}%
-    \aeb@initahref{#1}%
-    \ifx\ahrefcolor\@empty
-        \@eqlinktxtcolor{}\let\ahypercolor\@empty\else
-        \def\ahypercolor{\textcolor{\ahrefcolor}}\fi
-    \setLink[\Border{\aeb@border@parameters}%
-    \rawPDF{\ahref@BS@Dict}%
+\newcommand{\ahyperextract}[3][]{\begingroup\dl@preProcDefns
+  \def\u{\string\\u}%
+  \aeb@initahref{#1}%
+  \ifx\ahrefcolor\@empty
+    \@eqlinktxtcolor{}\let\ahypercolor\@empty\else
+    \def\ahypercolor{\textcolor{\ahrefcolor}}\fi
+  \setLink[\Border{\aeb@border@parameters}%
+  \rawPDF{\ahref@BS@Dict}%
 %    \end{macrocode}
 %\changes{v1.7}{2015/07/01}{Removed \cs{aref(\#2)}, replaced with \texttt{\#2}}
 % (2015/07/01) Removed \cs{aref(\#2)}, replaced with \texttt{\#2}
 %    \begin{macrocode}
-%    \A{\JS{this.exportDataObject({cName: "\aref(#2)",%
-    \A{\JS{this.exportDataObject({cName: "#2",%
+  \A{\JS{this.exportDataObject({cName: "#2",%
 nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
-    \endgroup
+  \endgroup
 }
 %    \end{macrocode}
 %    \end{macro}
-% \subsection{Unicodes}
-%    \begin{macro}{\convertChriiUnicode}
-% A simple command for mapping a character to its unicode
-%    \begin{macrocode}
-\def\convertChriiUnicode#1#2{\csarg\gdef{uni@#1}{#2}}%
-%    \end{macrocode}
-%    \end{macro}
-%    \begin{macrocode}
-\convertChriiUnicode\space{0020}
-\convertChriiUnicode{!}{0021}
-{\@makeother\"
-\convertChriiUnicode{"}{0022}}
-%\convertChriiUnicode{"}{0022}   % not available, but use \u0022 instead
-\convertChriiUnicode{#}{0023}
-\convertChriiUnicode{$}{0024}
-{\@makeother\%
-\convertChriiUnicode{%}{0025}}
-\convertChriiUnicode{&}{0026}
-\convertChriiUnicode{'}{0027}
-\convertChriiUnicode{(}{0028}
-\convertChriiUnicode{)}{0029}
-\convertChriiUnicode{*}{002A}
-\convertChriiUnicode{+}{002B}
-\convertChriiUnicode{,}{002C}
-\convertChriiUnicode{-}{002D}
-\convertChriiUnicode{.}{002E}
-\convertChriiUnicode{/}{002F}
-\convertChriiUnicode{0}{0030}
-\convertChriiUnicode{1}{0031}
-\convertChriiUnicode{2}{0032}
-\convertChriiUnicode{3}{0033}
-\convertChriiUnicode{4}{0034}
-\convertChriiUnicode{5}{0035}
-\convertChriiUnicode{6}{0036}
-\convertChriiUnicode{7}{0037}
-\convertChriiUnicode{8}{0038}
-\convertChriiUnicode{9}{0039}
-\convertChriiUnicode{:}{003A}
-\convertChriiUnicode{;}{003B}
-\convertChriiUnicode{<}{003C}
-\convertChriiUnicode{=}{003D}
-\convertChriiUnicode{>}{003E}
-\convertChriiUnicode{?}{003F}
-\convertChriiUnicode{@}{0040}
-\convertChriiUnicode{A}{0041}
-\convertChriiUnicode{B}{0042}
-\convertChriiUnicode{C}{0043}
-\convertChriiUnicode{D}{0044}
-\convertChriiUnicode{E}{0045}
-\convertChriiUnicode{F}{0046}
-\convertChriiUnicode{G}{0047}
-\convertChriiUnicode{H}{0048}
-\convertChriiUnicode{I}{0049}
-\convertChriiUnicode{J}{004A}
-\convertChriiUnicode{K}{004B}
-\convertChriiUnicode{L}{004C}
-\convertChriiUnicode{M}{004D}
-\convertChriiUnicode{N}{004E}
-\convertChriiUnicode{O}{004F}
-\convertChriiUnicode{P}{0050}
-\convertChriiUnicode{Q}{0051}
-\convertChriiUnicode{R}{0052}
-\convertChriiUnicode{S}{0053}
-\convertChriiUnicode{T}{0054}
-\convertChriiUnicode{U}{0055}
-\convertChriiUnicode{V}{0056}
-\convertChriiUnicode{W}{0057}
-\convertChriiUnicode{X}{0058}
-\convertChriiUnicode{Y}{0059}
-\convertChriiUnicode{Z}{005A}
-\convertChriiUnicode{[}{005B}
-%\convertChriiUnicode{\}{005C} % not available, use unicode \u005C
-\convertChriiUnicode{]}{005D}
-\convertChriiUnicode{^}{005E}
-\convertChriiUnicode{_}{005F}
-\convertChriiUnicode{`}{0060}
-\convertChriiUnicode{a}{0061}
-\convertChriiUnicode{b}{0062}
-\convertChriiUnicode{c}{0063}
-\convertChriiUnicode{d}{0064}
-\convertChriiUnicode{e}{0065}
-\convertChriiUnicode{f}{0066}
-\convertChriiUnicode{g}{0067}
-\convertChriiUnicode{h}{0068}
-\convertChriiUnicode{i}{0069}
-\convertChriiUnicode{j}{006A}
-\convertChriiUnicode{k}{006B}
-\convertChriiUnicode{l}{006C}
-\convertChriiUnicode{m}{006D}
-\convertChriiUnicode{n}{006E}
-\convertChriiUnicode{o}{006F}
-\convertChriiUnicode{p}{0070}
-\convertChriiUnicode{q}{0071}
-\convertChriiUnicode{r}{0072}
-\convertChriiUnicode{s}{0073}
-\convertChriiUnicode{t}{0074}
-\convertChriiUnicode{u}{0075}
-\convertChriiUnicode{v}{0076}
-\convertChriiUnicode{w}{0077}
-\convertChriiUnicode{x}{0078}
-\convertChriiUnicode{y}{0079}
-\convertChriiUnicode{z}{007A}
-%\convertChriiUnicode{{}{007B}     % not available, use unicode \u007B
-\convertChriiUnicode{|}{007C}
-%\convertChriiUnicode{}}{007D}     % not available, use unicode \u007D
-{\@makeother~
-\convertChriiUnicode{~}{007E}}
-%    \end{macrocode}
-%    \begin{macro}{\EURO}
-%    \begin{macro}{\BSLASH}
-%    \begin{macro}{\LBRACE}
-%    \begin{macro}{\RBRACE}
-%    \begin{macro}{\DQUOTE}
-% These characters are entered into the description parameter of \cs{autolabelNum}
-% or \cs{labelName} as either as literal characters or as its unicode \cs{uXXXX}.
-% When \cs{u} is detected \cs{@stringiiUnicode}, the command that converts the string
-% to all unicode hex, it calls \cs{getRawUnicode} to get the next four characters, which
-% should be XXXX, place them in the stream, followed by \cs{@stringiiUnicode} so as to
-% continue the processing of the next character in the description string. I've placed
-% an \cs{expandafter} in the definition of \cs{getRawUnicode} to allow the commands below
-% to be used. Thus instead of using \cs{u20AC}, which might necessitate the user to
-% look up the code, \verb!\u\EURO! can be used instead.  Additional shortcut commands
-% like these can be created. Except for \cs{EURO}, these are the ones \TeX{} has trouble
-% processing.
-%    \begin{macrocode}
-\def\EURO{20AC}
-\def\BSLASH{005C}
-\def\LBRACE{007B}
-\def\RBRACE{007D}
-\def\DQUOTE{0022}
-%    \end{macrocode}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%
-% Display the Unicode encoding of a character
-%
-%    \begin{macrocode}
-\def\displayUnicode#1{\csname uni@#1\endcsname}
-%    \end{macrocode}
-%    \begin{macro}{\stringiiUnicode}
-% This is the primary command for converting a string, which
-% may contain \cs{uXXXX} control sequences into unicode encoding.
-% The first four hex digits must be \texttt{FEFF} to signal that
-% the hex represents unicode.
-%    \begin{macrocode}
-\def\stringiiUnicode{FEFF\expandafter\@stringiiUnicode}
-\def\@stringiiUnicode#1{%
-    \ifx#1\relax\else
-        \ifx#1\u\aeb@exiii\getRawUnicode
-        \else
-            \displayUnicode{#1}\aeb@exiii\@stringiiUnicode
-        \fi
-    \fi
-}
-\def\getRawUnicode{\expandafter\@getRawUnicode}
-\def\@getRawUnicode#1#2#3#4{#1#2#3#4\@stringiiUnicode}
-%    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{\unicodeStr}
-% A convenience command for setting the initial value of a form field with unicode.
-% Usage:
-%\begin{verbatim}
-%\labelName{myCoolIV}{\u0022\u20AC|e^\u007B\u005Cln(17)\u007D|$\u0022}
-%\textField[\textSize{10}\textFont{MyriadPro-Regular}
-%    \uDV{\unicodeStr(myCoolIV)}\uV{\unicodeStr(myCoolIV)}
-%]{myCoolIV}{1.5in}{12bp}
-%\end{verbatim}
-% First you set the string using \cs{labelName}. The argument for \cs{unicodeStr}
-% is delimited by parentheses, the argument itself is the label defined with
-% \cs{labelName}.
-%
-%\medskip\noindent
-% (2015/07/12) If \texttt{\#1} does not define a recognizable label (defined by \cs{labelName}
-% we assume \texttt{\#1} is raw hex digits.
-%    \begin{macrocode}
-\def\unicodeStr(#1){\expandafter
-    \ifx\csname aeb@aDescript@#1\endcsname\relax
-    FEFF#1\else\aeb@exiii\stringiiUnicode\aref(#1)\relax\fi}
-%    \end{macrocode}
-%    \end{macro}
-%
-% \subsection{\texorpdfstring{\cs{labelName} and \cs{autolabelNum}}
+% \section{\texorpdfstring{\cs{labelName} and \cs{autolabelNum}}
 %  {\CMD{labelName} and \CMD{autolabelNum}}}
 %
 %    \begin{macro}{\autolabelNum}
@@ -3347,7 +3182,6 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % \cs{autolabelNum} and \cs{autolabelNum*} to make definitions, in that respect, \cs{labelName}
 % is the low-level command for setting up the mappings and definitions.
 %    \begin{macrocode}
-\def\ucspace{\u0020}
 \begingroup\catcode`\"=\active \gdef\DQ{\string\"}%
     \gdef\@handledblquotes{\catcode`\"=\active\def"{\DQ}}%
     \toks0=\expandafter{\DLspecialDefs\@handledblquotes}%
@@ -3369,14 +3203,23 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % gobble up any spaces between arguments before we switch to \string\cs{obeyspaces}.}
 % (2015/07/05) Modified \cs{labelName} and \cs{labelName@star} to
 % gobble up any spaces between arguments before we switch to \cs{obeyspaces}.
+% \changes{v2.9}{2017/08/25}{Test for \string\env{attachmentNames} environment}
 %    \begin{macrocode}
 \let\aeb@isFromAutoLabelNum\aebp@Zero
-\def\labelName#1{\bgroup\let\aeb@isFromAutoLabelNum\aebp@Zero
+\def\attachmentNamesEnv{attachmentNames} % dps23
+%    \end{macrocode}
+% If \cs{labelName} is outside the \env{attachmentNames} environment, use
+% \cs{defUniStr}, defined in \pkg{forms16be}.
+% \changes{v2.9}{2017/08/25}{Pass control to \string\pkg{forms16be}}
+%    \begin{macrocode}
+\def\labelName{\ifx\attachNamesEnv\attachmentNamesEnv % dps23
+  \def\ap@next{\labelName@Env}\else\def\ap@next{\defUniStr}\fi\ap@next}
+\def\labelName@Env#1{\bgroup\let\aeb@isFromAutoLabelNum\aebp@Zero %dps23
     \@for\x:=ABCDEFabcdef\do{\@makeother\x}%
     \def\aebp@labelname{#1}\@ifnextchar\bgroup{\labelName@i}{}}
 %    \end{macrocode}
 %\changes{v1.7k}{2015/08/02}{Added \cs{labelName@a}}
-% (2015/08/02) \cs{autoLabelNum} used to call \cs{labelName}, not it calls
+% (2015/08/02) \cs{autoLabelNum} used to call \cs{labelName}, now it calls
 % \cs{labelName@a}, which sets a switch to notify \cmd{\aeb@labelName} of the origins
 % of the call.
 %    \begin{macrocode}
@@ -3451,21 +3294,23 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % it contents verbatim to the file \cs{jobname\_xref.cut} and inputs it back in.  Child files can input this
 % file to get the labels assigned for them by the parent document.
 %    \begin{macrocode}
+\let\attachNamesEnv\@empty
 \newenvironment{attachmentNames}{%
-    \newwrite \aeb@attachments@xref
-    \immediate\openout \aeb@attachments@xref \jobname_xref.cut
-    \let\verbatim@out\aeb@attachments@xref
+  \newwrite \aeb@attachments@xref
+  \immediate\openout \aeb@attachments@xref \jobname_xref.cut
+  \let\verbatim@out\aeb@attachments@xref
 %    \end{macrocode}
 %\changes{v1.7l}{2015/08/07}{Set \cs{ifHandleDblQuotes} to true}
 % (2015/08/07) Set \cs{ifHandleDblQuotes} to true, added a group.
 %    \begin{macrocode}
-    \immediate\write\verbatim@out{\string\begingroup
-        \string\HandleDblQuotestrue}%
-    \verbatimwrite}{%
-    \endverbatimwrite
-    \immediate\write\verbatim@out{\string\endgroup}%
-    \immediate\closeout \aeb@attachments@xref
-    \aftergroup\aeb@Input@xref}
+  \immediate\write\verbatim@out{\string\begingroup
+    \string\HandleDblQuotestrue^^J%
+    \string\def\string\attachNamesEnv{attachmentNames}}%
+  \verbatimwrite}{%
+  \endverbatimwrite
+  \immediate\write\verbatim@out{\string\endgroup}%
+  \immediate\closeout \aeb@attachments@xref
+  \aftergroup\aeb@Input@xref}
 \def\aeb@Input@xref{\InputIfFileExists{\jobname_xref.cut}{}{}}
 %    \end{macrocode}
 %    \end{environment}

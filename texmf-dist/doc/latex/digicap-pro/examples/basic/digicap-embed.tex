@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage[%
+    web={tight,extended,usesf,usetemplates},
+    uselayers,eforms,graphicxsp={showembeds},aebxmp
+]{aeb_pro}
+\usepackage{digicap-pro}
+
+
+\margins{.5in}{.5in}{24pt}{.5in}    % left,right,top, bottom
+\screensize{6in}{6in}               % height, width
+
+%
+% embed cliff lee using \embedEPS of the graphicxsp package
+%
+\embedEPS[transparencyGroup]{clifflee}{./digis/IiFUCdIQ}
+
+
+\DeclareDocInfo
+{
+    title=The DigiCap Pro Package\texorpdfstring{\\[1ex]}{: }Demo of Embedding,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=Test file for the DigiCap Pro package,
+    keywords={Captioning, opacity, layers, roll-over},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={\today},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\nocopyright
+\talkdateLabel{Published:}
+
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\pagestyle{empty}
+
+\parskip6pt
+\parindent0pt
+
+\begin{document}
+
+\maketitle
+
+The following example appears in the \textsf{digicap\_man}, and shows how to embed a
+picture using \textsf{graphicxsp}, then reference it in the \cs{digiCap} command.
+
+\begin{center}
+\digiCap[inclgraphicx={name=clifflee,width=.75\linewidth},vcaption=b,
+    hcaption=c,outerboxsep=0pt]{./digis/IiFUCdIQ}[borderwidth=0bp,
+    fboxsep=10bp,bordercolor=nocolor,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{red}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win streak with an eight-inning gem Cliff Lee retired
+    14 straight in a 7-1 Indians win over the A's on Sunday. Grady
+    Sizemore had three RBIs as Cleveland halted its three-game skid.}\\[1ex]
+%
+\digiCap*[inclgraphicx={name=clifflee,width=.75\linewidth},vcaption=c,hcaption=l,outerboxsep=0pt]
+    {./digis/IiFUCdIQ}[borderwidth=4bp,fboxsep=10bp,
+    bordercolor=blue,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{webblue}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win streak with an eight-inning gem Cliff Lee retired
+    14 straight in a 7-1 Indians win over the A's on Sunday. Grady
+    Sizemore had three RBIs as Cleveland halted its three-game skid.}%
+\end{center}
+The file size of this file is about 56K.
+
+\end{document}

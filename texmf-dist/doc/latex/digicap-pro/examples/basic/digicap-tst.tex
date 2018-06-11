@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[%
+    web={tight,pro,usesf,usetemplates},
+    uselayers,eforms,aebxmp
+]{aeb_pro}
+\usepackage{digicap-pro}
+
+\margins{.5in}{.5in}{24pt}{.5in}    % left,right,top, bottom
+\screensize{4.8in}{6in}             % height, width
+\renewcommand{\titleauthorproportion}{.4}
+\DeclareDocInfo
+{
+    title=The DigiCap Pro Package\texorpdfstring{\\[1ex]}{: }Digital Captioning,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=Test file for the DigiCap Pro package,
+    keywords={Captioning, opacity, layers, roll-over},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={\today},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\pagestyle{empty}
+
+\parskip6pt
+\parindent0pt
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\digiCap[inclgraphicx={scale=.6},vcaption=b,hcaption=c,outerboxsep=0pt]
+    {./digis/4CzSojSc}[borderwidth=0bp,fboxsep=10bp,bordercolor=nocolor,bgop=.7]
+    {\bfseries\makebox[\linewidth][c]{\textcolor{red}
+    {Yankees fire first salvo in rivalry with two-hitter}}\\\relax\footnotesize
+    Chien-Ming Wang took a no-hitter into the fifth inning and
+    surrendered just two hits in a complete-game gem as the
+    Yankees beat the Red Sox, 4-1, on Friday at Fenway Park.}%
+\end{center}
+
+Two new commands \cs{graphicCaption} and  \cs{graphicCaptionRollover} are introduced.
+These two use \cs{graphicxbox} and another new command called \cs{opcolorbox}.
+
+The above photo has a transparent caption at the bottom. This can be changed to
+a center or top positioning.
+
+This style of captioning (using a transparent background with text on top) is used not only
+on the \href{http://www.mlb.com}{MLB web site}, but in magazine layouts as well, such as the
+paper version of \href{http://www.tvguide.com}{TV GUIDE}.
+
+The background image and text were taken from \href{http://www.mlb.com}{www.mlb.com}.
+
+% use a command to set popular options.
+\def\myOpts{inclgraphicx={scale=.6},vcaption=b,hcaption=r,outerboxsep=0pt}
+
+\begin{center}
+\digiCap*[\myOpts,rollovername=YankeesRedSox]%
+    {./digis/wobwRHNb}[borderwidth=0bp,fboxsep=10bp,bordercolor=nocolor,bgop=.7]
+    {\parskip6pt\bfseries\makebox[\linewidth][c]{\textcolor{webblue}{Tribe rally
+    falls short after Sabathia struggles}}\\\relax\footnotesize
+    C.C. Sabathia had no answers for Oakland on Friday, allowing
+    12 hits in a 9-7 loss. The Tribe battled from an eight-run
+    deficit but couldn't catch the A's.}
+\end{center}
+
+For the next three pages, the caption is hidden in a separate layer. Rollover the photo
+to see the caption.
+
+We stayed up late watching this rain-delayed game over the Internet. Late inning
+heroics fell short of the mark.
+
+Photos and descriptions of Indians action obtained from \href{http://indians.mlb.com}{indians.mlb.com}.
+
+\begin{center}
+\digiCap*[inclgraphicx={scale=.6},vcaption=t,hcaption=r,outerboxsep=0pt,rollovername=IndiansAs]%
+    {./digis/xn2cpnQk}[borderwidth=4bp,fboxsep=10bp,width=.85\linewidth,bordercolor=nocolor,bgop=.7]%
+    {\parskip6pt\bfseries\makebox[\linewidth][c]{\textcolor{webblue}
+    {Free passes, missed chances hurt Tribe}}\\\relax\footnotesize Fausto Carmona
+    issued eight walks in 3 1/3 innings, and the Indians scored just one
+    run with the bases full and one out in Saturday's 7-3 loss to the
+    A's.}
+\end{center}
+
+This was a disappointing game. The opposing team has
+several of their ``stars'' out of the line-up due to injuries, and
+we still could not beat them, thanks to the bad pitching performance
+of Fausto.
+
+Here the caption is \texttt{.85}\cs{linewidth}, it is placed at the
+top and has a right horizontal alignment. Note the \texttt{4bp}
+spacing between the caption and the edge of the photo, there are
+controls for this spacing.
+
+\begin{center}
+\digiCap*[inclgraphicx={scale=.6},vcaption=c,hcaption=l,outerboxsep=0pt,
+    rollovername=IndiansAsThirdGame]{./digis/IiFUCdIQ}[borderwidth=4bp,fboxsep=10bp,
+    bordercolor=blue,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{webblue}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win streak with an eight-inning gem Cliff Lee retired
+    14 straight in a 7-1 Indians win over the A's on Sunday. Grady
+    Sizemore had three RBIs as Cleveland halted its three-game skid.}%
+\end{center}
+
+The game on April 13th. My wife watched this while I assembled the new outdoor grill.
+
+You can place a transparent border around a caption, as illustrated above. This one goes
+the width of the image, you can have some separation around the border as well (not illustrated).
+
+
+\newpage
+
+\begin{center}
+\digiCap*[inclgraphicx={height=\textheight,width=\linewidth,keepaspectratio},%
+     vcaption=c,hcaption=r,outerboxsep=0bp]{./digis/sciencefair}[width=.4\linewidth,%
+     borderwidth=0bp,fboxsep=7bp,bordercolor=nocolor,bgcolor=webyellow,bgop=.6]{%
+        \begin{minipage}[b][\graphicHeight-2\fboxsep-2\fboxrule]{\linewidth}\color{webbrown}\small\bfseries\parskip6pt
+        A photo of the High School Science Fair project of my beloved son.
+        The project tested a subject's reaction time while
+        talking on a call-phone (hands-on and hands-free) and while
+        distracted. A statistical analysis of the data was
+        performed on the data. The results were inconclusive.
+
+        This caption demonstrates that it is possible to create a vertical caption, positioned
+        on the left, right or in the center.
+        \end{minipage}
+    }\\[6pt]
+My son's science fair project.
+\end{center}
+
+\end{document}

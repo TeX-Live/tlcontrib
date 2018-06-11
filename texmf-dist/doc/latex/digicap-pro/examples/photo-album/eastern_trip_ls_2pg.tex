@@ -1,0 +1,145 @@
+\documentclass{article}
+\usepackage[%
+    web={usetemplates,pro,usesf},
+    aebxmp,eforms,uselayers,
+    graphicxsp={showembeds}
+]{aeb_pro}
+\usepackage[display1]{digicap-pro}
+\usepackage{array}
+
+\margins{.25in}{.25in}{24pt}{.25in}                 % left,right,top, bottom
+%\sizePageFromGraphic{100_0141}{!}{5.5in}            % height, width
+\setScreensizeFromGraphic[width=5.5in]{./digis/100_0055}
+
+\DeclareDocInfo
+{%
+    title=Story's Trip to out East,
+    author=D. P. Story,
+    subject={Digital pics of the trip},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+
+\DeclareInitView
+{%
+    windowoptions={showtitle,fullscreen},
+}
+
+\parskip0pt\parindent0pt
+\pagestyle{empty}
+
+\setThumbAppearances[p1]{rgbcolor=1 0 0}
+
+\longCapFmt{\bfseries\scriptsize}
+
+
+\PicsThisDoc
+{%
+    {p1}{./digis/100_0031}{Gettysburg Battlefield: Seminary Ridge}
+        {This shot was taken from from seminary
+         ridge. You can see the ridge in the distance. I thought of
+         the some 60{,}000 casualties that occurred in the fields in
+         the foreground.},
+    {p2}{./digis/100_0035}{Gettysburg Battlefield: View from Little Round Top}
+        {Heavy fighting down below, the Confederates tried on
+         several occasions to take this high point.},
+    {p3}{./digis/100_0051}{Independence Hall: Desk where G. Washington presided from}
+        {This is on our trip through Washington D.C.
+         The July day was hot and humid.},
+    {p4}{./digis/100_0055}{The Liberty Bell}
+        {This is in Philadelphia, the pictures are a
+         little out of order.},
+    {p5}{./digis/100_0061}{Manhatten in New York City}
+        {New York! New York! It's my kind of town,
+         Chicago is! Oops, wrong song.},
+    {p6}{./digis/100_0075}{New York City: Rockefeller Center}
+        {Rockefeller Center, famous place,
+         now that I have been there, I've now seen it all!},
+    {p7}{./digis/100_0086}{New York City: Ground Zero}
+        {\centering September 11, 2001, a day that will
+         live in infamy!},
+    {p8}{./digis/100_0109}{Statue of Liberty}
+        {Give my your tired, your poor,
+         your hungry masses yearning to be free\dots},
+    {p9}{./digis/100_0141}{Washington D.C.: Jefferson Memorial}
+        {\centering The great man himself.},
+    {p10}{./digis/100_0142}{Washington D.C.: Jefferson Memorial}
+        {\centering A closer look at the great man.},
+    {p11}{./digis/100_0157}{Washington D.C.: The Lincoln Memorial}
+        {\centering Was there a more nobler man?},
+    {p12}{./digis/100_0180}{Washington D.C.: Washington Monument}
+        {\centering The first, and some say, the greatest of
+         our presidents.},
+    {p13}{./digis/100_0224}{Jamestown Colony}
+        {On to Jamestown, Virginia, site of the first
+         English colony in the new world.},
+    {p14}{./digis/100_0207}{Jamestown: Replica of the Discovery}
+        {One of three replicas of the ships
+         these folks took. This was the final stop on our eastern
+         vacation, we enjoyed it and it was educational to
+         Alexander.}
+}
+\template[name=p4,width=\paperwidth,transparency={/ca .3}]{\null}
+
+\begin{document}
+
+%\useRollovers
+
+% Order of presentation (the thumbs will be laid out in this order)
+\presentationOrder{p1,p2,p3,p4,p5,p6,p7,p8}
+
+\shortCapFmt{\footnotesize\sffamily\bfseries\color{blue}}
+
+\dcFirstOpt{vcaption=b,hcaption=c,outerboxsep=0pt}
+
+\dcFirstOpt[p1]{vcaption=t,hcaption=c,outerboxsep=0pt}
+
+\previewOff
+
+\addvspacetorows{0bp}
+
+\begin{minipage}[t]{.25\linewidth}\kern0pt
+\opcolorbox[bordercolor=blue,bgcolor=white,bgop=.5]{%
+\begin{minipage}[c]{\linewidth}\centering
+\insertThumbs{4}{2}
+\vskip-\baselineskip
+\footnotesize\textbf{\textcolor{blue}{Thumbnails}}
+\end{minipage}}%
+\end{minipage}\hfil
+\begin{minipage}[t]{.7\linewidth}\kern0pt\centering
+\sffamily\bfseries\normalsize\textcolor{red}{The Story's Trip out East}
+
+\digiDisplaySpace{220pt}{\linewidth}
+
+\smallskip
+% These are the captions (short form)
+\makebox[\linewidth][c]{\insertCaptions}
+\end{minipage}\hfil
+
+\newpage %-----------------------------------------------------
+
+\template[name=p9,width=\paperwidth,transparency={/ca .3}]{\null}
+
+\presentationOrder{p9,p10,p11,p12,p13,p14}
+
+\begin{minipage}[t]{.25\linewidth}\kern0pt
+\opcolorbox[bordercolor=blue,bgcolor=white,bgop=.5]{%
+\begin{minipage}[c]{\linewidth}\centering
+\insertThumbs{3}{2}%
+\vskip-\baselineskip
+\footnotesize\textbf{\textcolor{blue}{Thumbnails}}
+\end{minipage}}
+\end{minipage}\hfil
+\begin{minipage}[t]{.7\linewidth}\kern0pt\centering
+\sffamily\bfseries\normalsize\textcolor{red}{The Story's Trip out East}
+
+\digiDisplaySpace{220pt}{\linewidth}
+
+\smallskip
+% These are the captions (short form)
+\makebox[\linewidth][c]{\insertCaptions}
+\end{minipage}\hfil
+
+
+\end{document}

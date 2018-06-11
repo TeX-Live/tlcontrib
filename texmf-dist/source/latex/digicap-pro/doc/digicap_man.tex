@@ -1,0 +1,685 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[%
+    web={centertitlepage,usetemplates,designv,
+        forcolorpaper,tight*,latextoc,extended},
+    eforms,uselayers,graphicxsp={showembeds},aebxmp
+]{aeb_pro}
+\usepackage{digicap-pro}
+
+\usepackage{array}
+%\usepackage[usecmtt]{myriadpro}
+
+\usepackage[altbullet]{lucidbry}
+
+%\usepackage{makeidx}
+%\makeindex
+
+\previewOn
+
+\usepackage{acroman}
+
+\usepackage[active]{srcltx}
+
+\def\expath{../examples}
+
+
+\urlstyle{rm}
+
+\embedEPS{clifflee}{\expath/digis/IiFUCdIQ}%
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={ \texorpdfstring{DigiCap Pro\\[1em]}
+        {DigiCap Pro: }Captioning Digital Images},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Documentation for AeB Pro from AcroTeX},
+    talksite={\url{www.acrotex.net}},
+    version={1.0},
+    keywords={AeB, Adobe Acrobat, JavaScript},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+%\pagestyle{empty}
+%\parindent0pt\parskip\medskipamount
+
+\advance\marginparwidth10pt
+
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The DigiCap Pro Manual";
+var manualfilename="Manual_BG_Print_digicap.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}
+
+The \textsf{digicap-pro} package came about several years ago (2008);
+at that time, I was impressed by the tv guide layout of photos with
+captions. The captions were laid on top of the photos using a
+transparent box. I also saw this type of photo-caption layout on
+\url{www.mlb.com}. This photo-caption layout inspired to reproduce
+for {\LaTeX}/PDF.
+
+This package provides commands for simply displaying the digital photo
+with caption; the caption can be displayed as a rollover, that is, the caption
+is not visible until the user rolls over the photo using a mouse.
+
+Another component of the package is the display of collections of photos and captions.
+The \url{www.mlb.com} has (or had) thumbnails of the photos, by clicking the thumb, the
+photo with caption would appear.  Nowadays, this is done through the magic of Adobe Flash,
+which gives clever transitions of the thumbs and photos. This package does not do Adobe Flash, but
+perhaps a future edition of this package will incorporate Flash/Flex using my \texttt{rmannot} package.
+
+\section{Requirements}
+
+This package belongs to the high-class family of \textsf{\textcolor{blue}{AeB~Pro}}, hence,
+the major requirement of this package is that the PDF be created using \textbf{Acrobat Distiller},
+see Section~\ref*{ss:PDFCreator} for details.
+
+\subsection{{\LaTeX} Package Requirements}
+
+ The package builds on packages developed as part of \textsf{AeB} or \textsf{AeB~Pro}:
+\begin{itemize}
+ \item\textsf{aeb\_pro}: supplies support for layers and JavaScript management of layers
+ \item\textsf{graphicxbox}: places a graphic as the background of a box
+ \item\textsf{opacity-pro}: creates the transparency effects
+ \item\textsf{eforms}: use to create Acrobat form buttons with a roll-over action to make
+   roll-over captions visible or hidden.
+ \item \textsf{grahicxsp}: used with the commands input with the \texttt{design1} option.
+ See the section entitled \Nameref{s:photoalbum}.
+\end{itemize}
+The \textsf{graphicx} package is also used to import digital photos, or other graphics.
+
+
+\reversemarginpar
+
+\subsection{PDF Creator Requirements}\label{ss:PDFCreator}
+
+The big restriction on this package is the requirement to use\marginpar{\raggedleft\app{dvips}\\\app{dvipsone}}
+\textbf{Acrobat Distiller} (version 5.0, or version 6.0 for transparency).
+The package was developed using Acrobat Distiller 8.1. The package supports the
+creation of Postscript using \textsf{dvips} and \textsf{dvipsone}. These ``drivers''
+are defined through the required package \textsf{aeb\_pro}.
+
+\subsection{Transparency Requirements}
+
+To get the transparency effect, \textbf{Acrobat Distiller} version 6.0 or
+later is required. The default setting of the distiller does not
+support the \textbf{SetTransparency} pdfmark; it is necessary to
+edit the \texttt{.joboptions} file.
+
+The procedure for editing \texttt{.joboptions} to support transparency is as follows:
+\begin{enumerate}
+    \item Start \textbf{Acrobat Distiller}
+    \item From the Default Settings list, select the setting you want to edit,
+    usually, this will be the \texttt{Standard} job options.
+    \item Select \texttt{Settings} \texttt{>} \texttt{Edit Adobe PDF Settings} \texttt{(Ctrl+E)} from the
+    distiller menu.
+    \item Click the \texttt{SaveAs} button at the bottom of the \texttt{Adobe PDF Settings}
+    dialog box. Save your .jobsettings file under a new name,
+    say \texttt{Standard\_transparency} and make a note of where
+    the distiller saves this file.
+    \item With your favorite text editor, navigate to the folder where you saved your new
+    \texttt{.job\-options} file, and open it in your editor.
+    \item Look for the line that says
+    \texttt{/AllowTransparency false}, and change this to read \texttt{/AllowTransparency true}.
+    Save the changes and close the file.
+    \item Use this \texttt{.joboptions} file, \texttt{Standard\_transparency} for example,
+    whenever you distill with transparency pdfmarks.  If your {\LaTeX} file uses transparency,
+    and you are using a \texttt{.joboptions} file with \texttt{/AllowTransparency false}, distillation
+    will fail and the distiller log should say
+\begin{Verbatim}[fontsize=\small]
+%%[Error: The Postscript contains Transparency pdfmark, job aborted.]%%
+%%[ /AllowTransparency is false in job option settings.]%%
+%%[ Error: undefined; OffendingCommand: pdfmark;
+    ErrorInfo: Transparency Group ]%%
+\end{Verbatim}
+This suggests that you should use your \texttt{.joboptions} file that supports transparency!
+
+\newtopic \textbf{Note:} The required package \pkg{opacity-pro} comes with an
+\app{Acrobat Distiller} job options file named
+\texttt{Standard\_transparency.joboptions}. Instead of following the above
+instructions you can simply drop this file in a place where Distiller
+expects to find \texttt{.joboptions} files.\footnote{Go to \texttt{Settings
+> Edit Adobe PDF Settings ...} in the Distiller application window, then
+click the \texttt{SaveAs} button. A \textbf{Save Adobe PDF Settings As}
+dialog box opens, and you can then see where Distiller likes to save its
+\texttt{.joboptions} file. Copy the provided \texttt{.joboptions} to the
+folder and restart Distiller, the \texttt{Standard\_transparency} should
+now be visible in the drop down \textsf{Default Settings} list.}
+
+\end{enumerate}
+
+\section{Options of this Package}
+
+Currently, there is only one option for this package, it is
+\texttt{display1}.\marginpar{\raggedleft\opt{display1}} As noted in the
+introduction, this package provides basic commands for showing digital
+pictures with captions, and for displaying collections of photos using
+thumbnail activation. When \opt{display1} is specified, additional code input
+to support photo displays; refer to Section~\ref{s:photoalbum} for details of
+using \opt{display1} to create a photo album.  Future versions of this package
+may have additional display formats, perhaps provided by enthusiastic users.
+
+
+\section{The DigiCap Pro Commands}
+
+In this section we present the new commands defined in the \pkg{digicap-pro} package, and as a bonus,
+we also present, Section~\ref{s:photoalbum}, a series of commands to create a photo presentation.
+
+\subsection{Digital Photos with Captions}\label{ss:digiCap}
+
+For the mere captioning of a photo, there is one major command for this
+package, all other commands (presented in Section~\ref{s:photoalbum}) are built around this one:
+\bVerb\takeMeasure{\string\digiCap*[\ameta{pos-kvs}]\darg{\ameta{path}}[\ameta{design-kvs}]\darg{\ameta{caption}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\digiCap*[!ameta(pos-kvs)]{!ameta(path)}[!ameta(design-kvs)]{!ameta(caption)}
+\end{dCmd*}
+\eVerb
+\textbf{The star-option.} If \texttt{*} is present, the caption becomes a rollover caption.
+\paragraph*{Optional key-values for the first parameter (\ameta{pos-kvs}).} This set of parameters
+ control the placement of the caption on top of the background picture. There is
+ also a parameter to set the options for the \cs{includegraphics} command, and one to set
+the  form field name, in the case of a rollover.
+\begin{description}
+\item[\texttt{outerboxsep}:] The space the surrounds the boundary of the caption, the default is \texttt{3pt}
+\item[\texttt{vcaption}:] The vertical placement of the caption on the background graphic, possible
+   values are \texttt{b}, \texttt{c}, and \texttt{t}. The default is \texttt{b}.
+\item[\texttt{hcaption}:] The horizontal placement of the caption on the background graphic, possible
+   values are \texttt{l}, \texttt{c}, and \texttt{r}. The default is \texttt{c}.
+\item[\texttt{inclgraphicx}:] The value of this key is a list of key-value pairs that are passed on to the
+  underlying \cs{includegraphics} command.
+\item[\texttt{rollovername}:] The basename of the push button form field that is used for a rollover effect.
+   This command is used only with \cs{digiCap*}, ignored otherwise. For the \cs{digiCap*}
+   command, this key is optional, if not present, this package supplies a name.
+\end{description}
+
+\paragraph*{Second parameter, required (\ameta{path}).} The second parameter is
+ the path to the digital photo (or graphic) to be used as a background to
+ this box.
+
+\paragraph*{Optional key-values for the third parameter (\ameta{design-kvs}).} These are additional options for the design
+of the box that contains the caption.
+\begin{description}
+   \item[\texttt{borderwidth}:] The border width. The default is \texttt{2pt}
+   \item[\texttt{fboxsep}:] The space between the border and the text, the default is \texttt{6pt}
+   \item[\texttt{width:}] The width of \cs{parbox}, the default is \cs{linewidth}
+   \item[\texttt{bordercolor}:] A named color of border, the default is \texttt{black}. A special value
+   of \texttt{nocolor} is recognized, in that case, no color is applied.
+   \item[\texttt{bgcolor:}] A named color of background, the default is \texttt{white}. A special value
+   of \texttt{nocolor} is recognized, in that case, no color is applied.
+   \item[\texttt{borderop:}] A number type, the opacity for border $0 \le \mbox{number} \le 1$, the default is~$.5$
+   \item[\texttt{bgop:}] A number type, the opacity for background $0 \le \mbox{number} \le 1$, the default is~$.5$
+   \item[\texttt{textop:}] A number type, the opacity for text $0 \le \mbox{number} \le 1$, the default is~$1$
+   \item[\texttt{borderblend:}] The blend mode for the border, the default is \texttt{Normal}
+   \item[\texttt{bgblend:}] The blend mode for the background, the default is \texttt{Normal}
+\end{description}
+
+\paragraph*{Fourth parameter, required.} The text of the caption.
+
+\exSrc{digicap-tst}The following is a sample of examples, see the demo file
+\texttt{digicap-tst.tex} for extensive examples of \cs{digiCap} with its options.
+\begin{center}
+\digiCap[inclgraphicx={name=clifflee,width=.75\linewidth},vcaption=b,
+    hcaption=c,outerboxsep=0pt]{\expath/digis/IiFUCdIQ}[borderwidth=0bp,
+    fboxsep=10bp,bordercolor=nocolor,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{red}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win streak with an eight-inning gem Cliff Lee retired
+    14 straight in a 7-1 Indians win over the A's on Sunday. Grady
+    Sizemore had three RBIs as Cleveland halted its three-game skid.}\\[1ex]
+%
+\digiCap*[inclgraphicx={name=clifflee,width=.75\linewidth},vcaption=c,hcaption=l,outerboxsep=0pt]
+    {\expath/digis/IiFUCdIQ}[borderwidth=4bp,fboxsep=10bp,
+    bordercolor=blue,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{webblue}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win streak with an eight-inning gem Cliff Lee retired
+    14 straight in a 7-1 Indians win over the A's on Sunday. Grady
+    Sizemore had three RBIs as Cleveland halted its three-game skid.}%
+\end{center}
+The topmost photo has a static caption at the bottom of the photo, the photo below it has a rollover
+caption, the caption box has been designed with a border. The verbatim listing of these two images
+are
+
+\begin{Verbatim}[xleftmargin=\parindent,numbers=left,fontsize=\footnotesize]
+\digiCap[inclgraphicx={width=.75\linewidth},
+    vcaption=b,hcaption=c,outerboxsep=0pt]
+    {\expath/digis/IiFUCdIQ}[borderwidth=0bp,fboxsep=10bp,bordercolor=nocolor,
+    bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{red}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's ... as Cleveland halted its three-game skid.}
+\end{Verbatim}
+In line~(1), the \texttt{inclgraphicx} key sets the width of the graphic at
+\verb!.75\linewidth!. The first optional option continues on line~(2), we set
+\texttt{vcaption} and \texttt{hcaption} to the defaults (hence need not have
+appeared). The second required parameter is in line~(3). The third (optional)
+parameter also begins in line~(3) and continues onto line~(4): among the
+options is setting the \texttt{bordercolor} to \texttt{nocolor} and the
+\texttt{bgop} (background opacity) to .7. The fourth required parameter is
+begins in line~(4) and goes through line~(7). A title line is put in red, and
+the caption text set in a smaller size font.
+
+The second photo has code,
+
+\begin{Verbatim}[xleftmargin=\parindent,numbers=left,fontsize=\footnotesize]
+\digiCap*[inclgraphicx={width=.75\linewidth},vcaption=c,hcaption=l,
+    outerboxsep=0pt]{\expath/digis/IiFUCdIQ}[borderwidth=4bp,fboxsep=10bp,
+    bordercolor=blue,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{webblue}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's ... Cleveland halted its three-game skid.}
+\end{Verbatim}
+We use \cs{digiCap*}, the \texttt* signals that this digital photo should have a
+rollover caption. We set \texttt{vcaption} to \texttt{c}, which centers the caption
+vertically. In the third (optional) parameter, we set the \texttt{borderwidth} to 4bp,
+\texttt{fboxsep} to 10bp, \texttt{bordercolor} to blue and \texttt{bgop} to .7.
+
+Again, many examples appear in \texttt{digicap-tst.tex}.
+
+
+\subsubsection{Using \textsf{graphicxsp} Package}
+
+For normal uses, \cs{digiCap} is used to display several
+\emph{different} photos, photos are not repeatedly used. Each time a
+photo is displayed, it is imported into the document using the
+command \cs{includegrpahics}, if you show the same photo five times,
+the same graphic file is imported five times. This most certainly
+increases the file size.
+
+If the \textsf{graphicxsp} package is also used (required for the
+commands of the next section), photos can be embedded in the
+document and used multiple times without significantly increasing
+the size of the file size. The \textsf{digicap-pro} package allows
+for the use of the \textsf{graphicxsp} package, naturally.
+
+\def\nameKey{\textcolor{red}{name=clifflee}}
+
+The two instances of the Cliff Lee photo seen earlier is an example.
+In the verbatim code, I deleted one key-value pair. The true verbatim code is
+\begin{Verbatim}[xleftmargin=\parindent,numbers=left,fontsize=\footnotesize,commandchars=\|\<\>]
+\digiCap[inclgraphicx={|nameKey,width=.75\linewidth},vcaption=b,
+    hcaption=c,outerboxsep=0pt]{\expath/digis/IiFUCdIQ}[borderwidth=0bp,
+    fboxsep=10bp,bordercolor=nocolor,bgop=.7]{\parskip6pt\bfseries
+    \makebox[\linewidth]{\textcolor{red}{Lee ices A's win
+    streak with an eight-inning gem}}\\\relax\footnotesize
+    Lee ices A's win ... as Cleveland halted its three-game skid.}\\[1ex]
+\end{Verbatim}
+The new key-value pair is shown in red in line~(1). Within the \texttt{inclgraphicx} key we specify
+the symbolic name for the graphic, \texttt{name=clifflee}. In the preamble of this document,
+the follow code appears: \verb!\embedEPS{clifflee}{\expath/digis/IiFUCdIQ}! (the \cs{expath} expands
+to the path to the folder containing the \texttt{digis} folder).
+
+\exSrc{digicap-embed}The file \texttt{digicap-embed.tex} contains an example of this embedding.
+
+\subsection{Displaying Collections of Digital Photos}\label{s:photoalbum}
+
+Now, if you want to display a number of photos, you can either place one or two per page,
+or you can present all photos on the same page, the latter is the approach we take here.
+
+\paragraph*{Creating a photo album.} For each photo\marginpar{\small\raggedleft\opt{display1} option}, we create a smaller version (thumbnail) and set it as a
+button appearance. When you rollover the button, the larger version of the
+photo makes its appearance in the photo viewing area. The code for setting up
+the thumbnail layout is contained in additional code that is input with the
+\opt{design1} option.
+
+\paragraph*{Demo files for photo album.} There are three demo files for this
+section contained in the \texttt{photoalbum} folder:
+\begin{itemize}
+\item[]\exSrc[../photoalbum/digis/]{eastern_trip_por}\texttt{eastern\_trip\_por.tex}
+\item[]\exSrc[../photoalbum/digis/]{eastern_trip_ls}\texttt{eastern\_trip\_ls.tex}
+\item[]\exSrc[../photoalbum/digis/]{eastern_trip_ls_2pg}\texttt{eastern\_trip\_ls\_2pg.tex}
+\end{itemize}
+These three present the same collection of photos
+with different layouts for the thumbnails.
+
+\subsubsection{The Main Controls}\label{photoAlbum}
+
+We describe the commands in the order in which they appear in the
+document.
+
+\paragraph*{Declaring the picture collection}\leavevmode
+\bVerb\def\1{n}\takeMeasure{\quad\darg{\ameta{name\SUB1}}\darg{\ameta{path\SUB1}}\darg{\ameta{title\SUB1}}\darg{\ameta{caption\SUB1}},}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\PicsThisDoc
+{%
+!quad{!ameta(name!SUB1)}{!ameta(path!SUB1)}{!ameta(title!SUB1)}{!ameta(caption!SUB1)},
+!quad{!ameta(name!SUB2)}{!ameta(path!SUB2)}{!ameta(title!SUB2)}{!ameta(caption!SUB2)},
+!quad...
+!quad{!ameta(name!SUB!1)}{!ameta(path!SUB!1)}{!ameta(title!SUB!1)}{!ameta(caption!SUB!1)}
+}
+\end{dCmd*}
+\eVerb
+In the preamble of the document, the \cs{PicsThisDoc} commands declares
+the pictures to be displayed in this document. The arguments for this command
+are a comma-delimited list, each item in the list consists of four parameters, as described
+below:
+\begin{itemize}
+  \item \ameta{name}: a symbolic name that references this picture
+  \item \ameta{path}: the path to the photo (or any graphic), in the EPS format
+  \item \ameta{title}: a title for this photo
+  \item \ameta{caption}: a caption, or description, of this photo
+
+  \item[] Within the \ameta{caption}, the commands
+      \cs{graphicHeight}\marginpar{\small\raggedleft
+      \cs{graphicHeight}\\\cs{graphicWidth}} and \cs{graphicWidth} are
+      defined. Their values are the height and the width of the (scaled)
+      photo. An example of usage for \cs{graphicHeight} can be found in the
+      demo file \texttt{digicap-tst.tex}.
+\end{itemize}
+
+\paragraph*{Setting the presentation order.} The order the pictures are presented is set by the following command, also
+placed in the body of the document before the insertion of the pictures.
+\bVerb\def\1{n}\takeMeasure{\string\presentationOrder\darg{\ameta{name\SUB1},\ameta{name\SUB2},...,\ameta{name\SUB\1}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\presentationOrder{!ameta(name!SUB1),!ameta(name!SUB2),...,!ameta(name!SUB!1)}
+\end{dCmd*}
+\eVerb The names are defined by the \cs{PicsThisDoc} command.
+
+\paragraph*{Setting the display dimensions.} The photos are placed in a \cs{parbox}
+with height of \ameta{height} and width of \ameta{width}.
+\bVerb\def\1{n}\takeMeasure{\string\digiDisplaySpace\darg{\ameta{height}}\darg{\ameta{width}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\digiDisplaySpace{!ameta(height)}{!ameta(width)}
+\end{dCmd*}
+\eVerb Reads the information defined by \cs{presentationOrder} and inserts
+the photos at the current location in a \cs{parbox}
+
+\paragraph*{Insert the captions}\leavevmode
+\bVerb\def\1{n}\takeMeasure{\string\insertCaptions}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\insertCaptions
+\end{dCmd*}
+\eVerb Places the caption of the current photo at the current location.
+
+\paragraph*{Insert the thumbnails}\leavevmode
+\bVerb\takeMeasure{\string\insertThumbs\darg{\ameta{rows}}\darg{\ameta{columns}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\insertThumbs{!ameta(rows)}{!ameta(columns)}
+\end{dCmd*}
+\eVerb
+Lays out a \env{tabular} environment with \ameta{rows} and
+\ameta{columns}; within this \env{tabular} environment, the thumbnails are
+inserted.
+
+\paragraph*{Placement of the photo album elements.}
+The several commands \cs{digiDisplaySpace}, \cs{insertCaptions}, and
+\cs{insertCaptions} are placed on a page after the command \cs{presentationOrder},
+and can be arranged anyway desired; the three demo files give examples of
+different arrangements.
+
+\subsubsection{Additional Controls}
+
+The \cs{digiDisplaySpace} command ultimately uses \cs{digiCap} to display the
+photos, but \cs{digiCap} has two optional arguments, labeled \ameta{pos-kvs>}
+and \ameta{design-kvs>} in the description of \cs{digiCap},
+page~\pageref*{ss:digiCap}, that cannot be accessed. The \textsf{digicap-pro}
+package provides a way of setting these options for all photos, and for a
+particular photo.
+\bVerb\takeMeasure{\string\dcSecondOpt[\ameta{name}]\darg{\ameta{design-kvs}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\dcFirstOpt[!ameta(name)]{!ameta(pos-kvs)}
+\dcSecondOpt[!ameta(name)]{!ameta(design-kvs)}
+\end{dCmd*}
+\endgroup
+\CmdDescription \cs{dcFirstOpt} inserts its key-value pairs into the first optional argument
+of \cs{digiCap}, the one labeled \ameta{pos-kvs}. See
+\hyperref[ss:digiCap]{Section~\ref*{ss:digiCap}}, page~\pageref*{ss:digiCap}, for a list of these
+options. When the key-values are passed without a first argument, the key-values are applied to
+all photos; when the optional argument is specified (\ameta{name} is a symbolic name of one of
+the photos in the collection defined by \cs{PicsThisDoc}), the key-value pairs are applied only
+to that photo. For example,
+\begin{Verbatim}[xleftmargin=\parindent]
+\dcFirstOpt{vcaption=b,hcaption=c,outerboxsep=0pt}
+\dcFirstOpt[p1]{vcaption=t,hcaption=c,outerboxsep=0pt}
+\end{Verbatim}
+The first line sets the global options for all the photos (this is actually the package
+default, and  need not be specified here), the second line is the specification for
+the photo labeled \texttt{p1}. To repeat, the default definition for \cs{dcFirstOpt}
+is
+\bVerb\takeMeasure{\string\dcFirstOpt\darg{vcaption=b,hcaption=c,outerboxsep=0pt}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\dcFirstOpt{vcaption=b,hcaption=c,outerboxsep=0pt}
+\end{dCmd}
+\eVerb Similar comments are made for \cs{dcSecondOpt} that sets the second
+optional argument of \cs{digiCap} (which is actually the third parameter of
+that command), see, again, \hyperref[ss:digiCap]{Section~\ref*{ss:digiCap}},
+page~\pageref*{ss:digiCap}, for a listing in the paragraph titled
+\textbf{Optional key-values for the third parameter}. The default setting for
+\cs{dcSecondOpt} is
+\bVerb\takeMeasure{\string\dcSecondOpt\{borderwidth=0bp,fboxsep=10bp,}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\dcSecondOpt{borderwidth=0bp,fboxsep=10bp,
+    bordercolor=nocolor,bgop=.7}
+\end{dCmd}
+\eVerb
+The default behavior is that the caption appears with the photo. The \cs{digiCap}
+command does have an option for making the caption itself into a rollover; when the user
+rolls over the photo, the caption appears. To activate this feature of \cs{digiCap}
+use the command \cs{useRollovers} before the \cs{presentationOrder}.
+
+\bVerb\takeMeasure{\string\useRollovers\quad\string\noRollovers}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\useRollovers!quad\noRollovers
+\end{dCmd*}
+\eVerb
+You can turn off the roll over feature with \cs{noRollovers}. It is
+possible to have some of the photos displayed on one page, and the
+others on another page. The rollovers can be activated for one set
+of pictures, and deactivated for the other. (For photo displays over
+two pages, see the demo file \texttt{eastern\_trip\_ls\_2pg.tex}.
+
+
+\paragraph*{Formatting the Long Captions.} The long caption is the text that accompanies the
+photo, and is overlaid on top of the photo using a ``see through'' box.
+\cs{longCapFmt} is used for globally formatting the caption. This formatting
+can changed locally from within the fourth parameter---the \ameta{caption}
+parameter---, see the syntax for \cs{PicsThisDoc}, at the beginning of this
+section on \hyperref[photoAlbum]{page~\pageref*{photoAlbum}}. The default
+long caption formatting is \verb!\longCapFmt{}!, but a declaration of
+\verb!\longCapFmt{\bfseries}! puts all the captions in bold.
+\bVerb\takeMeasure{\string\longCapFmt\darg{\ameta{format-declns}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\longCapFmt{!ameta(format-declns)}
+\end{dCmd*}
+\endgroup
+\paragraph*{Formatting the Short Captions.} The short captions,
+perhaps a better term might have been the title of the photo, are
+defined as the third parameter, the \ameta{title} parameter, (in
+the set of four) of \cs{PicsThisDoc}. Use \cs{shortCapFmt} to apply
+format declarations:
+\bVerb\takeMeasure{\string\shortCapFmt\darg{\ameta{format-declns}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\shortCapFmt{!ameta(format-declns)}
+\end{dCmd*}
+\eVerb The default definition for \cs{shortCapFmt} is
+\begin{dCmd}{.67\linewidth}
+\shortCapFmt{\sffamily\bfseries\color{blue}}
+\end{dCmd}
+
+\paragraph*{Setting Appearance and Width of the Thumbs.} The thumbnails are
+automatically generated by \cs{insertThumbs}, but \cs{insertThumbs} does not
+contain any controls over the appearance or width of the buttons created.
+For this reason, \cs{setThumbAppearances} and \cs{setWidthOfThumbs}
+are provided.
+
+\bVerb\takeMeasure{\string\setThumbAppearances[\ameta{name}]\darg{\ameta{ro-kvs}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\setThumbAppearances[!ameta(name)]{!ameta(ro-kvs)}
+\end{dCmd*}
+\eVerb When the optional parameter \ameta{name} is not present, the
+\ameta{ro-kvs} are taken as global key-value pairs, applied to all the
+thumbs. When \ameta{name} is passed, the key-value pairs are applied only to
+the thumb associated with \ameta{name}. The key-value pairs themselves allow
+the document author to set the rollover attributes of the thumb, and to set
+the boundary color and width.
+\begin{itemize}
+\item\texttt{normalop}: The opacity of the normal appearance of the thumb, the default
+is~.5.
+\item\texttt{rolloverop}: The opacity of the rollover appearance of the thumb, the default
+is~1.
+\item\texttt{downop}:  The opacity of the down appearance of the thumb, the default
+is~.3.
+\item\texttt{boundarywidth}: The boundary width of the unscaled digital photo. The
+default is 30 (points).
+\item\texttt{rgbcolor}: The RGB color of the boundary, a space delimited
+    list of three numbers between 0 and 1. If the \pkg{xcolor}
+    package\marginpar{\small\raggedleft\pkg{xcolor} and named colors} is used,
+    than you can use a named color for the value; for example,
+    \texttt{rgbcolor=red}. There is no default, since, the default color is
+    in CMYK color space.
+\item\texttt{cmykcolor}: The CMYK color of the boundary, a space delimited list of four numbers
+between 0 and 1. If the \pkg{xcolor}
+    package\marginpar{\small\raggedleft\pkg{xcolor} and named colors} is used,
+    than you can use a named color for the value; for example,
+    \texttt{cmykcolor=magenta}.
+The default is \texttt{0 0 1 0} (yellow).
+\end{itemize}
+The following code,
+\bVerb\takeMeasure{\string\setThumbAppearances[p1]\darg{rgbcolor=1 0 0}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\setThumbAppearances[p1]{rgbcolor=1 0 0}!quad%!normalfont( or possibly !texttt(rgbcolor=red))
+\end{dCmd}
+\eVerb
+sets the border color to red of the thumbnail associated with the name \texttt{p1};
+the other default values are still in effect.
+
+The width of the thumbnails are calculated automatically, based on the number
+of columns and the linewidth of the tabular environment the thumbs are being
+laid out in. The \texttt{digicap-pro} package sets the width of the thumbs using
+\cs{setWidthOfThumbs}. The default setting is \verb!\setWidthOfThumbs{0pt}!.
+If the width is set to 0pt (the default), the width of the thumbs are
+set dynamically using the formulas:
+\begin{Verbatim}[xleftmargin=\parindent]
+\setWidthOfThumbs{\linewidth/(\dc@maxCols)-\tabcolsep*2}
+\end{Verbatim}
+Here, \cs{dc@maxCols} is the number of columns declared in the second
+parameter of \cs{insert\-Thumbs}. The \textsf{calc} package is used in this
+calculation. If the document author sets \cs{setWidthOfThumbs} to a length
+other than \texttt{0pt}, this declared length is used as the width of the
+thumbs.
+
+The width between rows of the tabular layout can be adjusted using
+command \cs{addvspacetorows}.
+\bVerb\takeMeasure{\string\addvspacetorows\darg{\ameta{length}}}%
+\def\1{\rlap{\hskip\bxSize\enspace{\normalfont{(\texttt{1ex})}}}}
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+!1\addvspacetorows{!ameta(length)}
+\end{dCmd*}
+\eVerb
+The default of \ameta{length} is given in parentheses above.
+
+\subsection{The \texorpdfstring{\protect\cs{opcolorbox}}{\CMD{opcolorbox}} Command}
+
+The \cs{opcolorbox} commands creates two color boxes, a larger one with a smaller one
+centered vertically and horizontally inside the larger one.
+Transparent options allow separate control over the opacity settings
+of the larger and smaller rectangle as well as the text that is
+written within the smaller rectangle.
+
+The purpose of this \cs{opcolorbox} is to contain the caption of the
+digital photo, and is laid on top of the photo. The key-value pairs passed through the
+third (optional) parameter of \cs{digiCap}, are, in turn, passed on to \cs{opcolorbox}
+to create the underlying color box for the caption.
+
+\bVerb\takeMeasure{\string\opcolorbox[\ameta{kvs}]\darg{\ameta{text}}}%
+\begin{dCmd*}[commandchars=!()]{\bxSize}
+\opcolorbox[!ameta(kvs)]{!ameta(text)}
+\end{dCmd*}
+\eVerb
+The optional parameter consists of key-value pairs, the same ones as for the second
+option parameter of \cs{digiCap}, see page~\pageref{ss:digiCap}. We reproduce these
+key-values here for your convenience:
+
+\paragraph*{Optional key-values for the first parameter}
+\begin{description}
+   \item[\texttt{borderwidth}:] The border width. The default is \texttt{2pt}
+   \item[\texttt{fboxsep}:] The space between the border and the text, the default is \texttt{6pt}
+   \item[\texttt{width:}] The width of \cs{parbox}, the default is \cs{linewidth}
+   \item[\texttt{bordercolor}:] A named color of border, the default is \texttt{black}. A special value
+   of \texttt{nocolor} is recognized, in that case, no color is applied.
+   \item[\texttt{bgcolor:}] A named color of background, the default is \texttt{white}. A special value
+   of \texttt{nocolor} is recognized, in that case, no color is applied.
+   \item[\texttt{borderop:}] A number type, the opacity for border $0 \le \mbox{number} \le 1$, the default is~$.5$
+   \item[\texttt{bgop:}] A number type, the opacity for background $0 \le \mbox{number} \le 1$, the default is~$.5$
+   \item[\texttt{textop:}] A number type, the opacity for text $0 \le \mbox{number} \le 1$, the default is~$1$
+   \item[\texttt{borderblend:}] The blend mode for the border, the default is \texttt{Normal}
+   \item[\texttt{bgblend:}] The blend mode for the background, the default is \texttt{Normal}
+\end{description}
+The second parameter \ameta{text} is the text that is to appear within the
+box.\medskip
+
+A document author does not normally have a need to use \cs{opcolorbox}, the
+demo file \texttt{eastern\_trip\_ls\_2pg.tex} demonstrates one possible use
+of this box.
+
+%\paragraph*{Limitations of \app{dvips}.} It appears that the \textbf{CA} entry
+%is not obeyed when the PDF is distilled from a PS file created by \app{dvips}
+%(Refer to the documentation for the \pkg{opacity-pro} package for a
+%discussion of these entries). Therefore, only the \textbf{ca} entry is
+%obeyed.\footnote{The key that directly sets the \textbf{ca} entry is
+%\texttt{textop}; however, the \pkg{digicap-pro} does the following: }
+%The setting of \ameta{ca} should be small enough to get
+%discernable transparency, but not so much that the text is difficult to read.
+%Recommendation: set \ameta{ca} to .7 or there abouts.
+
+\newtopic\noindent
+That's all for now, I simply must get back to my retirement. \dps
+
+\end{document}

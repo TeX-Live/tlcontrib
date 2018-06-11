@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage[%
+    web={usetemplates,pro,usesf},
+    aebxmp,eforms,uselayers,
+    graphicxsp={showembeds}
+]{aeb_pro}
+\usepackage[display1]{digicap-pro}
+\usepackage{array}
+
+\margins{.25in}{.25in}{24pt}{.25in}                 % left,right,top, bottom
+%
+% Get the bounding box for 100_0157.eps, trim a little off, and rescale
+% to a width of 5in.
+%
+\setScreensizeFromGraphic[width=5in,trim=0 0 0 108]{./digis/100_0157}
+
+\DeclareDocInfo
+{%
+    title=Story's Trip to out East,
+    author=D. P. Story,
+    subject={Digital pics of the trip},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+
+\DeclareInitView
+{%
+    windowoptions={showtitle,fullscreen},
+}
+
+\parskip0pt\parindent0pt
+\thispagestyle{empty}
+
+\setThumbAppearances[p1]{rgbcolor=red}
+
+\longCapFmt{\bfseries}
+
+\PicsThisDoc
+{%
+    {p1}{./digis/100_0031}{Gettysburg Battlefield: Seminary Ridge}
+        {\footnotesize This shot was taken from seminary
+         ridge. You can see the ridge in the distance. I thought of
+         the some 60{,}000 casualties that occurred in the fields in
+         the foreground.},
+    {p2}{./digis/100_0035}{Gettysburg Battlefield: View from Little Round Top}
+        {Heavy fighting down below, the Confederates tried on
+         several occasions to take this high point.},
+    {p3}{./digis/100_0051}{Independence Hall: Desk where G. Washington presided from}
+        {This is on our trip through Washington D.C.
+         The July day was hot and humid.},
+    {p4}{./digis/100_0055}{The Liberty Bell}
+        {This is in Philadelphia, the pictures are a
+         little out of order.},
+    {p5}{./digis/100_0061}{Manhatten in New York City}
+        {New York! New York! It's my kind of town,
+         Chicago is! Oops, wrong song.},
+    {p6}{./digis/100_0075}{New York City: Rockefeller Center}
+        {Rockefeller Center, famous place,
+         now that I have been there, I've now seen it all!},
+    {p7}{./digis/100_0086}{New York City: Ground Zero}
+        {\centering September 11, 2001, a day that will
+         live in infamy!},
+    {p8}{./digis/100_0109}{Statue of Liberty}
+        {\footnotesize Give my your tired, your poor,
+         your hungry masses yearning to be free\dots},
+    {p9}{./digis/100_0141}{Washington D.C.: Jefferson Memorial}
+        {\centering The great man himself.},
+    {p10}{./digis/100_0142}{Washington D.C.: Jefferson Memorial}
+        {\footnotesize\centering A closer look at the great man.},
+    {p11}{./digis/100_0157}{Washington D.C.: The Lincoln Memorial}
+        {Was there a more nobler man?},
+    {p12}{./digis/100_0180}{Washington D.C.: Washington Monument}
+        {\centering The first, and some say, the greatest of
+         our presidents.},
+    {p13}{./digis/100_0224}{Jamestown Colony}
+        {On to Jamestown, Virginia, site of the first
+         English colony in the new world.},
+    {p14}{./digis/100_0207}{Jamestown: Replica of the Discovery}
+        {\footnotesize One of three replicas of the ships
+         these folks took. This was the final stop on our eastern
+         vacation, we enjoyed it and it was educational to
+         Alexander.}
+}
+%
+% Use p11 = 100_0157.eps as a background template, but we trim off a little, same as above
+% as scale the paperwidth, which is 5in, from the \setScreensizeFromGraphic command.
+%
+\template[name=p11,width=\paperwidth,transparency={/ca .3},trim=0 0 0 108]{\null}
+
+\begin{document}
+
+\makebox[\linewidth][c]
+{\sffamily\bfseries\Large\textcolor{red}{The Story's Trip out East}}
+
+%\useRollovers
+
+% \previewOn
+
+% Order of presentation (the thumbs will be laid out in this order
+\presentationOrder{p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14}
+
+% default placement for all captions
+\dcFirstOpt{vcaption=b,hcaption=c,outerboxsep=0pt}
+
+% for p1, we move the caption to the top
+\dcFirstOpt[p1]{vcaption=t,hcaption=c,outerboxsep=0pt}
+
+% Set the display space
+\digiDisplaySpace{225pt}{\linewidth}
+\vfill
+% These are the captions (short form)
+\makebox[\linewidth][c]{\insertCaptions}
+
+\vfill
+% Insert the thumbs, 2 rows and 7 columns.
+\makebox[\linewidth][c]{\insertThumbs{2}{7}}
+
+\end{document}

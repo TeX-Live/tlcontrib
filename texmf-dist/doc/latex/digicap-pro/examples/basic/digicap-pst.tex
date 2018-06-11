@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[%
+    web={tight,pro,usesf,usetemplates},
+    uselayers,eforms,aebxmp
+]{aeb_pro}
+\usepackage{digicap-pro}
+
+\usepackage{pst-blur}
+
+\margins{.5in}{.5in}{24pt}{.5in}    % left,right,top, bottom
+\screensize{4.8in}{6in}             % height, width
+\renewcommand{\titleauthorproportion}{.4}
+\DeclareDocInfo
+{
+    title=The DigiCap Pro Package\texorpdfstring{\\[1ex]}{: }Using PSTricks,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=Test file for the DigiCap Pro package,
+    keywords={Captioning, opacity, layers, roll-over, pstricks},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={\today},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\pagestyle{empty}
+
+\parskip6pt
+\parindent0pt
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\psframebox[framesep=0pt,linewidth=0pt,shadow=true,blur=true,shadowsize=6pt,blurradius=3pt]{%
+\digiCap[vcaption=b,hcaption=c,outerboxsep=0pt]
+    {./digis/AdobeDon}[borderwidth=0bp,fboxsep=10bp,bordercolor=nocolor,bgop=.4]
+    {\bfseries\footnotesize A picture of D. P. Story, as depicted circa~2001.
+    He does not look as good now, as then. Even then, his looks were somewhat
+    questionable.}%
+}
+\end{center}
+
+One can use PSTricks, with pst-blur, to create a blurred shadow effect. Very nice.
+
+\end{document}

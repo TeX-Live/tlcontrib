@@ -1,0 +1,220 @@
+%%
+%% This is file `digi-p1.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% digicap-pro.dtx  (with options: `copyright,digidisplay1')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% digicap-pro package,                                   %%
+%% Copyright (C) 2008--2018                               %%
+%%   dpstory@acrotex.net                                  %%
+%%                                                        %%
+%% This program can redistributed and/or modified under   %%
+%% the terms of the LaTeX Project Public License          %%
+%% Distributed from CTAN archives in directory            %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the  %%
+%% License, or (at your option) any later version.        %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\PicsThisDoc}[1]{%
+    \@for\@args:=#1\do{\expandafter\dc@setPicsAndCaptions\@args}%
+}
+\def\dc@setPicsAndCaptions#1#2#3#4{%
+    \dc@embedEPSCreateAppearances{#1}{#2}%
+    \dc@defTheseCaptions{#1}{#3}{#4}%
+}
+\newcommand{\setThumbAppearances}[2][]{%
+    \def\dc@argi{#1}\ifx\dc@argi\@empty\def\dc@thumbApprs{#2}%
+    \setkeys{dc@ro@appr}{#2}\else
+    \expandafter\def\csname dc@thumbApprs@#1\endcsname{#2}\fi
+}
+\define@key{dc@ro@appr}{normalop}[.5]{\def\dc@ro@appr@normalopacity{#1}}
+\define@key{dc@ro@appr}{rolloverop}[1]%
+    {\def\dc@ro@appr@rolloveropacity{#1}}
+\define@key{dc@ro@appr}{downop}[.3]%
+    {\def\dc@ro@appr@downopacity{#1}}
+\define@key{dc@ro@appr}{boundarywidth}[30]%
+    {\def\dc@ro@appr@boundarywidth{#1}}
+\define@key{dc@ro@appr}{rgbcolor}[]{%
+  \def\dc@ro@appr@rgbcolor{#1}\ifx\dc@ro@appr@rgbcolor\@empty
+  \else
+    \expandafter\ef@isitnamed\dc@ro@appr@rgbcolor\ef@nil
+    \ifx\ef@latex@color\ef@y\expandafter
+      \HyColor@XZeroOneThreeFour
+        \expandafter{\dc@ro@appr@rgbcolor}{\dc@ro@appr@rgbcolor}{}{}%
+      \edef\dc@ro@appr@rgbcolor{\dc@ro@appr@rgbcolor}\fi
+\fi}
+\let\dc@ro@appr@rgbcolor\@empty
+\define@key{dc@ro@appr}{cmykcolor}[0 0 1 0]{%
+  \def\dc@ro@appr@cmykcolor{#1}\ifx\dc@ro@appr@cmykcolor\@empty
+  \else
+    \expandafter\ef@isitnamed\dc@ro@appr@cmykcolor\ef@nil
+    \ifx\ef@latex@color\ef@y\expandafter
+      \HyColor@XZeroOneThreeFour
+        \expandafter{\dc@ro@appr@cmykcolor}{\dc@ro@appr@cmykcolor}{}{}%
+      \edef\dc@ro@appr@cmykcolor{\dc@ro@appr@cmykcolor}\fi
+\fi}
+\def\dc@ro@appr@cmykcolor{0 0 1 0}
+\setThumbAppearances{normalop,rolloverop,downop,boundarywidth,%
+    rgbcolor,cmykcolor}
+\def\dc@embedEPSCreateAppearances#1#2{%
+    \embedEPS[transparencyGroup]{#1}{#2}%
+    \@ifundefined{dc@thumbApprs@#1}{\edef\dc@tmp@exp%
+        {\noexpand\setkeys{dc@ro@appr}{\dc@thumbApprs}}}%
+        {\edef\dc@tmp@exp{\noexpand\setkeys{dc@ro@appr}%
+        {\csname dc@thumbApprs@#1\endcsname}}}\dc@tmp@exp
+    \begin{createImage}{\bboxOf{#1}}{n#1}
+        gsave
+        \dc@mark/ca \dc@ro@appr@normalopacity
+          /SetTransparency pdfmark
+        \urxOf{#1} .1 mul \uryOf{#1} .1 mul moveto
+        currentpoint translate
+       .8  .8  scale
+        \dc@mark{#1} /SP pdfmark
+        grestore
+    \end{createImage}
+    \begin{createImage}{\bboxOf{#1}}{r#1}
+        \dc@mark/ca \dc@ro@appr@rolloveropacity
+          /CA \dc@ro@appr@rolloveropacity
+          /SetTransparency pdfmark
+        \dc@mark{#1} /SP pdfmark
+        \dc@ro@appr@boundarywidth\space setlinewidth
+        \ifx\dc@ro@appr@rgbcolor\@empty
+        \dc@ro@appr@cmykcolor\space setcmykcolor\else
+        \dc@ro@appr@rgbcolor\space setrgbcolor\fi\space
+        currentlinewidth 2 div dup
+        \urxOf{#1} currentlinewidth sub \uryOf{#1} currentlinewidth sub
+        rectstroke
+    \end{createImage}
+    \begin{createImage}{\bboxOf{#1}}{d#1}
+        \dc@mark/ca \dc@ro@appr@downopacity
+          /CA \dc@ro@appr@downopacity/SetTransparency pdfmark
+        \dc@mark{#1} /SP pdfmark
+        \dc@ro@appr@boundarywidth\space setlinewidth
+        \ifx\dc@ro@appr@rgbcolor\@empty
+        \dc@ro@appr@cmykcolor\space setcmykcolor\else
+        \dc@ro@appr@rgbcolor\space setrgbcolor\fi\space
+        currentlinewidth 2 div dup
+        \urxOf{#1} currentlinewidth sub \uryOf{#1} currentlinewidth sub
+        rectstroke
+    \end{createImage}
+}
+\def\dc@defTheseCaptions#1#2#3{%
+    \expandafter\gdef\csname #1Caption\endcsname{#2}%
+    \expandafter\gdef\csname #1Text\endcsname{#3}%
+}
+\newcommand{\presentationOrder}[1]{\def\dc@presentationOrder{#1}}
+\newcommand{\dcFirstOpt}[2][]{%
+    \def\dc@argi{#1}\ifx\dc@argi\@empty\def\dc@icontrol{#2}\else
+    \expandafter\def\csname dc@icontrol@#1\endcsname{#2}\fi}
+\newcommand{\dcSecondOpt}[2][]{%
+    \def\dc@argi{#1}\ifx\dc@argi\@empty\def\dc@iicontrol{#2}\else
+    \expandafter\def\csname dc@iicontrol@#1\endcsname{#2}\fi}
+\dcFirstOpt{vcaption=b,hcaption=c,outerboxsep=0pt}
+\dcSecondOpt{borderwidth=0bp,fboxsep=10bp,bordercolor=nocolor,bgop=.7}
+\def\useRollovers{\def\dc@use@Rollover{*}%
+    \def\hiddenPresets{\F{\FHidden}}}
+\def\noRollovers{\let\dc@use@Rollover\@empty
+    \def\hiddenPresets{}}
+\let\dc@use@Rollover\@empty
+\def\dc@fudge{\llap{.\hskip20in}}
+\newcommand{\longCapFmt}[1]{%
+    \def\dc@longCapFmt{#1}}
+\longCapFmt{}
+\def\dc@showPic#1{\leavevmode\xBld{#1}\dc@fudge
+    \vbox to0pt{\vss\hbox to0pt{\hss
+    \def\dc@incgfx@addkeys{width=\digiDSWidth,%
+        height=\digiDSHeight,keepaspectratio,name=#1}%
+    \@ifundefined{dc@icontrol@#1}{}{\expandafter\let\expandafter
+    \dc@icontrol\expandafter=\csname dc@icontrol@#1\endcsname}%
+    \@ifundefined{dc@iicontrol@#1}{}{\expandafter\let\expandafter
+    \dc@iicontrol\expandafter=\csname dc@iicontrol@#1\endcsname}{}%
+    \expandafter\digiCap\dc@use@Rollover%
+        [\dc@icontrol,rollovername=ro#1]{\null}[\dc@iicontrol]%
+        {\dc@longCapFmt\csname#1Text\endcsname}%
+\hss}\vss}\eBld}
+\newcommand{\digiDisplaySpace}[2]{%
+    \def\digiDSHeight{#1}\def\digiDSWidth{#2}%
+    \parbox[c][#1]{#2}{\centering\insertPhotos}%
+}
+\newcommand{\insertPhotos}{\edef\dc@tmp@exp{\noexpand\@for
+    \noexpand\@args:=\dc@presentationOrder}\dc@tmp@exp\do{%
+        \edef\dc@tmp@exp{\noexpand\dc@showPic{\@args}}\dc@tmp@exp}%
+}
+\newcommand{\shortCapFmt}[1]{%
+    \def\dc@showCaption##1##2{\makebox[0pt][c]{\xBld{##1}#1##2\eBld}}}
+\shortCapFmt{\sffamily\bfseries\color{blue}}
+\newcommand{\insertCaptions}{\dc@fudge\edef\dc@tmp@exp{\noexpand\@for
+    \noexpand\@args:=\dc@presentationOrder}\dc@tmp@exp\do{%
+        \edef\dc@tmp@exp{\noexpand\dc@showCaption{\@args}%
+            {\noexpand\csname\@args Caption\noexpand\endcsname}}%
+            \dc@tmp@exp}%
+}
+\newcommand{\setWidthOfThumbs}[1]{{%
+    \setlength{\dimen0}{#1}%
+    \xdef\dc@thumbwidth{\the\dimen0}%
+}}
+\setWidthOfThumbs{0pt}
+\newcommand{\addvspacetorows}[1]{\def\dc@addvspacetorows{#1}}
+\addvspacetorows{1ex}%
+\def\eq@tabSep{&}
+\def\insertThumbs#1#2{\begingroup
+    \count0=0\relax\count2=0\relax
+    \def\dc@maxRows{#1}\def\dc@maxCols{#2}%
+    \setlength{\dimen0}{\dc@thumbwidth}\ifdim\dimen0=0pt
+    \setWidthOfThumbs{\linewidth/(\dc@maxCols)-\tabcolsep*2}\fi
+    \edef\dc@thisArg{\dc@presentationOrder,}%
+    \def\dc@insThumb@cr{\\[\dc@addvspacetorows]}%
+    \kern0pt\begin{tabular}{*{#2}{m{\dc@thumbwidth}}}%
+    \@whilenum\count0<#1\do{%
+        \@whilenum\count2<#2\do{%
+            \ifx\dc@thisArg\@empty
+                \global\let\dc@insThumb@cr\relax
+                \global\count0=\dc@maxRows
+                \global\count2=\dc@maxCols\else
+                \expandafter\dc@getNextArg\dc@thisArg\@nil
+                \global\advance\count2by1\relax
+                \ifx\dc@testArg\@empty
+                \else\ifnum\count2=\dc@maxCols
+                \else\eq@tabSep\fi\fi\fi
+        }\dc@insThumb@cr
+        \global\count2=0\relax\global\advance\count0by1\relax
+    }%
+\end{tabular}%
+\endgroup}
+\def\dc@getNextArg#1,#2\@nil{\dc@digi@thumbs{#1}\gdef\dc@thisArg{#2}}
+\def\normalAppr#1{n#1}
+\def\downAppr#1{d#1}
+\def\rolloverAppr#1{r#1}
+\def\dc@digi@thumbs#1{\hfil%
+{\dimen0=\widthOf{#1}bp\relax\dimen2=\heightOf{#1}bp\relax
+ \ifdim\dimen0<\dimen2\relax
+    \edef\dc@argi{\string!}\edef\dc@argii{\dc@thumbwidth}\else
+    \edef\dc@argi{\dc@thumbwidth}\edef\dc@argii{\string!}\fi
+    \xdef\dc@tmp@exp{\noexpand\resizebox{\dc@argi}{\dc@argii}}%
+}\dc@tmp@exp{\pushButton[%
+    \autoCenter{n}\BC{}\BG{}\S{S}\W0
+    \A{\JS{%
+        showThisPicture("#1");\r
+        lastPicture="#1";\r
+        this.dirty=false;
+    }}\I{\normalAppr{#1}}\RI{\downAppr{#1}}\IX{\rolloverAppr{#1}}
+    \TP{1}\FB{true}]{pb#1}{\widthOf{#1}bp}{\heightOf{#1}bp}}}
+\begin{insDLJS}[showThisPicture]{digidjs1}{Show This Picture}
+var lastPicture="";
+function showThisPicture(name) {
+    if (lastPicture != "") {
+        var f = this.getField("dcRollover.ro"+lastPicture);
+        if ( f != null ) f.display=display.hidden;
+        toggleSetThisLayer(lastPicture,false);
+    }
+    var f = this.getField("dcRollover.ro"+name);
+    if ( f != null ) f.display=display.visible;
+    toggleSetThisLayer(name);
+}
+try { app.runtimeHighlight=false; app.focusRect=false; } catch(e) {};
+\end{insDLJS}
+\endinput
+%%
+%% End of file `digi-p1.def'.

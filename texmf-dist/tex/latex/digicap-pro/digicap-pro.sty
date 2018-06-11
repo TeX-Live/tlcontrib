@@ -1,0 +1,170 @@
+%%
+%% This is file `digicap-pro.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% digicap-pro.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% digicap-pro package,                                   %%
+%% Copyright (C) 2008--2018                               %%
+%%   dpstory@acrotex.net                                  %%
+%%                                                        %%
+%% This program can redistributed and/or modified under   %%
+%% the terms of the LaTeX Project Public License          %%
+%% Distributed from CTAN archives in directory            %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the  %%
+%% License, or (at your option) any later version.        %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{digicap-pro}
+ [2018/05/13 v1.3 Transparent Captions with Photos (dps)]
+\DeclareOption{display1}{\AtEndOfPackage{\dc@input@displayi}}
+\def\dc@input@displayi{\InputIfFileExists{digi-p1.def}{}{}}
+\ProcessOptions
+\RequirePackage{eforms}
+\RequirePackage{graphicx}
+\RequirePackage{graphicxbox}
+\RequirePackage{opacity-pro}
+\def\dc@nocolor{nocolor}
+\define@key{opcolorbox}{borderwidth}[2pt]{\def\opcb@borderwidth{#1}}
+\define@key{opcolorbox}{fboxsep}[6pt]{\def\opcb@fboxsep{#1}}
+\define@key{opcolorbox}{width}[\linewidth]{\def\opcb@width{#1}}
+\define@key{opcolorbox}{bordercolor}[black]{\def\opcb@bordercolor{#1}}
+\define@key{opcolorbox}{bgcolor}[white]{\def\opcb@bgcolor{#1}}
+\define@key{opcolorbox}{borderop}[.5]{\def\opcb@borderop{#1}}
+\define@key{opcolorbox}{bordertextop}[1]{\def\opcb@bordertextop{#1}}
+\define@key{opcolorbox}{bgop}[.5]{\def\opcb@bgop{#1}}
+\define@key{opcolorbox}{textop}[1]{\def\opcb@textop{#1}}
+\define@key{opcolorbox}{borderblend}[Normal]{%
+    \def\opcb@borderblendmode{#1}}
+\define@key{opcolorbox}{bgblend}[Normal]{\def\opcb@bgblendmode{#1}}
+\setkeys{opcolorbox}{borderwidth,fboxsep,width,bordercolor,bgcolor,%
+    bordertextop,borderop,bgop,textop,borderblend,bgblend}
+\def\dc@mark{[\space}%]
+\newcommand{\opcolorbox}[2][]{\begingroup
+  \edef\dc@tmp@exp{\noexpand\setkeys{opcolorbox}{#1}}\dc@tmp@exp
+  \ifx\opcb@bgcolor\dc@nocolor\let\opcb@set@bgcolor\mbox
+  \else\def\opcb@set@bgcolor{\colorbox{\opcb@bgcolor}}\fi
+  \ifx\opcb@bordercolor\dc@nocolor\let\opcb@set@bordercolor\mbox
+  \else\def\opcb@set@bordercolor{\colorbox{\opcb@bordercolor}}\fi
+  \setlength{\fboxsep}{\opcb@borderwidth}\setlength{\fboxrule}{0pt}%
+  \begin{settransparency}[\opcb@borderblendmode]{\opcb@bordertextop}%
+    {\opcb@borderop}%
+    \opcb@set@bordercolor{\parbox[c]{\opcb@width}{%
+    \setlength{\fboxsep}{\opcb@fboxsep}\setlength{\fboxrule}{0pt}%
+    \begin{settransparency}[\opcb@bgblendmode]{\opcb@textop}%
+      {\opcb@bgop}%
+      \opcb@set@bgcolor{\parbox[c]{\linewidth-2\fboxsep}{%
+      \begin{settransparency}{\opcb@textop}{\opcb@textop}%
+        #2%
+      \end{settransparency}%
+      }}%
+    \end{settransparency}}}%
+  \end{settransparency}%
+    \endgroup
+}
+\def\dc@vCaptionPlacement#1{\def\dc@captionPlacement{#1}%
+    \def\dc@@captionPlacement{0pt}%
+    \if\dc@captionPlacement c%
+        \def\dc@@captionPlacement{-\dc@graphicHalfHeight+3pt}\else
+    \if\dc@captionPlacement t%
+        \def\dc@@captionPlacement{-\dc@graphicHeight}%
+    \else
+        \def\dc@captionPlacement{b}%
+        \def\dc@@captionPlacement{0pt}%
+    \fi\fi
+}
+\dc@vCaptionPlacement{b}
+\def\dc@hCaptionPlacement#1{\def\dc@argi{#1}%
+    \if\dc@argi l\def\dc@Hplacement{\relax}\else
+        \if\dc@argi c\def\dc@Hplacement{\hfil}\else
+            \if\dc@argi r\def\dc@Hplacement{\hfill}\else
+                \def\dc@Hplacement{\relax}\fi\fi\fi
+}
+\dc@hCaptionPlacement{c}
+\def\dc@calc@adj@width#1{{%
+    \edef\dc@tmp@exp{\noexpand\setkeys{opcolorbox}{#1}}\dc@tmp@exp
+    \setlength{\linewidth}{\dc@graphicWidth-2\fboxsep}%
+    \setlength{\dimen@}{\opcb@width}%
+    \setlength{\dimen@ii}{\opcb@borderwidth}%
+    \setlength{\dimen@}{\dimen@-2\dimen@ii}%
+    \xdef\dc@adj@width{\the\dimen@}%
+}}
+\long\def\dc@insert@graphicx@opcolor@boxes#1#2#3#4#5{%
+    \graphicxbox{#1}{#2\parbox[\dc@captionPlacement]%
+        [\dc@graphicHeight-2\fboxsep]{\dc@graphicWidth-2\fboxsep}%
+        {\vskip0pt\dc@Hplacement\opcolorbox[#3,width=\dc@adj@width]%
+        {#4}\par\kern0pt}#5}%
+}
+\def\graphicHeight{\dc@graphicHeight-2\fboxsep-%
+    \dc@outerboxsep-\dc@outerboxsep-\opcb@borderwidth-\opcb@borderwidth}
+\def\graphicWidth{\dc@graphicWidth-2\fboxsep-%
+    \dc@outerboxsep-\dc@outerboxsep-\opcb@borderwidth-\opcb@borderwidth}
+%%\paragraph*{Fourth parameter, required.} The content of the caption.
+\define@key{dc@commands}{outerboxsep}[3pt]{\def\dc@outerboxsep{#1}}
+\define@key{dc@commands}{vcaption}[b]{\dc@vCaptionPlacement{#1}}
+\define@key{dc@commands}{hcaption}[c]{\dc@hCaptionPlacement{#1}}
+\define@key{dc@commands}{inclgraphicx}[]{%
+    \def\dc@inclgraphicx{#1\dc@incgfx@addkeys}}
+\let\dc@incgfx@addkeys\@empty
+\define@key{dc@commands}{rollovername}[]{{%
+    \gdef\dc@rollovername{#1}%
+    \ifx\dc@rollovername\@empty
+        {\count0=\dc@rollover@cnt\advance\count0by1\relax
+        \xdef\dc@rollover@cnt{\the\count0}%
+        \xdef\dc@rollovername{Cnt\dc@rollover@cnt}}%
+    \fi
+}}
+\let\dc@rollovername\@empty
+\def\dc@rollover@cnt{0}%
+\setkeys{dc@commands}{outerboxsep,vcaption,hcaption,inclgraphicx}
+\newcommand{\digiCap}{\@ifstar{\dc@digiCapRollover}
+    {\dc@digiCap}}
+\newcommand{\dc@digiCap}[2][]{\begingroup
+    \edef\dc@tmp@exp{\noexpand\setkeys{dc@commands}{#1}}\dc@tmp@exp
+    \def\dc@filename{#2}\setlength{\fboxsep}{\dc@outerboxsep}%
+    \dc@@digiCap
+}
+\newcommand{\dc@@digiCap}[2][]{%
+    \edef\dc@tmp@exp{\noexpand\setkeys{Gin}{\dc@inclgraphicx}}%
+    \dc@tmp@exp\edef\dc@tmp@exp{\setbox0=
+        \hbox{\noexpand\includegraphics[draft,\dc@inclgraphicx]%
+        {\dc@filename}}}\dc@tmp@exp\dimen@=\dp0 \advance\dimen@\ht0
+    \edef\dc@graphicHeight{\the\dimen@}%
+    \edef\dc@graphicWidth{\the\wd0}%
+    \dc@calc@adj@width{#1}\parbox{\dc@graphicWidth}{%
+    \dc@insert@graphicx@opcolor@boxes{\dc@filename}{}{#1}{#2}{}}%
+\endgroup}
+\newcommand{\dc@digiCapRollover}[2][]{\begingroup
+    \edef\dc@tmp@exp{\noexpand\setkeys{dc@commands}{#1}}%
+    \dc@tmp@exp\def\dc@filename{#2}%
+    \setlength{\fboxsep}{\dc@outerboxsep}%
+    \ifx\dc@rollovername\@empty\setkeys{dc@commands}{rollovername}\fi
+    \dc@@digiCapRollover
+}
+\newcommand{\dc@@digiCapRollover}[2][]{%
+    \edef\dc@tmp@exp{\noexpand\setkeys{Gin}{\dc@inclgraphicx}}%
+    \dc@tmp@exp\edef\dc@tmp@exp{\setbox0=\hbox{%
+        \noexpand\includegraphics[draft,\dc@inclgraphicx]%
+        {\dc@filename}}}\dc@tmp@exp\dimen@=\dp0\advance\dimen@\ht0
+    \edef\dc@graphicHeight{\the\dimen@}\dimen@=.5\dimen@
+    \edef\dc@graphicHalfHeight{\the\dimen@}%
+    \edef\dc@graphicWidth{\the\wd0}%
+    \dc@calc@adj@width{#1}\parbox{\dc@graphicWidth}{%
+        \raisebox{\dc@@captionPlacement}[0pt][0pt]{\rlap
+        {\pushButton[\presets{\digiCapsPresets{\dc@rollovername}}%
+         \presets{\hiddenPresets}]{dcRollover.\dc@rollovername}%
+         {\dc@graphicWidth}{\dc@graphicHeight}}}%
+         \dc@insert@graphicx@opcolor@boxes{\dc@filename}%
+        {\xBld{\dc@rollovername}}{#1}{#2}{\eBld}%
+    }\global\let\dc@rollovername\@empty%
+\endgroup}
+\def\digiCapsPresets#1{\W0\BG{}\BC{}\H{N}\autoCenter{n}% rollover mod
+    \AA{\AAMouseEnter{\JS{toggleSetThisLayer("#1",true);}}%
+    \AAMouseExit{\JS{toggleSetThisLayer("#1",false);}}}}
+\def\hiddenPresets{}
+\endinput
+%%
+%% End of file `digicap-pro.sty'.

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2017  D. P. Story                 %%
+%% Copyright (C) 2002-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -107,17 +107,19 @@
     /ANN pdfmark}%
     \to@insertStrucTabOrder{Link}\endgroup
 }
+\def\pboxRect{/Rect [\par@@Rect]}
+\def\mllnkcontainer#1{#1}
 \def\setLinkPbox@driver
 {%
     \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
     \@eqBS{}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [\par@@Rect]
+    \literalps@out{\mllnkcontainer{%
+    [ \eq@objdef\pboxRect
     \eq@Border
     \eq@QuadPoints  % QuadPoints
     \common@LinkCode
     /Subtype /Link
-    /ANN pdfmark}%
+    /ANN pdfmark}}%
     \to@insertStrucTabOrder{Link}\endgroup
 }
 \endinput

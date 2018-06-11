@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2017  D. P. Story                 %%
+%% Copyright (C) 2002-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -231,6 +231,19 @@
 {%
     \ifcase\nr\relax\@eqinline{y}\or
     \@eqinline{n}\fi
+}{}
+\define@choicekey{eforms}{mlfix}[\val\nr]{yes,no}
+{%
+    \ifcase\nr\relax\@eqmlfix{y}\or
+    \@eqmlfix{n}\fi
+}{}
+\define@key{eforms}{mlstrut}[\strut]{\@eqmlstrut{#1}}
+\define@key{eforms}{mlcrackat}[]{\@eqmlcrackat{#1}}
+\define@key{eforms}{mlcrackinat}[]{\@eqmlcrackinsat{#1}}
+\define@choicekey{eforms}{mlhyph}[\val\nr]{yes,no}
+{%
+    \ifcase\nr\relax\@eqmlhyph{y}\or
+    \@eqmlhyph{n}\fi
 }{}
 \define@key{eforms}{presets}{%
     \ef@jstoks=\expandafter{#1}%

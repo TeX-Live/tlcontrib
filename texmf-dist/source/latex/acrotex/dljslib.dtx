@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% dljsLib.sty package,                                 %%
-%% Copyright (C) 2001-2016  D. P. Story                 %%
+%% Copyright (C) 2001-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{dljslib}
-%<package> [2014/10/05 v2.0 Manage a Library of Document Level JavaScripts (dps)]
+%<package> [2017/08/11 v2.1 Manage a Library of Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -49,6 +49,8 @@
 % \InputIfFileExists{aebdonotindex.def}{\PackageInfo{dljslib}{Inputting aebdonotindex.def}}
 %    {\PackageInfo{dljslib}{aebdonotindex.def cannot be found}}
 %
+% \changes{v2.1}{2017/08/11}{Corresponding to exerquiz v8.0, dljslib is modified to
+%   conform to multi-letter variables.}
 % \changes{v1.3}{2005/08/27}{Added new user contributed routines for unordered,
 %        interval, point and factored responses. Added a feature whereby you
 %        can create a file called libcusopt.opt to declare your own options
@@ -151,6 +153,7 @@
 % \textsf{dvipdfm}.
 %
 %    \begin{macrocode}
+\RequirePackage{exerquiz}[2017/08/04]
 \RequirePackage{insdljs}
 %    \end{macrocode}
 % After inputting \textsf{insdljs}, we define |\setdecimalpoint|, which populates
@@ -265,15 +268,18 @@ var dljslib = true;
 \fi
 \begin{library@holding}{equations}
 \begin{newsegment}{dljslib: Equation Handling}
-function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     if (!ProcessIt) return null;
     ok2Continue = true;
     var success;
     var fieldname = event.target.name;
-    var UserAns = event.value;
 %    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
 %    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     var CorrExpressions = CorrAns.split("=");
     var zCorrAns = "("+CorrExpressions[0]+")-("+CorrExpressions[1] +")";
     UserAns = stripWhiteSpace (UserAns);
@@ -334,13 +340,13 @@ function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
     zUserAns = ParseInput(zUserAns);
     if (!ok2Continue) return null;
 %   convert vars to  new format, if needed
-    indepVar = TypeParameters(indepVar);
-    var lambda = getNonZeroRatio (domain, indepVar, zCorrAns, zUserAns);
+    indepVars = TypeParameters(indepVars);
+    var lambda = getNonZeroRatio (domain, indepVars, zCorrAns, zUserAns);
     if ( lambda == null ) {
         eqAppAlert(\eqSyntaxErrorUndefVar,3); return null; };
     if ( !ok2Continue ) return notifyField(false, flag, fieldname);
     zCorrAns  = lambda + "*(" + zCorrAns + ")";
-    success=randomPointCompare (n,domain,indepVar,epsilon,
+    success=randomPointCompare (n,domain,indepVars,epsilon,
         zCorrAns,zUserAns,comp)
     if ( success == null ) { eqAppAlert(\eqSyntaxErrorUndefVar,3);
         return null; }
@@ -419,7 +425,7 @@ function getNonZeroRatio (_a, _v, _F, _G)
 \fi
 \begin{library@holding}{vectors}
 \begin{newsegment}{dljslib: Vector Handling}
-function ProcVec (flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcVec (flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
 %    \end{macrocode}
 % This function attempts to process questions that have vectors
@@ -498,7 +504,7 @@ typeof oComp.priorParse != "undefined" ) {
         return null;
     }
     // convert to new format, if needed
-    indepVar = TypeParameters(indepVar);
+    indepVars = TypeParameters(indepVars);
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
@@ -511,7 +517,7 @@ typeof oComp.priorParse != "undefined" ) {
             return null;
         }
         if (!ok2Continue) return null;
-        success=randomPointCompare (n,domain,indepVar,epsilon,
+        success=randomPointCompare (n,domain,indepVars,epsilon,
             aCorrAns[i],aUserAns[i],comp)
         if ( success == null ) {
             eqAppAlert(\eqSyntaxErrorUndefVar,3); return null; }
@@ -552,12 +558,17 @@ typeof oComp.priorParse != "undefined" ) {
 %\end{verbatim}
 %\end{flushleft}
 %    \begin{macrocode}
-function ProcRespSetNum(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespSetNum(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
@@ -594,7 +605,7 @@ function ProcRespSetNum(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
         return notifyField(false, flag, fieldname);
     for ( var i=0; i< aCorrAns.length; i++) {
         var retn = _ProcResp(%
-flag,aCorrAns[i],aUserAns[i],n,epsilon,domain,indepVar,oComp);
+flag,aCorrAns[i],aUserAns[i],n,epsilon,domain,indepVars,oComp);
         if ( retn == -1 ) return null;
         if ( retn == null ) return syntaxError(), null;
         numCorrect += (retn) ? 1 : 0;
@@ -649,12 +660,17 @@ function formatAsVector() {
 %\end{verbatim}
 % \end{flushleft}
 %    \begin{macrocode}
-function ProcRespSetSym(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespSetSym(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
@@ -674,7 +690,7 @@ function ProcRespSetSym(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
     var retn=ck4Braces(UserAns);
     if (retn==null) return null;
     var aUserAns = UserAns.split(",");
-    var _V = indepVar.split(",");
+    var _V = indepVars.split(",");
     for ( var _i=0; _i < _V.length; _i++) {
          eval ( "var "+ _V[_i] + " = \"" + _i + "\";");
     }
@@ -691,8 +707,8 @@ function ProcRespSetSym(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
     for ( var _i=0; _i < aCorrAns.length; _i++) {
         try {
             if (isNaN(eval(aCorrAns[_i])))
-                return eqAppAlert(
-                    "Author error, recheck your code",3), null;
+                return eqAppAlert(%
+"Author error, recheck your code",3), null;
             aCorrAns[_i] = eval(aCorrAns[_i]);
         } catch(e) { return eqAppAlert(
             "Author error, recheck your code",3), null; }
@@ -722,11 +738,16 @@ flag,aCorrAns[_i],aUserAns[_i],n,epsilon,"[0,1]","i:_x",oComp);
 % \emph{ordered} list of expressions.
 %    \begin{macrocode}
 function ProcRespListFormula(flag,CorrAns,n,epsilon,domain,%
-indepVar,oComp) {
+indepVars,oComp) {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
@@ -748,7 +769,7 @@ indepVar,oComp) {
     UserAns = UserAns.replace(/,+/g, ",");
     UserAns = UserAns.replace(/,$/, "");
     UserAns = UserAns.replace(/^,/, "");
-    event.value = UserAns;
+%    event.value = UserAns; % dps17
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
     var aUserAns = UserAns.split(",");
@@ -758,7 +779,7 @@ indepVar,oComp) {
         return notifyField(false, flag, fieldname);
     for ( var i=0; i< aCorrAns.length; i++) {
         var retn =_ProcResp(flag,aCorrAns[i],aUserAns[i],%
-n,epsilon,domain,indepVar,oComp);
+n,epsilon,domain,indepVars,oComp);
         if ( retn == -1 ) return null;
         if ( retn == null ) return syntaxError(), null;
         numCorrect += (retn) ? 1 : 0;
@@ -785,11 +806,16 @@ n,epsilon,domain,indepVar,oComp);
 %\end{flushleft}
 %    \begin{macrocode}
 function ProcRespSetFormula(flag,CorrAns,n,epsilon,%
-domain,indepVar,oComp) {
+domain,indepVars,oComp) {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
@@ -811,7 +837,7 @@ domain,indepVar,oComp) {
     UserAns = UserAns.replace(/,+/g, ",");
     UserAns = UserAns.replace(/,$/, "");
     UserAns = UserAns.replace(/^,/, "");
-    event.value = UserAns;
+%    event.value = UserAns; % dps17
     CorrAns = stripWhiteSpace(CorrAns);
     if (!ok2Continue) return null;
     var aUserAns = UserAns.split(",");
@@ -823,7 +849,7 @@ domain,indepVar,oComp) {
         match = 0;
         for ( var j=i; j< aUserAns.length; j++) {
             var retn = _ProcResp(%
-flag,aCorrAns[i],aUserAns[j],n,epsilon,domain,indepVar,oComp);
+flag,aCorrAns[i],aUserAns[j],n,epsilon,domain,indepVars,oComp);
             if ( retn == -1 ) return null;
             if ( retn == null ) return syntaxError(), null;
             if (retn==1) {
@@ -883,17 +909,22 @@ flag,aCorrAns[i],aUserAns[j],n,epsilon,domain,indepVar,oComp);
 function cis(x,i) { return Math.cos(x) + i*Math.sin(x); }
 JSfCustom.push("cis");
 JSf = JSf.concat(JSfBuiltIn, JSfCustom);
-function ProcRespComplex(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespComplex(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     if (!ProcessIt) return null;
     ok2Continue = true;
     var i, success;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     CorrAns = stripWhiteSpace (CorrAns);
     UserAns = stripWhiteSpace (UserAns); // sets ok2Continue
     if ( !ok2Continue ) return null;
-    indepVar+="i";
+    indepVars+="i";
     domain+="x[0,1]";
 %    \end{macrocode}
 % We don't support powers of i
@@ -957,10 +988,10 @@ function ProcRespComplex(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
 %    \begin{macrocode}
     UserAns = ParseInput(UserAns);
     CorrAns = ParseInput(CorrAns);
-    indepVar = TypeParameters(indepVar);
+    indepVars = TypeParameters(indepVars);
     if (!ok2Continue) return null;
     success=randomPointCompare(
-        n,domain,indepVar,epsilon,CorrAns,UserAns,comp);
+        n,domain,indepVars,epsilon,CorrAns,UserAns,comp);
     if ( success == null ) { eqAppAlert(%
 \eqSyntaxErrorUndefVar,3); return null; }
     return notifyField(success, flag, fieldname);
@@ -975,11 +1006,16 @@ function ProcRespComplex(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
 %\end{verbatim}
 %    \begin{macrocode}
 function ProcRespListComplex(flag,CorrAns,n,epsilon,%
-domain,indepVar,oComp) {
+domain,indepVars,oComp) {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns); // sets ok2Continue
     if ( !ok2Continue ) return null;
@@ -999,7 +1035,7 @@ domain,indepVar,oComp) {
     UserAns = UserAns.replace(/,+/g, ",");
     UserAns = UserAns.replace(/,$/, "");
     UserAns = UserAns.replace(/^,/, "");
-    event.value = UserAns;
+%    event.value = UserAns; % dps17
     var aUserAns = UserAns.split(",");
     var aCorrAns = CorrAns.split(",");
     if ( aUserAns.length != aCorrAns.length )
@@ -1008,10 +1044,10 @@ domain,indepVar,oComp) {
     var match = 0;
     for ( var i=0; i< aCorrAns.length; i++) {
         match = 0;
-        event.value = aUserAns[i];
-        var retn = ProcRespComplex(
-        flag,aCorrAns[i],n,epsilon,domain,indepVar,oComp);
-        event.value = UserAns;
+%          event.value = aUserAns[i]; % dps17
+          var retn = ProcRespComplex(%
+flag,aCorrAns[i],n,epsilon,domain,indepVars,oComp,aUserAns[i]);
+%        event.value = UserAns; dps17
         if ( retn == null ) return null;
         numCorrect += (retn) ? 1 : 0;
     }
@@ -1028,11 +1064,16 @@ domain,indepVar,oComp) {
 %\end{verbatim}
 %    \begin{macrocode}
 function ProcRespSetComplex(flag,CorrAns,n,epsilon,%
-domain,indepVar,oComp) {
+domain,indepVars,oComp) {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     CorrAns = stripWhiteSpace(CorrAns); // sets ok2Continue
     if ( !ok2Continue ) return null;
@@ -1064,10 +1105,10 @@ domain,indepVar,oComp) {
     for ( var i=0; i< aCorrAns.length; i++) {
         match = 0;
         for ( var j=i; j< aUserAns.length; j++) {
-            event.value = aUserAns[j];
+%            event.value = aUserAns[j]; dps17
             var retn = ProcRespComplex(%
-flag,aCorrAns[i],n,epsilon,domain,indepVar,oComp);
-            event.value = UserAns;
+flag,aCorrAns[i],n,epsilon,domain,indepVars,oComp,aUserAns[j]);
+%            event.value = UserAns; dps17
             if ( retn == null ) return null;
             if (retn==1) {
                 var temp=aUserAns[j];
@@ -1144,8 +1185,14 @@ function changeArgs4Cis(str) {
 % a problem posed by David Arnold.}
 %    \begin{macrocode}
 var bNotifyWrngNumEntries=\satisfyEqNotify;
-function ProcRespEvalEq(flag,CorrAns,n,epsilon,domain,indepVar,oComp){
-    var retn=_ProcRespEvalEq(true,flag,CorrAns,n,epsilon,indepVar);
+function ProcRespEvalEq(flag,CorrAns,n,epsilon,domain,indepVars,oComp){
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+% dps17
+    var UserAns=(arguments.length>7)?arguments[7]:event.value;
+    var retn=_ProcRespEvalEq(true,flag,CorrAns,n,epsilon,%
+indepVars,UserAns);
     return retn;
 }
 %    \end{macrocode}
@@ -1153,18 +1200,29 @@ function ProcRespEvalEq(flag,CorrAns,n,epsilon,domain,indepVar,oComp){
 % all entries to be nonzero.
 %    \begin{macrocode}
 function ProcRespEvalEqNonZero(flag,CorrAns,n,epsilon,%
-domain,indepVar,oComp) {
-    var retn=_ProcRespEvalEq(false,flag,CorrAns,n,epsilon,indepVar);
+domain,indepVars,oComp) {
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+% dps17
+    var UserAns=(arguments.length>7)?arguments[7]:event.value;
+    var retn=_ProcRespEvalEq(false,flag,CorrAns,n,epsilon,
+indepVars,UserAns);
     return retn;
 }
 %    \end{macrocode}
 %    \begin{macrocode}
-function _ProcRespEvalEq(allowzero,flag,CorrAns,n,epsilon,indepVar)
+function _ProcRespEvalEq(allowzero,flag,CorrAns,n,epsilon,indepVars)
 {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>6); // dps17
+    var UserAns=(bSubstVars)?arguments[6]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     if (!ok2Continue) return null;
     if ( (UserAns.charAt(0) != "\(") || %
@@ -1182,7 +1240,7 @@ function _ProcRespEvalEq(allowzero,flag,CorrAns,n,epsilon,indepVar)
                 return eqAppAlert(\eqNonzeroEntries,3), null;
         } catch(e) { return syntaxError(), null; }
     }
-    var _v = TypeParameters(indepVar);
+    var _v = TypeParameters(indepVars);
     var _V = _v.split(",");  // e.g. _V[0] = "i:x"
     var _n = _V.length;
     if ( aUserAns.length != _n) {
@@ -1211,21 +1269,38 @@ function _ProcRespEvalEq(allowzero,flag,CorrAns,n,epsilon,indepVar)
 % The \texttt{CorrAns} parameter is of the form \texttt{n\_pairs; F-G}
 %    \begin{macrocode}
 function ProcRespEvalEqList(flag,CorrAns,n,epsilon,domain,%
-indepVar,oComp) {
-    var retn=_ProcRespEvalEqList(true,flag,CorrAns,n,epsilon,indepVar);
+indepVars,oComp) {
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+% dps17
+    var UserAns=(arguments.length>7)?arguments[7]:event.value;
+    var retn=_ProcRespEvalEqList(true,flag,CorrAns,n,epsilon,%
+indepVars,UserAns);
     return retn;
 }
 function ProcRespEvalEqListNonZero(flag,CorrAns,n,epsilon,domain,%
-indepVar,oComp){
-    var retn=_ProcRespEvalEqList(false,flag,CorrAns,n,epsilon,indepVar);
+indepVars,oComp){
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+% dps17
+    var UserAns=(arguments.length>7)?arguments[7]:event.value;
+    var retn=_ProcRespEvalEqList(false,flag,CorrAns,n,epsilon,%
+indepVars,UserAns);
     return retn;
 }
-function _ProcRespEvalEqList(allowzero,flag,CorrAns,n,epsilon,indepVar)
+function _ProcRespEvalEqList(allowzero,flag,CorrAns,n,epsilon,indepVars)
 {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>6); // dps17
+    var UserAns=(bSubstVars)?arguments[6]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     if (!ok2Continue) return null;
     var success;
@@ -1255,7 +1330,7 @@ function _ProcRespEvalEqList(allowzero,flag,CorrAns,n,epsilon,indepVar)
 %    \begin{macrocode}
     if (l > aUserAns.length )
         return eqAppAlert(\eqTooFewEntries,3), null;
-    var _v = TypeParameters(indepVar);
+    var _v = TypeParameters(indepVars);
     var _V = _v.split(",");  // e.g. _V[0] = "i:x"
 %    \end{macrocode}
 % \texttt{\_n} is the number of variables
@@ -1389,23 +1464,28 @@ return syntaxError(), null;
 % this is named \texttt{ProcRespNumsDe}.
 %    \begin{macrocode}
 function ProcRespNumsDe (flag,CorrAns,n,epsilon,%
-domain,indepVar,oComp) {
+domain,indepVars,oComp) {
     if (!ProcessIt) return null;
     ok2Continue = true;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
 %    \end{macrocode}
 % This is the only change over the \texttt{ProcResp}, we call
 % \texttt{\_ProcRespNumsDe}.
 %    \begin{macrocode}
     var success = _ProcRespNumsDe(flag,CorrAns,UserAns,n,%
-epsilon,domain,indepVar,oComp);
+epsilon,domain,indepVars,oComp);
     if ( success == -1 || !ok2Continue ) return null;
     if ( success == null ) { return syntaxError(), null; }
     return notifyField(success, flag, fieldname);
 }
 function _ProcRespNumsDe(flag,CorrAns,UserAns,n,epsilon,%
-domain,indepVar,oComp) {
+domain,indepVars,oComp) {
     ok2Continue = true;
     CorrAns = ParseInput(CorrAns);
     if (!ok2Continue) {
@@ -1447,9 +1527,9 @@ domain,indepVar,oComp) {
         return -1;
     }
     UserAns = ParseInput(UserAns);
-    indepVar = TypeParameters(indepVar);
+    indepVars = TypeParameters(indepVars);
     if (!ok2Continue) return null;
-    var success=randomPointCompare(n,domain,indepVar,%
+    var success=randomPointCompare(n,domain,indepVars,%
 epsilon,CorrAns,UserAns,comp);
         if ( success && (typeof(oComp)=="object") %
 && (typeof(oComp.postParse)!="undefined") )
@@ -1514,16 +1594,21 @@ epsilon,CorrAns,UserAns,comp);
 % parsing and error feedback.}
 %    \begin{macrocode}
 \begin{newsegment}{dljslib: Contrib - Processing Factors as Responses}
-function ProcRespFactors(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespFactors(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     ok2Continue = true;
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace(UserAns);
     if (!ok2Continue) return null;
     var retn = _ProcResp(flag,CorrAns,UserAns,n,epsilon,%
-domain,indepVar,oComp);
+domain,indepVars,oComp);
     if ( retn == -1 ) return null;
     if ( retn == null ) return syntaxError(), null;
     if ( retn == 0 ) {
@@ -1555,7 +1640,7 @@ the proper form");
         match = 0;
         for ( var j=i; j< aUserAns.length; j++) {
             var retn = _ProcResp(flag,aCorrAns[i],aUserAns[j],%
-n,epsilon,domain,indepVar,oComp);
+n,epsilon,domain,indepVars,oComp);
             if ( retn == -1 ) return null;
             if ( retn == null ) return syntaxError(), null;
             if (retn==1) {
@@ -1566,7 +1651,7 @@ n,epsilon,domain,indepVar,oComp);
             }
             else {
                 var retn = _ProcResp(flag,aNegCorrAns[i],aUserAns[j],%
-n,epsilon,domain,indepVar,oComp);
+n,epsilon,domain,indepVars,oComp);
                 if ( retn == -1 ) return null;
                 if ( retn == null ) return syntaxError(), null;
                 if (retn==1) {
@@ -1729,14 +1814,19 @@ function getFactorArray(str) {
 %\end{flushleft}
 %    \begin{macrocode}
 \begin{newsegment}{dljslib: Contrib - Processing a Point Response}
-function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     if (!ProcessIt) return null;
     ok2Continue = true;
     var i, success, truthCnt=1;
     var aScalar, scalar = 1;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
     UserAns = stripWhiteSpace (UserAns); // sets ok2Continue
     CorrAns = stripWhiteSpace(CorrAns);
     if ( !ok2Continue ) return null;
@@ -1801,7 +1891,7 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
         eqAppAlert(\pointErrorMsgiii,3);
         return null;
     }
-    indepVar = TypeParameters(indepVar);
+    indepVars = TypeParameters(indepVars);
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
@@ -1815,7 +1905,7 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
         }
         if (!ok2Continue) return null;
         success=randomPointCompare (
-            n,domain,indepVar,epsilon,aCorrAns[i],aUserAns[i],comp)
+            n,domain,indepVars,epsilon,aCorrAns[i],aUserAns[i],comp)
         if ( success == null ) {
             eqAppAlert(\eqSyntaxErrorUndefVar,3); return null; }
         truthCnt *= (success) ? 1 : 0;
@@ -1857,7 +1947,7 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
 % Usage:
 %\begin{verbatim}
 %\def\intervalbox#1{\RespBoxMath{#1}(infU){10}
-%    {1.0E-4}{[0,1]x[0,1]x[0,1]x[0,1]}*{ProcRespIntervals}}
+%    {1.0E-4}{\viidna}*{ProcRespIntervals}}
 %Some question requiring an interval or union of intervals
 %\intervalbox{(-inf,4]U[5,inf)}
 %\end{verbatim}
@@ -1871,18 +1961,23 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
 %\end{flushleft}
 %    \begin{macrocode}
 \begin{newsegment}{dljslib: Contrib - Processing Interval Responses}
-function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
      ok2Continue = true;
      if (!ProcessIt) return null;
      var fieldname = event.target.name;
-     var UserAns = event.value;
+%    \end{macrocode}
+%     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
+%    \begin{macrocode}
+%    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(bSubstVars)?arguments[7]:event.value;
      UserAns = stripWhiteSpace(UserAns);
      CorrAns = stripWhiteSpace(CorrAns);
      if (!ok2Continue) return null;
      UserAns = UserAns.replace(/inf/g, "x");
      CorrAns = CorrAns.replace(/inf/g, "x");
-     indepVar = "x";
+     indepVars = "x";
      domain="[0,1]";
      var aUserAns = UserAns.split("U");
      var aCorrAns = CorrAns.split("U");
@@ -1912,12 +2007,12 @@ function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
              if (aCorrInt[0] == aUserInt[0]) matchparts+=1;
              if (aCorrInt[3] == aUserInt[3]) matchparts+=1;
              var retn1 = _ProcResp(flag,aCorrInt[1],aUserInt[1],%
-n,epsilon,domain,indepVar,oComp);
+n,epsilon,domain,indepVars,oComp);
              if (retn1 == -1 ) return null;
              if (retn1 == null) return syntaxError(), null;
              if (retn1 == 1) matchparts+=1;
              var retn2 = _ProcResp(flag,aCorrInt[2],aUserInt[2],%
-n,epsilon,domain,indepVar,oComp);
+n,epsilon,domain,indepVars,oComp);
              if (retn2 == -1 ) return null;
              if (retn2 == null) return syntaxError(), null;
              if (retn2 == 1) matchparts+=1;

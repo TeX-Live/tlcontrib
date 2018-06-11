@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2017  D. P. Story                 %%
+%% Copyright (C) 2001-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,10 +19,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2017/03/02 v2.3f Insert Document Level JavaScripts (dps)]
+ [2017/09/03 v2.3g Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{ifluatex}
 \DeclareOptionX{dvipsone}{\def\dljs@drivernum{0}%
     \AtBeginDocument{\dvips@marker}}
 \DeclareOptionX{dvips}{\def\dljs@drivernum{0}%
@@ -30,6 +31,7 @@
 \DeclareOptionX{textures}{\def\dljs@drivernum{0}%
     \AtBeginDocument{\dvips@marker}}
 \DeclareOptionX{pdftex}{\def\dljs@drivernum{1}}
+\DeclareOptionX{luatex}{\def\dljs@drivernum{1}}
 \DeclareOptionX{dvipdfm}{\def\dljs@drivernum{2}}
 \DeclareOptionX{dvipdfmx}{\def\dljs@drivernum{2}}
 \DeclareOptionX{xetex}{\def\dljs@drivernum{2}}

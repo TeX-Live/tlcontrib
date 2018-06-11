@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2017  D. P. Story                 %%
+%% Copyright (C) 1999-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,8 +18,9 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2017/03/16 v7.8g %
+ [2018/03/21 v8.2.2 %
   Exerquiz document level JavaScript (dps)]
+    \ifmakeExSlLocal\protect\endgroup^^J\fi
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
 \def\redm{\\.}\def\remul{\\*}\def\rediv{\\/}\def\repow{\\^}
@@ -31,6 +32,17 @@
     \def\NoPeekAlert{eqAppAlert(#1)}}\def\newNoPeekArgs{}
 \def\NoPeekAlert{eqAppAlert(\noPeekMsg,3)}
 \newcommand{\dlLibSpecRespJS}{"none","undefined","empty"}
+\newif\ifSubstVars\SubstVarsfalse % dps17
+\newif\ifShowAppr\ShowApprtrue % dps17
+\def\altApprOn{\ShowApprtrue} % dps17
+\def\altApprOff{\ShowApprfalse} % dps17
+\def\corrChoiceFullyOn{\def\eqCorrChoiceFully{true}}
+\def\corrChoiceFullyOff{\def\eqCorrChoiceFully{false}}
+\corrChoiceFullyOn
+\def\corrLocalChoiceFullyOn{\def\eqCorrLocalChoiceFully{true}} % dpsf07
+\def\corrLocalChoiceFullyOff{\def\eqCorrLocalChoiceFully{false}} % dpsf07
+\def\resetLocalChoiceFully{\let\eqCorrLocalChoiceFully\@empty} % dpsf07
+\resetLocalChoiceFully % no local implementation
 \begin{insDLJS*}[exerquizLoaded]{exerquiz}
 \begin{newsegment}{AeB: AcroTeX eDucation Bundle}
 /*
@@ -50,12 +62,14 @@ var Score=0;
 var ptScore=0;
 var pcScore=0;
 var quizGrade="C";
+var NQuestions=0;
+var NPointTotal=0;
 var e = Math.E;
 var pi = Math.PI;
 var replaceExclaim = \replaceexclaim;
 var negPointsAllowed = \negpointsallowed;
 var negPointsMarkupAllowed = \negpointsmarkupallowed;
-var aQuizControl = new Array();
+var aQuizControl = new Object;
 var RightWrong=new Array();
 var ProbValue = new Array();
 var ProbDist = new Array();
@@ -236,6 +250,8 @@ function addMathObject(UserInput)
 function ParseInput(UserInput)
 {
     var re, repi;
+    re = /\b(a)\b/g;
+    UserInput = UserInput.replace(re, "(a)");
     UserInput = stripWhiteSpace (UserInput);
     if (!ok2Continue) return null;
     for(var i=0; i< aGroup.length; i++)
@@ -424,20 +440,24 @@ function TypeParameters(v)
         if ( aV[i].indexOf(":") == -1 ) aV[i] = "r:"+aV[i];
     return aV.join(",")
 }
-function ProcResp(flag,CorrAns,n,epsilon,domain,indepVar,oComp)
+function ProcResp(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 {
     if (!ProcessIt) return null;
     var fieldname = event.target.name;
-    var UserAns = event.value;
+    var bSubstVars=(arguments.length>7); // dps17
+    var UserAns=(arguments.length>7)?arguments[7]:event.value;
     var success = _ProcResp(flag,CorrAns,UserAns,%
-n,epsilon,domain,indepVar,oComp);
-    if ( success == -1 || !ok2Continue ) return null;
-    if ( success == null ) { return syntaxError(), null; }
+n,epsilon,domain,indepVars,oComp);
+    if ( success == -1 || !ok2Continue )
+      { resetHeadsUp(flag,fieldname); return null; } // dps17
+    if ( success == null )
+      { resetHeadsUp(flag,fieldname);
+        return syntaxError(), null; } // dps17
     return notifyField(success, flag, fieldname);
 }
 // changed name of var comp -> oComp
-function _ProcResp(flag,CorrAns,UserAns,n,epsilon,domain,indepVar,oComp)
-{
+function _ProcResp(flag,CorrAns,UserAns,n,epsilon,domain,%
+indepVars,oComp){
     ok2Continue = true;
     CorrAns = ParseInput(CorrAns);
     if (!ok2Continue) {
@@ -462,9 +482,9 @@ function _ProcResp(flag,CorrAns,UserAns,n,epsilon,domain,indepVar,oComp)
      var reRlCommaSubst=/@c@/g;
      UserAns=UserAns.replace(reRlCommaSubst,",");
     UserAns = ParseInput(UserAns);
-    indepVar = TypeParameters(indepVar);
+    indepVars = TypeParameters(indepVars);
     if (!ok2Continue) return null;
-    var success=randomPointCompare(n,domain,indepVar,%
+    var success=randomPointCompare(n,domain,indepVars,%
 epsilon,CorrAns,UserAns,comp);
         if ( success && (typeof(oComp)=="object") %
 && (typeof(oComp.postParse)!="undefined") )
@@ -489,7 +509,7 @@ function processSpecialParse(oParse,UserAns) {
     }
     return retn;
 }
-function randomPointCompare (n,domain,indepVar,epsilon,%
+function randomPointCompare (n,domain,indepVars,epsilon,%
 CorrAns,userAns,comp)
 {
     var error, i, j, k;
@@ -510,7 +530,7 @@ CorrAns,userAns,comp)
 -eval(endpoints[0]))*Math.random();
                 }
                 var cXY = aXY.toString();
-                error = comp(domain,cXY,indepVar,CorrAns,userAns);
+                error = comp(domain,cXY,indepVars,CorrAns,userAns);
                 if (error == null) return null;
                 if ( (error == -1) || (error > epsilon) ) {j=-1; break;}
             }
@@ -623,6 +643,87 @@ function requireFormNot(UserAns, regexpr) {
     }
 }
 \end{newsegment}
+\begin{newsegment}{Eq: Support for multi-letter variables}
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^[\s\string\uFEFF\string\xA0]+|%
+[\s\string\uFEFF\string\xA0]+$/g, '');
+  };
+}
+function _rplVarsBy(str1,str2) {
+    var re=new RegExp(str1,"g");
+    var result=str1.replace(re,str2);
+    return result;
+}
+function processMathVars(str) {
+  var pos1,pos2,lead,tmp;
+  while ((pos1=str.indexOf("_rplVarsBy"))!=-1) {
+    pos2=str.indexOf("@");
+    lead=str.substring(0,pos1);
+    tmp=str.substring(pos1,pos2);
+    str=str.substring(pos2+1);
+    tmp=eval(tmp);
+    str=lead+tmp+str;
+  }
+  str=str.replace(/\s/g,"");
+  return str;
+}
+getSubstValue.aSubsts=new Array();   // dps17
+function getSubstValue(v,s){
+/*
+  v=variable list, it may have the form "xyz", or if there
+    substitutions, it might look like "_rplVarsBy('theta','x')@";
+  s=Either the user's answer or the author's answer.
+
+  First develop an array of all variables are their substitutes.
+  ie, getSubstValue.aSubsts=[ "c","h", ["theta",x"], ["alpha",y],...];
+*/
+  var pos1,pos2,tmp,args,re,arg1,arg2;
+/*
+  change new style to old
+  New style: v="c,_rplVarsBy('theta->\u03B8','r:x')@,%
+_rplVarsBy('alpha->\u03B1','r:y')@";
+  Old style: v="c_rplVarsBy('theta->\u03B8','x')@%
+_rplVarsBy('alpha->\u03B1','y')@";
+*/
+  re=/([^'])(,)/g;
+  v=v.replace(re,'$1');
+  re=/([ri]\string\:)+(\string\w)/g;
+  v=v.replace(re,'$2');
+  getSubstValue.aSubsts=[]; // dps17
+  var start=0;
+  while (true) {
+    v=v.substring(start);
+    pos1=v.indexOf("_rplVarsBy");
+    if (pos1==-1) break;
+    pos2=v.indexOf("@");
+    args=v.substring(pos1+10+1,pos2-1);
+    tmp=args.split(",");
+    arg1=eval(tmp[0].toString());
+    tmp1=arg1.split("->");
+    for (var i=0; i<tmp1.length; i++)
+      tmp1[i]=tmp1[i].trim();
+    if (tmp1.length==1) getSubstValue.aSubsts.push(tmp1[0]);
+    else getSubstValue.aSubsts.push(tmp1);
+    arg2=eval(tmp[1].toString());
+    re=new RegExp(tmp1[0],"g");
+    s=s.replace(re,arg2);
+    start=pos2+1;
+  }
+  return s;
+}
+function RespBoxAppr(e){
+  var value=(typeof e=="object")?e.value:e;
+  var re;
+  for (var i=0; i<getSubstValue.aSubsts.length; i++) {
+    if (typeof getSubstValue.aSubsts[i]=="object") {
+      re=new RegExp(getSubstValue.aSubsts[i][0],"g");
+      value=(value.replace(re,getSubstValue.aSubsts[i][1],"g"));
+    }
+  }
+  return value;
+}
+\end{newsegment}
 \begin{newsegment}{Eq: Support Text Fill-in}
 function ProcRespTxt() {
     var i, success, authorAnswer, userAnswer = event.value;
@@ -695,7 +796,7 @@ function eqFilter(filterMethod) {
 \begin{newsegment}{Eq: Quiz Management}
 function InitMsg(msg) { return (\eqInitQuizMsg) }
 function syntaxError() { eqAppAlert(\eqSyntaxErrorUndefVar,3); }
-var lstOfQuizzes=new Array();
+var lstOfQuizzes=new Object();
 var reExtractBaseName=/^.+?\.(.+?)\..+$/;
 function ProcUserResp(key,userresp,probno,notify)
 {
@@ -814,6 +915,18 @@ function InitializeQuiz(qtfield,mark) {
     }
     return null;
 }
+function resetHeadsUp(flag,fieldname) {
+  if (flag==1) return;
+  var pos1=fieldname.indexOf(".");
+  var pos2=fieldname.indexOf(".",pos1+1);
+  var baseName=fieldname.substring(pos1+1,pos2);
+  var oQName=eval(baseName);
+  var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
+?\defaultColorJS:oQName.DefaultColorJSLoc;
+  var f=this.getField(fieldname);
+  if (f!=null) f.strokeColor=defaultColor;
+
+}
 function neutralizeQuizzes()
 {
     for ( var qtfield in aQuizControl ) aQuizControl[qtfield] = 0;
@@ -871,11 +984,11 @@ function GrpRight( a, nProb, qtfield )
     var prod = 1;
     for ( var i=1; i <= l; i++) prod *= !!a[i];
     return prod;
-
 }
 function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
 {
     Score = 0; ptScore = 0;
+    NPointTotal=nPointTotal; NQuestions=nQuestions;
     for (var i=1; i < RightWrong.length; i++)
     {
         if ( (typeof RightWrong[i] == "object" ) %
@@ -919,7 +1032,7 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
             }
         }
     }
-if ( !negPointsAllowed && (ptScore < 0) ) ptScore = 0;
+    if ( !negPointsAllowed && (ptScore < 0) ) ptScore = 0;
     if (ptScore == nPointTotal) pcScore = 100;
     else pcScore = util.printf("\%.1f", (100 * ptScore) / nPointTotal);
     var oQName=eval(qtfield);
@@ -1040,8 +1153,41 @@ function correctQuiz(qtfield,nQuestions)
 ?\rghtAnsSymbJS:oQName.RightAnsSymbJSLoc;
         var wrongAnsSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
 ?\wrngAnsSymbJS:oQName.WrongAnsSymbJSLoc;
+  var bFullyCorrect=(typeof oQName.fullyCorrectLoc=="undefined")%
+?\eqCorrChoiceFully:oQName.fullyCorrectLoc; // dpsf07
     var f = this.getField("mcq." + qtfield);
-    if ( f != null) f.display = display.visible;
+    if ( f != null) {
+      if (bFullyCorrect) { // dpsf07
+        f.display = display.visible;
+      } else {
+        for (var n=1; n<=nQuestions; n++) {
+          var h=this.getField("mc."+qtfield+"."+n);
+          var bOk=(h!=null);
+          if(bOk) var choiceType="mc";
+          else {
+            h=this.getField("mck."+qtfield+"."+n);
+            bOk=(h!=null);
+            var choiceType="mck";
+          }
+          if (bOk) {
+            var mcq=this.getField("mcq."+qtfield+"."+n);
+            var g=mcq.getArray();
+            if (choiceType=="mc") {
+              for (var j=0; j< g.length; j++) {
+                g[j].display=(h.isBoxChecked(j))?%
+display.visible:display.hidden;
+              }
+            } else {
+              var ck=h.getArray();
+              for (var j=0; j< g.length; j++) {
+                g[j].display=(ck[j].isBoxChecked(0))?%
+display.visible:display.hidden;
+              }
+            }
+          }
+        }
+      }
+    }
     f = this.getField("obj." + qtfield);
     if ( f != null ) {
         var a = f.getArray();
@@ -1212,23 +1358,23 @@ function chooseJSColor( b, c1, c2 ) {
     return ( b ) ? c1 : c2;
 }
 function notifyField(success, flag, fieldname) {
-    if ( flag != 0 )
-        return (success)?true:false;
-    var f = this.getField(fieldname);
-var re=/^(obj|grpobj)\./;
-var gname=fieldname.replace(re,"rbmarkup\.");
-var g =this.getField(gname);
-var isthereRBUP = ( g !=null );
-    var h = fieldname.replace(re,"");
-    var index=h.indexOf(".");
-    var oQName = eval(h.substring(0,index));
-    var rightColor=(typeof oQName.RightColorJSLoc=="undefined")%
+  if ( flag != 0 )
+    return (success)?true:false;
+  var f = this.getField(fieldname);
+  var re=/^(obj|grpobj)\./;
+  var gname=fieldname.replace(re,"rbmarkup\.");
+  var g =this.getField(gname);
+  var isthereRBUP = ( g !=null );
+  var h = fieldname.replace(re,"");
+  var index=h.indexOf(".");
+  var oQName = eval(h.substring(0,index));
+  var rightColor=(typeof oQName.RightColorJSLoc=="undefined")%
 ?\rghtColorJS:oQName.RightColorJSLoc;
-    var rightSymb=(typeof oQName.RightColorJSLoc=="undefined")%
+  var rightSymb=(typeof oQName.RightColorJSLoc=="undefined")%
 ?\rghtAnsSymbJS:oQName.RightAnsSymbJSLoc;
-        var wrongColor=(typeof oQName.WrongColorJSLoc=="undefined")%
+  var wrongColor=(typeof oQName.WrongColorJSLoc=="undefined")%
 ?\wrngColorJS:oQName.WrongColorJSLoc;
-        var wrongSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
+  var wrongSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
 ?\wrngAnsSymbJS:oQName.WrongAnsSymbJSLoc;
     if (success) {
         f.strokeColor = rightColor;
@@ -1287,37 +1433,37 @@ app.clearTimeOut(oNoPeekTimer);",5);
 var oCB=\bcheckboxused
 function OnBlurRespBox (retn)
 {
-    var qname = arguments[1];
-    var oQName = eval(qname);
-    var respMsg;
-    var cTitle = "AcroTeX eDucation Bundle";
-    if (retn != null) {
-        if ( typeof appAlerts[qname] == "undefined")
-            appAlerts[qname] = {bAfterValue: false, %
+  var qname = arguments[1];
+  var oQName = eval(qname);
+  var respMsg;
+  var cTitle = "AcroTeX eDucation Bundle";
+  if (retn != null) {
+    if ( typeof appAlerts[qname] == "undefined")
+      appAlerts[qname] = {bAfterValue: false, %
 cMsg: "\doNotShowAgainMsg"};
-        var respMsg = (retn) ? \eqsqrtmsg\space : \eqsqwgmsg;
-        if ( (event.target == this) || !oCB)
-            eqAppAlert({ cMsg: respMsg, nIcon: 3, cTitle: cTitle });
-        else {
-            if ( ! appAlerts[arguments[1]].bAfterValue )
-                eqAppAlert({ cMsg: respMsg, nIcon: 3, cTitle: cTitle, %
-oCheckbox: appAlerts[qname]});
-        }
-    }
+    var respMsg = (retn) ? \eqsqrtmsg\space : \eqsqwgmsg;
+    if ( (event.target == this) || !oCB)
+      eqAppAlert({ cMsg: respMsg, nIcon: 3, cTitle: cTitle });
     else {
-var re=/^(obj|grpobj)\./;
-var gname=event.target.name.replace(re,"rbmarkup\.");
-var g =this.getField(gname);
-var isthereRBUP = ( g !=null );
-        var str = event.target.value.toString();
-        if (str.replace(/\s/g,"") == "") {
-            var defaultColor=%
+      if ( ! appAlerts[arguments[1]].bAfterValue )
+        eqAppAlert({ cMsg: respMsg, nIcon: 3, cTitle: cTitle, %
+oCheckbox: appAlerts[qname]});
+    }
+  }
+  else {
+   var re=/^(obj|grpobj)\./;
+   var gname=event.target.name.replace(re,"rbmarkup\.");
+   var g =this.getField(gname);
+   var isthereRBUP = ( g !=null );
+    var str = event.target.value.toString();
+    if (str.replace(/\s/g,"") == "") {
+      var defaultColor=%
 (typeof oQName.DefaultColorJSLoc=="undefined")%
 ?color.black:oQName.DefaultColorJSLoc;
-if (isthereRBUP) g.display=display.hidden;
-            event.target.strokeColor = defaultColor;
-        }
+   if (isthereRBUP) g.display=display.hidden;
+        event.target.strokeColor = defaultColor;
     }
+  }
 }
 function jmpToNamedDest(fName,cDest,bAlert) {
     if ( (typeof appAlerts[fName]!="undefined" %

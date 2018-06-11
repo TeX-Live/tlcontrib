@@ -6,7 +6,7 @@
         forcolorpaper,latextoc,pro,useui},
     exerquiz,aebxmp
 ]{aeb_pro}
-\usepackage{aeb_mlink}
+\usepackage[dblevel=1]{aeb_mlink}
 \usepackage[altbullet]{lucidbry}
 %\usepackage{myriadpro}
 
@@ -63,14 +63,17 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
+    prepared={2018/03/22},
+    preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
 }
-
+%\revisionLabel{Distribution Dated:}
 \def\AEBBook{\textsl{{Acro\!\TeX} eDucation System Tools: {\LaTeX} for interactive PDF documents}}
 
+\setlength{\marginparwidth}{31.25pt}
 
 \renewcommand\hproportionwebtitle{.75}
 \universityLayout{fontsize=Large,fontfamily=sffamily}
@@ -167,6 +170,7 @@
 \def\FitItIn{\eq@fititin}
 \def\endredpoint{\FitItIn{{\large\ifusebw\color{black}\else\color{red}\fi$\blacktriangleleft$}}}
 
+\advance\marginparwidth16pt
 
 \makeatother
 
@@ -201,7 +205,7 @@
 
 \makeatletter
 \let\web@copyright\@gobble
-\let\web@revision\@gobble
+%\let\web@revision\@gobble
 \renewcommand\webdirectory
 {%
     \par\ifeqforpaper\else\minimumskip\fi\vspace{\stretch{1}}%
@@ -217,12 +221,21 @@
     \end{itemize}
     \end{flushleft}
 }
-\renewcommand\titlepageTrailer
+%\renewcommand\titlepageTrailer
+%{%
+%    \web@copyright\ \copyright\ \webcopyrightyears\ \webversion
+%        \hfill\url{http://www.acrotex.net}\\
+%    \web@revision\ \@date \hfill\href{mailto:\webemail}{\webemail}
+%}
+\DesignTitlePageTrailer
 {%
-    \web@copyright\ \copyright\ \webcopyrightyears\ \webversion
-        \hfill\url{http://www.acrotex.net}\\
-    \web@revision\ \@date \hfill\href{mailto:\webemail}{\webemail}
+    ul=Copyright \copyright\ \webcopyrightyears,
+    ur=\thewebemail,
+    lr=\url{http://www.acrotex.net},
+    ll={\web@revision\ \aeb@prepared},
+    raise=-25pt
 }
+
 \makeatother
 
 \newcounter{exampleno}
@@ -236,6 +249,9 @@
 
 \everyCheckBox{\BC{.690 .769 .871}\BG{.941 1 .941}\textColor{1 0 0}}
 \everyRadioButton{\BC{.690 .769 .871}\BG{.941 1 .941}\textColor{0 0 1}\symbolchoice{star}}
+
+\reversemarginpar
+\mlMarksOff
 
 \chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
@@ -286,7 +302,7 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 
 %\section{Introduction}
 
-In \hypertarget{eformsPkg}{this} document we describe the support for Acrobat form elements
+In \hypertarget{eformsPkg}{this} document we describe the support for \app{Acrobat} form elements
 in an {\cAcroT} document. The \textit{PDF Reference} indicates there
 are four different categories of fields for a total of seven types
 of fields.
@@ -312,9 +328,9 @@ of fields.
 \end{questions}
 The {\cAcroB} now supports \textit{signature fields}. Using the
 command \cs{sigField}, an unsigned signature field is created.
-The field can be signed, either by using Acrobat, or programmatically
+The field can be signed, either by using \app{Acrobat}, or programmatically
 from a {\LaTeX} source, but you need to use \textsf{aeb\_pro} and to
-create the PDF using Acrobat Distiller.
+create the PDF using \app{Acrobat} Distiller.
 
 The \textsf{hyperref} Package (Rahtz, Oberdiek \textit{et al})
 provides support for the same set of form fields; however, not all
@@ -327,7 +343,7 @@ commands, in this way, there is a uniform treatment of all form
 fields in the \cAcroB.
 
 \redpoint The demo files for {\eForm} support are
-\texttt{eqform.tex}, for those using the \textsf{Acrobat
+\texttt{eqform.tex}, for those using the \textsf{\app{Acrobat}
 Distiller} to create a PDF document, and \texttt{eqform\_pd.tex},
 for those who use \textsf{pdftex} or \textsf{dvipdfm}.
 
@@ -337,7 +353,7 @@ resources are recommended:
   \item \href{https://developer.mozilla.org/en/JavaScript}{Core JavaScript Reference} at
   Mozilla Developer Center.
   \item \href{http://livedocs.adobe.com/acrobat_sdk/9/Acrobat9_HTMLHelp/wwhelp/wwhimpl/js/html/wwhelp.htm?&accessible=true}
-  {\emph{JavaScript for Acrobat API Reference}} at the Acrobat Developer Center. In the navigation panel
+  {\emph{JavaScript for \app{Acrobat} API Reference}} at the \app{Acrobat} Developer Center. In the navigation panel
   on the left, select JavaScript.
   \item \href{\urlAcroTeXBlog/?cat=5}{PDF Blog},
   by D. P. Story.
@@ -745,11 +761,11 @@ variables.
 \redpoint \cs{Ff} \textbf{Field flags.} Values appropriate to a
 list box are \Cs{FfCommitOnSelChange} (commits
 immediately after selection, PDF 1.5); \Cs{FfSort} (sorts\footnote
-{This flag really is not useful unless you have the full Acrobat application, the
+{This flag really is not useful unless you have the full \app{Acrobat} application, the
 \texttt{Sort} \texttt{items} check box is checked in the Options
 tab of the Fields Properties dialog for the field.
 Initially, the items are listed in the same order as listed in the
-\texttt{\#5} argument; the Acrobat application will sort the list
+\texttt{\#5} argument; the \app{Acrobat} application will sort the list
 if you view the \textit{Fields Properties} for the field and click
 \texttt{OK}. Be sure to save the changes.\label{FfSortfoot}}the
 items); \Cs{FfMultiSelect} (allows more than one value to be
@@ -1022,7 +1038,7 @@ descriptions and notes on each of these variables.
     \verb!  {mySig}{2in}{4\baselineskip}!
     \end{minipage}
 
-\newtopic To sign this field, use the Acrobat user interface, or use the
+\newtopic To sign this field, use the \app{Acrobat} user interface, or use the
 package \textsf{aeb\_pro}, and the following \texttt{docassembly} code:
 
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -1059,13 +1075,13 @@ The \texttt{appearance} is important, through it, you can choose a particular ap
 for the digital signature, including a custom signature that you've created. In the example
 above, we have \texttt{appearance: "My Signature"}.  \texttt{My Signature} is the name I've
 given a particular digital ID of mine. If the \texttt{appearance} property is not
-included in \texttt{oInfo}, Acrobat will use the one named \texttt{"Standard Text"}.
+included in \texttt{oInfo}, \app{Acrobat} will use the one named \texttt{"Standard Text"}.
 \end{itemize}
 
 \Important Additional information on signatures can be found
-at the \mlhref{http://www.adobe.com/go/acrobat_developer}{Acrobat Developer Center};
+at the \mlhref{http://www.adobe.com/go/acrobat_developer}{\mbox{\app{Acrobat}} Developer Center};
 or go to the \href{http://www.adobe.com/go/acrobat_security}{Security page};
-in particular, see the document \textit{Digital Signature User Guide for Acrobat 9.0
+in particular, see the document \textit{Digital Signature User Guide for \app{Acrobat} 9.0
 and Adobe Reader 9.0}. Other comments on the topic of signature fields:
 \begin{itemize}
 \item The open key \cs{textSize} is recognized, but is change to 0.
@@ -1129,9 +1145,9 @@ package to create multiple-line links.
 \settowidth{\aebdimen}{\cs{setLinkText[\meta{options}]\darg{\meta{link\_text}}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \setLink[!meta(options)]{!meta(link_text)}
-\setLinkText[!meta(options)]{!meta(link_text)}
+!grayV(\setLinkText[!meta(options)]{!meta(link_text)})
 \end{dCmd}
-\newtopic Both link commands are the same, the use of the second one, \cs{setLink}, is
+\newtopic Both link commands are the same, the use of the second one, \cs{setLinkText} (grayed out), is
 discouraged in favor of the use of \cs{setLink}.
 
 \PD The command has two arguments, the first is optional. The first
@@ -1195,7 +1211,7 @@ A form field may simply gather data from the user; additionally,
 it may perform one or more \textit{actions}. Actions include
 execute JavaScript code, going to a particular page in a document,
 open a file, execute a menu item, reset a form, play media or a
-sound, and so on.  Beginning with Acrobat~5.0, most actions can be
+sound, and so on.  Beginning with \app{Acrobat}~5.0, most actions can be
 performed using JavaScript methods.
 
 An action is initiated by a \textit{trigger}, a field may have
@@ -1479,7 +1495,7 @@ for details of the syntax.
 \noindent See section~8.5.3, `URI Actions', of the \textit{PDF
 Reference}~\cite{tech:PDFRef} for details of the syntax.
 
-Acrobat (Adobe Reader) also support open parameters, using these key-value pairs,
+\app{Acrobat} (Adobe Reader) also support open parameters, using these key-value pairs,
 we can go to a specific page in a PDF on the web, and even search for words, for example
 \pushButton[\CA{Go & Search}\A{/S/URI/URI(http://www.math.uakron.edu/~dpstory/acrotex/aeb_man.pdf#page=8&search=AcroTeX web exerquiz)}]{myButton4a}{}{10bp}
 opens the AeB Manual on the Internet, goes to page 8, and searches for the words
@@ -1497,7 +1513,7 @@ item). Named actions listed in the \textit{PDF Reference} are
 \texttt{NextPage}, \texttt{PrevPage}, \texttt{FirstPage} and
 \texttt{LastPage}. A complete list of named actions can be
 obtained by executing the code \texttt{app.listMenuItems()} in
-the JavaScript console of Acrobat (Pro).
+the JavaScript console of \app{Acrobat} (Pro).
 \pushButton[\CA{Go}\AC{Previous!}\RC{To}\A{/S/Named/N/PrevPage}]{myButton5}{}{10bp}
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \pushButton[\CA{Go}\AC{Previous!}\RC{To}
@@ -1510,7 +1526,7 @@ actions listed in the PDF Reference are \texttt{NextPage},
 
 In theory, any menu item can be executed as a named actions; there
 are several factors to be taken into consideration: (1) Not all menu
-items available to Acrobat are listed on the menu bar of Adobe
+items available to \app{Acrobat} are listed on the menu bar of Adobe
 Reader, when choosing a name event to use, you should decide if the
 application executing the named action supports that action; (2) In
 recent versions, starting with version 7, there have been security
@@ -1563,7 +1579,7 @@ CollectionHome          & GoBackDoc             & rolReadPage\\
 CollectionPreview       & GoForwardDoc          & ZoomDragMenuItem\\
 \end{longtable}
 \end{small}
-\newtopic As mentioned before, some of these are for Acrobat only, others are available for Adobe Reader. I'll
+\newtopic As mentioned before, some of these are for \app{Acrobat} only, others are available for Adobe Reader. I'll
 let you sort them out. If you try to execute a named action that is not on the white list, the action will
 silently fail.
 
@@ -1636,24 +1652,24 @@ command \cs{JS}, defined in the \textsf{insldjs} package, it expands to the corr
 of \cs{JS}.
 
 Most all actions can be performed using JavaScript, the reader is
-referred to the \textit{JavaScript for Acrobat API
+referred to the \textit{JavaScript for \app{Acrobat} API
 Reference}~\cite{tech:AcroJSRef}.
 
 \section{JavaScript}
 
-Acrobat JavaScript is the cross-platform scripting language of the
-Acrobat suite of products. For Acrobat 5.0 or later, Acrobat
+\app{Acrobat} JavaScript is the cross-platform scripting language of the
+\app{Acrobat} suite of products. For \app{Acrobat} 5.0 or later, \app{Acrobat}
 JavaScript based on JavaScript version 1.5 of ISO-16262 (formerly
 known as ECMAScript), and adds extensions to the core language to
-manipulate Acrobat forms, pages, documents, and even the viewer
+manipulate \app{Acrobat} forms, pages, documents, and even the viewer
 application.
 
 Web-based references to core JavaScript are the \textit{Core
 JavaScript Guide}~\cite{tech:NetscapeJSGuide} and the \textit{Core
-JavaScript Reference}~\cite{tech:NetscapeJSReference}. For Acrobat
-JavaScript, we refer you to the \textit{Developing Acrobat
+JavaScript Reference}~\cite{tech:NetscapeJSReference}. For \app{Acrobat}
+JavaScript, we refer you to the \textit{Developing \app{Acrobat}
 Applications using JavaScript}~\cite{tech:AcroJSGuide} and the
-\textit{JavaScript for Acrobat API Reference}~\cite{tech:AcroJSRef}.
+\textit{JavaScript for \app{Acrobat} API Reference}~\cite{tech:AcroJSRef}.
 
 \verygoodbreak
 
@@ -1736,9 +1752,9 @@ literal double quotes \texttt{"}, to avoid \texttt{"} being
 interpreted as the end of the string (or the beginning of a string)
 we have to double escape the double quotes, as in \verb+\\"+.  (This
 is not necessary when entering code in the JavaScript editor if you
-have the Acrobat application.)  I try to write JavaScript that I can easily
+have the \app{Acrobat} application.)  I try to write JavaScript that I can easily
 read, edit, and debug in the JavaScript editor (available in
-the full Acrobat application); for this reason, I've added in new
+the full \app{Acrobat} application); for this reason, I've added in new
 lines and tabbing (\cs{r} and \cs{t}). Many people, however, have
 only the Adobe Reader and cannot see their code to debug it; in this
 case, the formatting is really not needed.
@@ -1828,7 +1844,7 @@ The syntax for this command is
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \defineJSStr{\!anglemeta(CMD)}{!anglemeta(JS_string)}
 \end{dCmd}
-\PD The parameter \cs{\anglemeta{CMD}} is a command to be define by
+\PD Where \cs{\anglemeta{CMD}} is a command to be defined by
 \cs{defineJSStr}, for example, \cs{myMessage}, and \anglemeta{JS\_string} is
 the JavaScript string to be defined as the expansion of the
 \cs{\anglemeta{CMD}}.
@@ -1957,61 +1973,72 @@ Later, a push button can use this preset, like so,
 
 \newtopic You can mix your \cs{myFavFive} with different key-value pairs, such as a JavaScript action.
 
+\handpoint In each of the subsequent subsections, the \pkg{eforms} key to its user-friendly counterpart is
+displayed in the margin. Some of the user-friendly are a combination of
+\pkg{eforms} KVs and are not represented in the margin in this case.
+
 \subsection{The Appearance Tab}
 
-We set these key-value pairs to model the user interface of Acrobat.
+We present these key-value pairs to model the user-interface of \app{Acrobat}.
 
-The key is \texttt{border}. In the case of a link, this is the Link Type: \textsf{Visible Rectangle}
-or \textsf{Invisible Rectangle}. For forms, this key has no counterpart
-in the user interface. If you set border equal to \texttt{invisible}, that
-will set border line width to zero \verb!\W{0}!.
 
 \settowidth{\aebdimen}{\ttfamily border=visible|invisible}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 border=visible|invisible
 \end{dCmd}
-\CmdDescription Used with link annotations and determines whether the border surrounding the bounding
-box of the link is visible. If this key is not specified, the \textsf{eforms}
+\CmdDescription Used with link annotations and determines whether the border
+surrounding the bounding box of the link is visible. In the case of a link,
+this is the Link Type: \textsf{Visible Rectangle} or \textsf{Invisible
+Rectangle}. If you set border equal to \texttt{invisible}, that will set
+border line width to zero \verb!\W{0}!. For forms, this key has no
+counterpart in the user interface.
+
+If this key is not specified, the \textsf{eforms}
 follows the rule: If \texttt{colorlinks} option of  \textsf{hyperref} is used, the border is invisible;
 otherwise, it is visible (and the default \texttt{linewidth} is 1). Use the border key to override
 this behavior.
 
-\settowidth{\aebdimen}{\ttfamily linewidth=thin|medium|thick}
+\settowidth{\aebdimen}{\ttfamily linewidth=thin|medium|thick}%
+\def\1{\llap{\Cs{W}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-linewidth=thin|medium|thick
+!1linewidth=thin|medium|thick
 \end{dCmd}
 \CmdDescription The \texttt{linewidth} of the border around a link
 or a form. The user interface choices are \texttt{thin},
 \texttt{medium}, and \texttt{thick}. This key-value is ignored if the
 document author has set the border to \texttt{invisible}.
 
-\settowidth{\aebdimen}{\ttfamily highlight=none|invert|outline|inset|push}
+\settowidth{\aebdimen}{\ttfamily highlight=none|invert|outline|inset|push}%
+\def\1{\llap{\Cs{H}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-highlight=none|invert|outline|inset|push
+!1highlight=none|invert|outline|inset|push
 \end{dCmd}
 \CmdDescription The highlight type for links and forms, choices are
 \texttt{none}, \texttt{invert}, \texttt{outline}, \texttt{inset} and
 \texttt{push}. The term \texttt{inset} is used with links, and
 \texttt{push} is used with forms. They each have the same key value pair.
 
-\settowidth{\aebdimen}{\ttfamily bordercolor=\anglemeta{num}\hardspace\anglemeta{num}\hardspace\anglemeta{num}}
+\settowidth{\aebdimen}{\ttfamily bordercolor=\anglemeta{num}\hardspace\anglemeta{num}\hardspace\anglemeta{num}}%
+\def\1{\llap{\smash{\parbox[c]{\marginparwidth}{\raggedright\shortstack[l]{\Cs{BC}\,(forms) or\\\Cs{Color}\,(links)}}}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-bordercolor=!anglemeta(num)!hardspace!anglemeta(num)!hardspace!anglemeta(num)
+!1bordercolor=!anglemeta(num)!hardspace!anglemeta(num)!hardspace!anglemeta(num)
 \end{dCmd}
 \CmdDescription The color of the border, when visible, in RGB color space.
 For example, \texttt{bordercolor=1 0 0}, is the color red.
 
-\settowidth{\aebdimen}{\ttfamily linestyle=solid|dashed|underlined|beveled|inset}
+\settowidth{\aebdimen}{\ttfamily linestyle=solid|dashed|underlined|beveled|inset}%
+\def\1{\llap{\Cs{S}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-linestyle=solid|dashed|underlined|beveled|inset
+!1linestyle=solid|dashed|underlined|beveled|inset
 \end{dCmd}
 \CmdDescription  The line style of the border, possible values are \texttt{solid},\texttt{dashed},
 \texttt{underlined}, \texttt{beveled},and \texttt{inset}. Links do not support
 the \texttt{beveled} option.
 
-\settowidth{\aebdimen}{\ttfamily dasharray=\anglemeta{num}[\hardspace\anglemeta{num}]}
+\settowidth{\aebdimen}{\ttfamily dasharray=\anglemeta{num}[\hardspace\anglemeta{num}]}%
+\def\1{\llap{\Cs{D}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-dasharray=!anglemeta(num)[!hardspace!anglemeta(num)]
+!1dasharray=!anglemeta(num)[!hardspace!anglemeta(num)]
 \end{dCmd}
 \CmdDescription When a line style of \texttt{dashed} is chosen, you can specify a dash array.
 The default is 3.0, which means a repeating pattern of 3 points of line, followed by 3 points of space.
@@ -2019,9 +2046,12 @@ A value of \texttt{dasharray=3~2} means three points of line, followed
 by two points of space. When this key is used without a value, the value is 3.0.
 When the \texttt{dashed} key is not present, 3.0 is used.
 
-\settowidth{\aebdimen}{\ttfamily linktxtcolor=\anglemeta{named\_color}}
+linktxtcolor
+
+\settowidth{\aebdimen}{\ttfamily linktxtcolor=\anglemeta{named\_color}}%
+\def\1{\llap{\Cs{linktxtcolor}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-linktxtcolor=!anglemeta(named_color)
+!1linktxtcolor=!anglemeta(named_color)
 \end{dCmd}
 \CmdDescription Set the color of the link text. Ignored if the
 \texttt{colorlinks} option of hyperref has not been taken.  The
@@ -2032,9 +2062,10 @@ redefining \cs{defaultlinkcolor}. If \verb!linktxtcolor={}! (an
 empty argument), or simply \texttt{linktxtcolor}, no color is
 applied to the text, the color of the text will be whatever the current color is.
 
-\settowidth{\aebdimen}{\ttfamily annotflags=hidden|print|-print|noview|lock}
+\settowidth{\aebdimen}{\ttfamily annotflags=hidden|print|-print|noview|lock}%
+\def\1{\llap{\Cs{F}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-annotflags=hidden|print|-print|noview|lock
+!1annotflags=hidden|print|-print|noview|lock
 \end{dCmd}
 
 \CmdDescription This is a bit field, possible values are \texttt{hidden}, \texttt{print},
@@ -2045,9 +2076,10 @@ For example, \verb|annotflags={-print,lock}| makes the field not printable and i
 locked, so the field cannot be moved through the UI.
 
 
-\settowidth{\aebdimen}{\ttfamily fieldflags=readonly|required|noexport|multiline|password|}
+\settowidth{\aebdimen}{\ttfamily fieldflags=readonly|required|noexport|multiline|password|}%
+\def\1{\llap{\Cs{Ff}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-fieldflags=readonly|required|noexport|multiline|password|
+!1fieldflags=readonly|required|noexport|multiline|password|
      notoggleoff|radio|pushbutton|combo|edit|
      sort|fileselect|multiselect|nospellcheck|
      noscrolling|comb|radiosinunison|commitonchange|
@@ -2057,20 +2089,25 @@ fieldflags=readonly|required|noexport|multiline|password|
 number of properties of a field. This is a multiple-selection key as well. The
 values are ``or-ed'' together.
 
-Normally, a document author would not specify \texttt{radio}, \texttt{pushbutton} or \texttt{combo}. These properties are used by \textsf{eforms} to construct a radio button field, a push button and a combo box. The others can be used as appropriate.
+Normally, a document author would not specify \texttt{radio},
+\texttt{pushbutton} or \texttt{combo}. These properties are used by
+\textsf{eforms} to construct a radio button field, a push button and a combo
+box. The others can be used as appropriate.
 
-\settowidth{\aebdimen}{\ttfamily maxlength=\anglemeta{num}}
+\settowidth{\aebdimen}{\ttfamily maxlength=\anglemeta{num}}%
+\def\1{\llap{\Cs{MaxLen}\hspace{\marginparsep}}}%%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-maxlength=!anglemeta(num)
+!1maxlength=!anglemeta(num)
 \end{dCmd}
 \CmdDescription Use \texttt{maxlength} to limit the number of characters input into a text field.
 Example: \texttt{maxlength=12}. When the \texttt{fieldflags} is set to \texttt{comb}, the value
 of \texttt{maxlength} determines the number of combs in the field.
 
 
-\settowidth{\aebdimen}{\ttfamily tooltip=\anglemeta{string}}
+\settowidth{\aebdimen}{\ttfamily tooltip=\anglemeta{string}}%
+\def\1{\llap{\Cs{TU}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-tooltip=!anglemeta(string)
+!1tooltip=!anglemeta(string)
 \end{dCmd}
 \CmdDescription Enter a text value to appear as a tool tip. A tool
 tip is text that appears in a frame when the user hovers the mouse
@@ -2084,10 +2121,12 @@ tooltip = {J\"{u}rgen, press me and see what happens!}
 \end{Verbatim}
 \noindent yields a tool tip of ``J\"{u}rgen, press me and see what happens!''
 
-\settowidth{\aebdimen}{\ttfamily default=\anglemeta{string}}
+\settowidth{\aebdimen}{\ttfamily default=\anglemeta{string}}%
+\def\1{\llap{\Cs{DV}\hspace{\marginparsep}}}%
+\def\2{\llap{\Cs{V}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-default=!anglemeta(string)
-value=!anglemeta(string)
+!1default=!anglemeta(string)
+!2value=!anglemeta(string)
 \end{dCmd}
 \CmdDescription Set default value of a field (text, list, combobox)
 using the \texttt{default} key. The default value is the value used
@@ -2103,24 +2142,29 @@ If the unicode option of hyperref is in effect, then setting
 ``\char1 \ 1 000 000''.
 
 \settowidth{\aebdimen}{\ttfamily rotate=0|90|180|270}
+\def\1{\llap{\Cs{R}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-rotate=0|90|180|270
+!1rotate=0|90|180|270
 \end{dCmd}
 \CmdDescription Set the orientation of the field, values are 0, 90, 180 and 270. If 90 or 270
 are chosen, the height and width of the field need to be reversed. This is not
 done automatically by \textsf{eforms}
 
 \settowidth{\aebdimen}{\ttfamily bgcolor=\anglemeta{num}\hardspace\anglemeta{num}\hardspace\anglemeta{num}}
+\def\1{\llap{\Cs{BG}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-bgcolor=!anglemeta(num)!hardspace!anglemeta(num)!hardspace!anglemeta(num)
+!1bgcolor=!anglemeta(num)!hardspace!anglemeta(num)!hardspace!anglemeta(num)
 \end{dCmd}
 \CmdDescription The background color of a form field. This is a RGB color value.
 
 \settowidth{\aebdimen}{\ttfamily rollovertxt=\anglemeta{string}}
+\def\1{\llap{\Cs{CA}\hspace{\marginparsep}}}%
+\def\2{\llap{\Cs{AC}\hspace{\marginparsep}}}%
+\def\3{\llap{\Cs{RC}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-uptxt=!anglemeta(string)
-downtxt=!anglemeta(string)
-rollovertxt=!anglemeta(string)
+!1uptxt=!anglemeta(string)
+!2downtxt=!anglemeta(string)
+!3rollovertxt=!anglemeta(string)
 \end{dCmd}
 \CmdDescription The normal (mouse up), mouse down and rollover text
 for a button field. All three of these keys obey the \texttt{unicode} option.
@@ -2131,21 +2175,24 @@ If the \opt{unicode} option of \pkg{hyperref} is in effect, then setting
 
 
 \newtopic \textbf{Push buttons only.} The following list of keys are used for
-creating custom appearances on button faces. Acrobat Distiller required for
+creating custom appearances on button faces. \app{Acrobat} Distiller required for
 this set. The example files
 \marginpar{\mbox{\makebox[0pt][l]{\textcolor{blue}{\Pisymbol{webd}{254}}}\raisebox{-2pt}{\color{red}{{\zqacr
 b\hspace{9.5pt}}}}}}\texttt{\href{\urlAcroTeXBlog/?p=879}{eqforms.pdf}} and
 \texttt{\href{\urlAcroTeXBlog/?p=1291}{eqforms\_pro.pdf}} illustrate the
 creation of icons as button appearances. In the latter PDF,
-\texttt{eqforms\_pro.pdf}, \textsf{Acrobat Distiller} is required to be the
+\texttt{eqforms\_pro.pdf}, \textsf{\app{Acrobat} Distiller} is required to be the
 PDF creator.
 \begin{itemize}
 \item[]
 \settowidth{\aebdimen}{\ttfamily normappr=\anglemeta{string}}
+\def\1{\llap{\Cs{I}\hspace{\marginparsep}}}%
+\def\2{\llap{\Cs{RI}\hspace{\marginparsep}}}%
+\def\3{\llap{\Cs{IX}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-normappr=!anglemeta(string)
-rollappr=!anglemeta(string)
-downappr=!anglemeta(string)
+!1normappr=!anglemeta(string)
+!2rollappr=!anglemeta(string)
+!3downappr=!anglemeta(string)
 \end{dCmd}
 \item[]\CmdDescription The normal, rollover, and down appearances of the button face icon. The value of each
 key is an indirect reference to a form XObject. Normally, you can use the \texttt{graphicxsp} package
@@ -2153,8 +2200,9 @@ to embed graphics and give a symbolic name which is used as the value of these k
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily layout=labelonly|icononly|icontop|iconbottom|}
+\def\1{\llap{\Cs{TP}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-layout=labelonly|icononly|icontop|iconbottom|
+!1layout=labelonly|icononly|icontop|iconbottom|
        iconleft|iconright|labelover
 \end{dCmd}
 \item[]\CmdDescription The value of this key determines the layout of the icon relative to the label (or caption).
@@ -2163,8 +2211,9 @@ layout=labelonly|icononly|icontop|iconbottom|
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily scalewhen=always|never|iconbig|iconsmall}
+\def\1{\llap{\Cs{SW}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-scalewhen=always|never|iconbig|iconsmall
+!1scalewhen=always|never|iconbig|iconsmall
 \end{dCmd}
 \item[]\CmdDescription The value of this key tells when to scale the icon. The \texttt{iconbig}
     scales the icon when it is too big for the bounding rectangle; while
@@ -2173,8 +2222,9 @@ scalewhen=always|never|iconbig|iconsmall
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily scale=proportional|nonproportional}
+\def\1{\llap{\Cs{ST}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-scale=proportional|nonproportional
+!1scale=proportional|nonproportional
 \end{dCmd}
 \item[]\CmdDescription This parameter sets the scale type, either \texttt{proportional} scaling, where
 the aspect ratio of the icon is preserved; or \texttt{nonproportional} scaling is used. The
@@ -2182,8 +2232,9 @@ default is \texttt{proportional}.
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily position=\anglemeta{x}\hardspace\anglemeta{y})}
+\def\1{\llap{\Cs{PA}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-position=!anglemeta(x)!hardspace!anglemeta(y)
+!1position=!anglemeta(x)!hardspace!anglemeta(y)
 \end{dCmd}
 \item[]\CmdDescription Both \anglemeta{x} and \anglemeta{y} are numbers
     between 0 and 1, inclusive, and separated by a space (not a comma). They
@@ -2195,8 +2246,9 @@ position=!anglemeta(x)!hardspace!anglemeta(y)
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily fitbounds=true|false}
+\def\1{\llap{\Cs{FB}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-fitbounds=true|false
+!1fitbounds=true|false
 \end{dCmd}
 \item[]\CmdDescription A Boolean value, if \texttt{true}, indicates
     that the button appearance should be scaled to fit fully
@@ -2208,19 +2260,20 @@ fitbounds=true|false
 
 \newtopic \textbf{Check boxes and Radio Buttons Only.} The following
 list of keys are used for creating custom appearances on check boxes and
-radio buttons. Acrobat Distiller required for this set. The example files
+radio buttons. \app{Acrobat} Distiller required for this set. The example files
 \marginpar{\mbox{\makebox[0pt][l]{\textcolor{blue}{\Pisymbol{webd}{254}}}\raisebox{-2pt}{\color{red}{{\zqacr
 b\hspace{9.5pt}}}}}}\texttt{\href{\urlAcroTeXBlog/?p=879}{eqforms.pdf}} and
 \texttt{\href{\urlAcroTeXBlog/?p=1291}{eqforms\_pro.pdf}} illustrate the
-creation of these appearances.. In the latter PDF, \texttt{eqforms\_pro.pdf},
-\textsf{Acrobat Distiller} is required to be the PDF creator.
+creation of these appearances. In the latter PDF, \texttt{eqforms\_pro.pdf},
+\textsf{\app{Acrobat} Distiller} is required to be the PDF creator.
 
 \begin{itemize}
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily appr=\darg{ norm=\darg{on=\darg\anglemeta{normOnAppr}},off=\darg{\anglemeta{normOffAppr}}},}
+\def\1{\llap{\Cs{AP}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-appr={ norm={on={!anglemeta(normOnAppr)},off={!anglemeta(normOffAppr)}},
+!1appr={ norm={on={!anglemeta(normOnAppr)},off={!anglemeta(normOffAppr)}},
        down={on={!anglemeta(downOnAppr)},off={!anglemeta(downOffAppr)}},
        roll={on={!anglemeta(rollOnAppr)},off={!anglemeta(rollOffAppr)}}}
 \end{dCmd}
@@ -2231,26 +2284,30 @@ appr={ norm={on={!anglemeta(normOnAppr)},off={!anglemeta(normOffAppr)}},
         have the same structure as \texttt{norm} does.
 
 \item[] If \texttt{appr} is not specified, then, by default, the usual appearances of the
-        buttons are used, as provided by Acrobat/AR.
+        buttons are used, as provided by \app{Acrobat}/AR.
 
 \item[] The \texttt{down} and \texttt{roll} are optional, if you use \texttt{appr} at all, you should
         specify the norm appearance, both \texttt{on} and \texttt{off} appearances.
 
 \end{itemize}
 
-\settowidth{\aebdimen}{\ttfamily align=left|centered|right}
+\settowidth{\aebdimen}{\ttfamily align=left|centered|right}%
+\def\1{\llap{\Cs{Q}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-align=left|centered|right
+!1align=left|centered|right
 \end{dCmd}
 \CmdDescription The type of alignment of a text field. Permitted values are
 \texttt{left}, \texttt{centered}, and \texttt{right}.
 
 
-\settowidth{\aebdimen}{\ttfamily textcolor=\anglemeta{num}[\hardspace\anglemeta{num}\hardspace\anglemeta{num}[\hardspace\anglemeta{num}]]}
+\settowidth{\aebdimen}{\ttfamily textcolor=\anglemeta{num}[\hardspace\anglemeta{num}\hardspace\anglemeta{num}[\hardspace\anglemeta{num}]]}%
+\def\1{\llap{\Cs{textFont}\hspace{\marginparsep}}}%
+\def\2{\llap{\Cs{textSize}\hspace{\marginparsep}}}%
+\def\3{\llap{\Cs{textColor}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-textfont=!anglemeta(font_name)
-textsize=!anglemeta(num)
-textcolor=!anglemeta(num)[!hardspace!anglemeta(num)!hardspace!anglemeta(num)[!hardspace!anglemeta(num)]]
+!1textfont=!anglemeta(font_name)
+!2textsize=!anglemeta(num)
+!3textcolor=!anglemeta(num)[!hardspace!anglemeta(num)!hardspace!anglemeta(num)[!hardspace!anglemeta(num)]]
 \end{dCmd}
 \CmdDescription
 The key \texttt{textfont} is the text font to be used with the text of the field,
@@ -2258,17 +2315,34 @@ while \texttt{textsize} is the text size to be used. A value of 0 means auto siz
 The color of the text in the field. This can be in \textsf{G}, \textsf{RGB} or \textsf{CMYK} color
 space by specifying 1, 3 or 4 numbers between 0 and 1.
 
-\settowidth{\aebdimen}{\ttfamily autocenter=yes|no}
+\settowidth{\aebdimen}{\ttfamily autocenter=yes|no}%
+\def\1{\llap{\Cs{autoCenter}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-autocenter=yes|no
+!1autocenter=yes|no
 \end{dCmd}
 \CmdDescription This is a feature of \textsf{eforms}. Use
 \texttt{autocenter=yes} (the default) to moderately center the bounding box,
 and use \texttt{autocenter=no} otherwise.
 
-\settowidth{\aebdimen}{\ttfamily presets=\meta{\string\CMD}}
+\settowidth{\aebdimen}{\ttfamily inline=yes|no}%
+\def\1{\llap{\Cs{inline}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-presets=!meta(\CMD)
+!1inline=yes|no
+\end{dCmd}
+\CmdDescription Same as \cs{autoCenter} (\texttt{autocenter}), but the algorithm
+for positioning the field is more sophisticated. The default is \verb|autocenter=no|
+
+To compare the last two (\texttt{autocenter} and \texttt{inline}), we present the following example:
+\begin{quote}\settowidth{\dimen0}{Enter your first name:\ }%
+\underbar{Enter your name:\ \textField[\V{D. P. Story}\DV{D. P. Story}\inline{y}]{ILtxt}{1.25in}{14bp}}\cgBdry[3bp](\texttt{inline=yes})\\[6bp]
+\underbar{Enter your name:\ \textField[\V{D. P. Story}\DV{D. P. Story}]{ACtxt}{1.25in}{14bp}}\cgBdry[3bp](\texttt{autoCenter=yes})
+\end{quote}
+
+
+\settowidth{\aebdimen}{\ttfamily presets=\meta{\string\CMD}}
+\def\1{\llap{\Cs{presets}\hspace{\marginparsep}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+!1presets=!meta(\CMD)
 \end{dCmd}
 \CmdDescription Set presets from inside a \cs{ui} argument. The value of \cs{ui} must be a user defined
 command, which expands to a  comma-delimited list of ui-key-value pairs.
@@ -2289,9 +2363,10 @@ Later, we can type,
 \setLink[\ui{presets={\myUIOpts}}]{Press Me Again!!}
 \end{dCmd*}
 
-\settowidth{\aebdimen}{\ttfamily symbolchoice=check|circle|cross|diamond|square|star}
+\settowidth{\aebdimen}{\ttfamily symbolchoice=check|circle|cross|diamond|square|star}%
+\def\1{\llap{\Cs{symbolchoice}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-symbolchoice=check|circle|cross|diamond|square|star
+!1symbolchoice=check|circle|cross|diamond|square|star
 \end{dCmd}
 \CmdDescription Used with a checkbox or radio button field. This sets the symbol
 that appears in the field when the box is checked. Choices are
@@ -2339,7 +2414,7 @@ and to pages and destinations to another PDF file. these are
   \item \texttt{view}: The view can be set when the \texttt{page} key is used.
     Possible values are \texttt{fitpage}, \texttt{actualsize},
     \texttt{fitwidth}, \texttt{fitvisible}, and \texttt{inheritzoom}.
-    These terms correspond to Acrobat's UI. When jumping to a
+    These terms correspond to \app{Acrobat}'s UI. When jumping to a
     destination, the view is set by the destination code.
 
   \item \texttt{open}: This key is used when you specify the \texttt{file} key. The
@@ -2376,9 +2451,10 @@ these are handled by the \textsf{eforms} package.
 \end{itemize}
 
 
-\settowidth{\aebdimen}{\ttfamily js=\darg{\anglemeta{script}}}
+\settowidth{\aebdimen}{\ttfamily js=\darg{\anglemeta{script}}}%
+\def\1{\llap{\ttfamily\Cs{A}\darg{\Cs{JS}\darg{\anglemeta{script}}}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-js={!anglemeta(script)}
+!1js={!anglemeta(script)}
 \end{dCmd}
 \CmdDescription A general purpose key to execute JavaScript actions on a mouse up trigger.
 The argument is a JavaScript text string, for example,
@@ -2436,8 +2512,9 @@ JavaScript code (\anglemeta{script}).
  as readonly (locked). The locked key controls that option.
 
 \settowidth{\aebdimen}{\ttfamily lock=\darg{\anglemeta{PDF KV-pairs}}}
+\def\1{\llap{\Cs{Lock}\hspace{\marginparsep}}}%Lock
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-lock={!anglemeta(PDF KV-pairs)}
+!1lock={!anglemeta(PDF KV-pairs)}
 \end{dCmd}
 
 \CmdDescription The \texttt{lock} key is used with signature fields, currently, there is
@@ -2577,7 +2654,7 @@ The syntax for \cs{setStructTabOrder} is
 of a previously defined PDF object, such as a form field (widget), a link, or an annotation. The
 optional argument takes two optional key-value pairs: (1) The type is a declaration of the type
 the PDF object is, the default is \texttt{Form} (you can use \texttt{Link} if its a link, and \texttt{Annot} if its a comment);
-(2) \texttt{title} is the title of the structure, the value of title appears in the Tags panel of the Acrobat
+(2) \texttt{title} is the title of the structure, the value of title appears in the Tags panel of the \app{Acrobat}
 user interface. The default title is to have no title.
 
 \newtopic The demo file is \marginpar{\mbox{\makebox[0pt][l]{\textcolor{blue}{\Pisymbol{webd}{254}}}\raisebox{-2pt}{\color{red}{{\zqacr
@@ -2624,32 +2701,33 @@ b\hspace{9.5pt}}}}}}\texttt{\href{\urlAcroTeXBlog/?p=334}{settaborder1.pdf}} for
 
 The \hypertarget{\pkg{insdljs}}{insdljsPkg} package provides support to {\LaTeX} in four areas:
 \begin{enumerate}
-  \item for embedding document level JavaScript into the PDF file created from a {\LaTeX} source,
-        the \texttt{insDLJS} environment.
-  \item for creating open page actions that are executed when the document is first opened to the first
-        page, the \cs{OpenAction} command.
-  \item for writing JavaScript code in an environment that preserves the formatting of the code,
-        this is the \texttt{defineJS} environment.
-  \item for executing JavaScript code once to perform post
-      distill tasks, this is the \texttt{execJS} environment. This environment works only for document
-      authors that use Acrobat/Acrobat Distiller to create PDF files.
+  \item for embedding document level JavaScript into the PDF file created
+      from a {\LaTeX} source, the \texttt{insDLJS} environment.
+  \item for creating open page actions that are executed when the document
+      is first opened to the first page, the \cs{OpenAction} command.
+  \item for writing JavaScript code in an environment that preserves the
+      formatting of the code, this is the \texttt{defineJS} environment.
+  \item for executing JavaScript code once to perform post-distillation
+      tasks, this is the \texttt{execJS} environment. This environment
+      works only for document authors that use \app{Acrobat}/\app{Acrobat}
+      Distiller to create PDF files.
 \end{enumerate}
 
 \newtopic This package defines a new environment, \texttt{insDLJS}, used
-for inserting Acrobat JavaScript into a PDF file created from a \LaTeX{}
-source. This package works correctly for users of \textsf{pdftex} (and
-luatex), \textsf{dvipdfm}, \textsf{dvipdfmx}, and \texttt{xetex}. For
-those that use the \textsf{Acrobat Distiller} (specifically, those that
-use either \textsf{dvips} or \textsf{dvipsone} to produce a postscript
-file, which is then distilled), you are required to have Acrobat~5.0 (or
-later).
+for inserting \app{Acrobat} JavaScript into a PDF file created from a
+\LaTeX{} source. This package works correctly for users of \textsf{pdftex}
+(and \app{luatex}), \textsf{dvipdfm}, \textsf{dvipdfmx}, and \texttt{xetex}.
+For\marginpar{\small\raggedleft\app{Acrobat} required for
+\app{dvips}} those who use either \app{dvips} or
+\app{dvipsone} to produce a postscript file, which is then distilled, you are
+required to have \app{Acrobat}~5.0 (or later).
 
 \section{Package Options}
 
 The \textsf{insdljs} supports five common ``drivers'': \texttt{dvipsone},
 \texttt{dvips}, \texttt{pdftex} (including the executable \textsf{lu(la)tex}), \texttt{dvipdfm},
 \texttt{dvipdfmx}, \texttt{xetex}, and \texttt{tex\-tures}. When using
-\texttt{dvipsone} or \texttt{dvips}, Acrobat Distiller and Acrobat
+\texttt{dvipsone} or \texttt{dvips}, \app{Acrobat} Distiller and \app{Acrobat}
 (version 5.0 or later) are required to embed the JavaScripts at the
 document level. The other drivers have primitives that allow the embedding
 of the JavaScripts.
@@ -2662,7 +2740,7 @@ of the JavaScripts.
 
 \item\NH\texttt{execJS} is a very useful option/feature if you know  how to use
     it.  Any JavaScript that is written in an \env{execJS} environment is
-    executed once when the document is first opened in Acrobat, then
+    executed once when the document is first opened in \app{Acrobat}, then
     discarded. AeB uses this for post-distillation document processing. The
     default is that the JavaScript in an \texttt{execJS} environment is not
     executed; using this option turns on this feature.
@@ -2745,14 +2823,14 @@ braces are set to normal characters, so the commands can't have any
 argument, they should be just text macros.
 
 \PD The environment takes three parameters, the first is optional, but required
-when  using the Acrobat Distiller.
+when  using the \app{Acrobat} Distiller.
 \begin{description}\def\NH{\hspace{-\labelsep}}%
 \item\NH\texttt{[\meta{js\_var}]} is an
     optional parameter \emph{was required} for the \texttt{dvipsone}
     and \texttt{dvips} options; otherwise it is ignored. Its value
     must be the name of one of the functions or JavaScript variables
     defined in the environment. This is used to detect whether the
-    \textsf{DLJS} has already been loaded by Acrobat.
+    \textsf{DLJS} has already been loaded by \app{Acrobat}.
 
 \handpoint The \texttt{[\meta{js\_var}]} is now optional even for
     users of \textsf{dvipsone} and \textsf{dvips}. If one is not
@@ -2767,7 +2845,7 @@ when  using the Acrobat Distiller.
 
 \item\NH\meta{script\_name} is the name of the JavaScript that you are
     embedding in the document. This title will appear in the document
-    JavaScript dialog in Acrobat; unless you use Acrobat, you can't
+    JavaScript dialog in \app{Acrobat}; unless you use \app{Acrobat}, you can't
     see this name in the user interface anyway. The
     \meta{script\_name} should be a string that is descriptive of
     the functionality of the code.
@@ -2835,7 +2913,7 @@ The \texttt{insDLJS*} environment can be used to better organize,
 edit and debug your JavaScript. It is suitable for package
 developers who write a large amount of code package application.
 
-If you have the full Acrobat product, you can open the DLJS edit
+If you have the full \app{Acrobat} product, you can open the DLJS edit
 dialog. There you will see a listing of all DLJS contained in the
 document. When you double click on one of the \textit{script names},
 you enter the edit window, where you can edit all JavaScript
@@ -2860,7 +2938,7 @@ contained under that name.
 \end{dCmd}
 \egroup
 \PD The environment takes two parameters, the first is optional, but required
-when  using the Acrobat Distiller. The nested environment \texttt{newsegment} takes
+when  using the \app{Acrobat} Distiller. The nested environment \texttt{newsegment} takes
 one required parameter.
 \begin{description}\def\NH{\hspace{-\labelsep}}
 \item\NH\texttt{[\meta{js\_var}]} is an optional parameter, its use is discouraged.
@@ -2869,7 +2947,7 @@ one required parameter.
     limited to eight characters. It is used to build the names of auxiliary
     files and to build the names of macros used by the environment.
 \item\NH\meta{script\_name\_i} is the script name (title) that appears in
-    the Document level JavaScript dialog of Acrobat.
+    the Document level JavaScript dialog of \app{Acrobat}.
 \end{description}
 
 \subsection{Escaping}
@@ -2935,29 +3013,31 @@ and returns \texttt{true} if such a pattern is found, \texttt{false}
 otherwise. If \verb!str="(x+1)^(3)"!, the search returns \texttt{true}.
 
 \subsection{Access and Debugging}
-For those who do not have \textsf{Acrobat}, the application,
+For those who do not have \textsf{\app{Acrobat}}, the application,
 unless you are writing very simple code, writing and debugging
-JavaScript will be very difficult.  From the Acrobat Reader,
+JavaScript will be very difficult.  From the \app{Acrobat} Reader,
 there is no access to the document JavaScript. You will be
 pretty much writing blind.
 
-Normally, I develop the JavaScript from within Acrobat. The GUI editor
+Normally, I develop the JavaScript from within \app{Acrobat}. The GUI editor
 does check for syntax errors, giving you a chance to correct some simple
 errors as you go. After I am satisfied with my code, I copy it from the
 editor and paste it into a \texttt{insDLJS} environment. This is how the
 JavaScript code of \textsf{exerquiz} was developed.
 
 In my opinion, if you want to develop rather complicated code, having the
-full Acrobat product is a must. (This implies that the Windows or Mac
+full \app{Acrobat} product is a must. (This implies that the Windows or Mac
 platform is needed!)
 
 \subsection{JavaScript References}
 
-The JavaScript used by Acrobat consists of the core JavaScript plus Acrobat's JavaScript extensions.
-The \textit{Core JavaScript Reference}~\cite{tech:NetscapeJSReference} may be found at \mlhref{http://developer.mozilla.org/en/docs/JavaScript}{Mozilla Developer Center}.
-The documentation for the Acrobat extensions may be found in the guides \textit{JavaScript for Acrobat API Reference}~\cite{tech:AcroJSRef}
-and \textit{Developing Acrobat Applications using JavaScript}~\cite{tech:AcroJSGuide}, both of which I've had a hand in writing. These
-are found at \href{http://www.adobe.com/devnet/acrobat/}{Acrobat Developer Center}. (Click on \textbf{JavaScript for Acrobat} in the right-hand navigation panel.)
+The JavaScript used by \app{Acrobat} consists of the core JavaScript plus \app{Acrobat}'s JavaScript extensions.
+The \textit{Core JavaScript Reference}~\cite{tech:NetscapeJSReference} may be found at
+\mlhref{http://developer.mozilla.org/en/docs/JavaScript}{Mozilla Developer Center}.
+The documentation for the \app{Acrobat} extensions may be found in the guides
+\textit{JavaScript for \app{Acrobat} API Reference}~\cite{tech:AcroJSRef}
+and \textit{Developing \app{Acrobat} Applications using JavaScript}~\cite{tech:AcroJSGuide}, both of which I've had a hand in writing. These
+are found at \href{http://www.adobe.com/devnet/acrobat/}{\app{Acrobat} Developer Center}. (Click on \textbf{JavaScript for \app{Acrobat}} in the right-hand navigation panel.)
 
 \section{Open Action}
 
@@ -3035,9 +3115,9 @@ the \cs{OpenAction} command.
 
 This is an environment useful to PDF developers who want to tap into
 the power of JavaScript. To use this environment, the developer
-needs Acrobat~5.0 or higher. \textsf{pdftex} or \textsf{dvipdfm} can
+needs \app{Acrobat}~5.0 or higher. \textsf{pdftex} or \textsf{dvipdfm} can
 be used to produce the PDF document, but the developer needs
-the Acrobat product for this environment to do anything.
+the \app{Acrobat} product for this environment to do anything.
 
 The \texttt{execJS} is used primarily for post-distillation
 processing (post-creation processing, in the case of \textsf{pdftex}
@@ -3050,7 +3130,7 @@ verbatim JavaScript code. This environment is a variation on
 \textsf{insdljs}, it writes a couple of auxiliary files to disk; in
 particular, the environment creates an \texttt{.fdf} file. When the
 newly produced PDF is loaded for the first time into the viewer
-(Acrobat, not Reader), the \texttt{.fdf} file generated
+(\app{Acrobat}, not Reader), the \texttt{.fdf} file generated
 by the \textsf{execJS} environment is imported, and the JavaScript
 executed. This JavaScript is \emph{not} saved with the document.
 The syntax of this environment is\dots
@@ -3101,7 +3181,7 @@ aebAddWatermarkFromFile = app.trustPropagatorFunction (
 });
 \end{Verbatim}
 
-Once this code is installed in the user JavaScript folder, and Acrobat is re-started, the code
+Once this code is installed in the user JavaScript folder, and \app{Acrobat} is re-started, the code
 is ready to be used. The way the code is used is with the \texttt{execJS} environment.
 
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -3114,7 +3194,7 @@ is ready to be used. The way the code is used is with the \texttt{execJS} enviro
 
 \newtopic This is the code used to prepare this manual. It places a
 background graphic on each page of the document.  When the newly
-distilled document is first opened in Acrobat, (version 7.0 or
+distilled document is first opened in \app{Acrobat}, (version 7.0 or
 higher, is when the privilege bit started to appear), the trusted
 function \texttt{aebTrustedFunctions} is executed with its
 arguments. Looking at the definition of
@@ -3211,7 +3291,7 @@ FLock      & locked field (PDF 1.4)\\
 \end{center}
 
 \medskip\noindent
-In the user interface for Acrobat, there are four visibility
+In the user interface for \app{Acrobat}, there are four visibility
 attributes for a form field. The table below is a list of these,
 and an indication of how each visibility attribute can be attained
 through the \textsf{F}.
@@ -3276,7 +3356,7 @@ FfRichText?           &  rich text (PDF 1.5)           & text\\
 Below is a list of the keys supported for modifying the appearance
 or for creating an action of a field. If the default value of a
 key is empty, e.g., \verb+\Ff{}+, then that key does not appear in
-the widget.  The Acrobat viewer may have a default when any
+the widget.  The \app{Acrobat} viewer may have a default when any
 particular key does not appear, e.g. \verb+\W{}+ will be
 interpreted as \verb+\W{1}+ by the viewer.
 
@@ -3333,6 +3413,10 @@ A?      & Action dictionary, use this to define JavaScript actions, as well as o
        & \verb+\A{}+\newline(no action)\\
 Border? & Used with link annotations, an array of three numbers and an optional dash array.
          If all three numbers are 0, no border is drawn &\verb+\Border{0 0 0}+\newline (no border)\\
+D?      & (link annotations) An array of two numbers that set the dash pattern of a link annotation.
+          The default is 3, which means 3 points of line, 3 points gap.
+          A value of \cs{D\darg{3 2}} means three points of line, followed
+          by two points of space.\\
 AP?     & Appearance dictionary, used mostly in {\AcroT} with check boxes
          to define the `On' value. &\verb+\AP{}+\\
 AS?     & Appearance state, normally used with check boxes and radio buttons when there are
@@ -3425,8 +3509,11 @@ Lock?   & This key is used to lock fields after the signature field is
 rawPDF?  & If all else fails, you can always introduce key-value pairs
           through this variable. &\verb+\rawPDF{}+\\
 autoCenter? & There is a centering code that attempts to give a pleasant
-             placement of the field. Say \verb+\autoCenter{n}+ to
-             turn this off.&\\
+             placement of the field. \verb+\autoCenter{n}+
+             turn auto centering off.&\\
+inline?  & If \mlcs{inline\darg{y}}, an alternate method is used
+           get a better vertical positioning. Designed for inline form fields.
+           The default is \mlcs{inline\darg{n}}.\\
 presets? & This commands takes a macro as its argument, the text of the macro
           are key-value pairs. This is useful for setting up a series of
           presets for fields. Example, \verb|\presets{\myFavFive}|\\
@@ -3444,13 +3531,13 @@ linktxtcolor? & The value of this variable is a named color and is the
 \end{longtable}
 \endgroup
 
-%The JavaScript used by Acrobat consists of the core JavaScript plus Acrobat's JavaScript extensions.
+%The JavaScript used by \app{Acrobat} consists of the core JavaScript plus \app{Acrobat}'s JavaScript extensions.
 %Core JavaScript can be found at \href{http://developer.mozilla.org/en/docs/JavaScript}{Mozilla Developer Center}.\footnote
 %{\url{http://developer.mozilla.org/en/docs/JavaScript}}
-%and documentation of the Acrobat extensions can be found in the guides \texttt{JavaScript for Acrobat API Reference}
-%and \emph{Developing Acrobat Applications using JavaScript}, both of which I've had a hand in writing. These
-%can be found at the \href{http://www.adobe.com/devnet/acrobat/}{Acrobat Developer Center},\footnote
-%{\url{http://www.adobe.com/devnet/acrobat/}}. Click on \textbf{JavaScript for Acrobat} in the right-hand navigation panel.
+%and documentation of the \app{Acrobat} extensions can be found in the guides \texttt{JavaScript for \app{Acrobat} API Reference}
+%and \emph{Developing \app{Acrobat} Applications using JavaScript}, both of which I've had a hand in writing. These
+%can be found at the \href{http://www.adobe.com/devnet/acrobat/}{\app{Acrobat} Developer Center},\footnote
+%{\url{http://www.adobe.com/devnet/acrobat/}}. Click on \textbf{JavaScript for \app{Acrobat}} in the right-hand navigation panel.
 
 
 \newpage
@@ -3466,17 +3553,17 @@ linktxtcolor? & The value of this variable is a named color and is the
     \textit{Core JavaScript Reference} available from \href{http://developer.mozilla.org/en/docs/JavaScript}{Mozilla Developer Center}.
 
 \bibitem{tech:AcroJSGuide}
-   \textit{Developing Acrobat Applications using JavaScript}, available from
-   \mlhref{http://www.adobe.com/devnet/acrobat/}{Acrobat Developer Center}
+   \textit{Developing \app{Acrobat} Applications using JavaScript}, available from
+   \mlhref{http://www.adobe.com/devnet/acrobat/}{\mbox{\app{Acrobat}} Developer Center}.
 
 \bibitem{tech:AcroJSRef}\hypertarget{references}{}%
-   \textit{JavaScript for Acrobat API Reference},available from
-   \href{http://www.adobe.com/devnet/acrobat/}{Acrobat Developer Center}
+   \textit{JavaScript for \app{Acrobat} API Reference},available from
+   \href{http://www.adobe.com/devnet/acrobat/}{\app{Acrobat} Developer Center}.
 
 
 \bibitem{tech:PDFRef}
     \textit{PDF Reference, sixth edition, PDF 1.7}, available from
-   \href{http://www.adobe.com/devnet/acrobat/}{Acrobat Developer Center}
+   \href{http://www.adobe.com/devnet/acrobat/}{\app{Acrobat} Developer Center}.
 
 \end{thebibliography}
 

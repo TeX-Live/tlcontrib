@@ -7,14 +7,19 @@
 %% exerquiz.dtx  (with options: `eqexam')
 %% 
 \ProvidesFile{eqexam.def}
- [2017/03/16 v7.8g %
+ [2018/03/21 v8.2.2 %
   Exerquiz support file for eqexam (dps)]
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
 \def\eq@r{r}\let\eq@f=f \let\eq@l=l
 \newif\ifeq@noforms \eq@noformsfalse
-\newif\ifeq@noquizsolutions \eq@noquizsolutionsfalse % dps new
+\newif\ifeq@noquizsolutions \eq@noquizsolutionsfalse
 \newif\ifnocorrections \nocorrectionsfalse
+\@ifundefined{ifeqe@flextended}{\newif\ifeqe@flextended
+  \eqe@flextendedfalse}{}
+\@ifundefined{ifcont@nnot}{\newif\ifcont@nnot \cont@nnotfalse}{}
+\@ifundefined{if@eqalignfilllinestoleft}{\newif\if@eqalignfilllinestoleft
+  \@eqalignfilllinestoleftfalse}{}
 \newif\ifkeepdeclaredvspacing \keepdeclaredvspacingfalse
 \newif\ifeq@nolink \eq@nolinkfalse
 \def\eq@ckglobalhide{\ifeq@globalshowsolutions\eq@hidesolutionfalse\fi}
@@ -23,7 +28,9 @@
 \newif\ifIsRespBox \global\IsRespBoxfalse
 \def\SolutionsAfter{\eq@solutionsaftertrue\eq@nolinktrue}
 \newif\ifcqSA\cqSAfalse
-\def\SolutionsAtEnd{\eq@solutionsafterfalse\eq@nolinkfalse}
+\def\SolutionsAtEnd{\eq@solutionsafterfalse\eq@nolinkfalse
+  \displayworkareatrue\ifvspacewithsolns\eq@nosolutionsfalse\else
+  \eq@nosolutionstrue\fi\eq@proofingfalse\answerkeyfalse}
 \def\NoSpaceToWork{\let\eq@insertverticalspace\eq@NO}
 \def\SpaceToWork{\let\eq@insertverticalspace\eq@YES}
 \SpaceToWork
@@ -44,9 +51,9 @@
     \def\exSolafterDefault{#1}\resetSolnAfterToDefault}
 \exsolafterDefault{\textit{Solution}:}
 \newcommand{\renameSolnAfterTo}[1]{\def\exsolafter{#1}}
-\def\recoverDisplayBelow{\vskip\belowdisplayskip}
 \newcommand{\adjDisplayBelow}{\vskip-\lastskip\vskip-\baselineskip}
 \newcommand{\adjDisplayBelowPlus}{\adjDisplayBelow\recoverDisplayBelow}
+\def\recoverDisplayBelow{\vskip\belowdisplayskip}
 \newcommand\setDefShortQuizLabelName[1]%
     {\def\eq@defaultShortQuizLabelName{#1}}
 \setDefShortQuizLabelName{Quiz}
@@ -351,7 +358,11 @@
 \newcommand\decleqterminex[1]{\def\eqterminex{#1}}
 \def\eqterminexDEF{\relax\ignorespaces}
 \decleqterminex{\eqterminexDEF}
+\newif\ifmakeExSlLocal \makeExSlLocalfalse
+\def\makeExSolnsLocalOn{\makeExSlLocaltrue}
+\def\makeExSolnsLocalOff{\makeExSlLocalfalse}
 \def\eqExerSolnHeaderSngl{%
+    \ifmakeExSlLocal\protect\begingroup^^J\fi
     \protect\eqEXt{\eqExtArg}{\eqFilterArg}\protect
     \solnItemMngt\protect\exerSolnHeader{\exsecrunhead}{ex.\the@exno}%
     {\exsllabelformat}\exer@solnheadhook
@@ -362,6 +373,7 @@
     \set@typeset@protect
 }
 \def\eqExerSolnHeaderList{%
+    \ifmakeExSlLocal\protect\begingroup^^J\fi
     \protect\eqEXt{\eqExtArg}{\eqFilterArg}\protect
     \solnItemMngt\protect\exerSolnHeader{\exsecrunhead}%
     {ex.\the@exno\thepartno}{\exsllabelformatwp}%
@@ -378,9 +390,23 @@
 \def\noSolnOpt{\global\eq@ckSolnVspacefalse}
 \let\solnhspace\space
 \let\solnspace\space
-\def\solnexer@woparts{\def\bLeaveVspace{x}% = no vertical space added
+\let\exsolnonceonlytophook\relax
+\def\solnexer@woparts{%
+  \ifanswerkey\ifeqe@flextended\ifcont@nnot
+  \ifx\solutionparshape\@empty\else % dpsj8
+    \pushEnvir
+      \everypar{}\if@eqalignfilllinestoleft\else
+      \parshape=1 \leadinIndent \linewidth\fi
+    \popEnvir
+  \fi\fi\fi\fi\def\bLeaveVspace{x}% = no vertical space added
+  \exsolnonceonlytophook % dps27
+  \global\let\exsolnonceonlytophook\relax
+  \@ifundefined{KV@eqefillLines@bgonly}{}
+    {\ifKV@eqefillLines@bgonly\ifvmode\else
+      \par\leavevmode\strut\fi\fi
+    \ifKV@eqefillLines@outlineonly\leavevmode\strut\fi}%
     \ifeq@ckSolnVspace
-        \def\eq@next{\@ifnextchar[{\solnexer@@woparts}%
+        \def\eq@next{\@ifnextchar[{\solnexer@@woparts}%]
         {\solnexer@@woparts[\null]}}\else
         \def\eq@next{\solnexer@@woparts[\null]}\fi
     \eq@next
@@ -397,26 +423,26 @@
     {\vskip0pt\penalty-50\vglue\wlVspace\eqWriteLine
         \advance\@tempcnta1\relax}\par\endgroup
 }
+\let\leavevspace\relax % dpsj5
 \newcommand{\vspaceFmt}[1]{%
-    \ifx\solutionparshape\@empty\else
-        \advance\linewidth-\leadinIndentPrtSep\fi
+  \ifx\solutionparshape\@empty\else
+      \advance\linewidth-\leadinIndentPrtSep\fi
     \ifdim\sameVspace>0pt
-        \let\bLeaveVspace\@empty
-        \def\leavevspace{%
-            \ifx\eq@insertverticalspace\eq@YES\par
-                \eqPriorVspace{#1}{\nobreak\noindent
-                \ifx\soln@keys@nLines\@empty
-                    \if@eqlinedfiller
-                        \def\eq@lines@next{\vspaceFiller{#1}}\else
-                        \def\eq@lines@next{\parbox[b][#1][t]{\linewidth}
-                        {\vspaceFiller{#1}}}\fi
-                 \else
-                     \def\eq@lines@next{\eq@linesXPgs}%
-                 \fi\eq@lines@next
-                 }%
-            \fi
-        }%
-    \fi
+      \let\bLeaveVspace\@empty
+      \def\leavevspace{%
+        \ifx\eq@insertverticalspace\eq@YES\par\eq@quessolskip
+          \eqPriorVspace{#1}{\nobreak\noindent
+          \if@eqlinedfiller
+            \ifx\soln@keys@nLines\@empty
+              \def\eq@lines@next{\vspaceFiller{#1}}\else
+                \def\eq@lines@next{\eq@linesXPgs}\fi
+          \else
+            \def\eq@lines@next{\parbox[b][#1][t]{\linewidth}
+              {\vspaceFiller{#1}}}%
+          \fi\eq@lines@next}%
+        \fi
+      }\expandafter\leavevspace % dpsj6
+  \fi
 }
 \define@key{soln@keys}{nLines}[]{\def\soln@keys@nLines{#1}}
 \let\soln@keys@nLines\@empty
@@ -458,17 +484,21 @@
             \let\soln@keys@nLines\@empty\fi
             \xdef\sameVspace{\XKV@rm}%
         }{\eqSolnForEqexam{#1}}%
-        \ifx\sameVspace\@empty\gdef\sameVspace{0pt}\fi
-        \ifvspacewithsolns\vspaceFmt{\sameVspace}\fi
-        \ifeq@nosolutions\ifeq@solutionsafter\else
-            \vspaceFmt{\sameVspace}\fi\fi
     \fi\fi
     \solnexer@@@woparts
 }
 \def\solnsafterSkip#1{\setlength{\@tempdima}{#1}%
-    \def\solnsafterSkipAmt{\the\@tempdima}%
-    \def\solutionsafterSkip{\vskip#1\relax}}
+    \edef\solnsafterSkipAmt{\the\@tempdima}%
+    \def\solutionsafterSkip{\vskip\solnsafterSkipAmt\relax}}
 \solnsafterSkip{\smallskipamount}
+\def\@solnafterSkipOnce#1{\setlength{\@tempdima}{#1}%
+    \xdef\@solnafterSkipOnceAmt{\the\@tempdima}}%
+\def\@@solnafterSkipOnce{\vskip\@solnafterSkipOnceAmt\relax %dpsj3
+  \gdef\@solnafterSkipOnceAmt{0pt}}
+\def\@solnafterSkipOnceAmt{0pt}
+\def\quessolSkip#1{\setlength{\@tempdima}{#1}%
+  \edef\eq@quessolskip{\noexpand\vskip\the\@tempdima\relax}}
+\def\eq@quessolskip{\vskip\smallskipamount}
 \def\eqe@debugVertSkip#1{}
 \def\eqe@showEndHere#1{#1}
 \def\eqe@setStartSolns{%
@@ -492,67 +522,80 @@
 \let\priorexsolafterTab\@empty
 \let\priorexsolafterSngl\@empty
 \def\eq@Hid{H}\def\eq@hid{h}
-\def\solnexer@@@woparts{%
-    \global\thereissolutiontrue
-    \def\exerwparts@cols{0}%
-    \let\verbatim@out\ex@solns
-    \if\currhideopt\eq@Hid
-        \let\minVspacet@bs\@empty
-        \let\procsoln\eqSavedComment
-        \let\endprocsoln\eqSavedEndCommet
-        \def\eq@next{\procsoln}%
+\def\solutionafterExCmds#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\eqSolnExCmds\relax\else
+  \def\eqSolnExCmds{#1}\fi}
+\let\eqSolnExCmds\relax
+\def\eq@b@ddCodeSpecialDef#1{#1}% dpsj4
+\let\eq@b@ddCodeSpecial\eq@b@ddCodeSpecialDef % dpsj4
+\def\solnexer@@@woparts{\ifeq@solutionsafter\else
+    \expandafter\begingroup\fi %dpsj10
+  \global\thereissolutiontrue
+  \global\let\procsoln\relax    % dpsj6
+  \global\let\endprocsoln\relax % dpsj6
+  \def\exerwparts@cols{0}%
+  \let\verbatim@out\ex@solns
+  \if\currhideopt\eq@Hid
+    \let\minVspacet@bs\@empty
+    \let\procsoln\eqSavedComment
+    \let\endprocsoln\eqSavedEndCommet
+    \def\eq@next{\procsoln}%
+  \else
+    \eq@ckglobalhide
+    \ifeq@hidesolution
+      \let\procsoln\eqSavedComment
+      \let\endprocsoln\eqSavedEndCommet
     \else
-        \eq@ckglobalhide
-        \ifeq@hidesolution
-            \let\procsoln\eqSavedComment
-            \let\endprocsoln\eqSavedEndCommet
-        \else
-            \ifx\bLeaveVspace\@empty\leavevspace\fi
-            \ifeq@solutionsafter\else
-                \ifx\eq@@CommonCmd\@empty\else
-                    \set@display@protect
-                    \immediate\write\verbatim@out{\eq@@CommonCmd}%
-                    \set@typeset@protect
-                \fi
-            \fi
-            \let\procsoln\verbatimwrite
-            \let\endprocsoln\endverbatimwrite
-        \fi
-        \def\eq@next{%
-            \ifeq@solutionsafter%\par
-                \removelastskip\removelastparskip
-                \cqSAtrue\eqCQDeclarations
-                \declCopyQues{\input{\cq@CutName}}%
-                \ifx\exsolafter\@empty
-                    \ifdim\sameVspace=0pt\eqe@setStartSolns
-                    \else
-                        \solutionsafterSkip
-                        \eqe@setStartSolns
-                    \fi
-                \else\par\kern0pt
-                    \solutionsafterSkip
-                    \noindent\strut\eqe@setStartSolns
-                \fi
-                \parskip\eqeques@parsep
-                \ifx\endparts\endexercise@parts@tabular
-                    \eq@setPrbSolnAftrIndnt
-                    \restorejustify
-                \fi
-                \ifx\endparts\endexercise@parts@tabular\expandafter
-                    \priorexsolafterTab\else
-                \ifx\endparts\endexercise@parts@list\expandafter
-                    \priorexsolafterList\else\expandafter
-                    \priorexsolafterSngl\fi\fi
-                \exsolafter\space\ignorespaces
-                \solutionparshape
-            \else
-                \eqExerSolnHeader
-                \global\let\eqExerSolnHeader\@empty
-                \global\therearesolutionstrue\expandafter\procsoln
-            \fi
-        }%
+      \ifeq@solutionsafter\else
+          \ifx\eq@@CommonCmd\@empty\else
+              \set@display@protect
+              \immediate\write\verbatim@out{\eq@@CommonCmd}%
+              \set@typeset@protect
+          \fi
+      \fi
+        \let\procsoln\verbatimwrite
+        \let\endprocsoln\endverbatimwrite
     \fi
-\eq@next}
+    \def\eq@next{%
+      \ifeq@solutionsafter
+        \let\procsoln\relax % dpsj6
+        \let\endprocsoln\relax
+        \removelastskip\removelastparskip
+        \cqSAtrue\eqCQDeclarations
+        \declCopyQues{\input{\cq@CutName}}%
+        \ifx\exsolafter\@empty
+          \ifdim\sameVspace=0pt\eqe@setStartSolns
+          \else
+            \solutionsafterSkip
+            \@@solnafterSkipOnce % dpsj3
+            \eqe@setStartSolns
+          \fi
+        \else\par\kern0pt
+          \solutionsafterSkip
+          \@@solnafterSkipOnce % dpsj3
+          \noindent\strut\eqe@setStartSolns
+        \fi
+        \parskip\eqeques@parsep
+        \ifx\endparts\endexercise@parts@tabular
+          \eq@setPrbSolnAftrIndnt
+          \restorejustify
+        \fi
+        \ifx\endparts\endexercise@parts@tabular\expandafter
+          \priorexsolafterTab\else
+        \ifx\endparts\endexercise@parts@list\expandafter
+          \priorexsolafterList\else\expandafter
+          \priorexsolafterSngl\fi\fi
+        \exsolafter\space\ignorespaces
+        \solutionparshape
+      \else
+        \eqExerSolnHeader
+        \global\let\eqExerSolnHeader\@empty
+        \global\therearesolutionstrue\expandafter\procsoln
+      \fi
+    }%
+  \fi
+  \eq@b@ddCodeSpecial{\eq@next}%
+}% dpsj4
 \let\endsolnexerhook\@empty
 \let\pkg@endsolnexerhook\@empty
 \let\endsolnexerhookaux\@empty
@@ -564,46 +607,59 @@
     {\protect\mbox{\if\exerstar*\exrtnlabelformatwp\else
         \exrtnlabelformat\fi}}%
     \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi^^J%
+    \ifmakeExSlLocal\protect\endgroup^^J\fi
 }
-\def\endsolnexer@woparts{%
-    \if\currhideopt H%
-        \ifkeepdeclaredvspacing\vskip\sameVspace\fi
-        \csname endprocsoln\endcsname
-    \else
-        \ifeq@solutionsafter
-            \if\exerstar*%
-            \eq@fititin{\mbox{\exrtnlabelformatwp}}\else
-            \eq@fititin{\mbox{\exrtnlabelformat}}\fi
-            \ifx\istabularexer\eq@YES\kern0pt\else\par\fi
-\ifx\minVspacet@bs\@empty
-            \ifkeepdeclaredvspacing
-                \@tempdima\pagetotal
-                \advance\@tempdima-\eq@startSoln
-                \@tempdimb\sameVspace\relax
-                \ifdim\@tempdimb>1sp\relax
-                    \advance\@tempdimb-\@tempdima
-                    \ifdim\@tempdimb>0pt\vglue\@tempdimb\kern0pt
-                        \let\eqe@showEndHere\@gobble
-                        \edef\tmp@exp{\noexpand\marginpar{%
-                        \noexpand\smash{e: adj \the\@tempdimb}}}%
-                        \eqe@debugVertSkip{\tmp@exp}%
-                    \fi
-                \fi
+\let\eq@e@ddCodeSpecialDef\relax % dpsj4
+\let\eq@e@ddCodeSpecial\eq@e@ddCodeSpecialDef % dpsj6
+\let\kdvsp@Restore\relax % dpsj20
+\def\endsolnexer@woparts{\endprocsoln\eq@e@ddCodeSpecial
+  \pkg@endsolnexerhook % djsj8 moved from the end of the macro
+  \ifeq@solutionsafter\else
+    \expandafter\endgroup\fi % from \begingroup at \solnexer@@@woparts
+  \global\let\exsolnonceonlytophook\relax
+  \ifx\sameVspace\@empty\gdef\sameVspace{0pt}\fi % dpsj5
+  \ifvspacewithsolns\vspaceFmt{\sameVspace}\else
+  \ifeq@nosolutions\ifeq@solutionsafter\else
+    \vspaceFmt{\sameVspace}\fi\fi\fi
+  \if\currhideopt H%
+  \ifkeepdeclaredvspacing\vskip\sameVspace\fi
+  \else
+    \ifeq@solutionsafter
+      \ifx\isitleadin\eq@YES\parshape=0 \fi % dpsj9
+      \if\exerstar*%
+      \eq@fititin{\mbox{\exrtnlabelformatwp}}\else
+      \eq@fititin{\mbox{\exrtnlabelformat}}\fi
+      \ifx\istabularexer\eq@YES\unskip\kern0pt\else\par\fi % dpsj6
+      \ifx\minVspacet@bs\@empty
+        \ifkeepdeclaredvspacing
+          \@tempdima\pagetotal
+          \advance\@tempdima-\eq@startSoln
+          \@tempdimb\sameVspace\relax
+          \ifdim\@tempdimb>1sp\relax
+            \advance\@tempdimb-\@tempdima
+            \ifdim\@tempdimb>0pt\vglue\@tempdimb\kern0pt
+              \let\eqe@showEndHere\@gobble
+              \edef\tmp@exp{\noexpand\marginpar{%
+                \noexpand\smash{e: adj \the\@tempdimb}}}%
+                \eqe@debugVertSkip{\tmp@exp}%
             \fi
-            \eqe@showEndHere{\eqe@debugVertSkip{\marginpar{\smash{e}}}}%
-\fi
-        \else
-            \endprocsoln
-            \eq@ckglobalhide
-            \ifeq@hidesolution\else
-                \endsolnexerhookaux
-                \set@display@protect
-                \immediate\write\verbatim@out{\eqExerSolnTrailer}%
-                \set@typeset@protect
-            \fi
+          \fi
         \fi
+        \eqe@showEndHere{\eqe@debugVertSkip{\marginpar{\smash{e}}}}%
+        \fi
+      \else
+        \eq@ckglobalhide
+        \ifeq@hidesolution\else
+          \endsolnexerhookaux
+          \let\verbatim@out\ex@solns
+          \set@display@protect
+          \immediate\write\verbatim@out{\eqExerSolnTrailer}%
+          \set@typeset@protect
+        \fi
+      \fi
     \fi
-\pkg@endsolnexerhook\endsolnexerhook}
+    \kdvsp@Restore % dpsj20
+    \endsolnexerhook\penalty0\relax}
 \let\eq@exerstarEnv\relax
 \newenvironment{exercise*}{\def\eq@exerstarEnv{*}\exercise}
 {\endexercise}
@@ -624,7 +680,7 @@
         parts environment}{Use \string\tableadin\space
         in the problem* environment of eqexam.}%
 }
-\let\istabularexer\eq@NO % dps 2016/12/16
+\let\istabularexer\eq@NO
 \def\exercise@parts{\let\rlspar\relax
   \ifx\solutionparshape\@empty
     \let\isitleadin\eq@NO
@@ -632,14 +688,14 @@
   \else\let\isitleadin\eq@YES\fi
   \rlspar\removelastskip\par
   \if\isitleadin\eq@YES
-    \def\eqparts@topsep{0pt}% dps88
-    \vskip\eqparts@itemsep\relax\fi % dps88
+    \def\eqparts@topsep{0pt}%
+    \vskip\eqparts@itemsep\relax\fi
   \topofpartshook
-  \let\itsExerParts\eq@YES % dps17
+  \let\itsExerParts\eq@YES
   \global\let\@listiiredefined\eq@NO
   \def\exerwparts@cols{0}\@ifnextchar[%
   {%
-   \if@tableadinitem\else\removelastparskip\fi % dps11
+   \if@tableadinitem\else\removelastparskip\fi
    \let\endparts\endexercise@parts@tabular\exercise@parts@tabular@}%
   {\let\endparts\endexercise@parts@list\exercise@parts@list}}
 \def\eq@extralabelsep{0pt}
@@ -661,16 +717,16 @@
 \def\eq@item@common{\eq@insertContAnnot\eqp@rtc@lcm@rk
     \def\currhideopt{x}\eq@hidesolutionfalse\eq@nolinkfalse
     \@ifnextchar[{\@ckhide}{\eq@item}}
-\newcommand{\partsitemsep}[1]{{% dps88
+\newcommand{\partsitemsep}[1]{{%
     \setlength{\@tempdima}{#1}%
     \xdef\eqparts@itemsep{\the\@tempdima}}}
 \let\eqpartsitemsep\partsitemsep
 \def\eqparts@itemsep{0pt}
-\newcommand\partsparsep[1]{{% dps88
+\newcommand\partsparsep[1]{{%
     \setlength{\@tempdima}{#1}%
     \xdef\eqparts@parsep{\the\@tempdima}}}
 \def\eqparts@parsep{0pt}
-\newcommand\partstopsep[1]{{% dps88
+\newcommand\partstopsep[1]{{%
     \setlength{\@tempdima}{#1}%
     \xdef\eqparts@topsep{\the\@tempdima}}}
 \def\eqparts@topsep{3pt}
@@ -718,9 +774,9 @@
     \makebox[\widthOfParts][r]{\eqexlisttabheader}%
 }{%
     \usecounter{partno}%
-    \if\isitleadin\eq@YES % dps7
+    \if\isitleadin\eq@YES
         \settowidth{\eq@tmplength}{\parts@indent\eqe@prtsepPrb}%
-        \xdef\prtsIndntSep{\the\eq@tmplength}% dps7
+        \xdef\prtsIndntSep{\the\eq@tmplength}%
         \if\itsforleadinitem\eqe@YES\setcounter{partno}{\fliPartNo}\else
         \setcounter{partno}{1}\fi\fi
     \let\leadinitem\eq@leadinitemparts
@@ -797,12 +853,12 @@
 \def\inittabMark{\global\eq@extabColCnt=0 }
 \def\resettabMark{\global\eq@extabColCnt=1 }
 \newcommand\autotabnewline[1][\eqparts@tabrowsep]{%
-    \ifnum\exerwparts@cols>0\relax % dps cq
+    \ifnum\exerwparts@cols>0\relax
     \ifx\eq@tabMarkChk\@gobble
         \def\eq@atnext{\expandafter
             \tabularnewline\expandafter[#1]}\else
         \def\eq@atnext{\resettabMark\tabularnewline
-            \noalign{\expandafter\kern#1}}\fi % dps7
+            \noalign{\expandafter\kern#1}}\fi
     \expandafter\eq@atnext\fi}
 \def\eq@tabMark{%
     \ifnum\eq@extabColCnt=0\relax
@@ -831,7 +887,7 @@
 \newenvironment{exercise@parts@tabular}{%
     \setcounter{partno}{0}%
     \def\tablrIndent{\hglue\prtsIndntSep\relax}%
-    \if\isitleadin\eq@YES % dps7
+    \if\isitleadin\eq@YES
         \if$\the\everypar$\let\tablrIndent\relax\fi
         \setcounter{partno}{1}\fi
     \let\leadinitem\eq@leadinitemparts
@@ -861,9 +917,9 @@
     \tabcolsep\@tempdima
     \multiply\@tempdima\@tempcnta
     \advance\eq@tmpdima-\@tempdima
-    \divide\eq@tmpdima by\exerwparts@cols
-    \advance\eq@tmpdima\prtsIndntSep\relax
-    \if@tableadinitem\else\vskip\eq@partstabtopsep\relax\fi % dps11
+    \divide\eq@tmpdima by\exerwparts@cols\relax %dpsj3
+    \edef\widthOfPartsBox{\the\eq@tmpdima}% dpsj2
+    \if@tableadinitem\else\vskip\eq@partstabtopsep\relax\fi
     \noindent\normalbaselines\kern0pt
     \prior@parts@hook\abovepartshook
     \tablrIndent\tabular[t]{@{}*{\exerwparts@cols}{>{\setTabulrSolnEnv
@@ -894,7 +950,6 @@
   \eq@tmpdima=\wd\eq@tmpbox
   \addtolength\eq@tmplength{\eq@extralabelsep}%
   \xdef\partshangamount{\the\eq@tmplength}%
-  \advance\linewidth-\eq@tmplength
   \parshape \@ne 0pt \linewidth
   \everypar{\parshape \@ne 0pt \linewidth}%
   \eq@setPrbSolnAftrIndnt
@@ -980,7 +1035,7 @@
         \fi
         \markright{\exsectitle}%
             \ifx\webnewpage\relax
-                \def\webnewpage{\let\webnewpage\newpage}%
+                \def\webnewpage{\global\let\webnewpage\newpage}%
             \fi
             \priorexsectitle\exerSolnsHeadnToc\priorexslinput
             \InputIfFileExists{\jobname.sol}
@@ -1078,6 +1133,7 @@
 \def\@shortquizCnt{0}
 \def\@sqGenBaseName{eqSqBn\@shortquizCnt}
 \let\sqhspace\space
+\let\ListOfSQuizNames\@empty
 \newenvironment{shortquiz}
 {%
     \xdef\eq@pageThisQ{\the\c@page}%
@@ -1102,8 +1158,11 @@
     \protected@edef\@currentlabelname{\@currentlabelname}\fi
 }
 \let\isQZ=q \let\isSQZ=s
+\let\eqQuizType\relax
 \def\@@shortquiz[#1]{%\begingroup
   \gdef\oField{#1}\gdef\curr@quiz{#1}\gdef\currQuiz{#1}%
+  \edef\tmp@Exp{\noexpand\g@addto@macro\noexpand
+    \ListOfSQuizNames{,#1}}\tmp@Exp
     \global\let\eqQzQuesList\@empty
     \let\eq@AddProbToQzQuesList\relax
     \edef\@currentlabel{\@shortquizCnt}%
@@ -1149,6 +1208,9 @@
 \let\prior@eqQt\@empty
 \let\prior@eqSQt\@empty
 \def\sqsolafterhspace{\space}
+\newif\ifmakeQzSlLocal \makeQzSlLocalfalse
+\def\makeQzSolnsLocalOn{\makeQzSlLocaltrue}
+\def\makeQzSolnsLocalOff{\makeQzSlLocalfalse}
 \def\solution@sq{\let\eq@next\relax
   \ifx\@qzsolndest\@empty
     \PackageWarning{exerquiz}%
@@ -1164,6 +1226,7 @@
     \global\therearequizsolutionstrue\let\verbatim@out=\quiz@solns
     \set@display@protect
     \immediate\write\verbatim@out{%
+      \ifmakeQzSlLocal\protect\begingroup^^J\fi
       \if\eqQuizType\isQZ
             \ifx\prior@eqQt\@empty\else\prior@eqQt\fi
             \protect\eqQt{\eqFilterArg}\else
@@ -1208,6 +1271,7 @@
             {\protect\mbox{\sqslrtnlabel}}\string\endeqSQt%
     \fi
     \ifeqforpaper\protect\fpAfterSolutionsSkip\fi^^J%
+    \ifmakeQzSlLocal\protect\endgroup^^J\fi
 }
 \let\eqSQt\@gobble
 \let\endeqSQt\relax
@@ -1308,8 +1372,8 @@
             \noexpand\eq@ansChoiceArray{,"\alph{quizno}"}}\fi
         \tmp@exp
 }
-\newcommand\Ans@list[2][0]{\gdef\eq@pPTs{#1}%
-    \xdef\Ans@choice{#2}\item\relax\noindent\if\eq@listType\eq@One
+\newcommand\Ans@list[2][0]{\gdef\eq@pPTs{#1}\xdef\Ans@choice{#2}%
+    \item\relax\noindent\if\eq@listType\eq@One
     \addtocounter{quizno}{-1}\@ifundefined{ifwithsoldoc}
         {\refstepcounter{quizno}}{\ifwithsoldoc\stepcounter{quizno}\else
         \refstepcounter{quizno}\fi}\fi
@@ -1328,7 +1392,7 @@
         \setlength{\itemsep}{0pt}\setlength{\partopsep}{0pt}%
         \setlength{\listparindent}{\parindent}%
         \ifnum\exerwparts@cols>1\relax
-            \ifx\itsExerParts\eq@YES % dps17
+            \ifx\itsExerParts\eq@YES
              \setlength{\leftmargin}{\labelwidth}\else
              \setlength{\leftmargin}{\labelwidth+\eqemargin}\fi
         \else
@@ -1340,15 +1404,15 @@
     }%
 }%
 {\endlist\setcounter{quizno}{0}\eq@answersEndHook}
-\newcommand\Ans@tabular[2][0]{\gdef\eq@pPTs{#1}%
-    \xdef\Ans@choice{#2}\leavevmode\@Ans
+\newcommand\Ans@tabular[2][0]{\gdef\eq@pPTs{#1}\xdef\Ans@choice{#2}%
+    \leavevmode\@Ans
 }
 \newcommand\sqtabsep[1]{\def\eq@argi{#1}\ifx\eq@argi\@empty
     \def\sq@tabsep{1.5pt}\else\def\sq@tabsep{#1}\fi}
 \sqtabsep{1.5pt}
 \def\sqTabPos#1{\def\sq@TabPos{[#1]}}\sqTabPos{}
 \def\answers@@sq@tabular#1{%
-    \ifinner % dps17
+    \ifinner
         \ifx\itsExerParts\eq@YES\par\removelastskip
             \removelastparskip\vskip\aboveanswersSkip\fi
     \else\par\removelastskip\removelastparskip

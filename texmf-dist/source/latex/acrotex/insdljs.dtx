@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2017  D. P. Story                 %%
+%% Copyright (C) 2001-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2017/03/02 v2.3f Insert Document Level JavaScripts (dps)]
+%<package> [2017/09/03 v2.3g Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -398,11 +398,13 @@
 %
 % The options are \texttt{dvipsone}, \texttt{dvips}, \texttt{pdftex} and
 % \texttt{dvipdfm}. The default is \texttt{dvipsone}/\texttt{dvips}.
+% \chages{v2.3g}{2017/09/03}{Added ifluatex package}
 %    \begin{macrocode}
 %<*package>
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{ifluatex}
 %    \end{macrocode}
 %
 % Standard driver options.\par\medskip\noindent
@@ -420,11 +422,14 @@
 %    \end{macrocode}
 %\textbf{Those not using Distiller}
 %    \IndexOpt{pdftex}
+%    \IndexOpt{luatex}
 %    \IndexOpt{dvipdfm}
 %    \IndexOpt{dvipdfmx}
 %    \IndexOpt{xetex}
+% \chages{v2.3g}{2017/09/03}{Added luatex option}
 %    \begin{macrocode}
 \DeclareOptionX{pdftex}{\def\dljs@drivernum{1}}
+\DeclareOptionX{luatex}{\def\dljs@drivernum{1}}
 \DeclareOptionX{dvipdfm}{\def\dljs@drivernum{2}}
 \DeclareOptionX{dvipdfmx}{\def\dljs@drivernum{2}}
 \DeclareOptionX{xetex}{\def\dljs@drivernum{2}}
@@ -2606,7 +2611,6 @@ var EFDate_KeystrokeEx=AFDate_KeystrokeEx;
 var EFSpecial_Keystroke=AFSpecial_Keystroke;
 var EFSpecial_Format=AFSpecial_Format;
 var EFSpecial_KeystrokeEx=AFSpecial_KeystrokeEx;
-var EFRange_Validate=AFRange_Validate;
 var EFRange_Validate=AFRange_Validate;
 var EFSimple_Calculate=AFSimple_Calculate;
 var EFMergeChange=AFMergeChange;

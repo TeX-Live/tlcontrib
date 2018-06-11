@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2017  D. P. Story                 %%
+%% Copyright (C) 2002-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,9 +19,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2017/02/27 v2.9l Provides general eforms support (dps)]
+ [2018/03/22 v2.9.19 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{ifluatex}
 \RequirePackage{calc}
 \let\ef@driver\@empty
 \DeclareOption{dvipsone}{\def\eq@drivernum{0}%
@@ -38,6 +39,10 @@
 \DeclareOption{pdftex}{%
     \def\eq@drivernum{1}\def\eq@driver{pdftex}%
     \def\eq@drivercode{epdftex.def}\def\ef@driver{pdftex}%
+}
+\DeclareOption{luatex}{%
+    \def\eq@drivernum{1}\def\eq@driver{luatex}%
+    \def\eq@drivercode{epdftex.def}\def\ef@driver{luatex}%
 }
 \DeclareOption{dvipdfm}{%
     \def\eq@drivernum{2}\def\eq@driver{dvipdfm}%
@@ -85,10 +90,11 @@
     \@ifpackageloaded{exerquiz}{%
         \ExecuteOptions{\eq@driver}%
     }{%
+        \ifluatex\ExecuteOptions{luatex}\else
         \ifpdf\ExecuteOptions{pdftex}\else
         \ifxetex\ExecuteOptions{xetex}\else
         \@ifundefined{l@tex@@@@driver}{\ExecuteOptions{dvips}}
-            {\ExecuteOptions{dvipsone}}\fi\fi
+            {\ExecuteOptions{dvipsone}}\fi\fi\fi
     }%
 }
 \ProcessOptions
@@ -134,17 +140,20 @@
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
 \@ifundefined{eq@tmpdimb}{\newdimen\eq@tmpdimb}{}
 \newlength\ef@dimena
+\newtoks\ef@scratchtoks
 \newif\ifmakeXasPD \makeXasPDtrue % 12/22
 \newif\ifmakePDasX \makePDasXfalse
 \def\makeXasPDOn{\makeXasPDtrue\makePDasXfalse}
 \def\makeXasPDOff{\makeXasPDfalse}
 \def\makePDasXOn{\makePDasXtrue\makeXasPDfalse}
 \def\makePDasXOff{\makePDasXfalse}
-\providecommand\previewColor{black}
-\def\ef@Bbox#1#2{%
-    \hbox{\ifpreview\setlength\fboxrule{0.4pt}\setlength\fboxsep{0pt}%
+\providecommand\ckboxColor[1]{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\ckbox@Color\relax\else
+    \def\ckbox@Color{\color{#1}}\fi}\let\ckbox@Color\relax
+\def\ef@Bbox#1#2{\hbox{\ifpreview
+    \setlength\fboxrule{0.4pt}\setlength\fboxsep{0pt}%
     \@tempdima=#1\advance\@tempdima by-\fboxrule
-    \@tempdimb=#2\advance\@tempdimb by-\fboxrule\color{\previewColor}%
+    \@tempdimb=#2\advance\@tempdimb by-\fboxrule \ckbox@Color
     \fbox{\parbox[b][\@tempdimb][c]{\@tempdima}{\hfill\vfill}}\else
     \parbox[b][#2][c]{#1}{\hfill\vfill}\fi}%
 }
@@ -291,8 +300,9 @@
 \long\def\ef@searchrPage#1\rPage#2#3\@nil{\def\ef@argii{#2}%
     \ifx\ef@argii\ef@end\else\rPage{#2}\fi}
 \def\ef@searchmlLink#1\mlLink#2#3\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\let\ef@mlLink=0\else
-    \ifx\ef@argii\ef@true\let\ef@mlLink=1\else\let\ef@mlLink=0\fi\fi}
+    \ifx\ef@argii\ef@end\let\ef@mlLink\ef@Zero\else
+    \ifx\ef@argii\ef@true\let\ef@mlLink\ef@One\else
+    \let\ef@mlLink\ef@Zero\fi\fi}
 \def\ef@searchGoToR#1/GoToR#2\@nil{\def\ef@argii{#2}%
     \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
     \def\ef@thislinkcolor{\@filecolor}\fi
@@ -334,7 +344,7 @@
     \let\eq@A\@empty\else\ef@preprocessA{#1}%
     \def\eq@A{/A <<#1>>}\fi}\def\eq@A{}
 \def\@eqmlLink#1{\def\eq@arg{#1}\ifx\eq@arg\ef@true
-    \let\ef@mlLink=1\else\let\ef@mlLink=0\fi}
+    \let\ef@mlLink\ef@One\else\let\ef@mlLink\ef@Zero\fi}
 \def\@eqLock#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@Lock\@empty\else\def\eq@Lock{/Lock <<#1>>}\fi}
     \def\eq@Lock{}
@@ -648,17 +658,60 @@
    \edef\symbol@choice{\eq@check}\else
    \edef\symbol@choice{\csname eq@#1\endcsname}\fi
 }
+\newif\iffixmlinks \fixmlinkstrue
+\def\mlfixOn{\fixmlinkstrue}
+\def\mlfixOff{\fixmlinksfalse}
+\def\@eqmlfix#1{\def\ef@arg{#1}\ifx\ef@arg\ef@y
+    \mlfixOn\else\ifx\ef@arg\ef@n
+    \mlfixOff\else\mlfixOn
+    \PackageWarning{eforms}{The value of '#1' is not a
+    supported value\MessageBreak for \string\mlfix.\MessageBreak
+    Using the default of 'y'}%
+    \fi\fi}
+\newbox\mlstrutbox
+\def\@eqmlstrut#1{\setbox\mlstrutbox\hbox{#1}%
+  \def\ml@strut{\vrule \@height\ht\mlstrutbox
+    \@depth\dp\mlstrutbox
+    \@width\z@\relax}}
+\def\ml@strut{\relax\ifmmode\copy\mlstrutbox\else
+  \unhbox\mlstrutbox\fi}
+\@eqmlstrut{\strut}
+\def\@eqmlcrackat#1{\def\eq@mlcrackat{#1}}
+\let\eq@mlcrackat\@empty
+\def\@eqmlhyph#1{\def\ef@arg{#1}\ifx\ef@arg\ef@y
+    \def\eq@mlhyph{-}\else\ifx\ef@arg\ef@n
+    \let\eq@mlhyph\@empty\else\let\eq@mlhyph\@empty
+    \PackageWarning{eforms}{The value of '#1' is not a
+    supported value\MessageBreak for \string\mlhyph.\MessageBreak
+    Using the default of 'n'}\fi\fi}
+\let\eq@mlhyph\@empty
+\def\@eqmlignore#1{\let\eq@mlignore\ef@YES}
+\let\eq@mlignore\ef@NO
+\def\@eqmlcrackinsat#1{\def\eq@mlcrackinsat{#1}}
+\let\eq@mlcrackinsat\@empty
 \def\eq@protect#1{\let#1\@empty}
 \begingroup\catcode`\#=12 \catcode`*=6
-\gdef\HEXNAME{efHex}
-\ifpdfmarkup\gdef\ef@Hx*1*2{\@nameuse{efHex*1*2}}\else
-\gdef\ef@Hx*1*2{#*1*2}\fi
+  \ifpdfmarkup
+    \gdef\ef@Hx*1*2{\@nameuse{efHex*1*2}}\else
+    \gdef\ef@Hx*1*2{\@nameuse{efHex*1*2}}\fi
 \endgroup
+\def\efHxError{\PackageError{eforms}{The glyph is not supported}{}}
+\def\HGERROR{efHxError}
 \ifpdfmarkup
-\def\HexGlyph#1#2{\global\@namedef{efHex#1}{#2}}
+    \def\HexGlyph#1#2{\def\arg@ii{#2}\ifx\arg@ii\HGERROR
+    \global\@namedef{efHex#1}{\csname#2\endcsname}\else
+    \global\@namedef{efHex#1}{\expandafter
+        \string\csname#2\endcsname}\fi}
+\else
+  \begingroup\catcode`\#=12 \catcode`*=6
+    \gdef\HexGlyph*1*2{\def\arg@ii{*2}\ifx\arg@ii\HGERROR
+    \global\@namedef{efHex*1}{\csname*2\endcsname}\else
+    \global\@namedef{efHex*1}{#*1}\fi}
+  \endgroup
+\fi
 \def\ef@inputPDFHEX{\InputIfFileExists{pdfdochex.def}
-    {\typeout{Inputtingpdfdochex.def}}{}}
-\expandafter\ef@inputPDFHEX\fi
+    {\PackageInfo{eforms}{Inputting pdfdochex.def}}{}}
+\AtEndOfPackage{\ef@inputPDFHEX}
 \def\ef@semicolon{;}
 \def\ef@stripsemi#1;\@nil{\def\ef@colorSpec@out{#1}}
 \def\ef@isitnamed{\let\ef@latex@color\ef@y
@@ -887,14 +940,17 @@
     \def\ef@rgi{0bp}\fi\setlength{\@tempdima}{\ef@rgi}%
     \ifxetex\else\addtolength{\@tempdima}{2bp}\fi
     \kern\@tempdima\egroup\ignorespaces}
+\newcommand{\efSupprIndent}{\ef@scratchtoks=\expandafter{\the\everypar}%
+  \everypar{{\setbox\z@\lastbox}\clubpenalty\@M
+  \everypar=\expandafter{\the\ef@scratchtoks}}}
 \newcommand\volBdry{\bgroup\parskip0pt\relax\@@par\nointerlineskip
-    \olBdry\noindent\egroup}
+    \olBdry\egroup\efSupprIndent}
 \newcommand\vcgBdry{\@ifstar{\edef\ef@offset{\the\parskip}\vcgBdry@i}
     {\def\ef@offset{0pt}\vcgBdry@i}}
 \newcommand\vcgBdry@i[1][0bp]{\bgroup
     \setlength{\ef@dimena}{#1-\ef@offset}\parskip0pt\relax
-    \par\nointerlineskip\cgBdry[\ef@dimena]\noindent
-    \egroup\ignorespaces}
+    \par\nointerlineskip\cgBdry[\ef@dimena]%
+    \egroup\ignorespaces\efSupprIndent}
 \def\common@choiceCode{%
     /Subtype/Widget
     /T (\Fld@name)
@@ -1239,11 +1295,10 @@
 \newcommand\setLink{\begingroup
     \ef@sanitize@toks\ef@setlinktext
 }
-\newcommand{\mlsetLink}{\mlhypertext}
 \let\setLinkText\setLink
 \newcommand{\ef@setlinktext}[1][]{%
     \endgroup\ef@searchmlLink#1\mlLink\end\@nil
-    \ifx\ef@mlLink0\def\ef@next{\set@LinkText[#1]}\else
+    \ifx\ef@mlLink\ef@Zero\def\ef@next{\set@LinkText[#1]}\else
     \def\ef@next{\mlhypertext[#1]}\fi\ef@next
 }
 \newcommand\set@LinkText[2][]{%
@@ -1264,6 +1319,11 @@
     }%
 }
 \def\ef@postProcLinkProps{}
+\newcommand{\mlsetLink}{\mlhypertext}
+\newcommand{\mlhypertext}[2][]{\@ifundefined{mlhypertext@i}
+  {\PackageWarning{eforms}{The \string\mlhypertext\space command
+  does nothing unless\MessageBreak the aeb_mlink package is loaded}}{}%
+  #2}
 \def\set@LinkBboxDefaults{\S{S}\Border{0 0 0}}
 \newcommand{\setLinkBbox}{\begingroup
     \ef@sanitize@toks\ef@linkbbox

@@ -14,9 +14,16 @@
 \usepackage{longtable,colortbl}
 \usepackage{graphicx}
 \usepackage{multicol}
+\usepackage{collectbox}
+
+\newbox\aebbox
 
 \usepackage{acroman}
 \usepackage[active]{srcltx}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
 
 \def\AcroBlog{{Acro\!\TeX} Blog}
 
@@ -219,10 +226,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2017/03/16}
+\version{2018/03/01}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2017/03/20}
+\prepared{2018/03/22}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -305,7 +312,7 @@ function indefCompare(a,b,c,F,G) {
 
 \part{Forward}
 
-\newtopic For the past several years (this year is 2016), I've been writing a book
+\newtopic For the past several years (this year is \the\year), I've been writing a book
 titled,
 \begin{quote}
 \AEBBook.
@@ -323,10 +330,10 @@ the features by studying the DTX documentation of the program files. Sorry,
 it took me three years to write the book, I don't want to spend another year
 on this documentation. \verb!:-{)!
 
-As noted in the part of this manual titled \textbf{\nhnameref{eq2db}} on
-page~\pageref{eq2db}, I've set up two websites that highlight the server-side
-scripts developed for the book (and available on the accompanying CD-ROM).
-You are invited to visit them and comment on them, if the spirit moves.
+As noted in \textbf{\nhnameref{eq2db}} on page~\pageref{eq2db}, I've set up a
+website that highlights the server-side scripts developed for the book (and
+available on the accompanying CD-ROM). You are invited to visit them and
+comment on them, if the spirit moves.
 
 \begin{flushright}
 Dr. D. P. Story\\[3pt]
@@ -4690,6 +4697,16 @@ exercise.  You'll note that I have moved the solutions in this
 file \emph{before} the \nameref{references} section, as indicated, for
 example, by its position in the table of contents.
 
+\subsubsection{Grouping the solutions at end}\label{ss:grpEx}
+
+Historically, solutions to exercises appearing at the end of the file
+\emph{are not grouped}. This means that a color change or a definition made
+in one solution, for example, may affect all subsequent solutions.
+
+You can now declare \cs{makeExSolnsLocalOn} or \cs{makeExSolnsLocalOff}
+anywhere in the document to turn on grouping for all exercises that follow,
+or to turn off this feature again. The default is \cs{makeExSolnsLocalOff}.
+
 
 \subsection{Redesigning the
 \texorpdfstring{\protect\texttt{exercise}}{exercise}
@@ -5667,6 +5684,17 @@ that I
 have moved the solutions in this file before the
 \nameref{references} section, as indicated, for example, by its
 position in the table of contents.
+
+\subsubsection{Grouping the solutions at end}\label{ss:grpQzs}
+
+Historically, solutions to quizzes (created by the \env{shortquiz} and
+\env{quiz} environments) appearing at the end of the file \emph{are not
+grouped}. This means that a color change or a definition made in one solution
+may affect all subsequent solutions.
+
+You can now declare \cs{makeQzSolnsLocalOn} or \cs{makeQzSolnsLocalOff}
+anywhere in the document to turn on grouping for all quizzes that follow, or
+to turn off this feature again. The default is \cs{makeQzSolnsLocalOff}.
 
 \subsection{Redesigning the
 \texorpdfstring{\protect\texttt{shortquiz}}{shortquiz}
@@ -7630,8 +7658,9 @@ The code for the above example is
 \noindent The \cs{RespBoxMath} need not appear in math mode. The definition
 of the \cs{redpoint} command, a command written for this document follows.
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\newcommand\redpoint{\par\removelastskip\vskip\medskipamount\noindent
-  \makebox[\parindent][l]{\large\color{red}$\blacktriangleright$}}
+\newcommand\redpoint{\par\removelastskip\vskip\medskipamount
+  \noindent\makebox[\parindent][l]{\large
+    \color{red}$\blacktriangleright$}}
 \end{Verbatim}
 
 \newtopic You can also pose multivariate questions as well, for example
@@ -7693,14 +7722,60 @@ of the section below and see the demo file \texttt{integer\_test.tex} to
 demonstrate the new method for specifying variables, found in the
 \texttt{dljslib\_examples} folder.
 
-%\item[\ttfamily\#3 :] An optional parameter, \textit{delimited by parentheses},
-%that defines the independent variable; \texttt{x}, is the default value. Note
-%that this parameter is set of by parentheses.
+\textbf{Multi-letter variables.} Beginning with v8.0 (2017/08/08) support for
+multi-letter variables and appearance replacement is added. Within the
+\texttt{\#3}, use the following notation:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+(x\rpl{alpha}{y}z)
+\end{Verbatim}
+This declares three variables, \texttt{x}, \texttt{alpha}, and \texttt{z}.
+What in fact is taking place is that \texttt{alpha} is replaced by \texttt{y}
+and processing continues from there.
+
+\textbf{Alternate appearances.} Additionally, there is  now a scheme for
+replacing the variables with alternate appearances.
+\begin{Verbatim}[xleftmargin=\amtIndent]
+(x\rpl{alpha->\\u03B1}{y}z)
+\end{Verbatim}
+The arrow notation (\texttt{->}) tells \pkg{exerquiz} to replace
+\texttt{alpha} with the unicode character \verb~\u03B1~ (note the double
+backslash above), which is the Greek letter alpha ($\alpha$). You can
+separate the variables with commas and use the type specification as well.
+But as noted above, use either the old style (no commas) or the new style
+(with commas), \emph{never mix the two together in one argument.}
+
+Below is a simple example of multi-letter variables with appearance replacement. Enter
+\texttt{alpha} for $\alpha$ and \texttt{theta} for $\theta$.
+\begin{oQuestion}{oQ2}
+\begin{equation*}
+    \dfrac{\partial}{\partial\theta}\alpha \sin(\theta)=
+    \RespBoxMath[\rectW{1.5in}]{alpha cos(theta)}(\rpl{alpha->\\u03B1}{x}\rpl{theta->\\u03B8}{y})
+    {3}{0.0001}{[0,3.14]x[0,3.14]}
+\end{equation*}
+\end{oQuestion}
+The verbatim listing for this question follows:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{oQuestion}{oQ2}
+\begin{equation*}
+  \dfrac{\partial}{\partial\theta}\alpha \sin(\theta)=
+  \RespBoxMath[\rectW{1.5in}]
+    {alpha cos(theta)}
+    (\rpl{alpha->\\u03B1}{x}\rpl{theta->\\u03B8}{y})
+    {3}{0.0001}{[0,3.14]*2}
+\end{equation*}
+\end{oQuestion}
+\end{Verbatim}
+
+\exAeBBlogPDF{p=1330} See the file
+\texttt{\href{\urlAcroTeXBlog/?p=1330}{ml-vars.pdf}} for a demonstration of
+multi-letter variables and alternate appearances.
+
 
 \item[\ttfamily\#4 :] Optional, a named destination to the solution to the
-question. There are two forms: the \texttt{[mydest]} an explicit destination for the solution to the problem, or
-a `\texttt*', in which case, the name is
-\texttt{[\string\curr@quiz.\string\thequestionno]} is automatically assigned.
+    question. There are two forms: the \texttt{[mydest]} an explicit
+    destination for the solution to the problem, or a `\texttt*', in which
+    case, the name is \texttt{[\string\curr@quiz.\string\thequestionno]} is
+    automatically assigned.
 
 If this parameter appears, a solution must follow the
 question, enclosed in a \texttt{solution} environment.
@@ -7708,20 +7783,46 @@ question, enclosed in a \texttt{solution} environment.
 
 \item[\ttfamily\#5 :] The number of samples points to be used, usually 3 or 4 is
 sufficient.
-\item[\ttfamily\#6 :] Precision required, a \emph{non-negative} ``$\epsilon$'' value, if you will. If the precision
-is set to zero, \texttt{reldiffCompare} is used as the default compare, and the precision
-is set to a small positive value, \text{1E-14}, by default. The small value is may reset with
-\cs{defaultRDPrecision}. The default definition, \verb!\defaultRDPrecision{1E-14}!.
+\item[\ttfamily\#6 :] Precision required, a \emph{non-negative}
+    ``$\epsilon$'' value, if you will. If the precision is set to zero,
+    \texttt{reldiffCompare} is used as the default compare, and the precision
+    is set to a small positive value, \text{1E-14}, by default. The small
+    value is may reset with \cs{defaultRDPrecision}. The default definition,
+    \verb!\defaultRDPrecision{1E-14}!.
 
-\item[\ttfamily\#7 :] Parameters \#7 and \#8 are  used to define the interval from
-which to draw the sample points. There are two forms: (1) \#7 is the left-hand endpoint
-of the interval and \#8 is the right-hand endpoint (the use of \#7 and \#8 in this form
-is deprecated); (2) the interval is defined by standard interval notation, \texttt{[a,b]}.
-For a multivariate question---one where parameter \#2 lists more than one variable,
-separate the intervals for each variable by a `\texttt{x}', \texttt{[0,2]x[1,2]x[3,4]}.
-\item[\ttfamily\#8 :] (1) \#8 is the right-hand endpoint of the interval (the use of this
-parameter is deprecated); (2) in the second
-case, \#8 is not used.
+\item[\ttfamily\#7 :] Parameters \#7 and \#8 are  used to define the interval
+    from which to draw the sample points. There are two forms: (1) \#7 is the
+    left-hand endpoint of the interval and \#8 is the right-hand endpoint
+    (the use of \#7 and \#8 in this form is deprecated); (2) the interval is
+    defined by standard interval notation, \texttt{[a,b]}. For a multivariate
+    question---one where parameter \#2 lists more than one variable---separate
+    the intervals for each variable by a `\texttt{x}',
+    \texttt{[0,2]x[1,2]x[3,4]}.
+
+
+\textbf{Interval repetition.} Beginning with v8.0 (2017/08/08),
+\pkg{exerquiz} allows \emph{interval repetition}. It is not unusual that the
+cartesian product of the same interval is needed, eg,
+\texttt{[0,1]x[0,1]x[0,1]}; rather than typing those repetitive interval
+specifications, you can simple use the notation \texttt{[0,1]*3}. The general
+syntax for an interval is now \texttt{\ameta{interval}*\ameta{num}}; the
+`\texttt{*\ameta{num}}' portion is optional, \ameta{num} is an positive
+integer. Note that `\texttt{*\ameta{num}}' follows the interval
+specification, this is \emph{vitally important} for the correct parsing of
+the expression.
+
+The notation may be mixed in with additional interval
+    specifications; thus, for example, `\texttt{[0,1]*3x[1,2]x[2,3]*2}' expands to
+    `\texttt{[0,1]x[0,1]x[0,1]x[1,2]\penalty0x\penalty0[2,3]x[2,3]}'.
+
+\exAeBBlogPDF{p=1330} See the file
+\texttt{\href{\urlAcroTeXBlog/?p=1330}{ml-vars.pdf}} for a demonstration of
+interval repetition.
+
+
+\item[\ttfamily\#8 :] (1) \#8 is the right-hand endpoint of the interval (the
+    use of this parameter is deprecated); (2) in the second case, \#8 is not
+    used.
 
 \item[\ttfamily\#9 :]\label{paraRespBoxNine} This optional parameter is the name of a customized
 comparison function.
@@ -8580,7 +8681,7 @@ code of this example, as well as more technical details of the
 All form elements have a first optional parameter for modifying their appearance,
 and they have an associated ``every'' command for global modifications as well.
 
-\begingroup
+\begin{center}
 \setlength{\extrarowheight}{1mm}
 \setlength{\tabcolsep}{2mm}
 \begin{longtable}{|>{\ttfamily}l|>{\PBS\raggedright}p{.5\linewidth}|}
@@ -8615,9 +8716,8 @@ and they have an associated ``every'' command for global modifications as well.
 \cs{RespBoxTxt}&\cs{everyRespBoxTxt}\\
 \cs{CorrAnsButton}&\cs{everyCorrAnsButton}
 \end{longtable}
-\par\endgroup
+\end{center}
 
-\bigskip
 \handpoint In additional to these, there are other ``every'' commands that effect
 the appearance of the various buttons and text fields. The two commands
 \cs{everyCorrButtonField} and \cs{every\-eqText\-Field} are executed before every
@@ -8630,6 +8730,169 @@ in appearance.
 \href{eformman.pdf}{eformman.pdf}) for complete documentation on how to
 modify a field using the optional first argument, and how to use the
 ``every'' mechanism.
+
+\subsection{Inserting additional action and format scripts}\label{ss:AddActScripts}
+
+Global changes in \emph{appearance}, as just discussed, is accomplished using
+any of the \cs{every\ameta{cmdname}} family of commands; however, that device
+cannot, by design, change any of the actions \pkg{exerquiz} has defined.
+S everal key-value pairs are used to insert JavaScript code into response
+boxes, multiple choice, and multiple selection fields.
+\settowidth{\aebdimen}{\cs{addToAction*\darg{\ameta{key}}\darg{\ameta{code}}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\AddAAFormat{!ameta(code)}
+\AddAAKeystroke{!ameta(code)}
+\AddAAMouseUpMC{!ameta(code)}
+\AddAAMouseUpMS{!ameta(code)}
+\setActionKeys{!ameta(KV-pairs)}
+\addToAction*{!ameta(key)}{!ameta(code)}
+\end{dCmd}
+\newtopic
+The command \cs{setActionKeys} is a special command used to process the
+KV-pairs of the \pkg{eforms} package. It only accepts these four keys:
+\cs{AddAAFormat}, \cs{AddAAKeystroke}, \cs{AddAAMouseUpMC}, and
+\cs{AddAAMouseUpMC}.
+
+
+\begin{description}
+  \item[\cs{AddAAFormat\darg{\ameta{code}}}] This is an \pkg{eforms} KV,
+      discussed an some detail on page~\pageref{para:ProcRespSetNum} that can be
+      specified in the optional argument of any response boxes to affect the
+      field locally, or globally through the \cs{setActionKeys} command.
+  \item[\cs{AddAAKeystroke\darg{\ameta{code}}}] Text fields have a keystroke
+      event (or trigger) that executes JavaScript each time a keystroke is
+      made into the field. The \pkg{exerquiz} key \cs{AddAAKeystroke} adds
+      its argument (\ameta{code}) to the keystroke event of all response boxes
+      (\cs{RespBoxMath}, \cs{RespBoxTxt}, and \cs{RespBoxTxtPC}).
+
+      To distinguish between \env{shortquiz} (and \env{oQuestions}) and
+      \env{quiz} environments, use the methods explained below in the
+      description of the \cs{AddAAMouseUpMC} key.
+
+      Should you want code that is specialized to these individual types, you can use
+      some internal macros to distinguish these three cases.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!(),fontsize=\small]
+\setActionKeys{\AddAAKeystroke{%
+  \ifx\annot@subtype\annot@subtype@rbm!ameta(rbm-code)\else
+    \ifx\annot@subtype\annot@subtype@rbt!ameta(rbt-code)\else
+      \ifx\annot@subtype\annot@subtype@rbtpc!ameta(rbtpc-code)\fi
+  \fi\fi}}
+\end{Verbatim}
+  Within the argument of \cs{setActionKeys} the character `\texttt{@}' is an ordinary letter,
+  so it can be used freely.
+
+  Within this keystroke event, script executed prior this additional
+  \ameta{code} defines a JavaScript variable \texttt{retn}, which has a value
+  of \texttt{true} (if the response is judged correct), \texttt{false} (if
+  the response is judged incorrect), or \texttt{null} (if there is a syntax
+  error). The \ameta{code} may use this variable.
+
+  \item[\cs{AddAAMouseUpMC\darg{\ameta{code}}}] This key adds its
+      \ameta{code} to the mouse up event of items (\cs{Ans}) of a multiple
+      choice (MC) question. Both \env{shortquiz} and \env{quiz} environments
+      are affected.
+
+      You can distinguish between the \env{shortquiz} and \env{quiz}
+      environments by comparing \cs{eqQuizType} with \cs{isSQZ} or \cs{isQZ}.
+      For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\setActionKeys{\AddAAMouseUpMC{%
+    \if\eqQuizType\isQZ!ameta(qz-code)\else!ameta(sqz-code)\fi}}
+\end{Verbatim}
+
+  \item[\cs{AddAAMouseUpMS\darg{\ameta{code}}}] This key adds its
+      \ameta{code} to the mouse up event of items (\cs{Ans}) of a multiple
+      selection (MS) question. Both \env{shortquiz} and \env{quiz}
+      environments are affected. As with \cs{AddAAMouseUpMC}, distinguish
+      between the environments \env{shortquiz} and \env{quiz} by comparing
+      \cs{eqQuizType} with \cs{isSQZ} or \cs{isQZ}, as shown above.
+\end{description}
+    In the case of both \cs{AddAAMouseUpMC} and \cs{AddAAMouseUpMS}, you
+    can distinguish between a correct response and an incorrect response
+    using the command \cs{Ans@choice}, which expands to 1 when correct
+    alternative (radio button or check box) is pressed, and expands to 0
+    otherwise. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\setActionKeys{\AddAAMouseUpMC{%
+    \if\Ans@choice1!ameta(true-code)\else!ameta(false-code)\fi}}
+\end{Verbatim}
+\cs{AddAAKeystroke}, \cs{AddAAMouseUpMC}, and \cs{AddAAMouseUpMC} don't work
+as local arguments of \cs{RespBoxMath}, \cs{RespBoxTxt}, and
+\cs{RespBoxTxtPC}; however, \cs{AddAAFormat} can be passed within the option
+list of these response box commands, the local option command over rights the
+global command.
+
+Remove any of the actions earlier declared by passing the empty argument,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\setActionKeys{\AddAAMouseUpMC{}}
+\end{Verbatim}
+Now, there is no added code to the mouse up action of the multiple choice
+fields that appear afterwards.
+
+The only command yet to be discussed is \cs{addToAction*}. Suppose we earlier
+declared,
+\begin{quote}\ttfamily
+\cs{setActionKeys\darg{\string\AddAAFormat}\darg{\ameta{code\SUB1}}}
+\end{quote}
+and later in the document we want to \emph{append}
+additional script (\ameta{code\SUB2}). To accomplish this, expand the command,
+\begin{quote}\ttfamily
+\cs{addToAction\darg{\string\AddAAFormat}\darg{\ameta{code\SUB2}}}
+\end{quote}
+Now the code executed for each response box
+is \ameta{code\SUB1}\ameta{code\SUB2}. However, if you wish to \emph{prepend} the \ameta{code\SUB2}, then
+expand \cs{addToAction} using the star-option,
+\begin{quote}\ttfamily
+\cs{addToAction*\darg{\string\AddAAFormat}\darg{\ameta{code\SUB2}}}
+\end{quote}
+The code executed for any response box is \ameta{code\SUB2}\ameta{code\SUB1}.
+
+It should ever be kept in mind that changing the value of a key with
+\cs{setActionKeys} is \cs{addToAction} affects all response boxes thereafter,
+\emph{unless these changes occur in a group}. Thus, the following change,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\begin{oQuestion}{oQ1}
+\addToAction{\AddAAFormat}{\r!ameta(code)}%
+It is well known that
+  $ 1 + 16 = \RespBoxMath{17}{1}{.0001}{[0,1]}$
+\end{oQuestion}
+\end{Verbatim}
+only affects that problem, and none other.
+
+\newtopic
+\textbf{Important/A little beg.} Any changes to the action script passed to
+the component elements of the \env{oQuestion}, \env{shortquiz}, and
+\env{quiz} environments \emph{should not impact} the basic functionality of the
+environments.
+
+\subsection{The correct-type math problem}
+
+The traditional way of posing a mathematical objective-style question is to use
+the \cs{RespBoxMath} command, which presents an empty text field for the student to enter
+the answer. However, an alternate approach is to pre-populate the field and ask the student
+to edit the expression provided to obtain a correct answer.
+\collectboxto{\aebbox}{}\bgroup
+\begin{minipage}{\linewidth-\mathindent}
+\begin{Verbatim}[fontsize=\small,commandchars={!@$}]
+\RespBoxMath[!textbf@\DV{cos(4x)}\V{cos(4x)}$]
+  {4xcos(2x^2)}{2}{.001}{[0,1]}
+\end{Verbatim}
+\end{minipage}\egroup
+
+\medskip\noindent\begin{oQuestion}{}
+Edit the expression to obtain the correct answer:
+\begin{align*}
+  &\dfrac{d}{dx}\sin(2x^2)=\RespBoxMath[\DV{cos(4x)}\V{cos(4x)}]{4xcos(2x\string^2)}{2}{.001}{[0,1]}\\[3pt]
+  &\usebox{\aebbox}
+\end{align*}
+\end{oQuestion}
+The field is initially populated by an incorrect answer (a very common mistake), the student needs to
+correct the answer.
+
+\exAeBBlogPDF{p=1335} Refer to the {\AcroTeX} Blog article
+\href{\urlAcroTeXBlog/?p=1335}{Correcting a math problem} for additional
+examples. The article also discusses the use of multi-letter variables in
+this context of a correct-type question.
 
 \subsection{Evaluating Equivalent Expressions}
 
@@ -9828,20 +10091,33 @@ an ASP (Active Server Page) that I have written. This ASP, named naturally,
 \texttt{eqRecord.asp}, takes the data and stores it to a database, such as
 Microsoft Access.
 
-You can also submit your form data as HTML, as the the two websites
-demonstrate.\footnote{These websites were prepared as a script demonstration
-site that is referenced in my yet-to-be submitted book \AEBBook~\cite{book:AEBB}.}
-\begin{quote}
-\url{http://faculty.nwfsc.edu/web/math/storyd/dps/}
-\end{quote}
-The above Web page is on a \app{Windows} server hosted by Northwest Florida State
-College (NWFSC). The server-side
-script is written as ASP pages using VBScript.
+%You can also submit your form data as HTML, as the two websites
+%demonstrate.\footnote{These websites were prepared as a script demonstration
+%site that is referenced in my yet-to-be submitted book \AEBBook~\cite{book:AEBB}.}
+%\begin{quote}
+%\url{http://faculty.nwfsc.edu/web/math/storyd/dps/}
+%\end{quote}
+%The above web page is on a \app{Windows} server hosted by Northwest Florida State
+%College (NWFSC). The server-side
+%script is written as ASP pages using VBScript.
+
+There is a website that you can experience submitting form data from a
+PDF.\footnote{This website was prepared as a script demonstration site that
+is referenced in my yet-to-be submitted book \AEBBook~\cite{book:AEBB}.}
 \begin{quote}
 \url{http://www.acrotex.net/dps/}
 \end{quote}
-This Web page is on a \app{Linux} server hosted by {\AcroTeX.Net}. The
+This web page is on a \app{Linux} server hosted by {\AcroTeX.Net}. The
 server-side script is written with PHP.
+
+\redpoint In recent years, the browser technology has evolved in an unwelcome
+direction. Most web browsers do not support the Adobe Reader plug-in, hence,
+Reader no longer appears in the browser window, so essential for a good user
+experience. Most browsers use their own `native' PDF viewer, which does
+respond to links, but knows nothing about JavaScript. The only browser, as of
+this writing, that still supports the Adobe Reader plug-in (or ActiveX) is
+Microsoft Internet Explorer~11. For online, interactive work with PDF, the
+document consumer must use Microsoft Internet Explorer~11.
 
 \redpoint For more details, see the package documentation,
 \texttt{eq2dbman.pdf}.\footnote{The absolute URL is
@@ -10156,7 +10432,7 @@ handle (math fill-in) questions whose answers are a \textit{set of
 numbers (symbols)} or a comma delimited \emph{list of numbers
 (symbols)}.
 
-\paragraph*{ProcRespSetNum:} The function can handle (math fill-in)
+\paragraph*{ProcRespSetNum:}\label{para:ProcRespSetNum} The function can handle (math fill-in)
 questions whose answers are a \textit{set of numbers} or a
 comma delimited \textit{list of numbers}.
 
@@ -10168,7 +10444,7 @@ JavaScript does after the comma-delimited list is entered and
 committed.
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 $(x+1)^2 (x+3) = 0$, $S = \RespBoxMath[\AddAAFormat{\formatAsSet}
-    \rectW{.75in}\textSize{0}]{-1,-3}{1}{.0001}{[0,1]}*{ProcRespSetNum}$
+   \rectW{.75in}\textSize{0}]{-1,-3}{1}{.0001}{[0,1]}*{ProcRespSetNum}$
 \end{Verbatim}
 \noindent The formatting of answer is accomplished by passing
 \verb!\AddAAFormat{\formatAsSet}! as an optional argument of
@@ -10197,7 +10473,7 @@ be the ``universal set'' of the problem.
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \def\U{a,b,c,d,e,f,g} % define a universal set
 $A \cap B = \RespBoxMath[\AddAAFormat{\formatAsSet}
-  \rectW{.75in}\textSize{0}]{c,d}(\U){1}{.0001}{[0,1]}*{ProcRespSetSym}$
+ \rectW{.75in}\textSize{0}]{c,d}(\U){1}{.0001}{[0,1]}*{ProcRespSetSym}$
 \end{Verbatim}
 
 \paragraph*{ProcRespListFormula:} This function can handle a (math fill-in)
@@ -10323,7 +10599,7 @@ are recognized by this procedure.
 
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \RespBoxMath{(-inf,4]U[5,inf)}{10}
-    {.0001}{[0,1]x[0,1]x[0,1]x[0,1]}*{ProcRespIntervals}
+    {.0001}{\viidna}*{ProcRespIntervals}
 \end{Verbatim}
 \Important Problems with unbalanced parentheses while
 authoring and building the PDF file. The code below

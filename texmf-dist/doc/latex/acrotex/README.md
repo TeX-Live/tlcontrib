@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2017-03-20
+Dated: 2018/03/22
 
 AeB contains the following:
 
@@ -18,6 +18,19 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2018/03/22) Changes in eforms to support features of aeb_mlink. Minor bug fixes
+
+What's New (2018/02/13) Added commands to optionally group each solution when the appear
+at the end of the file; this applies both exercises and quizzes.
+
+What's New (2017/09/06) Suggested new problem type: "Correcting a math problem", see
+http://www.acrotex.net/blog/?p=1335 for a demo. Better compatibility with luatex. Minor
+bug fixes.
+
+What's New (2017-08-08) Support for multi-letter variables, alternate appearances,
+and interval repetition. The demo file for these features is
+http://www.acrotex.net/blog/?p=1330
 
 I maintain a web site featuring TeX/LaTeX/PDF stuff called
 AcroTeX (www.math.uakron.edu/~dpstory/acrotex.html).  There you

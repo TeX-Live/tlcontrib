@@ -1,0 +1,120 @@
+%%
+%% This is file `aeb_tilebg.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_tilebg.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_tilebg.sty package,                              %%
+%% Copyright (C) 2006--2018                             %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aeb_tilebg}
+ [2018/04/26 v1.2 Tile a Background (dps)]
+\let\tb@Yes=y \let\tb@No=n
+\DeclareOption{uselltiling}{%
+    \AtEndOfPackage{%
+    \let\aeb@currentTileBkgrd\aeb@TileBkgrdLL}%
+}
+\DeclareOption{draft}{\let\aeb@tilebg@draft\tb@Yes
+  \AtEndOfPackage{\aeb@DraftMode}}
+\let\aeb@tilebg@draft\tb@No
+\DeclareOption{ignoreforpaper}{\let\aeb@tilebg@ignoreforpaper\tb@Yes}
+\let\aeb@tilebg@ignoreforpaper\tb@No
+\ProcessOptions
+\ifeqforpaper
+    \ifx\aeb@tilebg@draft\tb@No
+        \ifx\aeb@tilebg@ignoreforpaper\tb@No
+            \AtEndOfPackage{\aeb@DraftMode}%
+\fi\fi\fi
+\@ifpackageloaded{web}{}{%
+    \PackageError{web}{%
+        The web package is required for this package%
+    }{%
+        Add the web package with the usetemplates option\MessageBreak
+        in the preamble above this package.
+    }%
+}
+\RequirePackage{graphicx}
+\RequirePackage{multido}
+\def\@gobblesix{\expandafter\@gobbletwo\@gobblefour}
+\def\aeb@DraftMode{\let\setTileBgGraphic\aeb@setTileBgGraphicDraft
+\let\autosetScreensizeWithMargins\@gobblesix
+\let\aeb@TileBkgrd\@empty\disableTiling}
+\let\turnOffTiling\aeb@DraftMode
+\newbox\aeb@tilingbox
+\newdimen\aeb@tiledim
+\newcommand{\aeb@setTileBgGraphicFinal}[2][1]{%
+    \let\aeb@TileBkgrd\aeb@currentTileBkgrd
+    \edef\aeb@tile@hbox{%
+        \hbox{\noexpand\includegraphics[hiresbb,#1]{#2}}}%
+    \global\setbox\aeb@tilingbox\aeb@tile@hbox
+    \xdef\tileboxwidth{\strip@pt\wd\aeb@tilingbox}%
+    \xdef\tileboxheight{\strip@pt\ht\aeb@tilingbox}%
+    \xdef\tilewidth{\the\wd\aeb@tilingbox}%
+    \xdef\tileheight{\the\ht\aeb@tilingbox}
+}
+\newcommand{\aeb@setTileBgGraphicDraft}[2][1]{}
+\let\setTileBgGraphic\aeb@setTileBgGraphicFinal
+\newcommand{\maxiterations}[1]{\def\aebtile@maxiterations{#1}}
+\maxiterations{10}
+\newcommand{\placeTilesinLayers}[2][tileBG]{%
+    \@ifpackageloaded{aeb_pro}
+        {\@ifundefined{xBld}{\PackageWarning{aeb_tilebg}
+            {The uselayers option
+                of aeb_pro is\MessageBreak required with
+                \string\placeTilesinLayers}}
+            {\def\b@tileLayer{\xBld[#2]{#1}}\def\e@tileLayer{\eBld}}}
+        {\PackageWarning{aeb_tilebg}{\string\placeTilesinLayers\space
+            requires the\MessageBreak aeb_pro package}}%
+}
+\let\b@tileLayer\@empty \let\e@tileLayer\@empty
+\newcommand{\aeb@TileBkgrdUL}{%
+    \aeb@tiledim=\paperheight
+    \advance\aeb@tiledim-\tileheight
+    \xdef\aeb@startingHeight{\strip@pt\aeb@tiledim}%
+    \b@tileLayer\multido{\rj=\aeb@startingHeight+-\tileboxheight}
+        {\aebtile@maxiterations}{%
+        \ifdim\rj pt < -\tileheight \multidostop\else
+        \multido{\ri=0+\tileboxwidth}{\aebtile@maxiterations}{%
+            \ifdim\ri pt > \textscreenwidth\multidostop\else
+                \put(\ri,\rj){\copy\aeb@tilingbox}\fi}\fi}\e@tileLayer
+}
+\newcommand{\aeb@TileBkgrdLL}{\b@tileLayer
+    \multido{\nj=0+\tileboxheight}{\aebtile@maxiterations}{%
+        \ifdim\nj pt > \paperheight\multidostop\else
+        \multido{\ni=0+\tileboxwidth}{\aebtile@maxiterations}{%
+            \ifdim\ni pt > \textscreenwidth\multidostop\else
+                \put(\ni,\nj){\copy\aeb@tilingbox}\fi}\fi}\e@tileLayer
+}
+\let\aeb@TileBkgrd\@empty
+\let\aeb@currentTileBkgrd\aeb@TileBkgrdUL
+\AddToTemplate{aeb@TileBkgrd}
+\newcommand{\autosetScreensizeWithMargins}[6]
+{%
+    \paperwidth=\tilewidth
+    \paperwidth=#2\paperwidth
+    \edef\theReqWidth{\the\paperwidth}%
+    \paperheight=\tileheight
+    \paperheight=#1\paperheight
+    \edef\theReqHeight{\the\paperheight}%
+    \margins@web@save{#3}{#4}{#5}{#6}%
+    \screensize@web@save{\theReqHeight}{\theReqWidth} % height, width
+}
+\@onlypreamble\autosetScreensizeWithMargins
+\newcommand{\disableTiling}{\disableTemplate{aeb@TileBkgrd}}
+\newcommand{\enableTiling}{\enableTemplate{aeb@TileBkgrd}}
+\newcommand{\switchtoLLTiling}{\let\aeb@TileBkgrd\aeb@TileBkgrdLL}
+\newcommand{\switchtoULTiling}{\let\aeb@TileBkgrd\aeb@TileBkgrdUL}
+\endinput
+%%
+%% End of file `aeb_tilebg.sty'.

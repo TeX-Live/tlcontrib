@@ -1,10 +1,9 @@
 % \iffalse
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% aeb_mlink.sty package,          2015-10-28           %%
-%% Copyright (C) 2006--2015  D. P. Story                %%
+%% aeb_mlink.sty package,                               %%
+%% Copyright (C) 2006--2018  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
-%%   storyd@owc.edu                                     %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -15,28 +14,56 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{aeb_mlink}
-%<package> [2016/02/16 v2.0 AeB MLink (dps)]
+%<package> [2018/04/26 v2.3 AeB MLink (dps)]
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[colorlinks,hyperindex]{hyperref}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
 \pdfstringdefDisableCommands{\let\\\textbackslash}%
-\EnableCrossrefs \CodelineIndex
 \OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{web}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{web}{aebdocfmt.def cannot be found}}
 \begin{document}
-  \GetFileInfo{aeb_mlink.sty}
+\def\CMD#1{\textbackslash#1}
+\let\pkg\textsf
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\darg#1{\texttt{\char123\relax#1\char125\relax}}
+\addtolength{\marginparwidth}{3pt}
+  \GetFileInfo{web.sty}
   \title{The \textsf{aeb\_mlink} Package\texorpdfstring{\\}{: }
   A member of the AeB Pro family}
   \author{D. P. Story\\
-    Email: \texttt{storyd@owc.edu}}
+    Email: \texttt{dpstory@uakron.edu}}
   \date{processed \today}
   \maketitle
   \tableofcontents
-  \let\Email\texttt
   \DocInput{aeb_mlink.dtx}
-  \PrintIndex
+
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}
+    {\paragraph*{Index} The index goes here. Execute
+    \[\texttt{makeindex -s gind.ist -o aeb\_mlink.ind aeb\_mlink.idx}\] on the command line and recompile
+    \texttt{web.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}
+    {\paragraph*{Change History} The list of changes goes here. Execute
+    \[\texttt{makeindex -s gglo.ist -o aeb\_mlink.gls aeb\_mlink.glo}\] on the command line and recompile
+    \texttt{aeb\_mlink.dtx}.}
+
 \end{document}
 %</driver>
 % \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{aeb_mlink}{cannot find aebdonotindex.def}}
+%
 % \section{Introduction}
 % This package creates \underbar{m}ultiline-\underbar{links}.
 % The package \textsf{hyperref} does create links, but generally
@@ -74,45 +101,80 @@
 %specified by \texttt{Rect}.
 %\end{quote}
 %    \begin{macrocode}
-%<*package>
 %    \end{macrocode}
+%    \section{The \texorpdfstring{\protect\pkg{aeb-mlink}}{aeb-mlink} Package}
+%    The \pkg{aeb\_mlink} package is listed on CTAN as \pkg{aeb-mlink}; there was, in
+%    fact, no \pkg{aeb-mlink}. Here, we provide a `dummy' package by that name which
+%    passes everything on to \pkg{aeb\_mlink}.
 %    \begin{macrocode}
+%<*altpkgname>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aeb-mlink}
+ [2018/04/26 v1.0 AeB MLink Alt-name (dps)]
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{aeb_mlink}}
+\ProcessOptions
+\RequirePackage{aeb_mlink}[2018/03/22]
+%</altpkgname>
+%    \end{macrocode}
+%    \section{Package Requirements and Options}
+%    After having established the alternate of this package, we now work on the package itself.
+%    \changes{v2.3}{2018/04/26}{Added \string\pkg{aeb-mlink} as an alternate name for this package}
+%    \begin{macrocode}
+%<*package>
+\RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \newif\if@ml@dvips \@ml@dvipstrue
+\def\mlcsarg#1#2{\expandafter#1\csname#2\endcsname}
 %    \end{macrocode}
 %    \begin{macro}{dvipsone}
 % Set the driver for \texttt{dvipsone}
 %    \begin{macrocode}
-\DeclareOption{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
+\DeclareOptionX{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
     \PassOptionsToPackage{dvipsone}{eforms}
-    \PassOptionsToPackage{dvipsone}{hyperref} %,colorlinks
+    \PassOptionsToPackage{dvipsone}{hyperref}
 }
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{dvips}
 % Set the driver for \texttt{dvips}
 %    \begin{macrocode}
-\DeclareOption{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
+\DeclareOptionX{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
     \PassOptionsToPackage{dvips}{eforms}
-    \PassOptionsToPackage{dvips}{hyperref} %,colorlinks
+    \PassOptionsToPackage{dvips}{hyperref}
 }
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{eforms}}
 %    \end{macrocode}
 %    \end{macro}
+%    \begin{macrocode}
+\newcount\mldblevel \mldblevel=0
+\define@key{aeb_mlink.sty}{dblevel}[0]{\mldblevel=#1 }
+%    \end{macrocode}
 %    \begin{macrocode}
 \def\ml@err@msg{This package requires the driver dvips and\MessageBreak
     Adobe Distiller as the PDF creator}
 \ifpdf\PackageError{aeb_mlink}{\ml@err@msg}\else
     \ifxetex\PackageError{aeb_mlink}{\ml@err@msg}\else
-        \InputIfFileExists{web.cfg}{}{}
+        \let\ExecuteOptions@SAVE\ExecuteOptions
+        \let\ExecuteOptions\ExecuteOptionsX
+        \InputIfFileExists{web.cfg}{}
+        {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+            {\ExecuteOptionsX{dvipsone}}}%
+        \let\ExecuteOptions\ExecuteOptions@SAVE
 \fi\fi
-\ProcessOptions
+\ProcessOptionsX
 %    \end{macrocode}
 % We require hyperref, eforms and soul.  For eforms, a recent version is needed,
 % \texttt{2008/03/14} or later.
 %    \begin{macrocode}
 \RequirePackage{hyperref}
-\RequirePackage{eforms}[2008/03/14]
+\RequirePackage{refcount}
+%    \end{macrocode}
+%    Beginning with the version of \pkg{eforms} dated 2018/03/22 or later, there are several
+%    link options that are defined. These are \cs{mlfix}, \cs{mlstrut}, \cs{mlcrackat} and
+%    \cs{mlhyph}.
+%    \begin{macrocode}
+\RequirePackage{eforms}[2018/03/22]
 \RequirePackage{soul}
 %    \end{macrocode}
 %
@@ -121,18 +183,54 @@
 % Driver dependent definitions for dvipsone and dvips.
 %    \begin{macrocode}
 \def\ps@mark{[\space}
+\ifnum\mldblevel>0
+  \def\mlpgMsg{(\string\n Beginning of page: ) pf
+    PhysicalPage 20 string cvs
+    pf(\string\n)pf}\else
+  \def\mlpgMsg{}\fi
+\def\pgmonitoring{\if@ml@dvips
+    dup /PhysicalPage exch 1 add def
+    /PhysicalPage PhysicalPage def^^J\fi
+    \mlpgMsg
+}
+%    \end{macrocode}
+%    Redefining \cs{mllnkcontainer}, defined in \pkg{eforms}
+%    dated 2018/03/14 or later. If \cs{ifoldstylequads} is true,
+%    we do not set \texttt{/Rect} to the minimal rectangle, rather
+%    it is set to the region defining the whole page. This was
+%    the default rectangle in the past.
+%    \begin{macrocode}
+\def\smallRectTF{\ifoldstylequads false\else
+  \iffixmlinks true\else false\fi\fi\space
+  \ifSmallRect true\else false\fi\space and}
+\def\mllnkcontainer#1{bCreateLink { xoMsgB {
+  \smallRectTF\space mlRectFix^^J%
+  #1}if}{\the\aeb@mLinkCnt\space mlIsBldMsg}ifelse}
+%    \end{macrocode}
+%     \cs{pboxRect} is defined in \pkg{eforms}
+%    \begin{macrocode}
+\def\pboxRect{mlRect }
 \if@ml@dvips
 %    \end{macrocode}
-% This next \cs{special} defines some standard conversion
-% formulas, {\TeX} to PDF and PDF to {\TeX} for \textsf{dvips}.
+%     \textsf{\textbf{dvips} driver:} Code for the \textsf{dvips} driver
+%     This next \cs{special} defines some standard conversion
+%     formulas, {\TeX} to PDF and PDF to {\TeX} for \textsf{dvips}.
 %    \begin{macrocode}
+\def\mlDict{SDict}
 \special{!userdict begin
-   /TeXtoPDF {65536 div DVImag mul} def         % sp to pts
-   /PDFtoDvips {72.27 div Resolution mul} def   % points to dots
-   /PDFtoVDvips {72.27 div VResolution mul} def % points to dots
-   /DvipstoPDF {72.27 mul Resolution div} def   % dots to points
-   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def       % sp to dots
-   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def end} % sp to dots
+   /TeXtoPDF {65536 div DVImag mul} def          % sp to pts
+   /PDFtoDvips {72.27 div Resolution mul} def    % points to dots
+   /PDFtoVDvips {72.27 div VResolution mul} def  % points to dots
+   /DvipstoPDF {72.27 mul Resolution div} def    % dots to points
+   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def        % sp to dots
+   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def^^J%   % sp to dots
+   /PhysicalPage 0 def^^J%
+   /PageHeight {vsize} def^^J%
+   /PDFtoTeX {PDFtoDvips} def^^J%
+   /pf{print flush}def^^J%
+   /bop-hook{ \pgmonitoring\space } def
+end}
+
 %    \end{macrocode}
 % This command calculates the \cs{QuadPoints} array
 % when we are using the \textsf{dvips} driver.
@@ -155,12 +253,17 @@
     hsize 72 sub PDFtoDvips 72 neg PDFtoVDvips
 }
 %    \end{macrocode}
-% This next \cs{special} defines some standard conversion
-% formulas, {\TeX} to PDF and PDF to {\TeX} in the YandY TeX System.
+%     \textsf{\textbf{dvipsone} driver:} Code for the \textsf{dvipsone} driver
+%     This next \cs{special} defines some standard conversion
+%     formulas, {\TeX} to PDF and PDF to {\TeX} in the \textsf{YandY {\TeX} System}.
 %    \begin{macrocode}
 \else
+\def\mlDict{dvidict}
 \special{!/TeXtoPDF {65536 div mag 1000 div mul} def
-/PDFtoTeX {65536 mul mag 1000 div div} def}
+  /PDFtoTeX {65536 mul mag 1000 div div} def^^J%
+  /pf{print flush}def^^J%
+  /bphook{ \pgmonitoring\space } def^^J%
+}
 %    \end{macrocode}
 % This command calculates the \cs{QuadPoints} array
 % when we are using the \textsf{dvipsone} driver.
@@ -192,21 +295,35 @@
 \newbox\aeb@bbox
 \newcount\aeb@arrayIndx \aeb@arrayIndx=0
 \newcount\aeb@mLinkCnt \aeb@mLinkCnt=0
+\newif\ifmllinktotalchanged\mllinktotalchangedfalse
 %    \end{macrocode}
-%    \begin{macro}{\mlhypertext}
-%
-% This is a general purpose hypertext link. Not only is it
-% a fine stand-alone linking command, but it also serves
-% as a building block to some convenience commends that follow.
-%
-% The commands takes two arguments, the first an optional one the second
-% one requires.
-% \begin{enumerate}
-%   \item[\texttt{[\#1]}] A standard optional argument for eForms, to change
-%       the appearance of the link and/or to include actions.
-%   \item[\texttt{\#2}] The text to be enclosed in a link.
-% \end{enumerate}
+%     When \cs{ifSmallRect} is true (the default), the smallest possible \texttt{Rect}
+%     is constructed to enclose the text; obeyed only when \cs{iffixmlinks} (defined in \pkg{eforms}
+%     is true.
 %    \begin{macrocode}
+\newif\ifSmallRect \SmallRecttrue
+\AtEndDocument{\wrtmlinktot@l\ckchngmlinktot@l\wrt@linksnotformed}
+\def\wrt@linksnotformed{\iflinknotformed
+  \PackageWarningNoLine{aeb_mlinks}{Some link calculations are not
+  complete.\MessageBreak
+  DO NOT CONVERT TO PDF at this time. Compile at \MessageBreak
+  least twice more}\fi}
+\def\wrtmlinktot@l{\immediate\write\@auxout{\string\gdef
+  \string\mlinkstotal{\the\aeb@mLinkCnt}}}
+\def\ckchngmlinktot@l{\@ifundefined{mlinkstotal}{}
+    {\ml@mlinktot@l@changed}}
+\def\ml@mlinktot@l@changed{%
+  \ifnum\mlinkstotal=\the\aeb@mLinkCnt\relax\else
+  \PackageWarningNoLine{aeb_mlink}{The number of links has
+  changed. Compile again\MessageBreak until this message
+  does not appear}\immediate
+  \write\@auxout{\string\mllinktotalchangedtrue}\fi
+}
+\def\ml@mllinktotalchanged{\ifmllinktotalchanged
+  \PackageWarningNoLine{aeb_mlink}
+  {The number of links has changed, continue\MessageBreak
+   to compile}\fi}
+\AtBeginDocument{\ml@mllinktotalchanged}
 \def\CurrentBorderColor{\@linkbordercolor}
 \def\ml@nocolorHighlight{I}
 \def\ml@nocolorLineStyle{S}
@@ -224,33 +341,503 @@
 \def\ml@earlyExecProps#1{%
     \eq@setWidgetProps\relax{#1}%
 }
-\let\mlh@preambleCmdInsert\relax
-\newcommand{\mlhypertext}[1][]{\global\aeb@arrayIndx=0\relax
-    \global\advance\aeb@mLinkCnt1\relax
 %    \end{macrocode}
-% We do something different, we process the options early, mostly
-% to get any change in \texttt{linktxtcolor}, but only if the user-friendly \texttt{ui} is
-% present.
+%     The new scheme of fixing up the quad points write information
+%     to the AUX file, which then requires multiple compilations to bring
+%     that information up to date in the document. When working on document
+%     development, you can declare \cs{OldStyleBoxesOn} in the preamble to revert
+%     to the old style boxes that do not require AUX info.
+%\changes{v2.1.3}{2018/03/10}{Reinstate old style link}
 %    \begin{macrocode}
-    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}
-        /type /array /OBJ pdfmark}%
-    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
-    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}%
-        \presets{\ml@nocolor@defaults}%
-        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\endgroup}%
-    \aeb@mlh
+\newif\ifoldstylequads \oldstylequadsfalse
+\def\OldStyleBoxesOn{\mlfixOff\oldstylequadstrue}
+\def\OldStyleBoxesOff{\oldstylequadsfalse}
+\@onlypreamble\OldStyleBoxesOn
+\@onlypreamble\OldStyleBoxesOff
+\let\mlh@preambleCmdInsert\relax
+\def\mlcs#1{\texttt{\@backslashchar#1}}
+\bgroup\@makeother\%
+\gdef\CMT#1{ %\space #1}\egroup
+\def\mldbModeOn{\def\mldb##1##2{##2}}
+\def\mldbModeOff{\def\mldb##1##2{}}
+\def\mldb#1#2{\ifnum#1<\mldblevel#2\fi}
+\def\ml@adj@x{2}\def\ml@adj@y{2}
+\AtBeginDvi{\special{!%
+%    \end{macrocode}
+%     \paragraph*{Begin Postscript code} This code is executed as the PDF is created
+%     by either \app{Adobe Distiller} (preferred) or \app{ps2pdf}. Information is
+%     written to the \app{distiller} (\app{ps2pdf}) log.\medskip\par
+%
+%     {\noindent}A switch to determine if the link should be created or now; it may not be
+%     fully formed.
+%    \begin{macrocode}
+/bCreateLink true def
+%    \end{macrocode}
+%    The length of the arrays we deal with are multiples of eight (8), we use a value
+%    of 17 as a way of testing whether an array size has been updated. All arrays
+%    are set to 17 in length initially.
+%    \begin{macrocode}
+/mlIsBld 17 def
+/mlIsBldMsg {
+  /lnkCnt exch def
+  (\string\n!! mLink)pf
+  lnkCnt 20 string cvs pf
+  ( is not completely formed,
+   compile again!!\string\n)pf
+} def
+/xoMsgB true def^^J%
+/xoMsg {^^J%
+  /lnkCnt exch def^^J%
+  /Indx exch def^^J%
+  /nSyllable Indx 8 div def^^J% dpsa08
+  (!!------------------------------------------------------------------%
+  \string\n Warning:\string\n
+  The text of mLink)pf
+  lnkCnt 20 string cvs pf
+  ( has crossed a page boundary from page )pf
+  PhysicalPage 1 sub 10 string cvs pf
+  ( to ) pf PhysicalPage 10 string cvs pf
+  (.\string\n Cross page links are not supported by the
+    PDF Specification)pf
+  (.\string\n This link is not constructed,
+    please fix it.\string\n) pf
+  (Break point is after syllable number )pf
+  nSyllable cvi 20 string cvs pf (.\string\n)pf
+  (Use the \string\\mlcrackat{)pf
+  nSyllable cvi 20 string cvs pf
+  (} option with this link.\string\n)pf
+  (!!------------------------------------------------------------------%
+  \string\n)pf^^J%
+} def^^J%
+%    \end{macrocode}
+% quadpointsfixup is the major procedure for combining all `rectangles' that are on
+% the same line.
+%    \begin{macrocode}
+/quadpointsfixup {^^J%
+  /ary exch def^^J%
+  /quadL exch def^^J%
+  /lnkCnt exch def^^J%
+\mldb0{(Processing mLink)pf^^J}%
+\mldb0{lnkCnt 20 string cvs pf (: OK\string\n) pf^^J}%
+quadL 0 eq {
+(Problems with this link, length=0,
+  will skip the creation of this link)pf^^J%
+}{
+%    \end{macrocode}
+%    Begin by defining some variables needed for this operation.
+%    \begin{macrocode}
+/gOffset 0 def^^J%
+%    \end{macrocode}
+%    \texttt{gY} holds the y-coordinate of the lower-left corner of the first entry
+%    of a quad. We use it and others like it to determine at which syllable the line
+%    is broken.
+%    \begin{macrocode}
+/gY ary\space 1 gOffset add get def^^J%
+\mldb1{(gY is ) pf gY 20 string cvs print^^J}%
+\mldb1{flush (\string\n) pf^^J}%
+/gN 0 def^^J%
+%    \end{macrocode}
+%    \texttt{gMrk} is an array that will hold the offsets into \texttt{mLinkFxup<num>}. Each
+%    offset is the beginning of a line. We initially set the length of the array to 10, though
+%    this may not be correct. That is, we assume the hypertext will not exceed 10 lines in length.
+%    \begin{macrocode}
+/gMrk 10 array def^^J% limitation
+%    \end{macrocode}
+%    The first entry is always 0, because marks the location of the quad corresponding to the
+%    beginning of the first syllable.
+%    \begin{macrocode}
+gMrk 0 0 put^^J%
+%    \end{macrocode}
+%    \texttt{gMrkL} is the length of the array, we set it to 1, as we've already inserted
+%    the first entry into \texttt{gMrkL}.
+%    \begin{macrocode}
+/gMrkL 1 gOffset add def^^J%
+\mldb2{(Begin first for\string\n) pf^^J}%
+%    \end{macrocode}
+%    Begin a for loop\marginpar{\raggedleft for loop}. The purpose of this loop is to search
+%    through the quad points of \texttt{mLinkFxup<num>} and find the offsets into the
+%    structure where the line breaks occur.
+%    \begin{macrocode}
+0 8 quadL 8 sub {^^J%
+%    \end{macrocode}
+%     \texttt{gIndx} is the loop counter, which we use below. Since we are dealing
+%     with quads, we increment by 8 each time.
+%    \begin{macrocode}
+  /gIndx exch def^^J%
+\mldb2{(Outside gt if with gIndx=) pf^^J}%
+\mldb2{gIndx 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+%    \end{macrocode}
+%    \texttt{getEntry} is the y-coordinate of the lower-left corner of the
+%    quad we are currently examining. We will compare its value to that
+%    of \cs{gY}.
+%    \begin{macrocode}
+  /getEntry ary\space 1 gOffset add get def^^J%
+\mldb2{(getEntry=) pf getEntry 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+%    \end{macrocode}
+%    Here's where we compare \texttt{gY} with \texttt{getEntry}. If they differ
+%    by more than 2 points then the line has changed. (We do it this way since these
+%    are decimal numbers and they may have been rounded in unpredictable ways.\marginpar{\raggedleft if comparison}
+%    \begin{macrocode}
+  gY getEntry sub abs 2 gt  {^^J%
+\mldb2{(Inside gt if\string\n) pf^^J}%
+%    \end{macrocode}
+%     The two entries differ, so a line break must have occurred. We inert value
+%    of \texttt{gIndx} into \texttt{gMrk}. \texttt{gIndx} is essentially the offset
+%    into \texttt{mLinkFxup<num>} where the line break occurs.
+%    \begin{macrocode}
+    gMrk gMrkL gIndx put^^J%
+%    \end{macrocode}
+%     Increment \texttt{gMrkL} accordingly.
+%    \begin{macrocode}
+    /gMrkL gMrkL 1 add def^^J%
+%    \end{macrocode}
+%     Place the new y-value in \texttt{gY} before we look back
+%     and look for another line break.
+%    \begin{macrocode}
+    /gY  getEntry def^^J%
+\mldb2{(Updating gY to )pf gY 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+\mldb2{(gMrkL=)pf gMrkL 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+%    \end{macrocode}
+%     End of the if\marginpar{\raggedleft end if}
+%    \begin{macrocode}
+  } if^^J%
+  /gOffset gOffset 8 add def^^J%
+%    \end{macrocode}
+%     End of the for loop\marginpar{\raggedleft end for}
+%    \begin{macrocode}
+} for^^J%
+\mldb2{(end first for\string\n) pf^^J}%
+%    \end{macrocode}
+%    We finished searching for line breaks and are now going to work on combining
+%    contiguous quads. Contiguous quads are the ones between the offsets recorded
+%    in the \texttt{gMrk} array. Now, if there are now line breaks, the length
+%    of \texttt{gMrk} is one
+%
+%    \texttt{gAry} is an temporary array what holds all the quads corresponding to
+%    one line. Each syllable generates an quad of length 8. Here, we assume any given
+%    line has at most 20 syllables, this may be revised. The array \texttt{gAry} is declared
+%    inside the next loop, so it is redeclared at each iteration of the loop.
+%    \begin{macrocode}
+   /gAryL 8 20 mul def^^J% limitation
+\mldb2{(gAryL=) pf gAryL 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+%    \end{macrocode}
+%    \texttt{gFixup} is an array that will old the final combined quad points, this array
+%    is the one that will be referenced by the \texttt{QuadPoints} entry of the link annotation.
+%    It's length is set to 8 times the number of lines over which the hypertext is broken (\texttt{gMrkL})
+%    One quad for each line, rather than many quads, one for each syllable.
+%    \begin{macrocode}
+  /gFixup 8 gMrkL mul array def^^J%
+  /gOffset 0 def^^J%
+\mldb2{(for loop: gMrkL=)pf gMrkL 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+%    \end{macrocode}
+%   The last loop. In this loop, for each line of hypertext,
+%   we build its contiguous quad and load it into \texttt{gFixup}.\marginpar{\raggedleft begin for}
+%    \begin{macrocode}
+0 1 gMrkL 1 sub {^^J%
+\mldb2{(After gAry\string\n) pf^^J}%
+\mldb2{(Top of for loop\string\n) pf^^J}%
+    /gIndx exch def^^J%
+\mldb2{(gIndx=)pf gIndx 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+\mldb2{(gMrk=)pf gMrk gIndx get 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+\mldb2{(mLinkFxup<num> length = )^^J}%
+\mldb2{pf ary\space length 20 string cvs^^J}%
+\mldb2{pf (\string\n) pf^^J}%
+%    \end{macrocode}
+%    We need to determine if we are examining the quads for the last line, or not.
+%    The calculation of \texttt{gCount} is dependent on this.
+%    \begin{macrocode}
+gIndx 1 add gMrkL eq {^^J%
+  /gCount ary\space length gMrk gIndx get sub def^^J%
+}{^^J%
+  /gCount gMrk gIndx 1 add get gMrk gIndx get sub def^^J%
+} ifelse^^J%
+%    \end{macrocode}
+%    Declare the \texttt{gAry} array
+%    \begin{macrocode}
+/gAry gAryL array def^^J%
+\mldb2{(gCount=)pf gCount 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+%    \end{macrocode}
+%    We want to copy a slice of \texttt{mLinkFxup<num>}, we declare the next
+%    array of length \texttt{gCount} just computed.
+%    \begin{macrocode}
+/sliceOfLinkfxup gCount array def^^J%
+%    \end{macrocode}
+%    Populate this array with a slice of \texttt{mLinkFxup<num>} beginning at
+%    \texttt{gMrk[gIndx]} and including the subsequent \texttt{gCount} entries.
+%    array of length \texttt{gCount} just computed.
+%    \begin{macrocode}
+sliceOfLinkfxup 0 ary gMrk gIndx get^^J%
+  gCount getinterval putinterval^^J%
+    gAry 0 sliceOfLinkfxup putinterval^^J%
+\mldb1{(Listing elements of gFixup\string\n) pf^^J}%
+\mldb1{gAry 0 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 1 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 5 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 4 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 3 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 2 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 6 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 7 get 20 string cvs pf (\string\n)pf^^J}%
+    gFixup gOffset [^^J%
+      gAry 0 get ^^J%                           x1 ll
+      gAry 1 get^^J%                            y1 ll
+      gAry gCount 1 sub 5 sub get^^J%           x2 lr
+      gAry gCount 1 sub 4 sub get^^J%           y2 lr
+      gAry gCount 1 sub 3 sub get^^J%           x3 ur
+      gAry gCount 1 sub 2 sub get^^J%           y3 ur
+      gAry 6 get^^J%                            x4 ul
+      gAry 7 get^^J%                            y4 ul
+    ] putinterval^^J%
+    /gOffset gOffset 8 add def^^J%
+  } for^^J%
+\mldb2{(End of second for\string\n) pf^^J}%
+  } ifelse
+  } def^^J%
+%    \end{macrocode}
+% \texttt{smallquadpointsfixup} fixes up the bounding boxes. Raises their heights
+% by \cs{ml@adj@y}, and moves the left boundary \cs{ml@adj@x} to the left.
+% \changes{v2.1.2}{2018/03/09}{Added PS proc \string\texttt{smallquadpointsfixup}}
+%    \begin{macrocode}
+/smallquadpointsfixup {^^J%
+/gIndx exch def^^J%
+/ary exch def^^J%
+/lnkCnt exch def^^J%
+/quadL exch def^^J%
+/gSFup 8 array def^^J%
+  gSFup 0 ary 0 gIndx add get
+    gIndx 0 eq {\ml@adj@x\space sub} if put^^J% x1
+  gSFup 1 ary 1 gIndx add get put^^J%           y1
+  gSFup 2 ary 2 gIndx add get put^^J%           x2
+  gSFup 3 ary 3 gIndx add get put^^J%           y2
+  gSFup 4 ary 4 gIndx add get put^^J%           x3
+  gSFup 5 ary 5 gIndx add get put^^J%
+  gSFup 6 ary 6 gIndx add get
+    gIndx 0 eq {\ml@adj@x\space sub} if put^^J% x4
+  gSFup 7 ary 7 gIndx add get put^^J%
+  ary gIndx gSFup putinterval^^J%
+} def^^J%
+%    \end{macrocode}
+%    The \texttt{mlRectFix} procedure creates the minimum sized rectangle
+%    that encloses the text, and we use this as the dimensions of \texttt{/Rect}
+%    \changes{v2.1.10}{2018/03/25}{Set \string\texttt{/Rect} to minimal rectangle containing text}
+%    \begin{macrocode}
+/mlRectFix {^^J%
+/ifRectFix exch def^^J%
+ifRectFix {
+  /nL gFixup length 8 sub def^^J% number of lines
+  /xMin gFixup 0 get def^^J%
+  0 8 nL {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get xMin lt {/xMin gFixup Indx get def}if } for^^J%
+  /xMin xMin 2 sub def^^J%
+  /xMax gFixup 2 get def^^J%
+  2 8 nL 2 add {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get xMax gt {/xMax gFixup Indx get def}if } for^^J%
+  /xMax xMax 2 add def^^J%
+  /yMin gFixup 1 get def^^J%
+  1 8 nL 1 add {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get yMin lt {/yMin gFixup Indx get def}if } for^^J%
+  /yMin yMin 4 sub def^^J%
+  /yMax gFixup 5 get def^^J%
+  5 8 nL 5 add{^^J%
+  /Indx exch def^^J%
+  gFixup Indx get yMax gt {/yMax gFixup Indx get def}if } for^^J%
+  /yMax yMax 2 add def^^J%
+  /mlRect {/Rect [^^J%
+    xMin 72 sub PDFtoTeX^^J%
+    PageHeight 72 sub yMax sub PDFtoTeX^^J%
+    xMax 72 sub PDFtoTeX^^J%
+    PageHeight yMin sub 72 sub PDFtoTeX ]^^J%
+  }def^^J%
+}{^^J%
+  /mlRect{/Rect [ \par@@Rect ] }def^^J%
+}ifelse^^J%
+ifRectFix {
+\mldb1{(/Rect [)pf^^J%
+xMin 20 string cvs pf( )pf^^J%
+yMax 20 string cvs pf( )pf^^J%
+xMax 20 string cvs pf( )pf^^J%
+yMin 20 string cvs pf(]\string\n)pf^^J}%
+} if^^J%
+} def
+}}
+%    \end{macrocode}
+%     \leavevmode\DescribeMacro{\mlMarksOn}
+%     Added tracking marks. Turn them on with \cs{mlMarksOn} and off again
+%     with \DescribeMacro{\mlMarksOff}\cs{mlMarksOff}.
+%     \changes{v2.1.8}{2018/03/19}{Added tracking marks}
+%    \begin{macrocode}
+\newif\ifmlmarks\mlmarksfalse
+\def\mlMarksOn{\mlmarkstrue}
+\def\mlMarksOff{\mlmarksfalse}
+%    \end{macrocode}
+%   \leavevmode\DescribeMacro{\ml@MrkLnk}\hskip-\marginparsep\darg{\ameta{num}}
+%   The internal command \cs{ml@MrkLnk} typesets the tracking mark; it may be redefined.
+%    When the link is within a \env{tabular} environment (and perhaps others), in this case,
+%    \cs{baselineskip=0pt}. We raise instead the height of the capital letter `T',
+%    plus a little.
+%    \changes{v2.1.9}{2018/03/22}{Changed the definition of \cs{ml@MrkLnk}}
+%    \begin{macrocode}
+\def\ml@MrkLnk#1{\ifmlmarks\bgroup\ifdim\baselineskip=0pt
+  \setbox\z@\hbox{T}\def\ml@raiseamt{\ht\z@+.4pt}\else
+  \def\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalcolor\bfseries
+  \raisebox{\ml@raiseamt}{\tiny\strut{L#1}}}}\egroup\fi}
+\newif\iflinknotformed \linknotformedfalse
+\def\ml@underlinded{U}
+%    \end{macrocode}
+%    \begin{macro}{\mlhypertext}
+%
+% This is a general purpose hypertext link. Not only is it
+% a fine stand-alone linking command, but it also serves
+% as a building block to some convenience commends that follow.
+%
+% The commands takes two arguments, the first an optional one the second
+% one requires.
+% \begin{enumerate}
+%   \item[\texttt{[\#1]}] A standard optional argument for \pkg{eforms}, to change
+%       the appearance of the link and/or to include actions.
+%   \item[\texttt{\#2}] The text to be enclosed in a link.
+% \end{enumerate}
+% The most recently, \pkg{eforms} defines \cs{mlhypertext} to a warning
+% message. So if \cs{mlhypertext} is already defined, we \cs{renewcommand}
+% else we \cs{newcommand}.
+% \changes{v2.1.17}{2018/04/19}{added conditional command definition for \string\cs{mlhypertext}}
+%    \begin{macrocode}
+\@ifundefined{mlhypertext}{\newcommand}{\renewcommand}%
+{\mlhypertext}[2][]{\begingroup
+  \toks@=\expandafter{#2}%
+  \edef\ml@HytextArg{{\the\toks@}}%
+  \global\aeb@arrayIndx=\z@ % dpsa08
+%  \global\advance\aeb@mLinkCnt\@ne\relax
+  \def\ml@setlink##1{\setLinkPbox{%
+      \QuadPoints{mLink##1}#1}}%
+    \expandafter\processAppArgs\set@LinkPboxDefaults
+    \presets{\ml@nocolor@defaults}\S{S}\W{0}#1\end\@nil
+    \ifx\eq@S@value\ml@underlinded
+      \let\itsunderline\ef@YES\else\let\itsunderline\ef@NO\fi
+%    \end{macrocode}
+%     Now we test whether \cs{eq@mlcrackat} is empty or not. If not-empty
+%     we break this link to two parts.
+%    \begin{macrocode}
+    \ifx\eq@mlignore\ef@YES
+      \global\advance\aeb@mLinkCnt\@ne\relax
+      \def\ml@next{\mlhypertext@i{#1}}\else
+    \ifx\eq@mlcrackat\@empty
+%    \end{macrocode}
+%     A `normal' link, continue
+%    \begin{macrocode}
+      \global\advance\aeb@mLinkCnt\@ne\relax
+      \def\ml@next{\mlhypertext@i{#1}}%
+    \else
+%    \end{macrocode}
+%     We need to crack this link up into two
+%    \begin{macrocode}
+      \edef\temp@crackAt{\noexpand
+      \crackAt{\eq@mlcrackat}{\the\toks@}}\temp@crackAt
+      \def\ml@next{\mlhypertext[#1\mlignore{}]{\the\mlfrstoftwo}%
+      \eq@mlcrackinsat\penalty-50
+      \mlhypertext[#1\mlignore{}]{\the\mlsndoftwo}\aftergroup
+      \normalcolor\endgroup}%
+    \fi\fi
+    \ml@next
 }
-\def\mlh@setQuadSyllable#1{%
-    \setbox\aeb@bbox=\hbox{\strut#1}%
+\def\mlhypertext@i#1{%
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{\global
+    \linknotformedtrue\def\lngth{17}}
+    {\edef\lngth{\@nameuse{mLinkLngth\the\aeb@mLinkCnt}}}%
+    \ml@start@link{\the\aeb@mLinkCnt}{\lngth}% Step 1
+    \def\mlh@preambleCmdInsert{%
+      \ml@MrkLnk{\the\aeb@mLinkCnt}\ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{\endgroup}%
+%    \end{macrocode}
+%    Start \pkg{soul} on hypertext
+%    \begin{macrocode}
+    \expandafter\aeb@mlh\ml@HytextArg
+    \ml@finish@link{\the\aeb@mLinkCnt}{\lngth}%
+    \ml@setlink{\the\aeb@mLinkCnt}%
+    \ifoldstylequads\else
+      \iffixmlinks\literalps@out{restore}\fi\fi
+      \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{%
+      \immediate\write\@auxout{\string\mlcsarg
+        \string\gdef{mLinkLngth\the\aeb@mLinkCnt}{17}}%
+      }{\immediate\write\@auxout{\string\mlcsarg
+        \string\gdef{mLinkLngth\the\aeb@mLinkCnt}%
+        {\the\aeb@arrayIndx}}}\endgroup
+}
+\def\mlh@setQuadSyllable#1#2#3#4{%
+% #1 = current array Index
+% #2 = quad total
+% #3 = link cnt
+% #4 = content
+    \setbox\aeb@bbox=\hbox{\ml@strut#4}%
     {%
-        \count\z@=\ht\aeb@bbox\xdef\aeb@bbox@ht{\the\count\z@}%
-        \count\z@=\wd\aeb@bbox\xdef\aeb@bbox@wd{\the\count\z@}%
-        \dp\aeb@bbox=1pt\relax
-        \count\z@=\dp\aeb@bbox\xdef\aeb@bbox@dp{\the\count\z@}%
+        \setbox\@tempboxa\hbox{\ml@strut}%
+        \ifx\itsunderline\ef@YES\@tempdima1bp\relax\else
+          \@tempdima\dp\@tempboxa \ifdim\@tempdima>2bp
+            \advance\@tempdima-2bp\fi
+        \fi
+        \dp\aeb@bbox\@tempdima
+        \@tempdima\ht\@tempboxa \advance\@tempdima\dp\aeb@bbox
+        \advance\@tempdima1bp
+        \ht\aeb@bbox\@tempdima\def\x{\the\count\z@}%
+        \count\z@=\ht\aeb@bbox\xdef\aeb@bbox@ht{\x}%
+        \count\z@=\wd\aeb@bbox\xdef\aeb@bbox@wd{\x}%
+        \count\z@=\dp\aeb@bbox\xdef\aeb@bbox@dp{\x}%
     }%
-    \special{ps: \ps@mark{mLink\the\aeb@mLinkCnt}
+    \ifoldstylequads
+      \literalps@out{%
+        bCreateLink {^^J%
+          \mlDict\space/mLinkFxup#3\space known {^^J%
+        \ps@mark{mLink#3}
         \the\aeb@arrayIndx\space [\setQuadBox]
-            \space /PUTINTERVAL pdfmark}%
+            \space /PUTINTERVAL pdfmark}{^^J%
+        xoMsgB {
+        /xoMsgB false def
+        \the\aeb@arrayIndx\space
+        #3\space
+        xoMsg % dpsa08
+        } if^^J% xoMsgB
+        } ifelse } if
+      }%
+    \else
+      \literalps@out{%
+        bCreateLink  {^^J%
+          \mlDict\space/mLinkFxup#3\space known {^^J%
+          mLinkFxup#3\space
+          #1\space[\setQuadBox] putinterval^^J%
+%    \end{macrocode}
+%    Initiate fix up of little rectangles
+%    \begin{macrocode}
+        #2\space %
+        #3\space
+        mLinkFxup#3\space
+        #1\space
+        smallquadpointsfixup }{^^J%
+        xoMsgB {
+        /xoMsgB false def
+%        \the\aeb@arrayIndx\space
+        #1\space
+        #3\space
+        xoMsg % dpsa08
+        } if^^J% xoMsgB
+        } ifelse } if
+    }%
+    \fi
     \global\advance\aeb@arrayIndx8\relax
 }
 %    \end{macrocode}
@@ -259,12 +846,15 @@
 % \cs{labelRef} and \cs{atPage} are public, and can be used.
 %    \begin{macrocode}
 \def\aeb@exiii{\expandafter\expandafter\expandafter}
+%\def\aebnameref#1{\getrefbykeydefault{#1}{name}{??}}
 \def\aebnameref#1{\@ifundefined{r@#1}{??}
     {\aeb@exiii\@thirdoffive\csname r@#1\endcsname}}
+%\def\labelRef#1{\getrefbykeydefault{#1}{}{Doc-Start}}
 \def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
    {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
-\def\atPage#1{\@ifundefined{r@#1}{1}
-    {\aeb@exiii\@secondoffive\csname r@#1\endcsname}}
+\def\atPage#1{\getrefbykeydefault{#1}{page}{??}}
+%\def\atPage#1{\@ifundefined{r@#1}{1}
+%  {\aeb@exiii\@secondoffive\csname r@#1\endcsname}}
 %    \end{macrocode}
 %    \begin{macro}{\mlhyperlink}
 %    \begin{macro}{\mlhyperref}
@@ -327,7 +917,9 @@
 \def\ml@hyper@linkfile#1#2#3{%
     \let\ef@thislinkcolor\@filecolor
     \let\CurrentBorderColor\@filebordercolor
-    \def\theView{[0 \@pdfstartview]}%
+    \ifx\@pdfstartview\@empty
+        \def\theView{[0 /Fit]}\else
+        \def\theView{[0 \@pdfstartview]}\fi
     \@ifundefined{ifHy@pdfnewwindow}
     {\ifHy@newwindow}{\ifHy@pdfnewwindow}%
         \def\isWindow{/NewWindow true}\else
@@ -370,16 +962,17 @@
 %
 % The problem is not as ``easy'' as the previous cases. Arseneau places the URL in math mode
 % and it does not reconstruct (\texttt{soul} terminology) as it should. Our solution is to
-% hijack three commands of \texttt{soul} \cs{SOUL@doword}, \cs{SOUL@analyze}, and \cs{SOUL@dosyllable},
+% hijack three commands of \texttt{soul}, these are \cs{SOUL@doword}, \cs{SOUL@analyze}, and \cs{SOUL@dosyllable},
 % and modify them to do the work on an URL.
 %    \begin{macrocode}
-\newbox\ml@urlbuild
-\setbox\ml@urlbuild\hbox{}
+\newbox\ml@urlbuildi
+\newbox\ml@urlbuildii
 %    \end{macrocode}
 % We modify \cs{SOUL@doword} and name it \cs{ml@SOUL@doword}.
 %    \begin{macrocode}
 \def\ml@SOUL@doword{%
-    \global\setbox\ml@urlbuild\hbox{}%
+    \global\setbox\ml@urlbuildi\hbox{}%
+    \global\setbox\ml@urlbuildii\hbox{}%
     \edef\x{\the\SOUL@word}%
     \ifx\x\empty
     \else
@@ -427,53 +1020,36 @@
         \global\setbox\@ne=\lastbox}%
     \ifvoid\@ne
     \else
-        \setbox\@ne\hbox{\unhbox\@ne}%
 %    \end{macrocode}
-% If we say \verb!\mlurl{http://www.math.uakron.edu/~dpstory}!, then the \cs{box\cs{z@}} above contains
-% the following tokens, listed at their breakpoints:\goodbreak
-% \begin{flushleft}
-% \texttt{http:}\\
-% \texttt{\string\\}\\
-% \texttt{www.}\\
-% \texttt{math.}\\
-% \texttt{uakron.}\\
-% \texttt{edu/}\\
-% \texttt{\string~dpstory}
-% \end{flushleft}
-% The idea is to get each of these using \verb~\global\setbox\@ne=\lastbox~ (bottom to top)
-% and to build the URL with the quad points calculated. Each new token is added in front
-% of the URL as we build it. Results are held in \cs{ml@urlbuild}. We insert \cs{penalty0} to
-% promote a break point between components, as each component is enclosed in an \cs{hbox} now.
+% We encapsulate our changes at this point in \cs{ml@interface@analyze}
 %    \begin{macrocode}
-        \global\setbox\ml@urlbuild=\hbox{%
-            \mlh@setQuadSyllable{\unhcopy\@ne}%
-            \hbox{\unhcopy\@ne}\penalty0\unhcopy\ml@urlbuild}%
-        \SOUL@syllgoal=\wd\@ne
-        \advance\count@\@ne
+      \ml@interface@analyze
+      \SOUL@syllgoal=\wd\@ne
+      \advance\count@\@ne
 %    \end{macrocode}
-% We get the tokens recursively, be we jump back to \cs{ml@SOUL@analyze} not
+% We get the tokens recursively, but we jump back to \cs{ml@SOUL@analyze} not
 % \cs{SOUL@analyze}.
 %    \begin{macrocode}
-        \ml@SOUL@analyze
-        \SOUL@syllwidth\z@
-        \SOUL@syllable={}%
-        \ifnum\count@>\z@
-            \advance\SOUL@syllgoal-\SOUL@ttwidth
+      \ml@SOUL@analyze
+      \SOUL@syllwidth\z@
+      \SOUL@syllable={}%
+      \ifnum\count@>\z@
+          \advance\SOUL@syllgoal-\SOUL@ttwidth
 %    \end{macrocode}
 % At this point, we jump to \cs{ml@SOUL@dosyllable} rather than
 % \cs{SOUL@dosyllable}.
 %    \begin{macrocode}
-            \ml@SOUL@dosyllable
-            \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@hyphkern}%
-                {\SOUL@sethyphenchar}%
-            \SOUL@everyhyphen
-        \else
+          \ml@SOUL@dosyllable
+          \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@hyphkern}%
+              {\SOUL@sethyphenchar}%
+          \SOUL@everyhyphen
+      \else
 %    \end{macrocode}
 % Use \cs{ml@SOUL@dosyllable} not \cs{SOUL@dosyllable}.
 %    \begin{macrocode}
-            \ml@SOUL@dosyllable
-        \fi
-    \fi
+        \ml@SOUL@dosyllable
+      \fi
+  \fi
 }}
 %    \end{macrocode}
 % We modify \cs{SOUL@dosyllable} and name it \cs{ml@SOUL@dosyllable}.
@@ -519,21 +1095,175 @@
     \SOUL@n
 }
 %    \end{macrocode}
+%    We put most of our changes to \cs{ml@SOUL@analyze} in
+%    \DescribeMacro{\ml@interface@analyze}\cs{ml@interface@analyze}
+%    \begin{macrocode}
+\def\ml@interface@analyze{%
+  \global\advance\syllableCnt\@ne % dpsa11
+  \setbox\@ne\hbox{\unhbox\@ne}%
+%    \end{macrocode}
+% If we say \verb!\mlurl{http://www.math.uakron.edu/~dpstory}!, then the \cs{box\cs{z@}} above contains
+% the following tokens, listed at their breakpoints:\goodbreak
+% \begin{flushleft}
+% \texttt{http:}\\
+% \texttt{\string\\}\\
+% \texttt{www.}\\
+% \texttt{math.}\\
+% \texttt{uakron.}\\
+% \texttt{edu/}\\
+% \texttt{\string~dpstory}
+% \end{flushleft}
+% The idea is to get each of these using \verb~\global\setbox\@ne=\lastbox~ (bottom to top)
+% and to build the URL with the quad points calculated. Each new token is added in front
+% of the URL as we build it. Results are held in \cs{ml@urlbuild}. We insert \cs{penalty0} to
+% promote a break point between components, as each component is enclosed in an \cs{hbox} now.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     We'll try cracking the url here, if requested.
+%    \begin{macrocode}
+  \ifx\eq@mlcrackat\@empty
+%    \end{macrocode}
+%     Ordinary link, we don't crack it apart, continue with the old code.
+%    \begin{macrocode}
+    \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+      {\ml@qlngthchunki}{\ml@urlbuildi}%
+  \else
+    \ifnum\syllableCnt=\revCrackAt\relax
+%    \end{macrocode}
+%    Everything is in reverse order, this is the last syllable of the first chunk
+%    \begin{macrocode}
+      \aeb@arrayIndx=\z@
+%    \end{macrocode}
+% start first link
+%    \begin{macrocode}
+      \ml@start@link{\the\aeb@mLinkCnt}{\ml@qlngthchunki}%
+      \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+        {\ml@qlngthchunki}{\ml@urlbuildi}%
+    \else
+%    \end{macrocode}
+% Continue with first link
+%    \begin{macrocode}
+      \ifnum\syllableCnt>\revCrackAt\relax
+        \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+          {\ml@qlngthchunki}{\ml@urlbuildi}%
+      \else
+        \ifnum\syllableCnt=\@ne
+%    \end{macrocode}
+% start second link
+%    \begin{macrocode}
+          \aeb@arrayIndx=\z@
+%    \end{macrocode}
+%    Everything is in reverse order, this is the last syllable of the second chunk
+%    \begin{macrocode}
+            \ml@start@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+            \ml@bld@quadchunks{\aeb@mLinkCnt@}
+              {\ml@qlngthchunkii}{\ml@urlbuildii}%
+        \else
+%    \end{macrocode}
+% continue with second link
+%    \begin{macrocode}
+            \ml@bld@quadchunks{\aeb@mLinkCnt@}
+              {\ml@qlngthchunkii}{\ml@urlbuildii}%
+        \fi
+      \fi
+    \fi
+  \fi
+}
+\def\ml@bld@quadchunks#1#2#3{{%
+% #1 = link cnt
+% #2 = chunk size
+% #3 = \ml@urlbuild to i or ii
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}
+    {\edef\@indx{\the\aeb@arrayIndx}}
+    {\@tempcnta#2\relax
+     \advance\@tempcnta-8\relax
+     \advance\@tempcnta-\aeb@arrayIndx
+     \def\@indx{\the\@tempcnta}%
+  }%
+  \global\setbox#3=\hbox{%
+    \mlh@setQuadSyllable{\@indx}{#2}{#1}{\unhcopy\@ne}%
+    \hbox{\unhcopy\@ne}\penalty0\unhcopy#3}%hbox
+}}
+%    \end{macrocode}
 % After the above preliminaries, we finally define \DescribeMacro{\mlurl}\cmd{\mlurl}.
 %    \begin{macrocode}
-\newcommand{\mlurl}{\begingroup\def~{\string~}%
+\newcommand{\mlurl}{\begingroup\@makeother\~\relax% \def~{\string~}%
     \ef@sanitize@toks\mlurl@}
 %    \end{macrocode}
 % After sanitizing, we save the URL (\texttt{\#2}) an a macro
 % \cs{ml@url} using the \cs{urldef} command, defined in the \textsf{url} package.
 %    \begin{macrocode}
-\newcommand{\mlurl@}[2][]{\urldef\ml@url\nolinkurl{#2}%
-\def\SOUL@mlhpreamble{%\begingroup
+\newcommand{\mlurl@}[2][]{\@ifundefined{ef@thislinkcolor}
+  {\let\ef@thislinkcolor\normalcolor}{}\expandafter
+  \def\expandafter\ef@thislinkcolor@SAVE
+    \expandafter{\ef@thislinkcolor}%
+%\def\ml@urlOpts{#1}\def\ml@urlURI{#2}%
+    \def\ml@setlink##1{\setLinkPbox{\A{\URI{#2}}%
+    \QuadPoints{mLink##1}#1}}%
+%    \end{macrocode}
+%    We get the link options early to determine if this link is to
+%    be underlined.
+%    \begin{macrocode}
+    \expandafter\processAppArgs\set@LinkPboxDefaults
+    \presets{\ml@nocolor@defaults}\S{S}\W{0}#1\end\@nil
+    \ifx\eq@S@value\ml@underlinded
+      \let\itsunderline\ef@YES\else\let\itsunderline\ef@NO\fi
+%    \end{macrocode}
+%     \cs{ml@url} is the specified url to create a link around
+%    \begin{macrocode}
+  \global\aeb@arrayIndx=0\relax
+  \global\syllableCnt=0\relax
+  \global\advance\aeb@mLinkCnt\@ne\relax
+%    \end{macrocode}
+%    \begin{macrocode}
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{%
+    \global\linknotformedtrue\def\lngth{17}%
+    \def\ml@qlngthchunki{17}}
+    {\@tempcnta\@nameuse{mLinkLngth\the\aeb@mLinkCnt}\relax
+    \edef\lngth{\the\@tempcnta}%\multiply\@tempcnta8\relax
+    \edef\ml@qlngthchunki{\the\@tempcnta}}%
+%    \end{macrocode}
+%     We make some calculations in preparation to a link that will be
+%     cracked apart.
+%     \cs{MAXCNT} is the number of syllables of the un-cracked URL.
+%    \begin{macrocode}
+  \@ifundefined{mLinkSyCnt\the\aeb@mLinkCnt}
+    {\def\MAXCNT{0}\def\ml@lngthchunki{0}\def\ml@lngthchunkii{0}%
+    \def\ml@qlngthchunki{0}\def\ml@qlngthchunkii{0}\def\revCrackAt{0}}
+    {\edef\MAXCNT{\@nameuse{mLinkSyCnt\the\aeb@mLinkCnt}}%
+%    \end{macrocode}
+%     When \cs{MAXCNT} is known, and \cs{eq@mlcrackat} is known, we can calculate
+%     the number of syllables of each chunk of the URL, for the first chunk, it is
+%     \cs{eq@mlcrackat}, for the second it is $\cs{MAXCNT} - \cs{eq@mlcrackat}$.
+%    \begin{macrocode}
+    \ifx\eq@mlcrackat\@empty\else
+      \@tempcnta\MAXCNT\relax\advance\@tempcnta-\eq@mlcrackat\relax
+      \edef\ml@lngthchunki{\eq@mlcrackat}%
+      \edef\ml@lngthchunkii{\the\@tempcnta}%
+      \@tempcnta\ml@lngthchunki\relax\multiply\@tempcnta8\relax
+      \edef\ml@qlngthchunki{\the\@tempcnta}%
+      \@tempcnta\ml@lngthchunkii\relax\multiply\@tempcnta8\relax
+      \edef\ml@qlngthchunkii{\the\@tempcnta}%
+%    \end{macrocode}
+%     We take these chunks off in reverse order so we measure each from the end of the url.
+%     This calculation can be move to earlier code where it is not executed for each syllable (chunk).
+%     \cs{revCrackAt} is the value of \cs{eq@mlcrackat} as measure from the end of the url.
+%    \begin{macrocode}
+      \@tempcnta\MAXCNT\relax
+      \advance\@tempcnta-\eq@mlcrackat\relax
+      \advance\@tempcnta\@ne
+      \edef\revCrackAt{\the\@tempcnta}%
+    \fi}%
+    \@tempcnta\aeb@mLinkCnt\advance\@tempcnta\@ne
+      \edef\aeb@mLinkCnt@{\the\@tempcnta}%
+%    \begin{macrocode}
+  \urldef\ml@url\nolinkurl{#2}%
+  \def\SOUL@mlhpreamble{%\begingroup
     \mlh@preambleCmdInsert\ef@colorthislink}\hyper@chars
     \let\ef@thislinkcolor\@urlcolor
     \let\CurrentBorderColor\@urlbordercolor
 %    \end{macrocode}
-% Within this group, we direct the \textsf{soul} package to our customized versions of the
+% Within this group, we direct the \pkg{soul} package to our customized versions of the
 % commands.
 %    \begin{macrocode}
     \let\ml@SOUL@doword@SAVE\SOUL@doword
@@ -542,27 +1272,105 @@
 % The next several lines are taken from the definition of \cs{mlhypertext}, the basic command
 % for construction many of the `\cs{ml}' commands of this package.
 %    \begin{macrocode}
-    \global\aeb@arrayIndx=0\relax
-    \global\advance\aeb@mLinkCnt1\relax
-    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}%
-        /type /array /OBJ pdfmark}%
-    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
-    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}\A{\URI{#2}}%
-        \presets{\ml@nocolor@defaults}
-        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\expandafter
+    \ifx\eq@mlcrackat\@empty\ml@start@link{\the\aeb@mLinkCnt}{\lngth}\fi
+    \def\mlh@preambleCmdInsert{\ml@MrkLnk{\the\aeb@mLinkCnt}%
+      \ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{%
+        \expandafter
 %    \end{macrocode}
 % The coloring of the hypertext does not work unless we make the definition
 % global, so we do so and hope this does not mess other things up.
+% \changes{v2.0.1}{2017/09/19}{Save the incoming link color}
+% Save the incoming link color so we can globally change it.
+% After the link is formed, change it back again.
 %    \begin{macrocode}
-        \gdef\expandafter\ef@thislinkcolor
+        \def\expandafter\ef@thislinkcolor
              \expandafter{\ef@thislinkcolor}}%
 %    \end{macrocode}
 % Finally, we call \cs{aeb@mlh} which starts \textsf{soul} with \cs{SOUL@}.
 % This does this analysis, the custom command build the url in \cs{ml@urlbuild}, which
 % we then unbox.
 %    \begin{macrocode}
-    \aeb@mlh\ml@url\ef@colorthislink\unhcopy\ml@urlbuild\endgroup
+    \aeb@mlh\ml@url\ef@colorthislink\unhcopy\ml@urlbuildi
+    \expandafter\gdef\expandafter\ef@thislinkcolor
+    \expandafter{\ef@thislinkcolor@SAVE}%
+    \immediate\write\@auxout{\string\mlcsarg\string
+      \gdef{mLinkSyCnt\the\aeb@mLinkCnt}{\the\syllableCnt}}% dpsa11
+    \immediate\write\@auxout{\string\mlcsarg
+      \string\gdef{mLinkLngth\the\aeb@mLinkCnt}{\the\aeb@arrayIndx}}%
+    \ifx\eq@mlcrackat\@empty
+      \ml@finish@link{\the\aeb@mLinkCnt}{\lngth}%
+      \ml@setlink{\the\aeb@mLinkCnt}%
+      \iffixmlinks\literalps@out{restore}\fi
+    \else
+      \ml@finish@link{\the\aeb@mLinkCnt}{\ml@qlngthchunki}%
+      \ml@setlink{\the\aeb@mLinkCnt}%
+      \iffixmlinks\literalps@out{restore}\fi
+      \eq@mlcrackinsat\penalty-50
+      \ml@start@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+      \penalty0\@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{}
+      {\ml@MrkLnk{\aeb@mLinkCnt@}}\unhcopy\ml@urlbuildii
+      \ml@finish@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+      \ml@setlink{\aeb@mLinkCnt@}\iffixmlinks
+        \literalps@out{restore}\fi
+      \global\advance\aeb@mLinkCnt\@ne
+    \fi\aftergroup\normalcolor\endgroup
 }
+\def\ml@start@link#1#2{% Step 1
+% #1=link number
+% #2 = final quad length
+  \literalps@out{%
+    /xoMsgB true def^^J%
+    \ps@mark/_objdef {mLink#1}%
+      /type /array /OBJ pdfmark^^J%
+    \ifoldstylequads
+    /mLinkFxup#1\space0 array def
+    \else
+      /bCreateLink mlIsBld #2\space eq not def^^J%
+      bCreateLink{ /mLinkFxup#1\space
+        #2\space array def }if
+    \fi
+  }%
+}
+\def\ml@finish@link#1#2{% Step 4 and 5
+% #1=link number
+% #2 = final quad length
+  \ifoldstylequads\else
+    \ifnum\aeb@arrayIndx=0\relax
+      \PackageWarning{aeb_mlink}{%
+        Problem with mLink\the\aeb@mLinkCnt,\MessageBreak
+        Will skip the creation of this link}\fi
+  \literalps@out{%
+%    \end{macrocode}
+%    If \cs{iffixmlinks} is true, we fix the links, otherwise, we no not.
+%    \begin{macrocode}
+  \iffixmlinks
+    \ifnum\aeb@arrayIndx>0
+      save^^J%
+      bCreateLink {^^J%
+      \mlDict\space/mLinkFxup#1\space known {^^J%
+      #1\space
+      #2\space
+      mLinkFxup#1\space
+      quadpointsfixup^^J%
+      \ps@mark{mLink#1} 0 gFixup
+      /PUTINTERVAL pdfmark^^J%
+      }if }if
+    \fi
+  \else
+%    \end{macrocode}
+%    (2018/04/20) Added \texttt{bCreateLink}, etc., to protect
+%    against \app{distiller}/\app{ps2pdf} from crashing when \cs{mlfix\darg{n}}.
+%    \changes{v2.1.18}{2018/04/20}{Added \string\texttt{bCreateLink}, etc., to protect
+%    against distiller/ps2pdf from crashing}
+%    \begin{macrocode}
+    bCreateLink {^^J%
+    \mlDict\space/mLinkFxup#1\space known {^^J%
+    \ps@mark{mLink#1} 0 mLinkFxup#1
+      /PUTINTERVAL pdfmark^^J%
+     }if }if
+  \fi}%
+\fi}
 %    \end{macrocode}
 %    \end{macro}
 % \section{Macros used by the SOUL Interface}
@@ -581,15 +1389,11 @@
 % (2011/12/27) Originally, I had \verb|\let\protect\@empty| here, but removing this
 % seems to do no harm, so, we'll go for it.
 %    \begin{macrocode}
-%    \mlh@preambleCmdInsert\ef@colorthislink\let\protect\@empty}
     \mlh@preambleCmdInsert\ef@colorthislink}
 \def\SOUL@mlheverysyllable{%
-    \mlh@setQuadSyllable{\the\SOUL@syllable}%
-    \the\SOUL@syllable%
-    \SOUL@setkern\SOUL@charkern}%
-%\def\SOUL@mlheveryspace#1{%
-%    \mlh@setQuadSyllable{ #1\space\hskip\spaceskip}%
-%    #1\space\hskip\spaceskip}%
+    \mlh@setQuadSyllable{\the\aeb@arrayIndx}{\lngth}%
+      {\the\aeb@mLinkCnt}{\the\SOUL@syllable}%
+    \the\SOUL@syllable\SOUL@setkern\SOUL@charkern}%
 \def\SOUL@mlheveryspace#1{#1\space\hskip\spaceskip}%
 \def\SOUL@mlheveryhyphen{%
     \discretionary{%
@@ -599,7 +1403,8 @@
     }{}{}%
 }
 \def\SOUL@mlheveryexhyphen#1{%
-    \mlh@setQuadSyllable{\SOUL@setkern\SOUL@hyphkern#1}%
+    \mlh@setQuadSyllable{\the\aeb@arrayIndx}{\lngth}%
+      {\the\aeb@mLinkCnt}{\SOUL@setkern\SOUL@hyphkern#1}%
     \SOUL@setkern\SOUL@hyphkern#1%
     \discretionary{}{}{%
         \SOUL@setkern\SOUL@charkern
@@ -617,7 +1422,69 @@
 }
 \DeclareRobustCommand*\aeb@mlh{\SOUL@mlhsetup\SOUL@}
 %    \end{macrocode}
+%    \leavevmode\DescribeMacro{\crackAt}\hskip-\marginparsep\darg{\ameta{num}}\darg{\ameta{string}}
+%    The macro \cs{crackAt} breaks \ameta{string} into two parts and places the two parts in their
+%    own token register: \cs{mofrstoftwo} contains contains that portion of the string up to and including
+%    the \ameta{num}${}^{\mbox{\scriptsize th}}$ syllable. We use this macro to break apart a string that itself
+%    breaks across a page boundary on the \ameta{num}${}^{\mbox{\scriptsize th}}$ syllable.
 %    \begin{macrocode}
+\newtoks\mlfrstoftwo \mlfrstoftwo={}
+\newtoks\mlsndoftwo \mlsndoftwo={}
+\newcount\syllableCnt \syllableCnt=0
+%    \end{macrocode}
+%     We use the \pkg{soul} engine to break \ameta{string} apart, we count the syllables are they are
+%     determined by \pkg{soul}. Next is the setup for our soul command, \cs{crackAt}.
+%    \begin{macrocode}
+\def\SOUL@ckhsetup{\SOUL@setup
+%    \end{macrocode}
+%    Processing syllables
+%    \begin{macrocode}
+  \def\SOUL@everysyllable{\global\advance\syllableCnt\@ne
+    \ifnum\syllableCnt=\mlcr@ckAt\relax
+      \edef\x{\the\mlfrstoftwo\the\SOUL@syllable\eq@mlhyph}%
+      \global\mlfrstoftwo=\expandafter{\x}\else
+    \ifnum\syllableCnt>\mlcr@ckAt\relax
+      \edef\x{\the\mlsndoftwo\the\SOUL@syllable}%
+      \global\mlsndoftwo=\expandafter{\x}\else
+      \edef\x{\the\mlfrstoftwo\the\SOUL@syllable}%
+      \global\mlfrstoftwo=\expandafter{\x}\fi\fi
+  }%
+%    \end{macrocode}
+%    Processing spaces
+%    \begin{macrocode}
+  \def\SOUL@everyspace##1{%
+    \ifnum\syllableCnt<\mlcr@ckAt\relax
+      \edef\x{\the\mlfrstoftwo}%
+      \global\mlfrstoftwo=\expandafter{\x##1 }\else
+      \edef\x{\the\mlsndoftwo}%
+      \ifnum\syllableCnt=\mlcr@ckAt\relax
+%    \end{macrocode}
+% We assume the link breaks across a page here, so we try to toss the space.
+%    \begin{macrocode}
+      \global\mlsndoftwo=\expandafter{\x##1}\else
+      \global\mlsndoftwo=\expandafter{\x##1 }\fi\fi
+  }%
+%  \def\SOUL@everyhyphen{%
+%    \ifnum\syllableCnt>\mlcr@ckAt\relax
+%      \edef\x{\the\mlsndoftwo}\global
+%      \mlsndoftwo=\expandafter{\x\SOUL@mlheveryhyphen}\else
+%      \edef\x{\the\mlfrstoftwo}\global
+%      \mlfrstoftwo=\expandafter{\x\SOUL@mlheveryhyphen}\fi
+%    }%
+  \def\SOUL@everyexhyphen##1{\global
+    \ifnum\syllableCnt>\mlcr@ckAt\relax
+      \edef\x{\the\mlsndoftwo}\global
+      \mlsndoftwo=\expandafter{\x##1}\else
+      \edef\x{\the\mlfrstoftwo}\global
+      \mlfrstoftwo=\expandafter{\x##1}\fi
+    }%
+}
+\DeclareRobustCommand*\crackAt[1]{\def\mlcr@ckAt{#1}%
+  \mlfrstoftwo={}\mlsndoftwo={}\syllableCnt=0
+  \SOUL@ckhsetup\SOUL@}
+%    \end{macrocode}
+%    \begin{macrocode}
+% End of Package
 %</package>
 %    \end{macrocode}
 %  \Finale

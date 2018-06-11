@@ -1,34 +1,43 @@
-Package: aeb_mlink
-Author: D. P. Story
-Dated: 2016/02/16
-Version: v2.0
+Package: aeb_mlink 
+Author: D. P. Story 
+Dated: 2018/04/26 
 
-The aeb_mlink package implements new links capable of created multi-line
-links. The new commands are \mlhypertext, \mlhyperlink, \mlhyperref,
-\mlnameref, \mlNameref, \mlhref, and \mlurl. All but the first are multi-line
-versions of hyperref commands with the same root name.
+The aeb_mlink package defines new link commands to create multi-line links. 
+The new commands are \mlhypertext, \mlhyperlink, \mlhyperref, \mlnameref, 
+\mlNameref, \mlhref, and \mlurl. 
 
-What new in version 2.0, added the \mlurl command.
+PDF Creators: Adobe Distiller or ps2pdf 
 
-Restriction: This package requires that the PDF be created by Adobe
-Distiller, version 7.0 or later to create multi-line links, and requires
-Adobe Reader 7.0 or later for the links to work correctly.
+What's New (2018/04/26): Included a 'dummy' package named aeb-mlink. The 
+aeb_mlink package is listed on CTAN as aeb-mlink, though there is no such 
+package by that name. Well, now there is. 
 
-This package requires the latest version of AeB, in particular, the
-eforms package required is dated 2008/03/14 or later. See
-ctan.org/pkg/acrotex or
-www.math.uakron.edu/~dpstory/webeq.html to retrieve acrotex.zip.
+What's New (2018/04/20): Previously, the links created by aeb_mlink consisted 
+of a series of rectangles around each of the syllables of the hypertext or 
+url; the little rectangles responded in unison when any one of them were 
+clicked. In this version, Postscript procedures are used to combine the 
+little rectangles into one rectangle per line of hypertext. Also the Rect 
+entry has been changed to be the smallest rectange that encloses the 
+hypertext (or url). The Postscript tries to detect problems with the links, 
+and reports to the log (distiller or ps2pdf log). The PDF Specification does 
+not support cross-page links, to resolve this issued, a method of 'cracking' 
+a link apart, breaking it into two links. The second link is free to move to 
+the next page. 
 
-Installation Instructions: Place the zip file in your latex search
-path and unzip.  Refresh your file name database, and you are ready
-to go. Start with documentation and the demo files contained in the
-examples folder.
+This package requires the latest version of AeB, in particular, the eforms 
+package required is dated 2018/03/22 or later. See ctan.org/pkg/acrotex. 
+
+In addition to the demo files distributed with the package, there are two new 
+demo files available from the AcroTeX Blog webiste: 
+
+  aeb_mlink: Fixing multi-line link boxes 
+    (http://www.acrotex.net/blog/?p=1377)
+
+  aeb_mlink: Crossing page boundaries with multi-line links 
+    (http://www.acrotex.net/blog/?p=1383) 
 
 Let me know if there are problems or suggested features.  e-mail
 me at dpstory@uakron.edu or dpstory@acrotex.net
-
-The latest updates to the aeb_mlink package can be found at
-www.math.uakron.edu/~dpstory/aeb_pro.html.
 
 My other web site is http://blog.acrotex.net/ has the latest on my
 ruminations on LaTeX and PDF.
@@ -37,4 +46,4 @@ Now, I simply must get back to my retirement.
 
 D. P. Story
 dpstory@uakron.edu
-2016/02/16
+

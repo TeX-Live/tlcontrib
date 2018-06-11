@@ -7,12 +7,14 @@
     eforms={useui},
     aebxmp
 ]{aeb_pro}
-\usepackage{aeb_mlink}
+\usepackage[dblevel=1]{aeb_mlink}
 
 %\usepackage{myriadpro}
 \usepackage[altbullet]{lucidbry}
 
 \usepackage{acroman}
+
+\def\amtIndent{15pt}
 
 \usepackage[active]{srcltx}
 
@@ -23,9 +25,9 @@
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject={Wrapping links around to the next line},
-    keywords={XMP, E4X, Adobe Acrobat, JavaScript},
+    keywords={multi-line links, quad points, latex, pdf, aeb},
     talksite={\url{www.acrotex.net}},
-    version={2.0},
+    version={2.3, 2018/04/26},
     copyrightStatus={True},
     copyrightNotice={Copyright (C) 2006-\the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
@@ -37,6 +39,7 @@
    \kern-.6em \hbox{$\mathcal S$}}$}
 
 
+
 \def\AcroTeX{Acro\negthinspace\TeX}
 
 \def\unskipparskip{\vskip-\parskip}
@@ -46,6 +49,7 @@
 {\parskip0pt\noindent\footnotesize\verbatim}{\endverbatim\par\aftergroup\unskipparskip}
 
 \def\anglemeta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\let\ameta\anglemeta
 \def\meta#1{\textit{\texttt{#1}}}
 \def\darg#1{\texttt{\{#1\}}}
 \def\takeMeasure{\bgroup\obeyspaces\takeMeasurei}
@@ -56,7 +60,8 @@
 \let\opt\texttt
 \let\app\textsf
 
-\let\amtIndent\leftmargini
+%\let\amtIndent\leftmargini
+%\let\amtIndent\parindent
 \def\SUB#1{${}_{\text{#1}}$}
 
 \newdimen\aebdimen \aebdimen 0pt %\advance\aebdimen\partopsep
@@ -76,22 +81,66 @@
 \subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
 
 \makeatletter
+\def\cs#1{\texttt{\@backslashchar#1}}
 \renewcommand{\paragraph}
     {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{15pt}{6pt}{-3pt}{\bfseries}}
 \makeatother
 
 %\parindent0pt\parskip\medskipamount
 
 
-\definePath\bgPath{"C:/Users/Public/Documents/%
-    ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\definePath\bgPath{"C:/Users/Public/Documents/%
+%    ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\begin{docassembly}
+%\addWatermarkFromFile({%
+%    bOnTop: false,
+%    cDIPath: \bgPath
+%})
+%\executeSave()
+%\end{docassembly}
+
+\chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
-\addWatermarkFromFile({%
-    bOnTop: false,
-    cDIPath: \bgPath
-})
-\executeSave()
+var titleOfManual="The AeB mLink Manual";
+var manualfilename="Manual_BG_Print_mlink.pdf";
+var manualtemplate="Manual_BG_Blue.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
 \end{docassembly}
+
+\reversemarginpar
+
+%\mlMarksOn
+
 
 \begin{document}
 
@@ -105,36 +154,42 @@
 
 \section{Introduction}
 
-This package creates \underbar{m}ulti-line \underbar{link}s, a dream
-that I have had for a number of years. The package \pkg{hyperref}
-does create links, but generally these links cannot be broken across
-lines, unless the application \app{pdflatex} is used to create a
-PDF; however, since my workflow is primarily through \app{Acrobat
-Distiller}, this does me little good.
+This package creates \underbar{m}ulti-line \underbar{link}s, a dream of mine
+for a number of years. The package \pkg{hyperref} does create links,
+but generally these links cannot be broken across lines, unless the
+application \app{pdflatex} (or \app{xelatex}) is used to create a PDF;
+however, since my workflow is primarily through \app{Acrobat Distiller}, this
+does me little good.
 
-This package uses the \texttt{QuadPoints} entry of the link
-annotation dictionary to create a bounding region; consequently,
-\textbf{this package requires \app{Acrobat Distiller}} to create a PDF. The
-\texttt{QuadPoints} entry in the link annotation is a PDF 1.6
-feature, so these multi-line links will work in Adobe Reader 7.0 or
-later. If viewed in a version of Adobe Reader previous to 7.0, the
-viewer will use the underlying bounding box, which in the case of
-this package, is the entire page. \emph{Because the multi-line links don't
-work for versions of Adobe Reader prior to 7.0, this package should
-be used only when the reading audience has the required version}.
+This package uses the \texttt{QuadPoints} entry of the link annotation
+dictionary to create a bounding region; consequently, this package
+requires\marginpar{\small\raggedright\flushright \app{Distiller} or
+\app{ps2pdf} required} \app{Acrobat Distiller} or the \app{ps2pdf.exe}
+converter to create a PDF. The \texttt{QuadPoints} entry in the link
+annotation is a PDF 1.6 feature, so these multi-line links will work in
+\app{Adobe Reader} 7.0 or later. If viewed in a version of \app{Adobe Reader}
+previous to 7.0, the viewer will use the underlying bounding box, which is the
+smallest rectangle containing the link text.
 
+\section{Alternate package name: \texorpdfstring{\protect\pkg{aeb-mlink}}{aeb-mlink}}
+
+This package is known on CTAN as \pkg{aeb-mlink}
+(\href{http://www.ctan.org/pkg/aeb-mlink}{ctan.org/pkg/aeb-mlink}), even
+though there is no such package by that name, until now. Included within this distrubution
+is the `dummy' package \pkg{aeb-mlink} which loads \pkg{aeb\_mlink} and passes all options
+to it.
 
 \section{Requirements}
 
 The following {\LaTeX} packages are the major ones required by \texttt{aeb\_mlink}.
 \begin{itemize}
     \item \pkg{eforms} provides form and link support, \`a la
-        {Acro\negthinspace\TeX} (\url{ctan.org/pkg/acrotex}).
+        {Acro\negthinspace\TeX} (\href{http://www.ctan.org/pkg/acrotex}{ctan.org/pkg/acrotex}).
     \item \pkg{hyperref} provides link support, including the
         commands \cs{hyperref}, \cs{hyperlink}, \cs{href}, \cs{nameref},
         \cs{Nameref}, and \cs{href}.
     \item \pkg{soul} a very nice package by Melchior FRANZ, used by
-        \pkg{aeb\_mlink} to hyphenate links (\url{ctan.org/pkg/soul}).
+        \pkg{aeb\_mlink} to break the text of a link into its syllables (\href{http://www.ctan.org/pkg/soul}{ctan.org/pkg/soul}).
 %        \nolinkurl{CTAN: tex-archive/macros/latex/contrib/soul/}}
 
 \end{itemize}
@@ -153,13 +208,13 @@ of the Y\&Y {\TeX} System, no longer available, but is used by this author.} The
 \documentclass{article}
 \usepackage{xcolor}
 \usepackage[colorlinks]{hyperref}
-\usepackage[!anglemeta(driver)]{aeb_mlink}
+\usepackage[!anglemeta(options)]{aeb_mlink}
 \end{Verbatim}
 \end{minipage}\quad\begin{minipage}[t]{.4\linewidth}
 \begin{Verbatim}[commandchars=!(),fontsize=\small]
 \documentclass{article}
 \usepackage[designi]{web}
-\usepackage[!anglemeta(driver)]{aeb_mlink}
+\usepackage[!anglemeta(options)]{aeb_mlink}
 \end{Verbatim}
 \end{minipage}
 \eVerb Above are two typical preambles for the use of \pkg{aeb\_mlink}:
@@ -174,11 +229,23 @@ of the Y\&Y {\TeX} System, no longer available, but is used by this author.} The
         comes last.
 \end{itemize}
 
+\paragraph*{Options of \pkg{aeb\_mlinks}.} These are,
+\begin{description}
+  \item[\normalfont\texttt{dvips}] Use this option when the \textsf{dvips} application is used
+  to create the Postscript file.
+  \item[\normalfont\texttt{dvipsone}] Use this option when the \textsf{dvipsone} application is used
+  to create the Post\-script file. (Only a few people worldwide use this option.)
+  \item[\normalfont\texttt{dblevel=\ameta{\upshape{0|1|2}}}] To obtain information on the multi-line links being
+  created. Each value gives more information about what is going on. Used for development.
+  \item[\normalfont\ameta{eforms-options}] Any options other than the ones listed above are passed to the
+  \pkg{eforms} package.
+\end{description}
 Since \pkg{eforms} is a required package, the \pkg{acrotex} bundle
 (\pkg{AeB}) is installed; consequently, if you've set up the \texttt{web.cfg}
 configuration file (that accompanies \pkg{AeB}) with either
 \cs{ExecuteOptions\darg{dvips}} or \cs{ExecuteOptions\darg{dvipsone}}, the
-specification of the \anglemeta{driver} is not normally needed.
+specification of the driver (\opt{dvips} or \opt{dvipsone}) is not normally
+needed.
 
 \section{Multi-line link commands}
 
@@ -187,10 +254,10 @@ We define seven multi-line hypertext link commands: \cs{mlhypertext},
 \cs{href}, and \cs{mlurl}. The first is a basic command that is used in the definitions of
 the other six.
 
-\newtopic\noindent\textbf{Note:} Because of the way the bounding boxes are
-constructed, it is best that the bounding rectangle is set on invisible, that
-is, the line width of the boundary line is zero. The \opt{colorlinks} option
-of \app{hyperref} should be taken.
+%\newtopic\noindent\textbf{Note:} Because of the way the bounding boxes are
+%constructed, it is best that the bounding rectangle is set on invisible, that
+%is, the line width of the boundary line is zero. The \opt{colorlinks} option
+%of \app{hyperref} should be taken.
 
 \exSrc{mlink_tst}The demo file is \texttt{mlink\_tst.tex}, it illustrates all
 the commands -- with the exception of \cs{mlurl} -- of this package. The
@@ -238,7 +305,7 @@ create this PDF document.
     {Acrobat Distiller, version~7.0 or greater}
 \end{dCmd*}
 \eVerb In the above example, the link, shown in \textcolor{webgreen}{green}
-is broken across lines. Though is is not shown in this example, these links
+is broken across lines. Though is not shown in this example, these links
 can break a line at a hyphenation point as well. The optional argument is
 used to create an alert box that appears when the link is clicked.
 
@@ -274,7 +341,8 @@ the following text appears
 \end{quote}
 creating the named destination of \texttt{retire}.
 
-\subsection{\cmdtitle{mlhyperref}} A multi-line version of the \cs{hyperref} command.
+\subsection{\cmdtitle{mlhyperref}}\label{ss:mlhyperref}
+A multi-line version of the \cs{hyperref} command.
 
 \bVerb\takeMeasure{\string\mlhyperref[\#1]\darg{\#2}\darg{\#3}}%
 \begin{dCmd}{\bxSize}
@@ -493,10 +561,19 @@ two styles of key-values:
 \A{\JS{app.alert("AcroTeX rocks!")}}]{AcroTeX...browser.}
 \end{Verbatim}
 
+    An alternative link format is to provide a visible rectangle; \mlhypertext[\W1\linktxtcolor{}
+    \Color{red}\A{\JS{app.alert("Wrap the link!")}}]{Use a link with a non-zero boundary size along
+    with {\protect\cs{S\string{S\string}}}, which is the default.}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\mlhypertext[\W1\linktxtcolor{}\Color{red}
+\A{\JS{app.alert("Wrap the link!")}}]{Use a ... boundary size.}
+\end{Verbatim}
+
     The eForms KVP system is explained in the eforms manual,
     \textsl{\mlhref{http://www.math.uakron.edu/~dpstory/acrotex/eformman.pdf}{Support for AcroForms and Links, and for Document JavaScript and Open Page Events}},\footnote
     {\url{http://www.math.uakron.edu/~dpstory/acrotex/eformman.pdf}}
     where a complete listing of all supported KVPs is found in the appendices.
+
 
     \item \pkg{xkeyval} KVP: When the \opt{useui} option is taken of the eforms package, key-value pairs are
         defined of the form \texttt{\anglemeta{key}[\,=\,\anglemeta{value}]}. The key-value pairs are actually a value of
@@ -518,13 +595,265 @@ two styles of key-values:
     linktxtcolor=webgreen,
     js={app.alert("AcroTeX rocks!")}}]{AcroTeX...browser.}
 \end{Verbatim}
-
-
     \item[] The \pkg{xkeyval} KVP system is described in the document
     \textsl{\mlhref{http://www.math.uakron.edu/~dpstory/acrotex/eformman.pdf}{Support for AcroForms and Links, and for Document JavaScript and Open Page Events}}.\footnote
     {ibid.}
-
 \end{enumerate}
+
+\paragraph*{Keys special to the \pkg{aeb\_mlink} package.} The following links are defined
+within \pkg{eforms}, but are only obeyed from within the option list of one of the
+\cs{ml\ameta{cmdname}} commands.
+\begin{itemize}
+\item \cs{mlfix\darg{\ameta{\upshape{y|n}}}} (\pkg{xkeyval} KVP: \texttt{mlfix=\ameta{\upshape{yes|no}}})\\
+      If \cs{mlfix\darg{y}} is specified, contiguous bounding rectangles are combined; otherwise they are not.
+      See Section~\ref{s:FixQuads} for more information.
+\item \cs{mlstrut\darg{\ameta{some-strut}}} (\pkg{xkeyval} KVP: \texttt{mlstrut=\ameta{some-strut}})\\
+     The value of this key sets the height of the bounding rectangles; the default is \cs{strut}. See
+     Section~\ref{s:FixQuads} for detains and examples.
+\item \cs{mlcrackat\darg{\ameta{num}}} (\pkg{xkeyval} KVP: \texttt{mlcrackat=\ameta{num}})\\
+     This key is use to crack (or break) an hypertext or url into two links.
+     The application is to enable the link to break across a page boundary. Refer
+     to the paragraph \textbf{\mlnameref{para:xpage}}, beginning on page~\pageref{para:xpage}
+     for more information on \cs{mlcrackat}.
+\item \cs{mlhyph\darg{\ameta{\upshape{y|n}}}} (\pkg{xkeyval} KVP: \texttt{mlhyph=\ameta{\upshape{yes|no}}})\\
+    When the \cs{mlcrackat} option is used, an hyphen is inserted provided \cs{mlhyph{y}}, otherwise, no hypen
+    is inserted. Refer to the paragraph \textbf{\mlnameref{spara:fixxpage}}, page~\pageref{spara:fixxpage}, for
+    an example.
+\item \cs{mlcrackinsat\darg{\ameta{text}}} (\pkg{xkeyval} KVP: \texttt{mlcrackinsat=\ameta{text}})\\
+    The value \ameta{text} of this key is inserted after the break point, when
+    \cs{mlcrackat} is used. Normally, nothing is inserted after the brake point.
+\end{itemize}
+
+\section{Fixing the quad points}\label{s:FixQuads}
+
+In versions of \pkg{aeb\_mlink} prior to 2018/03/19, the each syllable
+(possible break point) of multi-line text was enclosed in a bounding
+rectangle (described by the coordinates of its four corners). For example, it
+is well known that \mlhypertext[\A{\JS{app.alert("And so it
+is");}}\mlfix{n}\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{the acrotex website
+is free to all who dare to enter.} Now you see the individual bounding
+rectangles; they are all linked together, if you click on one of them, they
+all react.
+
+Beginning with the version of \pkg{aeb\_mlink} dated 2018/03/19, Postscript
+code was introduced to fix up these bounding boxes so that all syllables
+\emph{on the same line} are enclosed in a single bounding rectangle.
+\mlhypertext[\A{\JS{app.alert("And so it is");}}\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{If we turn on this feature
+and declare the acrotex website is free to all who dare to enter.} Very cool!
+
+\exAeBBlogPDF{p=1377} The demonstration document for these feature is found on the
+\href{\urlAcroTeXBlog}{{\AcroTeX} Blog} web site. Refer to the article
+titled \textsl{\href{\urlAcroTeXBlog?p=1377}{Fixing multi-line link boxes}}.
+
+
+\paragraph*{Turning the fix on and off.} The feature of fixing up these
+little rectangles into one rectangle per line is controlled by the commands
+\cs{mlfixOn} and \cs{mlfixOff}; the first turns on the fix up, the second
+turns it off. The default is \cs{mlfixOn}. These two commands turn on or off
+the fix up for the document (or within a group), to turn the fix on or off
+for an individual link, use the key-value pairs \verb~\mlfix{y}~ to turn on
+the fix and \verb~\mlfix{n}~ to turn it off. These key-values are placed as
+an optional argument of any of the \cs{ml\ameta{cmdname}} commands. For
+example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\mlhypertext[!textbf(\mlfix{n})\A{\JS{app.alert("And so it is");}}
+\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{the acrotex website is
+free to all}
+\end{Verbatim}
+The user-friendly counterpart is \texttt{mlfix=\ameta{\upshape{yes|no}}}.
+
+\paragraph*{Changing the vertical size of the rectangles.} The default height
+and depth of the boxes are determined by \cs{strut}, in the current font
+size. A \emph{new key is introduced}, \cs{mlstrut\darg{\ameta{some-strut}}}.
+You can simple increase the vertical dimensions of the boxes by
+\verb~\mlstrut{\large\strut}~ or \verb~\mlstrut{\huge\strut}~.
+\mlhypertext[\A{\JS{app.alert("And so it is");}}\mlstrut{\large\strut}\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]
+{The  acrotex website is free to all} link should have vertically expanded rectangles.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\mlhypertext[!textbf(\mlstrut{\large\strut})\A{\JS{app.alert("And so it is");}}
+\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{The acrotex website
+is free to all}
+\end{Verbatim}
+When the link is underlined (\verb~\S{U}~) the depth is set to 1bp. These
+changes to the vertical size of the rectangles do not affect any text
+positioning of the content, only the bounding boxes.
+
+\texttt{mlstrut=\ameta{some-strut}} is the counterpart to
+ \cs{mlstrut\darg{\ameta{some-strut}}} in the user-friendly key-value system.
+
+The \ameta{some-strut} argument can be anything that takes up vertical space, any horizontal space is ignored.
+For example, \mlhypertext[\mlstrut{$\displaystyle\int_0^\pi$}\linktxtcolor{}\W1\H{O}\S{S}\Color{red}
+\A{\JS{app.alert("No action defined, other than this one.")}}]{``The integral
+{$\displaystyle\int_0^\pi \sin(x)\,dx$} has a value of a crummy little $2$.''}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\mlhypertext[\mlstrut{$\displaystyle\int_0^\pi$}\linktxtcolor{}\W1\H{O}
+\S{S}\Color{red}]{``The integral {$\displaystyle\int_0^\pi \sin(x)\,dx$}
+... $2$.''}
+\end{Verbatim}
+
+\paragraph*{Important:} When the feature of fixing the
+rectangles is active (with \cs{mlfixOn} or locally with \cs{mlfix\darg{y}}),
+you need to \emph{compile the document at least three times} before
+distilling the document; otherwise distiller fails. There are commands
+written to the \textsf{AUX} file that needs to be up to date. This is only
+needed after you modify any of the multi-line hypertext links. There are
+{\LaTeX} warning messages written to the {\TeX} log to inform you if the
+links are not fully formed; there are also messages in the distiller log.
+Setting the package option \texttt{dblevel=1} can increase the amount of
+feedback you get through the distiller log.
+
+\paragraph*{Marking the links.} You can run into trouble with one or more of the links. There
+may be tex log or distiller log messages referring to the link number (e.g.,
+\texttt{mLink30}), but where is this link? By expanding \cs{mlMarksOn}, you
+turn on the marking of the links. I'm turning on link marking for the rest of
+the document. Look for `L\ameta{num}' beginning in section~\ref{ss:probs}.
+Turn marking back off with \cs{mlMarksOff}. Above the starting point of each
+link will be a tiny `L\ameta{num}'. The format for this little `L\ameta{num}'
+is determined by the internal command \cs{ml@MrkLnk}; it may redefined as
+desired.
+
+\mlMarksOn
+
+\paragraph*{Multi-line links that break across pages.}\label{para:xpage} This phenomenon is not
+supported by the PDF Reference. These kinds of links can be created by
+{\LaTeX} when the link is near the bottom of the page and {\LaTeX} moves a
+portion of it to the next page. \pkg{aeb\_mlinks} detects this when the
+document is distilled and places a message in the distiller (or \app{ps2pdf}) log. If you have
+a link that crosses page boundaries, you need to reword the paragraph to
+avoid this. The message reads,\goodbreak
+\begin{Verbatim}[fontsize=\small]
+Beginning of page: 3
+!!------------------------------------------------------------------
+Warning:
+The text of mLink4 has crossed a page boundary from page 2 to 3.
+Cross page links are not supported by the PDF Specification.
+This link is not constructed, please fix it.
+Break point is after syllable number 4.
+Use the \mlcrackat{4} option with this link.
+!!------------------------------------------------------------------
+\end{Verbatim}
+and can't be missed. The link is not constructed. You can see here, there is a reference
+to \texttt{mLink4}. You need to turn on link marking (\cs{mlMarksOn}) or just go to page~2
+and look at the bottom of the page.
+
+\subparagraph*{Fixing a cross-page link.}\label{spara:fixxpage} There are several actions you can
+take to fix a link that has crossed a page boundary: (1) rewrite the
+paragraph so the link does not cross the page boundary; (2) as the log file suggests, you
+can use the \cs{mlcrackat\darg{4}} option. In this latter case, for example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\mlhypertext[\mlcrackat{4}\mlhyph{y}!ameta(other-opts)]
+  {Doctor Story created the acrotex website.}
+\end{Verbatim}
+Two links are created, the first consisting of the text `Doctor Story cre-'
+and the second on `ated the acrotex website.'; the second link (should) be
+inserted on the next page. The link  option \cs{mlhyp\darg{y}} inserts an
+hyphen at the break point. For URLs, a hyphen may not be appropriate.
+
+%\kern7pt
+
+\exAeBBlogPDF{p=1383}\textbf{ A working document:} The demonstration document
+for breaking links across pages is found on the
+\href{\urlAcroTeXBlog}{{\AcroTeX} Blog} web site. Please refer to the
+article titled
+\textsl{\mlhref{\urlAcroTeXBlog?p=1377}{Crossing page
+boundaries with multi-line links}}. Many other articles on {\AEB} and {\PDF}
+can be found at the \href{\urlAcroTeXBlog}{{\AcroTeX} Blog} web site, as
+well.
+
+%\normalcolor
+
+\paragraph*{Reverting to the old style.}
+The restriction of having to compile multiple times before
+distillation may be a burden when it comes to developing a document. You can
+declare \cs{OldStyleBoxesOn} in the preamble to revert to the old style that
+does not use the information written to the auxiliary file. After document
+development and the text of all links are stable, you can then say
+\cs{OldStyleBoxesOff} (or comment out \cs{OldStyleBoxesOn}) in the preamble.
+Compiling then yields the better formed and combined bounding rectangles.
+
+\paragraph*{Minimally sized \texttt{/Rect}.} For multi-line links, the link
+annotation contains two entries containing dimensions of rectangles, the
+\texttt{/Rect} and \texttt{/QuadPoints} entries. Our focus in this paragraph
+is on \texttt{/Rect}; there are two possible values for \texttt{/Rect}: (1)
+the dimensions of the entire page, which has been the default value since the
+inception of this package, or (2) the dimensions of the smallest rectangle
+containing all the hypertext, the new default.\smallskip
+
+\noindent\strut{\fboxsep0pt\fcolorbox{blue}{white}{\parbox{\linewidth}
+{\hskip\amtIndent For example, the following link is constructed using
+\cs{mlhypertext}: \mlhypertext[\A{\JS{app.alert("AcroTeX rocks with minimal rectangles!")}}]%
+{Acrobat Distiller, version~7.0 or greater} was used to
+create this PDF document. The blue rectangle}}} is a representation of the `unseen' \texttt{/Rect}
+dimensions. It is the smallest rectangle that contains the hypertext. You can revert to the old
+default (the whole page) by expanding \cs{useSmallRectOff}, the default is \cs{useSmallRectOn}.\medskip
+
+\textbf{The importance of small rectangles.} In the current age we live in,
+web browsers have their own `native' PDF viewers. These viewers generally do
+not obey JavaScript actions but they do recognize basic actions such as
+jumping to the destination in the document; however, they ignore the
+\texttt{/QuadPoints} entry in a link, and respect only the \texttt{/Rect}
+entry. In a `native' viewer, following a multi-line link may be problem when
+the \texttt{/Rect} entry is set the whole page. Now, the \texttt{/Rect} is
+the minimal rectangle, and following a link should not be an issue as long as
+\emph{one rectangle is not contained within another}. Multi-line links are
+fully supported by \app{Adobe Acrobat Reader}.
+
+\paragraph*{Tricky bits.} The use of \cs{mlnameref} and \cs{mlNameref} can be tricky when
+the referenced label contains special commands or font changes. Two tricks
+are to enclose the bad bits in braces (\texttt{\darg{}}) and/or \cs{protect}
+commands. Section or paragraph commands that end up as PDF bookmark need to use
+the \pkg{hyperref} command \cs{texorpdfstring}. To illustrate, an dummy subsection
+is introduced, and the discussion on this topic is continued there.
+
+
+\subsection{Discussion of \texorpdfstring
+  {{\protect\cs{mlnameref}}, {\protect\cs{mlNameref}}, and {\protect\cs{mlhypertext}}}
+  {\textbackslash{mlnameref}, \textbackslash{mlNameref}, and \textbackslash{mlhypertext}}}\label{ss:probs}
+
+To illustrate, we reference the section title ``\mlnameref{ss:probs}.'' The verbatim listing of this subsection is
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\subsection{Discussion of problems with \texorpdfstring
+  {{\protect\cs{mlnameref}}, {\protect\cs{mlNameref}},
+    and {\protect\cs{mlhypertext}}}
+  {\textbackslash{mlnameref}, \textbackslash{mlNameref},
+    and \textbackslash{mlhypertext}}}\label{ss:probs}
+\end{Verbatim}
+Observe use of \cs{texorpdfstring}, the first argument is typeset, the second
+one is placed in the bookmarks.
+\begin{itemize}
+  \item On the first argument of \cs{texorpdfstring}, we focus our comments
+      on the first \verb~{\protect\cs{mlnameref}}~ of the three commands
+      referenced. Note that it is enclosed in braces that signals the
+      \opt{soul} package, which does the parsing, to treat it as an
+      unbreakable unit. The control sequence \cs{cs} is protected by
+      \cs{protect}. Finally \cs{cs} is a command that produces a backslash in
+      front of its argument in monospace font.
+
+      There are two `common' definitions of \cs{cs}-style commands:
+      \begin{itemize}
+        \item \verb~\def\cs#1{\texttt{\char`\\#1}}~
+        \item \verb~\def\cs#1{\texttt{\@backslashchar#1}}~ (used in this manual)
+      \end{itemize}
+      The latter definition must be the one used within a section title, not the first one.
+
+      The \pkg{aeb\_mlinks} defines \cs{mlcs} using the second version; that
+      is \begin{flushleft}\hskip\amtIndent\verb~\def\mlcs#1{\texttt{\@backslashchar#1}}~\end{flushleft} is defined. In
+      this way both definitions for \cs{cs} are available. The \cs{mlcs}
+      version must be used in text that can be referenced by \mlcs{mlnameref}
+      or \mlcs{mlNameref}.
+\end{itemize}
+In the above title declaration, if any of the components (the braces, the \cs{protect}, and the special
+definition of \cs{cs}) {\LaTeX} compilation errors occur.
+
+Similar comments are made for \cs{mlhypertext}, \cs{mlhyperref}, and \cs{mlhyperlink}. These three take
+a text phrase as its `hypertext' string. For example,
+``\mlhyperref[\linktxtcolor{}\Color{red}\S{S}\W1]{ss:mlhyperref}{The exciting world of {\protect\mlcs{mlhyperref}} is average wonderful.}''
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\mlhyperref[\linktxtcolor{}\Color{red}\S{S}\W1]{ss:mlhyperref}{The
+  exciting world of {\protect\mlcs{mlhyperref}} is average wonderful.}
+\end{Verbatim}
+Notice the braces, the \cs{protect}, and the use of \cs{mlcs}; they work
+together for a successful link construction.
 
 \newpage
 

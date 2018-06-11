@@ -7,10 +7,9 @@
 %% aeb_mlink.dtx  (with options: `copyright,package')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% aeb_mlink.sty package,          2015-10-28           %%
-%% Copyright (C) 2006--2015  D. P. Story                %%
+%% aeb_mlink.sty package,                               %%
+%% Copyright (C) 2006--2018  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
-%%   storyd@owc.edu                                     %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -20,37 +19,73 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{aeb_mlink}
- [2016/02/16 v2.0 AeB MLink (dps)]
+ [2018/04/26 v2.3 AeB MLink (dps)]
+\RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \newif\if@ml@dvips \@ml@dvipstrue
-\DeclareOption{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
+\def\mlcsarg#1#2{\expandafter#1\csname#2\endcsname}
+\DeclareOptionX{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
     \PassOptionsToPackage{dvipsone}{eforms}
-    \PassOptionsToPackage{dvipsone}{hyperref} %,colorlinks
+    \PassOptionsToPackage{dvipsone}{hyperref}
 }
-\DeclareOption{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
+\DeclareOptionX{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
     \PassOptionsToPackage{dvips}{eforms}
-    \PassOptionsToPackage{dvips}{hyperref} %,colorlinks
+    \PassOptionsToPackage{dvips}{hyperref}
 }
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{eforms}}
+\newcount\mldblevel \mldblevel=0
+\define@key{aeb_mlink.sty}{dblevel}[0]{\mldblevel=#1 }
 \def\ml@err@msg{This package requires the driver dvips and\MessageBreak
     Adobe Distiller as the PDF creator}
 \ifpdf\PackageError{aeb_mlink}{\ml@err@msg}\else
     \ifxetex\PackageError{aeb_mlink}{\ml@err@msg}\else
-        \InputIfFileExists{web.cfg}{}{}
+        \let\ExecuteOptions@SAVE\ExecuteOptions
+        \let\ExecuteOptions\ExecuteOptionsX
+        \InputIfFileExists{web.cfg}{}
+        {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+            {\ExecuteOptionsX{dvipsone}}}%
+        \let\ExecuteOptions\ExecuteOptions@SAVE
 \fi\fi
-\ProcessOptions
+\ProcessOptionsX
 \RequirePackage{hyperref}
-\RequirePackage{eforms}[2008/03/14]
+\RequirePackage{refcount}
+\RequirePackage{eforms}[2018/03/22]
 \RequirePackage{soul}
 \def\ps@mark{[\space}
+\ifnum\mldblevel>0
+  \def\mlpgMsg{(\string\n Beginning of page: ) pf
+    PhysicalPage 20 string cvs
+    pf(\string\n)pf}\else
+  \def\mlpgMsg{}\fi
+\def\pgmonitoring{\if@ml@dvips
+    dup /PhysicalPage exch 1 add def
+    /PhysicalPage PhysicalPage def^^J\fi
+    \mlpgMsg
+}
+\def\smallRectTF{\ifoldstylequads false\else
+  \iffixmlinks true\else false\fi\fi\space
+  \ifSmallRect true\else false\fi\space and}
+\def\mllnkcontainer#1{bCreateLink { xoMsgB {
+  \smallRectTF\space mlRectFix^^J%
+  #1}if}{\the\aeb@mLinkCnt\space mlIsBldMsg}ifelse}
+\def\pboxRect{mlRect }
 \if@ml@dvips
+\def\mlDict{SDict}
 \special{!userdict begin
-   /TeXtoPDF {65536 div DVImag mul} def         % sp to pts
-   /PDFtoDvips {72.27 div Resolution mul} def   % points to dots
-   /PDFtoVDvips {72.27 div VResolution mul} def % points to dots
-   /DvipstoPDF {72.27 mul Resolution div} def   % dots to points
-   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def       % sp to dots
-   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def end} % sp to dots
+   /TeXtoPDF {65536 div DVImag mul} def          % sp to pts
+   /PDFtoDvips {72.27 div Resolution mul} def    % points to dots
+   /PDFtoVDvips {72.27 div VResolution mul} def  % points to dots
+   /DvipstoPDF {72.27 mul Resolution div} def    % dots to points
+   /HTeXtoDvips {TeXtoPDF PDFtoDvips} def        % sp to dots
+   /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def^^J%   % sp to dots
+   /PhysicalPage 0 def^^J%
+   /PageHeight {vsize} def^^J%
+   /PDFtoTeX {PDFtoDvips} def^^J%
+   /pf{print flush}def^^J%
+   /bop-hook{ \pgmonitoring\space } def
+end}
+
 \def\setQuadBox{%
     currentpoint DvipstoPDF \aeb@bbox@dp\space TeXtoPDF add
     neg vsize add 72 sub                                % y1
@@ -65,8 +100,12 @@
     hsize 72 sub PDFtoDvips 72 neg PDFtoVDvips
 }
 \else
+\def\mlDict{dvidict}
 \special{!/TeXtoPDF {65536 div mag 1000 div mul} def
-/PDFtoTeX {65536 mul mag 1000 div div} def}
+  /PDFtoTeX {65536 mul mag 1000 div div} def^^J%
+  /pf{print flush}def^^J%
+  /bphook{ \pgmonitoring\space } def^^J%
+}
 \def\setQuadBox{%
    currentpoint \aeb@bbox@dp\space add TeXtoPDF
    neg PageHeight add 72 sub                            % y1
@@ -84,6 +123,30 @@
 \newbox\aeb@bbox
 \newcount\aeb@arrayIndx \aeb@arrayIndx=0
 \newcount\aeb@mLinkCnt \aeb@mLinkCnt=0
+\newif\ifmllinktotalchanged\mllinktotalchangedfalse
+\newif\ifSmallRect \SmallRecttrue
+\AtEndDocument{\wrtmlinktot@l\ckchngmlinktot@l\wrt@linksnotformed}
+\def\wrt@linksnotformed{\iflinknotformed
+  \PackageWarningNoLine{aeb_mlinks}{Some link calculations are not
+  complete.\MessageBreak
+  DO NOT CONVERT TO PDF at this time. Compile at \MessageBreak
+  least twice more}\fi}
+\def\wrtmlinktot@l{\immediate\write\@auxout{\string\gdef
+  \string\mlinkstotal{\the\aeb@mLinkCnt}}}
+\def\ckchngmlinktot@l{\@ifundefined{mlinkstotal}{}
+    {\ml@mlinktot@l@changed}}
+\def\ml@mlinktot@l@changed{%
+  \ifnum\mlinkstotal=\the\aeb@mLinkCnt\relax\else
+  \PackageWarningNoLine{aeb_mlink}{The number of links has
+  changed. Compile again\MessageBreak until this message
+  does not appear}\immediate
+  \write\@auxout{\string\mllinktotalchangedtrue}\fi
+}
+\def\ml@mllinktotalchanged{\ifmllinktotalchanged
+  \PackageWarningNoLine{aeb_mlink}
+  {The number of links has changed, continue\MessageBreak
+   to compile}\fi}
+\AtBeginDocument{\ml@mllinktotalchanged}
 \def\CurrentBorderColor{\@linkbordercolor}
 \def\ml@nocolorHighlight{I}
 \def\ml@nocolorLineStyle{S}
@@ -101,28 +164,318 @@
 \def\ml@earlyExecProps#1{%
     \eq@setWidgetProps\relax{#1}%
 }
+\newif\ifoldstylequads \oldstylequadsfalse
+\def\OldStyleBoxesOn{\mlfixOff\oldstylequadstrue}
+\def\OldStyleBoxesOff{\oldstylequadsfalse}
+\@onlypreamble\OldStyleBoxesOn
+\@onlypreamble\OldStyleBoxesOff
 \let\mlh@preambleCmdInsert\relax
-\newcommand{\mlhypertext}[1][]{\global\aeb@arrayIndx=0\relax
-    \global\advance\aeb@mLinkCnt1\relax
-    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}
-        /type /array /OBJ pdfmark}%
-    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
-    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}%
-        \presets{\ml@nocolor@defaults}%
-        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\endgroup}%
-    \aeb@mlh
+\def\mlcs#1{\texttt{\@backslashchar#1}}
+\bgroup\@makeother\%
+\gdef\CMT#1{ %\space #1}\egroup
+\def\mldbModeOn{\def\mldb##1##2{##2}}
+\def\mldbModeOff{\def\mldb##1##2{}}
+\def\mldb#1#2{\ifnum#1<\mldblevel#2\fi}
+\def\ml@adj@x{2}\def\ml@adj@y{2}
+\AtBeginDvi{\special{!%
+/bCreateLink true def
+/mlIsBld 17 def
+/mlIsBldMsg {
+  /lnkCnt exch def
+  (\string\n!! mLink)pf
+  lnkCnt 20 string cvs pf
+  ( is not completely formed,
+   compile again!!\string\n)pf
+} def
+/xoMsgB true def^^J%
+/xoMsg {^^J%
+  /lnkCnt exch def^^J%
+  /Indx exch def^^J%
+  /nSyllable Indx 8 div def^^J% dpsa08
+  (!!------------------------------------------------------------------%
+  \string\n Warning:\string\n
+  The text of mLink)pf
+  lnkCnt 20 string cvs pf
+  ( has crossed a page boundary from page )pf
+  PhysicalPage 1 sub 10 string cvs pf
+  ( to ) pf PhysicalPage 10 string cvs pf
+  (.\string\n Cross page links are not supported by the
+    PDF Specification)pf
+  (.\string\n This link is not constructed,
+    please fix it.\string\n) pf
+  (Break point is after syllable number )pf
+  nSyllable cvi 20 string cvs pf (.\string\n)pf
+  (Use the \string\\mlcrackat{)pf
+  nSyllable cvi 20 string cvs pf
+  (} option with this link.\string\n)pf
+  (!!------------------------------------------------------------------%
+  \string\n)pf^^J%
+} def^^J%
+/quadpointsfixup {^^J%
+  /ary exch def^^J%
+  /quadL exch def^^J%
+  /lnkCnt exch def^^J%
+\mldb0{(Processing mLink)pf^^J}%
+\mldb0{lnkCnt 20 string cvs pf (: OK\string\n) pf^^J}%
+quadL 0 eq {
+(Problems with this link, length=0,
+  will skip the creation of this link)pf^^J%
+}{
+/gOffset 0 def^^J%
+/gY ary\space 1 gOffset add get def^^J%
+\mldb1{(gY is ) pf gY 20 string cvs print^^J}%
+\mldb1{flush (\string\n) pf^^J}%
+/gN 0 def^^J%
+/gMrk 10 array def^^J% limitation
+gMrk 0 0 put^^J%
+/gMrkL 1 gOffset add def^^J%
+\mldb2{(Begin first for\string\n) pf^^J}%
+0 8 quadL 8 sub {^^J%
+  /gIndx exch def^^J%
+\mldb2{(Outside gt if with gIndx=) pf^^J}%
+\mldb2{gIndx 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+  /getEntry ary\space 1 gOffset add get def^^J%
+\mldb2{(getEntry=) pf getEntry 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+  gY getEntry sub abs 2 gt  {^^J%
+\mldb2{(Inside gt if\string\n) pf^^J}%
+    gMrk gMrkL gIndx put^^J%
+    /gMrkL gMrkL 1 add def^^J%
+    /gY  getEntry def^^J%
+\mldb2{(Updating gY to )pf gY 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+\mldb2{(gMrkL=)pf gMrkL 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+  } if^^J%
+  /gOffset gOffset 8 add def^^J%
+} for^^J%
+\mldb2{(end first for\string\n) pf^^J}%
+   /gAryL 8 20 mul def^^J% limitation
+\mldb2{(gAryL=) pf gAryL 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+  /gFixup 8 gMrkL mul array def^^J%
+  /gOffset 0 def^^J%
+\mldb2{(for loop: gMrkL=)pf gMrkL 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+0 1 gMrkL 1 sub {^^J%
+\mldb2{(After gAry\string\n) pf^^J}%
+\mldb2{(Top of for loop\string\n) pf^^J}%
+    /gIndx exch def^^J%
+\mldb2{(gIndx=)pf gIndx 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+\mldb2{(gMrk=)pf gMrk gIndx get 20 string cvs pf^^J}%
+\mldb2{(\string\n) pf^^J}%
+\mldb2{(mLinkFxup<num> length = )^^J}%
+\mldb2{pf ary\space length 20 string cvs^^J}%
+\mldb2{pf (\string\n) pf^^J}%
+gIndx 1 add gMrkL eq {^^J%
+  /gCount ary\space length gMrk gIndx get sub def^^J%
+}{^^J%
+  /gCount gMrk gIndx 1 add get gMrk gIndx get sub def^^J%
+} ifelse^^J%
+/gAry gAryL array def^^J%
+\mldb2{(gCount=)pf gCount 20 string cvs pf^^J}%
+\mldb2{(\string\n)pf^^J}%
+/sliceOfLinkfxup gCount array def^^J%
+sliceOfLinkfxup 0 ary gMrk gIndx get^^J%
+  gCount getinterval putinterval^^J%
+    gAry 0 sliceOfLinkfxup putinterval^^J%
+\mldb1{(Listing elements of gFixup\string\n) pf^^J}%
+\mldb1{gAry 0 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 1 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 5 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 4 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 3 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry gCount 1 sub 2 sub get
+  20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 6 get 20 string cvs pf (\string\n)pf^^J}%
+\mldb1{gAry 7 get 20 string cvs pf (\string\n)pf^^J}%
+    gFixup gOffset [^^J%
+      gAry 0 get ^^J%                           x1 ll
+      gAry 1 get^^J%                            y1 ll
+      gAry gCount 1 sub 5 sub get^^J%           x2 lr
+      gAry gCount 1 sub 4 sub get^^J%           y2 lr
+      gAry gCount 1 sub 3 sub get^^J%           x3 ur
+      gAry gCount 1 sub 2 sub get^^J%           y3 ur
+      gAry 6 get^^J%                            x4 ul
+      gAry 7 get^^J%                            y4 ul
+    ] putinterval^^J%
+    /gOffset gOffset 8 add def^^J%
+  } for^^J%
+\mldb2{(End of second for\string\n) pf^^J}%
+  } ifelse
+  } def^^J%
+/smallquadpointsfixup {^^J%
+/gIndx exch def^^J%
+/ary exch def^^J%
+/lnkCnt exch def^^J%
+/quadL exch def^^J%
+/gSFup 8 array def^^J%
+  gSFup 0 ary 0 gIndx add get
+    gIndx 0 eq {\ml@adj@x\space sub} if put^^J% x1
+  gSFup 1 ary 1 gIndx add get put^^J%           y1
+  gSFup 2 ary 2 gIndx add get put^^J%           x2
+  gSFup 3 ary 3 gIndx add get put^^J%           y2
+  gSFup 4 ary 4 gIndx add get put^^J%           x3
+  gSFup 5 ary 5 gIndx add get put^^J%
+  gSFup 6 ary 6 gIndx add get
+    gIndx 0 eq {\ml@adj@x\space sub} if put^^J% x4
+  gSFup 7 ary 7 gIndx add get put^^J%
+  ary gIndx gSFup putinterval^^J%
+} def^^J%
+/mlRectFix {^^J%
+/ifRectFix exch def^^J%
+ifRectFix {
+  /nL gFixup length 8 sub def^^J% number of lines
+  /xMin gFixup 0 get def^^J%
+  0 8 nL {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get xMin lt {/xMin gFixup Indx get def}if } for^^J%
+  /xMin xMin 2 sub def^^J%
+  /xMax gFixup 2 get def^^J%
+  2 8 nL 2 add {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get xMax gt {/xMax gFixup Indx get def}if } for^^J%
+  /xMax xMax 2 add def^^J%
+  /yMin gFixup 1 get def^^J%
+  1 8 nL 1 add {^^J%
+  /Indx exch def^^J%
+  gFixup Indx get yMin lt {/yMin gFixup Indx get def}if } for^^J%
+  /yMin yMin 4 sub def^^J%
+  /yMax gFixup 5 get def^^J%
+  5 8 nL 5 add{^^J%
+  /Indx exch def^^J%
+  gFixup Indx get yMax gt {/yMax gFixup Indx get def}if } for^^J%
+  /yMax yMax 2 add def^^J%
+  /mlRect {/Rect [^^J%
+    xMin 72 sub PDFtoTeX^^J%
+    PageHeight 72 sub yMax sub PDFtoTeX^^J%
+    xMax 72 sub PDFtoTeX^^J%
+    PageHeight yMin sub 72 sub PDFtoTeX ]^^J%
+  }def^^J%
+}{^^J%
+  /mlRect{/Rect [ \par@@Rect ] }def^^J%
+}ifelse^^J%
+ifRectFix {
+\mldb1{(/Rect [)pf^^J%
+xMin 20 string cvs pf( )pf^^J%
+yMax 20 string cvs pf( )pf^^J%
+xMax 20 string cvs pf( )pf^^J%
+yMin 20 string cvs pf(]\string\n)pf^^J}%
+} if^^J%
+} def
+}}
+\newif\ifmlmarks\mlmarksfalse
+\def\mlMarksOn{\mlmarkstrue}
+\def\mlMarksOff{\mlmarksfalse}
+\def\ml@MrkLnk#1{\ifmlmarks\bgroup\ifdim\baselineskip=0pt
+  \setbox\z@\hbox{T}\def\ml@raiseamt{\ht\z@+.4pt}\else
+  \def\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalcolor\bfseries
+  \raisebox{\ml@raiseamt}{\tiny\strut{L#1}}}}\egroup\fi}
+\newif\iflinknotformed \linknotformedfalse
+\def\ml@underlinded{U}
+\@ifundefined{mlhypertext}{\newcommand}{\renewcommand}%
+{\mlhypertext}[2][]{\begingroup
+  \toks@=\expandafter{#2}%
+  \edef\ml@HytextArg{{\the\toks@}}%
+  \global\aeb@arrayIndx=\z@ % dpsa08
+  \def\ml@setlink##1{\setLinkPbox{%
+      \QuadPoints{mLink##1}#1}}%
+    \expandafter\processAppArgs\set@LinkPboxDefaults
+    \presets{\ml@nocolor@defaults}\S{S}\W{0}#1\end\@nil
+    \ifx\eq@S@value\ml@underlinded
+      \let\itsunderline\ef@YES\else\let\itsunderline\ef@NO\fi
+    \ifx\eq@mlignore\ef@YES
+      \global\advance\aeb@mLinkCnt\@ne\relax
+      \def\ml@next{\mlhypertext@i{#1}}\else
+    \ifx\eq@mlcrackat\@empty
+      \global\advance\aeb@mLinkCnt\@ne\relax
+      \def\ml@next{\mlhypertext@i{#1}}%
+    \else
+      \edef\temp@crackAt{\noexpand
+      \crackAt{\eq@mlcrackat}{\the\toks@}}\temp@crackAt
+      \def\ml@next{\mlhypertext[#1\mlignore{}]{\the\mlfrstoftwo}%
+      \eq@mlcrackinsat\penalty-50
+      \mlhypertext[#1\mlignore{}]{\the\mlsndoftwo}\aftergroup
+      \normalcolor\endgroup}%
+    \fi\fi
+    \ml@next
 }
-\def\mlh@setQuadSyllable#1{%
-    \setbox\aeb@bbox=\hbox{\strut#1}%
+\def\mlhypertext@i#1{%
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{\global
+    \linknotformedtrue\def\lngth{17}}
+    {\edef\lngth{\@nameuse{mLinkLngth\the\aeb@mLinkCnt}}}%
+    \ml@start@link{\the\aeb@mLinkCnt}{\lngth}% Step 1
+    \def\mlh@preambleCmdInsert{%
+      \ml@MrkLnk{\the\aeb@mLinkCnt}\ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{\endgroup}%
+    \expandafter\aeb@mlh\ml@HytextArg
+    \ml@finish@link{\the\aeb@mLinkCnt}{\lngth}%
+    \ml@setlink{\the\aeb@mLinkCnt}%
+    \ifoldstylequads\else
+      \iffixmlinks\literalps@out{restore}\fi\fi
+      \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{%
+      \immediate\write\@auxout{\string\mlcsarg
+        \string\gdef{mLinkLngth\the\aeb@mLinkCnt}{17}}%
+      }{\immediate\write\@auxout{\string\mlcsarg
+        \string\gdef{mLinkLngth\the\aeb@mLinkCnt}%
+        {\the\aeb@arrayIndx}}}\endgroup
+}
+\def\mlh@setQuadSyllable#1#2#3#4{%
+    \setbox\aeb@bbox=\hbox{\ml@strut#4}%
     {%
-        \count\z@=\ht\aeb@bbox\xdef\aeb@bbox@ht{\the\count\z@}%
-        \count\z@=\wd\aeb@bbox\xdef\aeb@bbox@wd{\the\count\z@}%
-        \dp\aeb@bbox=1pt\relax
-        \count\z@=\dp\aeb@bbox\xdef\aeb@bbox@dp{\the\count\z@}%
+        \setbox\@tempboxa\hbox{\ml@strut}%
+        \ifx\itsunderline\ef@YES\@tempdima1bp\relax\else
+          \@tempdima\dp\@tempboxa \ifdim\@tempdima>2bp
+            \advance\@tempdima-2bp\fi
+        \fi
+        \dp\aeb@bbox\@tempdima
+        \@tempdima\ht\@tempboxa \advance\@tempdima\dp\aeb@bbox
+        \advance\@tempdima1bp
+        \ht\aeb@bbox\@tempdima\def\x{\the\count\z@}%
+        \count\z@=\ht\aeb@bbox\xdef\aeb@bbox@ht{\x}%
+        \count\z@=\wd\aeb@bbox\xdef\aeb@bbox@wd{\x}%
+        \count\z@=\dp\aeb@bbox\xdef\aeb@bbox@dp{\x}%
     }%
-    \special{ps: \ps@mark{mLink\the\aeb@mLinkCnt}
+    \ifoldstylequads
+      \literalps@out{%
+        bCreateLink {^^J%
+          \mlDict\space/mLinkFxup#3\space known {^^J%
+        \ps@mark{mLink#3}
         \the\aeb@arrayIndx\space [\setQuadBox]
-            \space /PUTINTERVAL pdfmark}%
+            \space /PUTINTERVAL pdfmark}{^^J%
+        xoMsgB {
+        /xoMsgB false def
+        \the\aeb@arrayIndx\space
+        #3\space
+        xoMsg % dpsa08
+        } if^^J% xoMsgB
+        } ifelse } if
+      }%
+    \else
+      \literalps@out{%
+        bCreateLink  {^^J%
+          \mlDict\space/mLinkFxup#3\space known {^^J%
+          mLinkFxup#3\space
+          #1\space[\setQuadBox] putinterval^^J%
+        #2\space %
+        #3\space
+        mLinkFxup#3\space
+        #1\space
+        smallquadpointsfixup }{^^J%
+        xoMsgB {
+        /xoMsgB false def
+        #1\space
+        #3\space
+        xoMsg % dpsa08
+        } if^^J% xoMsgB
+        } ifelse } if
+    }%
+    \fi
     \global\advance\aeb@arrayIndx8\relax
 }
 \def\aeb@exiii{\expandafter\expandafter\expandafter}
@@ -130,8 +483,7 @@
     {\aeb@exiii\@thirdoffive\csname r@#1\endcsname}}
 \def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
    {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
-\def\atPage#1{\@ifundefined{r@#1}{1}
-    {\aeb@exiii\@secondoffive\csname r@#1\endcsname}}
+\def\atPage#1{\getrefbykeydefault{#1}{page}{??}}
 \newcommand\mlhyperlink[3][]{%
     \mlhypertext[#1\A{/S/GoTo/D (#2)}]{#3}}
 \newcommand\mlhyperref[3][]{%
@@ -152,7 +504,9 @@
 \def\ml@hyper@linkfile#1#2#3{%
     \let\ef@thislinkcolor\@filecolor
     \let\CurrentBorderColor\@filebordercolor
-    \def\theView{[0 \@pdfstartview]}%
+    \ifx\@pdfstartview\@empty
+        \def\theView{[0 /Fit]}\else
+        \def\theView{[0 \@pdfstartview]}\fi
     \@ifundefined{ifHy@pdfnewwindow}
     {\ifHy@newwindow}{\ifHy@pdfnewwindow}%
         \def\isWindow{/NewWindow true}\else
@@ -181,10 +535,11 @@
         \let\@hyper@launch\ml@hyper@launch
         \aeb@saved@href
 }
-\newbox\ml@urlbuild
-\setbox\ml@urlbuild\hbox{}
+\newbox\ml@urlbuildi
+\newbox\ml@urlbuildii
 \def\ml@SOUL@doword{%
-    \global\setbox\ml@urlbuild\hbox{}%
+    \global\setbox\ml@urlbuildi\hbox{}%
+    \global\setbox\ml@urlbuildii\hbox{}%
     \edef\x{\the\SOUL@word}%
     \ifx\x\empty
     \else
@@ -221,25 +576,22 @@
         \global\setbox\@ne=\lastbox}%
     \ifvoid\@ne
     \else
-        \setbox\@ne\hbox{\unhbox\@ne}%
-        \global\setbox\ml@urlbuild=\hbox{%
-            \mlh@setQuadSyllable{\unhcopy\@ne}%
-            \hbox{\unhcopy\@ne}\penalty0\unhcopy\ml@urlbuild}%
-        \SOUL@syllgoal=\wd\@ne
-        \advance\count@\@ne
-        \ml@SOUL@analyze
-        \SOUL@syllwidth\z@
-        \SOUL@syllable={}%
-        \ifnum\count@>\z@
-            \advance\SOUL@syllgoal-\SOUL@ttwidth
-            \ml@SOUL@dosyllable
-            \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@hyphkern}%
-                {\SOUL@sethyphenchar}%
-            \SOUL@everyhyphen
-        \else
-            \ml@SOUL@dosyllable
-        \fi
-    \fi
+      \ml@interface@analyze
+      \SOUL@syllgoal=\wd\@ne
+      \advance\count@\@ne
+      \ml@SOUL@analyze
+      \SOUL@syllwidth\z@
+      \SOUL@syllable={}%
+      \ifnum\count@>\z@
+          \advance\SOUL@syllgoal-\SOUL@ttwidth
+          \ml@SOUL@dosyllable
+          \SOUL@getkern{\the\SOUL@lasttoken}{\SOUL@hyphkern}%
+              {\SOUL@sethyphenchar}%
+          \SOUL@everyhyphen
+      \else
+        \ml@SOUL@dosyllable
+      \fi
+  \fi
 }}
 \def\ml@SOUL@dosyllable{%
     \SOUL@gettoken
@@ -278,27 +630,169 @@
     \fi\fi\fi\fi
     \SOUL@n
 }
-\newcommand{\mlurl}{\begingroup\def~{\string~}%
+\def\ml@interface@analyze{%
+  \global\advance\syllableCnt\@ne % dpsa11
+  \setbox\@ne\hbox{\unhbox\@ne}%
+  \ifx\eq@mlcrackat\@empty
+    \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+      {\ml@qlngthchunki}{\ml@urlbuildi}%
+  \else
+    \ifnum\syllableCnt=\revCrackAt\relax
+      \aeb@arrayIndx=\z@
+      \ml@start@link{\the\aeb@mLinkCnt}{\ml@qlngthchunki}%
+      \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+        {\ml@qlngthchunki}{\ml@urlbuildi}%
+    \else
+      \ifnum\syllableCnt>\revCrackAt\relax
+        \ml@bld@quadchunks{\the\aeb@mLinkCnt}
+          {\ml@qlngthchunki}{\ml@urlbuildi}%
+      \else
+        \ifnum\syllableCnt=\@ne
+          \aeb@arrayIndx=\z@
+            \ml@start@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+            \ml@bld@quadchunks{\aeb@mLinkCnt@}
+              {\ml@qlngthchunkii}{\ml@urlbuildii}%
+        \else
+            \ml@bld@quadchunks{\aeb@mLinkCnt@}
+              {\ml@qlngthchunkii}{\ml@urlbuildii}%
+        \fi
+      \fi
+    \fi
+  \fi
+}
+\def\ml@bld@quadchunks#1#2#3{{%
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}
+    {\edef\@indx{\the\aeb@arrayIndx}}
+    {\@tempcnta#2\relax
+     \advance\@tempcnta-8\relax
+     \advance\@tempcnta-\aeb@arrayIndx
+     \def\@indx{\the\@tempcnta}%
+  }%
+  \global\setbox#3=\hbox{%
+    \mlh@setQuadSyllable{\@indx}{#2}{#1}{\unhcopy\@ne}%
+    \hbox{\unhcopy\@ne}\penalty0\unhcopy#3}%hbox
+}}
+\newcommand{\mlurl}{\begingroup\@makeother\~\relax% \def~{\string~}%
     \ef@sanitize@toks\mlurl@}
-\newcommand{\mlurl@}[2][]{\urldef\ml@url\nolinkurl{#2}%
-\def\SOUL@mlhpreamble{%\begingroup
+\newcommand{\mlurl@}[2][]{\@ifundefined{ef@thislinkcolor}
+  {\let\ef@thislinkcolor\normalcolor}{}\expandafter
+  \def\expandafter\ef@thislinkcolor@SAVE
+    \expandafter{\ef@thislinkcolor}%
+    \def\ml@setlink##1{\setLinkPbox{\A{\URI{#2}}%
+    \QuadPoints{mLink##1}#1}}%
+    \expandafter\processAppArgs\set@LinkPboxDefaults
+    \presets{\ml@nocolor@defaults}\S{S}\W{0}#1\end\@nil
+    \ifx\eq@S@value\ml@underlinded
+      \let\itsunderline\ef@YES\else\let\itsunderline\ef@NO\fi
+  \global\aeb@arrayIndx=0\relax
+  \global\syllableCnt=0\relax
+  \global\advance\aeb@mLinkCnt\@ne\relax
+  \@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{%
+    \global\linknotformedtrue\def\lngth{17}%
+    \def\ml@qlngthchunki{17}}
+    {\@tempcnta\@nameuse{mLinkLngth\the\aeb@mLinkCnt}\relax
+    \edef\lngth{\the\@tempcnta}%\multiply\@tempcnta8\relax
+    \edef\ml@qlngthchunki{\the\@tempcnta}}%
+  \@ifundefined{mLinkSyCnt\the\aeb@mLinkCnt}
+    {\def\MAXCNT{0}\def\ml@lngthchunki{0}\def\ml@lngthchunkii{0}%
+    \def\ml@qlngthchunki{0}\def\ml@qlngthchunkii{0}\def\revCrackAt{0}}
+    {\edef\MAXCNT{\@nameuse{mLinkSyCnt\the\aeb@mLinkCnt}}%
+    \ifx\eq@mlcrackat\@empty\else
+      \@tempcnta\MAXCNT\relax\advance\@tempcnta-\eq@mlcrackat\relax
+      \edef\ml@lngthchunki{\eq@mlcrackat}%
+      \edef\ml@lngthchunkii{\the\@tempcnta}%
+      \@tempcnta\ml@lngthchunki\relax\multiply\@tempcnta8\relax
+      \edef\ml@qlngthchunki{\the\@tempcnta}%
+      \@tempcnta\ml@lngthchunkii\relax\multiply\@tempcnta8\relax
+      \edef\ml@qlngthchunkii{\the\@tempcnta}%
+      \@tempcnta\MAXCNT\relax
+      \advance\@tempcnta-\eq@mlcrackat\relax
+      \advance\@tempcnta\@ne
+      \edef\revCrackAt{\the\@tempcnta}%
+    \fi}%
+    \@tempcnta\aeb@mLinkCnt\advance\@tempcnta\@ne
+      \edef\aeb@mLinkCnt@{\the\@tempcnta}%
+  \urldef\ml@url\nolinkurl{#2}%
+  \def\SOUL@mlhpreamble{%\begingroup
     \mlh@preambleCmdInsert\ef@colorthislink}\hyper@chars
     \let\ef@thislinkcolor\@urlcolor
     \let\CurrentBorderColor\@urlbordercolor
     \let\ml@SOUL@doword@SAVE\SOUL@doword
     \let\SOUL@doword\ml@SOUL@doword
-    \global\aeb@arrayIndx=0\relax
-    \global\advance\aeb@mLinkCnt1\relax
-    \special{ps: \ps@mark/_objdef {mLink\the\aeb@mLinkCnt}%
-        /type /array /OBJ pdfmark}%
-    \def\mlh@preambleCmdInsert{\ml@earlyExecProps{#1}}%
-    \def\mlh@postambleCmd{\setLinkPbox{\S{S}\W{0}\A{\URI{#2}}%
-        \presets{\ml@nocolor@defaults}
-        \QuadPoints{mLink\the\aeb@mLinkCnt}#1}\expandafter
-        \gdef\expandafter\ef@thislinkcolor
+    \ifx\eq@mlcrackat\@empty\ml@start@link{\the\aeb@mLinkCnt}{\lngth}\fi
+    \def\mlh@preambleCmdInsert{\ml@MrkLnk{\the\aeb@mLinkCnt}%
+      \ml@earlyExecProps{#1}}%
+    \def\mlh@postambleCmd{%
+        \expandafter
+        \def\expandafter\ef@thislinkcolor
              \expandafter{\ef@thislinkcolor}}%
-    \aeb@mlh\ml@url\ef@colorthislink\unhcopy\ml@urlbuild\endgroup
+    \aeb@mlh\ml@url\ef@colorthislink\unhcopy\ml@urlbuildi
+    \expandafter\gdef\expandafter\ef@thislinkcolor
+    \expandafter{\ef@thislinkcolor@SAVE}%
+    \immediate\write\@auxout{\string\mlcsarg\string
+      \gdef{mLinkSyCnt\the\aeb@mLinkCnt}{\the\syllableCnt}}% dpsa11
+    \immediate\write\@auxout{\string\mlcsarg
+      \string\gdef{mLinkLngth\the\aeb@mLinkCnt}{\the\aeb@arrayIndx}}%
+    \ifx\eq@mlcrackat\@empty
+      \ml@finish@link{\the\aeb@mLinkCnt}{\lngth}%
+      \ml@setlink{\the\aeb@mLinkCnt}%
+      \iffixmlinks\literalps@out{restore}\fi
+    \else
+      \ml@finish@link{\the\aeb@mLinkCnt}{\ml@qlngthchunki}%
+      \ml@setlink{\the\aeb@mLinkCnt}%
+      \iffixmlinks\literalps@out{restore}\fi
+      \eq@mlcrackinsat\penalty-50
+      \ml@start@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+      \penalty0\@ifundefined{mLinkLngth\the\aeb@mLinkCnt}{}
+      {\ml@MrkLnk{\aeb@mLinkCnt@}}\unhcopy\ml@urlbuildii
+      \ml@finish@link{\aeb@mLinkCnt@}{\ml@qlngthchunkii}%
+      \ml@setlink{\aeb@mLinkCnt@}\iffixmlinks
+        \literalps@out{restore}\fi
+      \global\advance\aeb@mLinkCnt\@ne
+    \fi\aftergroup\normalcolor\endgroup
 }
+\def\ml@start@link#1#2{% Step 1
+  \literalps@out{%
+    /xoMsgB true def^^J%
+    \ps@mark/_objdef {mLink#1}%
+      /type /array /OBJ pdfmark^^J%
+    \ifoldstylequads
+    /mLinkFxup#1\space0 array def
+    \else
+      /bCreateLink mlIsBld #2\space eq not def^^J%
+      bCreateLink{ /mLinkFxup#1\space
+        #2\space array def }if
+    \fi
+  }%
+}
+\def\ml@finish@link#1#2{% Step 4 and 5
+  \ifoldstylequads\else
+    \ifnum\aeb@arrayIndx=0\relax
+      \PackageWarning{aeb_mlink}{%
+        Problem with mLink\the\aeb@mLinkCnt,\MessageBreak
+        Will skip the creation of this link}\fi
+  \literalps@out{%
+  \iffixmlinks
+    \ifnum\aeb@arrayIndx>0
+      save^^J%
+      bCreateLink {^^J%
+      \mlDict\space/mLinkFxup#1\space known {^^J%
+      #1\space
+      #2\space
+      mLinkFxup#1\space
+      quadpointsfixup^^J%
+      \ps@mark{mLink#1} 0 gFixup
+      /PUTINTERVAL pdfmark^^J%
+      }if }if
+    \fi
+  \else
+    bCreateLink {^^J%
+    \mlDict\space/mLinkFxup#1\space known {^^J%
+    \ps@mark{mLink#1} 0 mLinkFxup#1
+      /PUTINTERVAL pdfmark^^J%
+     }if }if
+  \fi}%
+\fi}
 \ifHy@colorlinks
     \def\ef@colorthislink{\color{\ef@thislinkcolor}}
 \else
@@ -308,9 +802,9 @@
 \def\SOUL@mlhpreamble{\begingroup
     \mlh@preambleCmdInsert\ef@colorthislink}
 \def\SOUL@mlheverysyllable{%
-    \mlh@setQuadSyllable{\the\SOUL@syllable}%
-    \the\SOUL@syllable%
-    \SOUL@setkern\SOUL@charkern}%
+    \mlh@setQuadSyllable{\the\aeb@arrayIndx}{\lngth}%
+      {\the\aeb@mLinkCnt}{\the\SOUL@syllable}%
+    \the\SOUL@syllable\SOUL@setkern\SOUL@charkern}%
 \def\SOUL@mlheveryspace#1{#1\space\hskip\spaceskip}%
 \def\SOUL@mlheveryhyphen{%
     \discretionary{%
@@ -320,7 +814,8 @@
     }{}{}%
 }
 \def\SOUL@mlheveryexhyphen#1{%
-    \mlh@setQuadSyllable{\SOUL@setkern\SOUL@hyphkern#1}%
+    \mlh@setQuadSyllable{\the\aeb@arrayIndx}{\lngth}%
+      {\the\aeb@mLinkCnt}{\SOUL@setkern\SOUL@hyphkern#1}%
     \SOUL@setkern\SOUL@hyphkern#1%
     \discretionary{}{}{%
         \SOUL@setkern\SOUL@charkern
@@ -337,6 +832,40 @@
     \def\SOUL@postamble{\SOUL@mlhpostamble}%
 }
 \DeclareRobustCommand*\aeb@mlh{\SOUL@mlhsetup\SOUL@}
+\newtoks\mlfrstoftwo \mlfrstoftwo={}
+\newtoks\mlsndoftwo \mlsndoftwo={}
+\newcount\syllableCnt \syllableCnt=0
+\def\SOUL@ckhsetup{\SOUL@setup
+  \def\SOUL@everysyllable{\global\advance\syllableCnt\@ne
+    \ifnum\syllableCnt=\mlcr@ckAt\relax
+      \edef\x{\the\mlfrstoftwo\the\SOUL@syllable\eq@mlhyph}%
+      \global\mlfrstoftwo=\expandafter{\x}\else
+    \ifnum\syllableCnt>\mlcr@ckAt\relax
+      \edef\x{\the\mlsndoftwo\the\SOUL@syllable}%
+      \global\mlsndoftwo=\expandafter{\x}\else
+      \edef\x{\the\mlfrstoftwo\the\SOUL@syllable}%
+      \global\mlfrstoftwo=\expandafter{\x}\fi\fi
+  }%
+  \def\SOUL@everyspace##1{%
+    \ifnum\syllableCnt<\mlcr@ckAt\relax
+      \edef\x{\the\mlfrstoftwo}%
+      \global\mlfrstoftwo=\expandafter{\x##1 }\else
+      \edef\x{\the\mlsndoftwo}%
+      \ifnum\syllableCnt=\mlcr@ckAt\relax
+      \global\mlsndoftwo=\expandafter{\x##1}\else
+      \global\mlsndoftwo=\expandafter{\x##1 }\fi\fi
+  }%
+  \def\SOUL@everyexhyphen##1{\global
+    \ifnum\syllableCnt>\mlcr@ckAt\relax
+      \edef\x{\the\mlsndoftwo}\global
+      \mlsndoftwo=\expandafter{\x##1}\else
+      \edef\x{\the\mlfrstoftwo}\global
+      \mlfrstoftwo=\expandafter{\x##1}\fi
+    }%
+}
+\DeclareRobustCommand*\crackAt[1]{\def\mlcr@ckAt{#1}%
+  \mlfrstoftwo={}\mlsndoftwo={}\syllableCnt=0
+  \SOUL@ckhsetup\SOUL@}
 \endinput
 %%
 %% End of file `aeb_mlink.sty'.

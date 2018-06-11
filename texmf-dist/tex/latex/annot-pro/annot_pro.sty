@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% annot_pro package,                                   %%
-%% Copyright (C) 2002-2016  D. P. Story                 %%
+%% Copyright (C) 2002-2017  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,20 +19,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{annot_pro}
- [2016/10/18 v1.1b Provides selected PDF annotation support (dps)]
+ [2018/04/26 v1.2 Provides selected PDF annotation support (dps)]
 \RequirePackage{xkeyval}
 \DeclareOptionX{preview}{\previewtrue}
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+\providecommand{\previewOn}{\previewtrue}
+\providecommand{\previewOff}{\previewfalse}
 \newif\ifuseAAXdim\useAAXdimtrue
 \DeclareOptionX{useA10Icons}{\useAAXdimtrue}
 \DeclareOptionX{!useA10Icons}{\useAAXdimfalse}
 \DeclareOptionX{useTextBox}{\def\ap@requireRichTextAsNeeded{%
     \RequirePackage{richtext}[2016/10/03]}}
 \let\ap@requireRichTextAsNeeded\relax
+\DeclareOptionX{scandoc}{\let\anp@InputScanDoc\anp@scanDoc
+    \PassOptionsToPackage{execJS}{insdljs}}
+\DeclareOptionX{!scandoc}{\let\anp@InputScanDoc\relax}
+\let\anp@InputScanDoc\relax
+\def\anp@scanDoc{\InputIfFileExists{scandoc-anp.def}
+    {\PackageInfo{annot_pro}{Inputting the scandoc-anp.def file}}
+    {\PackageWarning{annot_pro}{Cannot find the file scandoc-anp.def}}}
 \ProcessOptionsX\relax
+\RequirePackage{trig}
 \RequirePackage{hyperref}
 \RequirePackage{calc}
 \RequirePackage{insdljs}
+\ifx\anp@InputScanDoc\relax\else\let\execjs=y\fi
 \RequirePackage[structure]{taborder}
 \ap@requireRichTextAsNeeded
 \@ifpackageloaded{graphicxsp}{%
@@ -66,6 +77,8 @@
 \let\ap@type\@empty
 \define@key{annotpro}{name}[]{\def\annotpro@name{#1}}
 \let\annotpro@name\@empty
+\define@key{annotpro}{internalID}[]{\def\annotpro@internalID{#1}}
+\let\annotpro@internalID\@empty
 \define@choicekey+{annnotprotext}{name}{%
 Comment,Key,Note,Help,NewParagraph,Paragraph,Insert,Check,%
 Circle,Cross,Star,RightArrow,RightPointer,UpArrow,UpLeftArrow,%
@@ -123,6 +136,8 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 \let\apmargintext\@empty
 \newcommand{\margintextformat}[1]{\def\apmargintextformat{#1}}
 \margintextformat{\bfseries\tiny\color{blue}}
+\define@key{annotpro}{margprior}[]{\def\anp@margprior{#1}}
+\let\anp@margprior\@empty
 \define@key{annotpro}{presets}[]{\def\annotpro@presets{#1}}
 \let\annotpro@presets\@empty
 \define@key{annotpro}{objdef}[]{\def\eq@objdef{/_objdef {#1}}%
@@ -150,32 +165,47 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     dash1,dash2,dash3,dash4,dash5,dash6,cloud1,cloud2}[solid]{%
     \ifcase\nr\relax
         \def\ap@border@code{}\or
-        \def\ap@border@code{/BS <</S/S\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[2.0 2.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[3.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 4.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 3.0 2.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 3.0 16.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[8.0 4.0 4.0 4.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BE<</I 1.0/S/C>>/RD[\ap@BE@i@calc\space\ap@BE@i@calc
+        \def\ap@border@code{%
+            /BS <</S/S\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[2.0 2.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[3.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 3.0 2.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 3.0 16.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[8.0 4.0 4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BE<</I 1.0/S/C>>/RD[\ap@BE@i@calc\space\ap@BE@i@calc
             \space\ap@BE@i@calc\space\ap@BE@i@calc]%
         \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\or
-        \def\ap@border@code{/BE<</I 2.0/S/C>>/RD[\ap@BE@ii@calc\space\ap@BE@ii@calc
+        \def\ap@border@code{%
+            /BE<</I 2.0/S/C>>/RD[\ap@BE@ii@calc\space\ap@BE@ii@calc
             \space\ap@BE@ii@calc\space\ap@BE@ii@calc]%
         \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\fi
     \def\annotpro@border{#1}}{\PackageWarning{annot_pro}{Bad
-    choice for borderstyle,\MessageBreak permissible values are none, solid,%
-    dash1, dash2, dash3,\MessageBreak dash4, dash5, dash6, cloud1, cloud2. Try again}}
+    choice for borderstyle,\MessageBreak permissible values are none,
+    solid, dash1, dash2, dash3,\MessageBreak dash4, dash5, dash6,
+    cloud1, cloud2. Try again}}
 \def\ap@border@code{/BS <</S/S\ap@bwidth>>}
-\define@choicekey+{annotpro}{borderwidth}[\val\nr]{.5,1,2,3,4,6,8,10}[1]{%
+\define@choicekey+{annotpro}
+    {borderwidth}[\val\nr]{.5,1,2,3,4,6,8,10}[1]{%
     \edef\ap@bwidthNum{\val}%
     \def\ap@bwidth{/W #1}}{\PackageWarning{annot_pro}{Bad
-    choice for borderwidth,\MessageBreak permissible values are .5, 1, 2,\MessageBreak
-    3, 4, 6, 8, 10. Try again}}
+    choice for borderwidth,\MessageBreak permissible values are
+    .5, 1, 2,\MessageBreak 3, 4, 6, 8, 10. Try again}}
 \def\ap@bwidthNum{1}
 \let\ap@bwidth\@empty
-\define@key{annotpro}{readonly}[ 64 add]{\def\ap@readonly{#1}}
+\define@boolkey{annotpro}{readonly}[true]{\ifKV@annotpro@readonly
+  \def\ap@readonly{ 65 add}\else\let\ap@readonly\@empty\fi}
 \let\ap@readonly\@empty
+\define@boolkey{annotpro}{hidden}[true]{\ifKV@annotpro@hidden
+  \def\ap@hidden{ 2 add}\else\let\ap@hidden\@empty\fi}
+\let\ap@hidden\@empty
 \define@key{annotpro}{nohspace}[]{\def\annotpro@hspace{0pt}}
 \define@key{annotpro}{novspace}[]{\def\annotpro@vspace{0pt}}
 \define@key{annotpro}{nospace}[]{\def\annotpro@hspace{0pt}%
@@ -336,6 +366,7 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 \xdef\ap@pdfdate{\ap@pdfdate\withoptz@{\count0}00}
 \endgroup
 \newcount\ap@annot@cnt
+\def\currentAnnotName{annotpro\the\ap@annot@cnt}
 \newcount\ap@cusstamp@cnt
 {\catcode`\#=12\gdef\ap@signalCustomAP{#}}
 \def\pStamp#1{\ap@signalCustomAP#1}
@@ -345,8 +376,10 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     xfa:spec="2.0.2" xmlns="http://www.w3.org/1999/xhtml" %
     xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">}
 \def\ap@RV@endBody{<body>}
-\def\ap@sub#1{\rvorvstring{<span style="vertical-align:-0.0pt;">#1</span>}{#1}}%
-\def\ap@sup#1{\rvorvstring{<span style="vertical-align:+0.0pt;">#1</span>}{#1}}%
+\def\ap@sub#1{%
+    \rvorvstring{<span style="vertical-align:-0.0pt;">#1</span>}{#1}}%
+\def\ap@sup#1{%
+    \rvorvstring{<span style="vertical-align:+0.0pt;">#1</span>}{#1}}%
 \def\ap@uDec#1{\rt@amp\rt@hashtag#1;}
 \def\ap@uHex#1{\rt@amp\rt@hashtag x#1;}
 \def\ap@afterParaFont{%
@@ -366,13 +399,16 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 \newcommand{\annotpro}{%
     \begingroup
     \let\#\ap@signalCustomAP
-    \@nnotpro
-}
-\newcommand{\@nnotpro}[1][]{%
+    \@nnotpro}
+\def\@nnotpro{\@ifstar{\def\qr@isStar{*}\@nnotproi}
+    {\let\qr@isStar\@empty\@nnotproi}}
+\newcommand{\@nnotproi}[1][]{%
+    \expandafter\setkeys\qr@isStar{annotpro}{#1}%
+\ifx\annotpro@internalID\@empty
     \global\advance\ap@annot@cnt1\relax
-    \setkeys{annotpro}{#1}%
-    \@nn@tpro
-}
+    \xdef\currentAnnotName{annotpro\the\ap@annot@cnt}\else
+    \xdef\currentAnnotName{\annotpro@internalID}\fi
+    \@nn@tpro}
 \newcommand{\@nn@tpro}[1]
 {%
   \ifx\annotpro@presets\@empty\else
@@ -456,6 +492,12 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
                     for the ap key}\fi
                 \def\ap@ImageRef{\annotpro@ap\the\ap@cusstamp@cnt}%
                 \expandafter\ap@useStamp\expandafter{\annotpro@ap}%
+                \ifx\annotpro@rotate\@empty\else
+                    \PackageWarning{annot_pro}{The rotate
+                    key for a custom stamp is not\MessageBreak
+                     supported. Setting rotate=0}%
+                    \let\annotpro@rotate\@empty
+                \fi
                 \edef\ap@thisWidth{\widthOf{\ap@ImageRef}bp}%
                 \@tempdima=\ap@thisWidth\advance\@tempdima-2bp
                 \edef\ap@thisWidth{\the\@tempdima}%
@@ -540,9 +582,10 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
   \fi
   \ifx\annotpro@margin\@empty\let\apmargintext\@empty
     \expandafter\relax\else\expandafter\marginpar\fi
-  {\pdf@rect{\ap@Bbox{\ap@thisWidth}{\ap@thisHeight}}\literalps@out{%
+  {\anp@margprior{%
+   \pdf@rect{\ap@Bbox{\ap@thisWidth}{\ap@thisHeight}}\literalps@out{%
   [ \eq@objdef\ap@Rect
-    /F 4\ap@readonly
+    /F 4\ap@hidden\ap@readonly
     /Open \annotpro@open
     /Title (\annotpro@enc@title)
     /Subj (\annotpro@enc@subject)
@@ -561,10 +604,10 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 \fi
     /Name (\annotpro@@name)
     /Subtype/\ap@type
-    /NM (annotpro\the\ap@annot@cnt)
+    /NM (\currentAnnotName)
     /M (D:\ap@pdfdate)
     \ap@this@AP\ap@this@FS\ap@this@CA\ap@this@Rotate
-    /ANN pdfmark}\apmargintext}%
+    /ANN pdfmark}\apmargintext}}%end grouping, end marginpar
     \to@insertStrucTabOrder{Annot}\endgroup
 }
 \def\ap@set@Rotate@BBox{%
@@ -611,6 +654,7 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     [ {apFileStream\the\ap@annot@cnt} /CLOSE pdfmark}%
 }
 \setAnnotOptions{title,subject,open=false,color}
+\anp@InputScanDoc
 \endinput
 %%
 %% End of file `annot_pro.sty'.

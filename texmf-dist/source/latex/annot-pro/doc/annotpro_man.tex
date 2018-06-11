@@ -63,7 +63,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for annot\textunderscore pro from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={1.1b, 2016/10/18},
+    version={1.2, 2018/04/26},
     keywords={sticky notes, stamps, file attachment text box, free text, annotations},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -164,6 +164,13 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 \tableofcontents
 \selectColors{linkColor=webgreen}
 
+% New
+% X internalID
+% margprior
+% X hidden
+% X \currentAnnotName
+% annotpro*
+
 \section{Introduction}
 
 This package is used to create text, stamp, and file attachment
@@ -174,6 +181,11 @@ viewed in Adobe Reader. For users of \textsf{pdf(la)tex}, use the
 The package primarily in support of my \href{http://www.math.uakron.edu/~dpstory}
 {{Acro\negthinspace\TeX} PDF Blog}. I plan to use sticky notes, file attachments, and
 custom stamps to make side-comments, and to provide source files.
+
+\section{Alternate package name: \texorpdfstring{\protect\pkg{annot-pro}}{annot-pro}}
+
+CTAN lists this package as \pkg{annot-pro}, so might as well have such a package by that name:
+\pkg{annot-pro} loads \pkg{annot\_pro} with the specified options.
 
 \section{Requirements}
 
@@ -284,25 +296,31 @@ right in the \texttt{AllowPSFileOps} row to select Yes as the value.
 The main command of this package is \Com{annotpro}; the command is controlled by
 its optional parameters. The same command can create a text annotation (sticky note),
 a stamp annotation, a file attachment or a Free Text (Text Box) annotation. The syntax of this command is
-\bVerb\takeMeasure{\string\annotpro[\ameta{KV-pairs}]\darg{\ameta{text}}}%
+\bVerb\takeMeasure{\string\annotpro*[\ameta{KV-pairs}]\darg{\ameta{text}}}%
 \begin{minipage}{\linewidth}
 \begin{minipage}{\bxSize}
 \xdef\panelWidth{\the\linewidth}%
 \begin{Verbatim}[frame=single,commandchars=!()]
-\annotpro[!ameta(KV-pairs)]{!ameta(text)}
+\annotpro*[!ameta(KV-pairs)]{!ameta(text)}
 \end{Verbatim}
 \end{minipage}\hfill
 \begin{minipage}{\linewidth-\panelWidth}
 \setDisplayNumber\label{display:arbproCmd}
 \end{minipage}\end{minipage}\eVerb
-\PD The optional argument is one or more key-value pairs that describe the
-annotation; the required argument, \ameta{text}, is the ``contents'' of the
-annotation; for the text and stamp annotation, \ameta{text} becomes the
-contents of the popup annotation, for a file attachment annotation, which has
-not associated pop-up, it is the description of the file attachment that
-appears in the file attachment panel of Adobe Reader. In the latter case, the
-value of \ameta{text} should be rather short. The key-value pairs (\ameta{KV-pairs}) are
-described over the next few sections.
+\PD The optional argument consists is one or more key-value pairs
+(\ameta{KV-pairs}) that describe the annotation; the required argument,
+\ameta{text}, is the ``contents'' of the annotation; for the text and stamp
+annotation, \ameta{text} becomes the contents of the popup annotation, for a
+file attachment annotation, which has no associated pop-up, it is the
+description of the file attachment that appears in the file attachment panel
+of Adobe Reader. In the latter case, the value of \ameta{text} should be
+rather short. The key-value pairs (\ameta{KV-pairs}) are described over the
+next few sections.
+
+Normally, \cs{annotpro} uses the \cs{setkeys} command of \pkg{xkeyval} to
+determine the options specified, when the star-option is specified, \cs{annotpro}
+uses \cs{setkeys*} to evaluate the options, refer to the \pkg{xkeyval} documentation
+for a description of \cs{setkeys} and \cs{setkeys*}.
 
 \paragraph*{\color{red}Sample files.} The sample files \texttt{annots.tex} and \texttt{textbox.tex} illustrate the features
 of the \pkg{annotpro} package.
@@ -332,38 +350,69 @@ The following are key-value pairs common to all annotations.
 \end{Verbatim}
   \item \texttt{color}: The color of the title bar of the pop-up window of the annotation.
   \item \texttt{readonly=\ameta{\upshape{true|false}}} Set the annotation to readonly. The user can click on the annot to
-    see the popup, but the user, if using Acrobat, cannot move the annotation around on the page.
-    The popup window can still be move by the user. (This property makes no difference to the
-    user of Adobe Reader.)
+    see the popup, but the user, if using \app{Acrobat}, cannot move the annotation around on the page.
+    The popup window can still be moved by the user. (\texttt{readonly} is the same as \texttt{readonly=true}.)
+  \item \texttt{hidden=\ameta{\upshape{true|false}}} This key sets the annotation to hidden, it is not visible
+  and does not interact with the user. (\texttt{hidden} is the same as \texttt{hidden=true}.)
   \item \texttt{opacity=\ameta{dec}}: The opacity value ($
           \text0\le\text{\ameta{dec}}\le\text1$) to be used in painting the (icon of
           the) annotation, but does apply to the pop-up window. The default
           is 1.0.
   \item[] Adobe Distiller handles the opacity for us in all cases except when we create a (dynamic) stamp.
         If an opacity value less than 1 is desired, special techniques are needed, and the file needs to
-        be distilled using the \textbf{Standard\_tranparency} job options.
-
+        be distilled using the \textbf{Standard\_transparency} job options.
+  \item \texttt{internalID=\ameta{name}} Each annot must have an internal
+      name (or ID), \emph{unique to the page on which it appears}. The
+      \pkg{annot\_pro} package maintains an internal counter
+      (\cs{ap@annot@cnt}) and routinely assigns each annotation an internal
+      name (or ID) of
+      \begin{quote}\ttfamily
+        annotpro\string\the\string\ap@annot@cnt
+      \end{quote}
+      The \opt{internamID} key allows you to assign an alternate internal
+      name. Thus, if you assign \texttt{internalID=myCoolAnnot}, an
+      annotation is created with the name \texttt{myCoolAnnot}. The
+      internal ID can be used by JavaScript to find a particular annot on
+      the page and to get its properties. The macro \cs{currentAnnotName}
+      contains the internal name of the most recent annot created.
 \end{itemize}
-The following key-values are {\LaTeX} based concerning placement of the annotation in the margin.
+The following key-values are {\LaTeX} based concerning placement of the
+annotation in the margin.
 \begin{itemize}
-  \item \texttt{margin}: Use this key (it has no value), to declare that you want the annotation
-        to appear in the margin. The \cs{marginpar} command from core {\LaTeX} is used, the placement
-        of the annotation follows the rules set down by {\LaTeX}.  You can reverse the placement of the
-        annotation by using the {\LaTeX} command \cs{reversemarginpar} (annots placed in the right margin, and now placed in the left);
-        you can return to the default by using \cs{normalmarginpar}.
+  \item \texttt{margin}: Use this key (it has no value), to declare that
+      you want the annotation to appear in the margin. The \cs{marginpar}
+      command from core {\LaTeX} is used, the placement of the annotation
+      follows the rules set down by {\LaTeX}.  You can reverse the
+      placement of the annotation by using the {\LaTeX} command
+      \cs{reversemarginpar} (annots placed in the right margin, and now
+      placed in the left); you can return to the default by using
+      \cs{normalmarginpar}.
 
-  \item[] Given that you have use the \texttt{margin} key, there is an associated key that can be used, as well
-          as a command.
+  \item[] Given that you have use the \texttt{margin} key, there is an
+      associated key that can be used, as well as a command.
   \begin{itemize}
-        \item \texttt{margintext}: The value of this key is text that will be typeset just below the annotation icon.
-        \item \cs{marginpartextformat}: A {\LaTeX} command for
-                formatting the text in the margin, the default definition is\smallskip
+        \item \texttt{margintext}: The value of this key is text that
+            will be typeset just below the annotation icon.
+        \item \cs{marginpartextformat}: A {\LaTeX} command for formatting
+            the text in the margin, the default definition is\smallskip
 \begin{Verbatim}
 \margintextformat{\bfseries\tiny\color{blue}}
 \end{Verbatim}
     \end{itemize}
-    \item[] For an annotation placed in the margin with margin text, you might want to use the \texttt{readonly}
-        key, this prevents the user---even one using Acrobat---from moving the annotation away from its caption.
+    \item[] For an annotation placed in the margin with margin text, you
+        might want to use the \texttt{readonly} key, this prevents the
+        user---even one using Acrobat---from moving the annotation away
+        from its caption.
+    \item \texttt{margprior=\ameta{\cs{cmd}}} This key allows you to
+        operate on the annotation as a whole. The value \ameta{\cs{cmd}} is
+        expected to be, but it is not a requirement, a command taking one
+        argument. (This key-value pair defines \cs{anp@margprior} which
+        expands to \ameta{\cs{cmd}}; placement of \cs{anp@margprior} is
+        \texttt{\cs{anp@margprior}\darg{\meta{the-annot-code}}}. For
+        example, declaring \texttt{marprior=\cs{fbox}} draws an frame box
+        around the annotation, or
+        \texttt{marprior=\cs{raisebox\darg{10pt}}} raises the annotation
+        10pt.
 \end{itemize}
 The following key-value is for your convenience.
 \begin{itemize}
@@ -494,7 +543,7 @@ The following are the key-values associated with this annotation type.
     \texttt{stamps.pdf}), the width and height are not known to
     \textsf{annot\_pro}. In this case, use the \texttt{height} and \texttt{width} keys
     to set the dimensions of the bounding box. Adobe Distiller will
-    resize the stamp to the stamp is the largest one that can fit in
+    resize the stamp to the stamp that is the largest one that can fit in
     the bounding box, the stamp will be centered vertically and
     horizontally within the bounding box.
 
@@ -713,7 +762,9 @@ The required second argument is empty, which leads to an empty \uif{Text Box}.
 A much more interesting exercise is to pre-populate the \uif{Text Box} with rich text for the
 document consumer to read and/or to respond.
 
-\paragraph[Steps to create rich text content]{Steps to create rich text content.}\chgCurrLblName{Steps to create rich text content}\label{para:StepsRC}
+%[Steps to create rich text content]
+
+\paragraph{Steps to create rich text content.}\label{para:StepsRC}
 We briefly outline the techniques to create rich text
 for a \uif{Text Box} annotation.
 \begin{itemize}
@@ -785,7 +836,7 @@ This default style is assignment a name that is used as the value of the
 Once the \cs{rtpara}-declared paragraphs have been made and their names have passed through
 \cs{setRVVContent}, you are ready to create a \uif{Text Box} annotation.
 
-\paragraph[Key-values for second argument]{Key-values for second argument.}\chgCurrLblName{Key-values for second argument}\label{para:KV2ndArg}
+\paragraph[Key-values for second argument]{Key-values for second argument.}\label{para:KV2ndArg}
 The required second argument, refer to display~\eqref{display:textbox}, has
 two keys, both of which are optional. You are encouraged to read the
 documentation for the \pkg{richtext} package for greater understanding of the
@@ -867,8 +918,7 @@ result, features listed in the \uif{Paragraph} and \uif{Link} tabs of the
 \uif{Text Box}.
 
 \paragraph[Keys \& commands inherited from the \texorpdfstring{\protect\pkg{richtext}}{richtext} package]%
-{Keys \& commands inherited from the \pkg{richtext} package.}%
-\chgCurrLblName{Keys \& commands inherited from the \pkg{richtext} package}\label{para:InheritedKeys}
+{Keys \& commands inherited from the \pkg{richtext} package.}\label{para:InheritedKeys}
 The following keys are supported by the \uif{Text Box} annotation:
 \bVerb\begin{minipage}{\linewidth}
 \begin{minipage}[c]{4in}
@@ -897,17 +947,18 @@ not within an \uif{Text Box}. Refer to the documentation of the
 \pkg{richtext} for details of these keys and commands. In this document, we
 illustrate by example.
 
-\paragraph[Key-values of \texorpdfstring{\protect\cs{rtpara}}{\textbackslash{rtpara}}]{Key-values of \cs{rtpara}.}%
-\chgCurrLblName{Key-values of \cs{rtpara}}\label{para:KeysPara} The
-keys of display~\eqref{display:suppKeys} -- excluding the overstrike ones -- may be used in the
-\ameta{KV-pairs} argument of \cs{rtpara} of display~\eqref{display:rtpara}.
+
+\paragraph[Key-values of \texorpdfstring{\protect\cs{rtpara}}{\textbackslash{rtpara}}]{%
+Key-values of \cs{rtpara}.}\label{para:KeysPara}
+The keys of display~\eqref{display:suppKeys} -- excluding the overstrike ones
+-- may be used in the \ameta{KV-pairs} argument of \cs{rtpara} of
+display~\eqref{display:rtpara}.
 
 \paragraph[Permissible commands within \texorpdfstring{\protect\ameta{rich-content}}{<rich-content>}]{%
-Permissible commands within \ameta{rich-content}.}\chgCurrLblName{Permissible
-commands within \ameta{\ameta{rich-content}}}\label{para:KeysCmdsRC} The
-\ameta{rich-content} argument of display~\eqref{display:rtpara} (normally)
-consists of Latin 1 characters, plus any markup in the form of the commands
-listed in display~\eqref{display:suppCmds}.
+Permissible commands within \ameta{rich-content}.}\label{para:KeysCmdsRC}
+The \ameta{rich-content} argument of display~\eqref{display:rtpara}
+(normally) consists of Latin 1 characters, plus any markup in the form of the
+commands listed in display~\eqref{display:suppCmds}.
 \begin{itemize}
     \item \cs{span} has two arguments, more on this command in the paragraph below
     titled \Nameref{para:Span}.
@@ -944,7 +995,7 @@ The above markups, with the exception of \cs{span} are illustrated below.
 The verbatim listing for this example is in the sticky note in the margin.
 
 \paragraph[Some comments on the \texorpdfstring{\protect\cs{span}}{\textbackslash{span}}
-command]{Some comments on the \cs{span} command.}\chgCurrLblName{Some comments on the \cs{span} command}\label{para:Span}
+command]{Some comments on the \cs{span} command.}\label{para:Span}
 the \cs{span} command, defined only locally within the \ameta{rich-text} argument \cs{rtspan} is a general purpose
 command to format text. It has two argument:
 \begin{quote}
@@ -981,8 +1032,7 @@ There are several styles of underlining \span{ulstyle=ul}{basic underlining},
 The verbatim listing for this example is in the sticky note in the margin.
 
 \paragraph[Key-values of \texorpdfstring{\protect\cs{setDefaultStyle}}{\textbackslash{setDefaultStyle}}]%
-{Key-values of \cs{setDefaultStyle}.}%
-\chgCurrLblName{Key-values of \cs{setDefaultStyle}}\label{para:KeysDS} The
+{Key-values of \cs{setDefaultStyle}.}\label{para:KeysDS} The
 keys of display~\eqref{display:suppKeys} -- excluding the overstrike ones --
 may be used in the \ameta{KV-pairs} argument of \cs{setDefaultStyle} of
 display~\eqref{display:setDefStyle}; however, only the keys \opt{font},

@@ -1,8 +1,8 @@
-annot_pro --- D. P. Story
-Dated: 2016/10/18
+annot_pro 
+Dated: 2018/04/26 
+Version: v1.2
+Author: D. P. Story
 
-What's New: Added support for text box annotations (originally called free 
-text annotations). Added new sample file textbox.tex. 
 
 This package is used to create text, stamp, file attachment, and text box
 annotations using Adobe Distiller, these annotations can be viewed in
@@ -11,9 +11,11 @@ Kleber might suffice.
 
 Check out my http://www.acrotex.net/ website and my blog site as well
 at http://blog.acrotex.net/.
+What's New (2018/04/26): Added dummy package named annot-pro to conform with 
+CTAN naming. 
+
 
 Now, I simply must get back to my retirement.
 
 D. P. Story
-dpstory@uakron.edu
 dpstory@acrotex.net

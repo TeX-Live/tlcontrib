@@ -1,9 +1,8 @@
-\listfiles
 \documentclass{article}
 \usepackage[%
     web={tight,usesf,usetemplates},
 ]{aeb_pro}
-\usepackage{annot_pro}
+\usepackage[scandoc]{annot_pro}
 
 \title{The \textsf{annot\_pro} Package\texorpdfstring{\\[2ex]}{: }Text, Stamp, and File Attachment Annotations}
 \author{D. P. Story}
@@ -60,8 +59,7 @@ these are \texttt{title} (whose value is usually the author of the
 annotation), and \texttt{subject}. The \texttt{<content>} argument
 is the text of the pop-up window (in the case of text and stamp
 annotations), and the file attachment description (for file
-attachment annotations).For example, \annotpro[title=Don
-Story,subject=AcroTeX.Net]{This is the content of the sticky note.}; the code is
+attachment annotations).For example, \annotpro[title=Don Story,subject=AcroTeX.Net]{This is the content of the sticky note.}; the code is
 \begin{verbatim}
     \annotpro[title=Don Story,subject=AcroTeX.Net]
         {This is the content of the sticky note.}
@@ -121,7 +119,7 @@ various combinations of \cs{smash} and \cs{makebox}. The code for the stamp abov
     \smash{\makebox[0pt][l]{\raisebox{36pt}{
         \annotpro[type=stamp,name=Approved,widthTo=150bp,
             color=blue]{I give my stamp of approval!}}}}
-\end{verbatim}\previewtrue
+\end{verbatim}
 Did I forget to mention \cs{raisebox}? I needed that command keep the stamp from covering page content.
 The \textsf{annot\_pro} package has a \texttt{preview} option. If used, the bounding rectangles of
 the annotations can be viewed in a dvi previewer. This helped me to place the stamp through my dvi previewer.
@@ -162,8 +160,8 @@ These stamps are representatives of the many stamps that reside in the reference
 stamps are known by \textsf{annot\_pro} for these stamps. These can be resized using the \texttt{widthTo}, \texttt{heightTo}, or \texttt{scale}
 keys.
 
-Note that the names in the \texttt{Dynamic.pdf} file begin with the \texttt{\#} symbol. To reference these stamps, use
-\verb!\#!, like so \verb!name=\#DApproved!.
+Note that the names in the \texttt{Dynamic.pdf} file begin with the `\texttt{\#}' symbol. To reference these stamps, use
+\verb!\#!, like so, \verb!name=\#DApproved!.
 
 The bounding rectangle for the non-standard stamps---ones whose
 dimensions are not known to this package---can be set using the
@@ -196,8 +194,5 @@ a value of the file key must be set, here \verb!file={\graphicsPath/AdobeDon.pdf
 that expands to the path to the folder holding \texttt{AdobeDon.pdf}. The definition of the path was made using
 a special command, \cs{defineAPath}, in \texttt{annot\_pro}.
 
-
-
 \end{document}
 
-width=185.76bp,height=185.46bp

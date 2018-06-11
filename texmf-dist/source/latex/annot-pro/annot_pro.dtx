@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% annot_pro package,                                   %%
-%% Copyright (C) 2002-2016  D. P. Story                 %%
+%% Copyright (C) 2002-2017  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{annot_pro}
-%<package> [2016/10/18 v1.1b Provides selected PDF annotation support (dps)]
+%<package> [2018/04/26 v1.2 Provides selected PDF annotation support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[fleqn]{amsmath}
@@ -22,6 +22,7 @@
 \let\uif\textsf\let\app\textsf
 \let\pkg\textsf\let\env\texttt
 \def\psf#1{\textsf{\textbf{#1}}}
+\let\opt\texttt
 %\def\texorpdfstring#1#2{#1}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription  % comment out for implementation details
@@ -59,7 +60,21 @@ of changes goes here. Execute
 % \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
 %    {\PackageInfo{web}{cannot find aebdonotindex.def}}
 %
+% \section{Alternate package name: \texorpdfstring{\protect\pkg{annot-pro}}{annot-pro}}
+% CTAN lists this package (\pkg{annot\_pro}) as \pkg{annot-pro}, so we'll create
+% a dummy package by that name.
+% \changes{v1.2}{2018/04/26}{Added dummy package \string\pkg{annot-pro}}
 %    \begin{macrocode}
+%<*altpkgname>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{annot-pro}
+ [2018/04/26 v1.0 annot-pro Alt-name (dps)]
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{annot_pro}}
+\ProcessOptions
+\RequirePackage{annot_pro}
+%    \end{macrocode}
+%    \begin{macrocode}
+%</altpkgname>
 %<*package>
 \RequirePackage{xkeyval}
 %    \end{macrocode}
@@ -121,6 +136,8 @@ of changes goes here. Execute
 %    \begin{macrocode}
 \DeclareOptionX{preview}{\previewtrue}
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+\providecommand{\previewOn}{\previewtrue}
+\providecommand{\previewOff}{\previewfalse}
 %    \end{macrocode}
 %    \changes{v1.1}{2016/09/29}{Added \string\texttt{useA10Icons} and \string\texttt{useTextBox} options}
 %    (2016/09/29) Added \texttt{useA10Icons} and \texttt{useTextBox} options
@@ -136,10 +153,36 @@ of changes goes here. Execute
 \DeclareOptionX{useTextBox}{\def\ap@requireRichTextAsNeeded{%
     \RequirePackage{richtext}[2016/10/03]}}
 \let\ap@requireRichTextAsNeeded\relax
+%    \end{macrocode}
+%    The \IndexOpt{scandoc}\opt{scandoc} option calls some doc assembly JavaScript to scan the document
+%    for stamp annotations. For stamps shipped by Adobe this is not necessary, but for any custom stamps,
+%    this is needed.
+%    \begin{macrocode}
+\DeclareOptionX{scandoc}{\let\anp@InputScanDoc\anp@scanDoc
+    \PassOptionsToPackage{execJS}{insdljs}}
+%    \end{macrocode}
+%    During document development, you don't what to scan the newly created PDF after you build it to,
+%    perhaps, edit the text. In this case, use the \IndexOpt{!scandoc}\opt{!scandoc} option. You want to scan the document when you build the document for the last time
+%    before publishing it. Be sure to save the document using the SaveAs menu item. This saves the
+%    stamp appearances (symbology in this case) as part of the document.
+%    \begin{macrocode}
+\DeclareOptionX{!scandoc}{\let\anp@InputScanDoc\relax}
+%    \end{macrocode}
+%    The default is not to scan the document. Remember, the final document must be scanned; that is,
+%    it must be build with the \opt{scandoc} option in effect.
+%    \begin{macrocode}
+\let\anp@InputScanDoc\relax
+\def\anp@scanDoc{\InputIfFileExists{scandoc-anp.def}
+    {\PackageInfo{annot_pro}{Inputting the scandoc-anp.def file}}
+    {\PackageWarning{annot_pro}{Cannot find the file scandoc-anp.def}}}
+%    \end{macrocode}
+%    \begin{macrocode}
 \ProcessOptionsX\relax
+\RequirePackage{trig}
 \RequirePackage{hyperref}
 \RequirePackage{calc}
 \RequirePackage{insdljs}
+\ifx\anp@InputScanDoc\relax\else\let\execjs=y\fi
 \RequirePackage[structure]{taborder}
 \ap@requireRichTextAsNeeded
 %    \end{macrocode}
@@ -159,7 +202,6 @@ of changes goes here. Execute
 \def\ap@csarg#1#2{\expandafter#1\csname#2\endcsname}
 %    \end{macrocode}
 % Definitions for creating a rectangle used to create a building box for the annot.
-% This switch is later used when creating a custom stamp.
 %    \begin{macrocode}
 \def\ap@Bbox#1#2{%
     \edef\bbox@width{#1}\edef\bbox@height{#2}%
@@ -207,6 +249,14 @@ of changes goes here. Execute
 \define@key{annotpro}{name}[]{\def\annotpro@name{#1}}
 \let\annotpro@name\@empty
 %    \end{macrocode}
+%    The \opt{internalID} key allows you to specify the \psf{NM} entry. Must be
+%    unique throughout the page. The default is \texttt{annotpro\string\the\string\ap@annot@cnt}.
+%    The key is used only for the most particular of applications.
+%    \changes{v1.1c}{2017/06/06}{Added \string\texttt{internalID}}
+%    \begin{macrocode}
+\define@key{annotpro}{internalID}[]{\def\annotpro@internalID{#1}}
+\let\annotpro@internalID\@empty
+%    \end{macrocode}
 %    \end{macro}
 % For a text annotation, the following are permitted values for \texttt{name}:
 %    \begin{macrocode}
@@ -236,7 +286,7 @@ TopSecret}[Draft]{\def\annotpro@@name{#1}}%
 %    \begin{macrocode}
 %    \end{macrocode}
 %    \begin{macro}{customStamp}
-% There is a third case. The user can create a custom stamp using graphicxsp
+% There is a third case. The user can create a custom stamp using \pkg{graphicxsp}
 % package.
 %    \begin{macrocode}
 \define@key{annotpro}{customStamp}[]{\def\ap@customstamp@name{#1}}
@@ -334,6 +384,15 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
+%    \begin{macro}{margprior}
+%    Again, when the \texttt{margin} option is taken, we can insert content just inside
+%    the left brace of the \cs{marginpar} command.
+%    \changes{v1.1c}{2017/06/06}{Added the key \string\texttt{margprior}}
+%    \begin{macrocode}
+\define@key{annotpro}{margprior}[]{\def\anp@margprior{#1}}
+\let\anp@margprior\@empty
+%    \end{macrocode}
+%    \end{macro}
 %    \begin{macro}{presets}
 % A convenience key to allow the introduction of pre-defined options, for example,
 % you might like all your comment fields to be red, so you can define
@@ -402,28 +461,39 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     dash1,dash2,dash3,dash4,dash5,dash6,cloud1,cloud2}[solid]{%
     \ifcase\nr\relax
         \def\ap@border@code{}\or
-        \def\ap@border@code{/BS <</S/S\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[2.0 2.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[3.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 4.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 3.0 2.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[4.0 3.0 16.0 3.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BS <</D[8.0 4.0 4.0 4.0]/S/D\ap@bwidth>>}\or
-        \def\ap@border@code{/BE<</I 1.0/S/C>>/RD[\ap@BE@i@calc\space\ap@BE@i@calc
+        \def\ap@border@code{%
+            /BS <</S/S\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[2.0 2.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[3.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 3.0 2.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[4.0 3.0 16.0 3.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BS <</D[8.0 4.0 4.0 4.0]/S/D\ap@bwidth>>}\or
+        \def\ap@border@code{%
+            /BE<</I 1.0/S/C>>/RD[\ap@BE@i@calc\space\ap@BE@i@calc
             \space\ap@BE@i@calc\space\ap@BE@i@calc]%
         \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\or
-        \def\ap@border@code{/BE<</I 2.0/S/C>>/RD[\ap@BE@ii@calc\space\ap@BE@ii@calc
+        \def\ap@border@code{%
+            /BE<</I 2.0/S/C>>/RD[\ap@BE@ii@calc\space\ap@BE@ii@calc
             \space\ap@BE@ii@calc\space\ap@BE@ii@calc]%
         \ifx\ap@bwidth\@empty\else/BS <<\ap@bwidth>>\fi}\fi
     \def\annotpro@border{#1}}{\PackageWarning{annot_pro}{Bad
-    choice for borderstyle,\MessageBreak permissible values are none, solid,%
-    dash1, dash2, dash3,\MessageBreak dash4, dash5, dash6, cloud1, cloud2. Try again}}
+    choice for borderstyle,\MessageBreak permissible values are none,
+    solid, dash1, dash2, dash3,\MessageBreak dash4, dash5, dash6,
+    cloud1, cloud2. Try again}}
 \def\ap@border@code{/BS <</S/S\ap@bwidth>>}
-\define@choicekey+{annotpro}{borderwidth}[\val\nr]{.5,1,2,3,4,6,8,10}[1]{%
+\define@choicekey+{annotpro}
+    {borderwidth}[\val\nr]{.5,1,2,3,4,6,8,10}[1]{%
     \edef\ap@bwidthNum{\val}%
     \def\ap@bwidth{/W #1}}{\PackageWarning{annot_pro}{Bad
-    choice for borderwidth,\MessageBreak permissible values are .5, 1, 2,\MessageBreak
-    3, 4, 6, 8, 10. Try again}}
+    choice for borderwidth,\MessageBreak permissible values are
+    .5, 1, 2,\MessageBreak 3, 4, 6, 8, 10. Try again}}
 \def\ap@bwidthNum{1}
 \let\ap@bwidth\@empty
 %    \end{macrocode}
@@ -431,8 +501,18 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 %    \begin{macro}{readonly}
 % Set the annotation to readonly.
 %    \begin{macrocode}
-\define@key{annotpro}{readonly}[ 64 add]{\def\ap@readonly{#1}}
+%\define@key{annotpro}{readonly}[ 64 add]{\def\ap@readonly{#1}}
+\define@boolkey{annotpro}{readonly}[true]{\ifKV@annotpro@readonly
+  \def\ap@readonly{ 65 add}\else\let\ap@readonly\@empty\fi}
 \let\ap@readonly\@empty
+%    \end{macrocode}
+%    Added the \texttt{hidden} option.
+%    \changes{v1.1c}{2017/06/06}{Added \string\texttt{hidden} property}
+%    \begin{macrocode}
+%\define@key{annotpro}{hidden}[ 2 add]{\def\ap@hidden{#1}}
+\define@boolkey{annotpro}{hidden}[true]{\ifKV@annotpro@hidden
+  \def\ap@hidden{ 2 add}\else\let\ap@hidden\@empty\fi}
+\let\ap@hidden\@empty
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{nohspace}
@@ -685,8 +765,10 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 \endgroup
 %    \end{macrocode}
 % \section{The main code}
+%    \changes{v1.1c}{2017/06/06}{Define convenience command \string\cs{currentAnnotName}}
 %    \begin{macrocode}
 \newcount\ap@annot@cnt
+\def\currentAnnotName{annotpro\the\ap@annot@cnt}
 \newcount\ap@cusstamp@cnt
 {\catcode`\#=12\gdef\ap@signalCustomAP{#}}
 \def\pStamp#1{\ap@signalCustomAP#1}
@@ -702,8 +784,10 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 %    The implementation of rich text in a FreeText annotation is a little different from
 %    that of a rich text form field. We made some adjustments here for an annotation.
 %    \begin{macrocode}
-\def\ap@sub#1{\rvorvstring{<span style="vertical-align:-0.0pt;">#1</span>}{#1}}%
-\def\ap@sup#1{\rvorvstring{<span style="vertical-align:+0.0pt;">#1</span>}{#1}}%
+\def\ap@sub#1{%
+    \rvorvstring{<span style="vertical-align:-0.0pt;">#1</span>}{#1}}%
+\def\ap@sup#1{%
+    \rvorvstring{<span style="vertical-align:+0.0pt;">#1</span>}{#1}}%
 \def\ap@uDec#1{\rt@amp\rt@hashtag#1;}
 \def\ap@uHex#1{\rt@amp\rt@hashtag x#1;}
 \def\ap@afterParaFont{%
@@ -718,6 +802,8 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 }
 %    \end{macrocode}
 %    \begin{environment}{textboxpara}
+%    Rich text for the Text Box annotation is enclosed within this environment, then use \cs{rtpara} to
+%    format the text.
 %    \begin{macrocode}
 \newenvironment{textboxpara}{%
     \let\rt@sub\ap@sub\let\rt@sup\ap@sup
@@ -742,19 +828,29 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 % \verb!\#!
 %    \begin{macrocode}
     \let\#\ap@signalCustomAP
-    \@nnotpro
-}
-\newcommand{\@nnotpro}[1][]{%
+    \@nnotpro}
+%    \end{macrocode}
+%    Added a star option to \cs{annotpro}. When specified (\DescribeMacro{\annotpro*}\cs{annotpro*}),
+%    the options are expanded with \cs{setkeys*}. Also new is the
+%    options are expanded first before \cs{setkeys} or \cs{setkeys*} is applied.
+%    \changes{v1.1c}{2017/06/06}{Added a star option to \string\cs{annotpro}}
+%    \begin{macrocode}
+\def\@nnotpro{\@ifstar{\def\qr@isStar{*}\@nnotproi}
+    {\let\qr@isStar\@empty\@nnotproi}}
+\newcommand{\@nnotproi}[1][]{%
+%    \end{macrocode}
+% Process options after expanding them
+%    \begin{macrocode}
+    \expandafter\setkeys\qr@isStar{annotpro}{#1}%
+%    \edef\temp@exp{\noexpand\setkeys\qr@isStar{annotpro}{#1}}\temp@exp
+\ifx\annotpro@internalID\@empty
 %    \end{macrocode}
 % Increment a global counter, to count the annots as we create them.
 %    \begin{macrocode}
     \global\advance\ap@annot@cnt1\relax
-%    \end{macrocode}
-% Process options
-%    \begin{macrocode}
-    \setkeys{annotpro}{#1}%
-    \@nn@tpro
-}
+    \xdef\currentAnnotName{annotpro\the\ap@annot@cnt}\else
+    \xdef\currentAnnotName{\annotpro@internalID}\fi
+    \@nn@tpro}
 \newcommand{\@nn@tpro}[1]
 {%
 %    \end{macrocode}
@@ -903,6 +999,17 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
                 \def\ap@ImageRef{\annotpro@ap\the\ap@cusstamp@cnt}%
                 \expandafter\ap@useStamp\expandafter{\annotpro@ap}%
 %    \end{macrocode}
+%    We do not allow custom stamps to be initially rotated.
+%    \changes{v1.1c}{2017/06/06}{For custom stamps, do not allow the rotate
+%    key to be nonzero.}
+%    \begin{macrocode}
+                \ifx\annotpro@rotate\@empty\else
+                    \PackageWarning{annot_pro}{The rotate
+                    key for a custom stamp is not\MessageBreak
+                     supported. Setting rotate=0}%
+                    \let\annotpro@rotate\@empty
+                \fi
+%    \end{macrocode}
 % After making many experiments, there seems to be a need to
 % reduce dimensions by \texttt{2bp} so that the desired dimensions
 % are displayed through the user interface. There seems to
@@ -1028,10 +1135,13 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     \expandafter\relax\else\expandafter\marginpar\fi
 %    \end{macrocode}
 % Set the bounding box, and layout the annotation using the \textbf{pdfmark} operator.
+%    \changes{v1.1c}{2017/06/06}{added \string\cs{anp@margprior} followed by braces, so
+%    \string\cs{anp@margprior} could operate on the annot as a whole.}
 %    \begin{macrocode}
-  {\pdf@rect{\ap@Bbox{\ap@thisWidth}{\ap@thisHeight}}\literalps@out{%
+  {\anp@margprior{%
+   \pdf@rect{\ap@Bbox{\ap@thisWidth}{\ap@thisHeight}}\literalps@out{%
   [ \eq@objdef\ap@Rect
-    /F 4\ap@readonly
+    /F 4\ap@hidden\ap@readonly
     /Open \annotpro@open
     /Title (\annotpro@enc@title)
     /Subj (\annotpro@enc@subject)
@@ -1062,10 +1172,11 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
 %    \begin{macrocode}
     /Name (\annotpro@@name)
     /Subtype/\ap@type
-    /NM (annotpro\the\ap@annot@cnt)
+    /NM (\currentAnnotName)
+%   /NM (annotpro\the\ap@annot@cnt)
     /M (D:\ap@pdfdate)
     \ap@this@AP\ap@this@FS\ap@this@CA\ap@this@Rotate
-    /ANN pdfmark}\apmargintext}%
+    /ANN pdfmark}\apmargintext}}%end grouping, end marginpar
     \to@insertStrucTabOrder{Annot}\endgroup
 }
 %    \end{macrocode}
@@ -1152,10 +1263,62 @@ are Graph,Paperclip,PushPin,Tag. Try again}}
     >> /PUT pdfmark
     [ {apFileStream\the\ap@annot@cnt} /CLOSE pdfmark}%
 }
+%</package>
+%<*scandoc>
+%    \end{macrocode}
+%    \subsection{Document assembly}
+%    The document assembly code is executed when the \texttt{scandoc} option is used. It is executed
+%    then the document is first opened.
+%    \begin{macrocode}
+\begin{execJS}{scan4anp}
+var aANPStamps=new Array();
+if (typeof scancomplete=="undefined") {
+    var scancomplete=false;
+    this.syncAnnotScan();
+    for (var p=0; p<this.numPages; p++) {
+         a=this.getAnnots(p);
+         if (a!=null) {
+            for (var i=0; i<a.length; i++) {
+%    \end{macrocode}
+%    At this time, we search only for annots of type \texttt{"Stamp"} and with AP beginning
+%    with `\texttt{\#}', for these are user installed stamps or dynamic stamps.
+%    \begin{macrocode}
+                if ( a[i].type=="Stamp" && a[i].AP.indexOf("\#")==0 ) {
+                    aANPStamps.push(p);
+                    break;
+                }
+            }
+        }
+    }
+}
+ANPscrollPage.index=0;
+function ANPscrollPage() {
+%    \end{macrocode}
+%    We go to the page where each stamp of the type we are interested in. Opening the page
+%    causes \app{Acrobat} to populate the dynamic stamps.
+%    \begin{macrocode}
+    if (ANPscrollPage.index<aANPStamps.length) {
+        this.pageNum=aANPStamps[ANPscrollPage.index];
+        ANPscrollPage.index+=1;
+    } else {
+        app.clearInterval(anpTO);
+        scancomplete=true;
+        this.pageNum=0;
+    }
+}
+if (aANPStamps.length>0)
+    var anpTO=app.setInterval("ANPscrollPage()", 5);
+\end{execJS}
+%</scandoc>
+%<*package>
 %    \end{macrocode}
 % Set global options for this package.
 %    \begin{macrocode}
 \setAnnotOptions{title,subject,open=false,color}
+%    \end{macrocode}
+% Input \texttt{scandoc-anp.def}, if required.
+%    \begin{macrocode}
+\anp@InputScanDoc
 %</package>
 %    \end{macrocode}
 %  \Finale

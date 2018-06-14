@@ -14,3 +14,4 @@ $special{'futurans'}    = '&donormal';
 $special{'pcarl'}       = '&donormal';
 $special{'mathstone'}   = '&MAKEflatten';
 $special{'spark-otf'}   = '&MAKEflatten';
+$special{'opacity-pro'} = '&donormal';

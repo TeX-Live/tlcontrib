@@ -1,6 +1,6 @@
 Package: opacity-pro
 Author: D. P. Story 
-Dated: 2018/05/13 
+Dated: 2018/06/11 
 
 The opacity-pro package defines the \settransparency command and the
 settransparency environment. These allow the document to set the blend mode

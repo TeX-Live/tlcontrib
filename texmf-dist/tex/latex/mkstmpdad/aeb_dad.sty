@@ -1,0 +1,364 @@
+%%
+%% This is file `aeb_dad.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aeb_dad.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% aeb_dad package                                      %%
+%% Copyright (C) 2012--2016 D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aeb_dad}
+ [2016/10/26 v1.2b Drag and drop stamps matching game (dps)]
+\RequirePackage{annot_pro}[2012/11/10]
+\RequirePackage{xkeyval}
+\RequirePackage{calc}
+\RequirePackage{refcount}
+\newcounter{aebdadcnt}
+\edef\dad@subCat{\the\catcode`\_}
+\def\dd@csarg#1#2{\expandafter#1\csname#2\endcsname}
+\@makeother\_
+\newcommand{\ddDimens}[1]{\setkeys{ddm}{#1}}
+\define@key{ddm}{iconwidthTo}[]{{%
+    \def\ddm@argi{#1}\ifx\ddm@argi\@empty
+        \global\let\ddm@iconwidthTo\@empty
+    \else
+        \setlength{\dimen@}{#1}%
+        \xdef\ddm@iconwidthTo{\the\dimen@}%
+    \fi
+}}
+\define@key{ddm}{iconwidth}[\defaultStampWidth]{{%
+    \setlength{\dimen@}{#1}%
+    \xdef\ddm@iconwidth{\the\dimen@}%
+}}
+\define@key{ddm}{iconheight}[\defaultStampHeight]{{%
+    \setlength{\dimen@}{#1}%
+    \xdef\ddm@iconheight{\the\dimen@}%
+}}
+\define@key{ddm}{targetwidth}{{%
+    \setlength{\dimen@}{#1}%
+    \xdef\ddm@targetwidth{\the\dimen@}%
+}}
+\define@key{ddm}{targetheight}{{%
+    \setlength{\dimen@}{#1}%
+    \xdef\ddm@targetheight{\the\dimen@}%
+}}
+\ddDimens{iconwidth,iconheight,iconwidthTo,%
+    targetwidth=1.25in,targetheight=1.25in}
+\newcommand{\ddGameIcon}[1]{%
+    \expandafter\if\csname\thisDDNAME-init\endcsname0\relax
+        \refstepcounter{aebdadcnt}\phantomsection
+        \edef\@currentlabelname{Beginning of DAD Game: \thisDDNAME}%
+        \label{aebdadcnt\theaebdadcnt}%
+        \dd@EmitPageAction
+        \global\dd@csarg\let{\thisDDNAME-init}=1\relax
+    \fi
+    \ifx\ddm@iconwidthTo\@empty
+        \def\ddGameIconArgs{type=stamp,name=\##1,%
+        width=\ddm@iconwidth,%
+        height=\ddm@iconheight}%
+    \else
+        \def\ddGameIconArgs{type=stamp,name=\##1,%
+        width=\ddm@iconwidth,%
+        height=\ddm@iconheight,
+        widthTo=\ddm@iconwidthTo}%
+    \fi
+    \expandafter\annotpro\expandafter[\ddGameIconArgs]{}%
+}
+\newcommand{\ddBtnAppr}{\S{S}\BG{}
+    \AA{\AAMouseEnter{%
+        \JS{btnMouseUpAction(event,this.pageNum,"\thisDDNAME");}}}%
+}
+\newcommand{\ddTargetOfIcon}[2]{%
+    \expandafter\if\csname\thisDDNAME-init\endcsname0\relax
+        \refstepcounter{aebdadcnt}\phantomsection
+        \edef\@currentlabelname{Beginning of DAD Game: \thisDDNAME}%
+        \label{aebdadcnt\theaebdadcnt}%
+        \dd@EmitPageAction
+        \global\dd@csarg\let{\thisDDNAME-init}=1\relax
+    \fi
+    \parbox[t]{\ddm@targetwidth}
+    {\kern0pt\pushButton[\presets{\ddBtnAppr}
+    ]{\thisDDNAME @\##1}{\ddm@targetwidth}{\ddm@targetheight}%
+    \ddTargetCaption{#2}}%
+}
+\newcommand{\ddTargetFmt}[1]{\def\ddm@targetfmt{#1}}
+\ddTargetFmt{}
+\newcommand{\ddTargetCaption}[1]{\\[3pt]%
+    \parbox[t]{\linewidth}{\centering\ddm@targetfmt#1}}
+\newcommand{\thisDDName}[1]{%
+    \setAnnotOptions{subject={#1}}%
+    \gdef\thisDDNAME{#1}%
+}
+\newcount\dd@GameCnt \dd@GameCnt=0
+\newcommand{\initDDGame}[1]{\thisDDName{#1}%
+     \global\advance\dd@GameCnt1\relax
+     \global\dd@csarg\let{#1-init}0\relax
+}
+\def\dd@EmitPageAction{%
+    \@ifundefined{ddEmitOnPage\getpagerefnumber{aebdadcnt\theaebdadcnt}}
+    {\global\dd@csarg
+     \let{ddEmitOnPage\getpagerefnumber{aebdadcnt\theaebdadcnt}}\@empty
+        \pushButton[\F{\FHidden}\BG{}\BC{}\S{S}
+        \AApageopen{ddPageOpen(this.pageNum);}
+     ]{btnEmitPA-\theaebdadcnt}{0bp}{0bp}%
+    }{}%
+}
+\newcommand{\ddReset}[1][]{\def\dd@arg{#1}%
+    \ifx\dd@arg\@empty\else\thisDDName{#1}\fi
+    \mbox{\makebox[0pt][l]{%
+    \pushButton[\W0\BC{}\BG{}\S{S}]{ddHReset\thisDDNAME}{0bp}{0bp}}%
+    \pushButton[\CA{Reset}\A{\JS{%
+        resetDDM(this.pageNum,"\thisDDNAME");}}
+    \AA{\AAOnFocus{\JS{%
+        this.getField("ddHReset\thisDDNAME").setFocus();
+    }}}]{ddReset\thisDDNAME}{}{11bp}}%
+}
+\OpenAction{\JS{ddOpenDocAction();}}
+\newcommand{\ddRightMsg}{"Right!"}
+\newcommand{\ddWrongMsg}{"Wrong!"}
+\newcommand{\ddDragOnlyOne}{"Drag one icon at a time"}
+\newcommand{\ddExternalMsg}{"Drag and Drop of icons does not work "
+    + "in a browser. Save this file to your computer and view it in "
+    + "Adobe Reader XI or later, or in the Acrobat application."}
+\newcommand{\ddBadAppMsg}{"Any version of Adobe Acrobat, "
+    +"or Adobe Reader XI is required!"}
+\def\ddTrueName(#1,#2){ddTrueName("#1","#2")}
+\begin{insDLJS}{dadjs}{AcroTeX Stamp Game JavaScript}
+var oDADStamp=new Object();
+var oDADCnt=new Object();
+var aDDPageCtrl=new Array(this.numPages);
+var oDADAlerts=new Object();
+var ddTO;
+var activeStampName="";
+function ddTrueName (ddName,stampName) {
+    return ddName+"@#"+stampName;
+}
+function btnMouseUpAction(event,page,ddName)
+{
+    var stamps;
+    var aBtnRect=event.target.rect;
+    var cBtnName=event.target.name;
+    var l = cBtnName.indexOf("@#");
+    cBtnName = cBtnName.substring(1+l);
+    // convert to rotated user coordinates
+    var mxToDefault=(new Matrix2D()).fromRotated(this,page);
+    var mxToRotated=mxToDefault.invert();
+    var aBtnRectRot=mxToRotated.transform(aBtnRect);
+    var btnWidth=aBtnRect[2]-aBtnRect[0];
+    var btnHeight=aBtnRect[3]-aBtnRect[1];
+    stamps=this.selectedAnnots;
+    if (typeof stamps == "undefined") return;
+    if (stamps.length>1) {
+        app.alert({cMsg: \ddDragOnlyOne,
+        nIcon: 3, cTitle: "AcroTeX Drag and Drop"});
+        for (var i=0; i<stamps.length; i++) {
+            var index=stamps[i].subject+page;
+            stamps[i].rect=oDADStamp[index][stamps[i].AP][0];
+            stamps[i].setProps({rotate:0})
+        }
+        resetFocus("ddReset"+ddName);
+        this.dirty=false;
+        return;
+    }
+    for (var i=0; i<stamps.length; i++) {
+        var aStmpRect=stamps[i].rect;
+        var index=stamps[i].subject+page;
+        var stmpWidth=aStmpRect[2]-aStmpRect[0];
+        var stmpHeight=aStmpRect[3]-aStmpRect[1];
+        var nHorzCenter=(aStmpRect[2]+aStmpRect[0])/2;
+        var nVertCenter=(aStmpRect[3]+aStmpRect[1])/2;
+        if ( (nHorzCenter >= aBtnRectRot[0] )%
+&&(nHorzCenter<=aBtnRectRot[2]) ) {
+            if ( (nVertCenter>=aBtnRectRot[3])%
+&& (nVertCenter<=aBtnRectRot[1]) ) {
+                if (( (cBtnName==stamps[i].AP)%
+&& (stamps[i].subject==ddName))%
+&& (!oDADStamp[index][stamps[i].AP][1]) ) {
+                    activeStampName=stamps[i].AP.substring(1);
+                    var aStmpRect=oDADStamp[index][stamps[i].AP][0];
+                    var stmpWidth=aStmpRect[2]-aStmpRect[0];
+                    var stmpHeight=aStmpRect[3]-aStmpRect[1];
+                    oDADStamp[index][stamps[i].AP][1]=true;
+                    var deltaX=(btnWidth-stmpWidth)/2;
+                    var deltaY=(btnHeight-stmpHeight)/2;
+                    aCenterStamp=[
+                       aBtnRectRot[0]+deltaX,
+                       aBtnRectRot[3]-deltaY,
+                       aBtnRectRot[0]+deltaX+stmpWidth,
+                       aBtnRectRot[3]-deltaY-stmpHeight];
+                    ddCorrectAction(event,ddName);
+                    event.target.strokeColor=color.green;
+                    stamps[i].setProps({rotate:0});
+                    stamps[i].rect=aCenterStamp;
+                    event.target.readonly=true;
+                    resetFocus("ddReset"+ddName);
+                    break;
+                } else {
+                    activeStampName=stamps[i].AP.substring(1);
+                    ddWrongAction(event,ddName);
+                    if (!oDADAlerts[ddName].oAlrtChk.bAfterValue)
+                        ddReturnStamp(page,ddName,stamps[i]);
+                    else {
+                        ddReturnStamp.o=stamps[i];
+                        ddTO=app.setTimeOut("ddReturnStamp("
+                            +page+",\""+ddName
+                            +"\",ddReturnStamp.o);",250);
+                    }
+                    break;
+                }
+            } else {
+                // too high or two low.
+                if(!oDADStamp[index][stamps[i].AP][1])
+                    ddReturnStamp(page,ddName,stamps[i]);
+            }
+        } else {
+            // outside left or right of button
+            if(!oDADStamp[index][stamps[i].AP][1])
+                ddReturnStamp(page,ddName,stamps[i]);
+        }
+    }
+    this.dirty=false;
+}
+function ddReturnStamp(page,ddName,oStamp) {
+    var index=oStamp.subject+page;
+    oStamp.setProps({rotate:0})
+    oStamp.rect=oDADStamp[index][oStamp.AP][0];
+    resetFocus("ddReset"+ddName);
+}
+function resetDDM(page,ddName) {
+    var stamps=this.getAnnots(page);
+    for (var i=0; i<stamps.length; i++) {
+        if ( stamps[i].subject == ddName ) {
+            stamps[i].rect=oDADStamp[ddName+page][stamps[i].AP][0];
+            stamps[i].setProps({rotate:0})
+            oDADStamp[ddName+page][stamps[i].AP][1]=false;
+        }
+    }
+    oDADCnt[ddName+page]=[0,0];
+    for (var i=0; i<this.numFields; i++) {
+        var fname=this.getNthFieldName(i);
+        var getIndexOf = fname.indexOf("@#");
+        if ( (getIndexOf!=-1) %
+&& (fname.substring(0,getIndexOf)==ddName) ) {
+            var f=this.getField(fname);
+            if (f.readonly) {
+                f.readonly=false;
+                f.strokeColor=color.black;
+            }
+        }
+    }
+    if (typeof ddCustomResetAction=="function")
+        ddCustomResetAction(page,ddName);
+    this.dirty=false;
+}
+var ddGoodVersion=true;
+var ddNotification=false;
+function ddAlertInBrowser() {
+    app.alert({cMsg:\ddExternalMsg,
+        nIcon: 3, cTitle: "AeB DAD Match"});
+}
+function ddAlertBadApp() {
+    app.alert({cMsg:\ddBadAppMsg,
+        nIcon: 3, cTitle: "AeB DAD Match"});
+}
+function ddOpenDocAction() {
+    if (this.external) {
+        if (!ddNotification) {
+            ddNotification=true;
+            ddTO=app.setTimeOut("ddAlertInBrowser()",250);
+        }
+        ddGoodVersion=false;
+    } else {
+        if (app.viewerType == "Reader" && app.viewerVersion<11) {
+            if (!ddNotification) {
+                ddNotification=true;
+                ddTO=app.setTimeOut("ddAlertBadApp()",250);
+            }
+            ddGoodVersion=false;
+        }
+    }
+}
+function ddPageOpen(page) {
+    var bDDInit=false;
+    if (!aDDPageCtrl[page]) {
+        var bDDInit=true;
+        aDDPageCtrl[page]=true;
+    }
+    if (bDDInit) {
+console.println("Executing ddPageOpen for page "+(page+1));
+        this.syncAnnotScan();
+        var stamps=this.getAnnots(page);
+        if (stamps==null) return;
+        for (var i=0; i<stamps.length; i++) {
+            var si=stamps[i];
+            if ( si.type=="Stamp") {
+                var index=si.subject+page;
+                if (typeof oDADStamp[index]=="undefined" ) {
+                    oDADStamp[index]=new Array();
+                    oDADCnt[index]=[0,0];
+                    oDADAlerts[si.subject]=new Object();
+                    oDADAlerts[si.subject].oAlrtChk={bAfterValue:false};
+                }
+                oDADStamp[index][si.AP]=[si.rect, false];
+            }
+        }
+    } else console.println("Bypassing ddPageOpen for page "+page);
+}
+function resetFocus(fname) {
+    this.getField(fname).setFocus();
+}
+var gDDStats=new Object();
+var ddStats=new Object();
+function ddCorrectAction(event,ddName) {
+    var page = event.target.page;
+    oDADCnt[ddName+page][0] += 1;
+    oDADCnt[ddName+page][1] += 1;
+    gDDStats[ddName]={nCorrect: oDADCnt[ddName+page][0],
+        nTries: oDADCnt[ddName+page][1]};
+    ddStats=gDDStats[ddName];
+    if (typeof ddCustomCorrectAction == "function")
+        ddCustomCorrectAction(event,ddName);
+    else
+        ddCorrectActionDef(event,ddName);
+}
+function ddCorrectActionDef(event,ddName) {
+    if (!oDADAlerts[ddName].oAlrtChk.bAfterValue)
+        app.alert({cMsg: \ddRightMsg, nIcon: 3,
+            cTitle: "AeB DAD Matching",
+            oCheckbox:oDADAlerts[ddName].oAlrtChk});
+}
+function ddWrongAction(event,ddName) {
+    var page = event.target.page;
+    oDADCnt[ddName+page][1] += 1;
+    gDDStats[ddName]={nCorrect: oDADCnt[ddName+page][0],
+        nTries: oDADCnt[ddName+page][1]};
+    ddStats=gDDStats[ddName];
+    if (typeof ddCustomWrongAction == "function")
+        ddCustomWrongAction(event,ddName);
+    else
+        ddWrongActionDef(event,ddName);
+}
+function ddWrongActionDef(event,ddName) {
+    if (!oDADAlerts[ddName].oAlrtChk.bAfterValue)
+        app.alert({cMsg: \ddWrongMsg, nIcon:0,
+            cTitle: "AeB DAD Matching",
+            oCheckbox:oDADAlerts[ddName].oAlrtChk});
+        else
+            app.beep(4);
+}
+\end{insDLJS}
+\catcode`\_=\dad@subCat
+\endinput
+%%
+%% End of file `aeb_dad.sty'.

@@ -15,3 +15,20 @@ $special{'pcarl'}       = '&donormal';
 $special{'mathstone'}   = '&MAKEflatten';
 $special{'spark-otf'}   = '&MAKEflatten';
 $special{'opacity-pro'} = '&donormal';
+$special{'eq-save'}     = '&MAKEdps';
+$special{'fetchbibpes'} = '&MAKEdps';
+$special{'mkstmpdad'}   = '&MAKEdps';
+
+sub MAKEdps {
+  print "\t SPECIAL $package";
+
+  # sort of flatten, but not completely (keep the 'examples' subdir)
+  &xchdir($packagedir);
+  &SYSTEM('if [ -d doc ] ; then mv doc/* . && rmdir doc ; fi');
+  &SYSTEM('if [ -d docs ] ; then mv docs/* . && rmdir docs ; fi');
+
+  # now do the normal thing
+  &xchdir($RAW_DIR);
+  &donormal();
+}
+

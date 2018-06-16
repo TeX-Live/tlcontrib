@@ -1,0 +1,105 @@
+%%
+%% This is file `bibpes.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% bibpes.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bibpes.sty package,                                   %%
+%% Copyright (C) 2016  D. P. Story                       %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{bibpes}
+   [2016/04/19 v1.3 Import e-sword passages: TXT to DEF (dps)]
+\def\bibpesBody{\@ifnextchar\fi{\expandafter\bibpes@Body}
+    {\expandafter\endinput\bibpes@Body}}
+\def\bibpes@Body{\begin{document}
+\reportOnBibPes\readbackDefFile
+\end{document}}
+\RequirePackage{xkeyval}
+\define@key{bibpes.sty}{txtfilein}[]{\def\bpes@txtfilein{#1}}
+\define@key{bibpes.sty}{deffileout}[]{\def\bpes@deffileout{#1}}
+\define@key{bibpes.sty}{infolder}[]{\def\bpes@infolder{#1/}}
+\define@key{bibpes.sty}{outfolder}[]{\def\bpes@outfolder{#1/}}
+\let\bpes@txtfilein\@empty \let\bpes@deffileout\@empty
+\let\bpes@infolder\@empty \let\bpes@outfolder\@empty
+\newif\ifbibpes@dobuild \bibpes@dobuildtrue
+\DeclareOptionX{build}{\bibpes@dobuildtrue}
+\DeclareOptionX{!build}{\bibpes@dobuildfalse}
+\ProcessOptionsX
+\ifx\bpes@txtfilein\@empty
+    \PackageWarning{bibpes}{The txtfilein option is required}\fi
+\ifx\bpes@deffileout\@empty\edef\bpes@deffileout{\bpes@txtfilein}
+    \PackageInfo{bibpes}{The output file is named
+        \bpes@txtfilein.def}\fi
+\edef\bpes@txtfileinEXT{\ifx\bpes@txtfilein\@empty
+    <unspecified>\else\bpes@txtfilein\fi.txt}
+\edef\bpes@deffileoutEXT{\ifx\bpes@txtfilein\@empty
+    <unspecified>\else\bpes@deffileout\fi.def}
+\@ifundefined{CommentStream}{\newwrite\CommentStream}{}
+\immediate\openout\CommentStream report.cut
+\immediate\write\CommentStream{Input file:
+    \string\texttt{\bpes@infolder\bpes@txtfileinEXT}}
+\immediate\write\CommentStream{Output file:
+    \string\texttt{\bpes@outfolder\bpes@deffileoutEXT}}
+\immediate\closeout\CommentStream
+\def\reportOnBibPes{\begin{flushleft}\catcode`\_=12\relax\obeylines
+    \parskip3pt
+    \InputIfFileExists{report.cut}{}{}
+    \end{flushleft}
+}
+\def\readbackDefFile{\begingroup\parindent0pt\parskip3pt
+    \def\BV(##1){\makebox[0pt][r]{##1\quad}\ignorespaces}%
+    \def\null{\par}%
+    \InputIfFileExists{\bpes@outfolder\bpes@deffileoutEXT}{}
+        {There is a problem locating the file
+         \texttt{\bpes@deffileoutEXT}\ifx\bpes@txtfilein\@empty.
+        (A value for the \texttt{txtfilein} package option key is
+        \emph{required}, but it was not given a value; hence its
+        value is considered \texttt{<unspecified>},
+        please correct.)\else. (Check the path to the specified file;
+        in particular, the value of \texttt{infolder} and/or
+        \texttt{outfolder} may be incorrect.)\fi}\endgroup
+}
+\ifbibpes@dobuild\else\endinput\fi
+\ifx\bpes@txtfilein\@empty\expandafter\endinput\fi
+\begingroup
+\newread \inbiblepassage
+\newwrite \outbiblepassage
+\newif\ifreadOK\readOKtrue
+\edef\bpes@in{\bpes@infolder\bpes@txtfileinEXT}
+\edef\bpes@out{\bpes@outfolder\bpes@deffileoutEXT}
+\immediate\openin\inbiblepassage=\bpes@in
+\immediate\openout\outbiblepassage=\bpes@out
+\endlinechar=-1
+\def\iwo{\immediate\write\outbiblepassage}
+\def\FN{Filename: }\def\CO{Created on }\def\CF{From file: }
+{\uccode`c=`\%\uppercase{%
+      \iwo{cc}%
+      \iwo{cc\space \FN\bpes@deffileoutEXT}%
+      \iwo{cc\space \CO\today}%
+      \iwo{cc\space \CF\bpes@txtfileinEXT}%
+      \iwo{cc}%
+}}
+\loop
+    \read\inbiblepassage to \biblepassage
+    \ifeof\inbiblepassage\readOKfalse
+    \else\ifx\biblepassage\@empty\else
+        \iwo{\string\BV\biblepassage\string\null}
+    \fi\fi
+\ifreadOK\repeat
+\immediate\closeout\outbiblepassage
+\immediate\closein\inbiblepassage
+\endgroup
+\endinput
+%%
+%% End of file `bibpes.sty'.

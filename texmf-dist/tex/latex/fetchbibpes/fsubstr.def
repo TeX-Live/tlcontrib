@@ -1,0 +1,195 @@
+%%
+%% This is file `fsubstr.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% fetchbibpes.dtx  (with options: `copyright,fsubstr')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% fetchbibpes.sty package,                              %%
+%% Copyright (C) 2016--2018                              %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\define@key{fbpesvprts}{marks}[]{\fp@cntArgs#1\stop@rg
+  \xdef\nMarks{\fp@nReplace}\def\fbpesvprts@marks{#1}%
+  \def\fbpes@replace{#1{}}}
+\let\fbpesvprts@marks\@empty
+\define@key{fbpesvprts}{name}[]{\def\@rgi{#1}%
+  \ifx\@rgi\@empty\else
+    \@ifundefined{mvname#1}{\global\csarg\let{mvname#1}\null
+      \def\fbpesvprts@name{#1}}
+        {\PackageError{fetchbibpes}{%
+          The value assigned for the `name' key\MessageBreak
+          is already in use, choose another}
+          {Assign a value for `name' in \string\markverse}%
+    }%
+  \fi
+}
+\define@key{fbpesfsubstr}{name}[]{\def\@rgi{#1}%
+  \ifx\@rgi\@empty\else
+    \@ifundefined{mvname#1}{% Not declared earlier by \markverse
+      \PackageError{fetchbibpes}{%
+        The value `#1' has not been assigned earlier\MessageBreak
+        for the `name' key in \string\markverse}
+        {You've possibly mistyped the name,
+        or `name=#1'\MessageBreak was not declared earlier
+        in a \string\markverse\space command}%
+    }{\def\fbpesvprts@name{#1}}%
+  \fi
+}
+\define@key{fbpesfsubstr}{begin}[]{\def\fbpesvprts@begin{#1}}
+\let\fbpesvprts@begin\@empty
+\define@key{fbpesfsubstr}{end}[]{\def\fbpesvprts@end{#1}}
+\let\fbpesvprts@end\@empty
+\let\fbpesvprts@name\@empty
+\def\fb@removeBook#1 #2\@nil{%
+  \fb@get@chptverse{iftrue}#2\@nil
+}
+\def\fp@getOne#1#2\@nil{\def\fp@FT{#1}\def\fbpes@replace{#2}}%
+\let\bMrkFP\relax \let\eMrkFP\relax
+\newif\iffirstgr@b \firstgr@btrue
+\newwrite\bvout
+\long\def\gr@bSegment#1\bMrkFP#2\eMrkFP#3\@nil{%
+  \csarg\gdef{\fbpesvprts@name\thisIndex}{#2}%
+  \def\fb@passage{#3}% #1#3
+  \writeToJobnameBV
+}
+\def\writeSubstrNotFound{%
+  \csarg\gdef{\fbpesvprts@name\thisIndex}{\expandafter
+    \string\fb@qq(alt=\fbpesvprts@name\thisIndex:
+    substring not identified)\expandafter\string
+    \fb@qq}\writeToJobnameBV
+}
+\let\wrtToJBV\fb@NO
+\def\writeToJobnameBV{%
+    \iffirstgr@b
+        \global\let\wrtToJBV\fb@YES
+        \immediate\openout\bvout \jobname-bv.cut
+        \immediate\write\bvout{\string\begin{declareBVs*}}\fi
+    \global\firstgr@bfalse
+    \immediate\write\bvout{\string
+      \BV(\bib@ver\space\fbpesvprts@name\thisIndex)
+    \@nameuse{\fbpesvprts@name\thisIndex}\string\null}%
+}
+\newcommand\markverse[2][]{\bgroup
+  \setkeys{fbpesvprts,fbpes}{#1}%
+  \ifx\fbpesvprts@name\@empty
+    \PackageError{fetchbibpes}{%
+    You have not specified a value\MessageBreak
+    for the name key, please fix}{}\fi
+  \ifx\fbpesvprts@marks\@empty
+    \PackageWarning{fetchbibpes}{%
+    You have not specified any values\MessageBreak
+    for the marks key, please fix.\MessageBreak
+    Meanwhile, I'll set marks={}{}}%
+    \xdef\nMarks{2}\def\fbpesvprts@marks{{}{}}%
+    \def\fbpes@replace{{}{}{}}\fi
+  \fb@getBookAPassage#2\@nil
+  \fb@removeBook#2\@nil
+  \ifnum\fb@verseStart=\fb@verseEnd\relax\else
+    \PackageWarning{fetchbibpes}{You've specified multiple verses
+    (\fb@verseStart-\fb@verseEnd).\MessageBreak
+    The command \string\markverse\space
+    supports only a single verse.\MessageBreak
+    Will set the End verse equal to the Start verse\MessageBreak
+    and continue}\edef\fb@verseEnd{\fb@verseStart}%
+  \fi
+  \@tempcnta\fb@verseEnd\relax
+  \advance\@tempcnta\@ne
+  \edef\fb@verseEnd{\the\@tempcnta}%
+  \@tempcnta\fb@verseStart\relax
+  \let\fbpes@alt\@empty % the alt key is not supported
+  \@whilenum\@tempcnta<\fb@verseEnd\relax\do{%
+    \edef\bib@ver{\bib@book\space
+      \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+    \@ifundefined{\bib@ver}{%
+      \ifx\fbpes@alt\@empty\else
+        \ifuseoldalt\else
+          \edef\bib@ver{\bib@book\space
+            \bib@chpt:\the\@tempcnta\fbpes@from}\fi
+          \@ifundefined{\bib@ver}{%
+            \edef\bib@ver{\bib@book\space
+            \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+          }{%
+              \PackageWarning{fetchbibpes}{An alt value
+              of\fbpes@alt\space is specified.
+              \MessageBreak The verse '\bib@ver\fbpes@alt'
+              is undefined,\MessageBreak using
+              '\bib@ver' instead}%
+          }%
+      \fi
+    }{}%
+    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}
+    {%
+      \fp@loopformarks
+    }\advance\@tempcnta\@ne
+    \iffound@ltstarstop\let\fbpes@alt\@empty\fi
+  }%\@whildnum
+  \egroup
+}
+\let\markverseIn\markverse
+\newcommand\fetchsubstrOf[2][]{%
+  \setkeys{fbpesfsubstr}{#1}%
+  \fbpesvprts@begin\@nameuse{\fbpesvprts@name#2}\fbpesvprts@end
+}
+\def\fp@loopformarks{%
+  \@tempcntb\nMarks\relax
+  \multiply\@tempcntb\tw@\relax
+  \let\repl@cep@ssage\@empty
+  \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
+  \let\@@protect\protect
+  \let\protect\@unexpandable@protect
+  \let\fbpes@replace@save\fbpes@replace
+  \advance\@tempcntb\@ne
+  \edef\fp@cnt{\the\@tempcntb}\@tempcntb1\relax
+  \let\fb@passage@SAVE\fb@passage
+  \@whilenum\@tempcntb<\fp@cnt\do
+  {%
+    \expandafter\fp@getOne\fbpes@replace\@nil
+    \protected@edef\fb@@tmp{\noexpand
+        \fb@replace*{\fb@passage}}%
+    \ifodd\@tempcntb\relax
+      \edef\cntahold{\the\@tempcntb}%
+      \advance\@tempcntb\@ne
+      \divide\@tempcntb\tw@\relax
+      \xdef\thisIndex{\the\@tempcntb}%
+      \@tempcntb\cntahold\relax
+      \let\fb@foundNum\fb@Zero
+      \ifx\fp@FT\@empty
+        \expandafter\def\expandafter\fb@passage\expandafter
+            {\expandafter\bMrkFP\fb@passage}%
+        \let\fb@foundNum\fb@One
+      \else
+        \protected@edef\x{%
+          \noexpand\fb@@tmp{\fp@FT}{\bMrkFP\fp@FT}}\x
+            \iffb@doreplace\let\fb@foundNum\fb@One\fi
+      \fi
+    \else
+      \protected@edef\x{%
+      \noexpand\fb@@tmp{\fp@FT}{\fp@FT\eMrkFP}}\x
+      \iffb@doreplace\if\fb@foundNum\fb@One
+        \let\fb@foundNum\fb@Two\fi\fi
+    \fi
+    \ifodd\@tempcntb\else
+      \if\fb@foundNum\fb@Two\expandafter
+        \gr@bSegment\fb@passage\bMrkFP\eMrkFP\@nil
+      \else
+        \let\fb@passage\fb@passage@SAVE
+        \writeSubstrNotFound
+      \fi
+    \fi
+    \advance\@tempcntb\@ne
+  }% \@whilenum
+  \let\fbpes@replace\fbpes@replace@save
+  \set@typeset@protect
+}
+\endinput
+%%
+%% End of file `fsubstr.def'.

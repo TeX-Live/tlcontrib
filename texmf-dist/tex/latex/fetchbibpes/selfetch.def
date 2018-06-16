@@ -1,0 +1,84 @@
+%%
+%% This is file `selfetch.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% fetchbibpes.dtx  (with options: `copyright,sf')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% fetchbibpes.sty package,                              %%
+%% Copyright (C) 2016--2018                              %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\fb@gobbletonull#1\null{}
+\define@key{sel@verses}{onlyverses}{\def\sel@verses@onlyverses{#1}%
+  \parsefetchargfalse\fb@getBookAPassage#1 \@nil\parsefetchargtrue
+  \ifx\bib@passage\@empty
+  \else
+    \expandafter\fb@StrpSpcAftrBk\bib@passage \@nil
+  \fi
+}
+\let\sel@verses@onlyverses\@empty
+\def\fb@StrpSpcAftrBk#1 \@nil{\edef\bib@passage{#1}}
+\newif\iffb@fromused \fb@fromusedfalse
+\define@key{sel@verses}{from}{\fb@fromusedtrue
+    \def\@argi{#1}\ifx\@argi\@empty
+    \edef\sel@verses@from{ \fb@defaultBible}\else
+    \def\sel@verses@from{ #1}\fi}
+\edef\sel@verses@from{ \fb@defaultBible}%
+\define@key{sel@verses}{alt}{\def\sel@verses@alt{ #1}}
+\let\sel@verses@alt\@empty
+\def\selectedVersesFrom#1{%
+    \@tfor\@rg:=#1\do{%
+        \let\sel@verses@alt\@empty
+        \edef\sel@verses@from{ \fb@defaultBible}%
+        \edef\setkeysExp{\noexpand\setkeys{sel@verses}{\@rg}}\setkeysExp
+        \expandafter\fb@doInvLUAsNeeded\bib@book\@nil
+        \ifx\bib@passage\@empty\else
+        \expandafter\fb@getverses\expandafter{\bib@passage}\fi
+        \csarg\def{selb@\bib@book\sel@verses@from\sel@verses@alt}{}%
+        \ifx\sel@verses@alt\@empty\else
+        \csarg\def{selb@\bib@book\sel@verses@from}{}\fi
+    }%
+}
+\let\fb@BV\BV
+\def\BV(#1){\parsefetchargfalse\fb@getBookAPassage#1\@nil
+  \parsefetchargtrue\edef\bib@passage@exp{\bib@passage\space}%
+  \expandafter\fb@gettransl\bib@passage@exp\@nil
+  \@ifundefined{selb@\bib@book\bib@transl}
+    {\def\fb@next{\fb@BV(#1)}} % not a selected book
+    {%
+        \@ifundefined{sel@#1}
+        {\let\fb@next\fb@gobbletonull}
+        {\def\fb@next{\fb@BV(#1)}}%
+    }\fb@next
+}
+\def\fb@getPassageFrom#1 #2\@nil{\def\bib@passage{#1}\def\bib@from{#2}}
+\def\bib@transl@trimtrailspce#1 \@nil{\def\bib@transl{ #1}}
+\def\fb@gettransl#1 #2\@nil{% 1:1 ISV vs just 1:1
+  \def\bib@transl{#2}\ifx\bib@transl\@empty
+    \let\bib@transl\@empty\else
+    \bib@transl@trimtrailspce#2\@nil\fi}
+\def\fb@getverses#1{% 1:1-5,3:3-8
+  \@for\fb@versesvar:=#1\do{\fb@rmvspcsp{\fb@versesvar}\expandafter
+    \fb@markeach\expandafter{\fb@versesvar}}}
+\def\fb@markeach#1{%
+  \parsefetchargfalse\fb@get@chptverse{iftrue}#1\@nil\parsefetchargtrue
+  \@tempcnta\fb@verseEnd\relax
+  \advance\@tempcnta\@ne
+  \edef\fb@verseEndpi{\the\@tempcnta}%
+  \@tempcnta\fb@verseStart\relax
+  \@whilenum{\@tempcnta<\fb@verseEndpi\relax}\do
+    {\csarg\edef{sel@\bib@book\space
+      \bib@chpt:\the\@tempcnta\sel@verses@from\sel@verses@alt}{}
+      \advance\@tempcnta\@ne}}
+\endinput
+%%
+%% End of file `selfetch.def'.

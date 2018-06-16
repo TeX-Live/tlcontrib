@@ -1,0 +1,744 @@
+%%
+%% This is file `fetchbibpes.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% fetchbibpes.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% fetchbibpes.sty package,                              %%
+%% Copyright (C) 2016--2018                              %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{fetchbibpes}
+ [2018/03/21 v2.4.1 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+\RequirePackage{xkeyval}
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\let\fb@Zero=0 \let\fb@One=1 \let\fb@Two=2
+\define@key{fetchbibpes.sty}{deffolder}{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\fb@deffolder\@empty\else\def\fb@deffolder{#1/}\fi}
+\let\fb@deffolder\@empty
+\define@key{fetchbibpes.sty}{useverses}[]{\def\fbpes@useverses{#1}}
+\let\fbpes@useverses\@empty
+\define@key{fetchbibpes.sty}{useselverses}[]{%
+    \AtEndOfPackage{\InputIfFileExists{selfetch.def}
+    {\fetchInputMsg}{\fetchWarningMsg}}%
+}
+\def\fetchInputMsg{\PackageInfo{fetchbibpes}
+    {useselverses option,\MessageBreak
+        inputting file selfetch.def}}
+\def\fetchWarningMsg{\PackageWarning{fetchbibpes}
+    {useselverses option,\MessageBreak
+        cannot find file selfetch.def}}
+\define@key{fetchbibpes.sty}{usesr}[]{%
+    \AtEndOfPackage{\InputIfFileExists{sr.def}
+    {\srInputMsg}{\srWarningMsg}}%
+}
+\def\srInputMsg{\PackageInfo{fetchbibpes}
+    {usesr option detected, inputting file sr.def}}
+\def\srWarningMsg{\PackageWarning{fetchbibpes}
+    {usesr option detected, cannot find file sr.def}}
+\newif\iffetchsubstr \fetchsubstrfalse
+\newif\ifparsefetcharg \parsefetchargtrue
+\define@key{fetchbibpes.sty}{fetchsubstr}[]{\fetchsubstrtrue
+    \AtEndOfPackage{\InputIfFileExists{fsubstr.def}
+    {\fsbstrInputMsg}{\fsbstrWarningMsg}}%
+}
+\define@key{fetchbibpes.sty}{fetchsubtr}[]%
+  {\ExecuteOptionsX{fetchsubstr}}
+\def\fsbstrInputMsg{\PackageInfo{fetchbibpes}
+    {fetchsubtr option detected, inputting file fsubstr.def}}
+\def\fsbstrWarningMsg{\PackageWarning{fetchbibpes}
+    {fetchsubtr option detected, cannot find file fsubstr.def}}
+\newif\iffb@ignorecfg \fb@ignorecfgfalse
+\define@key{fetchbibpes.sty}{ignorecfg}[true]{\fb@ignorecfgtrue}
+\ProcessOptionsX
+\let\fb@NO=n
+\let\fb@YES=y
+\def\fbp@none{none}
+\ifx\fbpes@useverses\@empty
+    \PackageWarning{fetchbibpes}
+    {The useverses option is not present.\MessageBreak
+    At lease one DEF file is advised}
+\else
+    \ifx\fbpes@useverses\fbp@none\let\fbpes@useverses\@empty\fi
+\fi
+\def\BV(#1)#2 #3\null{\csarg\gdef{#1}{#3}}
+\newenvironment{declareBVs}{\cvrtdqs}{}
+\newenvironment{declareBVs*}{}{}
+\def\usePassage#1{\@nameuse{#1}}
+\iffetchsubstr
+    \AtEndDocument{%
+        \ifx\wrtToJBV\fb@YES
+        \immediate\write\bvout{\string\end{declareBVs*}}%
+        \immediate\closeout\bvout\fi}
+    \AtBeginDocument{\InputIfFileExists{\jobname-bv.cut}
+        {\PackageInfo{fetchbibpes}{Inputting \jobname-bv.cut}}
+        {\PackageInfo{fetchbibpes}{Cannot find \jobname-bv.cut}}}
+\fi
+\def\bookFmt#1#2#3#4{\csarg\def{bkfmt#1}{{#1}{#2}{#3}{#4}}}
+\bookFmt{Gen}{Genesis}{Gen\.}{Gn\.}
+\bookFmt{Exo}{Exodus}{Exod\.}{Ex\.}
+\bookFmt{Lev}{Leviticus}{Lev\.}{Lv}
+\bookFmt{Num}{Numbers}{Num\.}{Nb\.}
+\bookFmt{Deu}{Deuteronomy}{Deut\.}{Dt\.}
+\bookFmt{Jos}{Joshua}{Josh\.}{Jos\.}
+\bookFmt{Jdg}{Judges}{Judg\.}{Jg\.}
+\bookFmt{Rth}{Ruth}{Ruth}{Rt\.}
+\bookFmt{1Sa}{\1Samuel}{\1Sam\.}{\1S\.}
+\bookFmt{2Sa}{\2Samuel}{\2Sam\.}{\2S\.}
+\bookFmt{1Ki}{\1Kings}{\1Kgs\.}{\1K\.}
+\bookFmt{2Ki}{\2Kings}{\2Kgs\.}{\2K\.}
+\bookFmt{1Ch}{\1Chronicles}{\1Chr\.}{\1Ch\.}
+\bookFmt{2Ch}{\2Chronicles}{\2Chr\.}{\2Ch\.}
+\bookFmt{Ezr}{Ezra}{Ezra}{Ezr\.}
+\bookFmt{Neh}{Nehemiah}{Neh\.}{Ne\.}
+\bookFmt{Est}{Esther}{Esther}{Est\.}
+\bookFmt{Job}{Job}{Job}{Jb\.}
+\bookFmt{Psa}{Psalms}{Ps\.}{Ps\.}
+\bookFmt{Pro}{Proverbs}{Prov\.}{Pr\.}
+\bookFmt{Ecc}{Ecclesiastes}{Eccles\.}{Ecc\.}
+\bookFmt{Son}{Song of Solomon}{Song\.}{Sng\.}
+\bookFmt{Isa}{Isaiah}{Isa\.}{Is\.}
+\bookFmt{Jer}{Jeremiah}{Jer\.}{Jr\.}
+\bookFmt{Lam}{Lamentations}{Lam\.}{La\.}
+\bookFmt{Eze}{Ezekiel}{Ezek\.}{Ezk\.}
+\bookFmt{Dan}{Daniel}{Dan\.}{Dn}
+\bookFmt{Hos}{Hosea}{Hos\.}{Ho\.}
+\bookFmt{Joe}{Joel}{Joel}{Jl\.}
+\bookFmt{Amo}{Amos}{Amos}{Am\.}
+\bookFmt{Oba}{Obadiah}{Obad\.}{Ob\.}
+\bookFmt{Jon}{Jonah}{Jonah}{Jon\.}
+\bookFmt{Mic}{Micha}{Mic\.}{Mi\.}
+\bookFmt{Nah}{Nahum}{Nah\.}{Na\.}
+\bookFmt{Hab}{Habakkuk}{Hab\.}{Hab,}
+\bookFmt{Zep}{Zephaniah}{Zeph\.}{Zp\.}
+\bookFmt{Hag}{Haggai}{Hag\.}{Hg\.}
+\bookFmt{Zec}{Zechariah}{Zech\.}{Zc\.}
+\bookFmt{Mal}{Malachi}{Mal\.}{Ml\.}
+\bookFmt{Mat}{Matthew}{Matt\.}{Mt\.}
+\bookFmt{Mar}{Mark}{Mark}{Mk\.}
+\bookFmt{Luk}{Luke}{Luke}{Lk\.}
+\bookFmt{Joh}{John}{John}{Jn\.}
+\bookFmt{Act}{Acts}{Acts}{Ac\.}
+\bookFmt{Rom}{Romans}{Rom\.}{Rm\.}
+\bookFmt{1Co}{\1Corinthians}{\1Cor\.}{\1Co\.}
+\bookFmt{2Co}{\2Corinthians}{\2Cor\.}{\2Co\.}
+\bookFmt{Gal}{Galatians}{Gal\.}{Ga\.}
+\bookFmt{Eph}{Ephesians}{Eph\.}{Ep\.}
+\bookFmt{Php}{Philippians}{Phil\.}{Ph\.}
+\bookFmt{Col}{Colossians}{Col\.}{Col\.}
+\bookFmt{1Th}{\1Thessalonians}{\1Thess\.}{\1Th\.}
+\bookFmt{2Th}{\2Thessalonians}{\2Thess\.}{\2Th\.}
+\bookFmt{1Ti}{\1Timothy}{\1Tim\.}{\1Tm\.}
+\bookFmt{2Ti}{\2Timothy}{\2Tim\.}{\2Tm\.}
+\bookFmt{Tit}{Titus}{Tit\.}{Tt\.}
+\bookFmt{Phm}{Philemon}{Philem\.}{Phm\.}
+\bookFmt{Heb}{Hebrews}{Heb\.}{Heb\.}
+\bookFmt{Jas}{James}{Jas\.}{Jm\.}
+\bookFmt{1Pe}{\1Peter}{\1Pet\.}{\1P\.}
+\bookFmt{2Pe}{\2Peter}{\2Pet\.}{\2P\.}
+\bookFmt{1Jn}{\1John}{\1John}{\1Jn\.}
+\bookFmt{2Jn}{\2John}{\2John}{\2Jn\.}
+\bookFmt{3Jn}{\3John}{\3John}{\3Jn\.}
+\bookFmt{Jud}{Jude}{Jude}{Jude}
+\bookFmt{Rev}{Revelation}{Rev\.}{Rv\.}
+\define@choicekey+{fbpes}{abbr}[\val\nr]%
+    {esword,none,long,short}[esword]{%
+    \ifcase\nr\relax
+        \def\fbpes@abbr{\ioiv}\or
+        \def\fbpes@abbr{\iioiv}\or
+        \def\fbpes@abbr{\iiioiv}\or
+        \def\fbpes@abbr{\ivoiv}\fi
+}{}
+\define@boolkey{fbpes}{roman}[true]{\ifKV@fbpes@roman
+    \def\fb@numi{I}\def\fb@numii{II}\def\fb@numiii{III}\else
+    \def\fb@numi{1}\def\fb@numii{2}\def\fb@numiii{3}\fi
+}
+\newif\if@ddtoBiblesUsed \@ddtoBiblesUsedfalse
+\newcommand{\defaultBible}[1]{\def\@rg{#1}\ifx\@rg\@empty
+    \else\def\fb@defaultBible{#1}\def\fbpes@from{ #1}\fi}
+\defaultBible{KJV}
+\newcommand\addtoBibles[1]{%
+    \def\@rgi{#1}\ifx\@rgi\@empty\else
+    \global\@ddtoBiblesUsedtrue\fi
+    \define@choicekey+{bibadd}{addfrom}[\val\nr]{#1}{}
+        {\PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
+        will use \fb@defaultBible\space instead}%
+        \edef\fbpes@from{ \fb@defaultBible}}%
+}
+\@onlypreamble\addtoBibles
+\define@choicekey+{fbpes}{from}[\val\nr]%
+    {KJV,KJV+,ISV}[KJV]{%
+    \ifcase\nr\relax
+        \def\fbpes@from{ KJV}\or
+        \def\fbpes@from{ KJV+}\or
+        \def\fbpes@from{ ISV}\fi
+}{%
+    \if@ddtoBiblesUsed
+        \def\fbpes@from{ #1}\setkeys{bibadd}{addfrom=#1}\else
+        \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
+        will use \fb@defaultBible\space instead}%
+        \edef\fbpes@from{ \fb@defaultBible}\fi
+}
+\define@key{fbpes}{transl}[]{\def\fbpes@transl{#1}%
+    \ifx\fbpes@transl\@empty\else\edef\fbpes@transl{\space#1}\fi}
+\let\fbpes@transl\@empty
+\define@key{fbpes}{from*}[]{\setkeys{fbpes}{from=#1,transl=#1}}
+\newif\iffbpes@altstar\fbpes@altstarfalse
+\newif\ifuseoldalt \useoldaltfalse
+\def\useOldAlt{\useoldalttrue}
+\def\useNewAlt{\useoldaltfalse}
+\define@key{fbpes}{alt}[]{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\fbpes@alt\@empty\else\def\fbpes@alt{ #1}\fi}
+\let\fbpes@alt\@empty
+\define@key{fbpes}{alt*}[]{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\fbpes@altstar\@empty\else\def\fbpes@altstar{#1}\fi}
+\let\fbpes@altstar\@empty
+\define@key{fbpes}{delims}[]{\def\fbp@getDelims{#1}%
+    \ifx\fbp@getDelims\@empty\let\l@fbp@delim\@empty
+    \let\r@fbp@delim\@empty\else
+    \fbp@getDelimsi#1\@nil\fi}
+\def\fbp@getDelimsi#1#2#3\@nil{\def\@rgiii{#3}\ifx\@rgiii\@empty
+    \def\l@fbp@delim{#1}\def\r@fbp@delim{#2}\else
+    \PackageWarning{fetchbibpes}{Only two delimiters expected, using the
+    defaults of '()'}\def\l@fbp@delim{(}\def\r@fbp@delim{)}\fi}
+\def\l@fbp@delim{(}\def\r@fbp@delim{)}
+\define@key{fbpes}{enclosewith}[]{\def\fbp@getEnclose{#1}%
+    \def\quote{{``}{''}}%
+    \ifx\fbp@getEnclose\@empty\let\l@fbp@enclose\@empty
+    \let\r@fbp@enclose\@empty\else
+    \expandafter\fbp@getEnclosei#1\@nil\fi}
+\def\fbp@getEnclosei#1#2#3\@nil{\def\@rgiii{#3}\ifx\@rgiii\@empty
+    \def\l@fbp@enclose{#1}\def\r@fbp@enclose{#2}\else
+    \PackageWarning{fetchbibpes}{Only two tokens expected, using the
+    defaults of ''}\let\l@fbp@enclose\@empty
+    \let\r@fbp@enclose\@empty\fi}
+\let\l@fbp@enclose\@empty\let\r@fbp@enclose\@empty
+\define@key{fbpes}{format}{\def\fbp@format{#1}}
+\let\fbp@format\relax
+\newif\ifNotL@TeXQuotes \NotL@TeXQuotestrue
+\def\LaTeXQuotesOn{\NotL@TeXQuotesfalse}
+\def\LaTeXQuotesOff{\NotL@TeXQuotestrue}
+\define@key{fbpes}{ltxquotes}[]{\NotL@TeXQuotesfalse}
+\define@key{fbpes}{replace}[]{\fp@cntArgs#1\stop@rg
+    \def\fbpes@replace{#1}}
+\let\stop@rg\relax\def\st@p@arg{\stop@rg}%
+\def\fp@cntArgs#1\stop@rg{\bgroup\@tempcnta\z@
+    \fp@cntArgs@i#1\stop@rg}
+\def\fp@cntArgs@i#1{\def\arg@i{#1}%
+    \ifx\arg@i\st@p@arg
+        \ifodd\@tempcnta\PackageError{fetchbibpes}{You've supplied
+        an odd number of values for\MessageBreak
+        replace key. I was expecting an even number}{}\fi
+        \divide\@tempcnta2\relax
+        \xdef\fp@nReplace{\the\@tempcnta}%
+        \let\fb@next\egroup
+    \else
+        \advance\@tempcnta\@ne
+        \def\fb@next{\fp@cntArgs@i}%
+    \fi\fb@next
+}
+\let\fbpes@replace\@empty
+\let\repl@cep@ssage\@empty
+\newif\iffb@silentreplace \fb@silentreplacefalse
+\newif\iffb@doreplace \fb@doreplacefalse
+\def\isstopreplace#1{\istopreplacei#1\stoprepl@ce\@nil}
+\def\istopreplacei#1\stoprepl@ce#2\@nil{\def\fb@rgi{#1}\def\fb@rgii{#2}%
+    \ifx\fb@rgii\@empty\let\stoprepl@cehere\fb@Zero\else
+        \let\stoprepl@cehere\fb@One\fi}
+\def\gobbleto#1#2{\def#2##1#1{}}
+\def\fb@replace{\@ifstar{\fb@silentreplacetrue\fb@replace@i} %
+    {\fb@silentreplacefalse\fb@replace@i}}
+\def\fb@replace@i#1#2#3{\let\repl@cep@ssage\@empty
+    \global\fb@doreplacefalse
+    \iffb@silentreplace
+        \def\fb@gettoNext##1#2{\isstopreplace{##1}%
+            \ifx\stoprepl@cehere1\relax
+                \expandafter\g@addto@macro\expandafter
+                    \repl@cep@ssage\expandafter{\fb@rgi}%
+                \def\fb@next{\let\fb@passage\repl@cep@ssage}%
+            \else
+                \global\fb@doreplacetrue
+                \def\fb@next{\g@addto@macro\repl@cep@ssage{##1#3}%
+                    \fb@gettoNext}\fi
+            \fb@next}%
+    \else
+        \def\fb@gettoNext##1#2{##1#3\fb@gettoNext}%
+    \fi
+    \expandafter\fb@gettoNext#1\stoprepl@ce#2}
+\def\stoprepl@ce#1\fb@gettoNext{}
+\define@key{fbpes}{pcolor}[]{\def\fbp@pcolor{#1}}
+\let\fbp@pcolor\@empty
+\define@key{fbpes}{pformat}[]{\def\fbp@pformat{#1}}
+\let\fbp@pformat\@empty
+\define@boolkey{fbpes}{caps}[true]{\ifKV@fbpes@caps
+    \def\fbpes@case{\uppercase}\else
+    \let\fbpes@case\relax\fi
+}
+\let\fbpes@case\relax
+\define@boolkey{fbpes}{showfirst}[true]{}
+\KV@fbpes@showfirstfalse
+\define@key{fbpes}{shownone}[]{\let\verseFmt\@gobble}
+\define@boolkey{fbpes}{useperiod}[true]{%
+    \ifKV@fbpes@useperiod\def\fbp@period{.}\else\def\fbp@period{}\fi
+}
+\def\fbp@period{.}
+\KV@fbpes@useperiodtrue
+\define@boolkey{fbpes}{citeatend}[true]{}
+\define@boolkey{fbpes}{nocite}[true]{}
+\define@key{fbpes}{priorref}{\long\def\fbpes@priorref{#1}}
+\let\fbpes@priorref\relax
+\define@key{fbpes}{localdefs}[]{\def\fbpes@localdefs{#1}}
+\let\fbpes@localdefs\@empty
+\long\def\priorRefSpc#1{\def\fbp@priorRefSpc{#1}}
+\def\fbp@priorRefSpc{\space}
+\def\fbFitItIn{\noindent\unskip\nobreak\hfill\penalty100
+    \hskip1em\hbox{}\nobreak\hfill}%
+\def\fbFillRght{\hfil\break\null\hfill}
+\def\useBookStyle#1{%
+    \def\fp@SK{\setkeys{fbpes}}\expandafter\fp@SK\expandafter{#1}}
+\useBookStyle{abbr,roman=false,from,transl}
+\def\ioiv#1#2#3#4{#1}\def\iioiv#1#2#3#4{\fbpes@case{#2}}
+\def\iiioiv#1#2#3#4{\fbpes@case{#3}}\def\ivoiv#1#2#3#4{\fbpes@case{#4}}
+\def\afterBookSpc#1{\def\fb@bksp{#1}}
+\def\resetAfterBookSpc{\afterBookSpc{\ }}
+\def\fb@bksp{\ }
+\long\def\afterRef#1{\def\@rgi{#1}\ifx\@rgi\@empty
+    \def\@fterRef{\space}\else
+    \def\@fterRef{#1}\fi}
+\afterRef{}
+\def\afterNumSpc#1{\def\@nmsspc{#1}}
+\def\@nmsspc{\space}
+\def\setNumStyle{\def\1{\fb@numi\@nmsspc}\def\2{\fb@numii\@nmsspc}%
+    \def\3{\fb@numiii\@nmsspc}}
+\newif\ifbookexists \bookexiststrue
+\def\fb@fmtBook#1{\edef\fb@fmtBookExp{\noexpand
+    \fbpes@abbr\@nameuse{bkfmt#1}}\fb@fmtBookExp}
+\def\fb@getBookAPassage#1 #2\@nil{\def\bib@book{#1}\def\bib@passage{#2}%
+  \ifparsefetcharg\adjbib@passage{iffalse}\fi\fb@doInvLUAsNeeded#1\@nil
+}
+\def\adjbib@passage#1{\edef\@tempexp{\noexpand
+  \fb@get@chptverse{#1}}\expandafter\@tempexp\bib@passage\@nil}%
+\def\fb@doInvLUAsNeeded#1#2#3#4\@nil{\def\@rg{#4}%
+    \ifx\@rg\@empty
+        \@ifundefined{bkfmt#1#2#3}\bookexistsfalse\bookexiststrue
+        \ifbookexists\else\def\bib@book{#1#2#3}%
+        \PackageWarning{fetchbibpes}{The book '\bib@book' is not
+            recognized,\MessageBreak possibly misspelled}\fi
+    \else
+        \@ifundefined{inv@#1#2#3#4}\bookexistsfalse\bookexiststrue
+        \ifbookexists
+            \edef\bib@book{\@nameuse{inv@#1#2#3#4}}\else
+            \def\bib@book{#1#2#3#4}\PackageWarning{fetchbibpes}
+                {The book '\bib@book' is not recognized,\MessageBreak
+                possibly misspelled}\fi
+    \fi}
+\newif\ifversestochend \versestochendfalse
+\def\fb@get@chptverse#1#2:#3\@nil{\def\bib@chpt{#2}\def\bib@verses{#3}%
+    \ifx\bib@chpt\@empty\def\bib@chpt{1}\fi
+    \fb@get@verses{#1}#3--\@nil}
+\def\fb@dash{-}
+\def\fb@get@verses#1#2-#3-#4\@nil{\@tempcnta=#2
+  \edef\fb@verseStart{\the\@tempcnta}\def\@rgii{#3}%
+  \fb@rmvspcsp{\@rgii}\def\@rgiii{#4}\versestochendfalse
+  \ifparsefetcharg
+    \ifx\@rgiii\@empty
+      \edef\bib@passage{\bib@chpt:\fb@verseStart}\else
+      \ifx\@rgii\@empty\ifx\@rgiii\fb@dash
+          \edef\bib@passage{\bib@chpt:\fb@verseStart-\@rgii}\else
+          \edef\bib@passage{\bib@chpt:\fb@verseStart}\fi
+      \else\edef\bib@passage{\bib@chpt:\fb@verseStart-\@rgii}\fi
+    \fi
+  \fi
+  \csname#1\endcsname
+    \ifx\@rgii\@empty
+      \ifx\@rgiii\fb@dash
+        \versestochendtrue
+        \def\fb@verseEnd{1000}\else
+        \def\fb@verseEnd{#2}\fi
+    \else\def\fb@verseEnd{#3}\fi
+  \fi
+}
+\newcommand\fb@qq{\textbf{??}}
+\def\fp@getTwo#1#2#3\@nil{\def\fp@FT{{#1}{#2}}\def\fbpes@replace{#3}}%
+\def\fp@looptoreplace{%
+        \@tempcntb\fp@nReplace\relax
+        \let\repl@cep@ssage\@empty
+        \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
+        \let\@@protect\protect
+        \let\protect\@unexpandable@protect
+        \let\fbpes@replace@save\fbpes@replace
+        \@whilenum\@tempcntb>\z@\do
+        {%
+            \expandafter\fp@getTwo\fbpes@replace\@nil
+            \protected@edef\fb@@tmp{\noexpand
+                \fb@replace*{\fb@passage}}%
+            \expandafter\fb@@tmp\fp@FT
+            \advance\@tempcntb\m@ne
+        }%
+        \let\fbpes@replace\fbpes@replace@save
+        \set@typeset@protect
+        \fb@passage
+}
+\newcommand\fetchverse[2][]{\bgroup\setNumStyle
+    \def\@rgi{#1}\ifx\@rgi\@empty\else\useBookStyle{#1}\fi
+    \let\.\fbp@period\fbpes@localdefs
+    \fb@getBookAPassage#2\@nil\fb@fetchverse
+    \edef\bib@ver{\bib@book\space\bib@passage\fbpes@from\fbpes@alt}%
+    \@ifundefined{\bib@ver}{%
+        \ifx\fbpes@alt\@empty\else
+            \ifuseoldalt\else
+                \edef\bib@ver{\bib@book\space
+                    \bib@passage\fbpes@from}\fi
+                \@ifundefined{\bib@ver}{%
+                    \edef\bib@ver{\bib@book\space
+                        \bib@passage\fbpes@from\fbpes@alt}%
+                }{%
+                    \PackageWarning{fetchbibpes}{An alt value
+                    of\fbpes@alt\space is specified.
+                    \MessageBreak The verse '\bib@ver\fbpes@alt'
+                    is undefined,\MessageBreak using
+                    '\bib@ver' instead}%
+                }%
+            \fi
+        }{%
+    }%
+    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}
+    {\bgroup
+        \fbp@pformat
+        \ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+        \l@fbp@enclose
+        \ifx\fbpes@replace\@empty\@nameuse{\bib@ver}\else
+            \fp@looptoreplace\fi
+        \r@fbp@enclose
+    \egroup}%
+    \ifKV@fbpes@citeatend
+        \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
+            \book@passage\fi}\fi\egroup
+}
+\def\fb@fetchverse{%
+  \ifbookexists
+    \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
+    \expandafter{\bib@book}\fb@bksp\bib@passage
+    \fbpes@transl\r@fbp@delim}%
+  \else
+    \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
+    \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}%
+  \fi
+  \ifKV@fbpes@citeatend\else
+    \fbpes@priorref{\ifKV@fbpes@nocite\else
+      \book@passage\fi}\@fterRef
+  \fi
+}
+\newcommand\fetchverses{\bgroup\setNumStyle
+  \@ifstar{\let\isitstar\fb@One\fb@fetchversesi}
+    {\let\isitstar\fb@Zero\fb@fetchversesi}}
+\newcommand\fb@fetchversesi[2][]{\def\@rgi{#1}\def\passagespec{#2}%
+  \ifx\@rgi\@empty\else
+    \useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
+    \ifx\fbpes@alt\@empty\else\PackageWarning{fetchbibpes}
+    {You have specified both alt* and alt,\MessageBreak
+     removing the alt key}\fi\fi\fi
+  \let\.\fbp@period\fbpes@localdefs
+  \fb@getBookAPassage#2\@nil\fb@fetchversesii#2\@nil}
+\def\fb@insrtvn{\ifnum\@tempcnta=\fb@verseStart\relax
+  \ifKV@fbpes@showfirst\verseFmt{\the\@tempcnta}\fi
+  \else\space\verseFmt{\the\@tempcnta}\fi}
+\def\fb@fetchversesii#1 #2\@nil{%
+  \ifbookexists
+    \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
+      \expandafter{\bib@book}\fb@bksp\bib@passage
+      \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}\else
+    \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
+      \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}\fi
+  \if\isitstar\fb@One\ifKV@fbpes@citeatend\else
+    \fbpes@priorref{\book@passage}\@fterRef\fi\fi
+  \fb@get@chptverse{iftrue}#2\@nil
+  \@tempcnta\fb@verseEnd\relax
+  \advance\@tempcnta\@ne
+  \edef\fb@verseEnd{\the\@tempcnta}%
+  \@tempcnta\fb@verseStart\relax
+  \bgroup\fbp@pformat\ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+  \l@fbp@enclose
+  \ifx\fbpes@altstar\@empty\fbpes@altstarfalse
+    \else\fbpes@altstartrue\fi
+  \@whilenum\@tempcnta<\fb@verseEnd\do{%\fb@insrtvn
+  \iffbpes@altstar\fb@getnextalt\fi
+  \@fterVerseFmt{\the\@tempcnta}\edef\bib@ver{\bib@book\space
+      \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+    \@ifundefined{\bib@ver}{%
+      \ifx\fbpes@alt\@empty\else
+        \ifuseoldalt\else
+          \edef\bib@ver{\bib@book\space
+            \bib@chpt:\the\@tempcnta\fbpes@from}\fi
+        \@ifundefined{\bib@ver}{%
+          \edef\bib@ver{\bib@book\space
+            \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+        }{%
+          \PackageWarning{fetchbibpes}{An alt value
+          of\fbpes@alt\space is specified.
+          \MessageBreak The verse '\bib@ver\fbpes@alt'
+          is undefined,\MessageBreak using
+          '\bib@ver' instead}%
+        }%
+      \fi
+    }{%
+    }%
+      \@ifundefined{\bib@ver}{%
+        \ifversestochend
+          \advance\@tempcnta\m@ne
+          \immediate\write\@auxout{\string\csarg\string
+            \gdef{\passagespec}{\the\@tempcnta}}%
+          \@tempcnta\fb@verseEnd\else
+          \fb@insrtvn\fb@qq(\bib@ver)\fb@qq\fi
+        }{\bgroup\fb@insrtvn
+          \ifx\fbpes@replace\@empty
+            \@nameuse{\bib@ver}\else
+            \fp@looptoreplace\fi
+          \egroup
+        }\advance\@tempcnta\@ne
+    \iffound@ltstarstop\let\fbpes@alt\@empty\fi
+  }\r@fbp@enclose\egroup
+  \ifKV@fbpes@citeatend\fbp@priorRefSpc{\book@passage}\fi
+  \egroup
+}
+\newif\iffound@ltstarstop \found@ltstarstopfalse
+\def\removeAltSt@r#1,\stopAltSt@r\@nil{\def\fbpes@altstar{#1}}
+\def\removeTr@ilSpcs#1 #2;{\def\@rgi{#1}}
+\def\stopAltSt@r{stopAltSt@r}
+\def\fb@getnextalt{\expandafter
+    \fb@@getnextalt\fbpes@altstar,\stopAltSt@r\@nil}
+\def\fb@@getnextalt#1,#2\@nil{\def\@rgi{#1}\edef\@rgii{#2}%
+  \fb@rmvspcsp{\@rgi}%
+  \ifx\@rgii\stopAltSt@r
+    \let\fbpes@altstar\@empty
+    \fbpes@altstarfalse\found@ltstarstoptrue\else
+    \removeAltSt@r#2\@nil
+  \fi
+  \edef\@tmpexp{\noexpand\removeTr@ilSpcs\@rgi\space;}\@tmpexp
+  \ifx\@rgi\@empty\let\fbpes@alt\@empty\else
+  \edef\fbpes@alt{ \@rgi}\fi
+}
+\newcommand{\verseFmtDef}[1]{\ensuremath{{}^{\fb@sc{#1}}}}
+\newcommand{\verseFmt}[1]{\verseFmtDef{#1}}
+\newcommand{\verseFmtReset}{\def\verseFmt##1{\verseFmtDef{##1}}}
+\let\@fterVerseFmt\@gobble
+\def\afterVerseFmt#1{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\@fterVerseFmt\@gobble\else\def\@fterVerseFmt{#1}\fi}
+\@ifundefined{text}{\def\fb@sc#1{\mbox{\scriptsize #1}}}
+    {\def\fb@sc#1{\text{#1}}}
+\def\G#1{${}^{\fb@sc{G#1}}$}
+\def\H#1{${}^{\fb@sc{H#1}}$}
+\def\fb@gobtonil#1\@nil{}
+\def\fb@gettonil#1\@nil{\def\to@nilarg{#1}}
+\def\fb@ifspc{\ifx\@let@token\@sptoken
+    \let\fb@next\fb@xifspc\else
+    \let\fb@next\fb@gettonil\fi\fb@next}
+\begingroup
+\def\:{\fb@xifspc}
+\expandafter\gdef\: {\futurelet\@let@token\fb@ifspc}
+\endgroup
+\def\fb@strpspcs{\futurelet\@let@token\fb@ifspc}
+\def\fb@rmvspcsp#1{\expandafter\fb@strpspcs#1\@nil\edef#1{\to@nilarg}}
+\def\letEach#1\to#2{\@tfor\@tmp:=#1\do{\expandafter\let\@tmp=#2}}
+\define@key{fp@qts}{leftmargin}[\leftmargin]{\def\fp@qts@leftmargin{#1}}
+\def\fp@qts@leftmargin{\leftmargin}
+\define@key{fp@qts}{rightmargin}[\leftmargin]{%
+    \def\fp@qts@rightmargin{#1}}
+\def\fp@qts@rightmargin{\leftmargin}
+\define@key{fp@qts}{itemindent}[1.5em]{\def\fp@qts@itemindent{#1}}
+\def\fp@qts@itemindent{1.5em}
+\newenvironment{fpquote}[1][]
+   {\setkeys{fp@qts}{#1}\list{}
+        {\setlength{\leftmargin}{\fp@qts@leftmargin}%
+        \setlength{\rightmargin}{\fp@qts@rightmargin}}
+    \item\relax}
+   {\endlist}
+\newenvironment{fpverse}[1][]
+   {\let\\\@centercr\setkeys{fp@qts}{#1}%
+    \list{}{\itemsep \z@
+        \itemindent -\fp@qts@itemindent\relax
+        \listparindent\itemindent
+        \setlength{\leftmargin}{\fp@qts@leftmargin}%
+        \setlength{\rightmargin}{\fp@qts@rightmargin}%
+        \advance\leftmargin \fp@qts@itemindent\relax}%
+    \item\relax}
+   {\endlist}
+\newenvironment{fpquotation}[1][]
+   {\setkeys{fp@qts}{#1}\list{}{\listparindent \fp@qts@itemindent\relax
+        \itemindent \listparindent
+        \setlength{\leftmargin}{\fp@qts@leftmargin}%
+        \setlength{\rightmargin}{\fp@qts@rightmargin}%
+        \parsep \z@ \@plus\p@}%
+    \item\relax}
+   {\endlist}
+\let\fb@bibnoteshold\@empty
+\def\verseCmts#1{\def\@rg{#1}\ifx\@rg\@empty
+    \let\fb@bibnoteshold\@empty\let\fb@next\relax\else
+    \def\fb@next{\verseCmtsi{#1}}\fi\fb@next}
+\def\verseCmtsi#1{\@tfor\bib:=#1\do{%
+        \g@addto@macro\fb@bibnoteshold{\or}%
+        \expandafter\g@addto@macro\expandafter
+            \fb@bibnoteshold\expandafter
+            {\expandafter\fb@mpbib\expandafter{\bib}}%
+    }\g@addto@macro\fb@bibnoteshold{\fi}%
+}
+\newcommand\fb@DefaultMarParFmt[1]{\marginpar{\footnotesize\raggedright
+    \verseFmt{\vrseNum}#1}}
+\newcommand{\fbMarParFmt}[1]{\fb@DefaultMarParFmt{#1}}
+\newcommand{\fbResetMarParFmt}{%
+    \gdef\fbMarParFmt##1{\fb@DefaultMarParFmt{##1}}}
+\def\fb@mpbib#1{\def\@rg{#1}\ifx\@rg\@empty\else
+    \fbMarParFmt{#1}\fi}%
+\newcommand\fbMarNotesOn{\afterVerseFmt{\fb@cmtV}}
+\newcommand\fbMarNotesOff{\afterVerseFmt{}}
+\def\fb@cmtV{\ifx\fb@bibnoteshold\@empty\expandafter\@gobble\else
+    \expandafter\fb@cmtVi\fi}
+\def\fb@cmtVi#1{\def\vrseNum{#1}%
+    \def\fb@bifcase{\ifcase#1}\expandafter\fb@bifcase\fb@bibnoteshold}
+\newcount\fp@dqcnt \fp@dqcnt=0
+\newcount\fp@sqcnt \fp@sqcnt=0
+\def\fp@lq{`}\def\fp@rq{'}\def\fp@lqq{``}\def\fp@rqq{''}
+\def\h@ndledq{\ifodd\fp@dqcnt\fp@rqq\else\fp@lqq\fi
+    \global\advance\fp@dqcnt\@ne}
+\def\h@ndlesq{\ifodd\fp@sqcnt\fp@rq\else\fp@lq\fi
+    \global\advance\fp@sqcnt\@ne}
+\def\bH@ndleltxQs{\futurelet\fp@next\bQsCont@fp}
+\def\bH@ndleltxDQ{\fp@lqq\@gobble}
+\def\bH@ndleltxSQ{\fp@lq}
+\def\eH@ndleltxQs{\futurelet\fp@next\eQsCont@fp}
+\def\eH@ndleltxDQ{\fp@rqq\@gobble}
+\def\eH@ndleltxSQ{\fp@rq}
+\def\fp@rq@choice{\ifNotL@TeXQuotes
+    \def\fp@next{\h@ndlesq}\else
+    \def\fp@next{\eH@ndleltxQs}\fi\fp@next
+}
+\begingroup\catcode`\"=\active \catcode`\'=\active \catcode`\`=\active
+\gdef\bQsCont@fp{\ifx\fp@next`\let\fp@next\bH@ndleltxDQ\else
+    \let\fp@next\bH@ndleltxSQ\fi\fp@next}
+\gdef\eQsCont@fp{\ifx\fp@next'\let\fp@next\eH@ndleltxDQ\else
+    \let\fp@next\eH@ndleltxSQ\fi\fp@next}
+\gdef\cvrtdqs{%
+    \expandafter\catcode\fp@lq\"=\active\gdef"{\protect\h@ndledq}%
+    \expandafter\catcode\fp@lq\'=\active\gdef'{\protect\fp@rq@choice}%
+    \expandafter\catcode\fp@lq\`=\active\gdef`{\protect\bH@ndleltxQs}%
+}
+\endgroup
+\def\bDQ{\global\fp@dqcnt=0 }\def\bSQ{\global\fp@sqcnt=0 }
+\def\eDQ{\global\fp@dqcnt=1 }\def\eSQ{\global\fp@sqcnt=1 }
+\def\ckDQs@End{\ifodd\fp@dqcnt\PackageWarning{fetchbibpes}
+    {An odd number of double quotes detected,\MessageBreak
+     please correct}\fi}
+\AtEndDocument{\ckDQs@End}
+\def\inputVerseList#1{\InputIfFileExists{#1.def}
+    {\PackageInfo{fetchbibpes}{Inputting #1.def}}
+    {\PackageInfo{fetchbibpes}{#1.def cannot be found}}%
+}
+\def\fb@inv@name#1#2{\csarg\def{inv@#2}{#1}}
+\def\fb@rev@name#1#2{\csarg\def{rev@#1}{#2}}
+\def\fb@twoway#1#2{\fb@inv@name{#1}{#2}\fb@rev@name{#1}{#2}}
+\fb@twoway{Gen}{Genesis}
+\fb@twoway{Exo}{Exodus}
+\fb@twoway{Lev}{Leviticus}
+\fb@twoway{Num}{Numbers}
+\fb@twoway{Deu}{Deuteronomy}
+\fb@twoway{Jos}{Joshua}
+\fb@twoway{Jdg}{Judges}
+\fb@twoway{Rth}{Ruth}
+\fb@twoway{1Sa}{ISamuel}
+\fb@twoway{2Sa}{IISamuel}
+\fb@twoway{1Ki}{IKings}
+\fb@twoway{2Ki}{IIKings}
+\fb@twoway{1Ch}{IChronicles}
+\fb@twoway{2Ch}{IIChronicles}
+\fb@twoway{Ezr}{Ezra}
+\fb@twoway{Neh}{Nehemiah}
+\fb@twoway{Est}{Esther}
+\fb@twoway{Job}{Job}
+\fb@twoway{Psa}{Psalms}
+\fb@twoway{Pro}{Proverbs}
+\fb@twoway{Ecc}{Ecclesiastes}
+\fb@twoway{Son}{SongofSolomon}
+\fb@twoway{Isa}{Isaiah}
+\fb@twoway{Jer}{Jeremiah}
+\fb@twoway{Lam}{Lamentations}
+\fb@twoway{Eze}{Ezekiel}
+\fb@twoway{Dan}{Daniel}
+\fb@twoway{Hos}{Hosea}
+\fb@twoway{Joe}{Joel}
+\fb@twoway{Amo}{Amos}
+\fb@twoway{Oba}{Obadiah}
+\fb@twoway{Jon}{Jonah}
+\fb@twoway{Mic}{Micha}
+\fb@twoway{Nah}{Nahum}
+\fb@twoway{Hab}{Habakkuk}
+\fb@twoway{Zep}{Zephaniah}
+\fb@twoway{Hag}{Haggai}
+\fb@twoway{Zec}{Zechariah}
+\fb@twoway{Mal}{Malachi}
+\fb@twoway{Mat}{Matthew}
+\fb@twoway{Mar}{Mark}
+\fb@twoway{Luk}{Luke}
+\fb@twoway{Joh}{John}
+\fb@twoway{Act}{Acts}
+\fb@twoway{Rom}{Romans}
+\fb@twoway{1Co}{ICorinthians}
+\fb@twoway{2Co}{IICorinthians}
+\fb@twoway{Gal}{Galatians}
+\fb@twoway{Eph}{Ephesians}
+\fb@twoway{Php}{Philippians}
+\fb@twoway{Col}{Colossians}
+\fb@twoway{1Th}{IThessalonians}
+\fb@twoway{2Th}{IIThessalonians}
+\fb@twoway{1Ti}{ITimothy}
+\fb@twoway{2Ti}{IITimothy}
+\fb@twoway{Tit}{Titus}
+\fb@twoway{Phm}{Philemon}
+\fb@twoway{Heb}{Hebrews}
+\fb@twoway{Jas}{James}
+\fb@twoway{1Pe}{IPeter}
+\fb@twoway{2Pe}{IIPeter}
+\fb@twoway{1Jn}{IJohn}
+\fb@twoway{2Jn}{IIJohn}
+\fb@twoway{3Jn}{IIIJohn}
+\fb@twoway{Jud}{Jude}
+\fb@twoway{Rev}{Revelation}
+\let\useverseslist\@empty
+\newcommand{\@AddToVersesList}{\g@addto@macro\useverseslist}
+\@AddToVersesList{\begingroup\cvrtdqs}
+\ifx\fbpes@useverses\@empty\else
+    \edef\temp@expand{\noexpand\@for\noexpand\@@tmp:=\fbpes@useverses}
+    \temp@expand\do{%
+        \ifx\@@tmp\@empty\else
+            \fb@rmvspcsp{\@@tmp}%
+            \edef\tmp@expandverse{\noexpand
+                \inputVerseList{\fb@deffolder\@@tmp}}%
+            \expandafter\@AddToVersesList\expandafter{\tmp@expandverse}%
+        \fi
+    }%
+\fi
+\@AddToVersesList{\endgroup}
+\def\selectedVersesFrom#1{\PackageWarning{fetchbibpes}
+    {\string\selectedVersesFrom\space requires the\MessageBreak
+     useselverses option. Gobbling up\MessageBreak your argument}}
+\def\fb@loadcfg{\InputIfFileExists{fbpes.cfg}
+    {\PackageInfo{fetchbibpes}{Inputting fbpes.cfg}}
+    {\PackageInfo{fetchbibpes}{fbpes.cfg not found}}}
+\iffb@ignorecfg
+    \PackageInfo{fetchbibpes}{Ignoring CFG file}
+\else
+    \AtEndOfPackage{\fb@loadcfg}
+\fi
+\AtBeginDocument{\useverseslist}
+\endinput
+%%
+%% End of file `fetchbibpes.sty'.

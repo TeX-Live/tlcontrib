@@ -18,6 +18,9 @@ $special{'opacity-pro'} = '&donormal';
 $special{'eq-save'}     = '&MAKEdps';
 $special{'fetchbibpes'} = '&MAKEdps';
 $special{'mkstmpdad'}   = '&MAKEdps';
+$special{'dps'}         = '&MAKEdps';
+$special{'datepicker-pro'} = '&MAKEdps';
+
 
 sub MAKEdps {
   print "\t SPECIAL $package";

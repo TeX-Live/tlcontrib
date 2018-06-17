@@ -1,0 +1,932 @@
+% \iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% dps.sty package,             2006-10-06              %%
+%% Copyright (C) 2006  D. P. Story                      %%
+%%   dpstory@acrotex.net                                %%
+%%   storyd@owc.edu                                     %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesPackage{dps}
+%<package> [2006/10/31 v1.0 Das Puzzle Spiel (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex]{hyperref}
+\pdfstringdefDisableCommands{\let\\\textbackslash}%
+\EnableCrossrefs \CodelineIndex
+%\OnlyDescription  % comment out for implementation details
+\begin{document}
+  \GetFileInfo{dps.sty}
+  \title{The \texttt{dps} Package}
+  \author{D. P. Story\\
+    Email: \texttt{storyd@owc.edu}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \let\Email\texttt
+  \DocInput{dps.dtx}
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+% \section{Introduction}
+% The \textsf{dps} Package (Das Puzzle Spiel) provides the commands to create a matching
+% game and associated puzzle.  As the user answers each question, another part of the puzzle
+% is filled in.  After the user has correctly answered all the questions, the message contained
+% in the puzzle is fully visible.  The user answers the question by first clicking the checkbox
+% of that question, reading and solving the question, then by finding the correct answer listed
+% amongst the answer columns.  This game was inspired by one of the handout work sheets of my
+% son's eighth grade pre-algebra class.
+%
+% \section{Options}
+% We bring in the \textsf{xkeyval} Package so we can gather our options using
+% it's commands, rather than the default \textsf{keyval} commands.
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+%    \end{macrocode}
+%    \begin{macro}{nonrandomize}
+% The default behavior is to randomize the questions and answers. With this option, the
+% questions and answers are listed in the order they were written in the source file; good
+% for debugging, and testing the document.
+%    \begin{macrocode}
+\DeclareOptionX{nonrandomized}{\werandomizefalse}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{viewmode}
+% Used for developing the puzzle. When \texttt{viewmode} is optioned, the puzzle and letters in
+% the puzzle are seen.  By adjusting the argument of \cs{insertPuzzle} you can get the distribution
+% of the puzzle that you want. See also the comments preceding the definition of \cs{makeTextField} below.
+%    \begin{macrocode}
+\DeclareOptionX{viewmode}{\viewModetrue\previewtrue}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{showletters}
+% When this option is taken, in the answer columns, the letters that the answers correspond to appear;
+% and in the puzzle, the question number that corresponds to that letter.  Generally, this is used
+% when web is put in \texttt{forpaper} mode, but can be used in ``screen'' mode.
+%    \begin{macrocode}
+\DeclareOptionX{showletters}{\showletterstrue}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{showanswerlabels}
+% We give the user the option of showing the label for the answer, in the case
+% of for screen presentation.
+%\changes{v1.0}{2006/10/31}
+%{
+%    Added the \texttt{showanswerlabels} option
+%}
+%    \begin{macrocode}
+\DeclareOptionX{showanswerlabels}
+{%
+    \ifeqforpaper\else\def\dpsAitemOptArg{}\fi
+}
+\def\dpsAitemOptArg{[]}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{showanswerkey}
+% When this option is taken, the solution key appears in the footer. If the
+% graphicx package is loaded, the answer key is rotated 180 degrees.  The
+% answer key is always computed and saved in the macro \cs{AnswerKey},
+%    \begin{macrocode}
+\DeclareOptionX{showanswerkey}{\showsolutiontrue}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{savedata}
+% When this option is taken, the solution key appears in the footer. If the
+% graphicx package is loaded, the answer key is rotated 180 degrees.  The
+% answer key is always computed and saved in the macro \cs{AnswerKey},
+%    \begin{macrocode}
+\DeclareOptionX{savedata}{\savepuzzledatatrue}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+\newif\ifwerandomize \werandomizetrue
+\newif\ifviewMode \viewModefalse
+\newif\ifshowletters\showlettersfalse
+\newif\ifshowsolution\showsolutionfalse
+\newif\ifsavepuzzledata\savepuzzledatafalse
+\ifeqforpaper\showletterstrue\fi
+%    \end{macrocode}
+% The only language localizations are the clever commands that appear in the message box.
+%    \begin{macro}{lang}
+% We offer two language options, \texttt{english} (the default) and \texttt{german}. There
+% is a custom option for the author to provide his/her own language localizations.
+%    \begin{macrocode}
+\define@choicekey*+{dps.sty}{lang}[\val\nr]{english,german,custom}
+{%
+    \ifcase\nr\relax
+        \def\dps@lang@type{\input{dps_str_us.def}}
+    \or
+        \def\dps@lang@type{\input{dps_str_de.def}}
+    \or
+        \def\dps@lang@type{\input{dps_str_cus.def}}
+    \else
+        \def\dps@lang@type{\input{dps_str_us.def}}
+    \fi
+}{\PackageWarning{dps}{Bad choice for lang, permissible values
+are english, german and custom. Try again}}
+\def\dps@lang@type{\input{dps_str_us.def}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+\AtEndOfPackage{\dps@lang@type}
+\ProcessOptionsX
+%    \end{macrocode}
+% \section{Required Packages}
+% In addition to the \textsf{web} and \textsf{eforms} packages, the following are
+% used in the macro package.
+%    \begin{macrocode}
+\RequirePackage{verbatim}
+\RequirePackage{calc}
+\RequirePackage{multicol}
+\@ifundefined{nextrandom}{\input{random.tex}}{}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\nextrandom{\begingroup
+ \ifnum\randomi<\@ne % then initialize with time
+    \global\randomi\time
+    \global\multiply\randomi388 \global\advance\randomi\year
+    \global\multiply\randomi31 \global\advance\randomi\day
+    \global\multiply\randomi97 \global\advance\randomi\month
+    \message{Randomizer initialized to \the\randomi.}%
+    \nextrandom \nextrandom \nextrandom
+    \xdef\ds@saveRandomSeed{\the\randomi}%
+ \fi
+ \count@ii\randomi
+ \divide\count@ii 127773 % modulus = multiplier * 127773 + 2836
+ \count@\count@ii
+ \multiply\count@ii 127773
+ \global\advance\randomi-\count@ii % random mod 127773
+ \global\multiply\randomi 16807
+ \multiply\count@ 2836
+ \global\advance\randomi-\count@
+ \ifnum\randomi<\z@ \global\advance\randomi 2147483647\relax\fi
+ \endgroup
+}
+%    \end{macrocode}
+%
+% \section{Switches and things}
+%
+%    \begin{macrocode}
+\newif\ifforquestions \forquestionstrue
+\newcount\ds@nCnt
+\newcount\ds@nMax
+\newcount\ds@qNumber\ds@qNumber=0
+\newcount\ds@aNumber\ds@aNumber=0
+\newcount\ds@probCnt \ds@probCnt=0
+\newcount\ds@nCntCols \ds@nCntCols=0
+\newcount\ds@getRanNum
+\newtoks\ds@listIn \ds@listIn={}
+\newtoks\ds@newListIn \ds@newListIn={}
+\newtoks\ds@listOut \ds@listOut={}
+\newtoks\ds@tmpToks \ds@tmpToks={}
+\newtoks\ds@qlistOut \ds@qlistOut={}
+\newtoks\ds@alistOut \ds@alistOut={}
+\newtoks\ds@PuzzleAppearancetoks \ds@PuzzleAppearancetoks={}
+\newtoks\ds@QuesAppearancetoks \ds@QuesAppearancetoks={}
+\newtoks\ds@AnsAppearancetoks \ds@AnsAppearancetoks={}
+\newwrite \ds@question@write
+\ifsavepuzzledata
+\newwrite \ds@savedata
+\immediate\openout \ds@savedata \jobname_data.sav
+\fi
+\setlength{\multicolsep}{\topsep}
+%    \end{macrocode}
+% \section{Main Code}
+%    \begin{macro}{\makeTextField}
+%    \begin{macro}{\PuzzleAppearance}
+% When the user chooses the \texttt{viewmode} option, the underline appear in the puzzle
+% with the letter corresponding to that position; otherwise, a Acrobat text field is created.
+% Note that for letters what have accents, use the hyperref command \cs{texorpdfstring}
+% to give to letters, one for view mode (without accent) and one with accent. See the file
+% \texttt{pmg.tex} for an example of this, look for it in the \cs{DeclarePuzzle} command.
+%
+% The command \cs{PuzzleAppearance} can be used to change the appearance of the text fields for
+% the puzzle.
+%\changes{v1.0}{2006/10/31}
+%{
+%   Added a token list to hold any user changes in the appearance of the puzzle, as
+%   as suggested by Robert Marik.
+%}
+%    \begin{macrocode}
+%\def\PuzzleAppearance#1{\def\pAppearance{#1}}
+\def\PuzzleAppearance#1{\ds@PuzzleAppearancetoks={#1}}
+\ifeqforpaper
+    \ifviewMode
+        \def\makeTextField#1#2{\def\argii{#2}\ifx\argii
+            \ds@myspace\let\ds@ul\relax\else\let\ds@ul\underbar\fi
+            \ifshowletters\raisebox{-8pt}{%
+            \makebox[0pt][l]{\makebox[16bp][c]{%
+            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+            \ds@ul{\makebox[16bp][c]{\Hy@pdfstringfalse#1}}}
+    \else
+        \def\makeTextField#1#2{\def\argii{#2}\ifx\argii\ds@myspace
+            \let\ds@ul\relax\else\let\ds@ul\underbar\fi
+            \ifshowletters\raisebox{-8pt}{%
+            \makebox[0pt][l]{\makebox[16bp][c]{%
+            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+            \ds@ul{\makebox[16bp][c]{\hfil}}}
+    \fi
+\else
+    \ifviewMode
+        \def\makeTextField#1#2{\ifshowletters\raisebox{-8pt}{%
+            \makebox[0pt][l]{\makebox[16bp][c]{%
+            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+            \underbar{\makebox[16bp][c]{\Hy@pdfstringfalse#1}}}
+    \else
+        \def\makeTextField#1#2{\ifshowletters
+            \raisebox{-8pt}{\makebox[0pt][l]{\makebox[16bp][c]{%
+            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+            \edef\textfieldTmp{\noexpand\textField[\noexpand\Q{1}%
+            \noexpand\S{U}\noexpand\Ff\noexpand\FfReadOnly
+            \the\ds@PuzzleAppearancetoks\noexpand\DV{#1}]%
+            {puzzle.#2}{16bp}{11bp}}\Hy@pdfstringtrue\textfieldTmp}
+    \fi
+\fi
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macro}{\DeclarePuzzle}
+%    \begin{macro}{\insertPuzzle}
+% The puzzle is declare using the \cs{DeclarePuzzle} command. It's argument is a finite
+% number of two argument pairs. For example,
+%\begin{verbatim}
+%\DeclarePuzzle{
+%   {H}{H}
+%   {e}{e}
+%   {l}{l}
+%   {l}{l}
+%   {o}{o}
+%   {,}{punc}
+%   {}{space}
+%   {J}{J}
+%   {\texorpdfstring{\"{u}}{\string\374}}{uml}
+%   {g}{g}
+%   {e}{e}
+%   {n}{n}
+%   {!}{punc}
+%}
+%\end{verbatim}
+%The first term of the pair is the letter that appears in the puzzle, in this case, the puzzle is
+%``Hello, J\"{u}rgen!''.  Spaces between words are left as empty arguments.  A letter that has
+%a special accent can be entered as well; however, for preview mode, use the hyperref command
+%\cs{texorpdfstring}, as illustrated in the example above. (The first argument of \cs{texorpdfstring}
+%will be typeset when the document is in \texttt{viewmode}, the second argument will be inserted
+%into the text field and can be an accented character (it's octal representation).
+%
+%The second term of each pair will form the base name of the form fields created for this document.
+%The second argument must be a JavaScript identifier (basically consist of letters and numbers).
+%Puzzle entries with the same second argument will appear simultaneously when the corresponding
+%question is answered correctly. For example, the puzzle above has two of the letter `e' and
+%to of `l'.  As a result, there are only $8$ distinct form names, so $8$ or more questions are
+%needed.
+%
+%Second terms with the name of \texttt{space} and \texttt{punc} are special cases. A \texttt{space} field
+%will be type set as a text field with an empty value (maintaining the spacing of the puzzle); the \texttt{punc}
+%name is recognized as a signal for punctuation, and a text field is not generated for it. (Note, you can
+%give punctuation a field name other than \texttt{punc}, and a text field will be created, and you'll need
+%a question to make that field appear.)
+%
+% You can have more answers than questions, but you cannot have more questions than answers;
+% that is, not questions that have no listed answer and does not correspond to a letter
+% in the puzzle.
+%    \begin{macrocode}
+\def\DeclarePuzzle#1{\gdef\puzzleParameters{#1}}
+%    \end{macrocode}
+% Use \cs{insertPuzzle} to insert the puzzle at the location desired. The puzzle is placed
+% in a tabular environment. The only argument of this command is the number of columns
+% you want for this tabular environment. For example, \verb!\insertPuzzle{18}! distributes
+% the puzzle so that there are $18$ columns per row, one letter per column.
+%    \begin{macrocode}
+\def\insertPuzzle#1{\gdef\nCols{#1}%
+    \ifviewMode\Hy@pdfstringfalse\else\Hy@pdfstringtrue\fi
+    \expandafter\aeb@Puzzle\expandafter{\puzzleParameters}}%
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macro}{\rowsep}
+% This command is used to adjust the space between row of the tabular environment
+% for the puzzle. The default is \verb!\rowsep{1ex}!.
+%    \begin{macrocode}
+\def\rowsep#1{\gdef\@rowsep{[#1]}}\rowsep{\rowsep@default}
+\def\rowsep@default{1ex}
+%    \end{macrocode}
+%    \end{macro}
+% This code create the tabular environment, creating a new row when necessary,
+% and inserts the text field or typesets the puzzle (in the case of \texttt{viewmode}).
+%    \begin{macrocode}
+\def\eq@tabSep{&}\def\ds@punc{punc}
+\def\aeb@Puzzle#1{\edef\eq@tabEnd{\noexpand\\\@rowsep}%
+    \aeb@@Puzzle#1\relax\relax}%
+\def\aeb@@Puzzle{\begin{tabular*}{\linewidth}{*{\nCols}l}\@aebPuzzlei}%
+\def\@aebPuzzlei#1#2{\ifx#1\relax\gdef\nextPuzzleChar{\@aebPuzzleDone}%
+    \else\gdef\nextPuzzleChar{\@aebPuzzleii{#1}{#2}}\fi\nextPuzzleChar}%
+\def\@aebPuzzleii#1#2{\makeTextField{#1}{#2}\@takeaPeek}
+\def\@takeaPeek#1#2{\def\argii{#2}\ifx\argii\ds@punc
+    \def\@puzzNext{#1\@setSep@aebPuzzleii}%
+    \else\def\@puzzNext{\@setSep@aebPuzzleii{#1}{#2}}\fi\@puzzNext}
+\def\@setSep@aebPuzzleii{\global\advance\ds@nCntCols1\relax
+    \ifnum\ds@nCntCols=\nCols\expandafter\eq@tabEnd \global\ds@nCntCols=0
+    \else\expandafter\eq@tabSep\fi\@aebPuzzlei}%
+\def\@aebPuzzleDone{\end{tabular*}\ds@buildAnswerKey}%
+%    \end{macrocode}
+%    \begin{macro}{\AnswerKey}
+% The command \cs{AnswerKey} is defined at the end of the \cs{insertPuzzle} command
+% and is available thereafter for insertion into the document. If the \texttt{showanswerkey}
+% option is taken, it is displayed at the bottom of the page. If the \texttt{savedata}
+% option is taken, the answer key is save to a file along with the random seed that generated
+% this answer key. The file name containing the puzzle data is \cs{jobname\_data.sav}.
+%    \begin{macrocode}
+\def\ds@buildAnswerKey
+{%
+    {% local
+        \count0=0 \toks0={}%
+        \loop
+            \advance\count0by1
+            \xdef\AnswerKey{\the\toks0
+            \the\count0--\noexpand
+            \csname dps@probLetter\the\count0\noexpand\endcsname; }%
+            \toks0 = \expandafter{\AnswerKey}%
+        \ifnum\count0 < \ds@qNumber\repeat
+    }%
+    \ifshowsolution
+        \cfooter{\footnotesize\@ifundefined{rotatebox}{\AnswerKey}%
+        {\rotatebox{180}{\AnswerKey}}}%
+    \fi
+    \ifsavepuzzledata
+        \AtEndDocument{\ds@writePuzzleData}%
+    \fi
+}
+\def\ds@writePuzzleData{%
+    \let\verbatim@out\ds@savedata
+    \dps@IWVO{Initial seed: \string\randomi=\ds@saveRandomSeed}%
+    \dps@IWVO{Solution Key: \AnswerKey}%
+}
+%    \end{macrocode}
+%    \end{macro}
+% \section{Questions and Answers}
+%    \begin{environment}{Composing}
+% This is the environments in which the composing of questions and answers are made.
+% Use the \texttt{cQ} and \texttt{cA} for this purpose.
+%    \begin{macrocode}
+\newenvironment{Composing}
+{\global\ds@qNumber=0 \global\ds@aNumber=0}
+{\aftergroup\ds@publishRandomLists}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{environment}{cQ}
+%    \begin{environment}{cA}
+% Here are the two environment for composing questions and answers. The argument
+% of each environment corresponds to a form field in the puzzle. Each of these
+% environments are verbatim write environments; they write each question and solution
+% to a separate \texttt{.cut} file. These individual files are ultimately input
+% in a random order.
+%    \begin{macrocode}
+\newenvironment{cQ}[1]
+{%
+   \global\advance\ds@qNumber1
+   \immediate\openout \ds@question@write \jobname_q\the\ds@qNumber.cut
+    \let\verbatim@out\ds@question@write
+    \dps@IWVO{\noexpand\dpsQ{#1}}%
+    \verbatimwrite}
+{%
+    \endverbatimwrite
+    \immediate\closeout \ds@question@write
+}
+%    \end{macrocode}
+% The cA environment has an optional argument. This optional argument is only used
+% when the document is compiled with the showletters option.  The value of the argument
+% is a letter to appear in the answers column.  Normally, one of the first entries in the
+% \cs{DeclarePuzzle} command is used. Cases where you would want to include this optional
+% argument are (1) when giving an answer that does not correspond to a question; (2) the
+% letter is capitalized, suggesting a proper name or the beginning of a sentence, use the
+% optional argument to list the letter in lower case.
+%    \begin{macrocode}
+\newenvironment{cA}[2][]
+{%
+   \def\argi{#1}\global\advance\ds@aNumber1
+   \immediate\openout \ds@question@write \jobname_a\the\ds@aNumber.cut
+    \let\verbatim@out\ds@question@write
+    \let\protect\noexpand
+    \dps@IWVO{\noexpand\dpsA\ifshowletters
+        \ifx\argi\@empty\else[#1]\fi\fi{#2}}%
+    \verbatimwrite}
+{%
+    \endverbatimwrite
+    \immediate\closeout \ds@question@write
+}
+%    \end{macrocode}
+%    \end{environment}
+%    \end{environment}
+%    \begin{macro}{\QuesAppearance}
+%    \begin{macro}{\AnsAppearance}
+% These two commands can be used to change the appearance of the checkboxes for the questions and answers.
+% When the \texttt{forpaper} \textsf{web} option is taken, these have no effect.
+%    \begin{macrocode}
+\def\QuesAppearance#1{\ds@QuesAppearancetoks={#1}}
+\def\AnsAppearance#1{\ds@AnsAppearancetoks={#1}}
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macro}{\dpsQ}
+%    \begin{macro}{\dpsA}
+%    \begin{macro}{\afterQhookA}
+%    \begin{macro}{\OnFocusQhookAA}
+% The next two commands place the check boxes, the argument is the name of the form
+% field that corresponds to one of the letters in the puzzle.
+%
+% The commands \cs{dpsQ} and \cs{dpsA} are the ones that produce the checkboxes, and define the
+% JavaScript actions.  These two can be redefined as needed, but be sure to preserve the JS
+% functionality.
+%
+% The two commands \cs{afterQhookA} and \cs{OnFocusQhookAA} are commands that can be redefined
+% for additional JS action, the first is a  hook into the mouse up action, and the second is
+% a hook to the on focus action.
+%    \begin{macrocode}
+\let\afterQhookA\@gobble
+\let\OnFocusQhookAA\@gobble
+%    \end{macrocode}
+% Set the checkboxes and JS action for questions.  Allow also, changes to appearance
+% through the \cs{QuesAppearance} command.
+%    \begin{macrocode}
+\newcommand{\dpsQ}[1]{\item\relax\ifeqforpaper\else
+    \edef\checkboxTmp{\noexpand\checkBox[\the\ds@QuesAppearancetoks
+    \noexpand\A{\noexpand\JS{activeQuestion = event.target.name;
+    clearRedCrosses(); \noexpand\afterQhookA{#1}}}%
+    \noexpand\AA{\noexpand\AAOnFocus{\noexpand\JS{%
+    this.resetForm(["ckbxQ"]); \noexpand\OnFocusQhookAA{#1}}}}]%
+    {ckbxQ.#1}{14bp}{11bp}{Yes}}\makebox[0pt][r]{\checkboxTmp\enspace}%
+    \fi\ignorespaces}
+%    \end{macrocode}
+% Set the checkboxes and JS action for answers.  Allow also, changes to appearance
+% through the \cs{AnsAppearance} command. This command obeys the \texttt{showanswerlabels}
+% option by re-defining the command \cs{dpsAitemOptArg}. The default definition
+% is \verb!\def\dpsAitemOptArg{[]}!, which cancels the display of the item labels.
+%    \begin{macrocode}
+\newcommand{\dpsA}[2][]{\expandafter\item\dpsAitemOptArg\relax
+    \ifeqforpaper\else
+        \edef\checkboxTmp{\noexpand\checkBox[\the\ds@AnsAppearancetoks
+        \noexpand\A{\noexpand\JS{processChoice("#2")}}]%
+        {ckbxA.#2}{14bp}{11bp}{Yes}}%
+        \makebox[0pt][r]{\checkboxTmp\enspace}%
+    \fi
+    \def\argi{#1}%
+        \ifshowletters
+            \ifx\argi\@empty
+                \let\getLetterNext\relax
+                \let\ds@foundLetter=0\def\ds@currFN{#2}%
+                \def\getLetterNext{\ds@typesetPuzzleLetter}%
+                \expandafter\getLetterNext
+            \else
+                \makebox[0pt][r]{\Hy@pdfstringfalse#1\enspace\kern4bp}%
+            \fi
+        \fi
+    \ignorespaces
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macrocode}
+\def\ds@typesetPuzzleLetter{%
+    \expandafter\typeset@PuzzleLetter\expandafter{\puzzleParameters}}
+\def\typeset@PuzzleLetter#1{\typeset@@PuzzleLetter#1\relax\relax}%
+\def\typeset@@PuzzleLetter#1#2{%
+    \ifx#1\relax
+        \gdef\nextPuzzleLetter{\relax}%
+    \else
+        \gdef\nextPuzzleLetter{\typeset@PuzzleLetteri{#1}{#2}}%
+    \fi
+    \nextPuzzleLetter
+}
+\def\typeset@PuzzleLetteri#1#2{\def\argii{#2}\ifx\argii\ds@currFN
+    \if\ds@foundLetter0\makebox[0pt][r]{%
+        \Hy@pdfstringfalse#1\enspace\kern4bp}\let\ds@foundLetter=1\fi
+        \expandafter\typeset@@PuzzleLetter
+        \else\expandafter\typeset@@PuzzleLetter\fi}
+%    \end{macrocode}
+% This command is called at \verb!\end{Composing}!, which, in turn, calls
+% the macros \cs{ds@randomizeQuestionList} and \cs{ds@randomizeAnswerList} which randomly
+% permutes the \verb!1, 2, ... \the\ds@qNumber! and \verb!1, 2, ... \the\ds@aNumber!,
+% where \cs{ds@qNumber} and \cs{ds@aNumber} are the number of questions and answers,
+% respectively.
+%    \begin{macrocode}
+\def\ds@publishRandomLists{%
+    \ds@randomizeQuestionList{\the\ds@qNumber}%
+    \ds@randomizeAnswerList{\the\ds@aNumber}%
+}
+\def\ds@myspace{space}
+\def\ds@getProbNumber#1#2{%
+    \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
+    \ifx\ds@currentArgii\ds@myspace\def\ds@probNumNext{\relax}\else
+        \def\ds@probNumNext{%
+            \@ifundefined{dps@probNum#2}{\global\advance\ds@probCnt1
+% \typeout{\ds@probCnt = \the\ds@probCnt}%
+                \ds@@getProbNumber{\the\ds@probCnt}%
+            }{\csname dps@probNum#2\endcsname}%
+    }%
+    \fi
+    \ds@probNumNext
+}
+\def\ds@@getProbNumber#1{%
+    {\count0=0 \let\\=\ds@getNthOne\the\ds@qlistOut}%
+    \csname dps@probNum\ds@currentArgii\endcsname
+}
+\def\ds@getNthOne#1{\advance\count0by1
+    \ifnum\ds@probCnt=#1
+        \expandafter
+            \xdef\csname dps@probNum\ds@currentArgii\endcsname
+                {\the\count0 }%
+%\typeout{\the\count0, and \ds@currentArgi}%
+        \expandafter
+            \xdef\csname dps@probLetter\the\count0\endcsname
+                {\expandafter\noexpand\ds@currentArgi}%
+    \fi
+}
+%    \end{macrocode}
+%    \begin{macro}{\writeComposingEnv}
+% This is a helper macro.  After you declare your puzzle, \cs{DeclarePuzzle},
+% you can place this command just after, if needed, like so
+%\begin{verbatim}
+%\writeComposingEnv
+%\begin{document}
+%\end{document}
+%\end{verbatim}
+%In the case where \cs{DeclarePuzzle} is in the preamble; above, we begin the doc
+% and end the doc; assuming you have not developed your questions yet. The command
+% writes to the file \cs{jobname\_comp.def}. This file will be a skeleton of your
+% Composing environment, with correct labeling. Copy and paste it into your document
+% in some appropriate location, and begin writing your questions.
+%    \begin{macrocode}
+\def\writeComposingEnv{%
+    \newwrite \ds@composing@write
+    \immediate\openout \ds@composing@write \jobname_comp.def
+    \let\verbatim@out\ds@composing@write
+    \dps@IWVO{\string\begin{Composing}}%
+    \dps@IWVO{}%
+    \expandafter\write@ComposingEnv\expandafter{\puzzleParameters}%
+}
+\def\write@ComposingEnv#1{\write@@ComposingEnv#1\relax\relax}%
+\def\write@@ComposingEnv#1#2{\ifx#1\relax
+    \gdef\nextPuzzlePair{%
+    \dps@IWVO{\string\end{Composing}}%
+    \immediate\closeout \ds@composing@write}%
+    \else\gdef\nextPuzzlePair{\write@@@ComposingEnv{#1}{#2}}\fi
+    \nextPuzzlePair}%
+\def\write@@@ComposingEnv#1#2{%
+    \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
+    \ifx\ds@currentArgii\ds@myspace
+        \def\ds@probNumNext{\write@@ComposingEnv}%
+    \else
+        \ifx\ds@currentArgii\ds@punc
+            \def\ds@probNumNext{\write@@ComposingEnv}\else
+            \def\ds@probNumNext{%
+                \@ifundefined{dps@compQ#2}{% write to file
+                \expandafter\gdef\csname dps@compQ#2\endcsname{found}%
+                \dps@IWVO{\string\begin{cQ}{\noexpand#1}}%
+                \dps@IWVO{\string\end{cQ}}%
+                \dps@IWVO{\string\begin{cA}{\noexpand#1}}%
+                \dps@IWVO{\string\end{cA}}%
+                \dps@IWVO{}%
+                }{}%
+                \write@@ComposingEnv
+            }%
+    \fi\fi
+    \ds@probNumNext
+}
+%    \end{macrocode}
+%    \end{macro}
+% A standard \cs{verbatim} write used in exerquiz and other package in the AeB family.
+%    \begin{macrocode}
+\def\verbatimwrite{\@bsphack
+    \let\do\@makeother\dospecials
+    \catcode`\^^M\active \catcode`\^^I=12
+    \def\verbatim@processline{%
+        \immediate\write\verbatim@out
+        {\the\verbatim@line}}%
+    \verbatim@start}
+\def\endverbatimwrite{\@esphack}
+\def\dps@IWVO{\immediate\write\verbatim@out}
+%    \end{macrocode}
+% \cs{ds@populateList} is a utility command, its argument is a positive integer, \texttt{n},
+% and it generates a list of the form \verb!\\{1}\\{2}...\\{n}!. This listing is later
+% randomly permuted by \cs{ds@randomizeQuestionList} and \cs{ds@randomizeAnswerList}.
+%    \begin{macrocode}
+\def\ds@populateList#1{%
+    \ds@listIn = {}%
+    \ds@nCnt=0
+    \@whilenum \ds@nCnt < #1\do {%
+        \advance\ds@nCnt1
+        \edef\ds@listInHold{\the\ds@listIn\noexpand\\{\the\ds@nCnt}}%
+        \ds@listIn = \expandafter{\ds@listInHold}%
+    }%
+}
+%    \end{macrocode}
+% Used in \cs{ds@randomizeList} to build the permuted list of numbers.
+%    \begin{macrocode}
+\def\ds@processi#1{\advance\ds@nCnt1
+    \ifnum\ds@nCnt=\ds@getRanNum\edef\ds@listOutHold{\the\ds@listOut}%
+        \global\ds@listOut=\expandafter{\ds@listOutHold\\{#1}}%
+    \else
+        \edef\ds@listInHold{\the\ds@newListIn}%
+        \ds@tmpToks = \expandafter{\ds@listInHold\\{#1}}%
+        \ds@newListIn = \expandafter{\the\ds@tmpToks}%
+    \fi
+}
+%    \end{macrocode}
+% Used in \cs{displayRandomizedQuestions} to input the questions.
+%    \begin{macrocode}
+\def\ds@processii#1{\input{\jobname_q#1.cut}}
+%    \end{macrocode}
+% Used in \cs{displayRandomizedAnswers} to input the answers.
+%    \begin{macrocode}
+\def\ds@processiii#1{\input{\jobname_a#1.cut}}
+%    \end{macrocode}
+% Used in \cs{displayRandomizedAnswersLeftPanel} to input the top half
+% of the permuted list.
+%    \begin{macrocode}
+\def\ds@processL#1{\advance\count0by1 %\divide\ds@aNumber2
+    \ifnum\count0>\ds@aNumber\relax\else\input{\jobname_a#1.cut}\fi}
+%    \end{macrocode}
+% Used in \cs{displayRandomizedAnswersRightPanel} to input the bottom half
+% of the permuted list.
+%    \begin{macrocode}
+\def\ds@processR#1{\advance\count0by1 %\divide\ds@aNumber2
+    \ifnum\count0>\ds@aNumber\relax\input{\jobname_a#1.cut}\fi}
+%    \end{macrocode}
+%    \begin{macro}{\displayRandomizedQuestions}
+%    \begin{macro}{\displayRandomizedAnswers}
+%    \begin{macro}{\displayRandomizedAnswersLeftPanel}
+%    \begin{macro}{\displayRandomizedAnswersRightPanel}
+% These are user commands that actually display the randomized questions
+% and answers.
+%    \begin{macrocode}
+\def\displayRandomizedQuestions{\let\\=\ds@processii\the\ds@qlistOut}
+\def\displayRandomizedAnswers{\let\\=\ds@processiii\the\ds@alistOut}
+\def\displayRandomizedAnswersLeftPanel{{\let\\=\ds@processL\count0=0
+    \divide\ds@aNumber2 \the\ds@alistOut}}
+\def\displayRandomizedAnswersRightPanel{{\let\\=\ds@processR\count0=0
+    \divide\ds@aNumber2 \the\ds@alistOut}}
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \end{macro}
+%    \end{macro}
+% Develop a random permuted list for the questions.
+%    \begin{macrocode}
+\def\ds@randomizeQuestionList#1{%
+    \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
+    \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
+    \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
+    \global\forquestionstrue
+    \ifwerandomize
+        \expandafter\ds@randomizeList
+    \else
+%        \global\let\ds@qlistOut=\ds@listIn
+        \global\ds@qlistOut=\expandafter{\the\ds@listIn}
+    \fi
+}
+%    \end{macrocode}
+% Develop a random permuted list for the answers. Note that \cs{ifwerandomize}
+% we randomize, else, the output list is the same as the input list.
+%    \begin{macrocode}
+\def\ds@randomizeAnswerList#1{%
+    \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
+    \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
+    \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
+    \global\forquestionsfalse
+    \ifwerandomize
+%       \nextrandom \nextrandom \nextrandom
+        \expandafter\ds@randomizeList
+    \else
+%        \global\let\ds@alistOut=\ds@listIn
+        \global\ds@alistOut=\expandafter{\the\ds@listIn}%
+    \fi
+}
+%    \end{macrocode}
+% The loop that does all the work for randomizing.
+%    \begin{macrocode}
+\def\ds@randomizeList{%
+    \let\\=\ds@processi
+    \setrannum{\ds@getRanNum}{1}{\ds@nMax}%
+    \ds@nCnt=0\relax
+%    \typeout{LISTING: \the\ds@listIn}%
+    \the\ds@listIn
+    \ds@loopTest
+}
+%    \end{macrocode}
+% The loop that does all the work for randomizing.
+%    \begin{macrocode}
+\def\ds@loopTest{\advance\ds@nMax-1\relax
+    \ifnum\ds@nMax>0\relax
+        \def\@next{%
+            \ds@listIn=\expandafter{\the\ds@newListIn}%
+            \ds@newListIn={}\ds@randomizeList}%
+    \else
+        \let\@next\relax
+        \ifforquestions
+            \global\ds@qlistOut=\expandafter{\the\ds@listOut}%
+%            \typeout{\ds@qlistOut = \the\ds@qlistOut}%
+        \else
+%            \global\ds@alistOut=\expandafter{\@tmp}
+            \global\ds@alistOut=\expandafter{\the\ds@listOut}%
+%            \typeout{\ds@alistOut = \the\ds@alistOut}%
+        \fi
+    \fi
+    \@next
+}
+%    \end{macrocode}
+%    \begin{macro}{\placeMessageField}
+% The command inserts the required message field. The optional
+% first parameters enables the author to change the appearance
+% of the field, the second two required arguments are the width
+% and the height of the text field.
+%    \begin{macrocode}
+\newcommand{\placeMessageField}[3][]{%
+    \ifeqforpaper\else\textField[#1\Ff\FfMultiline]{report}{#2}{#3}\fi
+}
+%    \end{macrocode}
+%    \end{macro}
+% \section{Miscellaneous Settings}
+%    \begin{macro}{\threshold}
+%    \begin{macro}{\penaltypoints}
+%    \begin{macro}{\passing}
+% Threshold for number of incorrect answers for trying to answer one question.
+% If the threshold is exceeded, \cs{dspenaltypoints} are added to the final
+% points. Passing is missing no more than \cs{dspassing}.
+%    \begin{macrocode}
+\newcommand{\threshold}[1]{\def\dsthreshold{#1}}
+\threshold{3}
+\newcommand{\penaltypoints}[1]{\def\dspenaltypoints{#1}}
+\penaltypoints{3}
+\newcommand{\passing}[1]{\def\dspassing{#1}}
+\passing{4}
+%    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+% \section{Language Cutomizations}
+%    \begin{macrocode}
+%<*english>
+\def\chooseQ{"You must choose a question to answer before you answer!"}
+\def\triedTooMuch{"You have tried this problem too many times,
+    I'm adding "
+    + \dspenaltypoints
+    + " points, and resetting the penalty counter. Bad boy/girl!"}
+\def\congratFinished{"Congratulations! You finished the puzzle"
+        +((nMissed==0) ? " without missing a single problem, amazing!"
+        : ", but you missed " + nMissed + " questions in the process!")}
+\def\regretPleased{(( nMissed > n )
+        ? "I regret to report that you did not pass the test because
+            you missed too many questions."
+        : "I am pleased to report that you passed the test!")}
+\def\reportPenaltyPoints{"The number of penalty points is "
+    + nPenaltyPoints +"."}
+\def\finalPenaltyScore{"Final penalty score is " + nTotalPenaltyPoints + ". "}
+\def\aPenaltyScale{[-1,0], [0,4], [4, 10], [10,25], [25,5000]}
+\def\aPenaltyMsgs
+{%
+    "Perfect!",
+    "Very nice performance!",
+    "This is not looking good. Perhaps a review is in order!",
+    "Are you trying? No one could do so badly, you only need a seventh grade education!",
+    "You're hopeless!"
+}
+%</english>
+%<*german>
+\def\chooseQ{"Du musst erst eine Frage ausw\string\344hlen bevor Du antwortest!"}
+\def\triedTooMuch{"Du hast es leider zu oft versucht, ich z\string\344hle  "
+    + \dspenaltypoints
+    + " Punkte dazu und setze den Z\string\344hler dann zur\string\374ck. Bitte streng Dich an!"}
+\def\congratFinished{"Herzlichen Gl\string\374ckwunsch! Du hast das Puzzle beendet"
+        +((nMissed==0) ? "  ohne auch nur einen Fehler zu machen, wunderbar!"
+        : ", aber leider " + nMissed + " Mal falsch geantwortet!")}
+\def\regretPleased{(( nMissed > n )
+        ? "Ich bedauere Dir mitteilen zu m\string\374ssen, dass Du den Test leider nicht bestanden hast, weil Du zu viele Fragen falsch beantwortet hast."
+        : "Ich bin \string\344usserst erfreut Dir mitteilen zu d\string\374rfen, dass Du den Test bestanden hast!")}
+\def\reportPenaltyPoints{"Die Anzahl der Strafpunkte ist  " + nPenaltyPoints +"."}
+\def\finalPenaltyScore{"Die Gesamtanzahl der Strafpunkte ist damit " + nTotalPenaltyPoints + ". "}
+\def\aPenaltyScale{[-1,0], [0,4], [4, 10], [10,25], [25,5000]}
+\def\aPenaltyMsgs
+{%
+    "Perfekt!",
+    "Sehr gute Vorstellung!",
+    "Es sieht nicht sonderlich gut aus. Vielleicht w\string\344re eine Wiederholung gut!",
+    "R\string\344tst Du eigentlich nur? Niemand kann wirklich so schlecht sein. Das ist Stoff aus der siebten Klasse!",
+    "Du bist ein hoffnungsloser Fall!"
+}
+%</german>
+%    \end{macrocode}
+% \section{JavaScript Support}
+%    \begin{macrocode}
+%<*package>
+\begin{insDLJS}[processChoice]{match}{JS Update of Matching Puzzle}
+var missesByQuestion = new Array();
+var nMissed = 0;
+var nPenaltyPoints = 0;
+var activeQuestion = "";
+function processChoice(fieldname)
+{
+    // Get the question field that corresponds to this question,
+    // see if checked.
+    var f = this.getField("ckbxQ."+fieldname);
+    if ( (f != null) && (f.isBoxChecked(0)) ) { // right
+        clearRedCrosses ();
+        this.resetForm(["puzzle."+fieldname]);
+        event.target.textColor = ["RGB", 0, 0.6, 0];
+        f.strokeColor = ["RGB", 0, 0.6, 0];
+        f.readonly = true;
+        event.target.readonly=true;
+        try { afterCorrectChoiceHook() } catch(e) {};
+        checkForFinished(\dspassing);
+    } else { // wrong
+        if ( activeQuestion != "" ) var h = this.getField(activeQuestion);
+        if ( (activeQuestion=="") || (h.readonly) ) { // active question already answered
+            event.target.value = "Off";
+            var g = this.getField("report");
+            str = \chooseQ;
+            g.value = str;
+            var to = app.setTimeOut("clearMessages()", 2000);
+        } else {
+            event.target.style = style.cr;
+            event.target.textColor = color.red;
+            ++nMissed;
+            if ( typeof missesByQuestion[activeQuestion] !="number" )
+                missesByQuestion[activeQuestion] = 1;
+            else
+                missesByQuestion[activeQuestion] += 1;
+            if (missesByQuestion[activeQuestion] > \dsthreshold) {
+                var f = this.getField("report");
+                str = \triedTooMuch;
+                f.value = str;
+                nPenaltyPoints += \dspenaltypoints;
+                missesByQuestion[activeQuestion] = 0;
+                clearRedCrosses ();
+                var to = app.setTimeOut("clearMessages()", 2000)
+            }
+        }
+    }
+}
+function clearMessages()
+{
+    var f = this.getField("report");
+    f.value = "";
+}
+function clearRedCrosses ()
+{
+    var g = this.getField("ckbxA");
+    h = g.getArray();
+    for ( i=0; i < h.length; i++) {
+        if ( h[i].style == style.cr) h[i].checkThisBox(0,false);
+        h[i].style = style.ch;
+    }
+ }
+function checkForFinished(n)
+{
+    var f = this.getField("puzzle");
+    var g = f.getArray();
+    var anyEmpty = false;
+    for ( var i=0; i < g.length; i++) {
+        if ( (g[i].name != "puzzle.space") && (g[i].value.replace(/\s/g,"") == "") ) {
+            anyEmpty = true;
+            break;
+        }
+    }
+    var nTotalPenaltyPoints=nMissed + nPenaltyPoints;
+    if ( !anyEmpty ) {
+        try { dpsFinishedHook() } catch (e) {};
+        var f = this.getField("report");
+        str = \congratFinished
+        + "\n" + \regretPleased
+        + "\n" + \reportPenaltyPoints
+        + "\n" + \finalPenaltyScore
+        + " " + finalRating(nTotalPenaltyPoints);
+        f.value = str;
+    }
+}
+function finalRating(n) {
+    var aPenaltyScale = new Array( \aPenaltyScale\space);
+    var aPenaltyMsgs = new Array( \aPenaltyMsgs\space);
+    for ( var i=0; i<aPenaltyScale.length; i++)
+        if ( (n > aPenaltyScale[i][0]) && (n <= aPenaltyScale[i][1]) )
+            return aPenaltyMsgs[i];
+}
+\end{insDLJS}
+%</package>
+%    \end{macrocode}
+%  \Finale
+\endinput

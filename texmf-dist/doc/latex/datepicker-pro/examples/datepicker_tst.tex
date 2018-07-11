@@ -3,20 +3,25 @@
     web={extended,tight*,usesf},
     eforms,graphicxsp={showembeds}
 ]{aeb_pro}
+\usepackage{fancyvrb}
 \usepackage{rmannot}
 \usepackage{datepicker-pro}
 
 \margins{.25in}{.25in}{24pt}{.25in} % left,right,top, bottom
 \screensize{5in}{5.5in}             % height,width dimensions
 
+\renewcommand{\hproportionwebtitle}{.5}
+
+\iconBenOpts{\F{-\FPrint}}
+
 \DeclareDocInfo
 {
-    title=The datepicker-pro Package,
+    title=The datepicker-pro Package\texorpdfstring{\\[6pt]}{: }A date picker built by Adobe Flash Builder and AeB Pro,
     author=D. P. Story,
     university=Acro\negthinspace\TeX.Net,
     email=dpstory@acrotex.net,
     subject={Demo of the datepicker-pro package, SWF, rmannot, aeb\_pro, AcroTeX},
-    keywords={Adobe Acrobat;JavaScript;Adobe FLEX 3;ActionScript},
+    keywords={Adobe Acrobat;JavaScript;Adobe Flash Builder;Flex;ActionScript},
     talksite=\url{http://www.acrotex.net},
     talkdate={\today},
     copyrightStatus=True,
@@ -28,8 +33,11 @@
 \parindent=0pt\parskip6pt\pagestyle{empty}
 
 \useFLEXVer{3} % 3 or 4
-\definePath{\dppPath}{C:/Users/Public/Documents/My TeX Files/%
-    tex/latex/aeb/aebpro/datepicker-pro/swf}
+% This path has been move to the dp-pro.cfg configuration file. Find
+% that file in the top level of this distribution and edit it to reflect
+% the path to the SWF folder of this distribution, it must be an absolution path.
+%\definePath{\dppPath}{C:/Users/Public/Documents/My TeX Files/%
+%    tex/latex/aeb/aebpro/datepicker-pro/swf}
 \setpickerIcon{../icons/dp_icon1.pdf}{PickADate}
 \setpickerIcon{../icons/dp_icon2.pdf}{GERDate}
 
@@ -37,10 +45,9 @@
 
 \maketitle
 
-\begin{center}\color{blue}\bfseries\large
-A date picker built by FLEX and AeB Pro\\[1em]
-D. P. Story
-\end{center}
+In this short demonstration file, we present two date field styles, one for the U.S.\
+and the another for German.
+
 \begin{flushleft}
 U.S.-style: Pick a date:\ \kern1bp\datepicker{PickADate}{1in}{11bp}\quad
 (MM/DD/YYYY)
@@ -57,14 +64,14 @@ This is the default style: \verb!\datepicker{PickADate}{1in}{11bp}!
     daynamesLong={Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,%
         Freitag,Samstag},
     daynamesShort={So,Mo,Di,Mi,Do,Fr,Sa},
-    monthnamesLong={Januar,Februar,März,April,Mai,Juni,Juli,%
+    monthnamesLong={Januar,Februar,M\u00E4rz,April,Mai,Juni,Juli,%
         August,September,Oktober,November,Dezember},
     monthnamesShort={Jan,Feb,Mrz,Apr,Mai,Jun,Jul,Aug,%
         Sep,Okt,Nov,Dez},
     firstday=1,
     widthOfWindow=200,
     heightOfWindow=200,
-%    voffset=-100
+    voffset=-100
 }
 
 % Di, 13. August 2013
@@ -73,9 +80,12 @@ This is the default style: \verb!\datepicker{PickADate}{1in}{11bp}!
 German-style: Pick a date:\ \kern1bp\datepicker[\germanDates]{GERDate}{2in}{11bp}\quad
 %(EEEE, DD. MMMM YYYY)
 \end{flushleft}
+
+\end{document}
+
+
 A custom style, the verbatim listing of this field is given below:
-\begingroup\small
-\begin{verbatim}
+\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\small,commandchars=!()]
 \newcommand{\germanDates}
 {%
     formatstring={EEEE, DD. MMMM YYYY},
@@ -84,13 +94,13 @@ A custom style, the verbatim listing of this field is given below:
     daynamesLong={Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,
         Freitag,Samstag},
     daynamesShort={So,Mo,Di,Mi,Do,Fr,Sa},
-    monthnamesLong={Januar,Februar,März,April,Mai,Juni,Juli,
+    monthnamesLong={Januar,Februar,M!"(a)rz,April,Mai,Juni,Juli,
         August,September,Oktober,November,Dezember},
     monthnamesShort={Jan,Feb,Mrz,Apr,Mai,Jun,Jul,Aug,Sep,
         Okt,Nov,Dez},
     firstday=1,widthOfWindow=200,heightOfWindow=200
 }
 \datepicker[\germanDates]{GERDate}{2in}{11bp}
-\end{verbatim}
-\par\endgroup
+\end{Verbatim}
 \end{document}
+

@@ -17,6 +17,7 @@
         forcolorpaper,tight*,latextoc,pro},%usesf,
     eforms,uselayers,graphicxsp={showembeds},aebxmp
 ]{aeb_pro}
+\usepackage{xbmks}
 %\usepackage{myriadpro} %[usecmtt]
 \usepackage[altbullet]{lucidbry}
 \usepackage{datepicker-pro}
@@ -25,8 +26,11 @@
     tex/latex/aeb/aebpro/datepicker-pro/swf}
 \setpickerIcon{../icons/dp_icon1.pdf}{date1,PickADate}
 \setpickerIcon{../icons/dp_icon2.pdf}{GERDate}
-\setlength{\marginparwidth}{2in}
+\setlength{\marginparwidth}{1.25in}
 %\usepackage{array}
+
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
 
 
 %\usepackage{makeidx}
@@ -45,13 +49,13 @@
 \DeclareDocInfo
 {
     university={\AcroTeX.Net},
-    title={\texorpdfstring{datepicker-pro\\[1em]}
+    title={\texorpdfstring{The \textsf{datepicker-pro} Package\\[1em]}
         {datepicker-pro: }Picking a date using Flash},
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject={Documentation of datepicker-pro from for AeB Pro},
     talksite={\url{www.acrotex.net}},
-    version={1.0},
+    version={1.3, 2018/07/02},
     keywords={AeB, Adobe Acrobat, JavaScript, datepicker, FLEX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -73,11 +77,38 @@
 %\pagestyle{empty}
 %\parindent0pt\parskip\medskipamount
 
+\chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
+var titleOfManual="The Datepicker Pro Manual";
+var manualfilename="Manual_BG_Print_ddp.pdf";
+var manualtemplate="Manual_BG_Blue.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
 \addWatermarkFromFile({
     bOnTop:false,
-%    cDIPath:"/C/AcroTeX/AcroTeX/ManualBGs/Manual_BG_Print_AeB.pdf"
-    cDIPath:"C:/Users/Public/Documents/ManualBGs/Manual_BG_Print_AeB.pdf"
+    bOnPrint:false,
+    cDIPath:_path
 });
 \executeSave();
 \end{docassembly}
@@ -85,6 +116,15 @@
 \begin{document}
 
 \maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
 
 \selectColors{linkColor=black}
 \tableofcontents
@@ -118,6 +158,45 @@ optional. The first argument is used to modify the date picker, the second
 is a unique name (\texttt{date1} in the above example), these are followed
 by the width and height of the text input field.
 
+\paragraph*{Evolution of date picking.} It has been several years since I first issued
+the \pkg{datepicker-pro} package. Over that period, two events impact this package:
+\begin{enumerate}
+    \item Adobe has finally provided native support for date picking
+        through its \app{Acrobat Reader DC} application (and in
+        \app{Acrobat} itself, of course). Experience the date field below.
+\begin{quote}%\previewOn
+    \textField[\AA{%
+      \AAKeystroke{AFDate_KeystrokeEx("m/d/yy")}
+      \AAFormat{AFDate_FormatEx("m/d/yy")}
+    }]{goNatDate}{1in}{11bp}\quad
+\begin{minipage}[t]{2in}\small
+\begin{Verbatim}
+\textField[\AA{%
+  \AAKeystroke{AFDate_KeystrokeEx("m/d/yy")}
+  \AAFormat{AFDate_FormatEx("m/d/yy")}
+}]{goNatDate}{1in}{11bp}
+\end{Verbatim}
+\end{minipage}
+\end{quote}
+This feature has been long in coming and is finally here. Of course, this
+date picking feature is not supported in any other PDF viewer, but then,
+these non-Adobe PDF viewers do not support the approach taken by this package
+either.
+
+To my knowledge, there is no way to control the design of the calendar that
+appears as a popup; for example, a calendar in the German language cannot
+be specified. Going under the assumption that the calendar will be in the
+language of the \app{Reader DC} being used, I downloaded the German version
+of \app{Reader DC} and determined that the calendar is not
+localized to the viewer language. That's not good.
+
+\item This package uses \app{Flash} technology, which is still supported by
+    Adobe, but it has drawn some of the (user-interface) features offered
+    to \app{Acrobat} users. \app{Flash} is probably not supported by any
+    other PDF viewer.
+\end{enumerate}
+To take full advantage of this package, the end-user must use \app{Reader DC}
+or higher.
 
 \section{Requirements}
 
@@ -154,20 +233,20 @@ creation of PostScript using \textsf{dvips} and
 
 \subsection{Transparency requirements}
 
-Transparency is only required to make the RMA transparent; unlike a form
-field, a RMA does not have a hidden property, so we try to make it
+Transparency is only required to make the \EXT{RMA} transparent; unlike a form
+field, a \EXT{RMA} does not have a hidden property, so we try to make it
 transparent.
 
-To get the transparency effect, you must distill using a JOBOPTIONS file
+To get the transparency effect, you must distill using a \EXT{JOBOPTIONS} file
 that supports transparency. The \pkg{datepicker-pro} package comes with an
-\textbf{Distiller} job options file named
+\app{Distiller} job options file named
 \texttt{Standard\_transparency.joboptions}. Instead of going through
 the above rather tedious instructions, drop this file in the place
-where Distiller expects to find its own {JOBOPTIONS}
-files.\footnote{Go to Settings \texttt{>} Edit Adobe PDF Settings\dots
-in the Distiller application window, then click the \texttt{SaveAs}
+where \app{Distiller} expects to find its own \EXT{JOBOPTIONS}
+files.\footnote{Go to \textsf{Settings > Edit Adobe PDF Settings}
+in the \app{Distiller} application window, then click the \textsf{SaveAs}
 button. A \textsf{Save Adobe PDF Settings As} dialog box opens and
-you can then see where \textbf{Distiller} likes to save its
+you can then see where \app{Distiller} likes to save its
 \texttt{.joboptions} file. Copy the provided \texttt{.joboptions} to
 the folder and restart Distiller, the \texttt{Standard\_transparency}
 should now be visible in the drop down \textsf{Default Settings}
@@ -176,15 +255,16 @@ list.}
 If you distill without this \texttt{Standard\_transparency}, you get an
 error message in the \textbf{Distiller} log that reads like this:
 \begin{small}
-\begin{verbatim}
+\begin{Verbatim}
 %%[Error: The PostScript contains Transparency pdfmark, job aborted.]%%
 %%[ /AllowTransparency is false in job option settings.]%%
 %%[ Error: undefined; OffendingCommand: pdfmark;
     ErrorInfo: Transparency Group ]%%
-\end{verbatim}
+\end{Verbatim}
 \end{small}%
-This suggests that you should use a JOBOPTIONS file that
-supports transparency!
+This suggests that you should use a \EXT{JOBOPTIONS} file that supports
+transparency! Look for the \texttt{Standard\_transparency.joboptions} file in
+the \texttt{joboptions} folder of this distribution.
 
 \subsection{Viewing requirements}
 
@@ -194,11 +274,13 @@ effects of the \pkg{datepicker-pro} package. Most third-party PDF readers do
 not support interactive form fields, rich-media annotations, and Acrobat JavaScript API. Consumers
 of your document need to use \app{Adobe Reader} or \app{Acrobat}.
 
-\section{Options of this package}
+%\section{Options of this package}
+%There are no options for this package.
 
-There are no options for this package.
+\section{The \texorpdfstring{\protect\pkg{datepicker-pro}}{datepicker-pro} commands}
 
-\section{The datepicker-pro commands}
+We document the commands required in the preamble, the configuration file, and one that can
+be placed in the preamble or the body of the document.
 
 \subsection{Commands for the preamble}
 
@@ -245,7 +327,8 @@ is the \texttt{rmannot} option for \pkg{aeb\_pro}.
 \end{dCmd}
 \endgroup\noindent
 The \cs{useFLEXVer}\DM{useFLEXVer} command declare what version of \EXT{FLEX}
-is to be used, choices are 3 or 4, corresponding to \EXT{FLEX~3.6} and
+is to be used,\footnote{Adobe has since re-branded \EXT{FLEX} to \app{Adobe
+Flash Builder}.}  choices are 3 or 4, corresponding to \EXT{FLEX~3.6} and
 \EXT{FLEX~4.5}, respectively. I've found the version~4 is very slow in
 loading; not recommended. If \cs{useFLEXVer} is not present in the preamble,
 version~3 is used by default.
@@ -257,7 +340,9 @@ command is defined in \pkg{eforms} is simply allows you construct paths
 with normally forbidden characters. The \cs{dppPath} command is expected
 by \pkg{datepicker-pro} to be defined; otherwise, the file will not
 compile. The \meta{path} needs to be an \emph{absolute path} on your file
-system that points to the location of the \EXT{SWF} files.
+system that points to the location of the \EXT{SWF} files. The declaration
+of the path \cs{dppPath} may be moved to the configuration file\marginpar{\small\raggedleft{config file}},
+the topic of \hyperref[s:config]{Section~\ref*{s:config}}
 
 Finally, the \cs{setpickerIcon}\DM{setpickerIcon} declares the \meta{path} to
 the date picker icon; this is a relative (or absolute) path and includes the
@@ -269,8 +354,9 @@ The dimensions of the icon are determined by the command declarations
 \cs{setpickerIconWidth} and \cs{setpickerIconHeight}, these are discussed in
 \hyperref[s:PB]{Section~\ref*{s:PB}}. These latter two commands may be
 declared in the preamble or in the body of the document. This package
-distribution provides to icon files \texttt{dp\_icon1.pdf} and
-\texttt{dp\_icon2.pdf} found in the \texttt{icons} folder.
+distribution provides to icon files \texttt{dp\_icon1.pdf},
+\texttt{dp\_icon2.pdf}, \dots, \texttt{dp\_icon7.pdf}, found in the \texttt{icons} folder.\footnote{My thanks to
+J\"{u}rgen Gilg for providing additional icon files.}
 
 
 \newtopic\noindent
@@ -285,12 +371,27 @@ In this example, there are three date fields created, each of them is
 given the appearance of the icon file \texttt{dp\_icon2.pdf}.
 Or, we can declare,
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
-\definePath{\dppPath}{C:/Users/Public/Documents/My TeX Files/%
-    tex/latex/aeb/aebpro/datepicker-pro/swf}
+% !normalfont!texttt(\dppPath) moved to !texttt(dp-pro.cfg), see !hyperref[s:config](Section !ref(s:config)).
 \setpickerIcon{../icons/dp_icon1.pdf}{date1,PickADate}
 \setpickerIcon{../icons/dp_icon2.pdf}{GERDate}
 \end{Verbatim}
 where a different icon is used for the \texttt{GerDate} date picker.
+
+\subsection{The configuration file}\label{s:config}
+
+Rather than placing the path to the \texttt{swf} folder of this distribution in each
+file, you can place the declared path in the package configuration file, \texttt{dp-pro.cfg}.
+The file is found in the root directory of the package distribution. An example of its contents
+is given below.
+\begin{Verbatim}
+%
+% datepicker-pro configuration file
+%
+\definePath{\dppPath}{C:/Users/Public/Documents/My TeX Files/%
+    tex/latex/aeb/aebpro/datepicker-pro/swf}
+\end{Verbatim}
+Edit this file to reflect the absolute path to the \texttt{swf} folder of
+this distribution on your file system.
 
 \subsection{Commands for the body of the document}
 
@@ -302,7 +403,7 @@ Within the body of the document, there is only one command, \cs{datepicker}:
 \endgroup\noindent
 The \meta{name} argument should consist only of letters or numbers
 (however, a number must not be the first character in the name); for
-example, \texttt{date1} or \texttt{PickADate} are acceptable. The
+example, \texttt{date1} or \texttt{PickADate} is acceptable. The
 \meta{name} argument is used to build names for the components of
 the date picker field. The input text field, which is set to read only, is
 named \texttt{txt\anglemeta{name}}, the push button is named
@@ -315,7 +416,7 @@ to the input text field only.
 Now for the \meta{options} argument of \cs{datepicker}. The options consist
 of key-value pairs (\texttt{key=value}) and are rather numerous.
 \begin{itemize}\def\DescribeMacro#1{}
-\item \textbf{Format date string.}
+\item \textbf{Format date string}\vskip-.5\baselineskip\kern0pt
     \begin{itemize}
     \item\texttt{formatstring}: The value of the \texttt{formatstring} key
         uses various combinations of \texttt{M}, \texttt{D}, \texttt{Y},
@@ -335,7 +436,6 @@ of key-value pairs (\texttt{key=value}) and are rather numerous.
 \item[] One example is \verb!formatstring={EEEE, DD. MMMM YYYY}!. The default
 formatting string is \verb!formatstring={MM/DD/YYYY}!.
  \end{itemize}
-%\define@key{ddp}{formatstring}[MM/DD/YYYY]{\def\dpp@FormatStr{#1}}
 \item \textbf{Formatting the calendar.} The \textsf{dateChooser} control that
     is used in the \EXT{SWF} file contains the name of the month at the top
     and the names of the days of the week just below it. By default, the
@@ -343,6 +443,10 @@ formatting string is \verb!formatstring={MM/DD/YYYY}!.
     and the usual English days of the week names are used (Sunday, Monday,
     \dots,Saturday). However, these can be changed through the use of
     \texttt{monthnames} and \texttt{daynames} key.
+
+    \textbf{A note on Unicode.} Any glyph outside the range of Basic Latin (U0020-U007F), unicode notation may
+    be used. For example the German word for March is M\"{a}rz; it must be
+    specified as \verb~M\u00E4rz~, see the example of German dates presented below.
     \begin{itemize}
         \item \texttt{daynames}: The names of the days that appear on the
             popup calendar. The value of \texttt{daynames} is a
@@ -415,10 +519,10 @@ On the German calendar, \emph{Montag} (\emph{Mo}) is the first day of the week.
 daynamesLong={Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,%
     Freitag,Samstag},
 daynamesShort={So,Mo,Di,Mi,Do,Fr,Sa},
-monthnamesLong={Januar,Februar,März,April,Mai,Juni,Juli,%
-    August,September,Oktober,November,Dezember},
+monthnamesLong={Januar,Februar,M\u00E4rz,April,Mai,Juni,%
+  Juli,August,September,Oktober,November,Dezember},
 monthnamesShort={Jan,Feb,Mrz,Apr,Mai,Jun,Jul,Aug,Sep,%
-    Okt,Nov,Dez},
+  Okt,Nov,Dez},
 \end{Verbatim}
 \item[] Again, always list January (\textsl{Januar}/\textsl{Jan}) and
     Sunday (\textsl{Sonntag}/\textsl{So}) first.
@@ -467,7 +571,7 @@ of the German calendar illustrates.
     daynamesLong={Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,%
         Freitag,Samstag},
     daynamesShort={So,Mo,Di,Mi,Do,Fr,Sa},
-    monthnamesLong={Januar,Februar,März,April,Mai,Juni,Juli,%
+    monthnamesLong={Januar,Februar,M\u00E4rz,April,Mai,Juni,Juli,%
         August,September,Oktober,November,Dezember},
     monthnamesShort={Jan,Feb,Mrz,Apr,Mai,Jun,Jul,Aug,%
         Sep,Okt,Nov,Dez},
@@ -491,7 +595,7 @@ The verbatim listing of this last field is given below.
     daynamesLong={Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,%
         Freitag,Samstag},
     daynamesShort={So,Mo,Di,Mi,Do,Fr,Sa},
-    monthnamesLong={Januar,Februar,März,April,Mai,Juni,Juli,%
+    monthnamesLong={Januar,Februar,M\u00E4rz,April,Mai,Juni,Juli,%
         August,September,Oktober,November,Dezember},
     monthnamesShort={Jan,Feb,Mrz,Apr,Mai,Jun,Jul,Aug,%
         Sep,Okt,Nov,Dez},

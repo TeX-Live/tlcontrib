@@ -1,6 +1,6 @@
 The datepicker-pro Package
 Author: D. P. Story
-Dated: 2016/05/06
+Dated: 2018-07-02
 
 One of the (many) deficiencies of Adobe Acrobat Reader/Adobe Acrobat is that 
 they have never supported a proper date picker. This package now supplies
@@ -17,7 +17,9 @@ As with all such special features, to experience the datepicker, Adobe Reader
 or Acrobat are needed. Most other PDF readers do not support form field, rich 
 media annotations, and JavaScript. 
 
-Unpack the distribution by latexing datepicker-pro.ins.
+What's New (2018/07/02) Fixed a problem when the month data contain glyphs 
+beyond Basic Latin. Specify this using unicode, eg, M\u00E4rz (German for 
+March).
 
 Enjoy.
 

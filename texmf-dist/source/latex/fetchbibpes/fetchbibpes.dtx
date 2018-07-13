@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{fetchbibpes}
-%<package> [2018/03/21 v2.4.1 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+%<package> [2018/07/12 v2.4.5 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -924,7 +924,16 @@
 \define@key{fbpes}{localdefs}[]{\def\fbpes@localdefs{#1}}
 \let\fbpes@localdefs\@empty
 %    \end{macrocode}
-%See the demo file \texttt{bibpes\_replaces.tex} for an example.
+%See the demo file \texttt{bibpes\_replaces.tex} for an example.\par\medskip\noindent
+%    The\IndexKey{typeset}\space\texttt{typeset} key is used with \cs{fetchversestxt}. If true,
+%    we assume the \cs{passagetxt} command is meant to be typeset and, as a result, the normal
+%    behavior of \cs{fetchverses} is followed; if false, certain special definitions are activated
+%    that allows \cs{passagetxt} to pass to another macro, such as \cs{pdfcomment}. This option is
+%    ignored within the optional list of \cs{fetchverses}.
+%    \begin{macrocode}
+\define@boolkey{fbpes}{typeset}[true]{}
+\KV@fbpes@typesettrue
+%    \end{macrocode}
 %\par\medskip\noindent
 %This ends the section on the key-values of the \cs{fetchverse} and \cs{fetchverses} commands.
 %
@@ -1168,30 +1177,47 @@
 \newcommand\fb@qq{\textbf{??}}
 \def\fp@getTwo#1#2#3\@nil{\def\fp@FT{{#1}{#2}}\def\fbpes@replace{#3}}%
 \def\fp@looptoreplace{%
-        \@tempcntb\fp@nReplace\relax
-        \let\repl@cep@ssage\@empty
-        \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
+  \@tempcntb\fp@nReplace\relax
+  \let\repl@cep@ssage\@empty
+  \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
 %    \end{macrocode}
 %    (2016/09/19) Simulate \cs{protected@edef} throughout this loop below.
 %    \changes{v2.0a}{2016/09/19}{Added protection to the \string\cs{@whilenum} loop.}
 %    \begin{macrocode}
-        \let\@@protect\protect
-        \let\protect\@unexpandable@protect
-        \let\fbpes@replace@save\fbpes@replace
+  \let\@@protect\protect
+  \let\protect\@unexpandable@protect
+  \let\fbpes@replace@save\fbpes@replace
 %    \end{macrocode}
 %    Loop through this passage to replace.
 %    \begin{macrocode}
-        \@whilenum\@tempcntb>\z@\do
-        {%
-            \expandafter\fp@getTwo\fbpes@replace\@nil
-            \protected@edef\fb@@tmp{\noexpand
-                \fb@replace*{\fb@passage}}%
-            \expandafter\fb@@tmp\fp@FT
-            \advance\@tempcntb\m@ne
-        }%
-        \let\fbpes@replace\fbpes@replace@save
-        \set@typeset@protect
-        \fb@passage
+  \@whilenum\@tempcntb>\z@\do
+  {%
+      \expandafter\fp@getTwo\fbpes@replace\@nil
+      \protected@edef\fb@@tmp{\noexpand
+          \fb@replace*{\fb@passage}}%
+      \expandafter\fb@@tmp\fp@FT
+      \advance\@tempcntb\m@ne
+  }%
+  \let\fbpes@replace\fbpes@replace@save
+  \set@typeset@protect
+%    \end{macrocode}
+%    Include verse numbers in the case of \cs{fetchversestxt}.
+%    \changes{v2.4.4}{2018/07/11}{Include verse numbers in the case of \string\cs{fetchversestxt}}
+%    \begin{macrocode}
+  \if@versetxt
+    \ifKV@fbpes@typeset % dps
+%      \set@typeset@protect % dps
+        \protected@edef\x{\noexpand\g@addto@macro\noexpand
+          \passagetxt{\fb@insrtvn\fb@passage}}\x
+%      \set@display@protect
+    \else
+      \edef\x{\noexpand\g@addto@macro\noexpand
+        \passagetxt{\fb@insrtvn\fb@passage}}\x
+    \fi
+  \else
+    \fb@insrtvn
+    \fb@passage
+  \fi
 }
 \newcommand\fetchverse[2][]{\bgroup\setNumStyle
     \def\@rgi{#1}\ifx\@rgi\@empty\else\useBookStyle{#1}\fi
@@ -1216,27 +1242,31 @@
             \fi
         }{%
     }%
-    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}
-    {\bgroup
-        \fbp@pformat
-        \ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
-        \l@fbp@enclose
+    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}{\bgroup
+      \fbp@pformat
+      \ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+      \l@fbp@enclose
 %    \end{macrocode}
 %    (2016/09/17) Introduce the \texttt{replace} option here. The option is only implemented
 %    for \cs{fetchverse}, not \cs{fetchverses}.
 %    \changes{v2.0}{2016/09/17}{Implement the replace option here}
 %    \begin{macrocode}
-        \ifx\fbpes@replace\@empty\@nameuse{\bib@ver}\else
-            \fp@looptoreplace\fi
-        \r@fbp@enclose
+      \ifx\fbpes@replace\@empty
+        \@nameuse{\bib@ver}\else
+        \fp@looptoreplace\fi
+      \r@fbp@enclose
     \egroup}%
     \ifKV@fbpes@citeatend
-        \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
-            \book@passage\fi}\fi\egroup
+      \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
+      \book@passage\fi}\fi
+  \egroup
 }
 %    \end{macrocode}
+%    \begin{macrocode}
+\newif\if@versetxt\@versetxtfalse
+%    \end{macrocode}
 % \cs{fb@fetchverse} sets the form of the passage reference, the form includes many
-% variables whose vales are determined by the key-values and other formatting commands.
+% variables whose values are determined by the key-values and other formatting commands.
 %    \begin{macrocode}
 \def\fb@fetchverse{%
   \ifbookexists
@@ -1253,7 +1283,8 @@
   \fi
 }
 %    \end{macrocode}
-% \subsubsection{The \protect\cs{fetchverses} command}
+%
+% \subsubsection{The \protect\cs{fetchverses} and \protect\cs{fetchversestxt} commands}
 % \begin{macro}{\fetchverses}
 % fetches the verse or verses only, it does not
 % typeset the reference (such as `(Mat 2:1)'). The syntax of the argument is as follows:
@@ -1265,19 +1296,34 @@
 % the reference, but the \DescribeMacro{\fetchverses*}\cs{fetchverses*} variation does. Thus
 % |\fetchverses*{Mat 2:1}| typesets the passage: \fetchverses*{Mat 2:1}
 % \changes{v2.1}{2016/09/21}{Extended \string\texttt{replace} to \string\cs{fetchverses}}
+% \par\medskip\noindent
+% The syntax for \cs{fetchverses} and its \texttt*-variation is,
 %\begin{quote}\ttfamily
 %\cs{fetchverse}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs}}\\[3pt]
 %\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs}} or\\[3pt]
 %\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs\SUB{1}}-\ameta{vrs\SUB{2}}} or\\[3pt]
 %\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs\SUB{1}}-}
 %\end{quote}
-%where \cs{ech} indicates that we should pull all verses until the end of the chapter.
+% The last one indicates that we should pull all verses until the end of the chapter, or until we
+% have not more verses defined.
 %    \begin{macrocode}
 \newcommand\fetchverses{\bgroup\setNumStyle
   \@ifstar{\let\isitstar\fb@One\fb@fetchversesi}
     {\let\isitstar\fb@Zero\fb@fetchversesi}}
 %    \end{macrocode}
-% We continue. We get the arguments and parse them.
+%    \begin{macro}{\fetchversestxt}
+%    Retrieve the verse in question, but without formatting of any kind. We return the result
+%    in the macros \cs{versetxt} and \cs{passagetxt}; \cs{fetchversestxt} does not have an `\texttt*'
+%    option. Its syntax is the same as above, but with no \texttt*-option.
+%    \begin{macrocode}
+\newcommand{\fetchversestxt}[2][]{\bgroup
+  \@versetxttrue\KV@fbpes@typesetfalse
+  \global\let\passagetxt\@empty
+  \fetchverses[#1]{#2}\egroup
+}
+%    \end{macrocode}
+%    \end{macro}
+% We continue \cs{fetchverses} by getting the arguments and parsing them.
 %    \begin{macrocode}
 \newcommand\fb@fetchversesi[2][]{\def\@rgi{#1}\def\passagespec{#2}%
   \ifx\@rgi\@empty\else
@@ -1285,6 +1331,24 @@
     \ifx\fbpes@alt\@empty\else\PackageWarning{fetchbibpes}
     {You have specified both alt* and alt,\MessageBreak
      removing the alt key}\fi\fi\fi
+%    \end{macrocode}
+%     If this is not the \cs{fetchversestxt} command, we are going to typeset
+%     results.
+%    \begin{macrocode}
+  \if@versetxt\else\KV@fbpes@typesettrue\fi
+  \ifKV@fbpes@typeset\else
+%    \end{macrocode}
+%     The only way we expand this following code is if \cs{fetchversestxt}
+%     is in play, but the \texttt{typeset} option is not taken. Because this is
+%     not designed to be typeset, we don't use superscripts.
+%    \begin{macrocode}
+    \def\verseFmt##1{##1)\space}\def\fb@bksp{\space}%
+%    \end{macrocode}
+%   Also, all quotes are literal, no special processing, no active characters.
+%    \changes{v2.4.3}{2018/06/27}{A quotes are literal, no special processing}
+%    \begin{macrocode}
+    \def\h@ndledq{"}\def\h@ndlesq{'}\def\bH@ndleltxQs{'}%
+  \fi
   \let\.\fbp@period\fbpes@localdefs
   \fb@getBookAPassage#2\@nil\fb@fetchversesii#2\@nil}
 %    \end{macrocode}
@@ -1296,52 +1360,81 @@
   \else\space\verseFmt{\the\@tempcnta}\fi}
 \def\fb@fetchversesii#1 #2\@nil{%
   \ifbookexists
-    \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
-      \expandafter{\bib@book}\fb@bksp\bib@passage
-      \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}\else
+    \ifKV@fbpes@typeset % dps
+      \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
+        \expandafter{\bib@book}\fb@bksp\bib@passage
+        \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}%
+%    \end{macrocode}
+%    When typeset is true, we need to define \cs{versetxt} as well.
+%     \changes{v2.4.4}{2018/07/11}{Define \string\cs{versetxt} in all cases.}
+%    \begin{macrocode}
+      \xdef\versetxt{\noexpand\fbpes@abbr
+        \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
+        \fbpes@transl}%
+    \else
+      \if@versetxt
+        \edef\book@passage{%\fbp@format\l@fbp@delim
+          \noexpand\fbpes@abbr
+          \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
+          \fbpes@transl
+        }%
+        \xdef\versetxt{\book@passage}%
+      \fi % \if@versetxt %dps
+    \fi % \ifKV@fbpes@typeset
+  \else % \ifbookexits
     \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
-      \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}\fi
-  \if\isitstar\fb@One\ifKV@fbpes@citeatend\else
-    \fbpes@priorref{\book@passage}\@fterRef\fi\fi
+      \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}%
+%    \xdef\versetxt{??(\bib@book)??}%
+  \fi % \ifbookexits
+  \if\isitstar\fb@One
+    \ifKV@fbpes@citeatend\else
+      \fbpes@priorref{%
+        \ifKV@fbpes@typeset\book@passage\fi}\ifKV@fbpes@typeset
+          \@fterRef\fi
+        \fi
+    \fi % dps
   \fb@get@chptverse{iftrue}#2\@nil
   \@tempcnta\fb@verseEnd\relax
   \advance\@tempcnta\@ne
   \edef\fb@verseEnd{\the\@tempcnta}%
   \@tempcnta\fb@verseStart\relax
-  \bgroup\fbp@pformat\ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
-  \l@fbp@enclose
+  \bgroup
+    \ifKV@fbpes@typeset % dps
+      \fbp@pformat\ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+      \l@fbp@enclose
+    \fi
 %    \end{macrocode}
 %    Before entering the loop, we determine if \texttt{alt*} is used.
 %    \begin{macrocode}
-  \ifx\fbpes@altstar\@empty\fbpes@altstarfalse
-    \else\fbpes@altstartrue\fi
+    \ifx\fbpes@altstar\@empty\fbpes@altstarfalse
+      \else\fbpes@altstartrue\fi
 %    \end{macrocode}
 %    Rework of \cs{fetchverses} to support the \texttt{replace} key.
 %    \begin{macrocode}
-  \@whilenum\@tempcnta<\fb@verseEnd\do{%\fb@insrtvn
+    \@whilenum\@tempcnta<\fb@verseEnd\do{%
 %    \end{macrocode}
 %    If the user has specified \texttt{alt*}, then we retrieve the \texttt{alt} value
 %    from a list of values.
 %    \begin{macrocode}
-  \iffbpes@altstar\fb@getnextalt\fi
-  \@fterVerseFmt{\the\@tempcnta}\edef\bib@ver{\bib@book\space
-      \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+      \iffbpes@altstar\fb@getnextalt\fi
+      \@fterVerseFmt{\the\@tempcnta}\edef\bib@ver{\bib@book\space
+        \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
 %    \end{macrocode}
 %    Determine if the \cs{bib@ver} is defined.
 %    \begin{macrocode}
-    \@ifundefined{\bib@ver}{%
+      \@ifundefined{\bib@ver}{%
 %    \end{macrocode}
 %    The verse is undefined, try the passage without the \texttt{alt} specification,
 %    if there is one.
 %    \begin{macrocode}
-      \ifx\fbpes@alt\@empty\else
+        \ifx\fbpes@alt\@empty\else
 %    \end{macrocode}
 %    If there is no \texttt{alt} key, this verse is tagged as undefined (??).
 %    Otherwise, we see if verse is defined without the \texttt{alt} key.
 %    \begin{macrocode}
-        \ifuseoldalt\else
-          \edef\bib@ver{\bib@book\space
-            \bib@chpt:\the\@tempcnta\fbpes@from}\fi
+          \ifuseoldalt\else
+            \edef\bib@ver{\bib@book\space
+              \bib@chpt:\the\@tempcnta\fbpes@from}\fi
         \@ifundefined{\bib@ver}{%
 %    \end{macrocode}
 %    The verse is undefined without an \texttt{alt} key. No action taken, the verse
@@ -1371,12 +1464,41 @@
           \advance\@tempcnta\m@ne
           \immediate\write\@auxout{\string\csarg\string
             \gdef{\passagespec}{\the\@tempcnta}}%
-          \@tempcnta\fb@verseEnd\else
-          \fb@insrtvn\fb@qq(\bib@ver)\fb@qq\fi
-        }{\bgroup\fb@insrtvn
+          \@tempcnta\fb@verseEnd
+        \else
+          \ifKV@fbpes@typeset
+            \fb@insrtvn
+            \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+          \else
+            \edef\x{\noexpand\g@addto@macro\noexpand
+              \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
+          \fi
+        \fi
+        }{\bgroup
           \ifx\fbpes@replace\@empty
-            \@nameuse{\bib@ver}\else
-            \fp@looptoreplace\fi
+            \if@versetxt
+%    \end{macrocode}
+%     When typesetting the result, we first throw everything into the
+%     \cs{passagetxt} command, but we want to delay any special processing
+%     of apostrophes and quotes until we expand in the light of day. So,
+%     we use \cs{protected@edef} here.
+%    \begin{macrocode}
+              \ifKV@fbpes@typeset % dps
+                \set@typeset@protect % dps
+                  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+                    \passagetxt{\fb@insrtvn\@nameuse{\bib@ver}}}\x
+                \set@display@protect
+              \else
+                \edef\x{\noexpand\g@addto@macro\noexpand
+                  \passagetxt{\fb@insrtvn\@nameuse{\bib@ver}}}\x
+              \fi
+            \else
+              \fb@insrtvn
+              \@nameuse{\bib@ver}%
+            \fi
+          \else
+            \fp@looptoreplace
+          \fi
           \egroup
         }\advance\@tempcnta\@ne
 %    \end{macrocode}
@@ -1385,9 +1507,11 @@
 %    of gracefully exiting. \cs{fb@@getnextalt} sets \cs{iffound@ltstarstop} to \texttt{true},
 %    whereas the normal state is \texttt{false}.
 %    \begin{macrocode}
-    \iffound@ltstarstop\let\fbpes@alt\@empty\fi
-  }\r@fbp@enclose\egroup
-  \ifKV@fbpes@citeatend\fbp@priorRefSpc{\book@passage}\fi
+        \iffound@ltstarstop\let\fbpes@alt\@empty\fi
+      }\ifKV@fbpes@typeset\r@fbp@enclose\fi % dps
+    \egroup
+    \ifKV@fbpes@citeatend
+    \fbp@priorRefSpc{\book@passage}\fi
   \egroup
 }
 %    \end{macrocode}
@@ -1679,10 +1803,10 @@
 %    \changes{v1.7}{2016/04/11}{Advance \string\cs{fp@dqcnt} and \string\cs{fp@sqcnt} globally}
 %    (2016/04/11) Advance \cs{fp@dqcnt} and \cs{fp@sqcnt} globally
 %    \begin{macrocode}
-\def\h@ndledq{\ifodd\fp@dqcnt\fp@rqq\else\fp@lqq\fi
-    \global\advance\fp@dqcnt\@ne}
+\def\h@ndledq{\ifodd\fp@dqcnt\expandafter\fp@rqq\else
+  \expandafter\fp@lqq\fi\global\advance\fp@dqcnt\@ne}
 \def\h@ndlesq{\ifodd\fp@sqcnt\fp@rq\else\fp@lq\fi
-    \global\advance\fp@sqcnt\@ne}
+  \global\advance\fp@sqcnt\@ne}
 %    \end{macrocode}
 %    \changes{v1.8}{2016/09/14}{Changes in quote handling routines to allow for
 %    latex markup for quotes.}
@@ -1712,9 +1836,13 @@
 %    \begin{macrocode}
 \def\eH@ndleltxDQ{\fp@rqq\@gobble}
 \def\eH@ndleltxSQ{\fp@rq}
+%    \end{macrocode}
+%    Modified \cs{fp@rq@choice} to expand in mouth
+%    \changes{v2.4.3}{2018/06/27}{Modified \string\cs{fp@rq@choice} to expand in mouth}
+%    \begin{macrocode}
 \def\fp@rq@choice{\ifNotL@TeXQuotes
-    \def\fp@next{\h@ndlesq}\else
-    \def\fp@next{\eH@ndleltxQs}\fi\fp@next
+    \expandafter\h@ndlesq\else
+    \expandafter\eH@ndleltxQs\fi
 }
 \begingroup\catcode`\"=\active \catcode`\'=\active \catcode`\`=\active
 %    \end{macrocode}
@@ -1723,15 +1851,15 @@
 %    if it is, flow goes to \cs{bH@ndleltxDQ}, otherwise, it goes to
 %    \cs{bH@ndleltxSQ}. Similarly for right quotes.
 %    \begin{macrocode}
-\gdef\bQsCont@fp{\ifx\fp@next`\let\fp@next\bH@ndleltxDQ\else
-    \let\fp@next\bH@ndleltxSQ\fi\fp@next}
-\gdef\eQsCont@fp{\ifx\fp@next'\let\fp@next\eH@ndleltxDQ\else
-    \let\fp@next\eH@ndleltxSQ\fi\fp@next}
+  \gdef\bQsCont@fp{\ifx\fp@next`\expandafter\bH@ndleltxDQ\else
+    \expandafter\bH@ndleltxSQ\fi} % dps
+  \gdef\eQsCont@fp{\ifx\fp@next'\expandafter\eH@ndleltxDQ\else
+    \expandafter\eH@ndleltxSQ\fi} % dps
 %    \end{macrocode}
 %    \cs{cvrtdqs} creates active characters and associates commands for handling
 %    them. It is introduced through the \cs{@AddToVersesList} command.
 %    \begin{macrocode}
-\gdef\cvrtdqs{%
+  \gdef\cvrtdqs{%
 %    \end{macrocode}
 %    Replace \cs{let} by \cs{gdef}, and \cs{protect} each command.
 %    \changes{v2.1}{2016/09/21}{Replace \string\cs{let} with \string\cs{gdef},  and protect
@@ -1740,7 +1868,7 @@
     \expandafter\catcode\fp@lq\"=\active\gdef"{\protect\h@ndledq}%
     \expandafter\catcode\fp@lq\'=\active\gdef'{\protect\fp@rq@choice}%
     \expandafter\catcode\fp@lq\`=\active\gdef`{\protect\bH@ndleltxQs}%
-}
+  }
 \endgroup
 %    \end{macrocode}
 % In the case of unbalanced double quotes, you can force the correct quite to appear
@@ -2461,7 +2589,7 @@
       \fi
     \fi
     \advance\@tempcntb\@ne
-  }% \@whilenum 
+  }% \@whilenum
   \let\fbpes@replace\fbpes@replace@save
   \set@typeset@protect
 }

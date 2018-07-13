@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{fetchbibpes}
- [2018/03/21 v2.4.1 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+ [2018/07/12 v2.4.5 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 \RequirePackage{xkeyval}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \let\fb@Zero=0 \let\fb@One=1 \let\fb@Two=2
@@ -299,6 +299,8 @@
 \let\fbpes@priorref\relax
 \define@key{fbpes}{localdefs}[]{\def\fbpes@localdefs{#1}}
 \let\fbpes@localdefs\@empty
+\define@boolkey{fbpes}{typeset}[true]{}
+\KV@fbpes@typesettrue
 \long\def\priorRefSpc#1{\def\fbp@priorRefSpc{#1}}
 \def\fbp@priorRefSpc{\space}
 \def\fbFitItIn{\noindent\unskip\nobreak\hfill\penalty100
@@ -371,23 +373,34 @@
 \newcommand\fb@qq{\textbf{??}}
 \def\fp@getTwo#1#2#3\@nil{\def\fp@FT{{#1}{#2}}\def\fbpes@replace{#3}}%
 \def\fp@looptoreplace{%
-        \@tempcntb\fp@nReplace\relax
-        \let\repl@cep@ssage\@empty
-        \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
-        \let\@@protect\protect
-        \let\protect\@unexpandable@protect
-        \let\fbpes@replace@save\fbpes@replace
-        \@whilenum\@tempcntb>\z@\do
-        {%
-            \expandafter\fp@getTwo\fbpes@replace\@nil
-            \protected@edef\fb@@tmp{\noexpand
-                \fb@replace*{\fb@passage}}%
-            \expandafter\fb@@tmp\fp@FT
-            \advance\@tempcntb\m@ne
-        }%
-        \let\fbpes@replace\fbpes@replace@save
-        \set@typeset@protect
-        \fb@passage
+  \@tempcntb\fp@nReplace\relax
+  \let\repl@cep@ssage\@empty
+  \protected@edef\fb@passage{\@nameuse{\bib@ver}}%
+  \let\@@protect\protect
+  \let\protect\@unexpandable@protect
+  \let\fbpes@replace@save\fbpes@replace
+  \@whilenum\@tempcntb>\z@\do
+  {%
+      \expandafter\fp@getTwo\fbpes@replace\@nil
+      \protected@edef\fb@@tmp{\noexpand
+          \fb@replace*{\fb@passage}}%
+      \expandafter\fb@@tmp\fp@FT
+      \advance\@tempcntb\m@ne
+  }%
+  \let\fbpes@replace\fbpes@replace@save
+  \set@typeset@protect
+  \if@versetxt
+    \ifKV@fbpes@typeset % dps
+        \protected@edef\x{\noexpand\g@addto@macro\noexpand
+          \passagetxt{\fb@insrtvn\fb@passage}}\x
+    \else
+      \edef\x{\noexpand\g@addto@macro\noexpand
+        \passagetxt{\fb@insrtvn\fb@passage}}\x
+    \fi
+  \else
+    \fb@insrtvn
+    \fb@passage
+  \fi
 }
 \newcommand\fetchverse[2][]{\bgroup\setNumStyle
     \def\@rgi{#1}\ifx\@rgi\@empty\else\useBookStyle{#1}\fi
@@ -412,19 +425,21 @@
             \fi
         }{%
     }%
-    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}
-    {\bgroup
-        \fbp@pformat
-        \ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
-        \l@fbp@enclose
-        \ifx\fbpes@replace\@empty\@nameuse{\bib@ver}\else
-            \fp@looptoreplace\fi
-        \r@fbp@enclose
+    \@ifundefined{\bib@ver}{\fb@qq(\bib@ver)\fb@qq}{\bgroup
+      \fbp@pformat
+      \ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+      \l@fbp@enclose
+      \ifx\fbpes@replace\@empty
+        \@nameuse{\bib@ver}\else
+        \fp@looptoreplace\fi
+      \r@fbp@enclose
     \egroup}%
     \ifKV@fbpes@citeatend
-        \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
-            \book@passage\fi}\fi\egroup
+      \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
+      \book@passage\fi}\fi
+  \egroup
 }
+\newif\if@versetxt\@versetxtfalse
 \def\fb@fetchverse{%
   \ifbookexists
     \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
@@ -442,12 +457,22 @@
 \newcommand\fetchverses{\bgroup\setNumStyle
   \@ifstar{\let\isitstar\fb@One\fb@fetchversesi}
     {\let\isitstar\fb@Zero\fb@fetchversesi}}
+\newcommand{\fetchversestxt}[2][]{\bgroup
+  \@versetxttrue\KV@fbpes@typesetfalse
+  \global\let\passagetxt\@empty
+  \fetchverses[#1]{#2}\egroup
+}
 \newcommand\fb@fetchversesi[2][]{\def\@rgi{#1}\def\passagespec{#2}%
   \ifx\@rgi\@empty\else
     \useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
     \ifx\fbpes@alt\@empty\else\PackageWarning{fetchbibpes}
     {You have specified both alt* and alt,\MessageBreak
      removing the alt key}\fi\fi\fi
+  \if@versetxt\else\KV@fbpes@typesettrue\fi
+  \ifKV@fbpes@typeset\else
+    \def\verseFmt##1{##1)\space}\def\fb@bksp{\space}%
+    \def\h@ndledq{"}\def\h@ndlesq{'}\def\bH@ndleltxQs{'}%
+  \fi
   \let\.\fbp@period\fbpes@localdefs
   \fb@getBookAPassage#2\@nil\fb@fetchversesii#2\@nil}
 \def\fb@insrtvn{\ifnum\@tempcnta=\fb@verseStart\relax
@@ -455,31 +480,55 @@
   \else\space\verseFmt{\the\@tempcnta}\fi}
 \def\fb@fetchversesii#1 #2\@nil{%
   \ifbookexists
-    \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
-      \expandafter{\bib@book}\fb@bksp\bib@passage
-      \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}\else
+    \ifKV@fbpes@typeset % dps
+      \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
+        \expandafter{\bib@book}\fb@bksp\bib@passage
+        \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}%
+      \xdef\versetxt{\noexpand\fbpes@abbr
+        \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
+        \fbpes@transl}%
+    \else
+      \if@versetxt
+        \edef\book@passage{%\fbp@format\l@fbp@delim
+          \noexpand\fbpes@abbr
+          \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
+          \fbpes@transl
+        }%
+        \xdef\versetxt{\book@passage}%
+      \fi % \if@versetxt %dps
+    \fi % \ifKV@fbpes@typeset
+  \else % \ifbookexits
     \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
-      \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}\fi
-  \if\isitstar\fb@One\ifKV@fbpes@citeatend\else
-    \fbpes@priorref{\book@passage}\@fterRef\fi\fi
+      \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}%
+  \fi % \ifbookexits
+  \if\isitstar\fb@One
+    \ifKV@fbpes@citeatend\else
+      \fbpes@priorref{%
+        \ifKV@fbpes@typeset\book@passage\fi}\ifKV@fbpes@typeset
+          \@fterRef\fi
+        \fi
+    \fi % dps
   \fb@get@chptverse{iftrue}#2\@nil
   \@tempcnta\fb@verseEnd\relax
   \advance\@tempcnta\@ne
   \edef\fb@verseEnd{\the\@tempcnta}%
   \@tempcnta\fb@verseStart\relax
-  \bgroup\fbp@pformat\ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
-  \l@fbp@enclose
-  \ifx\fbpes@altstar\@empty\fbpes@altstarfalse
-    \else\fbpes@altstartrue\fi
-  \@whilenum\@tempcnta<\fb@verseEnd\do{%\fb@insrtvn
-  \iffbpes@altstar\fb@getnextalt\fi
-  \@fterVerseFmt{\the\@tempcnta}\edef\bib@ver{\bib@book\space
-      \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
-    \@ifundefined{\bib@ver}{%
-      \ifx\fbpes@alt\@empty\else
-        \ifuseoldalt\else
-          \edef\bib@ver{\bib@book\space
-            \bib@chpt:\the\@tempcnta\fbpes@from}\fi
+  \bgroup
+    \ifKV@fbpes@typeset % dps
+      \fbp@pformat\ifx\fbp@pcolor\@empty\else\color{\fbp@pcolor}\fi
+      \l@fbp@enclose
+    \fi
+    \ifx\fbpes@altstar\@empty\fbpes@altstarfalse
+      \else\fbpes@altstartrue\fi
+    \@whilenum\@tempcnta<\fb@verseEnd\do{%
+      \iffbpes@altstar\fb@getnextalt\fi
+      \@fterVerseFmt{\the\@tempcnta}\edef\bib@ver{\bib@book\space
+        \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
+      \@ifundefined{\bib@ver}{%
+        \ifx\fbpes@alt\@empty\else
+          \ifuseoldalt\else
+            \edef\bib@ver{\bib@book\space
+              \bib@chpt:\the\@tempcnta\fbpes@from}\fi
         \@ifundefined{\bib@ver}{%
           \edef\bib@ver{\bib@book\space
             \bib@chpt:\the\@tempcnta\fbpes@from\fbpes@alt}%
@@ -498,17 +547,42 @@
           \advance\@tempcnta\m@ne
           \immediate\write\@auxout{\string\csarg\string
             \gdef{\passagespec}{\the\@tempcnta}}%
-          \@tempcnta\fb@verseEnd\else
-          \fb@insrtvn\fb@qq(\bib@ver)\fb@qq\fi
-        }{\bgroup\fb@insrtvn
+          \@tempcnta\fb@verseEnd
+        \else
+          \ifKV@fbpes@typeset
+            \fb@insrtvn
+            \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+          \else
+            \edef\x{\noexpand\g@addto@macro\noexpand
+              \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
+          \fi
+        \fi
+        }{\bgroup
           \ifx\fbpes@replace\@empty
-            \@nameuse{\bib@ver}\else
-            \fp@looptoreplace\fi
+            \if@versetxt
+              \ifKV@fbpes@typeset % dps
+                \set@typeset@protect % dps
+                  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+                    \passagetxt{\fb@insrtvn\@nameuse{\bib@ver}}}\x
+                \set@display@protect
+              \else
+                \edef\x{\noexpand\g@addto@macro\noexpand
+                  \passagetxt{\fb@insrtvn\@nameuse{\bib@ver}}}\x
+              \fi
+            \else
+              \fb@insrtvn
+              \@nameuse{\bib@ver}%
+            \fi
+          \else
+            \fp@looptoreplace
+          \fi
           \egroup
         }\advance\@tempcnta\@ne
-    \iffound@ltstarstop\let\fbpes@alt\@empty\fi
-  }\r@fbp@enclose\egroup
-  \ifKV@fbpes@citeatend\fbp@priorRefSpc{\book@passage}\fi
+        \iffound@ltstarstop\let\fbpes@alt\@empty\fi
+      }\ifKV@fbpes@typeset\r@fbp@enclose\fi % dps
+    \egroup
+    \ifKV@fbpes@citeatend
+    \fbp@priorRefSpc{\book@passage}\fi
   \egroup
 }
 \newif\iffound@ltstarstop \found@ltstarstopfalse
@@ -608,10 +682,10 @@
 \newcount\fp@dqcnt \fp@dqcnt=0
 \newcount\fp@sqcnt \fp@sqcnt=0
 \def\fp@lq{`}\def\fp@rq{'}\def\fp@lqq{``}\def\fp@rqq{''}
-\def\h@ndledq{\ifodd\fp@dqcnt\fp@rqq\else\fp@lqq\fi
-    \global\advance\fp@dqcnt\@ne}
+\def\h@ndledq{\ifodd\fp@dqcnt\expandafter\fp@rqq\else
+  \expandafter\fp@lqq\fi\global\advance\fp@dqcnt\@ne}
 \def\h@ndlesq{\ifodd\fp@sqcnt\fp@rq\else\fp@lq\fi
-    \global\advance\fp@sqcnt\@ne}
+  \global\advance\fp@sqcnt\@ne}
 \def\bH@ndleltxQs{\futurelet\fp@next\bQsCont@fp}
 \def\bH@ndleltxDQ{\fp@lqq\@gobble}
 \def\bH@ndleltxSQ{\fp@lq}
@@ -619,19 +693,19 @@
 \def\eH@ndleltxDQ{\fp@rqq\@gobble}
 \def\eH@ndleltxSQ{\fp@rq}
 \def\fp@rq@choice{\ifNotL@TeXQuotes
-    \def\fp@next{\h@ndlesq}\else
-    \def\fp@next{\eH@ndleltxQs}\fi\fp@next
+    \expandafter\h@ndlesq\else
+    \expandafter\eH@ndleltxQs\fi
 }
 \begingroup\catcode`\"=\active \catcode`\'=\active \catcode`\`=\active
-\gdef\bQsCont@fp{\ifx\fp@next`\let\fp@next\bH@ndleltxDQ\else
-    \let\fp@next\bH@ndleltxSQ\fi\fp@next}
-\gdef\eQsCont@fp{\ifx\fp@next'\let\fp@next\eH@ndleltxDQ\else
-    \let\fp@next\eH@ndleltxSQ\fi\fp@next}
-\gdef\cvrtdqs{%
+  \gdef\bQsCont@fp{\ifx\fp@next`\expandafter\bH@ndleltxDQ\else
+    \expandafter\bH@ndleltxSQ\fi} % dps
+  \gdef\eQsCont@fp{\ifx\fp@next'\expandafter\eH@ndleltxDQ\else
+    \expandafter\eH@ndleltxSQ\fi} % dps
+  \gdef\cvrtdqs{%
     \expandafter\catcode\fp@lq\"=\active\gdef"{\protect\h@ndledq}%
     \expandafter\catcode\fp@lq\'=\active\gdef'{\protect\fp@rq@choice}%
     \expandafter\catcode\fp@lq\`=\active\gdef`{\protect\bH@ndleltxQs}%
-}
+  }
 \endgroup
 \def\bDQ{\global\fp@dqcnt=0 }\def\bSQ{\global\fp@sqcnt=0 }
 \def\eDQ{\global\fp@dqcnt=1 }\def\eSQ{\global\fp@sqcnt=1 }

@@ -1,6 +1,6 @@
 The fetchbibpes Bundle
 Author: D. P. Story
-Dated: 2018/03/21
+Dated: 2018/07/12
 
 This bundle provides two packages, bibpes and fetchbibpes. This pair of 
 packages was motivated by a friend, who was preparing Bible studies lessons 
@@ -23,9 +23,16 @@ LaTeX. He wanted a `database' of Bible packages from which he could simply
 
 Unpack the distribution by latexing fetchbibpes.ins.
 
-What's new (2018/03/21): Implemented open ended ranges, for example,
-  \fetchverses{Joh 3:27-} fetches all passages from John, chapter 3, starting
-  with verse 27 until the end of the chapter.
+What's new (2018/07/12) Defined a new command \fetchversestxt; the command 
+has the same arguments as \fetchverses, but it does not expand to typeset 
+content. Rather, it defines two commands \versetxt and \passagetxt. These two 
+are the passage reference and the passage for that verse but with all \LaTeX 
+styling and font changes.  
+
+What's new (2018/03/21): Implemented open ended ranges, for example, 
+\fetchverses{Joh 3:27-} fetches all passages from John, chapter 3, starting 
+with verse 27 until the end of the chapter. 
+
 What's new (2016/09/24): Changed behavior of the alt key. Added an alt* key.
 
 

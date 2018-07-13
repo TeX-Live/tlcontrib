@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage{pdfcomment}
+\usepackage[%
+    useverses=none
+%    useverses=verses
+]{fetchbibpes}
+
+\def\cs#1{\texttt{\char`\\#1}}
+\let\pkg\textsf
+\let\env\texttt
+
+\addtoBibles{YLT,ISV}
+
+
+\title{Highlighting the \texorpdfstring{\protect
+  \cs{fetchversestxt}}{\textbackslash{fetchversestxt}} command}
+\author{D. P. Story}
+
+\reversemarginpar
+
+\begin{declareBVs}
+\BV(1Co 1:1 KJV) Paul, called to be an apostle of Jesus Christ through the will of God, and Sosthenes our brother,\null
+\BV(1Co 1:2 KJV) Unto the church of God which is at Corinth, to them that are sanctified in Christ Jesus, called to be saints, with all that in every place call upon the name of Jesus Christ our Lord, both theirs and ours:\null
+\BV(1Co 1:3 KJV) Grace be unto you, and peace, from God our Father, and from the Lord Jesus Christ.\null
+\BV(1Co 1:4 KJV) I thank my God always on your behalf, for the grace of God which is given you by Jesus Christ;\null
+\BV(1Co 1:5 KJV) That in every thing ye are enriched by him, in all utterance, and in all knowledge;\null
+%
+\BV(1Ki 1:5 ISV) Meanwhile, about this time Haggith's son Adonijah began to seek a reputation for himself and decided, "I'm going to be king!" So he prepared chariots, cavalry, and 50 soldiers to serve as a security detail to guard him.\null
+%
+\BV(Gen 1:1 YLT) In the beginning of God's preparing the heavens and the earth--\null
+\BV(Gen 1:2 YLT) the earth hath existed waste and void, and darkness is on the face of the deep, and the Spirit of God fluttering on the face of the waters,\null
+\BV(Gen 1:3 YLT) and God saith, `Let light be;' and light is.\null
+\end{declareBVs}
+
+%\parindent0pt \parskip6pt
+
+\begin{document}
+
+\maketitle
+
+The \cs{fetchversestxt} command does not expand to typeset content, rather,
+it defines two commands \cs{versetxt}, which contains the verse reference,
+and \cs{passagetxt}, which contains the passage for that verse. Take as an
+example, \verb~\fetchversestxt[showfirst]{1Co 1:1-2}~\fetchversestxt[showfirst]{1Co 1:1-2}:
+it expands to nothing typeset; however, the command `\cs{versetxt}' expands
+to `\versetxt' and the command `\cs{passagetxt}' expands to `\passagetxt' The
+next expansion of \cs{fetchversestxt} overwrites the \cs{versetxt} and
+\cs{passagetxt} commands. You can use \cs{fetchversestxt} with the usual
+options, any formatting options are ignored (I hope), otherwise, all options
+should work as described in \texttt{fetchbibpes\_man.pdf}.
+
+The application\fetchversestxt[showfirst]{1Co 1:1-}\pdfmargincomment[author={\versetxt}]{\passagetxt}
+my former-friend had in mind was to pass the \cs{passagetxt} command to an
+annotation macro such as \cs{annotpro} (\pkg{annot\_pro} package) or
+\cs{pdfcomment} (\pkg{pdfcomment} package). What you see in the margin is a
+sticky note put there by  \cs{pdfmargincomment} from the \pkg{pdfcomment}
+package.
+
+We try this with a different book that has a passage containing an apostrophe
+and single quotes.\fetchversestxt[showfirst,abbr=none,from*=YLT]{Gen
+1:1-3}\pdfmargincomment[author={\versetxt}]{\passagetxt}
+In\eSQ\fetchversestxt[typeset,showfirst,abbr=none,from=YLT,localdefs=\gobbleto{and}{\gobbletoand},
+replace={saith,}{saith, `Let light be;' and\gobbletoand}]{Gen 1:1-3}
+\versetxt\space(YLT), it is written that \textsl{\passagetxt} If you have
+eagle-eyes, you would have noticed the different treatment of the single
+quotes and apostrophe in the passage listed in the sticky note and the one
+that is typeset. In the latter case, the \texttt{typeset} option is used as
+well as some fancy uses of the \texttt{replace} replace option to get the
+naughty single quotes and apostrophes to look right.
+
+The rest of this article discusses the \texttt{typeset} option using\fetchversestxt[abbr=none,from=ISV]{1Ki 1:5}
+\versetxt\space(ISV).\pdfmargincomment[author={\versetxt}]{\passagetxt}
+This passage contains double quotes (\texttt{"}) and apostrophes (\texttt{\char13}).
+
+\medskip\noindent
+\textbf{The \texttt{typeset} option of \cs{fetchversestxt}.} If, for whatever reason, you want
+to typeset the \cs{passagetxt}, as we've done above, you can use the
+\texttt{typeset} option. This will create the same passage (\cs{passagetxt})
+as \cs{fetchverses}.
+
+\medskip\goodbreak\noindent
+\verb~\fetchversestxt[typeset,abbr=none,from*=ISV]{1Ki 1:5}\passagetxt~\\[3pt]
+\bDQ\eSQ\fetchversestxt[typeset,abbr=none,from*=ISV]{1Ki 1:5}\passagetxt
+%\makeatletter\expandafter\@gobble\passagetxt\makeatother
+
+\medskip\noindent
+\verb~\fetchverses[abbr=none,from*=ISV]{1Ki 1:5}~\\[3pt]
+\bDQ\eSQ\fetchverses[abbr=none,from*=ISV]{1Ki 1:5}
+
+\medskip
+This passage has two apostrophes, which make it difficult to deal with
+correctly. We'll use advanced techniques. In the optional argument of both
+commands \cs{fetchversestxt} and \cs{fetchverses}, we use the
+\texttt{replace} option:
+\begin{flushleft}\small
+\quad\verb~replace={decided,}{decided, ``I'm going to be king!'' So\gobbletoSo}~
+\end{flushleft} were we have already declared
+\verb~\gobbleto{So}{\gobbletoSo}~.
+
+\medskip\noindent
+\gobbleto{So}{\gobbletoSo}
+\verb~\fetchversestxt[typeset,abbr=none,from*=ISV,replace=~\\
+\verb~{decided,}{decided, ``I'm going to be king!'' So\gobbletoSo}]~\\
+\verb~{1Ki 1:5}\passagetxt~\\[3pt]
+\bDQ\eSQ\fetchversestxt[replace={decided,}{decided, ``I'm going to be king!'' So\gobbletoSo},typeset,abbr=none,from*=ISV]{1Ki 1:5}\passagetxt
+
+\medskip\noindent
+\verb~\fetchverses[abbr=none,from*=ISV,replace={decided,}~\\
+\verb~{decided, ``I'm going to be king!'' So\gobbletoSo}]{1Ki 1:5}~\\[3pt]
+\bDQ\eSQ\fetchverses[replace={decided,}{decided, ``I'm going to be king!'' So\gobbletoSo},abbr=none,from*=ISV]{1Ki 1:5}
+
+\medskip
+Now for the proof in the pudding. When the \texttt{typeset} option is on,
+both forms yield the same results, but now let's take away the
+\texttt{typeset} option and put the \cs{passagetxt} in a comment
+field.\fetchversestxt[abbr=none,from*=ISV]{1Ki 1:5}
+\pdfmargincomment[author={\versetxt}]{\passagetxt}
+
+\end{document}

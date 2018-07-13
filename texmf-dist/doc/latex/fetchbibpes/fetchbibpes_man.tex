@@ -5,19 +5,26 @@
     eforms,aebxmp
 ]{aeb_pro}
 \usepackage{graphicx,array,fancyvrb}
+\usepackage{annot-pro}
 \usepackage{aeb_mlink}
 %\usepackage{myriadpro}
 %\usepackage{calibri}
+
 \usepackage[altbullet]{lucidbry}
 
 \usepackage[ignorecfg,
     useselverses,useverses=docverses,fetchsubtr]{fetchbibpes}
 
+\usepackage{xbmks}
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
+
 \addtoBibles{YLT,ESV,NKJV}
 
 \selectedVersesFrom
 {
-    {from=YILT,onlyverses={Gen 1:1-2}}
+    {from=YLT,onlyverses={Gen 1:1-2}}
 }
 
 \begin{declareBVs}
@@ -37,7 +44,6 @@
     {\def\yyPC{\special{color: pop}}}
 \makeatother
 \renewcommand{\hproportionwebtitle}{.8}
-
 
 
 \def\hardspace{{\fontfamily{cmtt}\selectfont\symbol{32}}}
@@ -66,7 +72,7 @@
     email={dpstory@acrotex.net},
     subject=Documentation for the fetchbibpes and bibpes packages,
     talksite={\url{www.acrotex.net}},
-    version={2.4.1, 2018/03/21},
+    version={2.4.5, 2018/07/12},
     Keywords={LaTeX, e-sword, Bible passages, AcroTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -84,7 +90,7 @@
 
 \chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
-var titleOfManual="The fetchbib Bundle";
+var titleOfManual="The fetchbibpes Bundle";
 var manualfilename="Manual_BG_Print_fetchbib.pdf";
 var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
 var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
@@ -122,6 +128,15 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 \begin{document}
 
 \maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
 
 \selectColors{linkColor=black}
 \tableofcontents
@@ -583,8 +598,8 @@ $$\begin{tabular}{lll|lll}\\
 
 \section{The \texorpdfstring{\protect\pkg{fetchbibpes}}{fetchbibpes} Package}\label{fetch}
 
-    The problem of fetching Bible verses was suggested to me by my friend Tom Price. He plans
-    to write Bible lessons, notes and handouts will be prepared using
+    The problem of fetching Bible verses was suggested to me by my friend Tom
+    Price. He plans to write Bible lessons, notes and handouts prepared using
     {\LaTeX} and these packages (\textsf{bibpes} and \textsf{fetchbibpes}).
 
     This is a companion package to \textsf{bibpes}. Use the
@@ -621,7 +636,7 @@ $$\begin{tabular}{lll|lll}\\
     must all be from the same chapter. The `\texttt{*}' parameter is
     optional, when present, the book and verse references are shown,
     otherwise they are not. We illustrate with \texttt{Gen\;1:1},
-    \texttt{Gen\;1:1-2}, and \texttt{Gen\;1:1-2}.
+    \texttt{Gen\;1:1-}, and \texttt{Gen\;1:1-2}.
 
 When the upper bound of the range is not specified, as in \ding{194}, the passages are displayed
 from the starting verse until the \emph{first undefined verse} (with the same chapter number \ameta{ch}).
@@ -738,7 +753,7 @@ It is perhaps always better to use \cs{fetchverses} for single and multiple vers
     The \texttt{from} key, only supports values \texttt{KJV},
     \texttt{KJV+}, \texttt{ISV}, these are the versions of the Bible are
     free versions available from \app{e-Sword} commonly used. When the
-    \texttt{from} key is not specified, the default Bible is usef, see
+    \texttt{from} key is not specified, the default Bible is the \cs{defaultBible}, see
     \hyperref[s:suppfetch]{Section~\ref*{s:suppfetch}} for more information on setting the default
     Bible. Initially, the default Bible is set to \texttt{KJV}; thus,
     \verb|\fetchverse{Gen 1:1}| fetches Genesis 1:1 from the \texttt{KJV},
@@ -909,6 +924,9 @@ no characters delimiting the Bible passage.
  passage reference, the second after; this results in a phrase that leads
  up to the passage itself.
 
+\handpoint When \texttt{delim} is used with \cs{fetchverses} the star-option must be used, otherwise,
+\texttt{delim} has  no effect.
+
 \item[\texttt{enclosewith=\ameta{tok\SUB{1}tok\SUB{2}\upshape|\cs{quote}}}] The
     \texttt{enclosewith} key takes either a two-token argument or the command
     \cs{quote}. The latter is used to enclose the passage in quotation
@@ -921,9 +939,10 @@ no characters delimiting the Bible passage.
    \begin{quote}
    {\small\verb|\fetchverse[delims={According to }{,},enclosewith=\quote]{Gen 1:1}|}\\[3pt]
    \fetchverse[abbr=none,delims={According to }{,},enclosewith=\quote]{Gen 1:1}\\[6pt]
-   {\small\verb|\fetchverses[delims={According to }{,},|\\
+   {\small\verb|\fetchverses*[delims={According to }{,},|\\
    \hspace*{16pt}\verb|enclosewith={\guillemotleft\space}{ \guillemotright}]{Gen 1:1-2}|}\\[3pt]
-   \fetchverses[abbr=none,delims={According to }{,},enclosewith={\guillemotleft\space}{ \guillemotright}]{Gen 1:1-2}
+   \fetchverses*[abbr=none,delims={According to }{,},enclosewith={\guillemotleft\space}{ \guillemotright}
+   ]{Gen 1:1-2}
    \end{quote}
 
    The \texttt{enclosewith} key must be used wisely as some passages, depending on the translation,
@@ -1033,7 +1052,8 @@ appear by default}, to make it appear, use \cs{fetchverses*}.
 \verb|\fetchverses*[priorref=\mpfmt,delims]{Gen 1:1-2}|\\[3pt]
 \fetchverses*[priorref=\mpfmt,delims]{Gen 1:1-2}
  \end{quote}
- The definition of \cs{mpfmt} within the quote environment is
+ The definition of \cs{mpfmt} is made prior to the passage (and is not a
+ command defined by the \pkg{fetchbibpes} package).
 \begin{verbatim}
    \def\mpfmt#1{\afterRef{{}}\marginpar{\small\raggedleft#1}}
 \end{verbatim}
@@ -1043,7 +1063,7 @@ The \cs{afterRef} command is described later in this documentation.
 the corresponding passage or passages uses {\LaTeX} style quotes, as in
 \texttt{\char018\char018God\char129s grace\char129\char129} or \texttt{\char018God\char129s grace\char129}.
 Such a situation can occur if you've hand-edited the \EXT{DEF} file that contains the passages of interest.
-In this case you want to use the \texttt{ltxquotes} open key with the \cs{fetchverses} command; for example,
+In this case you want to use the \texttt{ltxquotes} key with the \cs{fetchverses} command; for example,
 \begin{quote}
 \verb|\fetchverses*[ltxquotes,from*=NKJV]{Mat 8:5-13}|\\[3pt]
 \fetchverses*[ltxquotes,from*=NKJV]{Mat 8:5-13}
@@ -1155,7 +1175,7 @@ Prior to the passage, we make two declarations
     {, that I might preach Him}{ \ldots\gobbletoblood}
 ]{Gal 1:15-16}
 \end{quote}
-In line~(4) of the verbatim listing above, we fine the text \texttt{who
+In line~(4) of the verbatim listing above, we find the text \texttt{who
 separated me from my} (could have been shorter) and replace it by
 \texttt{who\cs{gobbletoand}}. The \cs{gobbletoand} command is inserted
 just after `\texttt{who}', and will gobble everything that follows it up
@@ -1215,6 +1235,12 @@ parse it correctly.
 
 The above example appears in \texttt{bibpes\_replaces.tex}.
 
+\item[\texttt{typeset=\ameta{\upshape{true|false}}}] This option is used with \cs{fetchversestxt};
+if \texttt{true} (or if simply \texttt{typeset} is specified), the macros created by
+\cs{fetchversestxt} are intended to be typeset into the document; the default for \cs{fetchversestxt}
+is \texttt{typeset=false} while the default for \cs{fetchverses} is \texttt{typeset=true}. Putting
+\texttt{typeset=false} within the optional argument of \cs{fetchverses} has no effect. Refer to the
+subsection titled \Nameref{fvtxt}.
 \end{description}
 
 \paragraph*{Predefined options using a `helper' command.}\label{para:PredefHelper} It can become
@@ -1429,6 +1455,63 @@ the \EXT{DEF} files. Thus, if we type \verb|\usePassage{Gen 1:1 KJV}|, we get,
 \end{quote}
 That is, you get the `raw' passage without any annotations (translation, book, chapter, verse, and so on).
 Only one passage (verse) may be retrieved this way.
+
+\subsubsection{\texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}:
+ raw retrieval with options}\label{fvtxt}
+
+\def\myNote{type=text,name=Note,color=webyellow}
+
+
+One user, a former friend, requested something more sophisticated than \cs{usePassage}. He wanted a \cs{fetchverses}-type
+command, but with no typesetting commands embedded, just pure text. He would then pass the text as the argument of another
+command.
+
+\bVerb\takeMeasure{\normalfont{Each of these defines two macros: }\ttfamily\string\versetxt,\,\string\passagetxt}%
+\setlength{\dimen0}{\bxSize}%
+\def\1{\rlap{\hskip\dimen0\relax\ding{192}}}%
+\def\2{\rlap{\hskip\dimen0\relax\ding{193}}}%
+\def\3{\rlap{\hskip\dimen0\relax\ding{194}}}%
+\def\4{\rlap{\hskip\dimen0\relax\ding{195}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\fetchversestxt[!ameta(opts)]{!ameta(book)(!vissp)!ameta(ch):!ameta(vrs)}
+\fetchversestxt[!ameta(opts)]{!ameta(book)(!vissp)!ameta(ch):!ameta(vrs)-}
+\fetchversestxt[!ameta(opts)]{!ameta(book)(!vissp)!ameta(ch):!ameta(vrs!SUB(1))-!ameta(vrs!SUB(2))}
+!STRUT!normalfont(Each of these defines two macros: )!ttfamily(\versetxt,!,\passagetxt)
+\end{dCmd}
+\eVerb The \cs{fetchversestxt} command does not expand to typeset content,
+rather, it defines two commands \cs{versetxt}, which contains the verse
+reference, and \cs{passagetxt}, which contains the passage for that verse.
+For example, \cs{fetchverses\darg{Gen 1:1-2}}\fetchversestxt{Gen 1:1-2}
+expands to nothing typeset; however, the command `\cs{versetxt}' expands
+to `\versetxt' and the command `\cs{passagetxt}' expands to `\passagetxt' The next
+expansion of \cs{fetchversestxt} overwrites the \cs{versetxt} and
+\cs{passagetxt} commands. You can use \cs{fetchversestxt} with the usual
+options, any formatting options are ignored (I hope), otherwise, all options
+should work as described earlier.
+
+The application\fetchversestxt[showfirst]{Gen 1:1-}\annotpro[presets=\myNote,
+margin,readonly,title={\versetxt},margintext={\hfill\versetxt},margprior=\hfill]{\passagetxt} my former-friend had in mind
+was to pass the \cs{passagetxt} command to an annotation macro such as \cs{annotpro} (\pkg{annot\_pro} package) or
+\cs{pdfcomment} (\pkg{pdfcomment} package). What you see in the margin is \cs{annotpro}.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+The application\fetchversestxt[showfirst]{Gen 1:1-}\annotpro[type=text,
+  name=Note,color=webyellow,margin,readonly,
+  title={\versetxt},margintext={\hfill\versetxt},
+  margprior=\hfill]{\passagetxt}
+my former-friend had in mind ...
+\end{Verbatim}
+Refer to the manual, \texttt{annotpro\_man.pdf} for the particulars of using \cs{annotpro} from the
+\pkg{annot\_pro} package.
+
+\paragraph*{The \texttt{typeset} option.} The optional argument of \cs{fetchversestxt} accepts the
+\texttt{typeset} option. Without the \opt{typeset} option, the expansion of
+\cs{passagetxt} does not contain any {\LaTeX} styling or font changes; if the
+\opt{typeset} option is taken, the \cs{passagetxt} expands to the same
+passage as its non-txt counterpart. The accompanying demonstration file
+\texttt{fetchversestxt.tex} extensively discusses the \opt{typeset} option.
+
+\newtopic\noindent
+The demonstration file for this feature is \texttt{fetchversestxt.tex}.
 
 \subsection{Setting various spaces}
 
@@ -1719,7 +1802,7 @@ For example, the following declaration is used in the example below.
     {First day}                            % v5
 }
 \end{Verbatim}
-Its argument is a series of token (comments enclosed in braces), the first token is the comment
+Its argument is a series of tokens (comments enclosed in braces), the first token is the comment
 for verse 1, then verse 2, and so on. All verses must have a comment, even an empty comment.
 
 The marginal notes are placed in the margin using \cs{marginpar}. The formatting for the marginal
@@ -1914,7 +1997,7 @@ Once the passages are declared, they can be retrieved at any point thereafter:
 The \env{declareBVs} environment is used in the sample files \texttt{bibpes\_replace.tex},
 \texttt{bibpes\_replaces.tex}, and \texttt{bibpes\_red.tex}.
 
-The \env{declareBVs*} environment is the same as \env{declareBVs*} but does not
+The \env{declareBVs*} environment is the same as \env{declareBVs} but does not
 define single and double quote as active characters. Refer to
 \hyperref[ProbsQuotes]{Section~\ref*{ProbsQuotes}} for more information on quotation marks.
 
@@ -2065,7 +2148,7 @@ Contiguous substrings as promised!
 
 In this example, \texttt{from=NKJV} was used in both the \cs{markverse}
 and \cs{fetchverse} commands to identify the translation, this is
-required if the passage from from a translation other than the default
+required if the passage comes from a translation other than the default
 translation (KJV in this document).
 
 \markverse[name=multihits,marks={`What}{wear?'},from=NKJV]{Mat 6:31}

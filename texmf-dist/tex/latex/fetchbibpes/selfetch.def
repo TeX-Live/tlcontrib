@@ -30,15 +30,15 @@
 \newif\iffb@fromused \fb@fromusedfalse
 \define@key{sel@verses}{from}{\fb@fromusedtrue
     \def\@argi{#1}\ifx\@argi\@empty
-    \edef\sel@verses@from{ \fb@defaultBible}\else
+    \edef\sel@verses@from{ \fbdefaultBible}\else
     \def\sel@verses@from{ #1}\fi}
-\edef\sel@verses@from{ \fb@defaultBible}%
+\edef\sel@verses@from{ \fbdefaultBible}%
 \define@key{sel@verses}{alt}{\def\sel@verses@alt{ #1}}
 \let\sel@verses@alt\@empty
 \def\selectedVersesFrom#1{%
     \@tfor\@rg:=#1\do{%
         \let\sel@verses@alt\@empty
-        \edef\sel@verses@from{ \fb@defaultBible}%
+        \edef\sel@verses@from{ \fbdefaultBible}%
         \edef\setkeysExp{\noexpand\setkeys{sel@verses}{\@rg}}\setkeysExp
         \expandafter\fb@doInvLUAsNeeded\bib@book\@nil
         \ifx\bib@passage\@empty\else

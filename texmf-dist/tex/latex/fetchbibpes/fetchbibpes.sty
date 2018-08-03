@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{fetchbibpes}
- [2018/07/12 v2.4.5 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+ [2018/07/30 v2.4.9 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 \RequirePackage{xkeyval}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \let\fb@Zero=0 \let\fb@One=1 \let\fb@Two=2
@@ -60,6 +60,8 @@
     {fetchsubtr option detected, cannot find file fsubstr.def}}
 \newif\iffb@ignorecfg \fb@ignorecfgfalse
 \define@key{fetchbibpes.sty}{ignorecfg}[true]{\fb@ignorecfgtrue}
+\define@key{fetchbibpes.sty}{cfg}[fbpes]{\def\fb@cfg@basename{#1}}
+\def\fb@cfg@basename{fbpes}
 \ProcessOptionsX
 \let\fb@NO=n
 \let\fb@YES=y
@@ -165,32 +167,35 @@
 }
 \newif\if@ddtoBiblesUsed \@ddtoBiblesUsedfalse
 \newcommand{\defaultBible}[1]{\def\@rg{#1}\ifx\@rg\@empty
-    \else\def\fb@defaultBible{#1}\def\fbpes@from{ #1}\fi}
+    \else\gdef\fbdefaultBible{#1}\def\fbpes@from{ #1}\fi}
 \defaultBible{KJV}
 \newcommand\addtoBibles[1]{%
     \def\@rgi{#1}\ifx\@rgi\@empty\else
     \global\@ddtoBiblesUsedtrue\fi
     \define@choicekey+{bibadd}{addfrom}[\val\nr]{#1}{}
         {\PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
-        will use \fb@defaultBible\space instead}%
-        \edef\fbpes@from{ \fb@defaultBible}}%
+        will use \fbdefaultBible\space instead}%
+        \edef\fbpes@from{ \fbdefaultBible}}%
 }
 \@onlypreamble\addtoBibles
-\define@choicekey+{fbpes}{from}[\val\nr]%
-    {KJV,KJV+,ISV}[KJV]{%
-    \ifcase\nr\relax
-        \def\fbpes@from{ KJV}\or
-        \def\fbpes@from{ KJV+}\or
-        \def\fbpes@from{ ISV}\fi
-}{%
-    \if@ddtoBiblesUsed
-        \def\fbpes@from{ #1}\setkeys{bibadd}{addfrom=#1}\else
-        \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
-        will use \fb@defaultBible\space instead}%
-        \edef\fbpes@from{ \fb@defaultBible}\fi
+\def\handleUnRegBibles#1{\edef\@rgi{#1}\if@ddtoBiblesUsed
+  \edef\fbpes@babbr{#1}\edef\x{\noexpand
+    \setkeys{bibadd}{addfrom=#1}}\x\else
+    \ifx\@rgi\@empty\edef\fbpes@babbr{\fbdefaultBible}\else
+  \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
+    will use \fbdefaultBible\space instead}%
+  \edef\fbpes@babbr{\fbdefaultBible}\fi\fi
+  \edef\fbpes@from{ \fbpes@babbr}%
 }
+\def\fbSetFromChoiceKey#1{%
+  \define@choicekey+{fbpes}{from}[\val\nr]%
+    {#1}[]{\edef\fbpes@babbr{\val}\edef\fbpes@from{ \val}}
+    {\handleUnRegBibles{##1}}}
+\def\registerBibles#1{\fbSetFromChoiceKey{#1}}%
+\registerBibles{KJV,KJV+,ISV}
 \define@key{fbpes}{transl}[]{\def\fbpes@transl{#1}%
-    \ifx\fbpes@transl\@empty\else\edef\fbpes@transl{\space#1}\fi}
+  \gdef\g@fbpes@transl{#1}\gdef\gtransl{#1}% dps29
+}
 \let\fbpes@transl\@empty
 \define@key{fbpes}{from*}[]{\setkeys{fbpes}{from=#1,transl=#1}}
 \newif\iffbpes@altstar\fbpes@altstarfalse
@@ -229,8 +234,12 @@
 \def\LaTeXQuotesOn{\NotL@TeXQuotesfalse}
 \def\LaTeXQuotesOff{\NotL@TeXQuotestrue}
 \define@key{fbpes}{ltxquotes}[]{\NotL@TeXQuotesfalse}
-\define@key{fbpes}{replace}[]{\fp@cntArgs#1\stop@rg
-    \def\fbpes@replace{#1}}
+\define@key{fbpes}{replace}[]{%\fp@cntArgs#1\stop@rg
+  \ifx\fbpes@replace\@empty\def\fbpes@replace{#1}\else % dps13
+    \expandafter\def\expandafter\fbpes@replace
+    \expandafter{\fbpes@replace#1}\fi
+    \expandafter\fp@cntArgs\fbpes@replace\stop@rg
+}
 \let\stop@rg\relax\def\st@p@arg{\stop@rg}%
 \def\fp@cntArgs#1\stop@rg{\bgroup\@tempcnta\z@
     \fp@cntArgs@i#1\stop@rg}
@@ -299,15 +308,35 @@
 \let\fbpes@priorref\relax
 \define@key{fbpes}{localdefs}[]{\def\fbpes@localdefs{#1}}
 \let\fbpes@localdefs\@empty
-\define@boolkey{fbpes}{typeset}[true]{}
-\KV@fbpes@typesettrue
+\newif\ifKV@fbpes@typeset\KV@fbpes@typesettrue
+\define@key{fbpes}{typeset}[]{\KV@fbpes@typesettrue
+  \def\fbpes@typeset{#1}}\let\fbpes@typeset\@empty
+\define@key{fbpes}{typeset*}[]{%
+  \def\fbpes@typeset{#1}}\let\fbpes@typeset\@empty
 \long\def\priorRefSpc#1{\def\fbp@priorRefSpc{#1}}
 \def\fbp@priorRefSpc{\space}
 \def\fbFitItIn{\noindent\unskip\nobreak\hfill\penalty100
     \hskip1em\hbox{}\nobreak\hfill}%
 \def\fbFillRght{\hfil\break\null\hfill}
-\def\useBookStyle#1{%
-    \def\fp@SK{\setkeys{fbpes}}\expandafter\fp@SK\expandafter{#1}}
+\newtoks\fetchtoks % dps13
+\newif\ifshowDefBible \showDefBiblefalse
+\def\showTranslAlways{\showDefBibletrue}
+\let\AlwaysShowDefBible\showTranslAlways
+\def\showTranslDecld{\showDefBiblefalse}
+\let\NeverShowDefBible\showTranslDecld
+\newif\if@versetxt\@versetxtfalse
+\def\useBookStyle#1{\def\fp@SK{\setkeys{fbpes}}\expandafter
+  \fp@SK\expandafter{#1}\if@versetxt\else
+    \ifx\fbpes@typeset\@empty\else
+      \fetchtoks={#1,}\edef\x{\the\fetchtoks}% dps13
+      \fetchtoks=\expandafter\expandafter
+        \expandafter{\expandafter\x\fbpes@typeset}%
+      \let\fbpes@replace\@empty
+      \edef\x{\the\fetchtoks}\expandafter
+      \fp@SK\expandafter{\x}%
+    \fi
+  \fi
+}
 \useBookStyle{abbr,roman=false,from,transl}
 \def\ioiv#1#2#3#4{#1}\def\iioiv#1#2#3#4{\fbpes@case{#2}}
 \def\iiioiv#1#2#3#4{\fbpes@case{#3}}\def\ivoiv#1#2#3#4{\fbpes@case{#4}}
@@ -441,13 +470,23 @@
 }
 \newif\if@versetxt\@versetxtfalse
 \def\fb@fetchverse{%
+  \ifshowDefBible
+    \ifx\fbpes@transl\@empty
+      \ifx\fbpes@babbr\@empty % default bible
+        \edef\fbpes@transl{\fbdefaultBible}% dpsjul30
+      \else
+        \edef\fbpes@transl{\fbpes@babbr}%
+      \fi
+    \fi % dps29
+  \fi
   \ifbookexists
     \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
     \expandafter{\bib@book}\fb@bksp\bib@passage
-    \fbpes@transl\r@fbp@delim}%
+    \fb@transl@fmt{\fbpes@transl}\r@fbp@delim}% dps29
   \else
     \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
-    \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}%
+    \fb@bksp\bib@passage
+    \fb@transl@fmt{\fbpes@transl}\r@fbp@delim}% dps29
   \fi
   \ifKV@fbpes@citeatend\else
     \fbpes@priorref{\ifKV@fbpes@nocite\else
@@ -462,9 +501,9 @@
   \global\let\passagetxt\@empty
   \fetchverses[#1]{#2}\egroup
 }
+\let\fetchversetxt\fetchversestxt
 \newcommand\fb@fetchversesi[2][]{\def\@rgi{#1}\def\passagespec{#2}%
-  \ifx\@rgi\@empty\else
-    \useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
+  \ifx\@rgi\@empty\else\useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
     \ifx\fbpes@alt\@empty\else\PackageWarning{fetchbibpes}
     {You have specified both alt* and alt,\MessageBreak
      removing the alt key}\fi\fi\fi
@@ -478,23 +517,44 @@
 \def\fb@insrtvn{\ifnum\@tempcnta=\fb@verseStart\relax
   \ifKV@fbpes@showfirst\verseFmt{\the\@tempcnta}\fi
   \else\space\verseFmt{\the\@tempcnta}\fi}
+\def\translTxtFmt#1{%
+  \def\fb@transl@txt@fmt##1{\ifx##1\@empty\else #1\fi}} % dps29
+\translTxtFmt{\space #1}  % dps29
+\let\fb@transl@txt@fmt@def\fb@transl@txt@fmt
+\def\translTxtFmtDef{\let\fb@transl@txt@fmt\fb@transl@txt@fmt@def}
+\def\translFmt#1{%
+  \def\fb@transl@fmt##1{\ifx##1\@empty\else #1\fi}} % dps29
+\translFmt{\space #1} % dps29
+\let\fb@transl@fmt@def\fb@transl@fmt
+\def\translFmtDef{\let\fb@transl@fmt\fb@transl@fmt@def}
 \def\fb@fetchversesii#1 #2\@nil{%
+  \ifshowDefBible
+    \ifx\fbpes@transl\@empty
+      \ifx\fbpes@babbr\@empty % default bible
+        \edef\fbpes@transl{\fbdefaultBible}% dpsjul30
+      \else
+        \edef\fbpes@transl{\fbpes@babbr}%
+      \fi
+    \fi % dps29
+  \fi
   \ifbookexists
+    \edef\expBkAbbrChoices{\@nameuse{bkfmt\bib@book}}% dpsjul30
+    \def\selBkAbbr{\expandafter\fbpes@abbr\expBkAbbrChoices}% dpsjul30
     \ifKV@fbpes@typeset % dps
       \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
         \expandafter{\bib@book}\fb@bksp\bib@passage
-        \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}%
-      \xdef\versetxt{\noexpand\fbpes@abbr
-        \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
-        \fbpes@transl}%
+        \@nameuse{\passagespec}\fb@transl@fmt{\fbpes@transl}% dps29
+        \r@fbp@delim
+      }%
+      \protected@xdef\versetxt{{\selBkAbbr\fb@bksp\bib@passage
+        \noexpand\fb@transl@txt@fmt{\fbpes@transl}% dps29
+      }}%
     \else
       \if@versetxt
-        \edef\book@passage{%\fbp@format\l@fbp@delim
-          \noexpand\fbpes@abbr
-          \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
-          \fbpes@transl
+        \protected@edef\book@passage{\selBkAbbr\fb@bksp\bib@passage
+          \noexpand\fb@transl@txt@fmt{\fbpes@transl}% dps29
         }%
-        \xdef\versetxt{\book@passage}%
+        \protected@xdef\versetxt{\book@passage}%
       \fi % \if@versetxt %dps
     \fi % \ifKV@fbpes@typeset
   \else % \ifbookexits
@@ -550,7 +610,6 @@
           \@tempcnta\fb@verseEnd
         \else
           \ifKV@fbpes@typeset
-            \fb@insrtvn
             \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
           \else
             \edef\x{\noexpand\g@addto@macro\noexpand
@@ -601,6 +660,16 @@
   \edef\@tmpexp{\noexpand\removeTr@ilSpcs\@rgi\space;}\@tmpexp
   \ifx\@rgi\@empty\let\fbpes@alt\@empty\else
   \edef\fbpes@alt{ \@rgi}\fi
+}
+\newcommand{\cobblevrs}{\@ifstar{\cobblevrs@i}{\cobblevrs@ii}}
+\def\cobblevrs@i#1{\let#1\@empty\cobblevrs@ii{#1}}
+\def\cobblevrs@ii#1#2{\ifx#1\undefined\let#1\@empty\fi
+  \bgroup
+    \toks0=\expandafter{#1}\toks2=\expandafter{#2}%
+    \set@typeset@protect
+    \protected@edef\fb@xtmp{\the\toks0 \the\toks2 }%
+    \protected@xdef#1{\fb@xtmp}%
+  \egroup
 }
 \newcommand{\verseFmtDef}[1]{\ensuremath{{}^{\fb@sc{#1}}}}
 \newcommand{\verseFmt}[1]{\verseFmtDef{#1}}
@@ -804,14 +873,14 @@
 \def\selectedVersesFrom#1{\PackageWarning{fetchbibpes}
     {\string\selectedVersesFrom\space requires the\MessageBreak
      useselverses option. Gobbling up\MessageBreak your argument}}
-\def\fb@loadcfg{\InputIfFileExists{fbpes.cfg}
-    {\PackageInfo{fetchbibpes}{Inputting fbpes.cfg}}
-    {\PackageInfo{fetchbibpes}{fbpes.cfg not found}}}
 \iffb@ignorecfg
-    \PackageInfo{fetchbibpes}{Ignoring CFG file}
+  \def\fb@loadcfg{\PackageInfo{fetchbibpes}{Ignoring CFG file}}
 \else
-    \AtEndOfPackage{\fb@loadcfg}
+  \def\fb@loadcfg{\InputIfFileExists{\fb@cfg@basename.cfg}
+    {\PackageInfo{fetchbibpes}{Inputting \fb@cfg@basename.cfg}}
+    {\PackageWarning{fetchbibpes}{\fb@cfg@basename.cfg not found}}}
 \fi
+\AtEndOfPackage{\fb@loadcfg}
 \AtBeginDocument{\useverseslist}
 \endinput
 %%

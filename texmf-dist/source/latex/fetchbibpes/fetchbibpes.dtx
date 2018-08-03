@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{fetchbibpes}
-%<package> [2018/07/12 v2.4.5 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+%<package> [2018/07/30 v2.4.9 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -128,7 +128,7 @@
 %\begin{quote}\ttfamily
 %\cs{fetchverse}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs}}\\[3pt]
 %\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs}} or\\[3pt]
-%\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs\SUB{1}}-\ameta{vrs\SUB{2}}}
+%\cs{fetchverses*}[\ameta{opts}]\darg{\ameta{book}{\visispace}\ameta{ch}:\ameta{vrs\SUB{1}}-\upshape[\ameta{vrs\SUB{2}}\upshape]}
 %\end{quote}
 %    where \ameta{opts} are defined options of the \texttt{fbpes} family;
 %    \ameta{book} is either the three letter book abbreviation that
@@ -136,15 +136,18 @@
 %    (as given in the \textbf{Alt\_Abbr} column of \hyperref[table:esabbr]{Table~\ref*{table:esabbr}});
 %    \ameta{ch}:\ameta{vrs} is a chapter-verse reference.
 %    The \cs{fetchverse} command only fetches a single verse, while \cs{fetchverses}
-%    can fetch multiple verses (by the syntax \ameta{ch}:\ameta{vrs\SUB1}-\ameta{vrs\SUB2}). The run of verses
+%    can fetch multiple verses (by the syntax \ameta{ch}:\ameta{vrs\SUB1}-\ameta{vrs\SUB2}); when you specify
+%    no upper limit to the range (\ameta{ch}:\ameta{vrs\SUB1}-), all verses starting with \ameta{vrs\SUB1} will be
+%    included up to the first verse that is undefined (in the same chapter). The run of verses
 %    must all be from the same chapter. The `\texttt{*}' parameter is optional, when
 %    present the book and verse references are shown, otherwise they are not. We
-%    illustrate with \texttt{Gen\;1:1} and \texttt{Gen\;1:1-2}.
+%    illustrate with \texttt{Gen\;1:1}, \texttt{Gen\;1:1-2}, and \texttt{Gen\;1:1-}.
 % \begin{itemize}
 %    \item \cs{fetchverse\darg{Gen\;1:1}}: \fetchverse{Gen 1:1}
 %    \item \cs{fetchverses\darg{Gen\;1:1}}: \fetchverses{Gen 1:1}
 %    \item \cs{fetchverses*\darg{Gen;1:1}}:\ \fetchverses*{Gen 1:1}
 %    \item \cs{fetchverses\darg{Gen\;1:1-2}}: \fetchverses{Gen 1:1-2}
+%    \item \cs{fetchverses\darg{Gen\;1:1-}}: \fetchverses{Gen 1:1-}
 % \end{itemize}
 %
 %\begin{table}[htb]
@@ -282,6 +285,17 @@
 \newif\iffb@ignorecfg \fb@ignorecfgfalse
 \define@key{fetchbibpes.sty}{ignorecfg}[true]{\fb@ignorecfgtrue}
 %    \end{macrocode}
+%    \leavevmode\IndexOpt{cfg}\hskip-\marginparsep\texttt{=\ameta{name}}
+%    We give the package user the option of having several configuration files, which can
+%    be specified through the \opt{cfg} option; here \ameta{name} is the base name of the
+%    configuration file (\texttt{\ameta{name}.cfg}). If \opt{cfg} is not specified in the
+%    package option list, \texttt{fbpes.cfg} is used for the configuration file, unless
+%    the \opt{ignorecfg} option is in effect.
+%    \changes{v2.4.9}{2018/07/30}{Added the \string\texttt{cfg} option}
+%    \begin{macrocode}
+\define@key{fetchbibpes.sty}{cfg}[fbpes]{\def\fb@cfg@basename{#1}}
+\def\fb@cfg@basename{fbpes}
+%    \end{macrocode}
 % We process the options for this package.
 %    \begin{macrocode}
 \ProcessOptionsX
@@ -308,7 +322,7 @@
 %
 % \subsection{The \texorpdfstring{\protect\cs{BV}}{\textbackslash{BV}} command \textsl{et al.}}
 %
-%    \begin{macro}{\BV}\texttt{(\ameta{verse-ref})}
+%    \begin{macro}{\BV}\hskip-\marginparsep\texttt{(\ameta{verse-ref})\ameta{passage}\string\null}\\
 %   The Bible verses are stored in a separate file (DEF) or declared within the \env{declareBVs} environment.
 %   (The companion package, \textsf{bibpes}, writes a DEF file.) In either case, a Bible verse is one of the
 %   arguments of the \cs{BV} command, the syntax of which is given below.
@@ -350,7 +364,7 @@
 \newenvironment{declareBVs*}{}{}
 %    \end{macrocode}
 %    \end{environment}
-%    \begin{macro}{\usePassage} \texttt{\darg{\ameta{verse-ref}}}
+%    \begin{macro}{\usePassage}\hskip-\marginparsep\texttt{\darg{\ameta{verse-ref}}}
 %    takes the raw \ameta{verse-ref} and expands to the associated passage:
 %    |\usePassage{Gen 1:1 KJV}| should produce the referenced passage, provided this reference has been
 %    defined.
@@ -512,7 +526,7 @@
 % of the Bible you are using the most.
 %    \begin{macrocode}
 \newcommand{\defaultBible}[1]{\def\@rg{#1}\ifx\@rg\@empty
-    \else\def\fb@defaultBible{#1}\def\fbpes@from{ #1}\fi}
+    \else\gdef\fbdefaultBible{#1}\def\fbpes@from{ #1}\fi}
 \defaultBible{KJV}
 %    \end{macrocode}
 %    \end{macro}
@@ -532,42 +546,47 @@
     \global\@ddtoBiblesUsedtrue\fi
     \define@choicekey+{bibadd}{addfrom}[\val\nr]{#1}{}
         {\PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
-        will use \fb@defaultBible\space instead}%
-        \edef\fbpes@from{ \fb@defaultBible}}%
+        will use \fbdefaultBible\space instead}%
+        \edef\fbpes@from{ \fbdefaultBible}}%
 }
 \@onlypreamble\addtoBibles
 %    \end{macrocode}
 %    \end{macro}
-% Now we define the \IndexKey{from}\texttt{from} key, it has only three values,
-% \texttt{KJV}, \texttt{KJV+}, and \texttt{ISV}, but through \cs{addtoBibles},
-% it can be extended.
-%    \begin{macrocode}
-\define@choicekey+{fbpes}{from}[\val\nr]%
-    {KJV,KJV+,ISV}[KJV]{%
-    \ifcase\nr\relax
-        \def\fbpes@from{ KJV}\or
-        \def\fbpes@from{ KJV+}\or
-        \def\fbpes@from{ ISV}\fi
-}{%
-    \if@ddtoBiblesUsed
-%    \end{macrocode}
 % If \cs{addtoBibles} has been expanded in the preamble, we determine if the argument
 % \texttt{\#1} is in the new list of Bibles, if yes, OK; otherwise, we emit a warning
 % and default to KJV.
 %    \begin{macrocode}
-        \def\fbpes@from{ #1}\setkeys{bibadd}{addfrom=#1}\else
-        \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
-        will use \fb@defaultBible\space instead}%
-        \edef\fbpes@from{ \fb@defaultBible}\fi
+\def\handleUnRegBibles#1{\edef\@rgi{#1}\if@ddtoBiblesUsed
+  \edef\fbpes@babbr{#1}\edef\x{\noexpand
+    \setkeys{bibadd}{addfrom=#1}}\x\else
+    \ifx\@rgi\@empty\edef\fbpes@babbr{\fbdefaultBible}\else
+  \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
+    will use \fbdefaultBible\space instead}%
+  \edef\fbpes@babbr{\fbdefaultBible}\fi\fi
+  \edef\fbpes@from{ \fbpes@babbr}%
 }
+%    \end{macrocode}
+% Now we define the \IndexKey{from}\texttt{from} key, it has only three values,
+% \texttt{KJV}, \texttt{KJV+}, and \texttt{ISV}, but through \cs{addtoBibles},
+% it can be extended.
+%    \begin{macrocode}
+\def\fbSetFromChoiceKey#1{%
+  \define@choicekey+{fbpes}{from}[\val\nr]%
+    {#1}[]{\edef\fbpes@babbr{\val}\edef\fbpes@from{ \val}}
+    {\handleUnRegBibles{##1}}}
+\def\registerBibles#1{\fbSetFromChoiceKey{#1}}%
+\registerBibles{KJV,KJV+,ISV}
 %    \end{macrocode}
 %\paragraph{Example} |\fetchverse[abbr=none,from=ISV]{Gen 1:1}| yields,
 %\begin{quote}\fetchverse[abbr=none,from=ISV]{Gen 1:1}\end{quote}
 % The \IndexKey{transl}\texttt{transl} key is an annotation key, that appends
 % text on the end of the Bible reference, such as a translation: \texttt{transl=KJV}.
+% \changes{v2.4.7}{2018/07/20}{Define a global command \string\cs{g@fbpes@transl}}
+% \changes{v2.4.8}{2018/07/28}{Make \string\cs{g@fbpes@transl} public with \string\cs{gtransl}}
 %    \begin{macrocode}
 \define@key{fbpes}{transl}[]{\def\fbpes@transl{#1}%
-    \ifx\fbpes@transl\@empty\else\edef\fbpes@transl{\space#1}\fi}
+  \gdef\g@fbpes@transl{#1}\gdef\gtransl{#1}% dps29
+}
 \let\fbpes@transl\@empty
 %    \end{macrocode}
 % \paragraph*{Example} We annotate the translation version using `King James Version'.
@@ -719,8 +738,14 @@
 %    and \ameta{repl} are strings, but they can be commands as well, if done correctly.
 %    \changes{v2.0}{2016/09/17}{Introduced the \string\texttt{replace} option for \string\cs{fetchverse}}
 %    \begin{macrocode}
-\define@key{fbpes}{replace}[]{\fp@cntArgs#1\stop@rg
-    \def\fbpes@replace{#1}}
+%\define@key{fbpes}{replace}[]{\fp@cntArgs#1\stop@rg
+%    \def\fbpes@replace{#1}}
+\define@key{fbpes}{replace}[]{%\fp@cntArgs#1\stop@rg
+  \ifx\fbpes@replace\@empty\def\fbpes@replace{#1}\else % dps13
+    \expandafter\def\expandafter\fbpes@replace
+    \expandafter{\fbpes@replace#1}\fi
+    \expandafter\fp@cntArgs\fbpes@replace\stop@rg
+}
 \let\stop@rg\relax\def\st@p@arg{\stop@rg}%
 %    \end{macrocode}
 %    Count the number of arguments to see if there are an even number of them.
@@ -925,14 +950,32 @@
 \let\fbpes@localdefs\@empty
 %    \end{macrocode}
 %See the demo file \texttt{bibpes\_replaces.tex} for an example.\par\medskip\noindent
-%    The\IndexKey{typeset}\space\texttt{typeset} key is used with \cs{fetchversestxt}. If true,
+%     \IndexKey{typeset}\hskip-\marginparsep\texttt{=\ameta{opts}}%
+%    The \texttt{typeset} key is used with \cs{fetchversestxt}. If true,
 %    we assume the \cs{passagetxt} command is meant to be typeset and, as a result, the normal
 %    behavior of \cs{fetchverses} is followed; if false, certain special definitions are activated
 %    that allows \cs{passagetxt} to pass to another macro, such as \cs{pdfcomment}. This option is
 %    ignored within the optional list of \cs{fetchverses}.
+%    \par\medskip\noindent Added a value to the key \texttt{typeset}, which was a boolean key.
+%    Now, it is a combination, both a Boolean and a regular key.
+% \changes{v2.4.6}{2018/07/13}{Change \string\texttt{typeset} so it has a value}
+%    \begin{itemize}
+%    \item If \cs{if@versetxt} is true, the value (\ameta{opts}) of \texttt{typeset} is ignored
+%    \item If \cs{if@versetxt} is false, the value of \texttt{typeset} (\ameta{opts}/\penalty0\cs{fbpes@typeset}) is included
+%    at the end of the option list.%
+%    \end{itemize}
 %    \begin{macrocode}
-\define@boolkey{fbpes}{typeset}[true]{}
-\KV@fbpes@typesettrue
+\newif\ifKV@fbpes@typeset\KV@fbpes@typesettrue
+\define@key{fbpes}{typeset}[]{\KV@fbpes@typesettrue
+  \def\fbpes@typeset{#1}}\let\fbpes@typeset\@empty
+%    \end{macrocode}
+%     \leavevmode\IndexOpt{typeset*}\hskip-\marginparsep\texttt{=\ameta{opts}}%
+%    The \texttt{typeset*} option is the same as \texttt{typeset}, but does
+%    not set the switch to \cs{KV@fbpes@typesettrue}.
+% \changes{v2.4.6}{2018/07/13}{Added \string\texttt{typeset*}}
+%    \begin{macrocode}
+\define@key{fbpes}{typeset*}[]{%
+  \def\fbpes@typeset{#1}}\let\fbpes@typeset\@empty
 %    \end{macrocode}
 %\par\medskip\noindent
 %This ends the section on the key-values of the \cs{fetchverse} and \cs{fetchverses} commands.
@@ -970,9 +1013,42 @@
 %command may be used in the body of the document to change the style.
 %\changes{v1.7}{2016/04/11}{Expand the first token of \string\texttt{\#1} before passing to
 %    \string\cs{setkeys}.}
+%\changes{v2.4.7}{2018/07/20}{Added switch \string\cs{ifshowDefBible}}
 %    \begin{macrocode}
-\def\useBookStyle#1{%
-    \def\fp@SK{\setkeys{fbpes}}\expandafter\fp@SK\expandafter{#1}}
+\newtoks\fetchtoks % dps13
+%    \end{macrocode}
+%   The translation note is not shown unless the \texttt{transl} key has a specified value. We provide
+%   a method of showing the translation note, even if \texttt{transl} is not present.
+%   \DescribeMacro\showTranslAlways\cs{showTranslAlways} turns on the feature of showing the translation
+%   note; whereas \DescribeMacro\showTranslDecld\cs{showTranslDecld} reverts the system back to its
+%   default, show translation note only if \texttt{transl} has a value.
+%   \changes{v2.4.8}{2018/07/28}{Added \string\cs{showTranslAlways} and \string\cs{showTranslDecld}}
+%    \begin{macrocode}
+\newif\ifshowDefBible \showDefBiblefalse
+\def\showTranslAlways{\showDefBibletrue}
+\let\AlwaysShowDefBible\showTranslAlways
+\def\showTranslDecld{\showDefBiblefalse}
+\let\NeverShowDefBible\showTranslDecld
+\newif\if@versetxt\@versetxtfalse
+\def\useBookStyle#1{\def\fp@SK{\setkeys{fbpes}}\expandafter
+  \fp@SK\expandafter{#1}\if@versetxt\else
+    \ifx\fbpes@typeset\@empty\else
+%    \end{macrocode}
+%    If \cs{fbpes@typeset} is nonempty and \cs{if@versetxt} is false, we combine
+%    any key-values passed to us through the \texttt{typeset} option.
+%    \begin{macrocode}
+      \fetchtoks={#1,}\edef\x{\the\fetchtoks}% dps13
+      \fetchtoks=\expandafter\expandafter
+        \expandafter{\expandafter\x\fbpes@typeset}%
+      \let\fbpes@replace\@empty
+%    \end{macrocode}
+%    And, read again this new set of options.
+%    \begin{macrocode}
+      \edef\x{\the\fetchtoks}\expandafter
+      \fp@SK\expandafter{\x}%
+    \fi
+  \fi
+}
 \useBookStyle{abbr,roman=false,from,transl}
 \def\ioiv#1#2#3#4{#1}\def\iioiv#1#2#3#4{\fbpes@case{#2}}
 \def\iiioiv#1#2#3#4{\fbpes@case{#3}}\def\ivoiv#1#2#3#4{\fbpes@case{#4}}
@@ -1206,10 +1282,8 @@
 %    \begin{macrocode}
   \if@versetxt
     \ifKV@fbpes@typeset % dps
-%      \set@typeset@protect % dps
         \protected@edef\x{\noexpand\g@addto@macro\noexpand
           \passagetxt{\fb@insrtvn\fb@passage}}\x
-%      \set@display@protect
     \else
       \edef\x{\noexpand\g@addto@macro\noexpand
         \passagetxt{\fb@insrtvn\fb@passage}}\x
@@ -1269,13 +1343,23 @@
 % variables whose values are determined by the key-values and other formatting commands.
 %    \begin{macrocode}
 \def\fb@fetchverse{%
+  \ifshowDefBible
+    \ifx\fbpes@transl\@empty
+      \ifx\fbpes@babbr\@empty % default bible
+        \edef\fbpes@transl{\fbdefaultBible}% dpsjul30
+      \else
+        \edef\fbpes@transl{\fbpes@babbr}%
+      \fi
+    \fi % dps29
+  \fi
   \ifbookexists
     \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
     \expandafter{\bib@book}\fb@bksp\bib@passage
-    \fbpes@transl\r@fbp@delim}%
+    \fb@transl@fmt{\fbpes@transl}\r@fbp@delim}% dps29
   \else
     \def\book@passage{\l@fbp@delim\fb@qq\bib@book\fb@qq
-    \fb@bksp\bib@passage\fbpes@transl\r@fbp@delim}%
+    \fb@bksp\bib@passage
+    \fb@transl@fmt{\fbpes@transl}\r@fbp@delim}% dps29
   \fi
   \ifKV@fbpes@citeatend\else
     \fbpes@priorref{\ifKV@fbpes@nocite\else
@@ -1322,12 +1406,15 @@
   \fetchverses[#1]{#2}\egroup
 }
 %    \end{macrocode}
+%     We \cs{let} \cs{fetchversetxt} to \cs{fetchversestxt} in case doc author fails type it correctly.
+%    \begin{macrocode}
+\let\fetchversetxt\fetchversestxt
+%    \end{macrocode}
 %    \end{macro}
 % We continue \cs{fetchverses} by getting the arguments and parsing them.
 %    \begin{macrocode}
 \newcommand\fb@fetchversesi[2][]{\def\@rgi{#1}\def\passagespec{#2}%
-  \ifx\@rgi\@empty\else
-    \useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
+  \ifx\@rgi\@empty\else\useBookStyle{#1}\ifx\fbpes@altstar\@empty\else
     \ifx\fbpes@alt\@empty\else\PackageWarning{fetchbibpes}
     {You have specified both alt* and alt,\MessageBreak
      removing the alt key}\fi\fi\fi
@@ -1358,27 +1445,69 @@
 \def\fb@insrtvn{\ifnum\@tempcnta=\fb@verseStart\relax
   \ifKV@fbpes@showfirst\verseFmt{\the\@tempcnta}\fi
   \else\space\verseFmt{\the\@tempcnta}\fi}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\translTxtFmt}\hskip-\marginparsep\texttt{\darg{\ameta{fmt-transl-\#1}}}\\
+%    Defines an internal text macro with one argument (\texttt{\#1}), this argument is the translation text macro \cs{fbpes@transl}.
+%     Its expansion is delayed. This command affects \cs{feachversestxt}. The initial declaration
+%     is |\translTxtFmt{\space #1}|, but the document author can change is for whatever purposes. Return to this
+%     default declaration by expanding \DescribeMacro{\translTxtFmtDef}\cs{translTxtFmtDef}. The initial declaration
+%     and default is |\translTxtFmt{\space #1}|.
+%    \changes{v2.4.8}{2018/07/28}{Added \string\cs{translTxtFmt} and \string\cs{translTxtFmtDef}}
+%    \begin{macrocode}
+\def\translTxtFmt#1{%
+  \def\fb@transl@txt@fmt##1{\ifx##1\@empty\else #1\fi}} % dps29
+\translTxtFmt{\space #1}  % dps29
+\let\fb@transl@txt@fmt@def\fb@transl@txt@fmt
+\def\translTxtFmtDef{\let\fb@transl@txt@fmt\fb@transl@txt@fmt@def}
+%    \end{macrocode}
+%     \leavevmode\DescribeMacro{\translTxt}\hskip-\marginparsep\texttt{\darg{\ameta{fmt-transl-\#1}}}\\
+%     Similar to \cs{translTxtFmt}, but applies to the command \cs{fetchverses} rather than \cs{fetchversestxt}. Reset
+%     to the default definition by expanding \DescribeMacro\translFmtDef\cs{translFmtDef}. The initial declaration
+%     and default is |\translFmt{\space #1}|.
+%    \changes{v2.4.8}{2018/07/28}{Added \string\cs{translFmt} and \string\cs{translFmtDef}}
+%    \begin{macrocode}
+\def\translFmt#1{%
+  \def\fb@transl@fmt##1{\ifx##1\@empty\else #1\fi}} % dps29
+\translFmt{\space #1} % dps29
+\let\fb@transl@fmt@def\fb@transl@fmt
+\def\translFmtDef{\let\fb@transl@fmt\fb@transl@fmt@def}
 \def\fb@fetchversesii#1 #2\@nil{%
+  \ifshowDefBible
+    \ifx\fbpes@transl\@empty
+      \ifx\fbpes@babbr\@empty % default bible
+        \edef\fbpes@transl{\fbdefaultBible}% dpsjul30
+      \else
+        \edef\fbpes@transl{\fbpes@babbr}%
+      \fi
+    \fi % dps29
+  \fi
   \ifbookexists
+%    \end{macrocode}
+%    We get the book abbreviation early, needed to get the proper expansion
+%    for \cs{fetchversestext}.
+%    \changes{v2.4.9}{2018/07/30}{Expand book abbr early}
+%    \begin{macrocode}
+    \edef\expBkAbbrChoices{\@nameuse{bkfmt\bib@book}}% dpsjul30
+    \def\selBkAbbr{\expandafter\fbpes@abbr\expBkAbbrChoices}% dpsjul30
     \ifKV@fbpes@typeset % dps
       \def\book@passage{\fbp@format\l@fbp@delim\expandafter\fb@fmtBook
         \expandafter{\bib@book}\fb@bksp\bib@passage
-        \@nameuse{\passagespec}\fbpes@transl\r@fbp@delim}%
+        \@nameuse{\passagespec}\fb@transl@fmt{\fbpes@transl}% dps29
+        \r@fbp@delim
+      }%
 %    \end{macrocode}
 %    When typeset is true, we need to define \cs{versetxt} as well.
 %     \changes{v2.4.4}{2018/07/11}{Define \string\cs{versetxt} in all cases.}
 %    \begin{macrocode}
-      \xdef\versetxt{\noexpand\fbpes@abbr
-        \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
-        \fbpes@transl}%
+      \protected@xdef\versetxt{{\selBkAbbr\fb@bksp\bib@passage
+        \noexpand\fb@transl@txt@fmt{\fbpes@transl}% dps29
+      }}%
     \else
       \if@versetxt
-        \edef\book@passage{%\fbp@format\l@fbp@delim
-          \noexpand\fbpes@abbr
-          \@nameuse{bkfmt\bib@book}\fb@bksp\bib@passage
-          \fbpes@transl
+        \protected@edef\book@passage{\selBkAbbr\fb@bksp\bib@passage
+          \noexpand\fb@transl@txt@fmt{\fbpes@transl}% dps29
         }%
-        \xdef\versetxt{\book@passage}%
+        \protected@xdef\versetxt{\book@passage}%
       \fi % \if@versetxt %dps
     \fi % \ifKV@fbpes@typeset
   \else % \ifbookexits
@@ -1467,7 +1596,7 @@
           \@tempcnta\fb@verseEnd
         \else
           \ifKV@fbpes@typeset
-            \fb@insrtvn
+%            \fb@insrtvn
             \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
           \else
             \edef\x{\noexpand\g@addto@macro\noexpand
@@ -1539,6 +1668,45 @@
   \edef\fbpes@alt{ \@rgi}\fi
 }
 %    \end{macrocode}
+%    \begin{macro}{\cobblevrs}
+%    \hskip-\marginparsep\,\texttt{*(\ameta{\string\cmd})\darg{\ameta{text}}}
+%    For users of \cs{fetchversestxt}, \cs{cobblevrs} `cobbles' verses together.
+%    \cs{cobblevrs} takes \ameta{text} and adds it onto the end of the macro \ameta{\string\cmd}.
+%    The star-version first \cs{let}s \ameta{\string\cmd} to \cs{@empty}. If \ameta{\string\cmd}
+%    is undefined, it is first set to \cs{@empty}.
+%    \changes{v2.4.9}{2018/07/30}{Added \string\cs{cobblevrs}}
+%
+%    This is a general purpose macro, not restricted to use by \cs{fetchversestxt}. For example,
+%\begin{verbatim}
+%\fetchversestxt[typeset,abbr=none,from*=KJV]{Gen 1:1}\cobblevrs*\holdverses
+%  {(\versetxt)\space\passagetxt}
+%\fetchversestxt[typeset,abbr=none,from=ISV,transl=ISV]{Gen 1:1}\cobblevrs
+%\holdverses{ Now, the same quote from ISV: (\versetxt)\space\passagetxt}
+%\fetchversestxt[typeset,abbr=none,from*=YLT]{Gen 1:1}\cobblevrs\holdverses
+%{ Again, but now from YLT: (\versetxt)\space\passagetxt}\holdverses
+%\end{verbatim}
+%yields
+%\begin{fpquote}
+%\fetchversestxt[typeset,abbr=none,from*=KJV]{Gen 1:1}\cobblevrs*\holdverses
+%  {(\versetxt)\space\passagetxt}
+%\fetchversestxt[typeset,abbr=none,from=ISV,transl=ISV]{Gen 1:1}\cobblevrs\holdverses
+%  { Now, the same quote from ISV: (\versetxt)\space\passagetxt}
+%\fetchversestxt[typeset,abbr=none,from*=YLT]{Gen 1:1}\cobblevrs\holdverses
+%{ Again, but now from YLT: (\versetxt)\space\passagetxt}\holdverses
+%\end{fpquote}
+%    \begin{macrocode}
+\newcommand{\cobblevrs}{\@ifstar{\cobblevrs@i}{\cobblevrs@ii}}
+\def\cobblevrs@i#1{\let#1\@empty\cobblevrs@ii{#1}}
+\def\cobblevrs@ii#1#2{\ifx#1\undefined\let#1\@empty\fi
+  \bgroup
+    \toks0=\expandafter{#1}\toks2=\expandafter{#2}%
+    \set@typeset@protect
+    \protected@edef\fb@xtmp{\the\toks0 \the\toks2 }%
+    \protected@xdef#1{\fb@xtmp}%
+  \egroup
+}
+%    \end{macrocode}
+%    \end{macro}
 %
 %    \subsubsection{Formatting the verse numbers} We define three commands to
 %    support the formatting of the verse numbers.
@@ -1637,7 +1805,7 @@
 %    \end{macrocode}
 %    \DescribeMacro{\letEach...\string\to} is a convenience command to \cs{let} several commands
 %    to another command, usually \cs{relax}. For example,
-%    \changes{v2.0a}{2016/09/19}{Added \string\cs{letEach...\string\cs{to}}}
+%    \changes{v2.0a}{2016/09/19}{Added \string\cs{letEach...}\string\cs{to}}
 %\begin{verbatim}
 %   \letEach\cmdi\cmdii\cmdiii\to\relax
 %\end{verbatim}
@@ -2003,16 +2171,19 @@
     {\string\selectedVersesFrom\space requires the\MessageBreak
      useselverses option. Gobbling up\MessageBreak your argument}}
 %    \end{macrocode}
-% \subsection{\texttt{fbpes.cfg}, the configuration file}
+% \section{Input the configuration file}
+% If \opt{ignorecfg} is not specified in the option list of \pkg{fetchbibpes}, a configuration
+% file is input at this point. The name of the configuration is set by the value of the
+% \opt{cfg} key; \texttt{fbpes.cfg} is input if \opt{cfg} is not specified.
 %    \begin{macrocode}
-\def\fb@loadcfg{\InputIfFileExists{fbpes.cfg}
-    {\PackageInfo{fetchbibpes}{Inputting fbpes.cfg}}
-    {\PackageInfo{fetchbibpes}{fbpes.cfg not found}}}
 \iffb@ignorecfg
-    \PackageInfo{fetchbibpes}{Ignoring CFG file}
+  \def\fb@loadcfg{\PackageInfo{fetchbibpes}{Ignoring CFG file}}
 \else
-    \AtEndOfPackage{\fb@loadcfg}
+  \def\fb@loadcfg{\InputIfFileExists{\fb@cfg@basename.cfg}
+    {\PackageInfo{fetchbibpes}{Inputting \fb@cfg@basename.cfg}}
+    {\PackageWarning{fetchbibpes}{\fb@cfg@basename.cfg not found}}}
 \fi
+\AtEndOfPackage{\fb@loadcfg}
 %    \end{macrocode}
 %    \begin{macrocode}
 %</package>
@@ -2084,9 +2255,9 @@
 \newif\iffb@fromused \fb@fromusedfalse
 \define@key{sel@verses}{from}{\fb@fromusedtrue
     \def\@argi{#1}\ifx\@argi\@empty
-    \edef\sel@verses@from{ \fb@defaultBible}\else
+    \edef\sel@verses@from{ \fbdefaultBible}\else
     \def\sel@verses@from{ #1}\fi}
-\edef\sel@verses@from{ \fb@defaultBible}%
+\edef\sel@verses@from{ \fbdefaultBible}%
 %    \end{macrocode}
 % \IndexKey{alt} The \texttt{alt} allows you to specify an alternate translation
 % of the passage.
@@ -2099,7 +2270,7 @@
 \def\selectedVersesFrom#1{%
     \@tfor\@rg:=#1\do{%
         \let\sel@verses@alt\@empty
-        \edef\sel@verses@from{ \fb@defaultBible}%
+        \edef\sel@verses@from{ \fbdefaultBible}%
         \edef\setkeysExp{\noexpand\setkeys{sel@verses}{\@rg}}\setkeysExp
 %    \end{macrocode}
 %    In case the author uses the full names, we do an inverse lookup, as needed.

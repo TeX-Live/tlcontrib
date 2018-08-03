@@ -32,8 +32,18 @@
 \BV(Gal 1:16 NKJV) to reveal His Son in me, that I might preach Him among the Gentiles, I did not immediately confer with flesh and blood,\null
 \end{declareBVs}
 
+\addtolength{\marginparwidth}{20pt}
 
 \makeatletter
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{5}
+\makeatletter
+\renewcommand*{\theparagraph}{\texorpdfstring{\protect\P\protect\ }{\textparagraph}}
+\renewcommand{\paragraph}
+    {\renewcommand{\@seccntformat}[1]{\theparagraph}%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\color{\aeb@subsubsectioncolor}\bfseries}}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+
 \renewenvironment{quote}[1][]
    {\def\@rgi{#1}\ifx\@rgi\@empty
     \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
@@ -56,10 +66,6 @@
 
 \urlstyle{tt}
 
-%\def\tutpath{doc/tutorial}
-%\def\tutpathi{tutorial}
-%\def\expath{../examples}
-
 \def\STRUT{\rule{0pt}{14pt}}
 
 
@@ -72,7 +78,7 @@
     email={dpstory@acrotex.net},
     subject=Documentation for the fetchbibpes and bibpes packages,
     talksite={\url{www.acrotex.net}},
-    version={2.4.5, 2018/07/12},
+    version={2.4.9, 2018/07/30},
     Keywords={LaTeX, e-sword, Bible passages, AcroTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -399,7 +405,7 @@ Output file: \texttt{mydefs/Gen1-KJV.def}
 \makebox[0pt][r]{\dots\dots\dots\dots\dots\dots\quad}\dots\dots\dots\dots\dots\dots
 \endgroup\par\medskip\noindent
 Passage references appear in the margins, while the passages themselves are
-in the body of the document. When\marginpar{\raggedright\opt{build} verses
+in the body of the document. When\marginpar{\small\raggedleft\opt{build}\\verses\\
 \opt{!build}} the \texttt{build} option, shown in bold font above, is
 specified, \pkg{bibpes} is fully functional in the sense that the \EXT{TXT}
 file is read and the \EXT{DEF} file is created and saved. When \texttt{build}
@@ -741,9 +747,9 @@ It is perhaps always better to use \cs{fetchverses} for single and multiple vers
        \item \fetchverse[abbr=long,roman]{1Co 1:1}
  \end{itemize}
 
- \item[\texttt{from=\ameta{\upshape{KVJ|KVJ+|ISV}}}] The value of the
-     \texttt{from} key is the Bible translation to be used. For example,
-     \texttt{from=ISV}.
+ \item[\texttt{from=\ameta{\upshape{KVJ|KVJ+|ISV}}}]\label{item:from} The
+     value of the \texttt{from} key is the Bible translation to be used. For
+     example, \texttt{from=ISV}.
 
     \textbf{Example} \verb|\fetchverse[abbr=none,from=ISV]{Gen 1:1}| yields,
     \begin{quote}
@@ -759,10 +765,12 @@ It is perhaps always better to use \cs{fetchverses} for single and multiple vers
     \verb|\fetchverse{Gen 1:1}| fetches Genesis 1:1 from the \texttt{KJV},
     if defined.
 
-    If you want to add other Bibles use the \cs{addtoBibles} to declare
-    them. See \mlhyperref[\linktxtcolor{webgreen}]{s:suppfetch}{Section~\protect\ref*{s:suppfetch}}
-    for more information on this
-    command.
+    If you want to introduce other Bible translations into your document, use
+    the command \cs{addtoBibles} to declare them; see
+    \mlhyperref[\linktxtcolor{webgreen}]{s:suppfetch}{Section~\protect\ref*{s:suppfetch}}
+    for more information on \cs{addtoBibles}. To add Bible translations to all
+    documents you produce, `register' them in the configuration files; refer
+    to \hyperref[s:cfg]{Section~\ref*{s:cfg}} to read how to do this.
 
     \item[\texttt{alt=\ameta{word}}]\label{key:alt} The value \ameta{word}
         is a single word (containing no spaces). The \pkg{fetchbibpes}
@@ -822,20 +830,57 @@ and an informative message is written to the log.
 The demo file \texttt{bibpes\_alt-star.tex} tests this feature.
 
     \item[\texttt{transl=\ameta{text}}] The \texttt{transl} key is an
-        annotation key that appends text (\ameta{text}) on the end of the
-        Bible reference, such as a translation abbreviation,
-        \texttt{transl=KJV}.
+        annotation key that appends text (\ameta{text}) to the end of the
+        Bible reference, such as \texttt{transl=KJV}, to obtain the
+        \textit{translation note}. The \texttt{transl} internally defines a macro
+        that holds its value, but also defines a public command \cs{gtransl}\marginpar{\small\raggedleft\cs{gtransl} defined} that
+        expands to \ameta{text}. This command is redefined at the next use of the
+        \texttt{transl} key within \cs{fetchverses} or \cs{fetchversestxt}.
 
-\paragraph*{Examples} We annotate the translation version using `King James Version'.
+\paragraph*{Examples} We set the translation note to `King James Version'.
 \begin{quote}\small
 \verb|\fetchverse[abbr=none,transl=King James Version]{Gen 1:1}|\\[3pt]\normalsize
 \fetchverse[abbr=none,transl=King James Version]{Gen 1:1}
 \end{quote}
 Normally, the version abbreviation is used as the \ameta{text}:
-\begin{quote}\small
+\begin{quote}
 \verb|\fetchverse[abbr=none,transl=KJV]{Gen 1:1}|\\[3pt]\normalsize
 \fetchverse[abbr=none,transl=KJV]{Gen 1:1}
 \end{quote}
+The translation note does not appear unless the \texttt{transl} key is specified with a value.
+In the example below, there is no \texttt{transl} key (and there is no \texttt{from} key so the
+default Bible is used (\fbdefaultBible)).
+\begin{quote}
+\verb|\fetchverse[abbr=none]{Gen 1:1}|\\[3pt]\normalsize
+\fetchverse[abbr=none,from=KJV]{Gen 1:1}
+\end{quote}
+To get the translation note to appear you can either specify a value for the
+\texttt{transl} key, as we did above, or turn on the feature of always showing the translation
+note.
+\bVerb\takeMeasure{\string\showTranslAlways\quad\string\showTranslDecld}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\showTranslAlways!quad\showTranslDecld
+\end{dCmd}
+\eVerb \cs{showTranslAlways} turns on the translation note,\footnote{If the
+\texttt{transl} key is not specified, tt uses the value of the \texttt{from}
+key; if the \texttt{from} key is not specified, the default Bible is used.}
+while \cs{showTranslDecld} to the default behavior, that is, show the
+translation note only when the \texttt{transl} key has a declared value. Thus,
+\begin{quote}
+\verb|\showTranslAlways|\\
+\verb|\fetchverse[abbr=none]{Gen 1:1}| expands to,\\[3pt]
+\showTranslAlways
+\fetchverse[abbr=none]{Gen 1:1}
+\end{quote}
+The Bible abbreviation is used (KJV), if the \texttt{transl} is present in the optional parameter
+list, its value will be used instead.
+\begin{quote}
+\verb|\showTranslAlways|\\
+\verb|\fetchverse[abbr=none,transl=KJ]{Gen 1:1}| expands to,\\[3pt]
+\showTranslAlways
+\fetchverse[abbr=none,transl=KJ]{Gen 1:1}
+\end{quote}
+The sample file \texttt{fetchversestxt.tex} illustrates \cs{showTranslAlways}.
 
 \item[\texttt{from*=\ameta{version}}] The \texttt{from*} combines the
     actions of the options \texttt{from} and \texttt{transl} and is
@@ -1235,12 +1280,53 @@ parse it correctly.
 
 The above example appears in \texttt{bibpes\_replaces.tex}.
 
-\item[\texttt{typeset=\ameta{\upshape{true|false}}}] This option is used with \cs{fetchversestxt};
-if \texttt{true} (or if simply \texttt{typeset} is specified), the macros created by
-\cs{fetchversestxt} are intended to be typeset into the document; the default for \cs{fetchversestxt}
-is \texttt{typeset=false} while the default for \cs{fetchverses} is \texttt{typeset=true}. Putting
-\texttt{typeset=false} within the optional argument of \cs{fetchverses} has no effect. Refer to the
-subsection titled \Nameref{fvtxt}.
+\item[\texttt{typeset=\ameta{opts}}]\label{item:typeset} This option was designed for
+    \cs{fetchversestxt}, but may be used with \cs{fetchverses} as
+    well.\footnote{This key is not used with \cs{fetchverse}.} Refer to the
+    subsection titled \mlNameref{fvtxt} for more information on the command.
+  \begin{itemize}
+    \item \textbf{For \cs{fetchverses}:} When \texttt{typeset} appears within
+        the optional argument of \cs{fetchverses} its value (\ameta{opts}) is
+        added \emph{to the end of the option list}. This may cause options
+        specified by \texttt{typeset} to overwrite the options that are
+        already declared. However, there is an important exception, that for
+        the \texttt{replace} key\marginpar{\small\raggedleft\texttt{replace} option special case}; in this case, the arguments of the
+        \texttt{replace} declared within \texttt{typeset} are appended to the
+        arguments of the \texttt{replace} declared in the option list of
+        \cs{fetchverses}. Thus,
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\fetchverses[typeset={{brother}{\textbf{brother}},!ameta(other-opts)},
+(!qquad)replace={brother,}{brother.},...]{1Co 1:1}
+!STRUT!normalfont(This is equivalent to)
+!STRUT\fetchverses[replace={brother,}{brother.}
+!qquad{brother}{\textbf{brother}},...,!ameta(other-opts)]{1Co 1:1}
+\end{Verbatim}
+
+    \item \textbf{For \cs{fetchversestxt}:} If the \texttt{typeset} key
+        appears (possibly with an empty value) within the option list of
+        \cs{fetchversestxt}, it declares that the two macros \cs{versestxt} and
+        \cs{passagetxt} (created by \cs{fetchversestxt}) are intended to be
+        typeset into the document; the \ameta{opts} value \emph{is ignored}.
+        The key itself effects the treatment of quotation marks and apostrophes;
+        when present, `smart quotes' are used and \cs{bDQ}, \cs{eDQ}, \cs{bSQ},
+        and \cs{eSQ} have effect. See \hyperref[ProbsQuotes]{Section~\ref*{ProbsQuotes}}
+        for a discussion of these latter commands.
+    \end{itemize}
+    The purpose of \texttt{typeset} (as well as \texttt{typeset*}) is to
+    enable the document author to write one set of options for both
+    \cs{fetchverses} and \cs{fetchversestxt}. The value of \texttt{typeset}
+    provides additional formatting options not available through
+    \cs{fetchversestxt}.
+
+\item[\texttt{typeset*=\ameta{opts}}] This key has the same features as
+    \texttt{typeset} when specified within the option list of
+    \cs{fetchverses}. Within the option list of \cs{fetchversestxt}, however,
+    this key-value has no effect at all; \cs{fetchversestxt} has its normal
+    characteristics: no {\LaTeX} formatting or font changes are supported;
+    the `smart quotes' are not used; and the commands \cs{bDQ}, \cs{eDQ},
+    \cs{bSQ}, and \cs{eSQ} are not obeyed.
+
+    The section \Nameref{fvtxt} includes some discussion and examples of these last two keys.
 \end{description}
 
 \paragraph*{Predefined options using a `helper' command.}\label{para:PredefHelper} It can become
@@ -1270,7 +1356,9 @@ The basic syntax for \pkg{fetchbibpes} is as follows:
     useverses={!ameta(list)},
     deffolder=!ameta(path),
     useselverses,
-    usesr,ignorecfg
+    usesr,
+    ignorecfg,
+    cfg=!ameta(name)
 ]{fetchbibpes}
 \end{Verbatim}
 
@@ -1334,13 +1422,21 @@ from a verse. See \hyperref[s:substr]{Section~\ref*{s:substr}} for details.
 \item[\opt{ignorecfg}] When this key is present (no value is required), the \EXT{CFG}
 file for this package (\texttt{fbpes.cfg}) is \emph{not loaded}. Refer to \hyperref[s:cfg]{Section~\ref*{s:cfg}}
 for more information on the \EXT{CFG} file.
+
+\item[\opt{cfg=\ameta{name}}] The value of this key specifies the base name
+    of the configuration file (\texttt{\ameta{name}.cfg}) to be used. If the
+    \opt{cfg} does not appear or has no value, the default configuration file
+    is used (\texttt{fbpes.cfg}). The configuration file is input only if the
+    \opt{ignorecfg} option \emph{does not appear} on the package option list.
+    An example of the default configuration file (\texttt{fbpes.cfg}) is
+    provided with this distribution.
 \end{description}
 
 \paragraph*{Demo file:} \texttt{bibpes\_tst.tex}.
 
 \subsection{Supporting commands for fetching verses}\label{s:suppfetch}
 
-\subsubsection{Adding Bibles}
+\subsubsection{Adding Bibles}\label{ss:addtoBibles}
 Suppose you want to fetch verses from the American Standard Version (ASV) and
 Young's Literal Translation (YLT), first download them (if not already on
 your system) using the \app{e-Sword} desktop application; second, use the
@@ -1373,17 +1469,18 @@ You can set your own default Bible using the \cs{defaultBible} command.
 \begin{dCmd}[commandchars=!()]{\bxSize}
 \defaultBible{!ameta(transl)}
 \end{dCmd}
-\eVerb where \ameta{transl} is the name of a Bible translation assigned
-by the \app{e-Sword} application. The name \ameta{transl} must be a
-recognized Bible translation: KJV, KJV+, ISV, or any Bible translation registered
-by the \cs{addtoBibles} command.
+\eVerb where \ameta{transl} is the name of a Bible translation assigned by
+the \app{e-Sword} application. The name \ameta{transl} must be a recognized
+Bible translation: KJV, KJV+, ISV, or any Bible translation registered by the
+\cs{addtoBibles} command. The command
+\cs{fbdefaultBible}\marginpar{\small\raggedleft\cs{fbdefaultBible} defined}
+holds the (current) default Bible abbreviation.
 
- of the \texttt{from}
-key of the fetch commands. Other than the ones initially defined
-(\texttt{KJV}, \texttt{KJV+}, and \texttt{ISV}), Bible can be added on
-with the \cs{addtoBibles} command, or by redefining the \texttt{from}
-key, perhaps in the \EXT{CFG}; see \hyperref[s:cfg]{Section~\ref*{s:cfg}}
-for more information on how to do this.
+Other than the ones initially defined (\texttt{KJV}, \texttt{KJV+}, and
+\texttt{ISV}), a Bible translation can be added on with the \cs{addtoBibles}
+command, or by adding in a new Bible translation in the \EXT{CFG};
+see \hyperref[s:cfg]{Section~\ref*{s:cfg}} for more information on how to do
+this.
 
 \paragraph*{Example} Purchase, download and install \texttt{NKJV} (a premium Bible)
 and declare in a document:
@@ -1456,7 +1553,7 @@ the \EXT{DEF} files. Thus, if we type \verb|\usePassage{Gen 1:1 KJV}|, we get,
 That is, you get the `raw' passage without any annotations (translation, book, chapter, verse, and so on).
 Only one passage (verse) may be retrieved this way.
 
-\subsubsection{\texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}:
+\subsubsection{\texorpdfstring{{\protect\mlcs{fetchversestxt}}}{\textbackslash{fetchversestxt}}:
  raw retrieval with options}\label{fvtxt}
 
 \def\myNote{type=text,name=Note,color=webyellow}
@@ -1490,7 +1587,7 @@ options, any formatting options are ignored (I hope), otherwise, all options
 should work as described earlier.
 
 The application\fetchversestxt[showfirst]{Gen 1:1-}\annotpro[presets=\myNote,
-margin,readonly,title={\versetxt},margintext={\hfill\versetxt},margprior=\hfill]{\passagetxt} my former-friend had in mind
+margin,readonly,title={\versetxt},margintext={\hfill\versetxt},margprior=\hfill]{\passagetxt} my former friend had in mind
 was to pass the \cs{passagetxt} command to an annotation macro such as \cs{annotpro} (\pkg{annot\_pro} package) or
 \cs{pdfcomment} (\pkg{pdfcomment} package). What you see in the margin is \cs{annotpro}.
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
@@ -1498,25 +1595,170 @@ The application\fetchversestxt[showfirst]{Gen 1:1-}\annotpro[type=text,
   name=Note,color=webyellow,margin,readonly,
   title={\versetxt},margintext={\hfill\versetxt},
   margprior=\hfill]{\passagetxt}
-my former-friend had in mind ...
+my former friend had in mind ...
 \end{Verbatim}
 Refer to the manual, \texttt{annotpro\_man.pdf} for the particulars of using \cs{annotpro} from the
 \pkg{annot\_pro} package.
 
-\paragraph*{The \texttt{typeset} option.} The optional argument of \cs{fetchversestxt} accepts the
-\texttt{typeset} option. Without the \opt{typeset} option, the expansion of
-\cs{passagetxt} does not contain any {\LaTeX} styling or font changes; if the
-\opt{typeset} option is taken, the \cs{passagetxt} expands to the same
-passage as its non-txt counterpart. The accompanying demonstration file
-\texttt{fetchversestxt.tex} extensively discusses the \opt{typeset} option.
+\paragraph[The \texttt{typeset} option]{The \texttt{typeset} option.}
+The \cs{fetchversestxt} command accepts \texttt{typeset} (see
+page~\pageref{item:typeset} for a description) as an option. Without the
+\opt{typeset} option, \cs{passagetxt} does not contain any {\LaTeX} styling
+or font changes; if the \opt{typeset} option is taken,  \cs{passagetxt}
+expands to the same passage as its non-txt counterpart. The accompanying
+demonstration file \texttt{fetchversestxt.tex} extensively discusses the
+\opt{typeset} option.
 
 \newtopic\noindent
-The demonstration file for this feature is \texttt{fetchversestxt.tex}.
+The demonstration file for this feature is \texttt{fetchversestxt.tex}. It
+includes several examples of the use of \texttt{typeset} and
+\texttt{typeset*} with both commands \cs{fetchverses} and \cs{fetchversestxt}, with
+and without a value for the key.
+
+\paragraph[Cobbling together verses]{Cobbling together verses.} In this paragraph the \cs{cobblevrs} command
+is discussed and illustrated.
+\bVerb\takeMeasure{\string\cobblevrs*\darg{\ameta{\cs{cmd}}\darg{\ameta{text}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\cobblevrs*{!ameta(\cmd)}{!ameta(text)}
+\end{dCmd}
+\endgroup\noindent \cs{cobblevrs} takes \ameta{text} and adds it to the end
+of the text macro \ameta{\cs{cmd}}. If \ameta{\cs{cmd}} is undefined
+initially, \cs{cobblevrs} defines it as to be empty; if \ameta{\cs{cmd}} is
+already defined, \cs{cobblevrs} adds \ameta{text} to \ameta{\cs{cmd}}. If
+\ameta{\cs{cmd}} is already defined (perhaps used previously by
+\cs{cobblevrs}), to empty its contents before using again (with
+\cs{cobblevrs}) use the star-version of the command.
+
+The \cs{cobblevrs} command was designed to be used with the commands \cs{versetxt} and \cs{passagetxt} generated
+by \cs{fetchversetxt}, but can be use for any purpose. Example of intended usage:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\fetchversestxt[typeset,abbr=none]{Gen 1:1}\cobblevrs*\holdverses
+  {(\versetxt)\space\passagetxt}
+\fetchversestxt[typeset,from*=ISV]{Gen 1:1}\cobblevrs\holdverses
+  { Now, the same quote from ISV: (\versetxt)\space\passagetxt}
+\fetchversestxt[typeset,from*=YLT]{Gen 1:1}\cobblevrs\holdverses
+  { Again, but now from YLT: (\versetxt)\space\passagetxt}%
+\holdverses % !normalfont(expand our cobbled verses)
+\end{Verbatim}
+The \cs{holdverses} macro then expands to the following paragraph:
+\begin{fpquote}
+\fetchversestxt[typeset,abbr=none]{Gen 1:1}\cobblevrs*\holdverses
+  {(\versetxt)\space\passagetxt}
+\fetchversestxt[typeset,from*=ISV]{Gen 1:1}\cobblevrs\holdverses
+  { Now, the same quote from ISV: (\versetxt)\space\passagetxt}
+\fetchversestxt[typeset,from*=YLT]{Gen 1:1}\cobblevrs\holdverses
+{ Again, but now from YLT: (\versetxt)\space\passagetxt}\holdverses
+\end{fpquote}
+\cs{cobblevrs} is a tool that is available if ever needed. The demo file for this feature
+is \texttt{fetchversestxt\_cobble.tex}.
+
+\subsection{Formatting the translation note}
+
+By ``translation note'', we mean the value of the \texttt{transl} key. By default, the note appears
+as plain text following the Bible reference and a space.
+\begin{fpquote}[]
+\verb|\fetchverses*[from=ISV,transl=ISV]{Gen 1:1}|\\
+\fetchverses*[from=ISV,transl=ISV]{Gen 1:1}
+\end{fpquote}
+
+\subsubsection{Formatting through the \texorpdfstring{\protect\texttt{transl}}{\textbackslash{transl}} key}
+
+In the next two paragraphs, we comment on formatting the translation note using the \texttt{transl} key.
+
+\paragraph[Using \texorpdfstring{\protect\cs{fetchverses}}{\textbackslash{fetchverses}}]{Using \texorpdfstring{\protect\cs{fetchverses}}{\textbackslash{fetchverses}}.}
+The translation note may be formatted for \emph{individual passages} using the
+\texttt{transl} key.
+\emph{Simple textual formatting} is possible, such as
+\begin{fpquote}[]
+\verb|\fetchverses*[from=ISV,transl={- ISV}]{Gen 1:1}|\\
+\fetchverses*[from=ISV,transl={- ISV}]{Gen 1:1}
+\end{fpquote}
+You can change font styles as well.
+\begin{fpquote}[]
+\verb|\fetchverses*[from=ISV,transl=\textbf{ISV}]{Gen 1:1}|\\
+\fetchverses*[from=ISV,transl=\textbf{ISV}]{Gen 1:1}
+\end{fpquote}
+
+\paragraph[Using \texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}]{Using \texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}.}
+The command \cs{fetchversestxt} does not produce any typeset material, but defines to macros
+\cs{versetxt} and \cs{passagetxt}. Simple changes to the translation note are no problem:
+\begin{fpquote}[]
+\verb|\fetchversestxt[from=ISV,transl={- ISV}]{Gen 1:1}|\\
+\fetchversestxt[from=ISV,transl={- ISV}]{Gen 1:1}\verb|\versetxt| now expands to \versetxt
+\end{fpquote}
+To individually change the font styling, we have to protect style change with \cs{protect},
+\begin{fpquote}[]
+\verb|\fetchversestxt[from=ISV,|\\
+\null\qquad\verb|transl={- |\textbf{\texttt{\string\protect}}\verb|\textbf{ISV}}]{Gen 1:1}|\\
+\fetchversestxt[from=ISV,transl={- \protect\textbf{ISV}}]{Gen 1:1}\verb|\versetxt| expands to \versetxt
+\end{fpquote}
+Above, the \cs{protect} command is shown in bold font for emphasis.
+
+\subsubsection{Setting the default format}
+
+Another way to set the formatting of the translation note is by changing the default formatting. (The default is
+plain text preceded by a space.)
+
+\paragraph{\texorpdfstring{\protect\cs{fetchverses}}{\textbackslash{fetchverses}}}
+
+As mentioned above, the default format is just plain text, though individual changes can be
+made through the \texttt{transl} key. To change the default formatting for \cs{fetchverses} and \cs{fetchverse},
+use the \cs{translFmt} command.
+\bVerb\takeMeasure{\string\translFmt\darg{\ameta{fmt-transl-\#1}}}%
+\setlength{\dimen0}{\bxSize}\edef\temp{\the\dimen0}\setlength{\dimen0}{\linewidth-\temp}%
+\def\1{\makebox[0pt][l]{\hspace{\temp}\enspace\textrm{(}\string\translFmt\darg{\string\space\#1}\textrm{)}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\translFmt{!ameta(fmt-transl-#1)}
+!1\translFmtDef
+\end{dCmd}
+\endgroup\noindent Within the argument of \cs{translFmt}, use \texttt{\#1} to symbolically represent the value of the \texttt{transl} key. The default
+declaration for \cs{translFmt} is given to the right in parentheses.
+For example,
+\begin{fpquote}[]
+\verb|\translFmt{ - \textbf{#1}}| (Note space after left brace)\\
+\verb|\fetchverses*[from*=ISV]{Gen 1:1}|\\
+\translFmt{ - \textbf{#1}}%
+\fetchverses*[from*=ISV]{Gen 1:1}
+\end{fpquote}
+The presentation for the translation note becomes a hyphen followed by the
+value of \texttt{transl} in bold font. This presentation of the translation
+note will continue until you either leave the group where \cs{translFmt} was
+used, or you expand \cs{translFmtDef} to return the presentation  to its
+package default, given above to the right in parentheses.
+
+
+\paragraph[\texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}]{\texorpdfstring{\protect\cs{fetchversestxt}}{\textbackslash{fetchversestxt}}.}
+
+When using \cs{fetchversestxt}, change the default presentation style for the translation note using
+\cs{translTxtFmt} and \cs{translTxtDef}.
+\bVerb\takeMeasure{\string\translTxtFmt\darg{\ameta{fmt-transl-\#1}}}%
+\setlength{\dimen0}{\bxSize}\edef\temp{\the\dimen0}\setlength{\dimen0}{\linewidth-\temp}%
+\def\1{\makebox[0pt][l]{\hspace{\temp}\enspace\textrm{(}\string\translTxtFmt\darg{\string\space\#1}\textrm{)}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\translTxtFmt{!ameta(fmt-transl-#1)}
+!1\translTxtFmtDef
+\end{dCmd}
+\endgroup\noindent These declarations only effect the \cs{versetxt} command defined by \cs{fetchversestxt}. Thus,
+\begin{fpquote}[]
+\verb|\translTxtFmt{ - \textbf{#1}}| (Note space after left brace)\\
+\verb|\fetchversestxt[from*=ISV]{Gen 1:1}|\\
+\translTxtFmt{\space- \textbf{#1}}%
+\fetchversestxt[from*=ISV]{Gen 1:1}\versetxt
+\end{fpquote}
+
+When using \cs{fetchversestxt}, a common presentation style is given in the next example:
+\begin{fpquote}[]
+\verb|translTxtFmt{ (#1)}| (Note space after left brace)\\
+\verb|\fetchversestxt[from*=ISV]{Gen 1:1}|\\
+\translTxtFmt{ (#1)}%
+\fetchversestxt[from*=ISV]{Gen 1:1}\verb|\versetxt| expands to \versetxt
+\end{fpquote}
+The sample file \texttt{fetchversestxt.tex} illustrates \cs{translTxtFmt}.
 
 \subsection{Setting various spaces}
 
-\paragraph*{The space prior to the reference for
-\texorpdfstring{\protect\opt{citeatend}}{citeatend}.}
+\subsubsection{The space prior to the reference for
+\texorpdfstring{\protect\opt{citeatend}}{citeatend}}
 
 When the option \texttt{citeatend=true}, the \cs{priorRefSpc} command sets the
 spacing between the passage and the reference.
@@ -1543,8 +1785,7 @@ declaration.
 \priorRefSpc{\fbFitItIn}\afterBookSpc{\nobreak\ }\fetchverses*{Gen 1:1-2}
  \end{quote}
 
-
-\paragraph*{Setting the space after the book name}\leavevmode
+\subsubsection{Setting the space after the book name}\leavevmode
 \bVerb\takeMeasure{\string\afterBookSpc\darg{\ameta{value}}\quad\normalfont(\texttt{\string\ })}%
 \begin{dCmd}[commandchars=~!@]{\bxSize}
 \afterBookSpc{~ameta!value@}~quad~normalfont(~ttfamily\~vissp~normalfont)
@@ -1566,7 +1807,7 @@ change occurred within a \texttt{quote} environment. A declaration of
 \cmd{\afterBookSpc\darg{}} removes the space completely. There may be some
 application to this command.
 
-\paragraph*{The space following the passage reference}\leavevmode
+\subsubsection{The space following the passage reference}\leavevmode
 \bVerb\takeMeasure{\string\afterRef\darg{\ameta{value}}\quad\normalfont(\texttt{\string\@empty})}%
 \begin{dCmd}[commandchars=~!^]{\bxSize}
 \afterRef{~ameta!value^}~quad~normalfont(~ttfamily\@empty~normalfont)
@@ -1583,7 +1824,7 @@ beginning of the passage use \cmd{\afterRef\darg{\darg{}}}; this latter
 declaration was used in the example of the \opt{priorref} key of the fetch
 commands.
 
-\paragraph*{The space between the book and book number}\leavevmode
+\subsubsection{The space between the book and book number}\leavevmode
 \bVerb\takeMeasure{\string\afterBookSpc\darg{\ameta{value}}\quad\normalfont(\texttt{\string\space})}%
 \begin{dCmd}[commandchars=~!@]{\bxSize}
 \afterBookSpc{~ameta!value@}~quad~normalfont(~ttfamily\space~normalfont)
@@ -1735,36 +1976,32 @@ to \textsl{Strong's Concordance}.
 \subsection{The \EXT{CFG} file of the package}\label{s:cfg}
 
 Unless the option \marginpar{\small\raggedleft\opt{ignorecfg} option}\opt{ignorecfg} option
-appears in the option list of \pkg{fectchbibpes}, the configuration file
+appears in the option list of \pkg{fetchbibpes}, the configuration file
 \texttt{fbpes.cfg} is input at the end of the package.
 
 There is not much to `configure' in this package, however. The application
 that was in mind when this feature was created is the redefinition of the
 \opt{from} key of the fetch command options.
+\bVerb\takeMeasure{\string\registerBibles\darg{\ameta{comma-delimited-list}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\defaultBible{!ameta(transl)}
+\registerBibles{!ameta(comma-delimited-list)}
+\end{dCmd}
+\endgroup\noindent The above is the suggest contents of the \texttt{fbpes.cfg}: (1) first establish
+the default Bible, if different than the one already declared; (2) list the
+Bible translations to be `registered'. The registered Bibles will be
+recognized by the \texttt{from} key, without having to first pass them
+through the \cs{addtoBibles} command (\Nameref{ss:addtoBibles}).
 
-For example, you might have many more books than the minimal ones set up by this package, so
+For example, you may routinely use many more books than the minimal ones set up by this package, so
 in your own \EXT{CFG} file you might define,
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \defaultBible{NKJV}
-\define@choicekey+{fbpes}{from}[\val\nr]%
-    {NKJV,KJV,KJV+,ISV,RV,YLT}[NKJV]{%
-    \ifcase\nr\relax
-        \def\fbpes@from{ NKJV}\or
-        \def\fbpes@from{ KJV}\or
-        \def\fbpes@from{ KJV+}\or
-        \def\fbpes@from{ ISV}\or
-        \def\fbpes@from{ RV}\or
-        \def\fbpes@from{ YLT}\fi
-}{%
-    \if@ddtoBiblesUsed
-        \def\fbpes@from{ #1}\setkeys{bibadd}{addfrom=#1}\else
-        \PackageWarning{fetchbibpes}{Bad Choice of \val\MessageBreak
-        will use \fb@defaultBible\space instead}\def\fbpes@from{}\fi
-}
+\registerBibles{NKJV,KJV,KJV+,ISV,RV,YLT}
 \end{Verbatim}
-The above code is a modification of \cs{define@choicekey} for the
-\texttt{from} key (the key family is named \texttt{fbpes}) found in
-\texttt{fetchbibpes.sty} (or \texttt{fetchbibpes.dtx}).
+The \cs{registerBibles}\marginpar{\small\raggedleft\cs{registerBibles}
+discussed} is a command not previously mentioned. Its argument is a
+comma-delimited list of Bible translations recognized by \textsf{e-Sword}.
 
 A less complicated method that does not modify the definition of the
 \opt{from} key of the \texttt{fbpes} family is to simply use the

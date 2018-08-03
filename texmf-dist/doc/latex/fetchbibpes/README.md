@@ -1,6 +1,6 @@
 The fetchbibpes Bundle
 Author: D. P. Story
-Dated: 2018/07/12
+Dated: 2018/07/30
 
 This bundle provides two packages, bibpes and fetchbibpes. This pair of 
 packages was motivated by a friend, who was preparing Bible studies lessons 
@@ -22,6 +22,13 @@ LaTeX. He wanted a `database' of Bible packages from which he could simply
         into the source document.
 
 Unpack the distribution by latexing fetchbibpes.ins.
+
+What's new (2018/07/30) Bug fixes. Added the cfg option for specifying a 
+custom contiguration file. New commands \showTranslAlways, \showTranslDecld, 
+\translFmt, \translTxtFmt, and \cobblevrs. All documented in the manual. 
+NOTE: The format for the CFG file has changes, you will need to update to 
+this new syntax; refer to Section 3.8 of the manual and to fbpes.cfg for an 
+example. 
 
 What's new (2018/07/12) Defined a new command \fetchversestxt; the command 
 has the same arguments as \fetchverses, but it does not expand to typeset 

@@ -1,9 +1,12 @@
 \documentclass{article}
 \usepackage{pdfcomment}
+\hypersetup{bookmarks=false}
 \usepackage[%
     useverses=none
 %    useverses=verses
 ]{fetchbibpes}
+
+\hypersetup{pdfpagemode=UseNone}
 
 \def\cs#1{\texttt{\char`\\#1}}
 \let\pkg\textsf
@@ -68,8 +71,22 @@ that is typeset. In the latter case, the \texttt{typeset} option is used as
 well as some fancy uses of the \texttt{replace} replace option to get the
 naughty single quotes and apostrophes to look right.
 
+\showTranslAlways
+\translTxtFmt{ (#1)}
+
+Before\fetchversestxt[showfirst]{1Co 1:1-2}\pdfmargincomment[author={\versetxt}]{\passagetxt} continuing the discussion of the \texttt{typeset} option, let us pause
+to illustrate the \cs{showTranslAlways} and \cs{translTxtFmt}. Notice that
+when quoting the default Bible (KJV) in the first sticky note above, the
+transition note does not appear in the title heading of the sticky note, this
+is because the \texttt{transl} key was not used. We expand
+\cs{showTranslAlways} to always show the translation note (refer to all the
+remaining sticky notes in this document). We also change the formatting for the transition notes
+in the title bar of the sticky notes by executing \verb|\translTxtFmt{ (#1)}|. All subsequent comment notes
+will reflect this change. We conclude this paragraph by inserting a sticky note in the margin that uses the default Bible (KJV).
+
+
 The rest of this article discusses the \texttt{typeset} option using\fetchversestxt[abbr=none,from=ISV]{1Ki 1:5}
-\versetxt\space(ISV).\pdfmargincomment[author={\versetxt}]{\passagetxt}
+\versetxt.\pdfmargincomment[author={\versetxt}]{\passagetxt}
 This passage contains double quotes (\texttt{"}) and apostrophes (\texttt{\char13}).
 
 \medskip\noindent
@@ -81,7 +98,6 @@ as \cs{fetchverses}.
 \medskip\goodbreak\noindent
 \verb~\fetchversestxt[typeset,abbr=none,from*=ISV]{1Ki 1:5}\passagetxt~\\[3pt]
 \bDQ\eSQ\fetchversestxt[typeset,abbr=none,from*=ISV]{1Ki 1:5}\passagetxt
-%\makeatletter\expandafter\@gobble\passagetxt\makeatother
 
 \medskip\noindent
 \verb~\fetchverses[abbr=none,from*=ISV]{1Ki 1:5}~\\[3pt]
@@ -116,4 +132,53 @@ both forms yield the same results, but now let's take away the
 field.\fetchversestxt[abbr=none,from*=ISV]{1Ki 1:5}
 \pdfmargincomment[author={\versetxt}]{\passagetxt}
 
+
+\medskip\noindent
+\textbf{The \texttt{typeset} and \texttt{typeset*} options with a value.} The
+rest of this article discusses the \texttt{typeset} and \texttt{typeset*}
+options. As a rule, if \cs{passagetxt} is to be passed to an annotation, the
+\texttt{typeset*} option should be used if it has a value; if it does not
+have a value, then there is no reason to use \texttt{typeset} or
+\texttt{typeset*}, under normal circumstances. Here we use \texttt{typeset*}
+for both \cs{fetchverses} and \cs{fetchversestxt}. We
+use\fetchversestxt[typeset*={replace={ad-n-ahy-juh}{ad-n-\textbf{ahy}-j\textit{uh}}},abbr=none,from*=ISV,replace={Adonijah}{Adonijah
+(ad-n-ahy-juh)}]{1Ki 1:5} \versetxt\space as our sample verse, and manipulate it
+with the \texttt{replace}
+option.\pdfmargincomment[author={\versetxt}]{\passagetxt} This passage
+contains double quotes (\texttt{"}) and apostrophes (\texttt{\char13}). The ``raw'' passage is,
+\begin{quote}
+\verb~\fetchverses[abbr=none,from*=ISV]{1Ki 1:5}~\\[3pt]
+\fetchverses[abbr=none,from*=ISV]{1Ki 1:5}
+\end{quote}
+Our goal with this passage is to correct the first apostrophe (Haggith`s son
+should be Haggith's son), and to insert a phonetic spelling of Adonijah. This passage
+will be typeset as well as inserted into a PDF annotation, so we must be sure not to
+include any {\LaTeX} formatting commands. After hours of meditation, the following options
+were taken:
+\begin{fpquote}[rightmargin=0pt]\small
+\verb~[typeset*={replace={ad-n-ahy-juh}{ad-n-\textbf{ahy}-j\textit{uh}}},~\\
+\verb~abbr=none,from*=ISV,replace={Adonijah}{Adonijah (ad-n-ahy-juh)}]~
+\end{fpquote}
+When these options are for \cs{fetchversestxt}, the value of
+\texttt{typeset*} is ignored; as a result, Adonijah is replaced by Adonijah
+(ad-n-ahy-juh), see the comment note below. When these options are applied to
+\cs{fetchverses}, the \texttt{replace} value is automatically modified to
+read,
+\begin{fpquote}[rightmargin=0pt]
+\verb~replace={Adonijah}{Adonijah (ad-n-ahy-juh)}~\\
+\qquad\verb~{ad-n-ahy-juh}{ad-n-\textbf{ahy}-j\textit{uh}}}~
+\end{fpquote}
+As a result, both versions of the passage a phonetic spelling of Adonijah, but the typeset version include changes of
+font styles.
+
+\medskip
+The final results of this set of argument is given below.
+\begin{quote}
+\bDQ\eSQ\fetchverses[typeset*=
+  {replace={ad-n-ahy-juh}{ad-n-\textbf{ahy}-j\textit{uh}}{decided,}{decided, ``I'm going to be king!'' So\gobbletoSo}},
+  replace={Adonijah}{Adonijah (ad-n-ahy-juh)},abbr=none,from*=ISV]{1Ki 1:5}\fetchversestxt[typeset*=
+  {replace={ad-n-ahy-juh}{ad-n-\textbf{ahy}-j\textit{uh}}{decided,}{decided, ``I'm going to be king!'' So\gobbletoSo}},
+  replace={Adonijah}{Adonijah (ad-n-ahy-juh)},abbr=none,from*=ISV]{1Ki 1:5}\pdfmargincomment[author={\versetxt}]{\passagetxt}
+\end{quote}
+Note the typeset version and the annotation version are exactly as designated!
 \end{document}

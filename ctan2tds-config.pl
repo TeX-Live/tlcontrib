@@ -1,7 +1,7 @@
 
 $special{'acmtrans'}    = '&MAKEflatten';
 $special{'adobecaslon'} = '&donormal';
-$special{'comicsans'}   = '&MAKEflatten';
+delete $special{'comicsans'}; # need to delete to get -tds ready try
 $special{'chemsym'}     = '&MAKEflatten';
 $special{'imprintmtshadow'} = '&donormal';
 $special{'lsabon'}      = '&donormal';
@@ -20,6 +20,8 @@ $special{'fetchbibpes'} = '&MAKEdps';
 $special{'mkstmpdad'}   = '&MAKEdps';
 $special{'dps'}         = '&MAKEdps';
 $special{'datepicker-pro'} = '&MAKEdps';
+$special{'aeb-pro'}     = '&MAKEdps';
+$special{'annot-pro'}   = '&MAKEdps';
 
 
 sub MAKEdps {

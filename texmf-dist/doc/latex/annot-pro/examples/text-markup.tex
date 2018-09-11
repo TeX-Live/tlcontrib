@@ -1,0 +1,107 @@
+\documentclass{article}
+\usepackage[designiv,extended]{web}
+\usepackage[richtext,dblevel=1]{annot_pro}
+
+\title{text markup annotations}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\subject{text markup annotations}
+\keywords{highlight, underline, squiggly, strikeout, pdf annotations, AcroTeX}
+\university  {Acro\TeX.NeT}
+\version{1.0}
+
+
+
+%\usepackage{lucidbry}
+
+% we increase the right margin width to accommodate a margin note
+\addtoWebWidth{.5in}
+\resetmargins{}{\incby+.5in}{}{}
+\setlength{\marginparsep}{4pt}
+
+% try uncommenting the first or second command below
+%\mlMarksOn
+%\turnSyllbCntOn
+
+\begin{textboxpara}
+\rtpara{mypara}{\it{This is italic}, whereas \bf{this is bold}, but wait, we can do
+\it{\bf{bold and italic}}. We can \sup{raise} or \sub{lower} text.
+    \br\spc\spc
+    This is a second paragraph. At your earliest convenience, go to the AcroTeX.Net web site:
+    \br\br\span{ulstyle=ul,color=0000FF}{http://www.acrotex.net} (URLs are not supported.)
+}
+\end{textboxpara}
+\setRVVContent{mypara}{mypara}
+
+\setAnnotOptions{subject={An AcroTeX Communiqu\'e},title={D. P. Story}}
+
+\parindent0pt
+\parskip4pt
+
+\begin{document}
+
+\makeinlinetitle % defined in web
+
+%\begin{center}
+%    Extending \textsf{annot\_pro} to include\\
+%    text markup annotations
+%\end{center}
+
+Syntax:\\
+\verb!\annotpro[type=<type>,<options>]{<content>}{<text>}!\\[3pt]
+where, \verb~type=highlight|underline|squiggly|strikeout~
+
+\textbf{Highlight:}
+  \annotpro[type=highlight]{Try to remember this, it's important}{A
+  \emph{highlight} text markup annotation: Let's extend this text to cross to
+  the next line.}
+
+\textbf{Underline:}
+  \annotpro[type=underline]{Memorize this passage}{An \emph{underline} text
+  \emph{markup} annotation: Let's extend this text to cross to the next
+  line.}
+
+\textbf{Squiggly:}
+  \annotpro[type=squiggly]{This needs revision}{An \emph{squiggly underline}
+  text markup annotation:  Let's extend this text to cross to the next line.}
+
+\textbf{Strike-Out:}
+  \annotpro[type=strikeout]{Nonsense!}{An \emph{strikeout} text markup
+  annotation:  Let's extend this text to cross to the next line.}
+
+% we are not breaking at an hyphenated word, too bad
+\annotpro[type=underline,crackat=37,color=blue]{Memorize this passage}{An
+\emph{underline} text \emph{markup} annotation: Let's extend this text to
+cross to the next line. We are not near a page boundary, so we must simulate
+cracking up the text markup annotation.}
+
+Here's the same example as above, but this time, we'll simulate a page break
+and use the \texttt{copycontent} option.
+
+\begingroup % make the next definition local
+\def\pb{\penalty-10 \rule{\linewidth}{.4pt}\makebox[0pt][l]{\hspace{\marginparsep}\small page break}\par\smallskip}%\turnSyllbCntOn
+\annotpro[type=underline,crackat=37,copycontent,crackinsat=\pb]{Memorize this
+    passage}{An \emph{underline} text \emph{markup} annotation: Let's extend this
+    text to cross to the next line. We are not near a page boundary, so we must simulate
+    cracking up the text markup annotation.}
+\endgroup
+
+\smallskip
+\textbf{Rich text:} We use \texttt{richtext=mypara}. \annotpro[type=squiggly]{richtext=mypara}{An \emph{squiggly underline}
+  text markup annotation:  Let's extend this text to cross to the next line.}
+
+
+\smallskip
+This next example uses the \texttt{hidden} option; this will hide the comment completely
+as well as the underlining appearance. When the user presses the push button labeled `C',
+the comment becomes visible.
+
+%\textbf{Underline:}
+  \annotpro[type=underline,hidden]{Memorize this passage}{An \emph{underline}
+  text \emph{markup} annotation: Let's extend this text to cross to the next
+  line.} \pushButton[\S{S}\textSize{0}\CA{C}\TU{Press to toggle visibility of this comment}\A{\JS{% var
+  annot=this.getAnnot({nPage:this.pageNum,cName:"\currentAnnotName"});\r
+  annot.hidden=!annot.hidden;}}]{btn}{}{9bp} This button will work in
+  \textsf{Acrobat Reader} and \textsf{PDF-Exchange Viewer}.
+
+\end{document}

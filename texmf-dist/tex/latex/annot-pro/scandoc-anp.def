@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% annot_pro package,                                   %%
-%% Copyright (C) 2002-2017  D. P. Story                 %%
+%% Copyright (C) 2002-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -20,33 +20,33 @@
 \begin{execJS}{scan4anp}
 var aANPStamps=new Array();
 if (typeof scancomplete=="undefined") {
-    var scancomplete=false;
-    this.syncAnnotScan();
-    for (var p=0; p<this.numPages; p++) {
-         a=this.getAnnots(p);
-         if (a!=null) {
-            for (var i=0; i<a.length; i++) {
-                if ( a[i].type=="Stamp" && a[i].AP.indexOf("\#")==0 ) {
-                    aANPStamps.push(p);
-                    break;
-                }
-            }
+  var scancomplete=false;
+  this.syncAnnotScan();
+  for (var p=0; p<this.numPages; p++) {
+    a=this.getAnnots(p);
+    if (a!=null) {
+      for (var i=0; i<a.length; i++) {
+        if ( a[i].type=="Stamp" && a[i].AP.indexOf("\#")==0 ) {
+          aANPStamps.push(p);
+          break;
         }
+      }
     }
+  }
 }
 ANPscrollPage.index=0;
 function ANPscrollPage() {
-    if (ANPscrollPage.index<aANPStamps.length) {
-        this.pageNum=aANPStamps[ANPscrollPage.index];
-        ANPscrollPage.index+=1;
-    } else {
-        app.clearInterval(anpTO);
-        scancomplete=true;
-        this.pageNum=0;
-    }
+  if (ANPscrollPage.index<aANPStamps.length) {
+    this.pageNum=aANPStamps[ANPscrollPage.index];
+    ANPscrollPage.index+=1;
+  } else {
+    app.clearInterval(anpTO);
+    scancomplete=true;
+    this.pageNum=0;
+  }
 }
 if (aANPStamps.length>0)
-    var anpTO=app.setInterval("ANPscrollPage()", 5);
+  var anpTO=app.setInterval("ANPscrollPage()", 5);
 \end{execJS}
 \endinput
 %%

@@ -10,17 +10,24 @@
         aebxmp,eforms,graphicxsp={showembeds}
 ]{aeb_pro}
 \usepackage{array}
-\usepackage{aeb_mlink}
+%\usepackage{aeb_mlink}
 %\usepackage{myriadpro} %[usecmtt]
 \usepackage[altbullet]{lucidbry}
-\usepackage{annot_pro}
+\usepackage[dblevel=0]{annot_pro}
 \usepackage{richtext}
 
-\DeclareInitView
-{%
-    layoutmag={mag=100},
-%    windowoptions={fit}
-}
+\usepackage{xbmks}
+
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
+\previewOff
+
+%\DeclareInitView
+%{%
+%    layoutmag={mag=100},
+%%    windowoptions={fit}
+%}
 
 %\useAAXdimtrue
 
@@ -38,6 +45,7 @@
 \let\opt\texttt
 \let\uif\textsf
 \let\env\texttt
+\let\key\texttt
 \def\meta#1{\textit{\texttt{#1}}}
 \def\ameta#1{$\langle\textit{\texttt{#1}}\rangle$}
 \newdimen\aebdimen \aebdimen6pt %\partopsep \advance\aebdimen\partopsep
@@ -50,6 +58,7 @@
 \def\takeMeasurei#1{\global\setbox\webtempboxi\hbox{\ttfamily#1}\egroup}
 \def\bxSize{\wd\webtempboxi+2\fboxsep+2\fboxrule}
 \let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent}
 
 %\def\tutpath{doc/tutorial}
 %\def\tutpathi{tutorial}
@@ -58,13 +67,13 @@
 {
     university={\AcroTeX.Net},
     title={The \texorpdfstring{\textsf{annot\_pro} Package\\[1em]}{annot\textunderscore pro Package: }
-        Text, Stamp, File Attachment, and Text Box Annotations},
+        Text, Stamp, File Attachment, Text Box, and Text Markup Annotations},
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject={Documentation for annot\textunderscore pro from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={1.2, 2018/04/26},
-    keywords={sticky notes, stamps, file attachment text box, free text, annotations},
+    version={1.4, 2018/08/13},
+    keywords={sticky notes, stamps, file attachment text box, free text, text markup, annotations},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
@@ -160,16 +169,18 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 
 \maketitle
 
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
+
 \selectColors{linkColor=black}
 \tableofcontents
 \selectColors{linkColor=webgreen}
-
-% New
-% X internalID
-% margprior
-% X hidden
-% X \currentAnnotName
-% annotpro*
 
 \section{Introduction}
 
@@ -204,6 +215,8 @@ distribution, are required:
   \item If you want to create custom stamps (on the fly) using the techniques
       developed for that purpose, the \textsf{graphicxsp} Package is required.\footnote
       {Available at \href{http://ctan.org/pkg/graphicxsp}{ctan.org/pkg/graphicxsp}}
+  \item \pkg{annot\_pro} now requires \pkg{aeb\_mlink} (2018/08/18 or later) to implement
+    text markup annotations. The \pkg{aeb\_mlink} package loads the \pkg{soul} package.
 \end{enumerate}
 The \textsf{annot\_pro} package is part of the \textcolor{blue}{AeB
 Pro} family, which means \textbf{Adobe Distiller} is required. The
@@ -291,17 +304,45 @@ right in the \texttt{AllowPSFileOps} row to select Yes as the value.
 \end{center}
 \end{figure}
 
+\section{Package Options}\label{pkgOpts}
+
+This package has several options to customize its use.
+
+\begin{itemize}
+  \item \opt{preview}: When this option is taken, the bounding rectangles
+      are visible in the typeset document. This feature can be locally
+      turned on with \cs{previewOn} and off with \cs{previewOff}.
+%  \item \opt{useA10Icons} (the default) and \opt{!useA10Icons}: Beginning
+%      with version 10 of \app{Acrobat} and \app{Adobe Reader} the
+%      dimensions of the icons used changed. If your target audience uses
+%      version~10 or later use the \opt{useA10Icons} option; if your target
+%      population is using version~9 or prior, use the \opt{!useA10Icons}
+%      option. This set of options are outdated, the default option is all
+%      that is needed.
+  \item \opt{richtext} and \opt{useTextBox}: All annotations supported by
+      this package can now take rich text for its contents. If you use rich
+      text in your comments, the \opt{richtext} option is required. (The
+      \opt{useTextBox} option is deprecated in favor of \opt{richtext}.)
+  \item \opt{scandoc} and \opt{!scandoc}: The \opt{scandoc} option is
+      needed when using custom stamps; the \opt{!scandoc} turns off
+      scanning. The \opt{!scandoc} is a convenience option.
+  \item \opt{dblevel=\ameta{num}} Sets the level of information feedback; this option
+  is passed to the \pkg{aeb\_mlink} package.
+\end{itemize}
+
+
+
 \section{The \texorpdfstring{\protect\cs{annotpro}}{\CMD{annotpro}} Command}
 
 The main command of this package is \Com{annotpro}; the command is controlled by
 its optional parameters. The same command can create a text annotation (sticky note),
 a stamp annotation, a file attachment or a Free Text (Text Box) annotation. The syntax of this command is
-\bVerb\takeMeasure{\string\annotpro*[\ameta{KV-pairs}]\darg{\ameta{text}}}%
+\bVerb\takeMeasure{\string\annotpro*[\ameta{KV-pairs}]\darg{\ameta{content}}}%
 \begin{minipage}{\linewidth}
 \begin{minipage}{\bxSize}
 \xdef\panelWidth{\the\linewidth}%
 \begin{Verbatim}[frame=single,commandchars=!()]
-\annotpro*[!ameta(KV-pairs)]{!ameta(text)}
+\annotpro*[!ameta(KV-pairs)]{!ameta(content)}
 \end{Verbatim}
 \end{minipage}\hfill
 \begin{minipage}{\linewidth-\panelWidth}
@@ -309,11 +350,12 @@ a stamp annotation, a file attachment or a Free Text (Text Box) annotation. The 
 \end{minipage}\end{minipage}\eVerb
 \PD The optional argument consists is one or more key-value pairs
 (\ameta{KV-pairs}) that describe the annotation; the required argument,
-\ameta{text}, is the ``contents'' of the annotation; for the text and stamp
-annotation, \ameta{text} becomes the contents of the popup annotation, for a
+\ameta{content}, is the ``content'' of the annotation; it is either text or a key-value pair.
+Use the key-value option to insert rich text content; see Section~\ref{rtContent} on page~\pageref{rtContent} for
+more information. For text and stamp annotations, \ameta{content} becomes the content of the popup annotation, for a
 file attachment annotation, which has no associated pop-up, it is the
 description of the file attachment that appears in the file attachment panel
-of Adobe Reader. In the latter case, the value of \ameta{text} should be
+of \app{Adobe Reader}. In the latter case, the value of \ameta{content} should be
 rather short. The key-value pairs (\ameta{KV-pairs}) are described over the
 next few sections.
 
@@ -329,10 +371,13 @@ of the \pkg{annotpro} package.
 
 The following are key-value pairs common to all annotations.
 
+%{$\langle\textit{\texttt{#1}}\rangle$}
+
 \begin{itemize}
-  \item \texttt{type=\ameta{\upshape{text|stamp|fileattachment|textbox}}} The \texttt{type} key determines the type of annotation to be produced;
-        permissible values are \texttt{text}, \texttt{stamp}, and \texttt{fileattachment}. This
-        key is optional, if not present, \texttt{type=text} is assumed.
+  \item \texttt{type=$\langle$\upshape{text|stamp|fileattachment|textbox|highlight|}}\\
+        \texttt{underline|squiggly|strikeout$\rangle$} The key determines
+        the type of annotation to be produced. The \texttt{type} key is
+        optional, if not present, \texttt{type=text} is assumed.
   \item \texttt{name=\ameta{name}} The name of the icon to use for the declared \texttt{type}. Permissible
         values are dependent on the \texttt{type}, and are discussed in subsequent sections.
   \item \texttt{title=\ameta{text}} Text to be displayed in the title bar of the annotation's pop-up window
@@ -490,10 +535,10 @@ is of \texttt{type=text}.
     Additional positioning of the icons can be made using standard {\LaTeX}
     commands such as \cs{raisebox} and \cs{smash}. For example,\smash{\raisebox{1in}{\annotpro[nospace,color=blue,opacity=.25]{I've raised this annot by 1in.
     I've also used the nospace key, the icon does not take up any TeX space.}}} the blue icon above was created by
-\begin{Verbatim}[fontsize=\footnotesize]
-    For example,\smash{\raisebox{1in}\raisebox{1in}{%
-        \annotpro[nospace,color=blue,
-            opacity=.25]{...clever message...}}}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\footnotesize]
+For example,\smash{\raisebox{1in}\raisebox{1in}{%
+  \annotpro[nospace,color=blue,
+    opacity=.25]{...clever message...}}}
 \end{Verbatim}
 Note that I've set the \texttt{opacity} to .25.
 
@@ -551,49 +596,63 @@ The following are the key-values associated with this annotation type.
 
 \begin{itemize}
 
-\previewtrue
-
-        \item This one \annotpro[type=stamp,name=SBApproved,widthTo=106bp,color=webbrown]{This package just got better!}
-        fits more or less exactly.  I determined the dimensions of this stamp through some controls of the user interface.
-        Contrast this this stamp
-        \annotpro[type=stamp,width=50bp,height=50bp,name=SBApproved,color=webbrown]{This package just got better!}
-        obtained by setting \texttt{width=50bp} and \texttt{height=50bp}. Notice the ``best fit,'' and that the bounding
-        box takes up space. We can use \cs{smash} to smash its vertical height, let's see how that looks,
-        \smash{\annotpro[type=stamp,width=50bp,height=50bp,name=SBApproved,color=webbrown]{This package just got better!}}
-
-\smallskip
-
 \begin{defineJS}{\annotstampi}
 Exact fit:
-\\annotpro[type=stamp,name=SBApproved,color=webbrown]{This package just got better!}
+\\annotpro[type=stamp,name=SBApproved,widthTo=106bp,color=webbrown]{This package just got better!}
 \end{defineJS}
 \begin{defineJS}{\annotstampii}
 Bad rectangle, but stamp fits the best it can:
-\\annotpro[type=stamp,name=SBApproved,color=webbrown]{This package just got better!}
+\\annotpro[type=stamp,name=SBApproved,width=50bp,height=50bp,color=webbrown]{This package just got better!}
 \end{defineJS}
 
-\previewfalse
 
-        \item[] The code for producing these stamps are given in the margins.
-        \annotpro[margin,readonly,margintext={\centering Good Fit}]{\annotstampi}%
-        \annotpro[margin,readonly,margintext={\centering Bad Fit}]{\annotstampii}%
+
+
+        \item This one
+            {\previewOn\annotpro[type=stamp,name=SBApproved,widthTo=106bp,color=webbrown]{This
+            package just got better!}} fits more or less exactly\annotpro[margin,readonly,margintext={\centering Good Fit}]{\annotstampi}.  I
+            determined the dimensions of this stamp through some controls
+            of the user interface. Contrast this stamp
+            {\previewOn\annotpro[type=stamp,width=50bp,height=50bp,name=SBApproved,color=webbrown]{This
+            package just got better!}}\annotpro[margin,readonly,margintext={\centering Bad Fit}]{\annotstampii} obtained by setting
+            \texttt{width=50bp} and \texttt{height=50bp}. Notice the
+            ``best fit,'' and that the bounding box takes up space. We
+            can use \cs{smash} to smash its vertical height, let's see
+            how that looks
+            {\previewOn\smash{\annotpro[type=stamp,width=50bp,height=50bp,name=SBApproved,color=webbrown]{This
+            package just got better!}}}.
+
+\smallskip
+
+
+\goodbreak
+
+\previewOff
+
+%        \item[] The code for producing these stamps are given in the margins.
+%        \annotpro[margin,readonly,margintext={\centering Good Fit}]{\annotstampi}%
+%        \annotpro[margin,readonly,margintext={\centering Bad Fit}]{\annotstampii}%
 
 \begin{defineJS}{\annotstampiii}
 Resize using \\resizebox. \\raisebox was used to lift the same up a little:
 \\raisebox{4pt}{\\resizebox{.5in}{!}{\\annotpro[type=stamp,name=SBApproved,color=webbrown]{This package just got better!}}}
 \end{defineJS}
 
-    \item[] You can resize these stamps using \cs{scalebox} and \cs{resizebox}, like so.
-    \raisebox{4pt}{\resizebox{.5in}{!}{\annotpro[type=stamp,name=SBApproved,color=webbrown]{This package just got better!}}}
-    \enspace The code for producing this stamp are given here \annotpro{\annotstampiii}.
+    \item[] You can resize these stamps using \cs{scalebox} and \cs{resizebox}, like so:
+    \raisebox{4pt}{\resizebox{.5in}{!}{\annotpro[type=stamp,name=SBApproved,color=webbrown]{This package just got better!}}}.
+    %\enspace
+    The code for producing this stamp are given here \annotpro{\annotstampiii}.
 
 \begin{defineJS}{\annotstampiv}
 \smash{\makebox[0pt][l]{\annotpro[type=stamp,name=Approved,color=blue]{I give my stamp of approval!}}}
 \end{defineJS}
 
-\item To create a stamp\smash{\makebox[0pt][l]{\annotpro[type=stamp,name=Approved,color=blue]{I give my stamp of approval!}}} that takes up no space, it is easiest to use \cs{smash} and \verb!\makebox[0pt][l]{text}!;
-    here is one of the standard stamps as listed in the \textsl{PDF Reference}. The code for this stamp is given
-    in this note \annotpro{\annotstampiv}.
+\item To create a
+    stamp\smash{\makebox[0pt][l]{\annotpro[type=stamp,name=Approved,color=blue]{I
+    give my stamp of approval!}}} that takes up no space, it is easiest
+    to use \cs{smash} and \cs{makebox[0pt][l]\darg{\ameta{contents}}}; here is one of
+    the standard stamps as listed in the \textsl{PDF Reference}. The code
+    for this stamp is given in this note \annotpro{\annotstampiv}.
 \end{itemize}
 
 \item[] Try changing the magnification of the page, you'll see that stamps are re-scaled as you zoom in or out, while
@@ -699,21 +758,21 @@ The key-value pairs special to this type of annotation are as follows.
 The file attachment icons can be resized using any of the graphics commands, \cs{scalebox} or \cs{resizebox}.
 
 \subsection{The \texorpdfstring{\protect\uif{Text Box}}{Text Box}
-    (\texorpdfstring{\protect\uif{Free Text}}{Free Text}) annotation}
+    (\texorpdfstring{\protect\uif{Free Text}}{Free Text}) annotation}\label{s:textbox}
 
 A \uif{Text Box} annotation is a rectangular region in which the user can
 enter rich text. The annotation may be created and `pre-populated' with rich text from a
 {\LaTeX} source through the \pkg{annot\_pro} package.
 
 The \uif{Text Box} annotation, as implemented by this package, requires the
-\pkg{richtex} package, dated 2016/09/30 or later. A one simple method for
-introducing \pkg{richtext} is through the \opt{useTextBox} option of
+\pkg{richtex} package, dated 2018/08/05 or later. A one simple method for
+introducing \pkg{richtext} is through the \opt{richtext} option of
 \pkg{annot\_pro}. Placing the following line in the preamble:
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\usepackage[useTextBox]{annot_pro}
+\usepackage[richtext]{annot_pro}
 \end{Verbatim}
 declares you are going to use \uif{Text Box} annotations. The option does
-nothing more than to execute \cs{usepackage\darg{richtext}[2016/09/30]}. The
+nothing more than to execute \cs{usepackage\darg{richtext}[2018/08/05]}. The
 option is more of a convenience.
 
 To create a  \uif{Text Box} (originally named \uif{Free Text}) annotation use the \cs{annotpro} command.
@@ -728,7 +787,7 @@ To create a  \uif{Text Box} (originally named \uif{Free Text}) annotation use th
 \begin{minipage}{\linewidth-\panelWidth}
 \setDisplayNumber\label{display:textbox}
 \end{minipage}\end{minipage}\eVerb
-Notice the second argument is not \ameta{text} as it is with the other annotations, but consists
+Notice the second argument is not \ameta{content} as it is with the other annotations, but consists
 of key-value pairs; recognized keys are \texttt{richtext} and \texttt{defstyle}.
 
 \newtopic\noindent The sample file \texttt{textbox.tex} illustrates the features of this section.
@@ -757,14 +816,14 @@ The verbatim listing of the above \uif{Text Box} is,
 \end{Verbatim}
 The required second argument is empty, which leads to an empty \uif{Text Box}.
 
-\subsubsection{Creating a non-empty \texorpdfstring{\protect\uif{Text Box}}{Text Box}}
+\subsubsection{Creating a non-empty \texorpdfstring{\protect\uif{Text Box}}{Text Box}}\label{ss:textbox}
 
 A much more interesting exercise is to pre-populate the \uif{Text Box} with rich text for the
 document consumer to read and/or to respond.
 
 %[Steps to create rich text content]
 
-\paragraph{Steps to create rich text content.}\label{para:StepsRC}
+\paragraph[Steps to create rich text content]{Steps to create rich text content.}\label{para:StepsRC}
 We briefly outline the techniques to create rich text
 for a \uif{Text Box} annotation.
 \begin{itemize}
@@ -954,8 +1013,8 @@ The keys of display~\eqref{display:suppKeys} -- excluding the overstrike ones
 -- may be used in the \ameta{KV-pairs} argument of \cs{rtpara} of
 display~\eqref{display:rtpara}.
 
-\paragraph[Permissible commands within \texorpdfstring{\protect\ameta{rich-content}}{<rich-content>}]{%
-Permissible commands within \ameta{rich-content}.}\label{para:KeysCmdsRC}
+\paragraph[Permissible commands within \texorpdfstring{{\protect\ameta{rich-content}}}{<rich-content>}]{%
+Permissible commands within {\protect\ameta{rich-content}}.}\label{para:KeysCmdsRC}
 The \ameta{rich-content} argument of display~\eqref{display:rtpara}
 (normally) consists of Latin 1 characters, plus any markup in the form of the
 commands listed in display~\eqref{display:suppCmds}.
@@ -974,7 +1033,7 @@ commands listed in display~\eqref{display:suppCmds}.
     have one argument, the text to be raised or lowered. For example,
     \verb~We can \sup{raise} or we can \sub{lower} text~.
 \end{itemize}
-The above markups, with the exception of \cs{span} are illustrated below.
+The above markups, with the exception of \cs{span} are illustrated below.\label{exmpl:rt}
 \begin{defineJS}{\annotextboxi}
 \\begin{textboxpara}
 \\rtpara{mypara}{\\it{This is italic}, whereas \\bf{this is bold}, but wait, we can do
@@ -1048,7 +1107,7 @@ of \cs{annotpro}, see display~\eqref{display:textbox}.
 
 \hyperref[s:CommonKeys]{Section~\ref*{s:CommonKeys}} lists keys that are
 common to all annotations; we list the ones that make sense for the \uif{Text
-Box} annotation, and strikeout these that do not:
+Box} annotation, and strikeout those that do not:
 \begin{quote}\raggedright
 \texttt{type}, \texttt{\st{name}}, \texttt{title}, \texttt{subject},
 \texttt{\st{color}}, \texttt{readonly}, \texttt{opacity}, \texttt{margin},
@@ -1090,17 +1149,252 @@ borderstyle=cloud1]{richtext=para3}}}\setRVVContent{para3}{para3}
 The second text box annotation above has transparent background color. Using your pointing device, move it around to verify
 the background is `see through', compare with the other two by moving them around, not `see through'.
 
-\subsubsection{Accented glyphs and the unicode characters}
+\subsection{The text markup annotations}
+
+We paraphrase the \textsl{PDF Reference}, version 1.7, on page~633,
+\begin{quote}
+Text markup annotations appear as highlights, underlines, strikeouts, and
+jagged (``quiggly'') underlines in the text of the document. When opened,
+they display a pop-up window the text of the associated note. The syntax
+for \cs{annotpro} is given below:
+\end{quote}
+This annotation type represents a challenge to the {\LaTeX} package developer in that
+this annotation is \annotpro[type=underline]{This first example demonstrates an underline text markup annotation.}{tied to typeset content of the document itself}.
+\bVerb\takeMeasure{\quad{type=\ameta{\upshape{highlight|underline|squiggly|strikeout}}},}%
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}%
+\begin{Verbatim}[frame=single,commandchars=!()]
+\annotpro*[% !sffamily(Syntax for text markup annotation)
+!quad(type=!ameta(!upshape(highlight|underline|squiggly|strikeout))),
+!quad!ameta(KV-pairs)]{!ameta(content)}{!ameta(text)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:arbproCmdtm}
+\end{minipage}\end{minipage}\eVerb For a text markup annotation, the \texttt{type} key must be one of
+the values listed above. Notice that when creating a text markup annotation, there is a third
+required argument, \ameta{text}; compare this with the syntax of all other
+annotations, given in display~\eqref{display:arbproCmd} on
+page~\pageref{display:arbproCmd}. The \ameta{content} argument can be text or
+a key-value pair, the latter is used to create rich text content. Refer to
+Section~\ref{rtContent} for a discussion of this option.
+
+\subsubsection{Key-values for the text markup annotation}
+
+This annotation inherits many of the key-values listed earlier, and recognized a few more.
+
+The following is the list of keys common to all annotations, taken from Section~\ref{s:CommonKeys}.
+The keys that are not applicable to the text markup annotation are struck out.
+\begin{quote}
+\key{type}, \key{\st{name}}, \key{title}, \key{subject}, \key{color} (the
+color of the appearance of the annotation), \key{hidden} (a hidden
+annotation may be made visible using JavaScript), \key{readonly},
+\key{opacity}, \key{internalID}, \key{\st{margin}}, \key{\st{margintext}},
+\key{presets}
+\end{quote}
+In addition to the ones above, there are several keys for this type of annotation. These address the problem
+of text markup that crosses page boundaries. The techniques are from \pkg{aeb\_mlink}.
+\begin{itemize}
+   \item \key{crackat=\ameta{num}} Break the \ameta{text} after the \ameta{num}${}^{\text{th}}$ syllable.
+   \item \key{hyph=\ameta{\upshape{true|false}}} If \texttt{true}, a hyphen character is inserted at the break point.
+   (The default is \texttt{false}.)
+   \item \key{crackinsat={\ameta{\LaTeX-markup}}} This key inserts \ameta{\LaTeX-markup} after the
+   break in the annotation, more precisely, after the hyphen, if any.
+   \item \key{copycontent=\ameta{\upshape{true|false}}} Now here's an idea.
+       When the \key{text} of a text markup annotation is ``cracked''
+       (broken), a new annotation is created on the next page where its
+       \ameta{text} is the remaining text (following the
+       \ameta{num}${}^{\text{th}}$ syllable), We can either transfer the
+       \key{content} to the new annotation or not. If
+       \key{copycontent=true} (or just \key{copycontent}) the
+       \ameta{content} is transferred to the to the annotation on the next
+       page. The default is \key{copycontent=false}, that is, do not copy
+       the original \key{content}. The content of the annotation on the
+       next page is \cs{apContText}, the definition of which is,
+\begin{Verbatim}[fontsize=\small]
+\newcommand\apContText{Continued from previous annotation}
+\end{Verbatim}
+This command may be redefined.
+\end{itemize}
+
+\subsubsection{Text markup illustrated}
+
+In this section, the four supported text markup annotation types are
+illustrated, and the problem of breaking (or cracking) a text markup annotation
+is discussed. The examples presented in this section are available on the sample
+file \texttt{text-markup.tex}, found in the \texttt{examples} folder.
+
+\paragraph[Ordinary text markups]{Ordinary text markups.}
+These are annotations that do not cross a page boundary.
+
+\begin{itemize}\tightsettings
+\item \textbf{Highlight:} \annotpro[type=highlight]{Try to remember this,
+    it's important}{A \emph{highlight} text markup annotation: Let's extend
+    this text to cross to the next line.}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\annotpro[type=highlight]{Try to remember this, it's
+  important}{A \emph{highlight} text markup annotation:
+  Let's extend this text to cross to the next line.}
+\end{Verbatim}
+
+\item \textbf{Underline:} \annotpro[type=underline]{Memorize this
+    passage}{An \emph{underline} text \emph{markup} annotation: Let's extend this
+    text to cross to the next line.}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\annotpro[type=underline]{Memorize this passage}
+  {An \emph{underline} text \emph{markup} annotation:
+  Let's extend this text to cross to the next line.}
+\end{Verbatim}
+
+\item \textbf{Squiggly:} \annotpro[type=squiggly]{This needs revision}{An
+    \emph{squiggly underline} text markup annotation:  Let's extend this
+    text to cross to the next line.}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\annotpro[type=squiggly]{This needs revision}{An
+  \emph{squiggly underline} text markup annotation:
+  Let's extend this text to cross to the next line.}
+\end{Verbatim}
+
+\item \textbf{Strike-Out:}
+    \annotpro[type=strikeout]{Nonsense!}{An \emph{strikeout} text markup annotation:  Let's
+    extend this text to cross to the next line.}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\annotpro[type=strikeout]{Nonsense!}{An \emph{strikeout}
+  text markup annotation:  Let's extend this text to
+  cross to the next line.}
+\end{Verbatim}
+\end{itemize}
+In all cases, the default color is used. (The default color is the same as
+the default color that \app{Adobe Acrobat} or \app{Adobe Reader} assigns.)
+
+\paragraph[Cracked text markups]{Cracked text markups.} A tricky problem unique to text markups is the
+possibility of \ameta{text} crossing over to the next page; in this circumstance, either rewrite the paragraph containing
+the annotation, or crack it up, that is, break it into two annotations, let the second one move to the next page.
+To illustrate:
+\begin{quote}\def\pb{\penalty-10 \rule{\linewidth}{.4pt}\makebox[0pt][l]{\hspace{\marginparsep}\small page break}\par\smallskip}%\turnSyllbCntOn
+\annotpro[type=underline,crackat=34,hyph,crackinsat=\pb]{Memorize this
+    passage}{An \emph{underline} text \emph{markup} annotation: Let's extend this
+    text to cross to the next line. We are not near a page boundary, so we must simulate
+    cracking up the text markup annotation.}
+\end{quote}
+If you are viewing this documentation in a PDF viewer that supports comment
+annotations (\app{Adobe Reader}), you can inspect the \ameta{content}. Prior
+to the ``page break'', \ameta{content} is ``Memorize this passage''; after
+the ``page break'', the \ameta{content} is the expansion of the command
+\cs{apContText}. The verbatim listing of is,
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{quote}
+  \def\pb{\penalty-10 \rule{\linewidth}{.4pt}\makebox[0pt][l]
+  {\hspace{\marginparsep}\small page break}\par\smallskip}%
+\annotpro[type=underline,!textbf(crackat=34),hyph,crackinsat=\pb]
+  {Memorize this passage}{An \emph{underline} text \emph{markup}
+  annotation: ... cracking up the text markup annotation.}
+\end{quote}
+\end{Verbatim}
+In the above code, \key{crackat=34} is used to break the \ameta{text} apart into two annotations of the
+same type and properties. The \key{hyph} key is used because the break point is at an hyphenated word.
+the \key{crackinst} key is used to insert additional material after the hyphen; it simulates a break
+in the page. (A \cs{pb} command is locally defined as a convenience command.)
+
+The above example is repeated, but with \key{copycontent} and another command \cs{turnSyllbCntOn}
+that can be helpful in the authoring stage.
+\begin{quote}\turnSyllbCntOn
+\def\pb{\penalty-10 \rule{\linewidth}{.4pt}\makebox[0pt][l]{\hspace{\marginparsep}\small page break}\par\smallskip}%\turnSyllbCntOn
+\annotpro[type=underline,crackat=34,hyph,copycontent,crackinsat=\pb]{Memorize this
+    passage}{An \emph{underline} text \emph{markup} annotation: Let's extend this
+    text to cross to the next line. We are not near a page boundary, so we must simulate
+    cracking up the text markup annotation.}
+\end{quote}
+If you view the \ameta{content} of annotations A8 versus A9, you''ll see they are the same; the content
+was copied between annotations, unlike the previous example. The other interesting change
+is the numbering of the syllables as the \pkg{soul} package sees them. You can now see why I chose
+\key{crackat=34}, it was the end of a line and that line ended in a hyphenated word. The notation
+A8 and A9 mark the beginning of a text markup annotation; these markups are referenced in the \app{Distiller}
+log or the \app{ps2pdf} log. The markups can be turned on and off by
+the commands \cs{mlMarksOn} and \cs{mlMarksOff}. The counting of syllables can be turned off by
+executing \cs{turnSyllbCntOff} (or by deleting or commenting out \cs{turnSyllbCntOn}).
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{quote}!textbf(\turnSyllbCntOn)
+  \def\pb{\penalty-10 \rule{\linewidth}{.4pt}\makebox[0pt][l]
+    {\hspace{\marginparsep}\small page break}\par\smallskip}%
+\annotpro[type=underline,crackat=34,hyph,!textbf(copycontent),
+  crackinsat=\pb]{Memorize this passage}{An \emph{underline}
+  text \emph{markup} annotation: ... cracking up the text
+  markup annotation.}
+\end{quote}
+\end{Verbatim}
+\textbf{Important.} You may have to compile several times to bring auxiliary
+files up to date. The {TEX} log will contain warnings on the state of the
+annotations; the \app{Distiller} or \app{ps2pdf} log contains even more
+information. You can increase the amount in information written to the logs
+by increasing the value of the \opt{dblevel}, try \opt{dblevel=1}.
+
+\section{Creating rich text contents}\label{rtContent}
+
+When the content (or comment) of an annotation is text, the syntax for the
+supported annotations are given in display~\eqref{display:arbproCmd}
+and~\eqref{display:arbproCmdtm}. An alternate syntax is implemented for
+the case of rich text content. Our comments in this section do not include the text box, which
+has already been covered in detail in Section~\ref{s:textbox}; the syntax for a text box is
+given in display~\eqref{display:textbox}.
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\usepackage[richtext]{annot_pro}
+\end{Verbatim}
+As with the text box, to obtain rich text in the content of the annotation,
+the \opt{richtext} option is required. That being required, the alternate
+syntax for the (non-text box) annotations is,
+\bVerb\takeMeasure{\quad{type=\ameta{\upshape{highlight|underline|squiggly|strikeout}}},}%
+\def\1{\rule[15pt]{0pt}{0pt}}
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}%
+\begin{Verbatim}[frame=single,commandchars=!()]
+\annotpro*[% !sffamily(Syntax for text markup annotation)
+!quad(type=!ameta(!upshape(highlight|underline|squiggly|strikeout))),
+!quad!ameta(KV-pairs)]{richtext=!ameta(name)}{!ameta(text)}
+!1\annotpro*[% !sffamily(Syntax for all other annotations)
+!quad!ameta(KV-pairs)]{richtext=!ameta(name)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:arbproRT}
+\end{minipage}\end{minipage}\eVerb
+In the above, \ameta{content} is replaced by \texttt{richtext=\ameta{name}}.
+
+The techniques for using rich text are described in the subsection
+`\mlnameref{ss:textbox}' on page~\pageref{ss:textbox}.
+\emph{Only} the \key{richtext} key is supported; the \key{defstyle} key is
+not supported, so \emph{do not use it}.
+
+
+\subsection{Annotations with rich text illustrated}
+
+Only two examples are presented here: firstly, a sticky note\annotpro[margin,readonly]{richtext=mypara} appears in the margins, and
+secondly, \annotpro[type=highlight]{richtext=mypara}{a text markup annotation within this current paragraph}.
+The verbatim listing of the highlight text markup is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\annotpro[type=highlight]!textbf({richtext=mypara}){a text markup
+  annotation within this current paragraph}
+\end{Verbatim}
+where \texttt{mypara} was defined earlier in
+paragraph~\mlNameref{para:KeysCmdsRC}. (See sticky note labeled
+`\textcolor{blue}{\textbf{The Code}}' in the margins of that paragraph, on
+page~\pageref{exmpl:rt}.)
+
+\subsection{Accented glyphs and the unicode characters}
 
 There are several advantages that text box annotation have over rich text
 form fields: movability and unicode. An annotation can be moved around the
-page by the user quite easily, a form field typically cannot unless the user
-is using \app{Acrobat}. Also, when it comes to using unicode, text box
-annotations are far superior to rich text form fields. Unicode characters may
-be inserted using the convenience commands \cs{uHex} and \cs{uDec}, where the
-first take a hex code as its argument and the second takes a non-negative
-integer as its argument. Latin1 accented characters can be entered using octal notation
-for example, \verb~J\374rgen~
+page by the user quite easily, a form field typically cannot unless the
+document consumer is using \app{Acrobat}. Also, when it comes to using
+unicode, text box annotations are far superior to rich text form fields.
+Unicode characters may be inserted using the convenience commands
+\cs{uHex}\marginpar{\small\cs{uHex}} and
+\cs{uDec}\marginpar{\small\cs{uDec}}, where the first take a hex code as its
+argument and the second takes a non-negative integer as its argument. Latin1
+accented characters may be entered using octal notation for example,
+\verb~J\374rgen~
 \begin{defineJS}{\annotextboxi}
 \\begin{textboxpara}
 \\rtpara{para1}{J\\374rgen is a nice fellow, though I've never met him.\\br\\br
@@ -1113,11 +1407,14 @@ We've communicated, J\\uHex{00FC}rgen and I, via email. J\\uDec{252}rgen where a
 \rtpara{para1}{J\374rgen is a nice fellow, though I've never met him.\br\br
 We've communicated, J\uHex{00FC}rgen and I, via email. J\uDec{252}rgen where are you?}
 \end{textboxpara}
-\begin{quote}%\previewtrue
+\begin{quote}
 \setRVVContent{para1}{para1}
 \annotpro[type=textbox,width=4in,height=16bp*4]{richtext=para1}%
 \annotpro[margin,readonly,margintext={\centering The Code}]{\annotextboxi}%
 \end{quote}
+
+\begin{comment}
+
 But wait, we're not done. In theory, we can access any unicode character through the use
 of \cs{uHex} or \cs{uDec}. I'll randomly pick off some unicode characters.
 \begin{defineJS}{\annotextboxi}
@@ -1143,8 +1440,9 @@ of \cs{uHex} or \cs{uDec}. I'll randomly pick off some unicode characters.
 \end{quote}
 Cool!
 
+\end{comment}
 
-\subsection{Setting Global Options with
+\section{Setting Global Options with
     \texorpdfstring{\protect\cs{setAnnotOptions}}{\CMD{setAnnotOptions}}}
 
 Global options are by using the \cs{setAnnotOptions} command.

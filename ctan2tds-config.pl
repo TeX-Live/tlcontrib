@@ -19,6 +19,7 @@ $special{'eq-save'}     = '&MAKEdps';
 $special{'fetchbibpes'} = '&MAKEdps';
 $special{'mkstmpdad'}   = '&MAKEdps';
 $special{'dps'}         = '&MAKEdps';
+$special{'fetchbibpes'} = '&MAKEdps';
 $special{'datepicker-pro'} = '&MAKEdps';
 $special{'aeb-pro'}     = '&MAKEdps';
 $special{'annot-pro'}   = '&MAKEdps';

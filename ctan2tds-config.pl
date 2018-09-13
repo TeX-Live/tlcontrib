@@ -23,6 +23,8 @@ $special{'fetchbibpes'} = '&MAKEdps';
 $special{'datepicker-pro'} = '&MAKEdps';
 $special{'aeb-pro'}     = '&MAKEdps';
 $special{'annot-pro'}   = '&MAKEdps';
+$special{'acrotex'}     = '&MAKEdps';
+$special{'aeb-mlink'}   = '&MAKEdps';
 
 
 sub MAKEdps {

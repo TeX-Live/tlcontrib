@@ -11,10 +11,16 @@
 
 %\usepackage{myriadpro}
 \usepackage[altbullet]{lucidbry}
+\usepackage{xbmks}
+
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
 
 \usepackage{acroman}
 
-\def\amtIndent{15pt}
+%\def\amtIndent{15pt}
+\edef\amtIndent{\the\leftmargini}
 
 \usepackage[active]{srcltx}
 
@@ -27,7 +33,7 @@
     subject={Wrapping links around to the next line},
     keywords={multi-line links, quad points, latex, pdf, aeb},
     talksite={\url{www.acrotex.net}},
-    version={2.3, 2018/04/26},
+    version={2.3.4, 2018/08/18},
     copyrightStatus={True},
     copyrightNotice={Copyright (C) 2006-\the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
@@ -145,6 +151,15 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 \begin{document}
 
 \maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
 
 \selectColors{linkColor=black}
 
@@ -655,8 +670,8 @@ for an individual link, use the key-value pairs \verb~\mlfix{y}~ to turn on
 the fix and \verb~\mlfix{n}~ to turn it off. These key-values are placed as
 an optional argument of any of the \cs{ml\ameta{cmdname}} commands. For
 example,
-\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
-\mlhypertext[!textbf(\mlfix{n})\A{\JS{app.alert("And so it is");}}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!@^}]
+\mlhypertext[!textbf@\mlfix{n}^\A{\JS{app.alert("And so it is");}}
 \linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{the acrotex website is
 free to all}
 \end{Verbatim}
@@ -669,8 +684,9 @@ You can simple increase the vertical dimensions of the boxes by
 \verb~\mlstrut{\large\strut}~ or \verb~\mlstrut{\huge\strut}~.
 \mlhypertext[\A{\JS{app.alert("And so it is");}}\mlstrut{\large\strut}\linktxtcolor{}\W1\H{O}\S{S}\Color{red}]
 {The  acrotex website is free to all} link should have vertically expanded rectangles.
-\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
-\mlhypertext[!textbf(\mlstrut{\large\strut})\A{\JS{app.alert("And so it is");}}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!@^}]
+\mlhypertext[!textbf@\mlstrut{\large\strut}^
+\A{\JS{app.alert("And so it is");}}
 \linktxtcolor{}\W1\H{O}\S{S}\Color{red}]{The acrotex website
 is free to all}
 \end{Verbatim}
@@ -712,6 +728,39 @@ link will be a tiny `L\ameta{num}'. The format for this little `L\ameta{num}'
 is determined by the internal command \cs{ml@MrkLnk}; it may redefined as
 desired.
 
+
+\paragraph*{Viewing the syllable numbers.} You can display the syllable numbers of multi-line
+hypertext by expanding \cs{turnSyllbCntOn}; \cs{turnSyllbCntOff} turns off this feature again.
+For example, we expand \cs{turnSyllbCntOn} in a group:
+\begin{quote}
+\turnSyllbCntOn\mlhypertext{We have set {\cs{turnSyllbCntOn}}
+in a group so the effects are not felt after the group}.
+\end{quote}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{quote}\turnSyllbCntOn
+\mlhypertext{We have set {\cs{turnSyllbCntOn}} in a
+group so the effects are not felt after the group}.
+\end{quote}
+\end{Verbatim}
+The sentence has 10 syllables, as counted by \pkg{soul} and \pkg{aeb\_mlink}. It should be noted that
+\cs{turnSyllbCntOn} also executes \cs{mlMarksOn}. This feature may be useful for determining where to
+break a link across pages, see the next paragraph.
+
+Notice we've enclose \verb~\cs{turnSyllbCntOn}~ in braces, as a reault, \pkg{soul} treats the contents
+as a single syllable. If we want to break this long command across a line (or page), we would have to register
+the command \cs{cs} with \cs{soulregister}:
+\begin{quote}\turnSyllbCntOn\soulregister{\cs}{1}
+\mlhypertext[\A{\JS{app.alert("...and it was so")}}]{Register \cs{cs} with \cs{soulregister} to have the command name \cs{turnSyllbCntOn}
+break across lines (or pages).}
+\end{quote}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{quote}\turnSyllbCntOn\soulregister{\cs}{1} % global declaration
+\mlhypertext{Register \cs{cs} with \cs{soulregister} to have
+the command name \cs{turnSyllbCntOn} break across lines (or pages).}
+\end{quote}
+\end{Verbatim}
+
+
 \mlMarksOn
 
 \paragraph*{Multi-line links that break across pages.}\label{para:xpage} This phenomenon is not
@@ -736,18 +785,23 @@ and can't be missed. The link is not constructed. You can see here, there is a r
 to \texttt{mLink4}. You need to turn on link marking (\cs{mlMarksOn}) or just go to page~2
 and look at the bottom of the page.
 
-\subparagraph*{Fixing a cross-page link.}\label{spara:fixxpage} There are several actions you can
+\subparagraph*{Fixing a cross-page link.}\label{spara:fixxpage} There are a couple of action choices you can
 take to fix a link that has crossed a page boundary: (1) rewrite the
-paragraph so the link does not cross the page boundary; (2) as the log file suggests, you
+paragraph so the link does not cross the page boundary; (2) manually break the link; (3) do as the log file suggests, you
 can use the \cs{mlcrackat\darg{4}} option. In this latter case, for example,
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
 \mlhypertext[\mlcrackat{4}\mlhyph{y}!ameta(other-opts)]
   {Doctor Story created the acrotex website.}
 \end{Verbatim}
+\begin{quote}\turnSyllbCntOn\def\pb{\penalty-10 \\\rule[2pt]{\linewidth-\widthof{\ (page break)}}{.4pt}\ \makebox[0pt][l]{(page break)}\\[3pt]}%
+\ameta{latex-content}\dotfill\mlhypertext[\mlcrackat{4}\mlhyph{y}\mlcrackinsat{\pb}]
+  {Doctor Story created the acrotex website.}
+\end{quote}
 Two links are created, the first consisting of the text `Doctor Story cre-'
 and the second on `ated the acrotex website.'; the second link (should) be
-inserted on the next page. The link  option \cs{mlhyp\darg{y}} inserts an
-hyphen at the break point. For URLs, a hyphen may not be appropriate.
+inserted on the next page. The link  option \cs{mlhyp\darg{y}} inserts a
+hyphen at the break point; for URLs, a hyphen may not be appropriate.
+\textbf{Question:} What is the missing \ameta{other-opts} in the above example?
 
 %\kern7pt
 
@@ -818,7 +872,7 @@ To illustrate, we reference the section title ``\mlnameref{ss:probs}.'' The verb
   {\textbackslash{mlnameref}, \textbackslash{mlNameref},
     and \textbackslash{mlhypertext}}}\label{ss:probs}
 \end{Verbatim}
-Observe use of \cs{texorpdfstring}, the first argument is typeset, the second
+Observe the use of \cs{texorpdfstring}, the first argument is typeset, the second
 one is placed in the bookmarks.
 \begin{itemize}
   \item On the first argument of \cs{texorpdfstring}, we focus our comments
@@ -868,6 +922,6 @@ My humble retirement \hypertarget{retire}{home}.
 \newtopic\noindent
 Now, I simply must get back to my retirement. \dps
 
-
-
 \end{document}
+
+\def\mlMaxNSylls{30}

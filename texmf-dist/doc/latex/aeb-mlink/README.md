@@ -1,12 +1,17 @@
 Package: aeb_mlink 
 Author: D. P. Story 
-Dated: 2018/04/26 
+Dated: 2018/08/18 
 
 The aeb_mlink package defines new link commands to create multi-line links. 
 The new commands are \mlhypertext, \mlhyperlink, \mlhyperref, \mlnameref, 
 \mlNameref, \mlhref, and \mlurl. 
 
 PDF Creators: Adobe Distiller or ps2pdf 
+
+What's New (2018/08/18): Created \turnSyllbCntOn (\turnSyllbCntOff) to turn
+on (resp., off) the viewing of syllable numbers. Reorganize core program to 
+accommodate the use of \mlhypertext command within the program code of 
+annot_pro. (This is to implement text markup annotations in that package.)
 
 What's New (2018/04/26): Included a 'dummy' package named aeb-mlink. The 
 aeb_mlink package is listed on CTAN as aeb-mlink, though there is no such 

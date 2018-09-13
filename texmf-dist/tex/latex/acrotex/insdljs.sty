@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2017/09/03 v2.3g Insert Document Level JavaScripts (dps)]
+ [2018/07/21 v2.4 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -134,6 +134,9 @@
    \ifxetex\immediate\@pdfm@mark{put @catalog <<\dl@@reqJS>>}\else
    \literalps@out{\AEB@psMrk{Catalog} <<\dl@@reqJS>> /PUT pdfmark}\fi\fi
 \fi
+\newif\ifthereisdjs \thereisdjsfalse
+\def\applydljs#1{\ifthereisdjs\else#1
+  \global\thereisdjstrue\fi}
 \providecommand\JS[1]{/S/JavaScript/JS(#1)}
 \providecommand\Named[1]{/S/Named/N/#1}
 \providecommand{\GoTo}{/S/GoTo/D}
@@ -545,13 +548,15 @@
     \iwvo{<< /FDF << /JavaScript << /Doc 2 0 R /After 3 0 R >> >> >> }
     \iwvo{endobj}
     \iwvo{2 0 obj}
-\ifpdfmarkup
-    \iwvo{[ (ExecJS \dljsBase) (var _\dljsBase\space = true;) ] }\else
-    \iwvo{[ (00 ExecJS \dljsBase) (var _\dljsBase\space = true;) ] }\fi
-    \iwvo{endobj}
-    \iwvo{3 0 obj}
-    \iwvo{<<>>}
-    \iwvo{stream}
+  \let\x\@empty
+  \applydljs{\def\x{^^Jvar _thereisdjs=true;}}%
+  \ifpdfmarkup
+    \iwvo{[ (ExecJS \dljsBase) (var _\dljsBase\space = true;\x) ] }\else
+    \iwvo{[ (00 ExecJS \dljsBase) (var _\dljsBase\space = true;\x)] }\fi
+  \iwvo{endobj}
+  \iwvo{3 0 obj}
+  \iwvo{<<>>}
+  \iwvo{stream}
 }
 \newenvironment{execJS}[1]
 {%
@@ -664,41 +669,42 @@
 \endgroup
 \def\fdfheader
 {%
-    \iwvo{\string\begingroup\string\efdlspecials}
-    \iwvo{\string\isdljstrue}
-    \iwvo{\string\makeatletter}
-    \iwvo{\string\immediate\string\openout\string
-        \js@verbatim@out=\string\js@Path\space\dljsBase.fdf}%
-    \iwvo{\string\begin{jsexpverbatimwrite}}
-    \iwvo{\string\firstFDFline}
-    \iwvo{1 0 obj}
-    \iwvo{<< /FDF << /JavaScript << /Doc 2 0 R >> >> >>}
-    \iwvo{endobj}
-    \iwvo{2 0 obj}
-    \iwvo{[ \string\csname\string\@gobble\space\dljsBase%
-        OBJ\string\endcsname]}
-    \iwvo{endobj}
+  \iwvo{\string\begingroup\string\efdlspecials}
+  \iwvo{\string\isdljstrue}
+  \iwvo{\string\makeatletter}
+  \iwvo{\string\immediate\string\openout\string
+      \js@verbatim@out=\string\js@Path\space\dljsBase.fdf}%
+  \iwvo{\string\begin{jsexpverbatimwrite}}
+  \iwvo{\string\firstFDFline}
+  \iwvo{1 0 obj}
+  \iwvo{<< /FDF << /JavaScript << /Doc 2 0 R >> >> >>}
+  \iwvo{endobj}
+  \iwvo{2 0 obj}
+  \iwvo{[ \string\csname\string\@gobble\space\dljsBase%
+      OBJ\string\endcsname]}
+  \iwvo{endobj}
 }
 \def\fdfbeginstreamobj
 {%
-    \iwvo{\thedljssegs\space 0 obj}
-    \iwvo{<<>>}
-    \iwvo{stream}
+  \iwvo{\thedljssegs\space 0 obj}
+  \iwvo{<<>>}
+  \iwvo{stream}
+  \applydljs{\iwvo{var _thereisdjs=true;}}
     \ifx\insdljsloadVar\@empty\else
         \iwvo{\insdljsloadVar}
         \global\let\insdljsloadVar\@empty
     \fi
 }
 \def\fdfendstreamobj{%
-    \iwvo{endstream}
-    \iwvo{endobj}
+  \iwvo{endstream}
+  \iwvo{endobj}
 }
-    \def\fdftrailer{%
-    \iwvo{trailer}
-    \iwvo{<< /Root 1 0 R >>}
-    \iwvo{\string\lastFDFline}
-    \iwvo{*end{jsexpverbatimwrite}}
-    \iwvo{\string\endgroup}
+\def\fdftrailer{%
+  \iwvo{trailer}
+  \iwvo{<< /Root 1 0 R >>}
+  \iwvo{\string\lastFDFline}
+  \iwvo{*end{jsexpverbatimwrite}}
+  \iwvo{\string\endgroup}
 }
 \newtoks\importfdftoks \importfdftoks={}
 \newtoks\dljsobjtoks \dljsobjtoks={}
@@ -762,84 +768,77 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 @endgroup
 \def\begindljs
 {%
-    \iwvo{\string\begingroup\string\efdlspecials}
-    \iwvo{\string\isdljstrue}
-    \iwvo{\string\makeatletter}
-    {\uccode`c=`\%\uppercase{%
-        \iwvo{\string\obeyspaces\string\obeylines
-            \string\let\string^\string^M=\string\jsR c}}}
-    {\escapechar=-1 \lccode`C=`\%\lowercase{%
-        \iwvo{\string\\catcode`\string\\"=12C}}}
+  \iwvo{\string\begingroup\string\efdlspecials}
+  \iwvo{\string\isdljstrue}
+  \iwvo{\string\makeatletter}
+  {\uccode`c=`\%\uppercase{%
+    \iwvo{\string\obeyspaces\string\obeylines
+      \string\let\string^\string^M=\string\jsR c}}}
+  {\escapechar=-1 \lccode`C=`\%\lowercase{%
+    \iwvo{\string\\catcode`\string\\"=12C}}}
 }
-\def\beginseg
-{%
-    {\lccode`P=`\{\lccode`C=`\%\lowercase{%
-        \iwvo{\string\gdef\string\dljs\dljsBase\roman{dljssegs}PC}}}%
+\def\beginseg{%
+  {\lccode`P=`\{\lccode`C=`\%\lowercase{%
+    \iwvo{\string\gdef\string\dljs\dljsBase\roman{dljssegs}PC}}}%
+  \applydljs{\iwvo{var _thereisdjs=true;}}%
 }
-\def\endseg
-{%
-    {\uccode`c=`\%\uccode`p=`\}\uppercase{\iwvo{pc}}}%
-}
-\def\enddljs
-{%
-    \iwvo{\string\endgroup}%
-}
+\def\endseg{{\uccode`c=`\%\uccode`p=`\}\uppercase{\iwvo{pc}}}}
+\def\enddljs{\iwvo{\string\endgroup}}
 \def\@roman#1{\romannumeral#1}
-\def\write@objs
-{%
-\iwvo{\begingroup}
-\iwvo{\string\catcode`\string\<=12 }
-\iwvo{\string\catcode`\string\>=12 }
-{\lccode`C=`\%\lowercase{\iwvo{\string\ccpdftex C}}}
-{\lccode`C=`\%\lowercase{\iwvo{%
-            \string\input{dljscc.def}C\the\dljsobjtoks}}}
-\iwvo{\endgroup}
+\def\write@objs{%
+  \iwvo{\begingroup}
+  \iwvo{\string\catcode`\string\<=12 }
+  \iwvo{\string\catcode`\string\>=12 }
+  {\lccode`C=`\%\lowercase{\iwvo{\string\ccpdftex C}}}
+  {\lccode`C=`\%\lowercase{\iwvo{%
+    \string\input{dljscc.def}C\the\dljsobjtoks}}}
+  \iwvo{\endgroup}
 }
 \newenvironment{newsegment@pdftex}[1]{%
-    \addtocounter{dljssegs}{1}%
-    \addtocounter{dljs@cnt}{1}%
-    \edef\tmp{^^J\string\immediate\string\pdfobj{ << /S/JavaScript/JS%
-    (\string\dljs\dljsBase\roman{dljssegs}) >> }}%
-    \edef\@dljstmp{\the\dljsobjtoks\tmp}%
-    \global\dljsobjtoks=\expandafter{\@dljstmp}%
-    \edef\tmp{^^J\string\xdef\string\obj\dljsBase\roman{dljssegs}%
-        {\string\the\string\pdflastobj\string\space 0 R}}%
-    \edef\@dljstmp{\the\dljsobjtoks\tmp}%
-    \global\dljsobjtoks=\expandafter{\@dljstmp}%
-    \edef\curr@Cnt{\ifnum\arabic{dljs@cnt}<10 0\fi\arabic{dljs@cnt}}%
-    \Hy@unicodefalse\pdfstringdef{\dljsName}{#1}%
-    \edef\dljspdftextmp
-    {\the\importfdftoks (\curr@Cnt\space\dljsName)
-        \noexpand\csname obj\dljsBase\roman{dljssegs}%
-            \noexpand\endcsname\space}%
-    \global\importfdftoks=\expandafter{\dljspdftextmp}%
-    \beginseg
-    \js@verbatimwrite
+  \addtocounter{dljssegs}{1}%
+  \addtocounter{dljs@cnt}{1}%
+  \edef\tmp{^^J\string\immediate\string\pdfobj{ << /S/JavaScript/JS%
+  (\string\dljs\dljsBase\roman{dljssegs}) >> }}%
+  \edef\@dljstmp{\the\dljsobjtoks\tmp}%
+  \global\dljsobjtoks=\expandafter{\@dljstmp}%
+  \edef\tmp{^^J\string\xdef\string\obj\dljsBase\roman{dljssegs}%
+      {\string\the\string\pdflastobj\string\space 0 R}}%
+  \edef\@dljstmp{\the\dljsobjtoks\tmp}%
+  \global\dljsobjtoks=\expandafter{\@dljstmp}%
+  \edef\curr@Cnt{\ifnum\arabic{dljs@cnt}<10 0\fi\arabic{dljs@cnt}}%
+  \Hy@unicodefalse\pdfstringdef{\dljsName}{#1}%
+  \edef\dljspdftextmp
+  {\the\importfdftoks (\curr@Cnt\space\dljsName)
+    \noexpand\csname obj\dljsBase\roman{dljssegs}%
+    \noexpand\endcsname\space}%
+  \global\importfdftoks=\expandafter{\dljspdftextmp}%
+  \beginseg
+  \js@verbatimwrite
 }{%
-    \endjs@verbatimwrite
-    \endseg
+  \endjs@verbatimwrite
+  \endseg
 }
 \newenvironment{insert@DLJS@pdftex}{%
-    \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
-    \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \begindljs
-    \ifx\multisegments\dl@NO\expandafter
-        \newsegment\expandafter{\expandafter\dljsName\expandafter}\fi
+  \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
+  \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
+  \begindljs
+  \ifx\multisegments\dl@NO\expandafter
+    \newsegment\expandafter{\expandafter\dljsName\expandafter}\fi
 }{%
-    \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
-    \enddljs
-    \write@objs
-    \endjs@verbatimwrite
-    \closejs@verbatim@out
-    \edef\@dljstmp{\noexpand\AtBeginDocument{%
-        \noexpand\input{\js@Path\dljsBase.djs}}}%
-    \@dljstmp
-    \ifx\importdljs\dl@YES
-        \ifx\firstdljs\dl@YES
-            \AtEndDocument{\edef\@dljstmp{\setDLJSRef@pdftex}\@dljstmp}
-            \global\let\firstdljs\dl@NO
-        \fi
+  \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
+  \enddljs
+  \write@objs
+  \endjs@verbatimwrite
+  \closejs@verbatim@out
+  \edef\@dljstmp{\noexpand\AtBeginDocument{%
+    \noexpand\input{\js@Path\dljsBase.djs}}}%
+  \@dljstmp
+  \ifx\importdljs\dl@YES
+    \ifx\firstdljs\dl@YES
+      \AtEndDocument{\edef\@dljstmp{\setDLJSRef@pdftex}\@dljstmp}
+      \global\let\firstdljs\dl@NO
     \fi
+  \fi
 }
 \def\setDLJSRef@pdftex
 {%
@@ -850,26 +849,26 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 }
 \newenvironment{newsegment@dvipdfm}[1]
 {%
-    \addtocounter{dljssegs}{1}%
-    \addtocounter{dljs@cnt}{1}%
-    \edef\tmp{^^J\string\immediate\string
-        \csname\space @pdfm@mark\string\endcsname
-        {obj @obj\dljsBase\roman{dljssegs}\space << /S/JavaScript%
-        /JS(\string\dljs\dljsBase\roman{dljssegs}) >> }}%
-    \edef\@dljstmp{\the\dljsobjtoks\space\tmp}%
-    \global\dljsobjtoks=\expandafter{\@dljstmp}%
-    \edef\curr@Cnt{\ifnum\arabic{dljs@cnt}<10 0\fi\arabic{dljs@cnt}}%
-    {\def\1{\string\1}\def\2{\string2}%
-    \def\3{\string\3}\xdef\dljsName{#1}}%
-    \edef\dljspdftextmp
-    {\the\importfdftoks (\curr@Cnt\space \dljsName) %
-        @obj\dljsBase\roman{dljssegs}\space}%
-    \global\importfdftoks=\expandafter{\dljspdftextmp}%
-    \beginseg
-    \js@verbatimwrite
+  \addtocounter{dljssegs}{1}%
+  \addtocounter{dljs@cnt}{1}%
+  \edef\tmp{^^J\string\immediate\string
+    \csname\space @pdfm@mark\string\endcsname
+    {obj @obj\dljsBase\roman{dljssegs}\space << /S/JavaScript%
+    /JS(\string\dljs\dljsBase\roman{dljssegs}) >> }}%
+  \edef\@dljstmp{\the\dljsobjtoks\space\tmp}%
+  \global\dljsobjtoks=\expandafter{\@dljstmp}%
+  \edef\curr@Cnt{\ifnum\arabic{dljs@cnt}<10 0\fi\arabic{dljs@cnt}}%
+  {\def\1{\string\1}\def\2{\string2}%
+  \def\3{\string\3}\xdef\dljsName{#1}}%
+  \edef\dljspdftextmp
+  {\the\importfdftoks (\curr@Cnt\space \dljsName) %
+    @obj\dljsBase\roman{dljssegs}\space}%
+  \global\importfdftoks=\expandafter{\dljspdftextmp}%
+  \beginseg
+  \js@verbatimwrite
 }{%
-    \endjs@verbatimwrite
-    \endseg
+  \endjs@verbatimwrite
+  \endseg
 }
 \def\setDLJSRef@dvipdfm
 {%
@@ -880,26 +879,26 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 }
 \newenvironment{insert@DLJS@dvipdfm}
 {%
-    \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
-    \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \begindljs
-    \ifx\multisegments\dl@NO\expandafter\newsegment\expandafter{%
-        \expandafter\dljsName\expandafter}\fi
+  \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
+  \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
+  \begindljs
+  \ifx\multisegments\dl@NO\expandafter\newsegment\expandafter{%
+    \expandafter\dljsName\expandafter}\fi
 }{%
-    \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
-    \enddljs
-    \write@objs
-    \endjs@verbatimwrite
-    \closejs@verbatim@out
-    \edef\@dljstmp{\noexpand\AtBeginDocument{%
-        \noexpand\input{\js@Path\dljsBase.djs}}}%
-    \@dljstmp
-    \ifx\importdljs\dl@YES
-        \ifx\firstdljs\dl@YES
-            \AtBeginDocument{\setDLJSRef@dvipdfm}%
-            \global\let\firstdljs\dl@NO
-        \fi
+  \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
+  \enddljs
+  \write@objs
+  \endjs@verbatimwrite
+  \closejs@verbatim@out
+  \edef\@dljstmp{\noexpand\AtBeginDocument{%
+    \noexpand\input{\js@Path\dljsBase.djs}}}%
+  \@dljstmp
+  \ifx\importdljs\dl@YES
+    \ifx\firstdljs\dl@YES
+      \AtBeginDocument{\setDLJSRef@dvipdfm}%
+      \global\let\firstdljs\dl@NO
     \fi
+  \fi
 }
 \catcode`\"=\dl@dquoteCat
 \inputAltAdbFncs

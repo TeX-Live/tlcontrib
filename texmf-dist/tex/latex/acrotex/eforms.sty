@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2018/03/22 v2.9.19 Provides general eforms support (dps)]
+ [2018/08/16 v2.9.20 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
@@ -27,12 +27,14 @@
 \let\ef@driver\@empty
 \DeclareOption{dvipsone}{\def\eq@drivernum{0}%
     \def\eq@drivername{0}\def\ef@driver{dvipsone}%
+    \def\eq@drivercode{epdfmark.def}%
     \PassOptionsToPackage{dvipsone}{insdljs}%
     \PassOptionsToPackage{dvipsone}{hyperref}%
 }
 \def\eq@drivername{2}
 \DeclareOption{dvips}{\def\eq@drivernum{0}%
     \def\eq@drivername{1}\def\ef@driver{dvips}%
+    \def\eq@drivercode{epdfmark.def}%
     \PassOptionsToPackage{dvips}{insdljs}%
     \PassOptionsToPackage{dvips}{hyperref}%
 }
@@ -70,7 +72,7 @@
 \def\eq@drivercode{epdfmark.def}
 \DeclareOption{preview}{\previewtrue}
 \DeclareOption*{\PassOptionsToPackage{\CurrentOption}{insdljs}}
-\@ifundefined{ifpreview}{\newif\ifpreview \previewfalse}{}
+\@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
 \providecommand{\previewOn}{\previewtrue}
 \providecommand{\previewOff}{\previewfalse}
 \DeclareOption{useui}{\AtEndOfPackage{\ef@InputUIeForms}}
@@ -685,7 +687,9 @@
     supported value\MessageBreak for \string\mlhyph.\MessageBreak
     Using the default of 'n'}\fi\fi}
 \let\eq@mlhyph\@empty
-\def\@eqmlignore#1{\let\eq@mlignore\ef@YES}
+\def\@eqmlignore#1{\def\eq@mlchunk{#1}\ifx\eq@mlchunk\@empty
+  \def\eq@mlchunk{0}\fi\let\eq@mlignore\ef@YES}
+\def\eq@mlchunk{0}
 \let\eq@mlignore\ef@NO
 \def\@eqmlcrackinsat#1{\def\eq@mlcrackinsat{#1}}
 \let\eq@mlcrackinsat\@empty

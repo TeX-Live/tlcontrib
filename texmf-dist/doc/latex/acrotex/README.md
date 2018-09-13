@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2018/03/22
+Dated: 2018/08/16
 
 AeB contains the following:
 
@@ -18,6 +18,10 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2018/08/16) Changes to eforms and insdljs: several keys (eforms) added to
+support aeb_mlink and annot_pro; switch add to insdljs to detect whether document JS
+has been included.
 
 What's New (2018/03/22) Changes in eforms to support features of aeb_mlink. Minor bug fixes
 

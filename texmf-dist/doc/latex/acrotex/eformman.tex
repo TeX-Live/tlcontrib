@@ -6,12 +6,19 @@
         forcolorpaper,latextoc,pro,useui},
     exerquiz,aebxmp
 ]{aeb_pro}
-\usepackage[dblevel=1]{aeb_mlink}
+\usepackage[dblevel=0]{aeb_mlink}
 \usepackage[altbullet]{lucidbry}
 %\usepackage{myriadpro}
 
 \usepackage{graphicx,array,longtable}
 %\usepackage[usecmtt]{myriadpro}
+
+\usepackage{xbmks}
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
+%\addtolength{\marginparwidth}{20pt}
+
 
 %\makeatletter
 %\renewcommand*\l@subsection{\@dottedtocline{2}{2.5em}{3.5em}}
@@ -63,7 +70,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2018/03/22},
+    prepared={2018/08/16},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -260,7 +267,7 @@ var manualfilename="Manual_BG_Print_eforms.pdf";
 var manualtemplate="Manual_BG_Blue.pdf"; // Blue, Green, Brown
 var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
 var doc;
-var buildIt=true;
+var buildIt=false;
 if ( buildIt ) {
     console.println("Creating new " + manualfilename + " file.");
     doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
@@ -291,6 +298,15 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 \begin{document}
 
 \maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{AeB Manual}[action={\GoToR/F(aeb_man.pdf)/D[0 /Fit]},color=blue,style={bf}]{AEB}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
 
 \selectColors{linkColor=black}
 
@@ -2019,7 +2035,7 @@ document author has set the border to \texttt{invisible}.
 \texttt{push} is used with forms. They each have the same key value pair.
 
 \settowidth{\aebdimen}{\ttfamily bordercolor=\anglemeta{num}\hardspace\anglemeta{num}\hardspace\anglemeta{num}}%
-\def\1{\llap{\smash{\parbox[c]{\marginparwidth}{\raggedright\shortstack[l]{\Cs{BC}\,(forms) or\\\Cs{Color}\,(links)}}}\hspace{\marginparsep}}}%
+\def\1{\llap{\smash{\parbox[c]{2\marginparwidth}{\raggedright\hfill\shortstack[l]{\Cs{BC}\,(forms) or\\\Cs{Color}\,(links)}}}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 !1bordercolor=!anglemeta(num)!hardspace!anglemeta(num)!hardspace!anglemeta(num)
 \end{dCmd}
@@ -3389,7 +3405,7 @@ then each of the following is valid: \verb!\textColor{myBlue}! (for specifying t
 \begingroup
 \setlength{\extrarowheight}{3mm}\setlength{\tabcolsep}{3pt}
 
-\begin{longtable}{>{\small\ttfamily\targ}l>{\small\PBS\raggedright}p{2.25in}>{\small}p{1.25in}}
+\begin{longtable}{>{\small\ttfamily\targ}r>{\small\PBS\raggedright}p{2.25in}>{\small}p{1.25in}}
 \multicolumn{3}{>{\bfseries}c}{Supported Key \hypertarget{kv}{Variables}}\\
 \multicolumn1{>{\bfseries\small}l}{Key}& \multicolumn1{>{\bfseries\small}l}{Description}&\multicolumn1{>{\bfseries\small}l}{Default}\\\hline
 \endfirsthead
@@ -3455,46 +3471,51 @@ mkIns?& A variable for introducing into the \texttt{MK} dictionary any other key
         Principle examples are \texttt{I}, \texttt{RI}, \texttt{IX}, \texttt{IF}, \texttt{TP},
         which are used for displaying icons on a button field. See an
         example in the demo file \textsf{eforms.tex} &\verb+\mkIns{}+\\
-I?   & (push buttons only) an indirect reference to a form XObject defining the buttons's \emph{normal icon}&\verb+\I{nIcon}+\\
-RI?   & (push buttons only) an indirect reference to a form XObject defining the buttons's \emph{rollover icon}&\verb+\RI{rIcon}+\\
-IX?   & (push buttons only) an indirect reference to a form XObject defining the buttons's \emph{down icon}&\verb+\I{dIcon}+\\
-TP?   & (push buttons only; optional) A code indicating the \texttt{layout} of the text and icon; these codes are
-        0 (label only); 1 (icon only); 2 (label below icon); 3 (label above icon); 4 (label to the right of icon);
-        5 (label to the left of icon); 6 (label overlaid on the icon). The default is 0.&\verb+\TP{1}+\\
-SW?   & (push buttons only; optional) The \emph{scale when key}. Permissible values are \texttt{A} (always scale),
+I?   & (push buttons only) an indirect reference to a form XObject defining the buttons's
+      \emph{normal icon}&\verb+\I{nIcon}+\newline(example)\\
+RI?   & (push buttons only) an indirect reference to a form XObject
+        defining the buttons's \emph{rollover icon}&\verb+\RI{rIcon}+\newline(example)\\
+IX?   & (push buttons only) an indirect reference to a form XObject
+        defining the buttons's \emph{down icon}&\verb+\I{dIcon}+\newline(example)\\
+TP?   & \texttt{\darg{\ameta{\upshape{0|1|2|3|4|5|6}}}} (push buttons only; optional)
+        A code indicating the \texttt{layout} of the text and icon; these codes are
+        0~(label only); 1~(icon only); 2~(label below icon); 3~(label above icon); 4~(label to the right of icon);
+        5~(label to the left of icon); 6~(label overlaid on the icon). The default is 0.&\verb+\TP{0}+\\
+SW?   & \texttt{\darg{\ameta{\upshape{A|B|S|N}}}} (push buttons only; optional) The \emph{scale when key}. Permissible values are \texttt{A} (always scale),
         \texttt{B} (scale when icon is too big), \texttt{S} (scale when icon is too small), \texttt{N}
         (never scale). The default is \texttt{A}. &\verb+\SW{A}+\\
-ST?     & (push buttons only; optional) The \emph{scaling type.} Permissible values are \texttt{A}
+ST?     & \texttt{\darg{\ameta{\upshape{A|P}}}} (push buttons only; optional) The \emph{scaling type.} Permissible values are \texttt{A}
             (anamorphic scaling); \texttt{P} (proportional scaling). The default is \texttt{P}.
             &\verb+\ST{P}+\\
-PA?     & (push buttons only; optional) The \textit{position array.} An array of two numbers, each
+PA?     & \texttt{\darg{\ameta{num\SUB1\space num\SUB2}}} (push buttons only; optional) The \textit{position array.} An array of two numbers, each
             between 0 and 1 indicating the fraction of left-over space to allocate at the left and bottom
             of the annotation rectangle. The two numbers should be separated by a space. The default value, \verb!\PA{.5 .5}!,
-            centers the icon in the rectangle. & \verb!\PA{0 0}!\\
-FB?  & (push buttons only; optional) The \emph{fit bounds} Boolean. If \texttt{true}, the button appearance
+            centers the icon in the rectangle. & \verb!\PA{.5 .5}!\\
+FB?  &  \texttt{\darg{true|false}} (push buttons only; optional) The \emph{fit bounds} Boolean. If \texttt{true}, the button appearance
         is scaled to fit fully within the bounds of the annotation without taking into consideration
-        the line width of the border. The default is \texttt{false}. &\verb+\FB{true}+\\\hline
+        the line width of the border. &\verb+\FB{false}+\\\hline
 %--------------------------------------------------------------
 %\pagebreak
 \multicolumn{3}{l}{\color{blue}Entries common to fields containing variable text:}\\
-Q?      & Quadding for text fields. Values are \texttt{0} (left-justified),
+Q?      & \texttt{\darg{0|1|2|empty}} Quadding for text fields. Values are \texttt{0} (left-justified),
          \texttt{1} (centered), \texttt{2} (right-justified); e.g., \verb+\Q{1}+.
        &\verb+Q{}+\newline(left justified)\\
 \multicolumn{3}{>{\small\bfseries}l}{Default Appearance (DA)}\\
 DA?       & Default appearance string of the text in the widget. Normally, you just
            specify text font, size and color. Can be redefined, advance techniques needed.&\\
-textFont? & Font to be used to display the text &\verb+\textFont{Helv}+\\
-textSize? & size in points of the text &\verb+\textSize{9}+\\
-textColor?& color of the text, there are several color spaces, including
-           grayscale and RGB; for example, \verb+\textColor{1 0 0 rg}+,
-           gives a red font. Recent advances in parsing this command have eliminated the
-           need to include the color space specification. Thus, \verb+\textColor{1 0 0}+
-           also gives a red font.
-           &\verb+\textColor{0 g}+\\\hline
+textFont? & \texttt{\darg{\ameta{font-spec}}} Font to be used to display the text &\verb+\textFont{Helv}+\\
+textSize? & \texttt{\darg{\ameta{num}}} The size in points of the text &\verb+\textSize{9}+\\
+textColor?& \texttt{\darg{\ameta{color-spec}}} The color of the text.
+  There are several color spaces, including
+  grayscale and RGB; for example, \verb+\textColor{1 0 0 rg}+,
+  gives a red font. Recent advances in parsing this command have eliminated the
+  need to include the color space specification. Thus, \verb+\textColor{1 0 0}+
+  also gives a red font.
+  &\verb+\textColor{0 g}+\\\hline
 %------------------------------------------------------------------
 %\pagebreak
 \multicolumn{3}{l}{\color{blue}Entries specific to text fields:}\\
-MaxLen?   & The maximum length of the text string input into a text field.
+MaxLen?   & \texttt{\darg{\ameta{num{\upshape|empty}}}} The maximum length of the text string input into a text field.
            Used also with comb fields to set the number of combs.
            Example, \verb+\MaxLeng{15}+.&\verb+\MaxLen{}+\\\hline
 %------------------------------------------------------------------
@@ -3506,28 +3527,45 @@ Lock?   & This key is used to lock fields after the signature field is
 %-------------------------------------------------------------------
 %\pagebreak
 \multicolumn{3}{l}{\color{blue}Specialized, non-PDF Spec, commands:}\\
-rawPDF?  & If all else fails, you can always introduce key-value pairs
+rawPDF?  & \texttt{\darg{\ameta{PDF-KVPs}}} If all else fails, you can always introduce key-value pairs
           through this variable. &\verb+\rawPDF{}+\\
-autoCenter? & There is a centering code that attempts to give a pleasant
+autoCenter? &\texttt{\darg{y|n}} There is a centering code that attempts to give a pleasant
              placement of the field. \verb+\autoCenter{n}+
              turn auto centering off.&\\
-inline?  & If \mlcs{inline\darg{y}}, an alternate method is used
+inline?  & \texttt{\darg{y|n}} If \mlcs{inline\darg{y}}, an alternate method is used
            get a better vertical positioning. Designed for inline form fields.
            The default is \mlcs{inline\darg{n}}.\\
-presets? & This commands takes a macro as its argument, the text of the macro
+presets? & \texttt{\darg{\ameta{\cs{cmd}}}} This commands takes a macro as its argument, the text of the macro
           are key-value pairs. This is useful for setting up a series of
           presets for fields. Example, \verb|\presets{\myFavFive}|\\
-symbolchoice? & Use this variable to specify what symbol is to be used
+symbolchoice? & \texttt{\darg{\ameta{symbol-choice}}} Use this variable to specify what symbol is to be used
                with a check box or radio button. Possible values are
                \texttt{check}, \texttt{circle}, \texttt{cross},
                \texttt{diamond}, \texttt{square} and \texttt{star}. Can
                be used to globally change the symbol choice as well; for
                example, \verb+\symbolchoice{check}+, which is the
                default value.\\
-linktxtcolor? & The value of this variable is a named color and is the
+linktxtcolor? & \texttt{\darg{\ameta{named-color{\upshape|empty}}}} The value of this variable is a named color and is the
                color of the link text. Only recognized
                in link annotations. A value of
-               \verb!\linktxtcolor{}! paints the text the \cs{normalcolor}.&\cs{linktxtcolor}\newline\verb+   {\@linkcolor}+
+               \verb!\linktxtcolor{}! paints the text the \cs{normalcolor}.&\cs{linktxtcolor}\newline\verb+   {\@linkcolor}+\\\hline
+\multicolumn{3}{l}{\color{blue}Special link key-values used by \pkg{aeb\_mlink} and \pkg{annot\_pro}}\\
+mlstrut? & \texttt{\darg{\ameta{strut}}} Adjusts the height of a multi-line link, e.g., \verb!\mlstrut{\large\strut}!
+         &\verb~\mlstrut{\strut}~\\
+mlcrackat?& \texttt{\darg{\ameta{num{\upshape|empty}}}} Used to break a multi-line link across a page boundary;
+     specifying \verb~\mlcrackat{3}~ breaks the link after the 3rd syllable. The \pkg{aeb\_mlink}
+     package then creates two links consisting of the text up to and including the crack-at value and
+     the second link consisting of the rest of the hypertext link (or url) string.
+     &\verb~\mlcrackat{}~\\
+mlhyph? & \texttt{\darg{y|n}} A key that takes `y' or `n' as its value. If `y' is passed, then a hyphen is inserted after
+    the break in a multi-line link that crosses a page boundary.
+    & \cs{mlhyph\darg{n}}\\
+mlignore? &\texttt{\darg{\upshape0|1}} An internal switch used in building multi-line links and text markup annotations
+that cross page boundaries. \emph{Do not use}.
+  &\cs{mlignore\darg{0}}\\
+mlcrackinsat? &\texttt{\cs{mlcrackinsat\darg{\ameta{latex-content}}}} This key inserts
+its argument after the hyphen (if there is one) at the point declared by the \cs{crackat} value.
+& \cs{mlcrackinsat\darg{}}
 \end{longtable}
 \endgroup
 

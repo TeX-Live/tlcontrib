@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2018/03/22 v2.9.19 Provides general eforms support (dps)]
+%<package> [2018/08/16 v2.9.20 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -105,6 +105,7 @@
 \let\ef@driver\@empty
 \DeclareOption{dvipsone}{\def\eq@drivernum{0}%
     \def\eq@drivername{0}\def\ef@driver{dvipsone}%
+    \def\eq@drivercode{epdfmark.def}%
     \PassOptionsToPackage{dvipsone}{insdljs}%
     \PassOptionsToPackage{dvipsone}{hyperref}%
 }
@@ -114,6 +115,7 @@
 %    \begin{macrocode}
 \DeclareOption{dvips}{\def\eq@drivernum{0}%
     \def\eq@drivername{1}\def\ef@driver{dvips}%
+    \def\eq@drivercode{epdfmark.def}%
     \PassOptionsToPackage{dvips}{insdljs}%
     \PassOptionsToPackage{dvips}{hyperref}%
 }
@@ -192,7 +194,7 @@
 %    \begin{macrocode}
 \DeclareOption{preview}{\previewtrue}
 \DeclareOption*{\PassOptionsToPackage{\CurrentOption}{insdljs}}
-\@ifundefined{ifpreview}{\newif\ifpreview \previewfalse}{}
+\@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
 %    \end{macrocode}
 %    (2017/01/01) Added two convenience commands.
 %    \changes{v2.9f}{2017/01/01}{Added \string\cs{previewOn} and \string\cs{previewOff}}
@@ -1075,7 +1077,7 @@
     \def\@eqR#1{\def\eq@R@value{#1}\ifx\eq@R@value\@empty
         \let\eq@R\@empty\else
 %    \end{macrocode}
-% Determine if we are rotating 90 or 270, if so, let a weak switch
+% Determine if we are rotating 90 or 270, if so, set a weak switch
 % \cs{@vertRotate} to 1
 %    \begin{macrocode}
         \@tempcnta=\eq@R@value\relax
@@ -1444,7 +1446,7 @@
 \@eqmlstrut{\strut}
 %    \end{macrocode}
 %     \DescribeMacro{\mlcrackat}\hskip-\marginparsep\texttt{\darg{\ameta{num}}}
-%     (2018/03/22) \cs{mlcrackat} is a link used to break a multi-line link across a page boundary;
+%     (2018/03/22) \cs{mlcrackat} is used to break a multi-line link across a page boundary;
 %     specifying \verb~\mlcrackat{3}~ breaks the link after the 3rd syllable. The \pkg{aeb\_mlink}
 %     package then creates two links consisting of the text up to and including the crack-at value and
 %     the second link consisting of the rest of the hypertext link (or url) string.
@@ -1466,14 +1468,25 @@
     Using the default of 'n'}\fi\fi}
 \let\eq@mlhyph\@empty
 %    \end{macrocode}
-%     \DescribeMacro{\mlignore}\hskip-\marginparsep\texttt{\darg{}}
+%     \leavevmode
+%     \DescribeMacro{\mlignore}\hskip-\marginparsep\texttt{\darg{\upshape0\string|1\string|empty}}
 %     (2018/03/22) \cs{mlignore} is an internal option used when breaking apart
-%     two multi-line links; not used with urls.
+%     two multi-line links; not used with urls. The argument is used to identify
+%     whether, when breaking a link or annot apart, we are working on the first or
+%     second part. The flag \cs{eq@mlignore} is set to \cs{ef@YES}.
 %     \changes{v2.9.19}{2018/03/22}{Added \string\cs{mlignore}}
+%     \changes{v2.9.20}{2018/08/16}{Added \string\cs{eq@mlchunk} to definition
+%     of \string\cs{@eqmlignore}}
 %    \begin{macrocode}
-\def\@eqmlignore#1{\let\eq@mlignore\ef@YES}
+\def\@eqmlignore#1{\def\eq@mlchunk{#1}\ifx\eq@mlchunk\@empty
+  \def\eq@mlchunk{0}\fi\let\eq@mlignore\ef@YES}
+\def\eq@mlchunk{0}
 \let\eq@mlignore\ef@NO
 %    \end{macrocode}
+%    \leavevmode\DescribeMacro{\mlcrackinsat}
+%    \hskip-\marginparsep\texttt{\darg{\ameta{latex-content}}}
+%    introduces \ameta{latex-content} just after \cs{eq@mlhyph}.
+%     \changes{v2.9.20}{2018/08/16}{Added \string\cs{eq@mlcrackinsat}}
 %    \begin{macrocode}
 \def\@eqmlcrackinsat#1{\def\eq@mlcrackinsat{#1}}
 \let\eq@mlcrackinsat\@empty
@@ -1791,11 +1804,6 @@
         \@break@tfor\fi}\ef@gobbletonil}}
 %    \end{macrocode}
 %    \begin{macrocode}
-%\def\ef@getfirst{\@ifnextchar[{\ef@gobbletonil}{%
-%    \@tfor\mytok:=.0123456789\do{%
-%        \if\mytok\@let@token
-%        \edef\ef@colorSpec@out{[gray]\ef@colorSpec@out}%
-%        \@break@tfor\fi}\ef@gobbletonil}}
 \def\ef@gobbletonil#1\ef@nil{}
 %    \end{macrocode}
 %    \begin{macro}{\ef@parsePDFColor}
@@ -1944,7 +1952,7 @@
 %
 %\subsubsection{Writing Actions}
 %
-% Writing actions for eForms requires certain key-value combinations. The following
+% Writing actions for \pkg{eforms} requires certain key-value combinations. The following
 % commands provides the correct syntax, the code is inserted via the required
 % argument of each.
 %

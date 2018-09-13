@@ -1,0 +1,87 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Web package,                                         %%
+%% Copyright (C) 1999-2018  D. P. Story                 %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% History: Noel Vaillant began developing a better web.sty
+%%   based on my earlier published web.sty. Many thanks
+%%   to him for starting me off.
+%%---------------------------------------------------------
+\newcommand{\setupFullwidth}{%
+    \setlength{\textwidth}{\paperwidth}%
+    \advance\textwidth-2in
+    \setlength{\linewidth}{\textwidth}%
+    \setlength{\columnseprule}{0pt}%
+    \setlength{\oddsidemargin}{0in}%
+    \setlength{\evensidemargin}{0in}%
+}
+\makeatletter
+\def\clindx{\ifcodeline@index\expandafter\@firstoftwo\else
+    \expandafter\@secondoftwo\fi}
+\GlossaryPrologue{\section{Change History}}
+\IndexPrologue{\section{Index} \parbox{\linewidth}{Numbers written in italic
+    refer to the page where the corresponding entry is described;
+     numbers underlined refer to the
+\clindx{code line of the}{}
+    definition; numbers in roman refer to the
+\clindx{code lines}{pages}
+    where the entry is used.}\medskip}
+\value{IndexColumns}=2
+\value{GlossaryColumns}=2
+\def\changes@#1#2#3{%
+    \protected@edef\@tempa{\noexpand\glossary{#1 (#2)\levelchar
+     \ifx\saved@macroname\@empty
+       \space
+       \actualchar
+       \generalname
+     \else
+       \expandafter\@gobble
+       \saved@macroname
+       \actualchar
+       \string\verb\quotechar*%
+       \verbatimchar\saved@macroname
+       \verbatimchar
+     \fi
+     :\levelchar #3}}%
+  \@tempa\endgroup\@esphack}
+\def\SpecialMainOptIndex#1{\@bsphack\index{%
+  #1\actualchar
+  {\string\ttfamily\space#1}
+     (option)%
+  \encapchar usage}%
+    \index{options:\levelchar#1\actualchar{%
+           \string\ttfamily\space#1}\encapchar
+   usage}\@esphack}
+\def\SpecialMainKeyIndex#1{\@bsphack\index{%
+  #1\actualchar
+  {\string\ttfamily\space#1}
+     (key)%
+  \encapchar usage}%
+    \index{keys:\levelchar#1\actualchar{%
+           \string\ttfamily\space#1}\encapchar
+   usage}\@esphack}
+\def\SpecialMainJSIndex#1{\@bsphack\index{%
+  #1\actualchar
+  {\string\ttfamily\space#1}
+     (JS function)%
+  \encapchar usage}%
+    \index{JS functions:\levelchar#1\actualchar{%
+           \string\ttfamily\space#1}\encapchar
+   usage}\@esphack}
+\makeatother
+\def\IndexOpt#1{\SpecialMainOptIndex{#1}%
+    \marginpar{\raggedleft\PrintDescribeMacro{#1}}}
+\def\IndexKey#1{\SpecialMainKeyIndex{#1}%
+    \marginpar{\raggedleft\PrintDescribeMacro{#1}}}
+\def\IndexJS#1{\SpecialMainJSIndex{#1}%
+    \marginpar{\raggedleft\PrintDescribeMacro{#1}}}
+\endinput
+%%
+%% End of file `aebdocfmt.def'.

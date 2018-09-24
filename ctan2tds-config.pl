@@ -25,6 +25,7 @@ $special{'aeb-pro'}     = '&MAKEdps';
 $special{'annot-pro'}   = '&MAKEdps';
 $special{'acrotex'}     = '&MAKEdps';
 $special{'aeb-mlink'}   = '&MAKEdps';
+$special{'aeb-minitoc'} = '&MAKEdps';
 
 
 sub MAKEdps {

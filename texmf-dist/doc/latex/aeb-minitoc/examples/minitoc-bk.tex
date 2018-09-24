@@ -1,0 +1,236 @@
+\documentclass{book}
+
+% If you remove hyperref, uncomment xcolor
+%\usepackage{xcolor}
+\usepackage[linktocpage,colorlinks,bookmarksnumbered]{hyperref}
+
+\usepackage{booktabs}
+\usepackage{aeb-minitoc}
+\usepackage{multicol}
+
+\TOPLevel{chapter}\BTMLevel{subsection}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+\begin{minitocfmt}{\minitocFmtColor}
+\@A{\def\@linkcolor{blue}}
+\declaretocfmt{section}{\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{2.5em}\@N{\color{blue}}\@P{\bfseries\textsl}}
+\declaretocfmt{subsubsection}{\@W{3.1em}\@D{5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtColoriiCols}
+\@A{\def\@linkcolor{blue}\@DS{2}\@PW{1em}\NoFmtTOCEntry}
+\declaretocfmt{section}{\@W{1.6em}\@D{0em}}
+\declaretocfmt{subsection}{\@R{1.55em\@plus 2em}\@W{2.6em}\@D{1.5em}\@N{\color{blue}}\@P{\bfseries\textsl}
+}
+\declaretocfmt{subsubsection}{\@W{3.1em}\@D{5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmti}
+\declaretocfmt{section}{\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{3.1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\newcommand{\insMinitoc}[2][]{%
+    \begin{center}#2
+    \begin{minipage}[c]{0.8\linewidth}
+    \insertminitoc[#1]
+    \end{minipage}
+    \end{center}
+}
+
+\newcommand{\insMinitoctab}[2][]{%
+    \begin{center}#2
+    \begin{tabular}\toprule
+    \begin{minipage}[c]{0.8\linewidth}
+    \insertminitoc[#1]
+    \end{minipage}\\\bottomrule
+    \end{tabular}
+    \end{center}
+}
+
+\newcommand{\insMinitociiCols}[2][]{%
+    \begin{center}#2
+    \begin{minipage}[c]{.9\linewidth}
+\begin{multicols}{2}
+    \insertminitoc[#1]
+\end{multicols}
+    \end{minipage}
+    \end{center}
+}
+
+\let\env\texttt
+\let\pkg\textsf
+\def\cs#1{\texttt{\char`\\#1}}
+
+
+\begin{document}
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
+\chapter{My first chapter}
+
+The topics of this section are listed below.
+
+\insMinitoc{\TOPLevel{chapter}\BTMLevel{subsection}\small\minitocFmtColor}
+
+Now let's try a two column format using the \pkg{multicol} package.
+
+\insMinitociiCols{\TOPLevel{chapter}\BTMLevel{subsection}\small\minitocFmtColoriiCols}
+
+\noindent We've set the \cs{linewidth} of the \env{minipage} environment to
+\texttt{.9\cs{linewidth}} and set the font size to \cs{small}.
+
+%\newpage
+
+\section{First of Many}
+
+\subsection[\protect\miniorfulltoc{\textbf}{Now is the time for all good men to come to the aid of their country, so it has been said}]{Now is the time for all good men to come to the aid of their country, so it has been said}
+
+Content
+
+\addtocontents{toc}{\protect\vspace{1em}\hfill
+    Vertical Space\hfill\protect\vspace{1em}}
+
+\subsection{For all good men}
+
+Let's insert a table in this section.
+
+\begin{table}[htb]
+\begin{center}
+Hello world 1!
+\end{center}
+\caption{Cool Table 1}
+\end{table}
+
+
+\subsubsection{A subsubsection}
+
+Content
+
+\subsubsection{Another one}
+
+Content
+
+\subsection{To come to the aid}
+
+Content
+
+\begin{table}[htb]
+\begin{center}
+Hello world 2!
+\end{center}
+\caption{Cool Table 2}
+\end{table}
+
+\subsubsection{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth}
+
+Content
+
+\subsection{Of their country}
+
+Content
+
+
+\newpage
+
+\section{Second to None}
+
+
+\insMinitoc{\TOPLevel{section}\BTMLevel{subsubsection}\small\minitocFmti}
+
+\subsection{Peter Piper}
+
+Content
+
+\subsubsection{A subsubsection}
+
+Content
+
+\subsubsection{Another one}
+
+Content
+
+\begin{figure}[htb]
+\begin{center}
+Hello world 1!
+\end{center}
+\caption{Cool Figure 1}
+\end{figure}
+
+
+\subsection{Picked a peck}
+
+Content
+
+\subsection{Of pickled peppers}
+
+Content
+
+\subsubsection{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth}
+
+Content
+
+\subsection[How many pecks]{How many pecks of pickled peppers}
+
+Content
+
+\subsection{Did Peter Piper pick?}
+
+\chapter{Second Chapter}
+
+Content
+
+\section{First of Second Chapter}
+
+\insMinitoc{\TOCLevels{section}{subsubsection}\minitocFmti}
+
+Content
+
+\subsection{First: A subsection}
+
+Content
+
+\subsubsection{First: A sub-subsection, and let's make it a long one}
+
+Content
+
+\subsection{First: Another one}
+
+Content
+
+\section{Second Section  of Second Chapter}
+
+\insMinitoc{\TOCLevels{section}{subsubsection}\minitocFmti}
+
+Content
+
+\subsection{Second: A subsection}
+
+Content
+
+\subsection{Second: Another one}
+
+Content
+
+\subsubsection{Second: Another subsub, bub}
+
+
+
+\end{document}

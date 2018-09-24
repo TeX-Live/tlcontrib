@@ -1,0 +1,211 @@
+\documentclass{article}
+
+% Use the nameref package to use the \Nameref command
+\usepackage{nameref}
+% if you use hyperref, nameref is automatically loaded
+%\usepackage[linktocpage,colorlinks,bookmarksnumbered]{hyperref}
+
+\usepackage{booktabs}
+\usepackage{aeb-minitoc}
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\BTMLevel{subsubsection}
+
+\renewcommand*{\thesubsubsection}{$\bullet$}
+%\renewcommand*{\thesubsubsection}{\texorpdfstring{$\bullet$}{\textbullet}}
+\renewcommand*{\theparagraph}{\protect\P}
+\renewcommand*{\thesubparagraph}{\protect\P\protect\P}
+% definitions for main toc
+\makeatletter
+\renewcommand\l@paragraph{\@dottedtocline{\sl@paragraph}{5.0em}{1em}} %{7.0em}{4.1em}}
+\renewcommand\l@subparagraph{\@dottedtocline{\sl@paragraph}{6.0em}{1.5em}} %{7.0em}{4.1em}}
+\renewcommand\@pnumwidth{.55em}
+
+\renewcommand{\paragraph}{%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+%\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+\renewcommand{\subparagraph}{%
+    \@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}{\bfseries}}
+\def\@seccntformat#1{\csname the#1\endcsname\ }
+\makeatother
+
+\begin{minitocfmt}{\fulltocFmt}
+\declaretocfmt{subsection}{\@W{1.5em}\@D{1.5em}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{3em}}
+\declaretocfmt{paragraph}{\@W{1em}\@D{4em}}
+\declaretocfmt{subparagraph}{\@W{1.5em}\@D{5em}}
+\end{minitocfmt}
+
+%\TOCLevels{section}{subsubsubsection}
+\begin{minitocfmt}{\minitocFmti}
+\declaretocfmt{subsection}{\@W{2em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}\def\@tocrmarg{1.55em\@plus 2em}\leftskip2em
+  \rightskip\@tocrmarg {#1},\nobreak{ #2}\enspace\allowbreak}
+\end{minitocfmt}
+
+
+%\TOCLevels{subsubsection}{subparagraph}
+\begin{minitocfmt}{\minitocFmtii}
+\declaretocfmt{paragraph}{\@W{1em}\@D{0em}}
+\declaretocfmt{subparagraph}{\@W{1.5em}\@D{1em}}
+\end{minitocfmt}
+
+
+\newcommand{\insMinitoc}[2][]{%
+    \begin{center}#2
+    \begin{minipage}[c]{0.8\linewidth}
+    \insertminitoc[#1]
+    \end{minipage}
+    \end{center}
+}
+
+\newcommand{\insMinitoctab}[2][]{%
+    \begin{center}#2
+    \begin{tabular}{c}\toprule
+    \begin{minipage}[c]{0.8\linewidth}
+    \insertminitoc[#1]
+    \end{minipage}\\ \bottomrule
+    \end{tabular}
+    \end{center}
+}
+
+
+\begin{document}
+
+\fulltocFmt
+
+\tableofcontents
+
+\newpage
+
+\section{First of Many}
+
+Let's introduce a paragraph listing TOC in this section.
+
+\insMinitoc{\TOCLevels{section}{subsubsection}\minitocFmti}
+
+As an exercise in referencing a mini-toc outside its natural scope, we list
+the paragraphs and subparagraphs of the section titled \Nameref{ss:fourth}.
+
+\insMinitoctab[ss:fourth]{\TOCLevels{subsubsection}{subparagraph}\minitocFmtii}
+
+
+\subsection{A subsection}
+
+Content
+
+\subsubsection{A subsubsection}
+
+Content
+
+\subsubsection{Another one, but let us make it a much longer entry}
+
+Content
+
+\subsection{To come to the aid}
+
+Content
+
+
+\subsubsection{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth subsubsection}\mtoclabel{ss:fourth}
+
+We list the named paragraphs and subparagraphs.
+
+
+\insMinitoctab{\TOCLevels{subsubsection}{subparagraph}\minitocFmtii}
+
+
+\paragraph{A paragraph} This is filler sentence, long enough to wrap around to the next line.
+
+
+\subparagraph{A sub-paragraph}
+
+Content
+
+\subparagraph{A sub-paragraph}
+
+Content
+
+\subsubsection{A fifth subsub}
+
+Content
+
+
+\paragraph{A paragraph}
+
+Content
+
+\subsection{Of their country}
+
+Content
+
+\newpage
+
+\section{Second to None}
+
+\insMinitoc{\TOCLevels{section}{subsubsection}\minitocFmti}
+
+\noindent
+Content
+
+\subsection{Peter Piper}
+
+Content
+
+\subsubsection{A subsubsection on the second page}
+
+\insMinitoctab{\TOCLevels{subsubsection}{subparagraph}\minitocFmtii}
+
+\noindent
+Content
+
+\paragraph{A paragraph of second section} \leavevmode\medskip
+
+\noindent
+Content
+
+\subparagraph{A sub-paragraph of second section} \leavevmode\medskip
+
+\noindent
+Content
+
+\paragraph{A paragraph of second section} \leavevmode\medskip
+
+\noindent
+Content
+
+\subsubsection{Another one}
+
+Content
+
+\subsection{Picked a peck}
+
+Content
+
+\subsection{Of pickled peppers}
+
+Content
+
+\subsubsection{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth}
+
+Content
+
+\subsection[How many pecks]{How many pecks of pickled peppers}
+
+Content
+
+\subsection{Did Peter Piper pick?}
+
+Content
+
+
+\end{document}

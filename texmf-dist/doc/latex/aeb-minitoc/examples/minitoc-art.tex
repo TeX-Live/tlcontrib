@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage[linktocpage,colorlinks]{hyperref}
+\usepackage{booktabs}
+\usepackage[!nominitocs]{aeb-minitoc} % try compiling with the nominitocs option
+\usepackage{ifthen}
+
+% Try uncommenting the next line, change subsection to subsection*
+% and subsubsection to subsubsection* in the minitocfmt below. What other
+% changes are needed to get a good looking mini-toc?
+% \setcounter{secnumdepth}{0}
+
+\begin{minitocfmt}{\minitocFmt} %{tctta}
+\@A{\FmtTOCEntry}%
+\declaretocfmt{subsection}{\vspace{3pt}%
+  \@W{1.55em}\@D{0em}
+  \ifthenelse{\arabic{page}=\@Pg}
+    {\@P{\hyperlink{\@L}{\mbox{\strut--}}\mtocgobble}}
+    {}%
+}
+\declaretocfmt{subsubsection}{%
+  \ifthenelse{\mtocref{TST}=\@E}
+    {\@F{\color{blue}}}
+      {\ifthenelse{\@E<\mtocref{StoNone}}
+        {\sffamily}{}}%
+  \@W{2.5em}\@D{1.5em}
+  \ifthenelse{\arabic{page}=\@Pg}
+    {\@P{\hyperlink{\@L}{\mbox{\strut--}}\mtocgobble}}
+    {}
+}
+\end{minitocfmt}
+
+\newcommand{\insMinitoc}[2][]{%
+    \begin{center}#2
+    \begin{minipage}[c]{0.8\linewidth}
+    \ifMiniTocListings
+      \insertminitoc[#1]\else
+      \fcolorbox{blue}{yellow}{\makebox[\linewidth][c]{\textbf{A mini-toc goes here}}}\fi
+    \end{minipage}
+    \end{center}
+}
+
+\newcommand{\insMinitoctab}[2][]{%
+    \begin{center}#2
+    \begin{tabular}{c}\toprule
+    \begin{minipage}[c]{0.8\linewidth}
+    \ifMiniTocListings
+      \insertminitoc[#1]\else
+      \centering\textbf{A mini-toc goes here}\fi
+    \end{minipage}\\ \bottomrule
+    \end{tabular}
+    \end{center}
+}
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+\section{First of Many}
+
+The topic headings of this section are listed below.
+
+
+\insMinitoc{\minitocFmt}
+
+
+For long section headings, for them to wrap around, we need to take the hyperref option
+\texttt{linktocpage}, unless pdflatex or xelatex are used.
+
+\subsection{Now is the time for all good men to come to the aid  of their country, so it has been said}
+
+\addtocontents{toc}{\protect\vspace{1em}\hfill
+    Vertical Space\hfill\protect\vspace{1em}}
+
+Content
+
+% Here is a non-tricky example of the \miniorfulltoc usage
+\subsection[\protect\miniorfulltoc{\protect\textbf}{For all good men}]{For all good men}
+
+Content
+
+\subsubsection{A subsubsection, let's make it a long subsection, shall we}\mtoclabel{TST}
+
+Content
+
+\subsubsection{Another one}
+
+Content
+
+
+
+\vfill Page break induced
+\newpage
+
+\subsection{To come to the aid}
+
+Content
+
+\subsubsection{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth}
+
+Content
+
+\subsection{Of their country}
+
+Content
+
+
+\newpage
+
+\section{Second to None}\mtoclabel{StoNone}
+
+\insMinitoctab{\minitocFmt}
+
+
+Content
+
+\subsection{Peter Piper}
+
+Content
+
+\subsubsection{A subsubsection}
+
+Content
+
+\subsubsection{Another one}
+
+Content
+
+\vfill Page break induced
+\newpage
+
+
+\subsection{Picked a peck}
+
+Content
+
+\subsection{Of pickled peppers}
+
+Content
+
+% Here is the answer to the question posed in the manual. \mtocgobble is a public version of the \@gobble of latex
+% These changes do not appear in the table of contents as displayed by \tableofcontents.
+\subsubsection[\protect\miniorfulltoc{A \protect\emph{third} sub\protect\textcolor{blue}{sub}section \protect\textcolor{red}{$\Leftarrow$}\protect\mtocgobble}{}]{A third subsubsection}
+
+Content
+
+\subsubsection{A fourth}
+
+Content
+
+\vfill Page break induced
+\newpage
+
+
+\subsection[How many pecks]{How many pecks of pickled peppers}
+
+Content
+
+\subsection{Did Peter Piper pick?}
+
+Content
+
+\end{document}

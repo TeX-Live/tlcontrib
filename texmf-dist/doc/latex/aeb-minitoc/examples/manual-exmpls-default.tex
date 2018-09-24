@@ -1,0 +1,268 @@
+\documentclass{article}
+\usepackage[linktocpage,colorlinks,bookmarksnumbered]{hyperref}
+\usepackage{booktabs}
+\usepackage[!nominitocs]{aeb-minitoc}
+\usepackage{ifthen}
+
+\let\db\mtocgobble
+
+% Same as manual-exmpls, but with numbers at all levels. Numerous adjustments
+% to the mini-toc entries were necessary.
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+\makeatletter
+\def\cs#1{\texttt{\@backslashchar#1}}
+\makeatother
+
+\title{Examples from the aeb-minitoc manual}
+\author{D. P. Story}
+
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{subsection}{\@W{1.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{2.5em}\@D{1.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmti}
+\@A{\def\@linkcolor{blue}\@PW{1.5em}}%
+\declaretocfmt{subsection}{\@W{1.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{2.5em}\@D{1.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtii}
+\declaretocfmt{subsection}{\@W{1.7em}\@D{0em}\@N{\textbf}}
+\declaretocfmt{subsubsection}{\@W{2.5em}\@D{1.7em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtvii}
+\declaretocfmt{subsection}{\@W{1.7em}\@D{0em}\@F{\bfseries}}
+\declaretocfmt{subsubsection}{\@W{2.5em}\@D{1.7em}\@F{\color{blue}}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtiv}
+\@A{\FmtTOCEntry}
+\declaretocfmt{subsection}{\@W{1.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{2.5em}\@D{1.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtv}
+\declaretocfmt{paragraph}{\@W{3.3em}\@D{0em}}
+\declaretocfmt{subparagraph}{\@W{4em}\@D{3.3em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtvi}
+\@A{\@PW{1em}}
+\declaretocfmt{subsection}{\@W{2em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{2.3em}
+  \@R{1.55em plus 2em}\leftskip2em\relax
+  \rightskip\@tocrmarg\relax{#1},\nobreak{ #2}\enspace\allowbreak}
+\end{minitocfmt}
+
+\newcommand{\insMinitoc}[2][]{%
+  \begin{center}#2
+  \begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}
+  \end{center}
+}
+
+\newcommand{\insMinitoci}[2][]{%
+  \begin{center}#2
+  \begin{minipage}[c]{0.8\linewidth}
+  Contents of Section~\ref*{CandM}: \nameref*{CandM}
+  \par\kern2pt
+  \insertminitoc[#1]
+  \end{minipage}
+  \end{center}
+}
+
+\newcommand{\insMinitoctab}[2][]{%
+  \begin{center}#2
+  \begin{tabular}{c}\toprule
+  \begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}\\ \bottomrule
+  \end{tabular}
+  \end{center}
+}
+
+\newcommand{\insMinitocfbox}[2][]{%
+  \begin{center}#2
+  \fbox{\begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}}
+  \end{center}
+}
+
+
+
+\begin{document}
+
+\maketitle
+
+\bgroup
+\value{secnumdepth}=3
+\value{tocdepth}=3
+\tableofcontents
+\egroup
+
+\newpage
+
+\section{Introduction}
+
+Content removed
+
+\section{Required packages and options}
+
+Content removed
+
+\section{Commands and methods}\mtoclabel{CandM}
+
+\insMinitoci{\minitocFmt}
+
+\subsection[\protect\miniorfulltoc{\protect\textbf}{Setting the top and bottom levels}]{Setting the top and bottom levels}
+
+Content removed
+
+\subsubsection{Automatically setting the levels}
+
+Content removed
+
+\subsubsection{Manually setting the levels}
+
+Content removed
+
+\subsection{The \texorpdfstring{\protect\cs{insertminitoc}}{\textbackslash{insertminitoc}} command}\mtoclabel{insertminitoc}
+
+Content removed
+
+\subsubsection{The \texttt{minitocfmt} environment}
+
+Content removed
+
+\subsubsection{Some examples that illuminate}\mtoclabel{SExmpls}
+
+Content removed
+
+\goodbreak
+
+\paragraph{Some basic examples} \leavevmode
+
+\subparagraph{First Example}  \leavevmode
+
+\insMinitoc[CandM]\minitocFmt
+
+\subparagraph{The TOC listing on page~\pageref*{SExmpls}} \leavevmode
+
+\insMinitoc[SExmpls]{\TOCLevels{subsubsection}{subparagraph}\minitocFmtv}
+
+\subparagraph{Color the page numbers} \leavevmode
+
+\insMinitoc[CandM]\minitocFmti
+
+\subparagraph{Make section numbers bold} \leavevmode
+
+\insMinitoc[CandM]\minitocFmtii
+
+\subparagraph{Make section headings some bold, some blue} \leavevmode
+
+\insMinitoc[CandM]\minitocFmtvii
+
+\paragraph{Some more advanced examples} \leavevmode
+
+\subparagraph{Formatting sections with no section number} \leavevmode
+
+\begin{minitocfmt}{\minitocFmtstar}
+\declaretocfmt{subsection*}{\@W{0em}\@D{0em}}
+\end{minitocfmt}
+\insMinitoctab[myRetirement]{\TOCLevels{section}{subsection}\minitocFmtstar}
+
+\subparagraph{Formatting individual title headings} \leavevmode
+
+\insMinitoc[CandM]\minitocFmtiv
+
+
+\subparagraph{A custom entry for \protect\cs{subsubsection}} \leavevmode
+
+\insMinitoc[CandM]\minitocFmtvi
+
+\subparagraph{Using \texorpdfstring{\protect\cs{@E}}{\textbackslash{@E}} for greater formatting control} \leavevmode
+
+\begin{minitocfmt}{\minitocFmtF}
+\declaretocfmt{subsection}
+  {\@W{2em}\@D{0em}
+   \ifthenelse{\@E=\mtocref{insertminitoc}}{\@F{\bfseries}}{}}
+\declaretocfmt{subsubsection}
+  {\@W{2.5em}\@D{2em}
+   \ifthenelse{\@E > \mtocref{insertminitoc}\and\@E < \mtocref{MPW}}
+   {\@F{\color{blue}}}{}}
+\end{minitocfmt}
+\insMinitoc[CandM]{\TOCLevels{section}{subsubsection}\minitocFmtF}
+
+\subparagraph{No leaders using \texorpdfstring{\protect\cs{@B}}{\textbackslash{@B}}} \leavevmode
+
+\begin{minitocfmt}{\minitocFmtB}
+\declaretocfmt{subsection}
+  {\vspace{6pt}\@W{2em}\@B{0em}\@F{\bfseries}\@N{\bfseries}\@P{\bfseries}}
+\declaretocfmt{subsubsection}
+  {\@W{2.5em}\@D{2em}}
+\end{minitocfmt}
+
+\insMinitoc[CandM]\minitocFmtB
+
+\subparagraph{Using the
+  \texorpdfstring{\protect\cs{@L} and \protect\cs{@Pg}}{\textbackslash{@L}
+    and \textbackslash{@Pg}} commands} \leavevmode
+
+\begin{minitocfmt}{\minitocFmtPara} % Para
+\@A{\@PW{2.5em}\@R{7em}}
+\declaretocfmt{paragraph}
+  {%
+    \@W{3.2em}\@D{0em}
+    \ifthenelse{\arabic{page}=\@Pg}
+      {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}
+      {}
+  }
+\declaretocfmt{subparagraph}
+  {%
+    \@W{4.1em}\@D{3.2em}
+    \ifthenelse{\arabic{page}=\@Pg}
+      {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}
+      {}
+  }
+\end{minitocfmt}
+
+\hfuzz12pt
+\insMinitoc[SExmpls]{\TOCLevels{subsubsection}{subparagraph}\minitocFmtPara}
+
+\paragraph{Using \texorpdfstring{\texttt{minitocfmt} with \protect\cs{tableofcontents}}
+  {minitocfmt with \textbackslash{tableofcontents}}}\leavevmode
+
+\subsubsection{Alternate presentations of the mini-toc}
+
+Content removed
+
+\paragraph{Predefined presentations} \leavevmode
+
+Defined in preamble
+
+\subparagraph{Enclose the mini-toc in an \texorpdfstring{\protect\cs{fbox}}{\textbackslash{fbox}}} \leavevmode
+
+\insMinitocfbox[CandM]{\TOCLevels{section}{subsubsection}\minitocFmt}
+
+\subparagraph{Enclose the mini-toc in a ruled tabular environment} \leavevmode
+
+\insMinitoctab[CandM]{\minitocFmt}
+
+
+\section{Methodology}\mtoclabel{MPW}
+
+Content removed
+
+\section{My retirement}\mtoclabel{myRetirement}
+
+\subsection*{Time to get back to it, dps}
+\addcontentsline{toc}{subsection}{Time to get back to it, dps}
+
+\end{document} 

@@ -1,0 +1,1284 @@
+%
+% Need some discussion on workflow
+%
+% makeindex < aebpro_man.idx > aebpro_man.ind
+\documentclass[10pt]{article}
+\usepackage[fleqn]{amsmath}
+%\usepackage{hyperref}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,latextoc,pro,addtoHyOpts={pagebackref=false}},
+    eforms,
+%    linktoattachments,
+    aebxmp
+]{aeb_pro}
+\usepackage{booktabs}
+\usepackage{aeb_mlink}
+\usepackage{aeb-minitoc}
+\usepackage{graphicx,array}
+\usepackage{ifthen}
+%\usepackage{myriadpro}
+%\usepackage{calibri}
+
+\usepackage[altbullet]{lucidbry}
+
+\usepackage{xbmks}
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
+\addtolength{\marginparwidth}{20pt}
+
+%\previewtrue
+%\usepackage{makeidx}
+%\makeindex
+\usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\makeatletter
+\renewcommand*{\thesubsubsection}{\texorpdfstring{$\bullet$}{\textbullet}}
+\renewcommand*{\theparagraph}{\texorpdfstring{\protect\P}{\textparagraph}}
+\renewcommand*{\thesubparagraph}{\texorpdfstring{\protect\P\protect\P}{\textparagraph\textparagraph}}
+\renewcommand{\paragraph}
+    {\renewcommand{\@seccntformat}[1]{\theparagraph\space}%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+\renewcommand{\subparagraph}
+    {\renewcommand{\@seccntformat}[1]{\thesubparagraph\space}%
+    \@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}{\bfseries}}
+
+\def\chgCurrLblName#1{\def\@currentlabelname{#1}}
+\def\echgCurrLblName#1{\edef\@currentlabelname{#1}}
+\let\db\@gobble
+\makeatother
+
+%\getDimsFromGraphic{graphics/dpsweb}{\dpswebW}{\dpswebH}
+
+
+%\urlstyle{rm}
+\urlstyle{sf}
+\let\uif\textsf
+\let\app\textsf
+\def\psf#1{\textbf{\textsf{#1}}}
+%\let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent}
+
+\renewcommand*\descriptionlabel[1]{\hspace\labelsep
+    \normalfont #1}
+
+
+\DeclareDocInfo
+{
+    university={Acro\negthinspace\TeX.Net},
+    title={The \textsf{aeb-minitoc} package\texorpdfstring{\\}{: } Inserting TOCs within a section},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Documentation for the aeb-minitoc package from AcroTeX: Inserting TOCs within a section},
+    talksite={\url{www.acrotex.net}},
+    version={1.6, 2018/09/21},
+    Keywords={AcroTeX, mini-toc},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textbullet}}
+
+\widestNumber{0.00.}
+%\pagestyle{empty}
+%\parindent0pt\parskip\medskipamount
+
+\def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\newcount\fldCnt \fldCnt=0
+\def\incFldCnt{\global\advance\fldCnt1\relax}
+
+\BTMLevel{subsubsection}
+
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmti}
+\@A{\def\@linkcolor{red}\@PW{1.5em}}%
+\declaretocfmt{subsection}{\@R{1.55em\@plus 2em}\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtii}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{0em}\@N{\textbf}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtvii}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{0em}\@F{\bfseries}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{2.5em}\@F{\color{blue}}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtiv}
+\@A{\FmtTOCEntry}
+\declaretocfmt{subsection}{\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtv}
+\declaretocfmt{paragraph}{\@W{1em}\@D{0em}\@R{1.55em plus 2em}}
+\declaretocfmt{subparagraph}{\@W{1.5em}\@D{1em}}
+\end{minitocfmt}
+
+\begin{minitocfmt}{\minitocFmtvi}
+\@A{\@PW{1em}}
+\declaretocfmt{subsection}{\@W{2em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}
+  \@R{1.55em plus 2em}\leftskip2em\relax
+  \rightskip\@tocrmarg\relax{#1},\nobreak{ #2}\enspace\allowbreak} %\allowbreak
+\end{minitocfmt}
+
+\newcommand{\insMinitoci}[2][]{%
+  \begin{center}#2
+  \begin{minipage}[c]{0.8\linewidth}
+  Contents of Section~\ref*{CandM}: \nameref*{CandM}
+  \par\kern2pt
+  \insertminitoc[#1]
+  \end{minipage}
+  \end{center}
+}
+
+\newcommand{\insMinitoctab}[2][]{%
+  \begin{center}#2
+  \begin{tabular}{c}\toprule
+  \begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}\\ \bottomrule
+  \end{tabular}
+  \end{center}
+}
+
+\newcommand{\insMinitocfbox}[2][]{%
+  \begin{center}#2
+  \fbox{\begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}}
+  \end{center}
+}
+
+\def\MP#1{\marginpar{\raggedleft\small\itshape #1}}
+\frenchspacing
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The aeb-minitoc package MANUAL";
+var manualfilename="Manual_BG_Print_minitoc.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
+
+\selectColors{linkColor=black}
+\bgroup
+\value{secnumdepth}=3
+\value{tocdepth}=3
+\tableofcontents
+\egroup
+\selectColors{linkColor=webgreen}
+
+\def\AcroT{Acro\!\TeX}\def\cAcroT{\textcolor{blue}{\AcroT}}
+\def\AcroEB{\AcroT{} eDucation Bundle}\def\cAcroEB{\textcolor{blue}{\AcroEB}}
+\def\AcroB{\AcroT{} Bundle}\def\cAcroB{\textcolor{blue}{\AcroB}}
+\def\bUrl{http://www.math.uakron.edu/~dpstory}
+
+\hypersetup{linktocpage}
+
+\section{Introduction}
+
+I was asked by a friend to write a small package to insert a ``mini-toc'' into
+the document body, and this is the result of that favor.
+
+%\begin{center}\minitocFmtvi
+%\begin{minipage}[c]{.8\linewidth}
+%\TOCLevels{section}{subsubsection}
+%\insertminitoc[3]\relax
+%\end{minipage}
+%\end{center}
+
+
+\section{Required packages and options}
+
+This package has been tested for the \texttt{book}, \texttt{report}, and \texttt{article} classes. It uses
+the {\LaTeX} core commands for building a table of contents---with or without \pkg{hyperref}. One requirement
+is that if \pkg{hyperref} is used, it must be loaded \textit{before} this package, so it can be detected.
+
+There are only two options for this package:
+\begin{aebDescript}
+    \item[\opt{nomintocs}] If this options is in effect, no mini-tocs are
+        created. Useful during document development. The \pkg{aeb-minitoc}
+        package reads the \cs{jobname.toc} file each time it encounters the
+        \cs{insertminitoc}; using this option reduces compile time. The
+        Boolean switch \cs{ifMiniTocListings} is set to false.\footnote{Refer
+        to the sample file \texttt{minitoc-art.tex} to see how this switch
+        might be used.}
+    \item[\opt{!nominitocs}] The negation of the previous option, when
+        \opt{!nominitocs} is in effect, mini-tocs are created. This is a
+        convenience option to make it simple to switch between mini-tocs and
+        no mini-tocs.
+\end{aebDescript}
+When no option is passed, mini-tocs are created.
+
+\newtopic\noindent\llap{\textcolor{red}{{\small\textit{Warning! }}\ding{042}}\enspace}%
+This package modifies the entries in the \cs{jobname.toc} file. For this
+package to work as designed, it must be loaded after any other package that
+modifies the TOC file.
+
+\section{Commands and methods}\mtoclabel{CandM}
+
+The few commands this package defines, as well as the discussion of various
+methods necessary to design your own mini-toc, are presented in this section.
+
+\insMinitoci{\minitocFmt}
+
+\subsection[\protect\miniorfulltoc{\protect\textbf}{Setting the top and bottom levels}]{Setting the top and bottom levels}
+%\subsection[\protect\miniorfulltoc{Setting the \protect\emph{top} and \protect\emph{bottom} levels\protect\GOBBLE}{Setting the top and bottom levels}]{Setting the top and bottom levels}
+
+%\subsection{Setting the top and bottom levels}
+
+The section title refers to establishing what section entries are to appear in your mini-toc. This can be done
+automatically or manually. What is meant by the top and bottom levels?
+\begin{itemize}
+   \item The \emph{top level} is a section name (chapter, part, section,
+       subsection, paragraph, subparagraph) that you want to list the
+       subsections of. For example, this document employs article
+       class, the top most level has been automatically set to section.
+       Thus, within each section (\cs{section}), a mini-toc can be inserted to list the
+       titles entries for all subsections, subsubsections, paragraphs, and subparagraphs.
+       Section~\ref{CandM} is a \cs{section}, and I've inserted a mini-toc just
+       after the introductory paragraph.
+   \item The \emph{bottom level} is a section name that is the lowest
+       section (in the hierarchy) that is to be included in the mini-toc.
+       In the table above, the bottom level for an article class
+       is subsubsection.
+\end{itemize}
+
+\subsubsection{Automatically setting the levels}
+
+The table below displays the automatic default levels.
+\begin{quote}
+\begin{tabular}{lll}
+\bfseries class & \bfseries top-level & \bfseries bottom-level\\\hline
+book    & chapter   & subsection\\
+report  & chapter   & subsection\\
+article & section   & subsubsection
+\end{tabular}
+\end{quote}
+
+\subsubsection{Manually setting the levels}
+
+The top and bottom levels may be set with the commands \cs{TOPLevel\darg{\ameta{top-level}}} and
+\cs{BTMLevel\darg{\ameta{btm-level}}}, respectively. For example, declaring
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\TOPLevel{section}
+\BTMLevel{paragraph}
+%!normalfont( or alternatively)
+\TOCLevels{section}{paragraph}
+\end{Verbatim}
+in an article class document will include any \cs{paragraph} title entries as well, provided
+the \texttt{tocdepth} counter is at least 4.
+
+\cs{TOCLevels\darg{\ameta{top-level}}\darg{\ameta{btm-level}}} combines the
+above two commands; the first argument is passed to \cs{TOPLevel} and the
+second to \cs{BTMLevel}. If an argument in any of the commands mentioned here
+are empty, that level goes unchanged from the current level setting (for the
+bottom or top level).
+
+
+
+\subsection{The \texorpdfstring{\protect\mlcs{insertminitoc}}{\textbackslash{insertminitoc}} command}\mtoclabel{insertminitoc}
+
+The main command of this package is,
+%
+\bVerb\takeMeasure{\string\insertminitoc[\ameta{label-name}]}%
+\setlength{\dimen0}{\wd\webtempboxi+2\fboxsep+2\fboxrule}%
+\def\1{\rlap{\mbox{\sffamily\hskip\dimen0 (OK to use \texttt{@} in environment)}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\insertminitoc[!ameta(label-name)]
+\end{dCmd}
+\eVerb When expanded without its optional argument, it defaults to a reference
+to the most recent section. When the optional argument is used, \ameta{label-name}
+is the name of a label set by the special \cs{mtoclabel} command, described in
+the paragraph \textbf{\mlnameref{para:mtocRef}} on page~\pageref*{para:mtocRef}.
+
+The \cs{insertminitoc[\ameta{label-name}} expands to a mini-toc that displays the subsections
+(subsections here also includes subsubsections, paragraphs, and
+subsubparagraphs) of that top-level section down to (and including) the
+subsection declared as the bottom level in the \cs{BTMLevel} (or
+\cs{TOCLevels}) command. The top-level section is not listed in the mini-toc.
+
+
+\paragraph*{Placement of the command} \leavevmode
+\begin{itemize}
+   \item (The ideal or usual placement) Place \cs{insertminitoc} inside the top-level
+   section and above any other section heading. In this case, no optional parameter is
+   needed. For example, assuming the top-level is `section',
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\section{My cool topics}
+...
+\insertminitoc\relax %!sffamily( !cs(relax) stops !LaTeX!space from looking for optional argument)
+...
+\subsection{The very next heading}
+...
+\end{Verbatim}
+  \item (Moving the command elsewhere) There may be a need to place a
+      mini-toc in a less than ideal location. In this case, use the
+      \cs{mtoclabel\darg{\ameta{label-name}}} command to mark the section
+      and pass the \ameta{label-name} as the optional argument. To illustrate,
+      again assume `section' is the top-level for a mini-toc.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!@^}]
+...
+\insertminitoc[myCT]
+...
+\section{My cool topics}!bfseries\mtoclabel{myCT}
+...
+!textsf@(Other content, including various section headings)^
+...
+\insertminitoc[!textbf@myCT^]
+...
+\end{Verbatim}
+In the above code, a mini-toc is place twice, once before the top-level
+section and once well below it. These techniques are illustrated many times
+throughout this manual.
+\end{itemize}
+
+\paragraph*{Referencing the top-level section.}\label{para:mtocRef} As mentioned
+in the previous paragraph, you can mark section commands (chapter, part,
+section, subsection, subsubsection, paragraph, and subparagraph) using a
+special label command (\cs{mtoclabel\darg{\ameta{label-name}}}) defined by
+\pkg{aeb-minitoc}. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\section{My cool topics}\mtoclabel{myCT}
+\end{Verbatim}
+The \cs{mtoclabel} command also emits the \cs{label}
+command,\footnote{\cs{label} is emitted with the same \ameta{label-name}}
+thus, you can both reference the above section in the usual manner
+(\verb|Section~\ref{myCT}|) and reference the section in the optional
+argument of \cs{insertminitoc} (\cs{insertminitoc[myCT]}). \emph{Do not
+pass}\MP{Warning!} a label name to the optional argument of
+\cs{insertminitoc} \emph{that has not been declared} using \cs{mtoclabel}.
+
+
+
+
+\subsubsection{The \texttt{minitocfmt} environment}
+
+This environment is used to declare the formatting for the mini-toc entries created by
+\cs{insertminitoc}.
+\bVerb\takeMeasure{... \%\sffamily{ additional \texttt{\string\declaretocfmt} statements}}%
+\setlength{\dimen0}{\wd\webtempboxi+2\fboxsep+2\fboxrule}%
+\def\1{\rlap{\mbox{\sffamily\hskip\dimen0 (OK to use \texttt{@} in environment)}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{minitocfmt}{\!ameta(cmdName)}
+\@A{!ameta(various)} %!sffamily( optional)
+!1\declaretocfmt{!ameta(sec-name)}{!ameta(various)}
+\declaretocfmt{!ameta(sec-name)*}{!ameta(various)}
+... %!sffamily( additional !texttt(\declaretocfmt) statements)
+\end{minitocfmt}
+\end{dCmd}
+\eVerb The purpose of this environment is to define formatting for a mini-toc. The formatting
+commands are saved in the body of the macro \cs{\ameta{cmdName}}; expand this macro prior to
+\cs{insertminitoc} to get the formatting declared within the environment.
+
+The content of the environment takes two types of commands:
+\begin{description}
+  \item[\cs{@A\darg{\ameta{various}}}]\hskip-.5em\relax\space is a command that is not used very
+      often, but is available when needed. The argument \ameta{various} is
+      various commands to support the min-toc being generated. For example,
+      Assuming \pkg{hyperref} is loaded and you want to change the color of
+      the page links. What you can do is
+      \cs{@A\darg{\string\def\string\@linkcolor\darg{blue}}}; this defines the link color that
+      \pkg{hyperref} will use to color the link. It is done in a group, so
+      it does not affect content outside the environment.
+\begin{description}
+      \item[\cs{@PW\darg{\ameta{length}}}] Within\MP{pg num box width} the argument of
+          \cs{@A}, you can insert \cs{@PW\darg{\ameta{length}}} to set
+          the width of the box that contains the page number
+          (\cs{@pnumwidth}). The value set by {\LaTeX} is
+          \texttt{1.55em}.
+      \item[\cs{@DS\darg{\ameta{num}}}] The \ameta{num}\MP{dots separation} determines the
+          separation between dots for a TOC entry that uses a dotted rule
+          line. This command is only recognized within the argument of
+          \cs{@A}. The default is 4.5.
+      \item[\cs{@R\darg{\ameta{length}}}]\hskip-.5em\space is a\MP{right margin of title}
+          convenience command, it takes its argument and defines the
+          {\LaTeX} command \cs{@tocrmarg}, which sets the right margin
+          for the sec-title. The length set by {\LaTeX} is
+          \texttt{2.55em}. The \ameta{length} of \cs{@R} should be \emph{larger
+          than} the \ameta{length} set by \cs{@PW}.
+\end{description}
+  \item[\cs{declaretocfmt\darg{\ameta{sec-name}}\darg{\ameta{various}}}]
+    This command formats all \ameta{sec-name} (section, subsection, etc.) entries.
+
+    A `typical' table of contents entry has the form:
+\begin{quote}\ttfamily
+\ameta{sec-num}\:\ameta{title-heading}\dotfill\ameta{pg-num}
+\end{quote}
+Should you include sections in your document that have no section number
+(either by setting \cs{setcounter\darg{secnumdepth}} to a smaller number or
+by manually placing a \texttt{*}-section into the table of contents), the
+\ameta{sec-num} does not appear. For these types of entries, use a
+\texttt{*}-declaration
+\cs{declaretocfmt\darg{\ameta{sec-name}*}\allowbreak\darg{\ameta{various}}}.\footnote{Refer to
+sample file \texttt{minitoc-art-star.tex} for an example of this.}
+
+Within the \ameta{various} argument, there are a number of commands that
+are recognized:
+\begin{description}
+    \item[\cs{@W\darg{\ameta{length}}}]\hskip-.5em\relax\space is\MP{sec
+        num box width} the width of the box that encloses
+        \ameta{sec-num}. Normally, all lengths are measured in
+        \texttt{em} units (\cs{@W\darg{\ameta{num}em}}). The default
+        length is \texttt{2.5em}
+    \item[\cs{@D\darg{\ameta{length}}}]\hskip-.5em\relax\space is\MP{use dots} the
+        amount to indent prior to \ameta{sec-num}. Again, \texttt{em}
+        units preferred (\cs{@D\darg{\ameta{num}em}}). When the \cs{@D}
+        command is present in the argument, a dotted line is
+        to be used for the entry (this is the norm). If \cs{@D} not
+        present, there is an opportunity within the \ameta{various}
+        argument to create a custom entry. See the example
+        \textbf{\nameref{subpara:Custom}} on
+        page~\pageref*{subpara:Custom} for more information.
+    \item[\cs{@B\darg{\ameta{length}}}] Same as \cs{@D}\MP{no dots}, but no dotted leaders are created.
+    \item[\cs{@N\darg{\ameta{fmt}}}]\hskip-.5em\relax\space is\MP{fmt sec num} the
+        formatting for \ameta{sec-num}. You can pass a command with one
+        argument that will operate on the section number; for example,
+        \cs{@N\darg{\cs{textbf}}}, \cs{@N\darg{\cs{color\darg{blue}}}},
+        or \cs{@N\darg{\cs{color\darg{blue}}\cs{textbf}}}. Note that
+        changing the style to bold might require a corresponding change
+        in \cs{@W}.
+    \item[\cs{@F\darg{\ameta{fmt}}}]\hskip-.5em\relax\space is\MP{fmt title} the formatting
+        for the title heading of the current section; for example, \cs{@F\darg{\string\bfseries}}
+        turns all heading, for this \ameta{sec-name}, bold.
+    \item[\cs{@P\darg{\ameta{fmt}}}]\hskip-.5em\relax\space is the\MP{fmt pg num}
+        formatting for the page number (\ameta{pg-num}). You can pass a
+        command with one argument that will operate on the page number
+        When \pkg{hyperref} is loaded with the \opt{colorlinks} option,
+        we cannot change the color of the page number (see the discussion
+        of \cs{@A} above), but \cs{@P\darg{\string\textit}} changes the
+        numbers to italics. If \pkg{hyperref} is not loaded,
+        \cs{@P\darg{\string\color\darg{red}\string\textit}} changes page
+        numbers to a red italic.
+    \item[\cs{@R\darg{\ameta{length}}}]\hskip-.5em\space is\MP{right margin of title} a convenience
+        command, it takes its argument and defined the {\LaTeX} command
+        \cs{@tocrmarg}, which sets the right margin for the sec-title.
+        The length set by {\LaTeX} is \texttt{2.55em}. Setting \cs{@R}
+        within the \ameta{various} argument of \cs{declaretocfmt} affects
+        the current section level as well as all lower section levels. If
+        you want to make this `local' change, you need to put \cs{@R}
+        back to its default of \texttt{2.55em} locally for other
+        declarations.
+    \item[\cs{@E}] Within\MP{TOC number} the \env{minitocfmt} environment, the command
+        \cs{@E} expands to the current TOC entry number of the TOC entry
+        being read in. Read the discussion in
+        \hyperref[MPW]{Section~\ref*{MPW}}, page~\pageref*{MPW}, for more
+        information. The paragraph \textbf{\mlnameref{subpara:@E}} on
+        page~\pageref*{subpara:@E} discusses one possible use of this
+        command.
+    \item[\cs{@L}] This\MP{link anchor} macro expands to the \pkg{hyperref} anchor of the
+        page entry reference, it is empty if \pkg{hyperref} is not
+        loaded.
+    \item[\cs{@Pg}] This\MP{pg number} macro expands to the page number this entry
+        references.
+  \end{description}
+\end{description}
+A useful macro, as we shall see in the subsequent examples, is
+\cs{mtocgobble}\MP{\cs{mtocgobble} described}, defined by \pkg{aeb-minitoc}. The macro absorbs (gobbles) the next token.
+For those unfamiliar with such a macro, here is a simple example: My name is
+\verb~D. P. Stor\mtocgobble{e}y~, this code expands to ``D. P. Stor\mtocgobble{e}y''. Not so impressive,
+but the argument of \cs{mtocgobble} is oftentimes another macro or an expression grouped by braces (\texttt{\{\}}).
+For example, \verb~\def\dps{ there}Don says `Hi\mtocgobble\dps!'~, which expands to
+\def\dps{ there}``Don says `Hi\mtocgobble\dps!''' See the paragraph \textbf{\nameref{spara:LPg}} on page~\pageref*{spara:LPg}
+for an example of use. The macro is also used in some of the example files.
+
+\subsubsection{Some examples that illuminate}\mtoclabel{SExmpls}
+
+Having introduced the basic command structure for \pkg{aeb-minitoc}, let's
+now do some examples. For your convenience, we present a mini-toc of the examples of this section.
+
+\begin{center}\minitocFmtv
+\TOCLevels{subsubsection}{subparagraph}
+\begin{minipage}[c]{0.8\linewidth}
+\insertminitoc\relax
+\end{minipage}
+\end{center}
+
+
+\paragraph[Some basic examples]{Some basic examples.} We present some examples that illustrate
+the special commands described above, these are \cs{@W}, \cs{@D}, \cs{@N}, and \cs{@F}.
+
+\subparagraph{First Example.} We begin with the mini-toc on
+page~\pageref{CandM}.\medskip \bVerb\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}
+\begin{minipage}[c]{.5\linewidth-5pt}\small\kern0pt
+\minitocFmt\insertminitoc[CandM]
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small]
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{subsectn
+  {\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+...
+\begin{center}\minitocFmt
+\begin{minipage}[c]{0.8\linewidth}
+\insertminitoc[CandM]
+\end{minipage}
+\end{center}
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\medskip\eVerb \textbf{Important Rule:} The value of \cs{@D} for one level is
+(usually) the sum of the values of \cs{@W} and \cs{@D} from the one level higher up;
+thus, for \texttt{subsubsection}, I put \cs{@D\darg{2.5em}}, \texttt{2.5em} is the sum
+of \texttt{2.5em} and \texttt{0em}, in the \texttt{subsection} declarations.
+
+\subparagraph{The TOC listing on page~\pageref*{SExmpls}.} Within the
+\cs{subsubsection}, titled `\mlnameref{SExmpls}', place another
+\cs{insertminitoc} after we define a new \env{minitocfmt} environment and
+reset the TOC levels.
+\medskip
+\bVerb\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\TOCLevels{subsubsection}{subparagraph}\small
+\minitocFmtv\insertminitoc[SExmpls]
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small]
+\TOCLevels{subsubsection}{subparagraph}
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{paragraph}
+  {\@W{1em}\@D{0em}\@R{1.55em plus 2em}}
+\declaretocfmt{subparagraph}
+  {\@W{1.5em}\@D{1em}}
+\end{minitocfmt}
+...
+\begin{center}\minitocFmt
+\begin{minipage}[c]{0.8\linewidth}
+\insertminitoc[SExmpls]
+\end{minipage}
+\end{center}
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\medskip\eVerb
+
+\noindent\llap{\textcolor{red}{\ding{042}}\enspace}%
+At this point onward, we will not display the part of the verbatim code containing \cs{insertminitoc} as they are
+all similar to the two examples above.
+
+
+\subparagraph[Color the page numbers]{Color the page numbers.} We use the
+command \cs{@A} to color the pages. Because \pkg{hyperref} is used in this
+document, we pass a redefinition of the link color through \cs{@A}.
+\medskip \bVerb\par
+\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}%
+\begin{minipage}[c]{.5\linewidth-5pt}\hfuzz2pt\small\kern0pt
+\minitocFmti\insertminitoc[CandM]%
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmt}
+!textbf(\@A{\def\@linkcolor{red}})
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\medskip\eVerb Notice the second line in the right column,  highlighted in bold.
+
+%...
+%\begin{center}\minitocFmt
+%\begin{minipage}[c]{0.8\linewidth}
+%\insertminitoc[CandM]
+%\end{minipage}
+%\end{center}
+
+\subparagraph[Make section numbers bold]{Make section numbers bold.} The \cs{@N} command is used.
+\medskip \bVerb
+\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}
+\begin{minipage}[c]{.5\linewidth-5pt}\small\kern0pt
+\minitocFmtii\insertminitoc[CandM]
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}!textbf(\@N{\textbf})}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\eVerb
+
+%...
+%\begin{center}\minitocFmt
+%\begin{minipage}[c]{0.8\linewidth}
+%\insertminitoc[CandM]
+%\end{minipage}
+%\end{center}
+
+
+\subparagraph[Make section headings some bold, some blue]
+  {Make section headings some bold, some blue.} The \cs{@F} command is used.
+\medskip \bVerb
+\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}
+\begin{minipage}[c]{.5\linewidth-5pt}\small\kern0pt
+\minitocFmtvii
+\insertminitoc[CandM]
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmt}
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}!textbf(\@F{\bfseries})}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}!textbf(\@F{\color{blue}})}
+\end{minitocfmt}
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\eVerb
+
+%...
+%\begin{center}\minitocFmt
+%\begin{minipage}[c]{0.8\linewidth}
+%\insertminitoc[CandM]
+%\end{minipage}
+%\end{center}
+
+
+\paragraph[Some more advanced examples]{Some more advanced examples.}
+Now for some trickier examples. These are increasing in complexity.
+
+\subparagraph[Formatting sections with no section number]{Formatting sections
+with no section number.}\label{spara:noNums} Again, by `section', all sections are referred to
+(chapter, part, section, subsection, subsubsection, paragraph, and
+subparagraph). In section~\ref{myRetirement}, I've created a subsection using
+\cs{subsection*}. Such a section heading has no section number and is written
+to the TOC file, by default. First, we need to get it into the TOC file (\cs{jobname.toc}); this
+is done as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\section{My retirement}\mtoclabel{myRetirement}
+
+\subsection*{Time to get back to it, \dps}
+\addcontentsline{toc}{subsection}{Time to get back to it,
+  \texorpdfstring{\protect\dps}{dps}}
+\end{Verbatim}
+We mark it with \cs{mtoclabel}. Now we create a \env{minitocfmt} environment:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmtstar}
+!textbf(\declaretocfmt{subsection*}){\@W{0em}\@D{0em}} %!sffamily( declare a star-section fmt)
+\end{minitocfmt}
+\insMinitoctab[myRetirement] %!textsf( !cs(nsMinitoctab) discussed beginning on page !pageref(ss:AltPresent))
+  {\TOCLevels{section}{subsection}\minitocFmtstar}
+\end{Verbatim}
+\begin{minitocfmt}{\minitocFmtstar}
+\declaretocfmt{subsection*}{\@W{0em}\@D{0em}}
+\end{minitocfmt}
+\insMinitoctab[myRetirement]{\TOCLevels{section}{subsection}\minitocFmtstar}
+\newtopic\indent Any section that does not have a number (more technically,
+a \cs{numberline} command its entry in the TOC file), \pkg{aeb-minitoc} considers
+a star-section. Formatting for star-section is done by declaring
+\cs{declaretocfmt\darg{\ameta{sec-name}*}}, as above.
+
+
+\subparagraph[Formatting individual title headings]{Formatting individual
+title headings.} Suppose we wanted to put the section title for section 3.1
+in bold font \emph{only}. After some experimentation, I determined the best
+course for doing this is through the optional argument of the section
+commands.\footnote{The same effects can be done, perhaps, more simply, by
+using the techniques of \textbf{\mlnameref{subpara:@E}},
+page~\pageref*{subpara:@E};  however, this technique can make custom changes
+that \cs{@E} cannot; refer to the \textbf{\textcolor{red}{Question}} on the
+next page.} \medbreak \bVerb The section command for that section is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\subsection[\protect!textbf(\miniorfulltoc){\protect\textbf}
+  {Setting the top and bottom levels}]{Setting the top and bottom levels}
+\end{Verbatim}
+\par\medskip
+\TOCLevels{section}{subsubsection}
+\noindent\hskip-62.5pt\begin{minipage}{\linewidth+62.5pt}
+\begin{minipage}[c]{.5\linewidth-5pt}\small\kern0pt
+\minitocFmtiv\insertminitoc[CandM]
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}\kern0pt
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmt}
+!textbf(\@A{\FmtTOCEntry})
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+\end{Verbatim}
+\end{minipage}
+\end{minipage}
+\medskip\eVerb \cs{miniorfulltoc\darg{\ameta{fmt}}\darg{\ameta{toc-sec-heading}}}, when inserted into
+the optional argument, will form the toc-entry. When read in by \cs{insertminitoc},
+\begin{quote}\cs{miniorfulltoc\darg{\ameta{fmt}}\darg{\ameta{toc-sec-heading}}}\end{quote} expands to
+\texttt{\darg{\ameta{fmt}\darg{\ameta{toc-sec-heading}}}} when the command
+\cs{FmtTOCEntry} is in effect (see next paragraph); when read outside the
+expansion of \cs{insertminitoc} (that is, when \cs{tableofcontents} is
+read), it expands to \texttt{\ameta{toc-sec-heading}}, the usual expression.
+
+%...
+%\begin{center}\minitocFmt
+%\begin{minipage}[c]{0.8\linewidth}
+%\insertminitoc[CandM]
+%\end{minipage}
+%\end{center}
+
+
+The special formatting declared with the \cs{miniorfulltoc} is activated by
+a special command \cs{FmtTOCEntry}\MP{\cs{FmtTOCEntry}}, passed through the \cs{@A} command.
+Refer to the verbatim listing of the last example; shown in bold is
+\cs{@A\darg{\cs{FmtTOCEntry}}} and causes this alternate formatting to take
+effect; this is a command not mentioned earlier.\footnote{In addition to
+\cs{FmtTOCEntry} there is also \cs{NoFmtTOCEntry}.} Actually,
+\cs{FmtTOCEntry} (and \cs{NoFmtTOCEntry}) can be used outside the
+\env{minitocfmt} environment to turn on or off the special formatting.
+
+\newtopic\noindent\textcolor{red}{\textbf{Question:}} How would you modify,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\subsection[\protect\miniorfulltoc{\protect\textbf}
+  {Setting the top and bottom levels}]{Setting the top and bottom levels}
+\end{Verbatim}
+so that `Setting the \emph{top} and \emph{bottom} levels' appears in a mini-toc, \emph{without}
+this same formatted entry appearing in the main table of contents?
+
+See the sample \texttt{minitoc-art.tex} for examples of the use of \cs{miniorfulltoc}.
+
+%\subsection[\protect\miniorfulltoc{Setting the \protect\emph{top} and \protect\emph{bottom} levels\protect\mtocgobble}{Setting the top and bottom levels}]{Setting the top and bottom levels}
+
+
+\subparagraph[A custom entry for \protect\mlcs{subsubsection}]{A custom entry for
+\texorpdfstring{\protect\mlcs{subsubsection}}{\textbackslash{subsubsection}}.}\label{subpara:Custom} For the subsubsection level,
+this document uses a bullet (\textbullet) instead of a section number. For this example, we present an alternate
+TOC, consistent with the style the \pkg{web} package has used for years.
+
+\begin{center}\minitocFmtvi
+\TOCLevels{section}{subsubsection}%
+\begin{minipage}[c]{.8\linewidth}
+\insertminitoc[CandM]
+\end{minipage}
+\end{center}
+The verbatim listing is given below.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{minitocfmt}{\minitocFmt}\@A{\@PW{1em}}
+\declaretocfmt{subsection}{\@W{2em}\@D{0em}}
+\declaretocfmt{subsubsection}{\@W{1em}\@R{1.55em plus 2em}%
+  \leftskip2em\rightskip\@tocrmarg {#1},\nobreak{ #2}\allowbreak}
+\end{minitocfmt}
+\end{Verbatim}
+\noindent When neither \cs{@D} nor \cs{@B} appears in the
+\ameta{various} argument of \cs{declaretocfmt}, the formatting for the
+entry must be created using low-level methods. That is what is done in the
+declaration of \texttt{subsubsection}:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\declaretocfmt{subsubsection}{\@W{1em}\@R{1.55em plus 2em}%
+  \leftskip2em\rightskip\@tocrmarg {#1},\nobreak{ #2}\enspace\allowbreak}
+\end{Verbatim}
+\textbf{Important Point:} When \cs{@D} and \cs{@B} \emph{do not appear},
+\texttt{\#1} is the sec-num (in a box) followed by the sec-title;
+\texttt{\#2} is the page number.
+
+%...
+%\begin{center}\minitocFmt
+%\begin{minipage}[c]{0.8\linewidth}
+%\insertminitoc[CandM]
+%\end{minipage}
+%\end{center}
+
+
+\newtopic\noindent\textbf{Comments on listing.} We reduce this width of the
+box containing \ameta{page-num} by passing \cs{@PW\darg{1em}} through the
+argument of \cs{@A}. We set the box width for the section number (a symbol in
+this case) with \cs{@W\darg{1em}}. \cs{@R} takes it argument and defines
+\cs{@tocrmarg}, which sets the right margin of the section-title; here, we
+place a little rubber glue so the title can warp around in a narrow column
+much better. We set the left and right margins with \cs{leftskip2em} and
+\cs{rightskip\cs{@tocrmarg}}; \texttt{2em} is used for \cs{leftskip}, since
+that is the sum of the \cs{@W} and \cs{@D} values for the level immediately
+above it. Next comes \texttt{\darg{\#1}}, which is the sec-num (a
+`\verb~$\bullet$~' in a box of width \texttt{1em}) followed by the sec-title.
+We then insert a comma followed by the page number \texttt{\darg{~\#2}}, followed
+in turn by a small space and \cs{allowbreak}.
+
+\subparagraph[Using \texorpdfstring{{\protect\mlcs{@E}}}{\textbackslash{@E}} for greater formatting control]%
+  {Using \cs{@E} for greater formatting control.}\label{subpara:@E} The \cs{@E} command can be used
+  for finer control over the format of a mini-toc, in fact, it allows some logic to be applied. Suppose
+  we want to highlight Section~3.2 and all of its subsections.
+
+\begin{minitocfmt}{\minitocFmtF}
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}
+   \ifthenelse{\@E=\mtocref{insertminitoc}}{\@F{\bfseries}}{}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}
+   \ifthenelse{\@E > \mtocref{insertminitoc}\and\@E < \mtocref{MPW}}
+   {\@F{\color{blue}}}{}}
+\end{minitocfmt}
+\begin{center}
+\begin{minipage}[c]{.8\linewidth}
+\TOCLevels{section}{subsubsection}
+\minitocFmtF\insertminitoc[CandM]{\minitocFmtF}
+\end{minipage}
+\end{center}
+The verbatim listing for the \env{minitocfmt} environment used is listed below.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmtF}
+\declaretocfmt{subsection}
+  {\@W{2.5em}\@D{0em}
+   \ifthenelse
+    {\@E=\mtocref{insertminitoc}} %!sffamily( if this entry is the one we want)
+    {\@F{\bfseries}}              %!sffamily( apply bold font)
+    {}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}
+   \ifthenelse %!sffamily( if after !texttt(insertminitoc) and before !texttt(MPW))
+    {\@E > \mtocref{insertminitoc}\and\@E < \mtocref{MPW}}
+    {\@F{\color{blue}}} %!sffamily( apply blue color)
+    {}}
+\end{minitocfmt}
+\end{Verbatim}
+The sample file \texttt{minitoc-art.tex} has similar shenanigans.
+
+
+\subparagraph[No leaders using \texorpdfstring{\protect\mlcs{@B}}{\textbackslash{@B}}]{No leaders using \cs{@B}.} We create
+a mini-toc in the manner of the main TOC, where no dotted leaders are generated
+for the top-most section heading.
+
+\begin{center}
+\begin{minitocfmt}{\minitocFmtB}
+\declaretocfmt{subsection}
+  {\vspace{6pt}\@W{2.5em}\@B{0em}\@F{\bfseries}\@N{\bfseries}\@P{\bfseries}}
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+\begin{minipage}[c]{.8\linewidth}\vskip-6pt
+\TOCLevels{section}{subsubsection}
+\minitocFmtB\insertminitoc[CandM]
+\end{minipage}
+\end{center}
+The verbatim listing is of the \env{minitocfmt} environment used is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmtB}
+\declaretocfmt{subsection}
+  {\vspace{6pt}\@W{2.5em}!textbf(\@B{0em})               %!sffamily( no dotted leaders)
+    \@F{\bfseries}\@N{\bfseries}\@P{\bfseries}} %!sffamily( all elements in bold)
+\declaretocfmt{subsubsection}
+  {\@W{1em}\@D{2.5em}}
+\end{minitocfmt}
+\end{Verbatim}
+A \cs{vspace} is used to insert some vertical space above a subsection, \cs{@F} is used to make the
+section heading entry bold,  \cs{@N} makes the section number in bold, and \cs{@P} puts the page number
+in bold.
+
+\subparagraph[Using the
+  \texorpdfstring{\protect\mlcs{@L} and \protect\mlcs{@Pg}}{\textbackslash{@L}
+    and \textbackslash{@Pg}} commands] {Using the \cs{@L} and \cs{@Pg}
+    commands.}\label{spara:LPg} These two commands can be used to, for example, modify the
+    representation of the page number. Suppose for an entry in the mini-toc
+    on the same page as the mini-toc, we wanted to typeset `this page'
+    rather than the page number.
+
+\begin{center}
+\begin{minitocfmt}{\minitocFmtPara} % Para
+\@A{\@PW{2.5em}\@R{3.8em}}
+\declaretocfmt{paragraph}
+  {
+    \@W{1em}\@D{0em}
+    \ifthenelse{\arabic{page}=\@Pg}
+      {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}
+      {}
+  }
+\declaretocfmt{subparagraph}
+  {
+    \@W{1.5em}\@D{1em}
+    \ifthenelse{\arabic{page}=\@Pg}
+      {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}
+      {}
+  }
+\end{minitocfmt}
+\minitocFmtPara
+\TOCLevels{subsubsection}{subparagraph}
+\begin{minipage}[c]{0.8\linewidth}\hfuzz15pt
+\insertminitoc[SExmpls]
+\end{minipage}
+\end{center}
+The listing for this \env{minitocfmt} environment is,
+The verbatim listing is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\begin{minitocfmt}{\minitocFmt}
+\@A{\@PW{2.5em}\@R{3.8em}} %!sffamily( adj.! width of page number box and right margin of title)
+\declaretocfmt{paragraph}{\@W{1em}\@D{0em}
+  \ifthenelse{\arabic{page}=\@Pg} %!sffamily( if this page = !cs(@Pg) create a new link)
+    {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}{}} %!sffamily( else do nothing)
+\declaretocfmt{subparagraph}{\@W{1.5em}\@D{1em}
+  \ifthenelse{\arabic{page}=\@Pg}
+    {\@P{\small\hyperlink{\@L}{this page}\mtocgobble}}{}}
+\end{minitocfmt}
+\end{Verbatim}
+Here, we use a \pkg{aeb-minitoc} command: \cs{mtocgobble} is a public
+version of the core {\LaTeX} command \cs{@gobble}; it simply absorbs
+(gobbles) its argument. What \cs{mtocgobble} is doing in the above code is
+gobbling up, what turns out to be, \pkg{hyperref}'s hyperlink code to the
+page number. We replace it with our custom code. The anchor is \cs{@L}.
+Seems to work.
+
+\paragraph[Using \texorpdfstring{{\protect\env{minitocfmt}} with the full TOC ({\protect\mlcs{tableofcontents}})}
+  {Using minitocfmt with the full TOC (\textbackslash{tableofcontents})}]%
+  {Using \env{minitocfmt} with the full TOC (\cs{tableofcontents}).}\label{para:toc} You will note that
+  the table of contents for this document goes down to the
+  \texttt{subsubsection} level, but not \texttt{paragrah} or below. Yet,
+  for the mini-toc on page~\pageref{SExmpls} contains paragraph and
+  subparagraph entries. How is this possible? In the preamble of this document,
+  we have,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\setcounter{tocdepth}{5} \setcounter{secnumdepth}{5}
+\end{Verbatim}
+Setting \texttt{tocdepth} to 5 causes {\LaTeX} to write table of contents lists to the subsubparagraph
+level. \cs{setcounter\darg{secnumdepth}\darg{5}} says that we are to have numbers (or identifiers)
+for sections through the subsubparagraph level. When we expand the command \cs{tableofcontents} it under
+the following conditions:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\setcounter{secnumdepth}{3}\setcounter{tocdepth}{3}
+\tableofcontents
+\end{Verbatim}
+You can use \cs{minitocfmt} to design how the main TOC entries are displayed.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\bgroup               % !sffamily(make these changes local)
+\value{secnumdepth}=3 % !sffamily(!cs(setcounter) is global, this is local)
+\value{tocdepth}=3
+\minitocMain
+\tableofcontents
+\egroup
+\end{Verbatim}
+where \cs{minitocMain} is defined through a \env{minitocfmt} environment.
+
+
+\subsubsection{Alternate presentations of the mini-toc}\label{ss:AltPresent}
+
+In all the examples of this manual, a pretty generic presentation of the
+mini-tocs was used. In this section, some other presentation styles, or
+just use the class style.
+
+\paragraph[Predefined presentations]{Predefined presentations.} This document defines and uses
+several predefined styles, two of which are given below.
+\medskip\bVerb
+\begin{minipage}[c]{.5\linewidth-5pt}
+\begin{Verbatim}[fontsize=\small]
+\newcommand{\insMinitocfbox}[2][]{%
+  \begin{center}#2
+  \fbox{%
+  \begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}}
+  \end{center}
+}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}[c]{.5\linewidth-5pt}
+\begin{Verbatim}[fontsize=\small]
+\newcommand{\insMinitoctab}[2][]{%
+  \begin{center}#2
+  \begin{tabular}{c}\toprule
+  \begin{minipage}[c]{0.8\linewidth}
+  \insertminitoc[#1]
+  \end{minipage}\\\bottomrule
+  \end{tabular}
+  \end{center}
+}
+\end{Verbatim}
+\end{minipage}
+\eVerb Each command takes two arguments, one of which is optional. The
+optional argument is passed to the optional argument of \cs{insertmintoc},
+the required argument enters within a group, making its effects local. The
+required argument is used to pass a (formatting) command defined by one of
+the \env{minitocfmt} environments.
+
+The definition on the left encloses the mini-toc in an \cs{fbox} while the
+one on the right uses a tabular approach. These two are illustrated in the
+next two paragraphs.
+
+\subparagraph{Enclose the mini-toc in an \mlcs{fbox}}
+
+\insMinitocfbox[CandM]{\TOCLevels{section}{subsubsection}\minitocFmt}
+
+\noindent The verbatim listing is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\insMinitocfbox[CandM]
+  {\TOCLevels{section}{subsubsection}\minitocFmt}
+\end{Verbatim}
+The \cs{TOCLevels} information is not really needed until just prior to the
+expansion of the command \cs{insertminitoc}. A good strategy, therefore, is
+to pass it in the argument of \cs{insMinitocfbox}.
+
+\goodbreak
+\subparagraph{Enclose the mini-toc in a ruled tabular environment}
+
+\insMinitoctab[CandM]{\minitocFmt}
+
+\noindent
+The verbatim listing is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\insMinitoctab[CandM]
+  {\TOCLevels{section}{subsubsection}\minitocFmt}
+\end{Verbatim}
+The display uses \cs{toprule} and \cs{bottomrule}, defined in the
+\pkg{booktabs} package.
+
+\section{Counters of importance}
+
+There are two counters that affect the creation of a table of contents:
+\begin{description}
+    \item[\texttt{tocdepth}] The \texttt{tocdepth} counter determines the
+        depth of the table of contents. To include paragraphs or
+        subparagraphs,  eclare \cs{setcounter\darg{tocdepth}\darg{4}} for
+        paragraph or \cs{setcounter\darg{tocdepth}\darg{5}} for
+        subparagraphs in the preamble. For more information, read my
+        discussion \textbf{\mlnameref{para:toc}} on page~\pageref*{para:toc}.
+    \item[\texttt{secnumdepth}]\hskip-.5em\relax\space determines the depth of the sections
+    that will be numbered. If a section is not numbered and in a mini-toc, it is considered
+    a star-section must be formatted by a \cs{declaretocfmt\darg{\ameta{sec-name}*}\darg{\ameta{various}}} statement.
+    Read the discussion in the paragraph \textbf{\nameref{spara:noNums}} on page~\pageref*{spara:noNums}.
+\end{description}
+
+\section{Methodology}\mtoclabel{MPW}
+
+%For the purpose of this discussion, assume \cs{TopLevel\darg{subsubsection}} is in force.
+
+Each time an \cs{insertminitoc} command is expanded, the \cs{jobname.toc}
+file is read in. Any TOC entry prior to the current \ameta{top-level} are
+discarded, \footnote{The \ameta{top-level} entry itself is not displayed.}
+all TOC entries are displayed that are within the specified range
+\cs{TOCLevels\darg{\ameta{top-level}}\darg{\ameta{btm-level}}},\footnote{The
+\ameta{btm-level} entry is displayed.} and all entries beginning at the
+\emph{next} \ameta{top-level} section are discarded.\footnote{Actually, all
+entries beginning at the next entry in the TOC that has a section level
+equal to or higher than the \ameta{top-level} are discarded.}
+
+If you look at the TOC file for your document (when it uses \pkg{aeb-minitoc}),
+the entries in that file have this form (for a \pkg{hyperref} document):
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\mtocCL {\contentsline {section}
+  {\numberline {1}Introduction}{3}{section.1}}{!ameta(entry-cnt)}
+\end{Verbatim}
+\pkg{aeb-minitoc} encloses each entry as the argument of \cs{mtocCL} (a
+macro taking two arguments). When expanding the command
+\cs{tableofcontents}, \cs{mtocCL} does nothing.\footnote{It leaves the
+first argument (the TOC entry) and gobbles the second argument.} When
+expanding the command \cs{insertminitoc}, \cs{mtocCL} removes any entry
+that does not contain \cs{contentsline} and does not display any entry that
+is not within the \ameta{top-level} to \ameta{btm-level} range; it also
+repositions the \ameta{entry-cnt} argument for later use.
+Because\MP{Warning!} of the importance of
+\cs{mtocCL}, any package that changes the \cs{jobname.toc} file should be
+\emph{loaded prior to} \pkg{aeb-minitoc}.
+
+When you use \cs{mtoclabel\darg{\ameta{label-name}}}, that command acquires
+the most recently defined \ameta{entry-cnt}, and save that value as a
+macro. (The value can be retrieved by
+\cs{mtocref\darg{\ameta{label-name}}}; the use of this macro is normally
+not needed.) When \ameta{label-name} is passed to the optional argument of
+the \cs{insertminitoc} command, internally
+\cs{mtocref\darg{\ameta{label-name}}} is expanded, and this value is used
+to (uniquely) identify the desired top-level section. As an example, we
+have used \texttt{CandM} a number of times, this is the \ameta{label-name}
+created by \cs{mtoclabel} for Section~\ref*{CandM}; the expansion of
+\cs{mtocref\darg{CandM}} is `\texttt{\mtocref{CandM}}'.\footnote{This `\texttt{\mtocref{CandM}}'
+does not refer to Section~3, but means this is the third TOC entry in the file \cs{jobname.toc}.}  In this way, each
+item in the table of contents has a unique designator.
+
+%The system works well when the \ameta{top-level} section generates a unique
+%section number. This unique section number is used to detect when the
+%\ameta{top-level} begins and when it ends (by the detection of the
+%\textit{next} \ameta{top-level}.
+
+\begin{comment}
+\subsection{The \texorpdfstring{{\protect\ameta{top-level}}}{<top-level>}
+  uses a unique section number}\mtoclabel{s:toplevelRef}
+
+This is the most frequently case. The only problem is when the \cs{insertminitoc} command
+is placed outside scope of the \ameta{top-level}. There are two courses of action:
+\begin{enumerate}
+  \item Pass the unique \ameta{top-level} section number to the optional argument of
+  the command \cs{insertminitoc}; below we expand \verb|\insMinitoctab[CandM]{\minitocFmt}|:
+
+  \TOCLevels{section}{subsubsection}
+  \insMinitoctab[CandM]{\minitocFmt}
+
+  We obtain the Section~3 listing even though we are in Section~4.
+
+  \item A problem occurs with method~1 when an additional section is
+      inserted above Section~3, so, Section~3 becomes Section~4, and the
+      above code would get the listing of the new Section~3, which is not
+      what we want.
+
+      To solve this problem, \pkg{aeb-minitoc} defines two commands:
+      \cs{mtoclabel\darg{\ameta{name}}} and \cs{mtocref\darg{\ameta{name}}}, analogous \cs{label}
+      and \cs{ref}. To avoid duplication of effort, \cs{mtoclabel\darg{\ameta{name}}} also
+      expands \cs{label{\darg{\ameta{name}}}}. \cs{mtoclabel} saves its unique section number, and
+      can then be retrieved by \cs{mtocref} and passed to the optional first argument of
+      \cs{insertminitoc}. The listing below is the expansion of
+      \verb|\insMinitoctab[CandM]{\minitocFmt}|:
+
+      \insMinitoctab[CandM]{\minitocFmt}
+
+      Where Section~\ref*{CandM} is labeled as
+      \cs{mtoclabel\darg{CandM}}. Use the \cs{mtoclabel} command at a
+      \ameta{top-level} section in which a mini-toc is built, or if a
+      mini-toc is built outside the scope of that section.
+\end{enumerate}
+
+
+\subsection{The \texorpdfstring{\protect\ameta{top-level}}{<top-level>}
+  does not use a unique section number}
+
+  What if the \ameta{top-level} section does not generate a unique number?
+  To illustrate this problem we use the \cs{subsubsection} named
+  `\mlnameref{SExmpls}' on page~\pageref*{SExmpls}. You'll note that
+  at the \cs{subsubsection} level, a bullet ($\bullet$) as the section
+  identifier. This creates problem with detecting when the section
+  (sub-sub-section) begins, and most importantly end.
+
+  \subsubsection{\texorpdfstring{\protect\pkg{hyperref}}{hyperref} loaded}
+
+  Even though \cs{subsubsection} does not have a unique section number,
+    \pkg{hyperref} provides it in the file \cs{jobname.toc}.
+\begin{Verbatim}[fontsize=\small]
+\mtocCL{\contentsline {subsubsection}
+  {\numberline {{$\bullet $}}Some examples that
+  illuminate}{6}{subsubsection.3.2.2}}
+\end{Verbatim}
+Where, the entry is wrapped around. \pkg{hyperref} adds an argument to the
+end of the classic {\LaTeX} \cs{contentsline}; in this case it is
+\texttt{\darg{subsubsection.3.2.2}}. \pkg{aeb-minitoc} uses this number as
+its required unique section identifier. As a result, nothing special is needed.
+To list the TOC structure of the section titled `\nameref{SExmpls}', we simple
+expand \verb!\insMinitoctab[SExmpls]{\minitocFmt}! to get:
+
+\insMinitoctab[SExmpls]{\TOCLevels{subsubsection}{subparagraph}\minitocFmt}
+
+Cool!
+
+
+  \subsubsection{\texorpdfstring{\protect\pkg{hyperref}}{hyperref} not loaded}
+
+    This is the problem child. The TOC entry
+    in \cs{jobname.toc} would look like this:
+\begin{Verbatim}[fontsize=\small]
+\mtocCL{\contentsline {subsubsection}
+  {\numberline {{$\bullet $}}Some examples that illuminate}{6}}
+\end{Verbatim}
+No unique section identifier is found. In this case, we have to create one using
+a special command \cs{mtocSecFmt\darg{\ameta{sec-name}}\darg{\ameta{sec-identifier}}}.
+\begin{Verbatim}[fontsize=\small]
+\renewcommand*{\thesubsubsection}{\mtocSecFmt{subsubsection}{$\bullet$}}
+%\renewcommand*{\thesubsubsection}
+%  {\texorpdfstring{\mtocSecFmt{subsubsection}{$\bullet$}}{\textbullet}}
+\end{Verbatim}
+The second one (commented out) is how the definition is made for \pkg{hyperref}, though
+for a \pkg{hyperref} document, such a redefinition is not needed.
+
+With the above redefinition made for a non-\pkg{hyperref} document, an
+\texttt{subsubsection} entry in \cs{jobname.toc} has the following form:
+\begin{Verbatim}[fontsize=\small]
+\mtocCL{\contentsline {subsubsection}
+  {\numberline {\mtocsecfmt {$\bullet $}{3.2.2}Some examples
+  that illuminate}{6}}
+\end{Verbatim}
+\pkg{aeb-minitoc} then picks off and uses the section identifier.
+\cs{mtoclabel} uses the section identifier so you can pass
+\cs{mtocref\darg{\ameta{name}}} to the optional argument of the command
+\cs{insertminitoc}.
+
+\end{comment}
+
+\section{Sample files} The demonstration files are found in the \texttt{examples} folder.
+
+  All examples given in this manual can be found in
+\texttt{manual-exmpls-bullets.tex} and \texttt{manual-exmpls-default.tex}.
+
+%The \pkg{xcolor} package is used, otherwise, the packages used are minimal.
+%The spelling of the \ameta{sec-name} must be exact, to repeat, the names
+%are chapter, part, section, subsection, paragraph, and subparagraph. Not
+%all names are defined for all classes.
+
+\section{My retirement}\mtoclabel{myRetirement}
+
+\subsection*{Time to get back to it, \dps}
+\addcontentsline{toc}{subsection}{Time to get back to it, \texorpdfstring{\protect\dps}{dps}}
+
+
+\end{document}

@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{aeb-minitoc}
-%<package> [2018/09/21 v1.6 Creates a simple mini-toc]
+%<package> [2018/09/29 v1.7 Creates a simple mini-toc]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
@@ -97,7 +97,7 @@
 % signals that there is a non-empty listing; otherwise, it is set to false. It is used to display
 % a latex warning to the user that the listing is empty. Also, globally, \cs{ifMiniTocListings}
 % is set to false when \IndexOpt{nominitocs}\opt{nominitocs} is taken. The other option
-% is \IndexOpt{\EXCL!nominitocs}\opt{!nominitocs} is a convenience option; it is not `not' version
+% is \IndexOpt[\protect\EXCL]{!nominitocs}\opt{!nominitocs} is a convenience option; it is not `not' version
 % of \opt{nominitocs}; when \opt{!nominitocs} is specified, mini-tocs are created. This is the
 % same as specifiying no option at all.
 %    \begin{macrocode}
@@ -171,7 +171,7 @@
 \let\mtoc@contentsline\contentsline
 \let\mtoc@starttoc\@starttoc
 \let\mtoc@tableofcontents\tableofcontents
-\let\mtoc@addtocontents\addtocontents
+%\let\mtoc@addtocontents\addtocontents
 %    \end{macrocode}
 %    Some counters and utility macros. The counter \DescribeMacro\@minitocCnt\cs{@minitocCnt} is incremented
 %    in the redefined \cs{addtocontents} command. The command \DescribeMacro{\mtocgobble}\cs{mtocgobble} is
@@ -344,12 +344,16 @@
 \def\mtocCL#1#2{#1}
 %    \end{macrocode}
 % Here, we modify the macro \cs{addtocontents} to insert \cs{mtocCL}.
+%    \changes{v1.7}{2018/09/29}{Delay redefinition of \string\cs{addtocontents} until beginning of document,
+%    to avoid incompatability with \string\pkg{siunitx}.}
 %    \begin{macrocode}
-\renewcommand\addtocontents[2]{%
+\newcommand\addtocontents@mtoc[2]{%
     \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
     \global\advance\@minitocCnt\@ne
     \mtoc@addtocontents{#1}{\protect\mtocCL{#2}{\the\@minitocCnt}}\else
     \mtoc@addtocontents{#1}{#2}\fi}
+\AtBeginDocument{\let\mtoc@addtocontents\addtocontents
+  \let\addtocontents\addtocontents@mtoc}
 %    \end{macrocode}
 % Modify the \cs{tableofcontents} to \cs{mtoc@tableofcontents}.
 % We compensate later by executing \cs{mtoc@start@toc} at the end of the document.

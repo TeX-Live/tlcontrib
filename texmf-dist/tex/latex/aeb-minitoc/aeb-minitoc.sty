@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{aeb-minitoc}
- [2018/09/21 v1.6 Creates a simple mini-toc]
+ [2018/09/29 v1.7 Creates a simple mini-toc]
 \newif\ifMiniTocListings \MiniTocListingstrue
 \DeclareOption{nominitocs}{\AtEndOfPackage{\MiniTocListingsfalse
   \let\insertminitoc\insertminitocNOT}}
@@ -28,7 +28,6 @@
 \let\mtoc@contentsline\contentsline
 \let\mtoc@starttoc\@starttoc
 \let\mtoc@tableofcontents\tableofcontents
-\let\mtoc@addtocontents\addtocontents
 \newcount\@minitocCnt \@minitocCnt=0\relax
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \let\mtoc@One=1 \let\mtoc@Zero=0
@@ -125,11 +124,13 @@
 \AtEndDocument{\mtoc@start@toc}
 \def\mtoc@TOC{toc}
 \def\mtocCL#1#2{#1}
-\renewcommand\addtocontents[2]{%
+\newcommand\addtocontents@mtoc[2]{%
     \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
     \global\advance\@minitocCnt\@ne
     \mtoc@addtocontents{#1}{\protect\mtocCL{#2}{\the\@minitocCnt}}\else
     \mtoc@addtocontents{#1}{#2}\fi}
+\AtBeginDocument{\let\mtoc@addtocontents\addtocontents
+  \let\addtocontents\addtocontents@mtoc}
 \def\tableofcontents{%
     \def\@starttoc##1{\makeatletter
     \@input{\jobname.##1}\makeatother}%

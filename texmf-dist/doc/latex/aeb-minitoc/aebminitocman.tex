@@ -75,7 +75,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for the aeb-minitoc package from AcroTeX: Inserting TOCs within a section},
     talksite={\url{www.acrotex.net}},
-    version={1.6, 2018/09/21},
+    version={1.7, 2018/09/29},
     Keywords={AcroTeX, mini-toc},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -279,7 +279,7 @@ When no option is passed, mini-tocs are created.
 \newtopic\noindent\llap{\textcolor{red}{{\small\textit{Warning! }}\ding{042}}\enspace}%
 This package modifies the entries in the \cs{jobname.toc} file. For this
 package to work as designed, it must be loaded after any other package that
-modifies the TOC file.
+modifies the TOC file.\footnote{Such packages include \pkg{hyperref} and \pkg{siunitx}.}
 
 \section{Commands and methods}\mtoclabel{CandM}
 
@@ -545,7 +545,7 @@ For those unfamiliar with such a macro, here is a simple example: My name is
 \verb~D. P. Stor\mtocgobble{e}y~, this code expands to ``D. P. Stor\mtocgobble{e}y''. Not so impressive,
 but the argument of \cs{mtocgobble} is oftentimes another macro or an expression grouped by braces (\texttt{\{\}}).
 For example, \verb~\def\dps{ there}Don says `Hi\mtocgobble\dps!'~, which expands to
-\def\dps{ there}``Don says `Hi\mtocgobble\dps!''' See the paragraph \textbf{\nameref{spara:LPg}} on page~\pageref*{spara:LPg}
+\def\dpsi{ there}``Don says `Hi\mtocgobble\dpsi!''' See the paragraph \textbf{\nameref{spara:LPg}} on page~\pageref*{spara:LPg}
 for an example of use. The macro is also used in some of the example files.
 
 \subsubsection{Some examples that illuminate}\mtoclabel{SExmpls}
@@ -739,7 +739,7 @@ We mark it with \cs{mtoclabel}. Now we create a \env{minitocfmt} environment:
 \begin{minitocfmt}{\minitocFmtstar}
 !textbf(\declaretocfmt{subsection*}){\@W{0em}\@D{0em}} %!sffamily( declare a star-section fmt)
 \end{minitocfmt}
-\insMinitoctab[myRetirement] %!textsf( !cs(nsMinitoctab) discussed beginning on page !pageref(ss:AltPresent))
+\insMinitoctab[myRetirement] %!textsf( !cs(insMinitoctab) discussed beginning on page !pageref(ss:AltPresent))
   {\TOCLevels{section}{subsection}\minitocFmtstar}
 \end{Verbatim}
 \begin{minitocfmt}{\minitocFmtstar}

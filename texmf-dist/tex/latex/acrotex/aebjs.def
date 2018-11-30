@@ -18,9 +18,8 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2018/03/21 v8.2.2 %
+ [2018/10/03 v8.2.5 %
   Exerquiz document level JavaScript (dps)]
-    \ifmakeExSlLocal\protect\endgroup^^J\fi
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
 \def\redm{\\.}\def\remul{\\*}\def\rediv{\\/}\def\repow{\\^}
@@ -646,8 +645,8 @@ function requireFormNot(UserAns, regexpr) {
 \begin{newsegment}{Eq: Support for multi-letter variables}
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
-    return this.replace(/^[\s\string\uFEFF\string\xA0]+|%
-[\s\string\uFEFF\string\xA0]+$/g, '');
+    return this.replace(/^[\s\string\\uFEFF\string\\xA0]+|%
+[\s\string\\uFEFF\string\\xA0]+$/g, '');
   };
 }
 function _rplVarsBy(str1,str2) {
@@ -668,24 +667,9 @@ function processMathVars(str) {
   str=str.replace(/\s/g,"");
   return str;
 }
-getSubstValue.aSubsts=new Array();   // dps17
+getSubstValue.aSubsts=new Array();
 function getSubstValue(v,s){
-/*
-  v=variable list, it may have the form "xyz", or if there
-    substitutions, it might look like "_rplVarsBy('theta','x')@";
-  s=Either the user's answer or the author's answer.
-
-  First develop an array of all variables are their substitutes.
-  ie, getSubstValue.aSubsts=[ "c","h", ["theta",x"], ["alpha",y],...];
-*/
   var pos1,pos2,tmp,args,re,arg1,arg2;
-/*
-  change new style to old
-  New style: v="c,_rplVarsBy('theta->\u03B8','r:x')@,%
-_rplVarsBy('alpha->\u03B1','r:y')@";
-  Old style: v="c_rplVarsBy('theta->\u03B8','x')@%
-_rplVarsBy('alpha->\u03B1','y')@";
-*/
   re=/([^'])(,)/g;
   v=v.replace(re,'$1');
   re=/([ri]\string\:)+(\string\w)/g;
@@ -1459,7 +1443,7 @@ oCheckbox: appAlerts[qname]});
     if (str.replace(/\s/g,"") == "") {
       var defaultColor=%
 (typeof oQName.DefaultColorJSLoc=="undefined")%
-?color.black:oQName.DefaultColorJSLoc;
+?\defaultColorJS:oQName.DefaultColorJSLoc;
    if (isthereRBUP) g.display=display.hidden;
         event.target.strokeColor = defaultColor;
     }

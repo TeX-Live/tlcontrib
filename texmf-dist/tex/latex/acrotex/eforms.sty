@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2018/08/16 v2.9.20 Provides general eforms support (dps)]
+ [2018/11/27 v2.9.22 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
@@ -288,8 +288,17 @@
     \let\eq@Border\@empty\else\def\eq@Border{/Border [#1]}\fi}%
 \def\eq@Border{/Border [0 0 0]}
 \def\@eqAP#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AP\@empty\else\def\eq@AP{/AP<<#1>>}\fi}%
-    \let\eq@AP\@empty
+  \let\eq@AP\@empty\else\let\Off\eq@@Off\let\On\eq@@On
+  \ifx\annot@type\annot@type@button
+    \let\N\eq@pb@N\else\let\N\eq@cbrb@N\fi
+  \edef\eq@AP{/AP<<#1>>}\fi}\let\eq@AP\@empty
+\def\eq@pb@N#1{/N \ifpdf #1 \space 0 R\else
+  \ifxetex #1\else{#1}\fi\fi}
+\def\eq@cbrb@N#1{/N <<#1>>}
+\def\eq@@On#1#2{/#1 \ifpdf #2 \space 0 R\else
+  \ifxetex #2\else{#2}\fi\fi}
+\def\eq@@Off#1{/Off \ifpdf #1 \space 0 R\else
+  \ifxetex #1\else{#1}\fi\fi}
     \def\@eqOn#1{\def\eq@On{/#1}}\def\eq@On{/Yes}
 \def\@eqAS#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@AS\@empty\else\ifpdfmarkup\def\eq@AS{/AS(#1) cvn }\else
@@ -554,35 +563,58 @@
         \let\eq@AC\@empty\let\ef@kvAC\@empty
         \else\def\eq@AC{#1}\def\ef@kvAC{/AC<#1>}\fi}
 \def\eq@define@IconMK{\def\eq@IconMK{\eq@I\eq@RI\eq@IX\eq@TP
-    /IF<<\eq@SW\eq@ST\eq@PA\eq@FB>>}}
+  /IF<<\eq@SW\eq@ST\eq@PA\eq@FB>>}}
 \let\eq@IconMK\@empty
-\ifpdf\def\eq@relRef#1{0 0 R}\else %{#1\space 0 R}
+\def\eq@relRef@null#1{0 0 R}
+\ifluatex\def\eq@relRef#1{#1 \space 0 R}\else
+  \ifpdf\def\eq@relRef#1{#1\space 0 R}\else
     \ifxetex\def\eq@relRef#1{#1}\else
-    \def\eq@relRef#1{{#1}}\fi\fi
+      \def\eq@relRef#1{{#1}}\fi\fi\fi
+\def\@eqimportIcons#1{\ifpdfmarkup\ifx\annot@type\annot@type@button
+  \def\ef@arg{#1}\ifx\ef@arg\ef@y
+  \ifx\eq@I\@empty\@eqI{null}\fi\fi\fi\fi}
 \def\ef@null{null}
-\def\@eqI#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@I\@empty\else
-    \def\eq@I{/I \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@I{/I 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqI#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@I\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@I{/I \ef@null}\else
+        \def\eq@I{/I \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@I{}
-\def\@eqRI#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@RI\@empty\else
-    \def\eq@RI{/RI \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@RI{/RI 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqRI#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@RI\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@RI{/RI \ef@null}\else
+        \def\eq@RI{/RI \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@RI{}
-\def\@eqIX#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@IX\@empty\else
-    \def\eq@IX{/IX \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@IX{/IX 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqIX#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@IX\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@IX{/IX \ef@null}\else
+        \def\eq@IX{/IX \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@IX{}
 \def\@eqTP#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@TP\@empty\else\def\eq@TP{/TP #1}\fi}
@@ -1054,6 +1086,9 @@
     \mbox{\combo@@Box{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
         \eq@choice@driver}{\comboBoxDefaults\every@comboBox}}%
 }
+\def\eq@APX{\ifx\eq@I\@empty\eq@AP\else
+    /AP<< \expandafter\get@NIR\eq@I\@nil\space>>\fi}
+\def\get@NIR/#1 #2\@nil{/N #2}
 \def\common@pushButtonCode{%
     /Subtype/Widget
     /T (\Fld@name)
@@ -1063,12 +1098,9 @@
     \eq@H
     \eq@F
     /BS <<\eq@W\eq@S >>
-\ifx\eq@AP\@empty
     /MK <<\eq@R\eq@BC\eq@BG%
          \ef@kvCA\ef@kvRC\ef@kvAC\eq@IconMK\eq@mkIns>>
-\else
-    \eq@AP
-\fi
+    \eq@APX
     /DA (\eq@DA)
     \eq@A\eq@AA
     \eq@rawPDF

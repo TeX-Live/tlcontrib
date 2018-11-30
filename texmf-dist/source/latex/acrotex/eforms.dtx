@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2018/08/16 v2.9.20 Provides general eforms support (dps)]
+%<package> [2018/11/27 v2.9.22 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -626,10 +626,24 @@
 %    \end{macrocode}
 % \DescribeMacro{\AP} Appearance dictionary, used mostly with check boxes
 %    to define the `On' value.
+% \changes{v2.9.21}{2018/11/10}{Modified \string\cs{@eqAP}, added two internal
+% commands \string\cs{eq@@On} and \string\cs{eq@@Off}}
+% Within \cs{@eqAP}, \DescribeMacro\Off\cs{Off} and \DescribeMacro\On\cs{On} are
+% \cs{let} to \cs{eq@@Off} and \cs{eq@On} to make
+% it `easy' to assign on and off values in the case of icon appearances.
 %    \begin{macrocode}
 \def\@eqAP#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AP\@empty\else\def\eq@AP{/AP<<#1>>}\fi}%
-    \let\eq@AP\@empty
+  \let\eq@AP\@empty\else\let\Off\eq@@Off\let\On\eq@@On
+  \ifx\annot@type\annot@type@button
+    \let\N\eq@pb@N\else\let\N\eq@cbrb@N\fi
+  \edef\eq@AP{/AP<<#1>>}\fi}\let\eq@AP\@empty
+\def\eq@pb@N#1{/N \ifpdf #1 \space 0 R\else
+  \ifxetex #1\else{#1}\fi\fi}
+\def\eq@cbrb@N#1{/N <<#1>>}
+\def\eq@@On#1#2{/#1 \ifpdf #2 \space 0 R\else
+  \ifxetex #2\else{#2}\fi\fi}
+\def\eq@@Off#1{/Off \ifpdf #1 \space 0 R\else
+  \ifxetex #1\else{#1}\fi\fi}
 %    \end{macrocode}
 % In the \texttt{AP} dictionary for checkboxes is the `On' value.
 % It is introduced into \texttt{AP} by passing a TeX parameter
@@ -1192,49 +1206,74 @@
 % \cs{eq@IconMK} is empty.
 %    \begin{macrocode}
 \def\eq@define@IconMK{\def\eq@IconMK{\eq@I\eq@RI\eq@IX\eq@TP
-    /IF<<\eq@SW\eq@ST\eq@PA\eq@FB>>}}
+  /IF<<\eq@SW\eq@ST\eq@PA\eq@FB>>}}
 \let\eq@IconMK\@empty
 %    \end{macrocode}
 % \DescribeMacro{\I} an indirect reference to a form XObject defining the
 % buttons's \emph{normal icon}
 % \changes{v2.9}{2016/05/09}{Modified \string\cs{I}, \string\cs{RI}, and
 % \string\cs{IX} to accommodate pdftex for null argument.}
+% \changes{v2.9.21}{2018/11/10}{Modified \string\cs{@eqI}, \string\cs{@eqRI},
+% and \string\cs{@eqIX} in the case of pdftex}
 %    \begin{macrocode}
-\ifpdf\def\eq@relRef#1{0 0 R}\else %{#1\space 0 R}
+\def\eq@relRef@null#1{0 0 R}
+\ifluatex\def\eq@relRef#1{#1 \space 0 R}\else
+  \ifpdf\def\eq@relRef#1{#1\space 0 R}\else
     \ifxetex\def\eq@relRef#1{#1}\else
-    \def\eq@relRef#1{{#1}}\fi\fi
+      \def\eq@relRef#1{{#1}}\fi\fi\fi
+\def\@eqimportIcons#1{\ifpdfmarkup\ifx\annot@type\annot@type@button
+  \def\ef@arg{#1}\ifx\ef@arg\ef@y
+  \ifx\eq@I\@empty\@eqI{null}\fi\fi\fi\fi}
 \def\ef@null{null}
-\def\@eqI#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@I\@empty\else
-    \def\eq@I{/I \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@I{/I 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqI#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@I\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@I{/I \ef@null}\else
+        \def\eq@I{/I \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@I{}
 %    \end{macrocode}
 % \DescribeMacro{\RI} an indirect reference to a form XObject defining
 % the buttons's \emph{rollover icon}
 %    \begin{macrocode}
-\def\@eqRI#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@RI\@empty\else
-    \def\eq@RI{/RI \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@RI{/RI 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqRI#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@RI\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@RI{/RI \ef@null}\else
+        \def\eq@RI{/RI \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@RI{}
 %    \end{macrocode}
 % \DescribeMacro{\IX} an indirect reference to a form XObject defining
 % the buttons's \emph{down icon}
 %    \begin{macrocode}
-\def\@eqIX#1{\ifx\annot@type\annot@type@button
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@IX\@empty\else
-    \def\eq@IX{/IX \eq@relRef{#1}}%
-    \ifpdf\ifx\eq@arg\ef@null
-    \def\eq@IX{/IX 0 0 R}\fi\fi
-    \eq@define@IconMK\fi\fi}
+\def\@eqIX#1{%
+  \ifx\annot@type\annot@type@button
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@IX\@empty\else
+      \ifx\eq@arg\ef@null
+        \def\eq@IX{/IX \ef@null}\else
+        \def\eq@IX{/IX \eq@relRef{#1}}%
+      \fi
+    \fi
+    \eq@define@IconMK
+  \fi
+}
 \def\eq@IX{}
 %    \end{macrocode}
 % \DescribeMacro{\TP} A code indicating the \texttt{layout} of the text and icon; these codes are
@@ -1280,13 +1319,15 @@
 %    \begin{macrocode}
 \def\@eqmkIns#1{\def\eq@mkIns{#1}}\def\eq@mkIns{}
 %    \end{macrocode}
-% \paragraph*{Additional entries specific to choice fields:} \texttt{Opt, TI, I}
+% \paragraph*{Additional entries specific to choice fields:} \texttt{Opt, TI, I}\par\medskip\noindent
+% An array of options in the list
 %    \begin{macrocode}
-% an array of options in the list
 \def\@eqOpt#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@Opt\@empty\else\def\eq@Opt{/Opt [#1]}\fi}
     \def\eq@Opt{}
-% for scrollable list boxes, the top index.
+%    \end{macrocode}
+% For scrollable list boxes, the top index.
+%    \begin{macrocode}
 \def\@eqTI#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@TI\@empty\else\def\eq@TI{/TI #1}\fi}
     \def\eq@TI{}
@@ -2607,8 +2648,15 @@
 %    \end{macrocode}
 %    \end{macro}
 % \subsection{Button Fields}\label{button}
-% Here is the field template for push button fields.
+% Here is the field template for push button fields.\par\medskip\noindent
+%
+% (2018/11/10) \cs{eq@APX} determines if \cs{eq@I} is empty, if not we supply the normal appearance
+% for the button to be the same appearance as set by \cs{eq@I}.
+% \changes{v2.9.21}{2018/11/10}{Introduce \string\cs{eq@APX} an `intelligent' AP key}
 %    \begin{macrocode}
+\def\eq@APX{\ifx\eq@I\@empty\eq@AP\else
+    /AP<< \expandafter\get@NIR\eq@I\@nil\space>>\fi}
+\def\get@NIR/#1 #2\@nil{/N #2}
 \def\common@pushButtonCode{%
     /Subtype/Widget
     /T (\Fld@name)
@@ -2618,12 +2666,15 @@
     \eq@H
     \eq@F
     /BS <<\eq@W\eq@S >>
-\ifx\eq@AP\@empty
+%    \end{macrocode}
+%   (2018/11/10) Remove conditional \string\cs{eq@AP}, some PDF viewers
+%    use AP to build the normal appearance for buttons.
+%    \changes{v2.9.21}{2018/11/10}{Remove conditional \string\cs{eq@AP}
+%    in \string\cs{common@pushButtonCode}}.
+%    \begin{macrocode}
     /MK <<\eq@R\eq@BC\eq@BG%
          \ef@kvCA\ef@kvRC\ef@kvAC\eq@IconMK\eq@mkIns>>
-\else
-    \eq@AP
-\fi
+    \eq@APX
     /DA (\eq@DA)
     \eq@A\eq@AA
     \eq@rawPDF
@@ -3616,6 +3667,11 @@
 {%
     \ifcase\nr\relax\@eqmlfix{y}\or
     \@eqmlfix{n}\fi
+}{}
+\define@choicekey{eforms}{importicons}[\val\nr]{yes,no}
+{%
+    \ifcase\nr\relax\@eqimportIcons{y}\or
+    \@eqimportIcons{n}\fi
 }{}
 \define@key{eforms}{mlstrut}[\strut]{\@eqmlstrut{#1}}
 \define@key{eforms}{mlcrackat}[]{\@eqmlcrackat{#1}}

@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2018/03/21 v8.2.2 %
+ [2018/10/03 v8.2.5 %
   Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -3506,8 +3506,9 @@ if (_bOK) {\jsR\jsT
 \allowNoAlertBox
 \newcommand\RespBoxNT{\RespBoxMath}
 \newcommand\RespBox{\RespBoxMath}
+\def\eqsanitize{\@makeother\_\@makeother\^\@makeother\&}
 \newcommand\RespBoxMath{\def\rbFlag{0}\begingroup\Hy@unicodefalse
-    \@makeother\^\@makeother\&\@RespBox}
+    \eqsanitize\@RespBox}
 \def\eq@rpl#1#2{_rplVarsBy('#1','#2')@} % dps17
 \ifnum\eq@drivernum=0\def\RorRT{\r\t}\else\def\RorRT{\r}\fi
 \def\toAltApprCnt{0}\def\toAltApprVar{_toAltAppr\toAltApprCnt}
@@ -3553,7 +3554,7 @@ var\eqSP_substValue=getSubstValue(_substVars,event.value);\RorRT
 0\ifx\grpquestions1,\thegrpquestionno\fi);\r
   }\r
   if (!isQuizInitialized("\currQuiz")) {\r\t
-    \eqObjAlert\space eqAppAlert(InitMsg("\bqlabelISO"),3);\r\t
+    \eqObjAlert eqAppAlert(InitMsg("\bqlabelISO"),3);\r\t
     event.rc = false;\r
   }
 }
@@ -3592,7 +3593,7 @@ var\eqSP_substValue=getSubstValue(_substVars,event.value);\RorRT
       var\eqSP_mathVars=\indepVars;\r\t
       var\eqSP retn=\processJSfunc(\rbArgs,\compareJSfunc);
 \fi
-\if\@sqTurnOffAlerts1\r\t
+\if\@sqTurnOffAlerts1%
       OnBlurRespBox(retn,"\curr@quiz");
 \fi
       \eqAddAAKeystroke\r
@@ -3807,7 +3808,7 @@ var\eqSP_substValue=getSubstValue(_substVars,event.value);\RorRT
     \if\@sqTurnOffAlerts1retn\else null\fi,"\curr@quiz");}
 \def\eqObjAlert{%
     \ifx\eqQuizType\isQZ\ifx\eq@online\eq@YES\ifeq@noquizsolutions
-    \else if (false)\fi\fi\fi}
+    \else if (false) \fi\fi\fi}
 \begin{defineJS}[%
     \catcode`\@=0\relax\catcode`\%=14\relax]{\AAKqRespBoxTxt}
 if(event.willCommit){

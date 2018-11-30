@@ -70,7 +70,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2018/08/16},
+    prepared={2018/11/27},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -591,6 +591,8 @@ width based on the width of the text given by \Cs{CA}, \Cs{RC} and
 \pushButton[\CA{Push}\AC{Me}\RC{Reset}\A{/S/ResetForm}]
     {myButton}{}{12bp}
 \end{Verbatim}
+Refer to the \pkg{icon-appr} package to supply icon appearances to push buttons created by
+the \pkg{eforms} package.
 
 \subsubsection{Check Boxes}\label{CheckBoxes}
 
@@ -645,6 +647,9 @@ command appears in the preamble of this document:
     \textColor{1 0 0}       % text color
 }
 \end{Verbatim}
+Refer to the \pkg{icon-appr} package to supply icon appearances to checkbox buttons created by
+the \pkg{eforms} package.
+
 
 \subsubsection{Radio Buttons}\label{RadioButtons}
 
@@ -715,6 +720,8 @@ command appears in the preamble of this document:
     \symbolchoice{star}     % check symbol
 }
 \end{Verbatim}
+Refer to the \pkg{icon-appr} package to supply icon appearances to radio button fields created by
+the \pkg{eforms} package.
 
 \subsection{Choice Fields}
 
@@ -2201,18 +2208,21 @@ creation of icons as button appearances. In the latter PDF,
 PDF creator.
 \begin{itemize}
 \item[]
-\settowidth{\aebdimen}{\ttfamily normappr=\anglemeta{string}}
+\settowidth{\aebdimen}{\ttfamily importicons=\anglemeta{yes|no}}
 \def\1{\llap{\Cs{I}\hspace{\marginparsep}}}%
 \def\2{\llap{\Cs{RI}\hspace{\marginparsep}}}%
 \def\3{\llap{\Cs{IX}\hspace{\marginparsep}}}%
+\def\4{\llap{\Cs{importIcons}\hspace{\marginparsep}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 !1normappr=!anglemeta(string)
 !2rollappr=!anglemeta(string)
 !3downappr=!anglemeta(string)
+!4importicons=!anglemeta(!upshape(yes|no))
 \end{dCmd}
 \item[]\CmdDescription The normal, rollover, and down appearances of the button face icon. The value of each
 key is an indirect reference to a form XObject. Normally, you can use the \texttt{graphicxsp} package
-to embed graphics and give a symbolic name which is used as the value of these keys.
+to embed graphics and give a symbolic name which is used as the value of these keys. \texttt{importIcons}
+is a special key used in conjunction with importing icons using JavaScript methods.
 
 \item[]
 \settowidth{\aebdimen}{\ttfamily layout=labelonly|icononly|icontop|iconbottom|}
@@ -3477,6 +3487,8 @@ RI?   & (push buttons only) an indirect reference to a form XObject
         defining the buttons's \emph{rollover icon}&\verb+\RI{rIcon}+\newline(example)\\
 IX?   & (push buttons only) an indirect reference to a form XObject
         defining the buttons's \emph{down icon}&\verb+\I{dIcon}+\newline(example)\\
+importIcons? & (push buttons only) a special key to signal that this button is the target
+of JavaScript that will supply the icons faces. Syntax: \cs{importIcons\darg{y|n}}&\verb|\importIcons{n}|\\
 TP?   & \texttt{\darg{\ameta{\upshape{0|1|2|3|4|5|6}}}} (push buttons only; optional)
         A code indicating the \texttt{layout} of the text and icon; these codes are
         0~(label only); 1~(icon only); 2~(label below icon); 3~(label above icon); 4~(label to the right of icon);
@@ -3500,6 +3512,7 @@ FB?  &  \texttt{\darg{true|false}} (push buttons only; optional) The \emph{fit b
 Q?      & \texttt{\darg{0|1|2|empty}} Quadding for text fields. Values are \texttt{0} (left-justified),
          \texttt{1} (centered), \texttt{2} (right-justified); e.g., \verb+\Q{1}+.
        &\verb+Q{}+\newline(left justified)\\
+\pagebreak
 \multicolumn{3}{>{\small\bfseries}l}{Default Appearance (DA)}\\
 DA?       & Default appearance string of the text in the widget. Normally, you just
            specify text font, size and color. Can be redefined, advance techniques needed.&\\

@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2018/03/21 v8.2.2 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2018/10/03 v8.2.5 %
 %<package>  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver>  Exerquiz documentation driver file (dps)]
 %<aebjs>  Exerquiz document level JavaScript (dps)]
@@ -2077,7 +2077,7 @@
 %\changes{v6.7}{2013/04/07}{Inserted another argument into \cs{eqEXt}}
 % (2013/04/07) Added another argument into \cs{eqEXt}, used for filtering.\par\medskip
 %    \noindent
-%    When solutions are written to the SOL file, they are not normally in a group.
+%    (2018/02/13) When solutions are written to the SOL file, they are not normally in a group.
 %    If you execute \DescribeMacro\makeExSolnsLocalOn\cs{makeExSolnsLocalOn}, each solution
 %    is written in a group. Undo this with \DescribeMacro\makeExSolnsLocalOff\cs{makeExSolnsLocalOff},
 %    which is the historic default.
@@ -2521,8 +2521,11 @@
         \exrtnlabelformat\fi}}%
     \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi^^J%
 %</eqexam>
-    \ifmakeExSlLocal\protect\endgroup^^J\fi
 %<*package|eqexam>
+%    \end{macrocode}
+%     \changes{v8.2.5}{2018/10/03}{\string\cs{ifmakeExSlLocal} misplaced, corrected}
+%    \begin{macrocode}
+    \ifmakeExSlLocal\protect\endgroup^^J\fi
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -7725,9 +7728,12 @@ if (_bOK) {\jsR\jsT
 %    \end{macrocode}
 %     (2018/03/21) Exclude unicode from \cs{RespBoxMath}
 %    \changes{v8.2.2}{2018/03/21}{Exclude unicode from \string\cs{RespBoxMath}}
+%    \changes{v8.2.3}{2018/09/12}{Made subscript catode 12 in \string\cs{RespBoxMath}}
+%    \changes{v8.2.4}{2018/09/24}{Defined \string\cs{eqsanitize} for \string\cs{RespBoxMath}}
 %    \begin{macrocode}
+\def\eqsanitize{\@makeother\_\@makeother\^\@makeother\&}
 \newcommand\RespBoxMath{\def\rbFlag{0}\begingroup\Hy@unicodefalse
-    \@makeother\^\@makeother\&\@RespBox}
+    \eqsanitize\@RespBox}
 %    \end{macrocode}
 % Within \cs{RespBoxMath}, \cs{rpl} (\cs{rpl=\texttt{\underbar{r}e\underbar{pl}ace}}) is \cs{let} to \cs{eq@rpl}. The command \cs{rpl}, used
 % within the variable argument of \cs{RespBoxMath}, declares a multi-letter variable. There are
@@ -7809,7 +7815,7 @@ if (_bOK) {\jsR\jsT
 0\ifx\grpquestions1,\thegrpquestionno\fi);\r
   }\r
   if (!isQuizInitialized("\currQuiz")) {\r\t
-    \eqObjAlert\space eqAppAlert(InitMsg("\bqlabelISO"),3);\r\t
+    \eqObjAlert eqAppAlert(InitMsg("\bqlabelISO"),3);\r\t
     event.rc = false;\r
   }
 }
@@ -7858,7 +7864,7 @@ if (_bOK) {\jsR\jsT
       var\eqSP_mathVars=\indepVars;\r\t
       var\eqSP retn=\processJSfunc(\rbArgs,\compareJSfunc);
 \fi
-\if\@sqTurnOffAlerts1\r\t
+\if\@sqTurnOffAlerts1%
       OnBlurRespBox(retn,"\curr@quiz");
 \fi
 %    \end{macrocode}
@@ -8303,7 +8309,7 @@ if (_bOK) {\jsR\jsT
     \if\@sqTurnOffAlerts1retn\else null\fi,"\curr@quiz");}
 \def\eqObjAlert{%
     \ifx\eqQuizType\isQZ\ifx\eq@online\eq@YES\ifeq@noquizsolutions
-    \else if (false)\fi\fi\fi}
+    \else if (false) \fi\fi\fi}
 \begin{defineJS}[%
     \catcode`\@=0\relax\catcode`\%=14\relax]{\AAKqRespBoxTxt}
 if(event.willCommit){
@@ -11372,15 +11378,33 @@ function requireFormNot(UserAns, regexpr) {
 \begin{newsegment}{Eq: Support for multi-letter variables}
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
-    return this.replace(/^[\s\string\uFEFF\string\xA0]+|%
-[\s\string\uFEFF\string\xA0]+$/g, '');
+    return this.replace(/^[\s\string\\uFEFF\string\\xA0]+|%
+[\s\string\\uFEFF\string\\xA0]+$/g, '');
   };
 }
+%    \end{macrocode}
+%    \makebox[0pt][r]{\texttt{\_rplVarsBy\hskip\marginparsep}}\hskip-\marginparsep\texttt{(str1,str2)}
+%    replaces \texttt{str1} by \texttt{str2}; i.e.,
+%    |_rplVarsBy('theta','x')|. The first argument is a multi-letter variable,
+%    the second is a single letter variable that \pkg{exerquiz} works with directly.
+%    \begin{macrocode}
 function _rplVarsBy(str1,str2) {
     var re=new RegExp(str1,"g");
     var result=str1.replace(re,str2);
     return result;
 }
+%    \end{macrocode}
+%    \makebox[0pt][r]{\texttt{processMathVars\hskip\marginparsep}}\hskip-\marginparsep\texttt{(str)}
+%    searches through \texttt{str} for the string \texttt{\_rplVarsBy}; if found, it gets all string
+%    content up to the next \texttt{@} marker. It replaces the multi-letter with single letter and returns
+%    the \pkg{exerquiz} single-leter variable list.
+%\begin{verbatim}
+%   var _substVars="a,_rplVarsBy('omega->\u03C9','y')@";
+%   var _mathVars=processMathVars(_substVars);
+%   var _substValue=getSubstValue(_substVars,event.value);
+%   var _substAns=getSubstValue(_substVars,"a+omega");
+%\end{verbatim}
+%    \begin{macrocode}
 function processMathVars(str) {
   var pos1,pos2,lead,tmp;
   while ((pos1=str.indexOf("_rplVarsBy"))!=-1) {
@@ -11388,34 +11412,55 @@ function processMathVars(str) {
     lead=str.substring(0,pos1);
     tmp=str.substring(pos1,pos2);
     str=str.substring(pos2+1);
+%    \end{macrocode}
+%    For example, for |tmp="_rplVarsBy('omega->\u03C9','y')"|, after \texttt{eval(tmp)}, \texttt{tmp} is then
+%    \texttt{y}.
+%    \begin{macrocode}
     tmp=eval(tmp);
+%    \end{macrocode}
+%    Combine this new result with the old, for example \texttt{str="a,y"}, for the example above.
+%    \begin{macrocode}
     str=lead+tmp+str;
   }
   str=str.replace(/\s/g,"");
   return str;
 }
-getSubstValue.aSubsts=new Array();   // dps17
+%    \end{macrocode}
+%    \makebox[0pt][r]{\texttt{getSubstValue}\hskip\marginparsep}\hskip-\marginparsep\texttt{(v,s)}
+%    Below is a two multi-letter variable example:
+%\begin{verbatim}
+%	var _substVars=
+%   "c_rplVarsBy('theta->\u03B8','x')@_rplVarsBy('alpha->\u03B1','y')@";
+%	var _mathVars=processMathVars(_substVars);
+%	var _substValue=getSubstValue(_substVars,event.value);
+%	var _substAns=getSubstValue(_substVars,"-c alpha sin(theta)");
+%	var retn=ProcResp(0,_substAns,3,.0001,"[0,1]x[0,1]x[0,1]",%
+%   _mathVars,diffCompare,_substValue);
+%\end{verbatim}
+%The first argument is \texttt{v}, the variable list; it might be \texttt{"xyz"}, or
+%if there are substitutions, it might be as above (see \texttt{\_substVars}). The second
+%argument is \texttt{s}, the user's answer or the author's answer.
+%    \begin{macrocode}
+getSubstValue.aSubsts=new Array();
 function getSubstValue(v,s){
-/*
-  v=variable list, it may have the form "xyz", or if there
-    substitutions, it might look like "_rplVarsBy('theta','x')@";
-  s=Either the user's answer or the author's answer.
-
-  First develop an array of all variables are their substitutes.
-  ie, getSubstValue.aSubsts=[ "c","h", ["theta",x"], ["alpha",y],...];
-*/
   var pos1,pos2,tmp,args,re,arg1,arg2;
-/*
-  change new style to old
-  New style: v="c,_rplVarsBy('theta->\u03B8','r:x')@,%
-_rplVarsBy('alpha->\u03B1','r:y')@";
-  Old style: v="c_rplVarsBy('theta->\u03B8','x')@%
-_rplVarsBy('alpha->\u03B1','y')@";
-*/
+%    \end{macrocode}
+%  Change new style to old.\\
+%  \textbf{New style} (commas):\\\null\quad|v="c,_rplVarsBy('theta->\u03B8','r:x')@,%|\\\null\qquad
+%|_rplVarsBy('alpha->\u03B1','r:y')@";|\\
+%  \textbf{Old style} (no commas):\\\null\quad|v="c_rplVarsBy('theta->\u03B8','x')@%|\\\null\qquad
+%|_rplVarsBy('alpha->\u03B1','y')@";|\\
+%We want to remove the commas that are \emph{not preceded} by a single quote (\texttt'), as this type
+%are inside the argument of \texttt{\_rplVarsBy}. We also remove things like \texttt{r:x}.
+%    \begin{macrocode}
   re=/([^'])(,)/g;
   v=v.replace(re,'$1');
   re=/([ri]\string\:)+(\string\w)/g;
   v=v.replace(re,'$2');
+%    \end{macrocode}
+%  Now, develop an array of all variables and their substitutes.
+%  ie,\\|getSubstValue.aSubsts=[ ["theta","\u03B8"], ["alpha","\u03B1"],...];|
+%    \begin{macrocode}
   getSubstValue.aSubsts=[]; // dps17
   var start=0;
   while (true) {
@@ -11438,6 +11483,21 @@ _rplVarsBy('alpha->\u03B1','y')@";
   }
   return s;
 }
+%    \end{macrocode}
+%    \makebox[0pt][r]{\texttt{RespBoxAppr}\hskip\marginparsep}\hskip-\marginparsep\texttt{(e)}
+%    The variable is either an event object (when called from a format event) or is a string
+%    (when called from an Ans button). Assume \texttt{e="-c*alpha*sin(theta)"}.
+%    We go through the \texttt{etSubstValue.aSubsts}, and replace each variable
+%    developed by \texttt{getSubstValue()} by its substitute variable. Here a lines from
+%    an Ans button
+%\begin{verbatim}
+%		var _substVars="c_rplVarsBy('theta->\u03B8','x')@
+%       _rplVarsBy('alpha->\u03B1','y')@";
+%		var _substAns=getSubstValue(_substVars,"-c*alpha*sin(theta)");
+%		var value=RespBoxAppr("-c*alpha*sin(theta)");
+%\end{verbatim}
+%We must call \texttt{getSubstValue()} prior to calling this function.
+%    \begin{macrocode}
 function RespBoxAppr(e){
   var value=(typeof e=="object")?e.value:e;
   var re;
@@ -12417,7 +12477,7 @@ oCheckbox: appAlerts[qname]});
     if (str.replace(/\s/g,"") == "") {
       var defaultColor=%
 (typeof oQName.DefaultColorJSLoc=="undefined")%
-?color.black:oQName.DefaultColorJSLoc;
+?\defaultColorJS:oQName.DefaultColorJSLoc;
   		if (isthereRBUP) g.display=display.hidden;
         event.target.strokeColor = defaultColor;
     }

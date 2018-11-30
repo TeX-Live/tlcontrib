@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage[web={designv,tight},eforms
+]{aeb_pro}
+\usepackage{icon-appr}\previewOff
+\usepackage{fancyvrb}
+
+\title{Creating icon appearances for push buttons\texorpdfstring{\\[1ex]}{}
+  using \textsf{aeb\_pro}}
+\author{D. P. Story}
+\university{Acro\TeX.Net}
+\email{dpstory@acrotex.net}
+\subject{Techniques for creating button appearances}
+\keywords{icon appearances of push button,JavaScript}
+\version{1.0}
+\norevisionLabel
+
+\let\pkg\textsf
+\let\app\textsf
+\def\hardspace{{\fontfamily{cmtt}\selectfont\symbol{32}}}
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\begin{embedding}
+\embedIcon[placement={Avatar1,[2]Avatar2}]{../graphics/man1.pdf}
+\embedIcon[placement={[1]Avatar1,[1]Avatar2}]{../graphics/scot.gif}
+\embedIcon[placement={[2]Avatar1,[0]Avatar2}]{../graphics/girl.png}
+\end{embedding}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Here we use JavaScript methods for creating icon appearances for push buttons
+(but not for check box or radio button fields). The technique requires
+\app{aeb\_pro}. \app{Adobe Distiller} is needed to create the PDF (after
+apply \app{dvips}), then open the newly created PDF in the full \app{Acrobat}
+application and save the document.
+
+You can use purely EPS files as well that do not use JavaScript methods and
+does not require \pkg{aeb\_pro}; however, \pkg{graphicxsp} is required
+instead. Refer to \texttt{icons-appr-eps.tex}.\medskip
+
+\noindent\textbf{The premise.} We have two fields we want to supply icon
+appearances to; these are \texttt{Avatar1} and \texttt{Avatar2}. In the
+preamble of this document, we have,
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\begin{embedding}
+\embedIcon[placement={Avatar1,[2]Avatar2}]{../graphics/man1.pdf}
+\embedIcon[placement={[1]Avatar1,[1]Avatar2}]{../graphics/scot.gif}
+\embedIcon[placement={[2]Avatar1,[0]Avatar2}]{../graphics/girl.png}
+\begin{embedding}
+\end{Verbatim}
+The required argument is the path to the image file. For this situation, for
+the optional argument, there are two keys of interest, \texttt{placement} and
+\texttt{page}, the latter applies to a PDF image file. The value of
+\texttt{page} is a base~0 page number (the first page is page~0).
+
+The \texttt{placement} key ``places'' the image on the button faces of the
+field names listed (\texttt{Avatar1} and \texttt{Avatar2}). There is an
+optional argument that precedes the field name that determines the face of
+the button the icon is to appear on; the values are \texttt{[0]} (default,
+normal icon); \texttt{[1]} (down icon); and \texttt{[2]} (rollover icon). The
+optional argument precedes the field name, and is shown in the example above.
+There must be no space between the optional argument and the field name; if
+you type `\texttt{[2]\hardspace Avatar1}', for example, the field name is interpreted
+as `\texttt{\hardspace Avatar1}', which is incorrect. The example is shown below.\medskip
+
+\def\myPresets{\BC{}\BG{}\S{S}\autoCenter{n}\importIcons{y}
+  \FB{true}\TP{1}}
+
+\hspace*{20pt}\pushButton[\presets{\myPresets}\A{\JS{app.alert("Avatar 1")}}]{Avatar1}{.5in}{.5in}\qquad
+\pushButton[\presets{\myPresets}\A{\JS{app.alert("Avatar 2")}}]{Avatar2}{.5in}{.5in}\medskip
+
+\noindent The verbatim listing of the above push buttons with custom appearance follows:
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\def\myPresets{\BC{}\BG{}\S{S}\autoCenter{n}
+    \FB{true}\importIcons{y}\TP{1}}
+\pushButton[\presets{\myPresets}
+    \A{\JS{app.alert("Avatar 1")}}]{Avatar1}{.5in}{.5in}\qquad
+\pushButton[\presets{\myPresets}
+    \A{\JS{app.alert("Avatar 2")}}]{Avatar2}{.5in}{.5in}
+\end{Verbatim}
+Note that I've inserted a \cs{presets} key with value of \cs{myPresets}, to
+conveniently enter standard optional parameters. The meaning of \cs{FB} and
+\cs{TP} are explained in the \pkg{icon-appr} package documentation. An
+important key-value is \cs{importIcons}, we set its value as
+\verb!\importIcons{y}!; this declares that the push button field is the
+target of some JavaScript that will supply the icon appearances.
+
+\section{Check box and radio buttons fields}
+
+We use JavaScript methods to populate the appearance faces of push buttons;
+however, there are no JavaScript methods for populating appearance faces for
+check boxes and radio button fields. Other methods need to be used; these are
+methods demonstrated in \texttt{icons-appr-eps.tex}.
+
+\end{document}

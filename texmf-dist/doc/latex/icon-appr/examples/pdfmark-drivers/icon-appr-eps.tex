@@ -1,0 +1,84 @@
+\documentclass{article}
+
+\usepackage[designv,tight]{web}
+\usepackage{eforms}
+\usepackage{graphicxsp}[2018/11/20]
+\usepackage{icon-appr}\previewOff
+
+\title{Creating icon appearances for button fields\texorpdfstring{\\[1ex]}{ }using EPS methods}
+\author{D. P. Story}
+\university{Acro\TeX.Net}
+\email{dpstory@acrotex.net}
+\subject{Techniques for creating icon appearances for button fields}
+\keywords{icon appearances of button fields}
+\version{1.0}
+\norevisionLabel
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\begin{embedding}
+\embedEPS[hiresbb,name=mani]{../graphics/man1}
+\embedEPS[hiresbb,name=girl]{../graphics/girl}
+\embedEPS[hiresbb,name=scot]{../graphics/scot}
+\end{embedding}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+For the \textsf{\textbf{pdfmark}}-type drivers (\textsf{dvips} and
+\textsf{dvipsone}), there are two ways to create an icon appearance: (1)
+JavaScript methods and (2) EPS methods. The JavaScript methods are
+demonstrated in \texttt{icons-appr-pb.tex}. A shortcoming of the JavaScript
+method is that \textsf{Acrobat} and \textsf{Distiller}) are needed, and the
+methods do not apply to check box and radio button fields. The advantage of
+EPS methods is they apply to all button fields.
+
+
+\section{Push button fields}
+
+\noindent\begin{minipage}[t]{100bp}\kern0pt
+\pushButton[\BC{}\BG{}\autoCenter{n}
+%  \A{\JS{app.alert("AcroTeX rocks!")}}
+  \TP{1}\BG{}\S{S}
+  \I{\mani}
+  \RI{\girl}
+  \IX{\scot}
+]{myButton}{100bp}{100bp}
+\end{minipage}\cgBdry[6bp]\raisebox{-.5\baselineskip}{\begin{minipage}[t]{\linewidth-108bp}
+\textbf{Comments on PDF creation.} The file can be distilled and viewed in
+\textsf{Acrobat} and saved for others to view in another PDF viewer; however,
+you can also use \textsf{ps2pdf} to produce a PDF file; however, the
+resulting PDF does not display correctly in \textsf{PDF-XChange Editor} (or
+\textsf{Viewer}). In this case, open the file in \textsf{Adobe Reader DC} (or
+\textsf{Acrobat}) and save it. It will now view correctly in
+\textsf{PDF-XChange}. This file does view correctly for \textsf{SumatraPDF};
+however, the buttons have the correct appearances, but are not functional.
+\end{minipage}}
+
+\section{A check box button field}
+
+\checkBox[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myCkBx}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\hfill
+\pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}
+
+\section{A radio button field}
+
+\radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad \radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad\radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\hfill
+\pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}
+
+
+\end{document}

@@ -1,0 +1,487 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,tight*,latextoc,pro},
+    eforms={req=2018/11/10},aebxmp
+]{aeb_pro}
+\usepackage{icon-appr}\previewOff
+\usepackage{array,fancyvrb}
+\usepackage[showembeds,!draft]{graphicxsp}
+\usepackage{aeb_mlink}
+\usepackage{icon-appr}
+
+\usepackage{xbmks}
+\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\xbmksetup{colors={int=red},styles={intbf}}
+
+\advance\marginparwidth 14pt
+
+\begin{embedding}
+\embedEPS[hiresbb,name=mani]{../examples/graphics/man1}
+\embedEPS[hiresbb,name=girl]{../examples/graphics/girl}
+\embedEPS[hiresbb,name=scot]{../examples/graphics/scot}
+\end{embedding}
+
+%\usepackage{myriadpro}
+%\usepackage{calibri}
+\usepackage[altbullet]{lucidbry}
+
+\def\hardspace{{\fontfamily{cmtt}\selectfont\symbol{32}}}
+\let\uif\textsf
+\def\psf#1{\textsf{\textbf{#1}}}
+\def\mpFmt{\raggedleft\itshape\small}
+
+\usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\urlstyle{tt}
+%\renewcommand\LayoutTextField[2]{#2}
+
+\def\STRUT{\rule{0pt}{14pt}}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \textsf{icon-appr} Package},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject=Documentation for the icon-appr package,
+    talksite={\url{www.acrotex.net}},
+    version={1.0, 2018/11/23},
+    Keywords={LaTeX, form field, icon appearances, AcroTeX},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The icon-appr Package";
+var manualfilename="Manual_BG_Print_iconappr.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+
+\begin{document}
+
+\maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
+
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}\label{intro}
+
+In this package, we provide commands and methods for creating icon
+appearances for form field buttons, which includes push buttons, check box
+buttons, and radio buttons. Below are examples of the three types of buttons
+having icon appearances, rather than their customary appearances:
+\begin{flushleft}
+\hskip15pt
+\pushButton[\BC{}\BG{}\autoCenter{y}
+%  \A{\JS{app.alert("AcroTeX rocks!")}}
+  \TP{1}\BG{}\S{S}
+  \I{\mani}
+  \RI{\girl}
+  \IX{\scot}
+]{myButton}{50bp}{50bp}\qquad
+%
+\checkBox[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{/N << \On{Man}{\mani} \Off{\girl} >> }
+    ]{myCkBx}{22bp}{22bp}{Man}\qquad %(Girl is `off', Man is `on')\hfill
+%
+\radioButton[\BC{}\BG{}
+  \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+  \AP{/N << \On{Man}{\mani} \Off{\girl} >> }
+  ]{myRadBtn}{22bp}{22bp}{Man}\quad
+\radioButton[\BC{}\BG{}
+  \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+  \AP{/N << \On{Man}{\mani} \Off{\girl} >> }
+  ]{myRadBtn}{22bp}{22bp}{Man}\quad
+\radioButton[\BC{}\BG{}
+  \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+  \AP{/N << \On{Man}{\mani} \Off{\girl} >> }
+  ]{myRadBtn}{22bp}{22bp}{Man}\qquad %(Girl is `off', Man is `on')\hfill
+%
+\pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{.5in}{11bp}\hfill
+\parbox{1.5in}{\footnotesize For the check box and radio buttons, the Girl is `off'
+and the Man is `on'}%
+\\[3pt]\hglue15pt
+\bgroup\fboxsep0pt\relax\footnotesize
+\makebox[52bp][c]{\hss Push button\hss}\qquad
+\makebox[24bp][c]{\hss Check box\hss}\qquad
+\makebox[66bp+2bp+2em][c]{\hss Radio buttons\hss}\\[3pt]
+\makebox[52bp][c]{\hfill}\qquad
+\egroup
+\end{flushleft}
+The two sections that follow document the environment, commands, and methods for producing the
+above results. The above buttons are used in the demo files, these are found in the
+\textsf{examples} folder:
+\begin{itemize}
+\item \texttt{examples/icon-appr.exmpl.tex}
+\item \texttt{examples/pdfmark-drivers/icon-appr-pb.tex}
+\item \texttt{examples/pdfmark-drivers/icon-appr-eps.tex}
+\item \texttt{examples/pdfmark-drivers/icon-appr-eps-transp.tex}.
+\end{itemize}
+The first one listed above is for the \app{pdflatex}, \app{lualatex}, and
+\app{xelatex} drivers (applications), the latter three are designed for users
+of \app{dvips} or \app{dvipsone}.
+
+\newtopic\noindent
+The \pkg{eforms}\marginpar{\mpFmt\pkg{eforms} package
+required} package, dated 2018/11/10 or later, is required to create buttons
+with icon appearances, this is because, as of this writing, the form fields
+produced by \pkg{hyperref} do not support the necessary markup to produce
+icon appearances.
+
+
+\section{Methods for non-\textsf{pdfmark} drivers}\label{nPdfmark}
+
+The supported `non-\psf{pdfmark}' drivers are \app{pdflatex}, \app{lualatex}, and
+\app{xelatex}\marginpar{\mpFmt\app{pdflatex}\\ \app{lualatex}\\ \app{xelatex}}. To create icon appearances, embed the icon files with the
+\cs{embedIcon} command from within the \env{embedding} environment. This
+occurs in the preamble of the document.
+\bVerb\takeMeasure{\string\embedIcon[\ameta{KV-pairs]\darg{\ameta{path}}}} %
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{embedding}
+\embedIcon[!ameta(KV-pairs)]{!ameta(path)}
+...
+\end{embedding}
+\end{dCmd}
+\eVerb The \cs{embedIcon} embeds the icon file (\ameta{path}) in the
+document; it can then be referenced multiple times without significantly
+increasing the file size. The two relevant key-values (\ameta{KV-pairs}) are
+\texttt{name=\ameta{name}}\marginpar{\mpFmt The \texttt{name} key} and
+\texttt{hyopts=\darg{\ameta{various}}}. Internally, \ameta{name} is made into
+a control sequence (\cs{\ameta{name}}) which is used to reference the
+embedded icon file in the form field markup. Normally, \ameta{name} consists
+of letters, no active characters allowed; if \ameta{name} contains
+non-letters, its name may be referenced using the \cs{csOf}\marginpar{\mpFmt
+The \cs{csOf} cmd} command (\cs{csOf\darg{\ameta{name}}}). The other
+key-value pair is \texttt{hyopts=\darg{\ameta{various}}}\marginpar{\mpFmt The
+\texttt{hyopts} key}, the value \ameta{various} are key-values of the
+\cs{includegraphics} command, which is used in the background. Passing any
+key-value through to \cs{includegraphics} may or may not have an effect. One
+useful key is the \texttt{page} key; when \ameta{path} leads to a multi-page
+PDF file, and \app{xelatex} is \emph{not being used},
+\texttt{page=\ameta{num}} retrieves page~\ameta{num} from the PDF document.
+
+\paragraph*{Example.} We reproduce part of the file \texttt{icon-app-exmpl.tex}. First, in the preamble,
+embed all icon files to be used.
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\begin{embedding}
+\embedIcon[name=mani]{graphics/man1.pdf}
+\embedIcon[name=girl]{graphics/girl.pdf}
+\embedIcon[name=scot]{graphics/scot.pdf}
+\end{embedding}
+\end{Verbatim}
+From these declarations, the commands \cs{mani}, \cs{girl}, and \cs{scot} are
+defined. Now in the body of the document, we create a push button:
+\begin{Verbatim}[xleftmargin=\parindent,commandchars=!(),fontsize=\small]
+\pushButton[%
+  \TP{1}\BG{}\S{S}
+  \I{\csOf{mani}}  %!normalfont( normal appearance, where we use !texttt(\csOf) to demonstrate its use)
+  \RI{\girl}       %!normalfont( rollover appearance, here, we reference the icon using !texttt(\girl))
+  \IX{\scot}       %!normalfont( down appearance, we reference the icon using !texttt(\scot))
+]{myButton}{50bp}{50bp}
+\end{Verbatim}
+The same techniques work for choice boxes and radio button fields. Refer to sample file \texttt{icon-appr-exmpl.tex}
+for a working example.
+
+\section{Methods for \textsf{pdfmark} drivers}
+
+For \psf{pdfmark} drivers (\app{dvips} and \app{dvipsone})\marginpar{\mpFmt\sffamily dvips\\ dvipsone}, there
+are two techniques that have been developed. These techniques were developed because
+EPS files are the only graphics files \app{dvips} (and \app{dvipsone}) work with.
+\begin{itemize}
+   \item \textbf{JavaScript approach:} Acrobat JavaScript has a method for
+       embedding a number of graphics file formats as icons, which can then
+       be used as icon appearance faces. This method requires the
+       \app{Acrobat} application to open the newly created PDF file, after
+       \app{Distiller} (or \app{ps2pdf}) has created the PDF file. Any
+       supported graphics file format can be used. The method is explained
+       in detail in \hyperref[s:JSMethods]{Section~\ref*{s:JSMethods}}.
+
+   \item \textbf{Purely EPS approach:} We can use exclusively EPS files for
+       icon appearances; in fact, the examples given in the
+       \textbf{Introduction} section on page~\pageref{intro} were created by this
+       method. Details are found in \hyperref[s:EPSMethods]{Section~\ref*{s:EPSMethods}}.
+\end{itemize}
+
+\subsection{The JavaScript approach}\label{s:JSMethods}
+
+\textbf{Requirements:} The {\LaTeX} package
+\pkg{aeb\_pro}\marginpar{\mpFmt\pkg{aeb\_pro} package} is
+required as it supplies the JavaScript code.
+\app{Distiller}\marginpar{\mpFmt \app{Distiller} or
+\app{ps2pdf}, and \app{Acrobat}} or \app{ps2pdf} is used to create the PDF.
+Open the file in \app{Acrobat} where the JavaScript is executed to embed
+referenced files as icon objects and associate icon files with push button
+appearances.
+
+This method only applies to push buttons\marginpar{\mpFmt
+push buttons only}, not to check box or radio button fields. Again, the
+basic elements to use are the \env{embedding} environment in the preamble and
+the \cs{embedIcon} command.
+\bVerb\takeMeasure{\string\embedIcon[\ameta{KV-pairs]\darg{\ameta{path}}}} %
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{embedding}
+\embedIcon[!ameta(KV-pairs)]{!ameta(path)}
+...
+\end{embedding}
+\end{dCmd}
+\eVerb The set of key-value pairs (\ameta{KV-pairs}) of \cs{embedIcon} is a
+little different than the ones listed in
+\hyperref[nPdfmark]{Section~\ref*{nPdfmark}}, these are (1) the
+\texttt{placement}\marginpar{\mpFmt
+\texttt{placement} key} key informs the underlying JavaScript where to place
+the icon file; (2) the \texttt{page}\marginpar{\mpFmt
+\texttt{page} key} key can be used for multi-page PDF icons files to specify
+the number of the page to be used, this is a 0-based page number.
+
+\subparagraph{Syntax for the value of the \texttt{placement} key:} The
+\texttt{placement} key ``places'' the image on the button faces of the field
+names listed (\texttt{myButton}). A push button has three appearance faces:
+normal appearance, rollover appearance, and down appearance. As a result of
+this, there is an optional argument that precedes the field name that
+determines the face of the button the icon is to appear on; the values are
+\texttt{[0]} (default, normal icon);\footnote{When no optional argument
+precedes the field name, it is understood to be the normal appearance.}
+\texttt{[1]} (down icon); and \texttt{[2]} (rollover icon). The optional
+argument precedes the field name, and is shown in the example below. There
+must be no space between the optional argument and the field name; if you
+type `\texttt{[2]\hardspace myButton}', for example, the field name is
+interpreted as `\texttt{\hardspace myButton}', which is incorrect.
+
+\paragraph*{Example.} This is a modified version of the example that appears
+in the sample file \texttt{icon-appr-pb.tex}. We begin by embedding the icon
+files in the document. The target field has name `\texttt{myButton}' and we
+place the images on it: \texttt{man1.pdf} is the normal appearance;
+\texttt{scot.gif} is the down appearance; and\texttt{ girl.png} is the
+rollover appearance.
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\begin{embedding}
+\embedIcon[placement=myButton]{graphics/man1.pdf}
+\embedIcon[placement={[1]myButton}]{graphics/scot.gif}
+\embedIcon[placement={[2]myButton}]{graphics/girl.png}
+\end{embedding}
+\end{Verbatim}
+Note the variety of icon file formats used.
+
+In the body of the document, we create a push button. At the time
+the button is created, the icon files have not been imported and embedded,
+but we indicate that this button uses icon appearances by passing
+\verb~\importIcons{y}~ as an optional argument, \emph{this is
+important}.\marginpar{\mpFmt Important!}
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,commandchars=!()]
+\pushButton[\BC{}\BG{}\S{S}!textbf(\importIcons{y})
+  \FB{true}\TP{1}]{myButton}{50bp}{50bp}
+\end{Verbatim}
+When the newly created PDF is first opened in \app{Acrobat} some JavaScript
+will execute and embed the icon files in the PDF, then populate the specified
+button faces with the specified icons.
+
+By the way, a single \cs{embedIcon} command can provide multiple push buttons with
+its icon; the value of \texttt{placement} can be a comma-delimited list of
+field names (with optional argument preceding). For example,
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\begin{embedding}
+\embedIcon[placement={myButton,[1]myOtherButton}]{graphics/man1.pdf}
+...
+\end{embedding}
+\end{Verbatim}
+Refer to \texttt{icon-appr-pb.tex} for a working example.
+
+
+\subsection{The purely EPS approach}\label{s:EPSMethods}
+
+\textbf{Requirements.} The EPS method requires the use of the
+\pkg{graphicxsp}\marginpar{\mpFmt \pkg{graphicxsp}
+required} package, dated 2018/11/20 or later. \app{Distiller} or \app{ps2pdf}
+can be used to produce the PDF file; \app{Acrobat} is \emph{not required}
+(unless another package requires it). It is strongly recommended that when
+creating check boxes or radio button fields that the newly created PDF be
+opened in \app{Adobe Reader DC} (or, optionally \app{Acrobat} itself) and
+\emph{saved}\marginpar{\mpFmt save the PDF!}. This will
+enable users of \app{PDF-XChange Viewer/Editor} to view these buttons
+correctly.
+
+The technique is similar to that of the non-\psf{pdfmark}
+drivers. Again, we use the \env{embedding} environment in the preamble, but
+the \cs{embedEPS} command within the environment is used instead of
+\cs{embedIcon}.
+\bVerb\takeMeasure{\string\embedEPS[\ameta{KV-pairs]\darg{\ameta{path}}}} %
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{embedding}
+\embedEPS[!ameta(KV-pairs)]{!ameta(path)}
+...
+\end{embedding}
+\end{dCmd}
+\eVerb Where \ameta{path} points to an EPS file. The
+\texttt{name=\ameta{name}}\marginpar{\mpFmt\texttt{name}
+key required} key-value is required in the optional argument
+\ameta{KV-pairs}, other key-value pairs are passed to \cs{includegraphics}.
+
+Internally, \ameta{name} is made into a control sequence (\cs{\ameta{name}})
+which is used to reference the embedded icon file in the form field markup.
+Normally, \ameta{name} consists of letters, no active characters; if
+\ameta{name} contains non-letters, its name may be referenced using the
+\cs{csOf}\marginpar{\mpFmt The \cs{csOf} cmd} command
+(\cs{csOf\darg{\ameta{name}}}).
+
+\paragraph*{Example.} This is a modified version of the example that appears in the sample
+file \texttt{icon-appr-eps.tex}.
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\begin{embedding}
+\embedEPS[hiresbb,name=mani]{graphics/man1}
+\embedEPS[hiresbb,name=girl]{graphics/girl}
+\embedEPS[hiresbb,name=scot]{graphics/scot}
+\end{embedding}
+\end{Verbatim}
+Here, we pass the \texttt{hiresbb} key to \cs{includegraphics}.
+From this declarations, the command \cs{mani}, \cs{girl}, and \cs{scot} are
+defined. Now in the body of the document, we create a push button:
+\begin{Verbatim}[xleftmargin=\parindent,commandchars=!(),fontsize=\small]
+\pushButton[%
+  \TP{1}\BG{}\S{S}
+  \I{\csOf{mani}}  %!normalfont( normal appearance, where we use !texttt(\csOf) to demonstrate its use)
+  \RI{\girl}       %!normalfont( rollover appearance, here, we reference the icon using !texttt(\girl))
+  \IX{\scot}       %!normalfont( down appearance, we reference the icon using !texttt(\scot))
+]{myButton}{50bp}{50bp}
+\end{Verbatim}
+Note that this is the same markup as was presented in \hyperref[nPdfmark]{Section~\ref*{nPdfmark}}.
+The same techniques work for choice boxes and radio button fields. Refer to sample file \texttt{icon-appr-eps.tex}
+for a working example.
+
+When EPS methods are used, the Adobe transparency model can be used (\app{Distiller} required). See
+the sample file \texttt{icon-appr-eps-transp.tex}.
+
+\section{Parameters controlling the icon appearance for push buttons}\label{parameters}
+
+The \textbf{MK} entry is used to provide an \emph{appearance characteristic
+dictionary} containing additional information for constructing the
+annotation's appearance. The \pkg{eforms} package has key-value pairs that
+populates the \textbf{MK} dictionary; we describe the entries in the
+dictionary, these entries are entered through the optional argument of a
+\cs{pushButton} command. In the listing below, we give the key-value pairs,
+the first is the original key scheme, the second is the more user-friendly
+key. Additional details can be found in \texttt{eformman.pdf}, the documentation
+of the \pkg{eform} package.
+
+\begin{itemize}
+  \item [\textbf{I}] Indirect reference to the normal appearance of an icon. The keys
+  used by eforms are \cs{I} and \texttt{normalappr}.
+  \item [\textbf{RI}] Indirect reference to the rollover appearance of an icon. The keys
+  are \cs{RI} and \texttt{rollappr}.
+  \item [\textbf{IX}] Indirect reference to the down appearance of an icon. The keys
+  are \cs{IX} and \texttt{downappr}.
+\end{itemize}
+\textbf{Note.} When importing icon appearances using JavaScript
+(\hyperref[s:JSMethods]{Section~\ref*{s:JSMethods}}), the above three keys
+are not used explicitly (JavaScript sets these key-value entries); use
+instead the key-value pair \verb~\importIcons{y}~, as seen in the example
+given in \hyperref[s:JSMethods]{Section~\ref*{s:JSMethods}}.
+\begin{itemize}
+  \item [\textbf{IF}] The \emph{icon fit dictionary}. The entries of the \textbf{IF} follow:
+  \begin{itemize}
+    \item [\textbf{SW}] (name; optional) The circumstances under which the icon should be scaled inside
+    the annot rectangle. The key is either \cs{SW} or \texttt{scalewhen}.
+    \begin{itemize}
+      \item [\textbf{A}] always scale (the default value).\\KVP: \verb!\SW{A}! or \texttt{scalewhen=always}.
+      \item [\textbf{B}] Scale only when the icon is bigger than the annotation rectangle.\\KVP: \verb!\SW{B}!
+      of \texttt{scalewhen=iconbig}.
+      \item [\textbf{S}] Scale only when the icon is smaller than the rectangle.\\KVP: \verb!\SW{S}!
+      or \texttt{scalewhen=iconsmall}.
+      \item [\textbf{N}] Never Scale.\\KVP: \verb!\SW{N}! or \texttt{\texttt{scalewhen=never}}.
+    \end{itemize}
+    \item [\textbf{S}] (name; optional) The type of scaling to use
+    the annot rectangle. The key to use is \cs{ST} or \texttt{scale}.
+    \begin{itemize}
+        \item [\textbf{A}] \emph{Anamorphic scaling:} Scale the icon to fill the annotation exactly, without
+              regard to the original aspect ratio.\\KVP: \verb!\ST{A}! or \texttt{scale=nonproportional}.
+        \item [\textbf{P}] \emph{Proportional scaling:} Scale the icon to fit the width or height
+        of the rectangle while maintaining the icon's original aspect ratio (ratio width to height)
+        (the default).\\KVP: \verb!\ST{P}! or \texttt{scale=proportional}.
+    \end{itemize}
+
+    \item [\textbf{A}] (array; optional) An array of two numbers between $0.0$ and $1.0$ indicating the fraction of the left
+    over space to allocate at the left and bottom of the icon. A value of $[\,0.0\ 0.0\,]$ positions the icon
+    at the bottom-left corner; a value of $[\,0.5\ 0.5\,]$ centers it within the rectangle. This entry is only used
+    of the icon is scaled proportionally. The default is $[\,0.5\ 0.5\,]$
+    the \texttt{annot} rectangle. The key is either \cs{PA} or \texttt{position}.
+    The default is \verb!\PA{.5 .5}! (no comma between numbers), in the user friendly style
+    \verb!position={.5 .5}! (no comma between numbers).
+
+  \item [\textbf{FB}] (Boolean; optional) If \texttt{true}, indicates that the button appearance should be scaled to fit
+  fully within the bounds of the annotation  without taking into consideration the line width of the border.
+  The default is \texttt{false}. The key is \cs{FB} or  \texttt{fitbounds}; the default
+  is \verb!\FB{false}! or \verb!fitbounds=false!.
+  \end{itemize}
+  \item [\textbf{TP}] a code indicating position of text relative to icon. The key is either
+  \cs{TP} or \texttt{layout}.
+  \begin{itemize}
+    \item[0] No icon; caption only. KVP: \verb!\TP{0}! or \texttt{layout=labelonly}.
+    \item[1] No caption; icon only. KVP: \verb!\TP{1}! or \texttt{layout=icononly}.
+    \item[2] Caption below icon. KVP: \verb!\TP{2}! or \texttt{layout=icontop}.
+    \item[3] Caption above icon. KVP: \verb!\TP{3}! or \texttt{layout=iconbottom}.
+    \item[4] Caption to the right of icon. KVP: \verb!\TP{4}! or \texttt{layout=iconleft}.
+    \item[5] Caption to the left of icon. KVP: \verb!\TP{5}! or \texttt{layout=iconright}.
+    \item[6] Caption overlaid on the icon. KVP: \verb!\TP{6}! or \texttt{layout=labelover}.
+  \end{itemize}
+\end{itemize}
+
+
+\medskip\noindent That's it, now, back to my retirement!
+
+
+
+\end{document}

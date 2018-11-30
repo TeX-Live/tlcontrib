@@ -1,0 +1,332 @@
+% \iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% icon-appr.sty package,                                %%
+%% Copyright (C) 2018  D. P. Story                       %%
+%% dpstory@acrotex.net                                   %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesPackage{icon-appr}
+%<package> [2018/11/23 v1.0 Provides icon appearances for button fields (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{icon-appr}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{icon-appr}{aebdocfmt.def cannot be found}}
+\begin{document}
+\def\CMD#1{\textbackslash#1}
+\let\pkg\textsf
+\let\opt\texttt
+\let\env\texttt
+\let\app\textsf
+\def\psf#1{\textsf{\textbf{#1}}}
+\def\darg#1{\texttt{\char123\relax#1\char125\relax}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\GetFileInfo{icon-appr.sty}
+\title{The \textsf{icon-appr} Package}
+\author{D. P. Story\\
+  Email: \texttt{dpstory@acrotex.net}}
+\date{processed \today}
+\maketitle
+\tableofcontents
+\let\Email\texttt
+\DocInput{icon-appr.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here. Execute
+    \begin{quote}
+    \texttt{makeindex -s gind.ist -o icon-appr.ind icon-appr.idx}
+    \end{quote}
+    on the command line and recompile \texttt{icon-appr.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here. Execute
+    \begin{quote}
+    \texttt{makeindex -s gglo.ist -o icon-appr.gls icon-appr.glo}
+    \end{quote}
+    on the command line and recompile \texttt{icon-appr.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{icon-appr}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{icon-appr}{cannot find aebdonotindex.def}}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%    \section{Required packages}
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{ifluatex}
+\RequirePackage{eforms}[2018/11/10]
+\RequirePackage{graphicx}
+%    \end{macrocode}
+%    \section{Introduction}
+%    The \cs{special}s and primitives of \app{pdflatex}, \app{lualatex}, and \app{xelatex} are used to provide support for inserting
+%    icon appearances into a button form field. We require \pkg{eforms} (2018/11/10) to create the form fields because
+%    the form support by \pkg{hyperref} does not provide the entries in a button field to create icon appearances. This
+%    package also supports icon appearances for \app{dvips} and \app{dvipsone} when the \pkg{aeb\_pro} package is used
+%    and \app{Acrobat Distiller} or \app{ps2pdf} is used as the PDF creator, but in both cases, \app{Adobe Acrobat} must
+%    be the primary PDF viewer.\footnote{This means the newly created PDF must be opened with \app{Acrobat} and saved before
+%    the file is ready for general use.}
+%    \section{Utility commands}
+%    \begin{macrocode}
+\def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
+\def\heightOf#1{\@nameuse{#1heightOf}}
+\def\widthOf#1{\@nameuse{#1widthOf}}
+\newif\if@bEmbed \@bEmbedfalse
+\newif\if@EmbedIconUsed \@EmbedIconUsedfalse
+\newif\if@EmbedEPSUsed \@EmbedEPSUsedfalse
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\csOf\hskip-\marginparsep\darg{\cs{\ameta{name}}}
+%      Use \cs{csOf} to expand a control name.
+%    \begin{macrocode}
+\@ifundefined{csOf}{\let\csOf\@nameuse}{}
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
+\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\let\IA@CreateImage@xsp\@empty
+\let\IA@EndEmbedding@aebpro\relax
+%    \end{macrocode}
+%    \section{The main commands}
+%    \begin{macrocode}
+\define@key{IAKVfamily}{name}[]{\def\IAKVfamily@name{#1}}
+\define@key{IAKVfamily}{hyopts}[]{\def\IAKVfamily@hyopts{#1}}
+\define@key{IAKVfamily}{cipresp}[]{\def\IAKVfamily@presp{#1}}
+\define@key{IAKVfamily}{cipostsp}[]{\def\IAKVfamily@postsp{#1}}
+\let\IAKVfamily@name\@empty
+\let\IAKVfamily@hyopts\@empty
+\let\IAKVfamily@presp\@empty
+\let\IAKVfamily@postsp\@empty
+%    \end{macrocode}
+%\subsection{The \texttt{embedding} environment}
+%    \begin{environment}{embedding}
+%    The \env{embedding} environment encloses are embedding commands (\cs{embedIcon}
+%    and \cs{embedEPS}).
+%    \begin{macrocode}
+\newenvironment{embedding}{\def\IA@mark{[\space}\global\@bEmbedtrue
+  \@ifpackageloaded{graphicxsp}{\let\IA@embedEPS@save\embedEPS
+    \let\embedEPS\IA@embedEPS}{\let\embedEPS\IA@embedEPS@null}%
+}{\global\@bEmbedfalse
+  \gdef\IA@EndEmbedding{\IA@EndEmbedding@aebpro
+  \IA@CreateImage@xsp}\aftergroup\IA@EndEmbedding
+}
+%    \end{macrocode}
+%   The commands \cs{embedIcon} and \cs{embedEPS} are placed inside the \env{embedding} environment.
+%    \end{environment}
+%
+%    \subsection{The \texorpdfstring{\cs{embedIcon}}{\textbackslash{embedIcon}} command}
+%
+%    \begin{macro}{\embedIcon}
+%    \hskip-\marginparsep\texttt{[\ameta{KVPairs}]\darg{\ameta{path}}}
+%    This is the main embedding command of the package. An example of use
+%    is given below, as taken from \texttt{icons-appr-exmpl1.tex}.
+%\begin{verbatim}
+%\begin{embedding}
+%   \embedIcon[name=mani]{graphics/man1.pdf}
+%   \embedIcon[name=girl]{graphics/girl.pdf}
+%   \embedIcon[name=scot]{graphics/scot.pdf}
+%\end{embedding}
+%\end{verbatim}
+%The \texttt{name} key is required for non-pdfmark drivers, its value must consist only of letters (or possibly non-active characters).
+%The name value, say `mani', is made into a control sequence, which may be referred to by
+%\cs{mani} or \cs{csOf\darg{mani}}.
+%
+%The syntax for \app{dvips}/\app{dvipsone} is more complicated, we refer the user
+%to the sample file \texttt{icons-appr-pb.tex}.
+%
+%Initially, we test whether \cs{embedIcon} is enclosed in the \cs{bEmbeddeind}/\allowbreak
+%\cs{eEmbedding} command pair. If yes, we fork off to any of five versions of \cs{embedIcon},
+%internally named \cs{IA@embedIcon}:
+% (1) one for \app{lualatex}; (2) one for \app{pdftex}; (3) one for \app{xelatex};
+% (4) one for \app{dvips}/\allowbreak\app{dvipsone} with \pkg{aeb\_pro}; and (5)
+% one for the otherwise case, it does nothing but does avoids stopping the tex engine.
+%    \begin{macrocode}
+\newcommand{\embedIcon}{\global\@EmbedIconUsedtrue
+  \if@bEmbed\def\IA@next{\IA@embedIcon}\else
+    \PackageWarning{icon-appr}{\string\embedIcon\space commands must be
+    enclosed\MessageBreak in the embedding environment}%
+    \def\IA@next{\IA@embedIcon@null}\fi
+  \IA@next}
+\def\IA@handle@name@empty#1{{\count0=\aeb@image@cnt
+    \advance\count0by1\relax\xdef
+    \aeb@image@cnt{\the\count0 }}%
+    \edef\IAKVfamily@name{aebImage\aeb@image@cnt}%
+    \PackageWarning{icon-appr}{%
+    The `name' key is not specified,\MessageBreak
+    will assign a name of `\IAKVfamily@name'\MessageBreak
+    for the icon #1}}
+%    \end{macrocode}
+%    \textbf{Requirements of package not met.} This version makes a necessary
+%    definition to avoid stopping the tex engine.
+%    \begin{macrocode}
+\newcommand{\IA@embedIcon@null}[2][]{%
+  \begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty\fi
+  \x@namedef{\IAKVfamily@name widthOf}{0pt}%
+  \x@namedef{\IAKVfamily@name heightOf}{0pt}%
+  \x@namedef{\IAKVfamily@name}{null}%
+  \endgroup}
+\let\IA@embedEPS@null\IA@embedIcon@null
+\@ifundefined{aeb@image@cnt}{\def\aeb@image@cnt{0}}{}
+\ifluatex
+%    \end{macrocode}
+%    \textbf{The \app{lualatex} driver.} The two \app{lualatex} commands \cs{saveboxresource} and
+%    \cs{lastsavedboxresourceindex} are used.
+%    \begin{macrocode}
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \immediate\saveboxresource\@tempboxa
+  \x@namedef{\IAKVfamily@name}
+    {\the\lastsavedboxresourceindex}\endgroup}
+\else\ifpdf
+%    \end{macrocode}
+%    \textbf{The \app{pdflatex} driver.} The \app{pdflatex} commands \cs{pdfxform} and
+%    \cs{pdflastxform} are used.
+%    \begin{macrocode}
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \immediate\pdfxform\@tempboxa
+  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}\endgroup
+}
+\else\ifxetex
+%    \end{macrocode}
+%    \textbf{The \app{xelatex} driver.} The \app{xelatex} \cs{special}s \texttt{bxobj},
+%    \texttt{image}, and \texttt{exobj} are used. The \texttt{image} syntax does not
+%    support the concept of page for a PDF file, consequently, it always reads
+%    the first page.
+%    \begin{macrocode}
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \x@namedef{\IAKVfamily@name}{@\IAKVfamily@name}%
+  \@pdfm@mark{bxobj @\IAKVfamily@name\space
+    width \the\wd\@tempboxa \space
+    height \the\ht\@tempboxa \space}%
+  \@pdfm@mark{image width \the\wd\@tempboxa \space
+    height \the\ht\@tempboxa \space (#2)}%
+  \@pdfm@mark{exobj}\endgroup
+}
+\else
+%    \end{macrocode}
+%    If not any of the previously discussed drivers, it must a \textsf{\textbf{pdfmark}}-type driver.
+%    \begin{macrocode}
+\@ifpackageloaded{aeb_pro}{%
+%    \end{macrocode}
+%    For success in this case, we require the \pkg{aeb\_pro} package; \app{Acrobat} needs to load
+%    and save the newly created PDF, created by either \app{distiller} or \app{ps2pdf}. The
+%    \pkg{aeb\_pro} command \cs{declareImageAndPlacement} is used for this purpose. The command
+%    \cs{IA@EndEmbedding@aebpro} is redefined to input an \env{execJS} environment, which will get things going.
+%    \begin{macrocode}
+\newcommand{\IA@embedIcon}[2][1]{\begingroup
+  \declareImageAndPlacement{path=#2,#1}\endgroup}
+%    \end{macrocode}
+%    When \pkg{aeb\_pro} is loaded and a pdfmark-type driver is used, \cs{embedIcon} uses
+%    \cs{declareImageAndPlacement} from \pkg{aeb\_pro} (see documentation of that package).
+%    JavaScript methods embed the graphics files.
+%    \begin{macrocode}
+\def\IA@EndEmbedding@aebpro{\@bEmbedfalse\begingroup
+  \IfFileExists{\jobname-exec.cut}{}
+  {\immediate\openout\@auxout \jobname-exec.cut
+  \immediate\write1 {\string\begin{execJS}{IAexec}^^J%
+  \string\insertPreDocAssembly^^J%
+  \string\end{execJS}}}%
+  \InputIfFileExists{\jobname-exec.cut}{}{}%
+\endgroup}%
+}{%
+%    \end{macrocode}
+%    The final case, we \cs{let} \cs{IA@embedIcon} to \cs{IA@embedIcon@null} to let the document
+%    compile. A warning message is written to the log.
+%    \begin{macrocode}
+  \let\IA@embedIcon\IA@embedIcon@null
+}
+\fi\fi\fi
+%    \end{macrocode}
+%    \subsection{The \texorpdfstring{\cs{embedEPS}}{\textbackslash{embedEPS}} command}
+%    \begin{macro}{\embedEPS}
+%    \hskip-\marginparsep\texttt{[\ameta{KVPairs}]\darg{\ameta{path}}}
+%    When a \psf{pdfmark}-type driver is being used, \cs{embedEPS} is \cs{let} to
+%    \cs{IA@embedEPS}. This command is used to embed EPS files.
+%    \begin{macrocode}
+\newcommand\IA@embedEPS[2][]{\global\@EmbedEPSUsedtrue
+  \begingroup\let\x\noexpand
+  \setkeys*{IAKVfamily}{#1}%\XKV@rm has remaining keys
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty\fi
+%  \x@namedef{\IAKVfamily@name}{\IAKVfamily@name}%
+  \edef\@tmpexp{\x
+    \IA@embedEPS@save[\XKV@rm]{embed\IAKVfamily@name}{#2}}\@tmpexp
+  \edef\@tmpexp{\x\begin{createImage}{\x
+    \bboxOf{embed\IAKVfamily@name}}{\IAKVfamily@name}
+    \ifx\IAKVfamily@presp\@empty\else\IAKVfamily@presp\space\fi
+    \IA@mark{embed\IAKVfamily@name} /SP pdfmark
+    \ifx\IAKVfamily@postsp\@empty\else\space\IAKVfamily@postsp\fi
+    \x\end{createImage}}%
+  \toks@=\expandafter{\@tmpexp}%
+  \edef\@tmpexp{\x\g@addto@macro\x
+    \IA@CreateImage@xsp{\the\toks@}}\@tmpexp
+  \endgroup
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+\def\IA@WarningMsgStr{%
+%  This package only supports pdflatex, lualatex,\MessageBreak
+%    xelatex, and dvips/dvipsone.\MessageBreak
+    A pdfmark driver used - dvips(one),\MessageBreak
+    something's not right however:
+    \if@EmbedIconUsed
+      \@ifpackageloaded{aeb_pro}{}{\MessageBreak Use of \string\embedIcon\space
+        requires the\MessageBreak aeb_pro package, or possibly use\MessageBreak
+        a non-pdfmark driver}\fi
+  \if@EmbedEPSUsed
+    \@ifpackageloaded{graphicxsp}{}{\MessageBreak\string\embedEPS\space
+      requires the graphicxsp package}\fi
+  }
+\def\IA@WarningMsg{\PackageWarningNoLine{icon-appr}{\IA@WarningMsgStr}}
+\ifpdfmarkup
+  \AtBeginDocument{%
+    \if@EmbedIconUsed
+      \@ifpackageloaded{aeb_pro}{}{\ifx\IA@WarningMsg\relax\else
+        \IA@WarningMsg\let\IA@WarningMsg\relax\fi}\fi
+    \if@EmbedEPSUsed
+      \@ifpackageloaded{graphicxsp}{}{\ifx\IA@WarningMsg\relax\else
+      \IA@WarningMsg\let\IA@WarningMsg\relax\fi}\fi}%
+\else
+    \AtBeginDocument{\if@EmbedEPSUsed
+      \PackageWarningNoLine{icon-appr}{The use of \string\embedEPS\space
+      not allowed\MessageBreak
+      with \ifluatex lualatex\else\ifpdf pdflatex\else xetex\fi\fi}
+    \fi}%
+\fi
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%  \Finale
+\endinput

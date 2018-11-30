@@ -1,0 +1,179 @@
+%%
+%% This is file `icon-appr.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% icon-appr.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% icon-appr.sty package,                                %%
+%% Copyright (C) 2018  D. P. Story                       %%
+%% dpstory@acrotex.net                                   %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{icon-appr}
+ [2018/11/23 v1.0 Provides icon appearances for button fields (dps)]
+\RequirePackage{xkeyval}
+\RequirePackage{ifpdf}[2006/02/20]
+\RequirePackage{ifxetex}[2006/08/21]
+\RequirePackage{ifluatex}
+\RequirePackage{eforms}[2018/11/10]
+\RequirePackage{graphicx}
+\def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
+\def\heightOf#1{\@nameuse{#1heightOf}}
+\def\widthOf#1{\@nameuse{#1widthOf}}
+\newif\if@bEmbed \@bEmbedfalse
+\newif\if@EmbedIconUsed \@EmbedIconUsedfalse
+\newif\if@EmbedEPSUsed \@EmbedEPSUsedfalse
+\@ifundefined{csOf}{\let\csOf\@nameuse}{}
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
+\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\let\IA@CreateImage@xsp\@empty
+\let\IA@EndEmbedding@aebpro\relax
+\define@key{IAKVfamily}{name}[]{\def\IAKVfamily@name{#1}}
+\define@key{IAKVfamily}{hyopts}[]{\def\IAKVfamily@hyopts{#1}}
+\define@key{IAKVfamily}{cipresp}[]{\def\IAKVfamily@presp{#1}}
+\define@key{IAKVfamily}{cipostsp}[]{\def\IAKVfamily@postsp{#1}}
+\let\IAKVfamily@name\@empty
+\let\IAKVfamily@hyopts\@empty
+\let\IAKVfamily@presp\@empty
+\let\IAKVfamily@postsp\@empty
+\newenvironment{embedding}{\def\IA@mark{[\space}\global\@bEmbedtrue
+  \@ifpackageloaded{graphicxsp}{\let\IA@embedEPS@save\embedEPS
+    \let\embedEPS\IA@embedEPS}{\let\embedEPS\IA@embedEPS@null}%
+}{\global\@bEmbedfalse
+  \gdef\IA@EndEmbedding{\IA@EndEmbedding@aebpro
+  \IA@CreateImage@xsp}\aftergroup\IA@EndEmbedding
+}
+\newcommand{\embedIcon}{\global\@EmbedIconUsedtrue
+  \if@bEmbed\def\IA@next{\IA@embedIcon}\else
+    \PackageWarning{icon-appr}{\string\embedIcon\space commands must be
+    enclosed\MessageBreak in the embedding environment}%
+    \def\IA@next{\IA@embedIcon@null}\fi
+  \IA@next}
+\def\IA@handle@name@empty#1{{\count0=\aeb@image@cnt
+    \advance\count0by1\relax\xdef
+    \aeb@image@cnt{\the\count0 }}%
+    \edef\IAKVfamily@name{aebImage\aeb@image@cnt}%
+    \PackageWarning{icon-appr}{%
+    The `name' key is not specified,\MessageBreak
+    will assign a name of `\IAKVfamily@name'\MessageBreak
+    for the icon #1}}
+\newcommand{\IA@embedIcon@null}[2][]{%
+  \begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty\fi
+  \x@namedef{\IAKVfamily@name widthOf}{0pt}%
+  \x@namedef{\IAKVfamily@name heightOf}{0pt}%
+  \x@namedef{\IAKVfamily@name}{null}%
+  \endgroup}
+\let\IA@embedEPS@null\IA@embedIcon@null
+\@ifundefined{aeb@image@cnt}{\def\aeb@image@cnt{0}}{}
+\ifluatex
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \immediate\saveboxresource\@tempboxa
+  \x@namedef{\IAKVfamily@name}
+    {\the\lastsavedboxresourceindex}\endgroup}
+\else\ifpdf
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \immediate\pdfxform\@tempboxa
+  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}\endgroup
+}
+\else\ifxetex
+\newcommand{\IA@embedIcon}[2][]{\begingroup
+  \setkeys*{IAKVfamily}{#1}%
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
+  \toks@={\setbox\@tempboxa\hbox\bgroup\includegraphics}%
+  \edef\x{\the\toks@[\IAKVfamily@hyopts]{#2}\egroup}\x
+  \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
+  \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
+  \x@namedef{\IAKVfamily@name}{@\IAKVfamily@name}%
+  \@pdfm@mark{bxobj @\IAKVfamily@name\space
+    width \the\wd\@tempboxa \space
+    height \the\ht\@tempboxa \space}%
+  \@pdfm@mark{image width \the\wd\@tempboxa \space
+    height \the\ht\@tempboxa \space (#2)}%
+  \@pdfm@mark{exobj}\endgroup
+}
+\else
+\@ifpackageloaded{aeb_pro}{%
+\newcommand{\IA@embedIcon}[2][1]{\begingroup
+  \declareImageAndPlacement{path=#2,#1}\endgroup}
+\def\IA@EndEmbedding@aebpro{\@bEmbedfalse\begingroup
+  \IfFileExists{\jobname-exec.cut}{}
+  {\immediate\openout\@auxout \jobname-exec.cut
+  \immediate\write1 {\string\begin{execJS}{IAexec}^^J%
+  \string\insertPreDocAssembly^^J%
+  \string\end{execJS}}}%
+  \InputIfFileExists{\jobname-exec.cut}{}{}%
+\endgroup}%
+}{%
+  \let\IA@embedIcon\IA@embedIcon@null
+}
+\fi\fi\fi
+\newcommand\IA@embedEPS[2][]{\global\@EmbedEPSUsedtrue
+  \begingroup\let\x\noexpand
+  \setkeys*{IAKVfamily}{#1}%\XKV@rm has remaining keys
+  \ifx\IAKVfamily@name\@empty\IA@handle@name@empty\fi
+  \edef\@tmpexp{\x
+    \IA@embedEPS@save[\XKV@rm]{embed\IAKVfamily@name}{#2}}\@tmpexp
+  \edef\@tmpexp{\x\begin{createImage}{\x
+    \bboxOf{embed\IAKVfamily@name}}{\IAKVfamily@name}
+    \ifx\IAKVfamily@presp\@empty\else\IAKVfamily@presp\space\fi
+    \IA@mark{embed\IAKVfamily@name} /SP pdfmark
+    \ifx\IAKVfamily@postsp\@empty\else\space\IAKVfamily@postsp\fi
+    \x\end{createImage}}%
+  \toks@=\expandafter{\@tmpexp}%
+  \edef\@tmpexp{\x\g@addto@macro\x
+    \IA@CreateImage@xsp{\the\toks@}}\@tmpexp
+  \endgroup
+}
+\def\IA@WarningMsgStr{%
+    A pdfmark driver used - dvips(one),\MessageBreak
+    something's not right however:
+    \if@EmbedIconUsed
+      \@ifpackageloaded{aeb_pro}{}{\MessageBreak Use of \string\embedIcon\space
+        requires the\MessageBreak aeb_pro package, or possibly use\MessageBreak
+        a non-pdfmark driver}\fi
+  \if@EmbedEPSUsed
+    \@ifpackageloaded{graphicxsp}{}{\MessageBreak\string\embedEPS\space
+      requires the graphicxsp package}\fi
+  }
+\def\IA@WarningMsg{\PackageWarningNoLine{icon-appr}{\IA@WarningMsgStr}}
+\ifpdfmarkup
+  \AtBeginDocument{%
+    \if@EmbedIconUsed
+      \@ifpackageloaded{aeb_pro}{}{\ifx\IA@WarningMsg\relax\else
+        \IA@WarningMsg\let\IA@WarningMsg\relax\fi}\fi
+    \if@EmbedEPSUsed
+      \@ifpackageloaded{graphicxsp}{}{\ifx\IA@WarningMsg\relax\else
+      \IA@WarningMsg\let\IA@WarningMsg\relax\fi}\fi}%
+\else
+    \AtBeginDocument{\if@EmbedEPSUsed
+      \PackageWarningNoLine{icon-appr}{The use of \string\embedEPS\space
+      not allowed\MessageBreak
+      with \ifluatex lualatex\else\ifpdf pdflatex\else xetex\fi\fi}
+    \fi}%
+\fi
+\endinput
+%%
+%% End of file `icon-appr.sty'.

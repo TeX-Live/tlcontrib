@@ -1,0 +1,79 @@
+\documentclass{article}
+
+\usepackage[designv,tight]{web}
+\usepackage{eforms}
+\usepackage{graphicxsp}[2018/11/20]
+\usepackage{icon-appr}\previewOff
+
+\title{Creating icon appearances for button fields\texorpdfstring{\\[1ex]}{} using EPS methods with transparency}
+\author{D. P. Story}
+\university{Acro\TeX.Net}
+\email{dpstory@acrotex.net}
+\subject{Techniques for creating button appearances with transparency}
+\keywords{icon appearances of push button,JavaScript}
+\version{1.0}
+\norevisionLabel
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\begin{embedding}
+\embedEPS[hiresbb,name=mani,transparencyGroup,
+  cipresp={[ /ca .3 /SetTransparency pdfmark}]{../graphics/man1}
+\embedEPS[hiresbb,name=girl]{../graphics/girl}
+\embedEPS[hiresbb,name=scot]{../graphics/scot}
+\end{embedding}
+
+\begin{createImage}{\bboxOf{embedmani}}{manii}
+    [ {embedmani} /SP pdfmark
+\end{createImage}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This document shows how to use transparency with the EPS method. It also shows how to use the same file
+with 30\% opacity and 100\% opacity. \textsf{Adobe Distiller} is required as the PDF creator; the
+\textsf{Distiller} settings must be set to \texttt{Standard\_transparency}, which ships with
+\textsf{graphicxsp}. Instructions for installation of the \texttt{Standard\_transparency.joboptions}
+file is presented in the documentation of the \textsf{graphicxsp} package.
+
+\section{Check box and radio buttons fields}
+
+The man icon has 30\% opacity in the checkbox and radio button fields below.\vcgBdry[6pt]
+
+Checkbox:
+\checkBox[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myCkBx}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
+
+Radio Button Fields: \radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad \radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad\radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani} \Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\hfill
+\pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}
+
+
+\section{Push button fields revisited}
+
+This push button uses the appearance referenced by \cs{manii}, which has 100\% opacity and was
+declare in the \texttt{CreateIcon} environment, after embedding the icon files. \vcgBdry[6pt]
+
+\pushButton[%
+%  \A{\JS{app.alert("AcroTeX rocks!")}}
+  \TP{1}\BC{}\BG{}\S{S}
+  \I{\manii}
+  \RI{\girl}
+  \IX{\scot}
+]{myButton}{50bp}{50bp}
+
+
+\end{document} 

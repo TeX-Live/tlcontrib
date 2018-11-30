@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage[designv]{web}
+\usepackage{icon-appr}\previewOff % change to \previewOn to see the positions of other form fields within your PDF viewer (such as SumatraPDF)
+\usepackage{hologo}
+
+\usepackage[active]{srcltx}
+
+\title{Creating icon appearances for form buttons\texorpdfstring{\\}{}
+  using \textsf{pdflatex}, \textsf{lualatex}, and \textsf{xelatex}}
+\author{D. P. Story}
+\university{Acro\TeX.Net}
+\email{dpstory@acrotex.net}
+\subject{Techniques for creating button appearances}
+\keywords{icon appearances of form buttons}
+\version{1.0}
+\norevisionLabel
+
+\optionalPageMatter{%
+    \begin{center}\fcolorbox{red}{webyellow}{%
+    \begin{minipage}{.67\linewidth}
+      Icon appearance images for the buttons of this document were produced by \ifluatex
+      \hologo{LuaLaTeX}\else\ifpdf\hologo{pdfLaTeX}\else\ifxetex\hologo{XeLaTeX}\else
+      an unsupported driver (\textsf{aeb\_pro} needed)\fi\fi\fi.
+    \end{minipage}}
+    \end{center}
+}
+
+\begin{embedding}
+\embedIcon[name=mani]{graphics/man1.pdf}
+\embedIcon[name=girl]{graphics/girl.pdf}
+\embedIcon[name=scot]{graphics/scot.pdf}
+\end{embedding}
+
+\begin{document}
+
+\maketitle
+
+\section{Push Buttons}
+
+We produce two push buttons, the second one is a re-scaling of the first.\medskip
+
+\noindent\pushButton[%
+%  \A{\JS{app.alert("AcroTeX rocks!")}}
+  \TP{1}\BG{}\S{S}
+  \I{\csOf{mani}}
+  \RI{\girl}
+  \IX{\scot}
+]{myButton}{100bp}{100bp}
+\qquad
+\pushButton[%
+  \TP{1}\BG{}\S{S}
+  \I{\mani}
+  \RI{\girl}
+  \IX{\scot}
+]{myButton1}{50bp}{50bp*\ratio{100bp}{100bp}}\vcgBdry[12pt]
+
+\noindent The push buttons are properly produced for all drivers
+(\textsf{pdflatex}, \textsf{lualatex}, and \textsf{xelatex}) and can be
+viewed, with full functionality, in \textsf{Acrobat}, \textsf{Adobe Reader},
+\textsf{PDF-XChange Viewer}, and \textsf{PDF-XChange Editor}. All buttons, including
+the ones on the next page can be viewed in \textsf{SumatraPDF}, without any functionality.
+
+\newpage
+
+\section{Check box and Radio Button Fields}
+
+Similar techniques are made for check box and radio button fields;
+however, \emph{there is one caveat}, the icon faces do not appear when the
+file is first viewed in \textsf{PDF-XChange Editor}.\footnote{If you are
+using that viewer.} You must first open the file in \textsf{Adobe Reader DC}
+or \textsf{Acrobat}, and save it. The file then views properly in
+\textsf{PDF-XChange Editor}, \emph{but not in} \textsf{PDF-XChange Viewer},
+however.\vcgBdry[6pt]
+
+Checkbox:
+\checkBox[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani}\Off{\girl}} }
+    ]{myCkBx}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
+
+Radio Button Fields: \radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad \radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad\radioButton[\BC{}\BG{}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
+    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
+
+\pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}\vcgBdry[6pt]
+
+\end{document}

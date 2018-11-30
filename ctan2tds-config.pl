@@ -27,6 +27,7 @@ $special{'acrotex'}     = '&MAKEdps';
 $special{'aeb-mlink'}   = '&MAKEdps';
 $special{'aeb-minitoc'} = '&MAKEdps';
 $special{'graphicxsp'}  = '&MAKEdps';
+$special{'icon-appr'}   = '&MAKEdps';
 
 
 sub MAKEdps {

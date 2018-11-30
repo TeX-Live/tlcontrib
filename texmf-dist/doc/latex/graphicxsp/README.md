@@ -1,7 +1,8 @@
 The GraphicxSP Package
 Author: D. P. Story
-Dated: 2016/02/19
-Version: v1.0
+Dated: 2018-11-20
+
+What's new (2018-11-20) Minor changes to support the icon-appr package.
 
 GraphicxSP is an extension of the graphicx package. GraphicxSP
 embeds the graphic in the PDF document once, and allows the document
@@ -26,13 +27,7 @@ examples folder.
 Let me know if there are problems or suggested features.  e-mail
 me at dpstory@uakron.edu or dpstory@acrotex.net
 
-I maintain a web site featuring TeX/LaTeX/PDF stuff called
-AcroTeX (www.math.uakron.edu/~dpstory/acrotex.html).  There you
-will find the home web page of the GraphicxSP Bundle.
-(www.math.uakron.edu/~dpstory/graphicxsp.html).
-
-My other web site is http://blog.acrotex.net/, there you can find all my
-ruminations on AeB and PDF.
+General resource for what's new in AcroTeX packages: http://blog.acrotex.net/.
 
 Now, I simply must get back to my retirement.
 

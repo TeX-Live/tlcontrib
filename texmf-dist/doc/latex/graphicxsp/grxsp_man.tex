@@ -6,7 +6,7 @@
     eforms,linktoattachments,aebxmp
 ]{aeb_pro}
 \usepackage{aeb_mlink}
-\usepackage[dvipsone,showembeds]{graphicxsp}
+\usepackage[dvipsone,showembeds]{graphicxsp}\previewOff
 \usepackage{array,fancyvrb}
 
 %\usepackage[LY1]{fontenc}
@@ -39,7 +39,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for AeB Pro from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={1.0},
+    version={1.0.2, 2018/11/20},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -64,6 +64,15 @@
 \newdimen\aebdimen \aebdimen 0pt %\advance\aebdimen\partopsep
 \newcommand\bVerb[1][]{\begingroup#1\vskip\aebdimen\parindent0pt}%
 \def\eVerb{\vskip\aebdimen\endgroup\noindent}
+
+\def\setDisplayNumber#1#2{\kern0pt
+    \setlength\abovedisplayshortskip{0pt}%
+    \setlength\belowdisplayshortskip{0pt}%
+    \setlength\abovedisplayskip{0pt}%
+    \setlength\belowdisplayskip{0pt}%
+    \begin{equation}\label{#2}\end{equation}\kern0pt
+}
+
 
 \makeatletter
 \renewcommand{\paragraph}
@@ -163,7 +172,7 @@
 
 \section{Introduction}
 
-Beginning with Version 5.0, ``Acrobat Distiller allows a PostScript
+Beginning with Version 5.0, ``Acrobat Distiller allows a Postscript
 language program to specify that a given set of graphical operations
 should be encapsulated and treated as a single object. The pdfmarks
 \textbf{BP} (Begin Picture) and \textbf{EP} (End Picture) enclose a
@@ -220,7 +229,7 @@ version.
 The big restriction on this package is the requirement to use
 \textbf{Acrobat Distiller} (version 5.0, or version 6.0 for transparency).
 The package was developed using Acrobat Distiller 8.1. The package supports the
-creation of PostScript using \app{dvips} and \app{dvipsone}.
+creation of Postscript using \app{dvips} and \app{dvipsone}.
 
 Though distiller is required, there is no reason why, however, this
 package can't be modified to work for any PDF creator that supports
@@ -262,7 +271,7 @@ The procedure for editing \texttt{.joboptions} to support transparency is as fol
         \texttt{/AllowTransparency false}, distillation will fail and the
         distiller log should say
 \begin{Verbatim}[fontsize=\small]
-%%[Error: The PostScript contains Transparency pdfmark, job aborted.]%%
+%%[Error: The Postscript contains Transparency pdfmark, job aborted.]%%
 %%[ /AllowTransparency is false in job option settings.]%%
 %%[ Error: undefined; OffendingCommand: pdfmark;
     ErrorInfo: Transparency Group ]%%
@@ -279,7 +288,7 @@ Currently, there is a minimal of package options
 \item \texttt{dvips}: Use this option if you are a user of most any other
     {\TeX} systems available to the community.
 \item \texttt{dvipsone}: Use this option if you are a user of the Y{\small\&}\!Y
-    {\TeX} system to create your PostScript file.
+    {\TeX} system to create your Postscript file.
 \item \texttt{preview}: The dvi previewers are designed to show a preview
     of the graphic, these previewers know nothing about the \textbf{SP}
     pdfmark (Show Picture). If you use the \texttt{preview} option, a
@@ -391,15 +400,35 @@ graphic as an appearance.
 
 The \cs{embedEPS} command is designed for graphics that are in an exterior
 EPS file. You can also define a graphic, or image, using raw
-PostScript using the \Indextt{createImage} environment.
+Postscript using the \Indextt{createImage} environment.
+
+%\bVerb\takeMeasure{\string\begin\darg{createImage}[\meta{key-values}]\darg{\meta{bbox}}\darg{\meta{name}}}
+%\begin{dCmd}[commandchars=!()]{\bxSize}
+%\begin{createImage}[!meta(key-values)]{!meta(bbox)}{!meta(name)}
+%    !meta(postscript code)
+%\end{createImage}
+%\end{dCmd}
+%\eVerb
+
 
 \bVerb\takeMeasure{\string\begin\darg{createImage}[\meta{key-values}]\darg{\meta{bbox}}\darg{\meta{name}}}
+\begin{minipage}[c]{\linewidth}
+\begin{minipage}[c]{\bxSize}
 \begin{dCmd}[commandchars=!()]{\bxSize}
 \begin{createImage}[!meta(key-values)]{!meta(bbox)}{!meta(name)}
     !meta(postscript code)
 \end{createImage}
 \end{dCmd}
-\endgroup
+\end{minipage}\hfill
+\begin{minipage}[c]{\linewidth-(\bxSize)}
+\setDisplayNumber\label{createImg}
+\end{minipage}
+\end{minipage}\medskip
+\eVerb The \env{createImage} environment defines a command \cs{\meta{name}} that expands to
+\meta{name}. If \cs{\meta{name}} is already defined, a message appears in the log to that effect.
+Normally \meta{name} consists of non-active characters; however, if other characters are used,
+the command \cs{csOf\darg{\meta{name}}} can be used. The \cs{\meta{name}} command was created to support
+the \pkg{icon-appr} package.
 
 \PD The parameters are as follows:
 \begin{enumerate}
@@ -418,7 +447,6 @@ the graphic. This symbolic name must be unique to the document (or
 distiller will crash); \pkg{GraphicxSP} will stop compilation if two
 embedded EPS files are given the same name.
 \end{enumerate}
-
 The following image appears in one of the demo files of this package, and is code
 written many years ago for a tic-tac-toe game in PDF.
 \begin{Verbatim}
@@ -436,7 +464,7 @@ written many years ago for a tic-tac-toe game in PDF.
 \end{Verbatim}
 we can then manipulate this image a little
 \begin{Verbatim}
-\begin{createImage}{\bbox{myBestPic}}{upsideDownAD}
+\begin{createImage}{\bboxOf{myBestPic}}{upsideDownAD}
      0 \heightOf{myBestPic} rmoveto
      currentpoint translate
      1 -1 scale [ {myBestPic} /SP pdfmark
@@ -459,6 +487,7 @@ are discussed.
 The commands \cs{llxOf}, \cs{llyOf}, \cs{urxOf}, \cs{uryOf}, \cs{bboxOf},
 \cs{heightOf} and \cs{widthOf} are also defined for images created by the
 \texttt{createImage} environment.
+
 
 \subsection{Inserting graphics commands}
 
@@ -513,12 +542,12 @@ a few more:
     The most useful of these is \textbf{ca}, and it is illustrated
     in the demo files and well as here.
 
-    \item[] Example: \verb!transparency={/ca .3 /BM/Normal}!
+    \item[] \textbf{Example:} \verb!transparency={/ca .3 /BM/Normal}!
 
     \item \texttt{presp=\meta{postscript}}: This allows you to insert
-        PostScript commands just before \textbf{SP} pdfmark.
+        Postscript commands just before \textbf{SP} pdfmark.
     \item \texttt{postsp=\meta{postscript}}: This allows you to insert
-        PostScript commands just after \textbf{SP} pdfmark.
+        Postscript commands just after \textbf{SP} pdfmark.
 \end{enumerate}
 The latter two key-values can be used to create special effects, as illustrated below.
 
@@ -531,7 +560,7 @@ The latter two key-values can be used to create special effects, as illustrated 
 \small\verb!\includegraphics[name=myBestPic,width=1in]{}!
 \end{center}
 
-Below is the image created not from a EPS file, but from PostScript language code.
+Below is the image created not from a EPS file, but from Postscript language code.
 
 \begin{center}
 \includegraphics[name=xO,width=1in]{}\\
@@ -557,6 +586,8 @@ and it is this white background you see showing through the image.
 \insertEPS[width=1in]{transparentAD}\\
 \verb!\insertEPS[width=1in]{transparentAD}!
 \end{center}
+
+
 
 Next, we set the \texttt{transparency} key to an opacity value ranging from 70\% on the left (\texttt{/ca .7})
 to 30\% on the right (\texttt{/ca .3}), and place a colorful background under the
@@ -703,22 +734,29 @@ various opacity settings for the appearances.
 
 The button code is
 
-\begin{Verbatim}
-\resizebox{.5in}{!}{\pushButton[%
-    \autoCenter{n}
-    \A{\JS{app.alert("AcroTeX rocks the world!"); this.dirty=false;}}
-    \AP{/N {nAdobeDon} /D {dAdobeDon} /R {rAdobeDon}}
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\resizebox{.5in}{!}{\pushButton[\BC{}\BG{}\S{S}
+  \A{\JS{app.alert("AcroTeX rocks the world!"); this.dirty=false;}}
+  \autoCenter{y}\TP{1}\FB{true}
+  \I{nAdobeDon}\IX{dAdobeDon}\RI{rAdobeDon}
 ]{pbAdobeDon}{\widthOf{myBestPic}bp}{\heightOf{myBestPic}bp}}
 \end{Verbatim}
-
-See the eforms manual for details of these key-value pairs.
+See the \pkg{eforms} manual for details of these key-value pairs.\smallskip
 
 Finally, the button looks like this: \resizebox{.5in}{!}{\pushButton[%
-    \autoCenter{n}
+    \autoCenter{y}\BC{}\BG{}\S{S}
     \A{\JS{app.alert("AcroTeX rocks the world!");this.dirty=false;}}
-    \AP{/N {nAdobeDon} /D {dAdobeDon} /R {rAdobeDon}}
+    \I{nAdobeDon}\IX{dAdobeDon}\RI{rAdobeDon}\TP{1}\FB{true}
+]{pbAdobeDon}{\widthOf{myBestPic}bp}{\heightOf{myBestPic}bp}}\par\smallskip\noindent
+In light of the discussion following display~\eqref{createImg} on page~\pageref*{createImg}, the code for the above
+button could have been,
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\resizebox{.5in}{!}{\pushButton[\BC{}\BG{}\S{S}
+  \A{\JS{app.alert("AcroTeX rocks the world!"); this.dirty=false;}}
+  \autoCenter{y}\TP{1}\FB{true}
+  \I{\nAdobeDon}\IX{\dAdobeDon}\RI{\rAdobeDon}
 ]{pbAdobeDon}{\widthOf{myBestPic}bp}{\heightOf{myBestPic}bp}}
-
+\end{Verbatim}
 When using \textbf{SP} images for form fields in this way, the images
 \textbf{must always pass} through a \texttt{createImage} environment where the
 bounding boxes can be precisely set, in the verbatim listing above,

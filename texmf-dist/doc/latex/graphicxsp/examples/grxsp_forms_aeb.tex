@@ -2,6 +2,7 @@
 \usepackage[designiv,usetemplates]{web}
 \usepackage{eforms}
 \usepackage{graphicxsp}
+\usepackage{fancyvrb}
 
 %\previewMiKTeX
 
@@ -15,6 +16,7 @@
 \keywords{Distiller, Form XObjects, BP, EP, and SP operators,transparency}
 
 \newcommand{\cs}[1]{\texttt{\char`\\#1}}
+\let\pkg\textsf
 
 \embedEPS[hiresbb,transparencyGroup]{AdobeDon}{graphics/AdobeDon}
 \embedEPS{3Dcheck}{graphics/3Dcheck}
@@ -72,18 +74,17 @@ try { app.runtimeHighlight=false } catch(e) {};
 
 In the preamble, we make the following definitions: We embed for EPS
 files, one of which are set a transparency group:
-{\small\begin{verbatim}
+{\small\begin{Verbatim}[fontsize=\small]
 \embedEPS[hiresbb,transparencyGroup]{AdobeDon}{graphics/AdobeDon}
 \embedEPS{3Dcheck}{graphics/3Dcheck}
 \embedEPS{3Dx}{graphics/3Dx}
-\end{verbatim}
+\end{Verbatim}
 }
 We also use the \texttt{createImage} environment to create more images, some new, others made
 from the embedded files.\medskip
 
 Create variations on \texttt{AdobeDon} by giving the image various degrees of opacity:
-\begin{scriptsize}
-\begin{verbatim}
+\begin{Verbatim}[fontsize=\scriptsize]
 \begin{createImage}{\bboxOf{AdobeDon}}{nAdobeDon}   % normal appearance
     [ {AdobeDon} /SP pdfmark
 \end{createImage}
@@ -97,8 +98,7 @@ Create variations on \texttt{AdobeDon} by giving the image various degrees of op
     [ /ca .5 /SetTransparency pdfmark
     [ {AdobeDon} /SP pdfmark
 \end{createImage}
-\end{verbatim}
-\end{scriptsize}
+\end{Verbatim}
 
 
 \newpage
@@ -107,9 +107,7 @@ Now create two new graphic images using raw PostScript. In all cases we use
 the \texttt{createImage} environment, first optional argument is the bounding box,
 the second is the symbolic name for the graphic. The symbolic name can be used
 in the \cs{includegraphics} command or the \cs{insertEPS} command.
-
-\begin{scriptsize}
-\begin{verbatim}
+\begin{Verbatim}[fontsize=\scriptsize]
 \begin{createImage}{0 0 100 100}{xO}
 .7529 setgray 0 0 100 100 rectfill 1 setgray 2 2 moveto 2 98 lineto 98 98 lineto
 96 96 lineto 4 96 lineto 4 4 lineto fill 0.34 setgray 98 98 moveto 98 2 lineto
@@ -123,15 +121,12 @@ in the \cs{includegraphics} command or the \cs{insertEPS} command.
 2 2 lineto 4 4 lineto 96 4 lineto 96 96 lineto fill
 0 setgray 27 22.5 moveto 0 0 1 setrgbcolor /Helvetica 72 selectfont (X) show
 \end{createImage}
-\end{verbatim}
-\end{scriptsize}
-
-Subsequent pages demonstrate how to use these images in the context of form fields.
+\end{Verbatim}
+Subsequent pages demonstrate how to use these images in the context of form fields.\medskip
 
 Here are more traditional uses for a checkbox, but this time using
-custom checks and crosses.
+custom checks and crosses.\bigskip
 
-\medskip
 \noindent\hspace*{20pt}\resizebox{11bp}{!}{\checkBox[%
     \A{\JS{%
         var f = this.getField("reportCk");\r
@@ -141,23 +136,7 @@ custom checks and crosses.
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{n}
     \AP{/N << /Yes {xX} /Off {xO} >> }
 ]{ckBoxXO}{\widthOf{xX}bp}{\heightOf{xX}bp}{Yes}}
-\textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk}{.5in}{11bp}
-
-\smallskip
-\noindent\hspace*{20pt}\resizebox{11bp}{!}{\checkBox[%
-    \A{\JS{%
-        var f = this.getField("reportCk3D");\r
-        f.value = !!event.target.isBoxChecked(0);\r
-        this.dirty=false;
-    }}
-    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{n}
-    \AP{/N << /Yes {on3Dcheck} /Off {off3Dx} >> }
-]{ckBox3D}{\widthOf{3Dcheck}bp}{\heightOf{3Dcheck}bp}{Yes}}
-\textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk3D}{.5in}{11bp}
-
-\medskip The verbatim listing of the second check box is, for example,
-\begin{small}
-\begin{verbatim}
+\textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk}{.5in}{11bp}\cgBdry[6pt]
 \resizebox{11bp}{!}{\checkBox[%
     \A{\JS{%
         var f = this.getField("reportCk3D");\r
@@ -167,13 +146,28 @@ custom checks and crosses.
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{n}
     \AP{/N << /Yes {on3Dcheck} /Off {off3Dx} >> }
 ]{ckBox3D}{\widthOf{3Dcheck}bp}{\heightOf{3Dcheck}bp}{Yes}}
+\textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk3D}{.5in}{11bp}\medskip 
+
+The verbatim listing of the second check box is, for example,
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\resizebox{11bp}{!}{\checkBox[\A{\JS{(!normalfont!itshape(JS code not shown))}}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{n}
+    \AP{/N << /Yes {on3Dcheck} /Off {off3Dx} >> }
+]{ckBox3D}{\widthOf{3Dcheck}bp}{\heightOf{3Dcheck}bp}{Yes}}
 \textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk3D}{.5in}{11bp}
-\end{verbatim}
-\end{small}
-
+\end{Verbatim}
 We use \cs{resizebox} from the \textsf{graphicx} package to adjust
-the sizes of the appearances.
+the sizes of the appearances.\medskip
 
+For \pkg{eforms} dated 2018/11/27 or later, the above check box code can be simplified
+as follows:
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\resizebox{11bp}{!}{\checkBox[\A{\JS{(!normalfont!itshape(JS code not shown))}}
+    \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{n}
+    \AP{\N{\On{Yes}{\on3Dcheck}\Off{\off3Dx}}}
+]{ckBox3D}{\widthOf{3Dcheck}bp}{\heightOf{3Dcheck}bp}{Yes}}
+\textField[\Q1\Ff\FfReadOnly\autoCenter{n}]{reportCk3D}{.5in}{11bp}
+\end{Verbatim}
 \newpage
 
 
@@ -184,7 +178,7 @@ appearance, and AdobeDon at 30\% for the down appearance. Will it
 work, we'll see:\medskip
 
 Push button: \raisebox{-3pt}{\resizebox{.5in}{!}{\pushButton[%
-    \autoCenter{n}\BC{}\S{S}
+    \autoCenter{y}\BC{}\S{S}
     \A{\JS{app.alert("AcroTeX rocks the world!"); this.dirty=false;}}
     \I{nAdobeDon}\RI{dAdobeDon}\IX{rAdobeDon}\TP{1}\FB{true}
 ]{pbAdobeDon}{\widthOf{AdobeDon}bp}{\heightOf{AdobeDon}bp}}}
@@ -192,14 +186,14 @@ Push button: \raisebox{-3pt}{\resizebox{.5in}{!}{\pushButton[%
 
 \medskip The verbatim listing is
 \begin{small}
-\begin{verbatim}
+\begin{Verbatim}[fontsize=\small]
 Push button: \raisebox{-3pt}{\resizebox{.5in}{!}{\pushButton[%
-    \autoCenter{n}\BC{}\S{S}
+    \autoCenter{y}\BC{}\S{S}
     \A{\JS{app.alert("AcroTeX rocks the world!");
        this.dirty=false;}}
     \I{nAdobeDon}\RI{dAdobeDon}\IX{rAdobeDon}\TP{1}\FB{true}
 ]{pbAdobeDon}{\widthOf{AdobeDon}bp}{\heightOf{AdobeDon}bp}}}
-\end{verbatim}
+\end{Verbatim}
 \end{small}
 
 \end{document}

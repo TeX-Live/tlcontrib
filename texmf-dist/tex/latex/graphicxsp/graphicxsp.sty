@@ -7,9 +7,9 @@
 %% graphicxsp.dtx  (with options: `copyright,package')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% graphicxsp.sty package,           2007-08-14         %%
-%% Copyright (C) 2007  D. P. Story                      %%
-%%   storyd@owc.edu / dpstory@acrotex.net               %%
+%% graphicxsp.sty package,                              %%
+%% Copyright (C) 2007--2018  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -20,19 +20,24 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{graphicxsp}
- [2016/02/19 v1.0 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
+ [2018/11/20 v1.0.2 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+\providecommand{\previewOn}{\previewtrue}
+\providecommand{\previewOff}{\previewfalse}
 \DeclareOption{preview}{\previewtrue}
 \DeclareOption{dvipsone}{\def\gxsp@drivernum{0}}
 \DeclareOption{dvips}{\def\gxsp@drivernum{1}}
 \DeclareOption{showembeds}{\let\gxsp@showembeds=0}
+\DeclareOption{!showembeds}{\let\gxsp@showembeds=1}
 \let\gxsp@showembeds=1
 \def\gxsp@drivernum{1}
 \DeclareOption{draft}{\spxGin@drafttrue
     \PassOptionsToPackage{draft}{graphicx}}
+\DeclareOption{!draft}{}
 \DeclareOption{final}{\spxGin@draftfalse
     \PassOptionsToPackage{final}{graphicx}}
 \DeclareOption{shownonames}{\@spx@shownameindraftfalse}
+\DeclareOption{!shownonames}{\@spx@shownameindrafttrue}
 \newif\if@spx@shownameindraft \@spx@shownameindrafttrue
 \newif\ifspxGin@draft \spxGin@draftfalse
 \InputIfFileExists{graphics.cfg}{}{}
@@ -201,6 +206,7 @@ userdict
 \def\llyOf#1{\csname#1Gin@lly\endcsname}
 \def\urxOf#1{\csname#1Gin@urx\endcsname}
 \def\uryOf#1{\csname#1Gin@ury\endcsname}
+\let\csOf\@nameuse
 \newcommand{\embedEPS}[3][]{%
     \@ifundefined{#2Gin@llx}{}{%
         \PackageError{graphicxsp}%
@@ -301,7 +307,11 @@ userdict
     [/EP pdfmark
     grestore}%
 }
-\newcommand{\sp@createImage}[3][]{%
+\def\ci@undef@msg#1{\PackageWarning{graphicxsp}{The command
+  `\expandafter\string\csname #1\endcsname' is already defined\MessageBreak
+  choose a different name instead of\MessageBreak`#1'}}
+\newcommand{\sp@createImage}[3][]{\@ifundefined{#3}{}{\ci@undef@msg{#3}}%
+    \x@namedef{#3}{#3}%
     \@ifundefined{#3Gin@llx}{}{%
         \PackageError{graphicxsp}%
         {The name, #3, on line \the\inputlineno\space\MessageBreak

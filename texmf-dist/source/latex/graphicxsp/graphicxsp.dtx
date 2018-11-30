@@ -1,9 +1,9 @@
 %\iffalse
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% graphicxsp.sty package,           2007-08-14         %%
-%% Copyright (C) 2007  D. P. Story                      %%
-%%   storyd@owc.edu / dpstory@acrotex.net               %%
+%% graphicxsp.sty package,                              %%
+%% Copyright (C) 2007--2018  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -15,7 +15,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{graphicxsp}
-%<package> [2016/02/19 v1.0 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
+%<package> [2018/11/20 v1.0.2 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex]{hyperref}
@@ -61,15 +61,24 @@
 %    \begin{macro}{dvipsone}
 %    \begin{macro}{dvips}
 %    \begin{macro}{showembeds}
+%    \begin{macro}{!showembeds}
 % This package recognizes three options: driver names \texttt{dvips} (the default),
 % \texttt{dvipsone} (old YandY \TeX) and a \texttt{preview}.
 % \texttt{dvipsone}, using distiller, can insert and re-use \texttt{.eps} figures.
 %    \begin{macrocode}
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
+%    \end{macrocode}
+%    (2017/03/12) Added two convenience commands.
+%    \changes{v1.0a}{2017/03/12}{Added \string\cs{previewOn} and \string\cs{previewOff}}
+%    \begin{macrocode}
+\providecommand{\previewOn}{\previewtrue}
+\providecommand{\previewOff}{\previewfalse}
+%    \end{macrocode}
 \DeclareOption{preview}{\previewtrue}
 \DeclareOption{dvipsone}{\def\gxsp@drivernum{0}}
 \DeclareOption{dvips}{\def\gxsp@drivernum{1}}
 \DeclareOption{showembeds}{\let\gxsp@showembeds=0}
+\DeclareOption{!showembeds}{\let\gxsp@showembeds=1}
 \let\gxsp@showembeds=1
 \def\gxsp@drivernum{1}
 %    \end{macrocode}
@@ -77,9 +86,11 @@
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
+%    \end{macro}
 %    \begin{macro}{draft}
 %    \begin{macro}{final}
 %    \begin{macro}{shownonames}
+%    \begin{macro}{!shownonames}
 % The \texttt{draft} mode passes \texttt{draft} on to \textsf{graphicx}. The images
 % appear as rectangles, with the name of the image. The \texttt{shownonames} option
 % removes the name inside the rectangle.
@@ -87,12 +98,15 @@
 %    \begin{macrocode}
 \DeclareOption{draft}{\spxGin@drafttrue
     \PassOptionsToPackage{draft}{graphicx}}
+\DeclareOption{!draft}{}
 \DeclareOption{final}{\spxGin@draftfalse
     \PassOptionsToPackage{final}{graphicx}}
 \DeclareOption{shownonames}{\@spx@shownameindraftfalse}
+\DeclareOption{!shownonames}{\@spx@shownameindrafttrue}
 \newif\if@spx@shownameindraft \@spx@shownameindrafttrue
 \newif\ifspxGin@draft \spxGin@draftfalse
 %    \end{macrocode}
+%    \end{macro}
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
@@ -166,7 +180,7 @@ userdict
    /HTeXtoDvips {TeXtoPDF PDFtoDvips} def       % sp to dots
    /VTeXtoDvips {TeXtoPDF PDFtoVDvips} def end} % sp to dots
 %    \end{macrocode}
-% The \texttt{cstr} is used to calculate the lower left corner of the the bounding
+% The \texttt{cstr} is used to calculate the lower left corner of the bounding
 % box of an \textsf{EPS} file for \texttt{dvips}.
 %    \begin{macrocode}
 \special{!userdict begin /cstr {currentpoint translate
@@ -327,7 +341,7 @@ userdict
 \def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
 \def\e@namedef#1{\expandafter\edef\csname #1\endcsname}
 %    \end{macrocode}
-% Below is a counter to insure each name is unique. It is used
+% Below is a counter to ensure each name is unique. It is used
 % in \cs{Ginclude@eps@SP}.
 %    \begin{macrocode}
 \newcount\grxsp@cnt \grxsp@cnt=0
@@ -367,6 +381,7 @@ userdict
 %    \begin{macro}{\llyOf}
 %    \begin{macro}{\urxOf}
 %    \begin{macro}{\uryOf}
+%    \begin{macro}{\csOf}
 % More helper commands for calculating the height, width and path of
 % an embedded file. These can be used by the user, that's you.
 %    \begin{macrocode}
@@ -378,11 +393,17 @@ userdict
 \def\urxOf#1{\csname#1Gin@urx\endcsname}
 \def\uryOf#1{\csname#1Gin@ury\endcsname}
 %    \end{macrocode}
+%Use \cs{csOf} to expand a name.
+%\changes{v1.0.2}{2018/11/20}{Added \string\cs{csOf}}
+%    \begin{macrocode}
+\let\csOf\@nameuse
+%    \end{macrocode}
 % Other internal commands that save info.
 %    \begin{macrocode}
 %\def\grcxsp@pathOf#1{\csname#1path\endcsname}
 %\def\grcxsp@importSF#1{\csname#1importScaleFactor\endcsname}
 %    \end{macrocode}
+%    \end{macro}
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
@@ -616,8 +637,13 @@ userdict
 %   created a public version, \texttt{createImage}, which is restricted to the preamble. This change
 %   is needed to create dynamic appearances in the \textsf{rmannot} package.
 %}
+%\changes{v1.0.2}{2018/11/20}{Added convenience command to reference xobjects using commands}
 %    \begin{macrocode}
-\newcommand{\sp@createImage}[3][]{%
+\def\ci@undef@msg#1{\PackageWarning{graphicxsp}{The command
+  `\expandafter\string\csname #1\endcsname' is already defined\MessageBreak
+  choose a different name instead of\MessageBreak`#1'}}
+\newcommand{\sp@createImage}[3][]{\@ifundefined{#3}{}{\ci@undef@msg{#3}}%
+    \x@namedef{#3}{#3}%
     \@ifundefined{#3Gin@llx}{}{%
         \PackageError{graphicxsp}%
         {The name, #3, on line \the\inputlineno\space\MessageBreak

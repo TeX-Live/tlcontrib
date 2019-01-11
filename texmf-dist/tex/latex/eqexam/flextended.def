@@ -1,0 +1,303 @@
+%%
+%% This is file `flextended.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eqexam.dtx  (with options: `copyright,flextended')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eqexam.sty package,                                  %%
+%% Copyright (C) 2005--2018  D. P. Story                %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\fls@vebaselinelineskip{% dps22
+  \xdef\flbaselineskip{\the\baselineskip}}
+\def\fl@Cnt{0}
+\def\fl@CutName{flx-\jobname.cut}
+\def\flwriteexsol@fter{% dpsj23
+  \ifx\exsolafter\@empty
+    \immediate\write\verbatim@out{\string\ignorespaces}% dpsj23
+  \else
+    \immediate\write\verbatim@out{\string\exsolafter
+      \string\space\string\ignorespaces}%
+  \fi
+}
+\def\fl@getcontent#1{\begingroup
+  {\count0=\fl@Cnt\relax
+    \advance\count0by1\relax
+    \xdef\fl@Cnt{\the\count0 }}%
+  \global\let\verbatim@out\CommentStream
+  \immediate\openout\verbatim@out=#1
+  \ifwithinparts
+    \ifx\istabularexer\eq@YES
+      \immediate\write\verbatim@out{\string\hfuzz\string\hsize}%
+      \immediate\write\verbatim@out{\string\minipage[t]{\string\hsize}}%
+      \ifanswerkey
+        \immediate\write\verbatim@out{\string\expandafter
+          \string\noindent\string\eqSolnExCmds}% dps23
+        \flwriteexsol@fter
+      \else
+        \immediate\write\verbatim@out{\string\expandafter
+          \string\noindent\string\priorWorkAreaCmds
+          \string\ignorespaces}% dps23
+      \fi
+    \else
+      \ifanswerkey\flwriteexsol@fter\fi
+    \fi
+  \else
+    \ifanswerkey\flwriteexsol@fter\fi
+  \fi
+  \verbatimwrite
+}
+\def\fl@vsplitandplace#1{%
+  \iffl@firstpass
+  \global\setbox\eqe@nskeyflsplit\color@vbox
+    \normalbaselines
+    \predisplaypenalty=-50
+    \postdisplaypenalty=-50
+    \setlength{\hsize}{\eqe@fillwidth}%
+    \expandafter\noindent % dpsj23
+    \ifanswerkey\expandafter\eqSolnExCmds\else
+      \expandafter\priorWorkAreaCmds\fi
+    \ignorespaces\input{#1}\fls@vebaselinelineskip
+    \color@endbox\global\fl@firstpassfalse\fi
+  \@tempdima\eqe@HOfVrule\relax
+  \advance\@tempdima\flfboxrule
+  \advance\@tempdima\lineskip
+  \ifflfrstsplit\else\advance\@tempdima\wlVspace\fi
+  \advance\@tempdima\maxdepth
+  \advance\@tempdima by\twe@kBre@kPoint\relax
+  \eq@tmplengthB\@tempdima % target height
+  \splittopskip\wlVspace
+  \splitmaxdepth\maxdepth
+  \advance\splitmaxdepth by\twe@kBre@kPoint\relax
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \setbox\eqe@nskeyfltop=\vsplit\eq@pointbox to \@tempdima
+  \setbox\eqe@nskeyfltop=\vbox{\unvbox\eqe@nskeyfltop}%
+  \ifvoid\eq@pointbox\else
+    \setlength{\@tempdimb}
+        {\eq@tmplengthB-\dp\eqe@nskeyfltop}%
+    \ifdim\@tempdimb<0pt
+      \@tempdimb=-\@tempdimb
+      \ifdim\@tempdimb>\maxdepth
+        \advance\@tempdima-\flbaselineskip\relax
+      \else
+      \fi
+    \else
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \advance\@tempdima by\flbaselineskip\relax
+  \setbox\eqe@nskeyfltop=\vsplit\eq@pointbox to \@tempdima
+  \setbox\eqe@nskeyfltop=\vtop{\unvbox\eqe@nskeyfltop}%
+  \setlength{\@tempdimb}{\eq@tmplengthB-\dp\eqe@nskeyfltop}%
+    \ifdim\@tempdimb<0pt % too much
+        \advance\@tempdima-\flbaselineskip\relax
+      \else
+      \fi
+    \fi
+  \fi
+  \splittopskip\wlVspace
+  \lineskip1pt
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \global\setbox\eqe@nskeyfltop=\vsplit\eqe@nskeyflsplit to \@tempdima
+  \global\setbox\eqe@nskeyfltop\vtop{\unvbox\eqe@nskeyfltop\vskip0pt}%
+  \ifvoid\eqe@nskeyflsplit
+    \ifeqedb\llap{Bot}\fi
+    \ifeqedb\raise\eqe@HOfVrule\llap{Top}\fi
+    \ifeqedb\llap{V\qquad}\fi
+    \ifflfrstsplit\global\flfrstsplitfalse
+      \ifeqedb\llap{FP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eqe@nskeyfltop\vfil}}}\else
+      \ifeqedb\llap{SP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\wlVspace+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eq@pointbox\vfil}}}%
+        \global\setbox\eqe@nskeyflsplit\box\voidb@x
+    \fi
+  \else
+    \ifeqedb\llap{Bot}\fi
+    \ifeqedb\raise\eqe@HOfVrule\llap{Top}\fi
+    \ifeqedb\llap{nV\qquad}\fi
+    \ifflfrstsplit\global\flfrstsplitfalse
+    \ifeqedb\llap{FP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eqe@nskeyfltop\vfil}}}\else
+      \ifeqedb\llap{SP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\wlVspace+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eqe@nskeyfltop\vfil}}}%
+    \fi
+  \fi
+  \setbox\eq@pointbox\box\voidb@x
+}
+\let\turnfl@nskeyOnOff\relax
+\def\turnflnosolnsOn{\eqe@flnosolnstrue}
+\def\turnflnosolnsOff{\eqe@flnosolnsfalse}
+\def\turnflanskeyOn{%
+  \def\turnfl@nskeyOnOff{%
+    \ifanswerkey
+      \ifx\makeVgrid\relax % already in grid mode, do nothing
+        \ifwriteVertic@lFLines\KV@eqefillLines@toplinefalse\fi % dps16
+        \writeVertic@lFLinesfalse
+        \let\makeVgrid\eqe@makeVgrid % dpsj5
+      \fi % dps17
+      \let\eqe@insert@more@content\eqe@insertSolns % dpsj5
+      \eqe@flextendedtrue % dps16
+      \fillTypeGrid % dps16
+      \global\let\eq@insertverticalspace\eq@YES
+      \global\vspacewithsolnstrue
+    \fi
+  }%
+}
+\def\turnflanskeyOff{%
+  \def\turnfl@nskeyOnOff{%
+    \ifanswerkey
+      \writeVertic@lFLinestrue
+      \eqe@flextendedfalse
+      \let\eq@insertverticalspace\eq@NO
+      \@eqlinedfillerfalse
+      \global\let\eqe@insert@more@content\relax
+      \global\let\eq@insertverticalspace\eq@YES
+      \ifvspacewithsolns\else
+      \global\vspacewithsolnsfalse\fi
+      \global\displayworkareafalse
+    \fi
+  }%
+}
+\turnflanskeyOff
+\let\p@ssToSolns\relax % dps30
+\def\eqe@insertSolns{\clubpenalty=50
+  \widowpenalty=50 \vbadness=10000
+  \fl@vsplitandplace{s\fl@CutName}}
+\def\eq@b@ddCodeSpecial#1{\global\gridpgbrkfalse % dpsj15
+  \global\let\eq@e@ddCodeSpecial\relax
+  \gdef\eqe@flnexti{#1}% dpsj5
+  \if@eqlinedfiller
+    \ifKV@eqefillLines@bgonly\leavevmode
+        \vskip-\baselineskip\kern\lineskip\fi % dpsj11
+    \ifKV@eqefillLines@outlineonly\leavevmode
+        \vskip-\baselineskip\kern\lineskip\fi
+    \ifanswerkey %\turnfl@nskeyOnOff % dps16
+      \ifeqe@flextended
+        \ifcont@nnot
+          \ifx\makeVgrid\relax
+            \gdef\p@ssToFLs{\turnfl@nskeyOnOff
+              \let\eqe@insert@more@content\eqe@insertSolns
+              \writeVertic@lFLinesfalse
+              \KV@eqefillLines@toplinefalse
+              \let\makeVgrid\eqe@makeVgrid
+            }%
+          \else
+            \gdef\p@ssToFLs{\turnfl@nskeyOnOff
+              \let\eqe@insert@more@content\eqe@insertSolns
+              \writeVertic@lFLinestrue}%
+          \fi
+          \gdef\eqe@flnexti{\turnfl@nskeyOnOff
+            \global\fl@firstpasstrue % dpsj5
+            \p@ssToSolns
+            \global\gridpgbrkfalse
+            \eqe@setStartSolns
+            \xdef\kdvsp@SAVE{\ifkeepdeclaredvspacing
+                true\else false\fi}%
+            \gdef\kdvsp@Restore{\@nameuse
+              {keepdeclaredvspacing\kdvsp@SAVE}%
+              \gdef\twe@kBre@kPoint{0pt}\global
+              \let\kdvsp@Restore\relax}% dpsj21
+          \expandafter\global\vspacewithkeyOff
+          \vbadness=10000
+          \fl@getcontent{s\fl@CutName}}%
+          \gdef\eq@e@ddCodeSpecial{\endverbatimwrite\endgroup
+            \ifwithinparts\ifx\istabularexer\eq@YES
+            \immediate\write\verbatim@out{\string\endminipage}\fi\fi
+            \immediate\closeout\verbatim@out
+            \global\let\eq@e@ddCodeSpecial\relax
+          }%
+        \else
+          \PackageWarningNoLine{eqexam}{For solutions to appear
+            using filler lines\MessageBreak
+            (with flextexded and answerkey options),\MessageBreak
+            you must first expand \string\turnContAnnotOn\MessageBreak
+            prior to line \the\inputlineno.\MessageBreak
+            Switching to \string\useFillerDefault}%
+          \useFillerDefault
+          \let\eq@insertverticalspace\eq@NO
+        \fi
+      \fi
+    \fi
+  \fi
+  \eqe@flnexti
+}% dpsj4
+\def\eqe@priorw@content{%
+      \clubpenalty=50 % dps15
+      \widowpenalty=50
+      \vbadness=10000
+      \fl@vsplitandplace{p\fl@CutName}%
+}%
+\renewenvironment{priorworkarea}{\par
+  \ifx\solutionparshape\@empty\else % dps28
+    \pushEnvir
+        \everypar{}\if@eqalignfilllinestoleft\else
+        \parshape=1 \leadinIndent \linewidth\fi
+    \popEnvir
+  \fi
+  \global\let\p@ssToFLs\relax
+  \global\let\p@ssToSolns\relax
+  \vspacewithkeyOff
+  \ifeq@nosolutions\else\sloppy\fi
+  \def\eqe@flnexti{\eqSavedComment}%
+  \ifeqe@flnosolns\ifdisplayworkarea
+    \def\eqe@flnexti{\fl@getcontent{p\fl@CutName}}\fi\fi % dpsj21
+  \gdef\eqe@flnextii{\eqSavedEndCommet}%
+  \ifeqe@flnosolns\ifdisplayworkarea
+    \gdef\eqe@flnextii{\endverbatimwrite\endgroup
+    \ifwithinparts\ifx\istabularexer\eq@YES
+      \immediate\write\verbatim@out{\string\endminipage}\fi\fi
+    \immediate\closeout\verbatim@out}\fi\fi
+  \eqe@flnexti
+}{%
+  \eqe@flnextii
+  \ifcont@nnot
+    \ifeqe@flnosolns
+      \ifdisplayworkarea
+        \ifx\eq@insertverticalspace\eqe@YES
+          \ifx\makeVgrid\relax
+            \gdef\p@ssToFLs{%
+              \let\eqe@insert@more@content\eqe@priorw@content
+              \writeVertic@lFLinesfalse
+              \KV@eqefillLines@toplinefalse
+              \let\makeVgrid\eqe@makeVgrid}%
+          \else
+            \gdef\p@ssToFLs{%
+              \let\eqe@insert@more@content\eqe@priorw@content
+              \writeVertic@lFLinestrue}%
+          \fi
+          \gdef\kdvsp@Restore{\gdef\twe@kBre@kPoint{0pt}\global
+            \let\kdvsp@Restore\relax}% dpsj21
+        \fi
+      \fi
+    \else
+      \global\setbox\eqe@nskeyflsplit\box\voidb@x
+      \global\setbox\eqe@nskeyfltop\box\voidb@x
+    \fi
+  \else
+    \PackageWarningNoLine{eqexam}{For priorworkarea to appear
+      using filler lines\MessageBreak
+      (with flextexded and nosolutions options),\MessageBreak
+      you must first expand \string\turnContAnnotOn\MessageBreak
+      prior to line \the\inputlineno.\MessageBreak
+      Switching to \string\useFillerDefault}%
+    \gdef\p@ssToSolns{\useFillerDefault}%
+  \fi
+}
+\endinput
+%%
+%% End of file `flextended.def'.

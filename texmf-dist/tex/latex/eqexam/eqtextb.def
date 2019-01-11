@@ -8,14 +8,14 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2017  D. P. Story                %%
+%% Copyright (C) 2005--2018  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
-%% the terms of the LaTeX Project Public License 1.2    %%
+%% the terms of the LaTeX Project Public License        %%
 %% Distributed from CTAN archives in directory          %%
-%% macros/latex/base/lppl.txt; either version 1 of the  %%
-%% License, or (at your option) any later version.      %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{eqtextb.def}
  [2016/01/18 v4.6 Cmds used by the fortextbook option (dps)]
@@ -229,7 +229,7 @@
 \setSolnIndent{00}{(d)}
 \renewcommand{\setSolnMargins}[1]{%
     \ifdim\solnGutter=0pt \setlength\eqemargin{#1}\else
-    \setlength\eqemargin{\solnGutter}\fi}
+    \setlength\eqemargin{\solnGutter}\fi\ignorespaces}
 \newcommand{\defaultSolnIndent}{\global\solnGutter=0pt}
 \defaultSolnIndent
 \renewcommand{\exlabelformat}{%
@@ -260,9 +260,9 @@
 \newcommand{\hangSolWPrtsFmt}[2]{%
     \def\prior@parts@hook{%
         \ifisleadin\else
-        \writeToSolnFile{^^J\protect\bpartsmrk}\fi}%
+        \writeT@SolnFile{^^J\protect\bpartsmrk}\fi}%
     \def\post@parts@hook{%
-        \writeToSolnFile{\protect\epartsmrk^^J}}%
+        \writeT@SolnFile{\protect\epartsmrk^^J}}%
     \def\bpartsmrk{\global\firstitemtrue\begin{eqepartsquestions}}%
     \def\epartsmrk{\end{eqepartsquestions}\global\firstitemfalse}%
     \let\solWPrtsFmt\solWPrtsFmt@hang
@@ -591,17 +591,17 @@
 \eqequeslistparindent{0pt}
 \renewenvironment{eqequestions}{%
     \begin{list}{}{%
-    \ifwithsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
+    \ifwithinsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
     \setlength{\labelwidth}{\eqemargin}%
     \setlength{\parsep}{\eqeques@parsep}%
     \setlength{\itemsep}{\eqeques@itemsep}
     \setlength{\topsep}{\eqeques@topsep}%
     \setlength{\itemindent}{0pt}%
-    \setlength{\listparindent}{\eqeques@listparindent}%dps%
-    \ifwithsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
+    \setlength{\listparindent}{\eqeques@listparindent}%
+    \ifwithinsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
     \settowidth{\labelsep}{\eqe@hspannerPrb}\fi
     \setlength{\leftmargin}{\labelwidth}%
-    }\ifwithsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
+    }\ifwithinsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
 \newcommand{\eqepquestopsep}[1]{\def\eqepques@topsep{#1}}
 \newcommand{\eqepquesparsep}[1]{\def\eqepques@parsep{#1}}
 \newcommand{\eqepquesitemsep}[1]{\def\eqepques@itemsep{#1}}
@@ -624,14 +624,14 @@
 \let\fillInFormatDefault\@empty
 \def\exerSolnsHeadnToc{}
 \renewcommand{\exerSolnInput}{%
-    \let\webnewpage\relax
+    \global\let\webnewpage\relax
     \ifsolutionsonly\else\immediate\closeout\ex@solns\fi
     \ifeq@nosolutions\else\newpage % 2012-03-14
         \iftherearesolutions\eq@solutionshook\eqsolutionshook
             \ifsolutionsonly\else\newpage\eq@solutionshook
             \eqsolutionshook\fi
             \ifx\webnewpage\relax
-                \def\webnewpage{\let\webnewpage\newpage}%
+                \gdef\webnewpage{\global\let\webnewpage\newpage}%
             \fi
             \priorexsectitle\exerSolnsHeadnToc\priorexslinput
             \InputIfFileExists{\jobname.sol}{}{\PackageWarning{exerquiz}
@@ -641,7 +641,7 @@
 }
 \setcounter{partno}{1}\edef\firstPartLtr{\thepartno}
 \newif\iffrstProbNumShown\frstProbNumShownfalse
-\def\tb@insertDecPoint{\ifwithsoldoc\eqedecPointSoln\else
+\def\tb@insertDecPoint{\ifwithinsoldoc\eqedecPointSoln\else
     \eqe@decPointMrg\fi}
 \newcommand{\eqedsplyOnlyFrst}[2]{\def\thisPart{#2}%
     \ifx\thisPart\firstPartLtr\global\frstProbNumShowntrue
@@ -669,7 +669,7 @@
 \renewcommand{\examSolnHeadFmt}[1]{\textbf{#1}}
 \renewcommand{\postExamSolnHead}{\smallskip}
 \newcommand{\wrtChapSolnHead}[1]{%
-    \writeToSolnFile{%
+    \writeT@SolnFile{%
     \protect\preChapSolnHead
     \protect\chapHeadSolnFmt{\protect\ftbFmtChapter{\thechapter}#1}%
     \protect\postChapSolnHead

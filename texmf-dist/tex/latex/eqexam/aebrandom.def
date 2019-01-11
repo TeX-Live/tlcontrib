@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2017  D. P. Story                 %%
+%% Copyright (C) 1999-2018  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebrandom.def}
- [2017/03/16 v7.8g %
+ [2018/12/13 v8.2.8 %
  Exerquiz support for randomization (dps)]
 \@ifundefined{nextrandom}{\input{random.tex}}{}
 \def\nextrandom{\begingroup
@@ -42,6 +42,7 @@
  \ifnum\randomi<\z@ \global\advance\randomi 2147483647\relax\fi
  \endgroup
 }
+\def\writeSeedToSolnFile{\writeT@ExSolns{\string\randomi=\the\randomi}}
 \def\@ansChoices[#1]%
 {%
     \global\let\@tempholdSaveAns\@empty % 5/24

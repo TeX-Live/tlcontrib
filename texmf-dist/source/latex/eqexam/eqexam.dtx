@@ -4,20 +4,20 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2017  D. P. Story                %%
+%% Copyright (C) 2005--2018  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
-%% the terms of the LaTeX Project Public License 1.2    %%
+%% the terms of the LaTeX Project Public License        %%
 %% Distributed from CTAN archives in directory          %%
-%% macros/latex/base/lppl.txt; either version 1 of the  %%
-%% License, or (at your option) any later version.      %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package> [2017/03/16 v4.9 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2017/03/16}
+%<package>  [2018/12/13 v5.1.3 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2018/12/13}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -25,7 +25,16 @@
 \value{IndexColumns}=2
 \value{GlossaryColumns}=2
 \usepackage{makeidx}
-\usepackage[colorlinks,hyperindex]{hyperref}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\def\darg#1{\texttt{\{#1\}}}
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+%\def\cs#1{\texttt{\bslash#1}}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}%
 \EnableCrossrefs
 \CodelineIndex
@@ -33,6 +42,9 @@
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{eqexam}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{eqexam}{aebdocfmt.def cannot be found}}
+\makeatletter
+  \let\@latex@warning\@gobble
+\makeatother
 \begin{document}
     \let\pkg\textsf
     \def\switchCats{\catcode`\{=12\relax\catcode`\}=12\relax
@@ -243,6 +255,7 @@
 \let\eqe@YES=y \let\eqe@NO=n
 \let\eqe@One=1 \let\eqe@Zero=0
 \let\eqe@Two=2 \let\eqe@Three=3 \let\eqe@Four=4
+\def\eqe@h{h}
 \DeclareOptionX{nototals}{\AtEndOfPackage{\NoTotals}}
 \DeclareOptionX{noparttotals}{%
     \AtEndOfPackage{\let\eq@parttotals\eqe@NO}}
@@ -293,10 +306,28 @@
 %    \IndexOpt{answerkey}
 % Equivalent to solutionsafter and proofing.
 %    \begin{macrocode}
-\newif\ifanswerkey \answerkeyfalse
-\DeclareOptionX{answerkey}{\AnswerKey}
-\def\AnswerKey{\answerkeytrue\eq@proofingtrue
-    \eq@solutionsaftertrue}
+\@ifundefined{ifanswerkey}{\newif\ifanswerkey\answerkeyfalse}{}
+\@ifundefined{ifsolutionsAtEnd}
+    {\newif\ifsolutionsAtEnd\solutionsAtEndtrue}{}
+%    \end{macrocode}
+%     A more intelligent processing of certain options is deployed: Now, we allow
+%     only one of the options \texttt{answerkey}, \texttt{nosolutions},
+%     \texttt{vspacewithsolns}, \texttt{solutionsafter}, and
+%     \texttt{solutionsonly} at a time.
+%    \begin{macrocode}
+\let\thisOpt@OK \eqe@YES
+\def\w@rningBadOpts{\PackageWarningNoLine{eqexam}{You've chosen two
+    conflicting options,\MessageBreak \l@stPO\space and \CurrentOption.
+    We will recognize\MessageBreak the \l@stPO\space option.
+    Please correct\MessageBreak this if my guess is wrong}}
+\def\eqe@optiont@kenMsg{\PackageInfo{eqexam}
+  {Option \CurrentOption\space taken}}
+\DeclareOptionX{answerkey}{\ifx\thisOpt@OK\eqe@YES
+  \def\l@stPO{answerkey}\let\thisOpt@OK\eqe@NO
+  \eqe@optiont@kenMsg\expandafter\AnswerKey\else
+  \w@rningBadOpts\fi}
+\def\AnswerKey{\solutionsAtEndfalse\answerkeytrue
+  \eq@proofingtrue\eq@solutionsaftertrue\displayworkareafalse}
 %    \end{macrocode}
 %    \IndexOpt{vspacewithsolns}
 %    When \texttt{vspacewithsolns} is used, vertical space is created by
@@ -316,14 +347,36 @@
 %    \begin{macrocode}
 \newif\ifvspacewithsolns\vspacewithsolnsfalse
 \def\ifkeyalt{\csname ifvspacewithsolns\endcsname}
+  \let\keyalttrue\vspacewithsolnstrue
+  \let\keyaltfalse\vspacewithsolnsfalse
+%\def\ifkeyalt{\csname ifvspacewithsolns\endcsname}
 \def\ifkeyOrkeyalt{\ifanswerkey
     \def\eqe@next{\csname iftrue\endcsname}\else
     \ifvspacewithsolns\def\eqe@next{\csname iftrue\endcsname}\else
     \def\eqe@next{\csname iffalse\endcsname}\fi\fi\eqe@next}
-\DeclareOptionX{vspacewithsolns}{%
-    \vspacewithsolnstrue\displayworkareatrue}
-\DeclareOptionX{ftbsolns}{%
-    \vspacewithsolnstrue\displayworkareatrue}
+\DeclareOptionX{vspacewithsolns}{\ifx\thisOpt@OK\eqe@YES
+    \def\l@stPO{vspacewithsolns}\let\thisOpt@OK\eqe@NO
+    \eqe@optiont@kenMsg
+    \vspacewithsolnstrue\expandafter\displayworkareatrue
+    \else\w@rningBadOpts\fi}
+\DeclareOptionX{ftbsolns}{\ExecuteOptionsX{vspacewithsolns}}
+%    \end{macrocode}
+%    The \IndexKey{flextended}\opt{flextended} is an (experimental) option
+%    to allow filler lines (fl) to be superimposed under the solutions, when the \opt{answerkey}
+%    option is taken.
+%    \changes{2017/12/05}{v5.0g}{Added option \string\texttt{flextended}.}
+%    \begin{macrocode}
+\DeclareOptionX{flextended}{\AtEndOfPackage{\flextendedInput}}
+\def\flextendedInput{\eqe@flextendedtrue
+    \InputIfFileExists{flextended.def}
+        {\PackageInfo{eqexam}{Inputting flextended.def for
+            flextended\MessageBreak option}}
+        {\eqe@flextendedfalse\PackageWarning{eqexam}
+    {Cannot find flextended.def for flextended\MessageBreak
+    option. You should rebuild the package. Removing\MessageBreak
+    flextended for now}}}
+\@ifundefined{ifeqe@flextended}
+  {\newif\ifeqe@flextended \eqe@flextendedfalse}{}
 %    \end{macrocode}
 %    \IndexOpt{useforms}
 %    Use forms (if online option is taken); otherwise draw rectangles for
@@ -437,6 +490,7 @@
 %    \subsection{Options from and for \textsf{web}}
 %    \IndexOpt{forpaper}
 %    \IndexOpt{forcolorpaper}
+%    \IndexOpt{forcolorpaper*}
 %    Here is the list of options of \textsf{exerquiz} we plan to recognize.
 %    \changes{v4.6a}{2016/06/04}{Added \string\cs{ifequsecolor} to easily distinguish between
 %    \string\texttt{forpaper} and \string\texttt{forcolorpaper} options.}
@@ -444,7 +498,10 @@
 \@ifundefined{ifequsecolor}{\newif\ifequsecolor\equsecolorfalse}{}
 \DeclareOptionX{forpaper}{\equsecolorfalse\eqforpapertrue
     \PassOptionsToPackage{monochrome}{\eq@ColorPackage}}
-\DeclareOptionX{forcolorpaper}{\equsecolortrue\eqforpapertrue}  % for print
+\DeclareOptionX{forcolorpaper}{\equsecolortrue\eqforpapertrue}
+\newif\ifForceNoColor\ForceNoColorfalse
+\DeclareOptionX{forcolorpaper*}{\equsecolortrue\eqforpapertrue
+    \ForceNoColortrue} % for print
 %    \end{macrocode}
 %    \IndexOpt{preview}
 %    Preview shows outlines for form fields.
@@ -474,17 +531,25 @@
 %    \IndexOpt{solutionsonly}
 %    Solutions related options
 %    \begin{macrocode}
-%    dps 03/04/11
-\DeclareOptionX{nosolutions}{\eq@nolinktrue\eq@nosolutionstrue
-    \displayworkareatrue}
+\DeclareOptionX{nosolutions}{\ifx\thisOpt@OK\eqe@YES
+    \def\l@stPO{nosolutions}\let\thisOpt@OK\eqe@NO
+    \eqe@optiont@kenMsg\eq@nolinktrue\eq@nosolutionstrue
+    \expandafter\displayworkareatrue
+    \else\w@rningBadOpts\fi}
 \DeclareOptionX{nohiddensolutions}{\eq@globalshowsolutionstrue}
 \DeclareOptionX{noHiddensolutions}%
     {\eq@globalshowsolutionstrue\AtBeginDocument{\def\Hidesymbol{h}}}
-\DeclareOptionX{solutionsafter}{\eq@solutionsaftertrue
-    \displayworkareafalse}
-\DeclareOptionX{solutionsonly}{%
-    \solutionsonlytrue\answerkeytrue\displayworkareafalse
-    \AtEndOfPackage{\therearesolutionstrue\let\exerSolnsHeadnToc\relax}}
+\DeclareOptionX{solutionsafter}{\ifx\thisOpt@OK\eqe@YES
+    \def\l@stPO{solutionsafter}\let\thisOpt@OK\eqe@NO
+    \eqe@optiont@kenMsg
+    \eq@solutionsaftertrue\expandafter
+    \displayworkareafalse\else\w@rningBadOpts\fi}
+\DeclareOptionX{solutionsonly}{\ifx\thisOpt@OK\eqe@YES
+    \def\l@stPO{solutionsafter}\let\thisOpt@OK\eqe@NO
+    \eqe@optiont@kenMsg\AtEndOfPackage{\therearesolutionstrue
+        \let\exerSolnsHeadnToc\relax}
+        \solutionsonlytrue\answerkeytrue\expandafter
+        \displayworkareafalse\else\w@rningBadOpts\fi}
 %    \end{macrocode}
 %    \IndexOpt{proofing}
 %    The \texttt{proofing} option sets a switch that controls whether
@@ -516,13 +581,21 @@
     {\AtEndOfPackage{\aebshowgrayletterstrue}}
 %    \end{macrocode}
 %
-%\changes{v2.0i}{2011/04/17 }
+%\changes{v2.0i}{2011/04/17}
 %{
 %   Added the switch \cs{ifdisplayworkarea} to better control when the
 %   work area is to be displayed.
 %}
+%\changes{v5.1.3}{2018/12/13}{\string\cs{ifdisplayworkarea} conditionally defined;
+%  defined \string\cs{displayworkareaOn} and
+%    \string\cs{displayworkareaOff}. Consistent with exerquiz.}
+%    Define \cs{ifdisplayworkarea}\DescribeMacro\ifdisplayworkareaOn\DescribeMacro\ifdisplayworkareaOff\space
+%    and user commands to turn off and on.
 %    \begin{macrocode}
-\newif\ifdisplayworkarea \displayworkareafalse
+\@ifundefined{ifdisplayworkarea}{\newif\ifdisplayworkarea
+  \displayworkareafalse}{}
+\providecommand\displayworkareaOn{\displayworkareatrue}
+\providecommand\displayworkareaOff{\displayworkareafalse}
 %    \end{macrocode}
 %
 %    \paragraph*{Color packages}
@@ -562,7 +635,6 @@
 %    \IndexOpt{dvipdfmx}
 %    \IndexOpt{xetex}
 %    \IndexOpt{textures}
-% The list of recognized and supported drivers.
 %    \begin{macrocode}
 \DeclareOptionX{dvipsone}{%
     \def\eqe@drivernum{0}\def\eqDriverName{dvipsone}%
@@ -594,6 +666,9 @@
 % in web, exerquiz, or eforms.
 %    \begin{macrocode}
 \newif\ifeq@solutionsafter \eq@solutionsafterfalse
+\def\ifsolutionsafter{\csname ifeq@solutionsafter\endcsname}
+  \let\solutionsaftertrue\eq@solutionsaftertrue
+  \let\solutionsafterfalse\eq@solutionsafterfalse
 \newif\ifsolutionsonly\solutionsonlyfalse
 \newif\ifeq@hidesolution \eq@hidesolutionfalse
 \newif\ifeq@globalshowsolutions \eq@globalshowsolutionsfalse
@@ -662,6 +737,17 @@
 %    \begin{macrocode}
 \ProcessOptionsX
 %    \end{macrocode}
+%    When the online or email option is taken, as well as answserkey, we cancel the \texttt{flextended} option.
+%    \begin{macrocode}
+\ifeqeonline
+    \ifanswerkey
+    \def\flextendedInput{\let\turnfl@nskeyMsg\@empty
+    \PackageWarningNoLine{eqexam}
+    {You've chosen the online or email option\MessageBreak
+    with the flextended option. This is not\MessageBreak
+    supported, removing the flextended option}}\fi
+\fi
+%    \end{macrocode}
 % \changes{v3.2c}{2013/02/23}{Added \cs{selectedMC} at end of package}
 % The \cs{selectedMC} command contains the choice for the styling for the
 % region multiple choice questions: rectangles or circles. The default is
@@ -714,7 +800,7 @@
     \makeAnsEnvForSolnsAtEnd\eqTopOfSolnPage
     \answerkeytrue\eq@proofingtrue
     \eq@solutionsaftertrue\vspacewithsolnstrue
-    \displayworkareafalse\withsoldoctrue
+    \displayworkareafalse %\withinsoldoctrue % now within \eqTopOfSolnPage
 }
 %    \end{macrocode}
 %    \begin{macro}{\makeAnsEnvForSolnsAtEnd}
@@ -747,6 +833,7 @@
         \eqe@IWO\quiz@solns{\string\eqeAEFormatting}\fi
     \fi
 }
+\def\writeWithSolDocTrue{\writeT@SolnFile{\protect\withinsoldoctrue}}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -754,7 +841,7 @@
 %    Sets the value of \cs{eqemargin} in the context of the solution file,
 %    this command is redefined later.
 %    \begin{macrocode}
-\newcommand{\setSolnMargins}[1]{\setlength\eqemargin{#1}}
+\newcommand{\setSolnMargins}[1]{\setlength\eqemargin{#1}\ignorespaces}
 %    \end{macrocode}
 %    \end{macro}
 %    (2011/05/08) In the new version of \textsf{eqexam}, the one that makes
@@ -766,17 +853,20 @@
 %    to the solution file, but leave a back door open to write an alternate string.
 %    (2014/03/20) \DescribeMacro{\altSetSolnMargins}\cmd{\altSetSolnMargins} allows you,
 %    through its argument to pass an alternate string.
+%    \changes{v5.1.1}{2018/12/05}{Added \string\cs{eqprior}}
 %    \begin{macrocode}
 \def\altSetSolnMargins#1{\def\alt@SetSolnMargins{#1}}
 \let\alt@SetSolnMargins\@empty
-\def\writeBeginEqeQuestions{%
-    \ifsolutionsonly\else
+\def\writeBeginEqeQuestions{\ifsolutionsonly\else
+  \ifOKToWriteExamData
     \let\quiz@solns\ex@solns
     \ifx\alt@SetSolnMargins\@empty
-        \writeToSolnFile{\string\setSolnMargins{\the\eqemargin}}\else
-        \writeToSolnFile{\alt@SetSolnMargins}\fi
-    \writeToSolnFile{\string\noindent\string\begin{eqequestions}}%
+      \writeT@SolnFile{\string\setSolnMargins{\the\eqemargin}}\else
+      \writeT@SolnFile{\alt@SetSolnMargins}\fi
+    \writeT@SolnFile{\protect\eqgriii\string\noindent
+      \string\begin{eqequestions}}%
     \fi
+  \fi
 }
 %    \end{macrocode}
 % (2011/05/08) We define the command that writes the end of the \texttt{eqequestions}
@@ -788,19 +878,36 @@
 \setBtwnExamSkip{6pt}
 \def\writeEndEqeQuestions{%
     \ifsolutionsonly\else
+    \ifOKToWriteExamData
     \let\quiz@solns\ex@solns
-    \eqe@IWO\quiz@solns{\string\end{eqequestions}^^J}%
-    \writeToSolnFile{\string\btwnExamSkip^^J}%
-    \fi
+    \eqe@IWO\quiz@solns{\string\eqgrii
+      \string\end{eqequestions}^^J}%
+    \writeT@SolnFile{\string\btwnExamSkip^^J}%
+    \fi\fi
 }
 %    \end{macrocode}
 % If \cs{ifvspacewithsolns} we set the switches need to simulate
 % \texttt{nosolutions}.
 %    \begin{macrocode}
-\ifvspacewithsolns
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\def\saveIFEQE#1{\def\ARG{#1ifSave}%
+  \expandafter\csarg\expandafter
+  \let\expandafter\ARG\csname#1\if#1true\else false\fi\endcsname}
+\saveIFEQE{vspacewithsolns}\saveIFEQE{answerkey}
+\saveIFEQE{eq@proofing}\saveIFEQE{eq@solutionsafter}
+\saveIFEQE{eq@nolink}\saveIFEQE{eq@nosolutions}
+\saveIFEQE{displayworkarea}
+\def\vpwsSimulateNoSolns{% dps28
+  \ifvspacewithsolns
     \answerkeyfalse\eq@proofingfalse\eq@solutionsafterfalse
     \eq@nolinkfalse\eq@nosolutionsfalse\displayworkareatrue
-\fi
+  \fi}
+\def\reverseVSWS{\vspacewithsolnsfalse
+  \answerkeyifSave\eq@proofingifSave
+  \eq@solutionsafterifSave\eq@nolinkifSave
+  \eq@nosolutionsifSave\displayworkareaifSave
+}
+\vpwsSimulateNoSolns
 %    \end{macrocode}
 %
 % \subsection{Save Switch Values}
@@ -831,8 +938,14 @@
 %    \end{macrocode}
 % Bring the \texttt{comment} package in early, before \texttt{verbatim}, these two
 % clash a bit.
+% \changes{v5.1.2}{2018/12/05}{Use version 3.2 of comment style under the name of aeb-comment}
 %    \begin{macrocode}
-\RequirePackage{comment}
+\RequirePackage{aeb-comment}
+\def\eqe@commentChkMsg{\@ifpackageloaded{comment}
+  {\PackageWarningNoLine{eqexam}
+    {The comment package is incompatible with the\MessageBreak
+     aeb-comment package, do not use the comment package}}{}}
+\AtBeginDocument{\eqe@commentChkMsg}
 %    \end{macrocode}
 % The macro \cs{includeexersolutions} is defined in \textsf{eqexam.def}. We execute
 % the command \cs{include@solutions} before the web package is loaded. The \textsf{web} package
@@ -925,8 +1038,6 @@
 % We've processed the options, I need to detect whether the document author
 % has not chosen any solutions options.
 %    \begin{macrocode}
-\@ifundefined{ifsolutionsAtEnd}
-    {\newif\ifsolutionsAtEnd\solutionsAtEndtrue}{}
 \ifvspacewithsolns\solutionsAtEndtrue\fi
 \ifanswerkey\solutionsAtEndfalse\fi
 \ifeq@nosolutions\solutionsAtEndfalse\fi
@@ -1022,12 +1133,14 @@
 % on the current page. \DescribeEnv{eq@numparts} The counter \texttt{eq@numparts}
 % holds the number of parts of the multi-part question.
 %    \begin{macrocode}
+\newcount\eqe@tempcnta
 \newcounter{eqpointsofar}
 \newcounter{eqpointsthispage}
 \newcounter{eq@numparts}
 \newcounter{eq@count}
 \newtoks\partNames \partNames={}
 \newlength{\eq@tmplengthA}
+\newlength{\eq@tmplengthB}
 \newbox{\eq@pointbox}
 \newlength{\eq@pointboxtotalheight}
 %    \end{macrocode}
@@ -1072,6 +1185,14 @@
 \def\NoSolutions{\eq@nolinktrue\eq@nosolutionstrue
     \displayworkareatrue}
 \@onlypreamble\NoSolutions
+%    \end{macrocode}
+%    Added \cs{chngToNoSolns}, useful for book authors that want to switch between
+%    \cs{AnswerKey}, \cs{chngToNoSolns}, and \cs{SolutionsAtEnd}.
+%    \changes{v5.0o}{2017/12/26}{Added \string\cs{chngToNoSolns}}
+%    \begin{macrocode}
+\def\chngToNoSolns{\solutionsAtEndfalse\answerkeyfalse
+    \eq@proofingfalse\eq@solutionsafterfalse
+    \eq@nosolutionstrue\displayworkareatrue}
 %    \end{macrocode}
 %    \begin{macro}{\vspacewithkeyOn}
 %    \begin{macro}{\vspacewithkeyOff}
@@ -1156,15 +1277,36 @@
 \providecommand{\sectionColor}[1]{\def\web@sectionsColorOld{#1}
     \def\aeb@sectioncolor{#1}}
 \sectionColor{blue}
-\newcommand{\forceNoColor}{%
-    \proofingsymbolColor{black}\instructionsColor{black}
-    \eqCommentsColor{black}\universityColor{black}
-    \titleColor{black}\authorColor{black}
-    \subjectColor{black}\linkcolor{black}
-    \nolinkcolor{black}\fillinColor{black}
-    \eqEndExamTotalColor{black}
-    \if\load@web\eqe@YES\sectionColor{black}\fi
+\def\forceNoColorSet{\proofingsymbolColor{black}%
+    \instructionsColor{black}%
+    \eqCommentsColor{black}\universityColor{black}%
+    \titleColor{black}\authorColor{black}%
+    \subjectColor{black}\linkcolor{black}%
+    \nolinkcolor{black}\fillinColor{black}%
+    \instructionsColor{black}\eqCommentsColor{black}%
+    \eqCommentsColorBody{black}%
+    \eqEndExamTotalColor{black}\ckboxColor{}%
+    \ckcirColor{}\if\load@web\eqe@YES
+        \sectionColor{black}\fi
 }
+\ifForceNoColor
+    \AtBeginDocument{\forceNoColorSet}
+\fi
+\newcommand{\forceNoColor}{\ifForceNoColor\else\ForceNoColortrue
+    \AtBeginDocument{\forceNoColorSet}\fi}
+%    \end{macrocode}
+% The \DescribeMacro{\ckboxColor}\cs{ckboxColor} provides color for the MC and MS boxes,
+% then a PDF-related option is not in effect, while \DescribeMacro{\ckcirColor}\cs{ckcirColor}
+% provides color for circular checkboxes. Usually, these are black or both the same color.
+%\changes{v4.9b}{2017/10/10}{Provides color for check boxes when a PDF-related option
+%   is not taken}
+%    \begin{macrocode}
+\providecommand{\ckboxColor}[1]{\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\ckbox@Color\relax\else
+    \def\ckbox@Color{\color{#1}}\fi}\ckboxColor{}
+\providecommand{\ckcirColor}[1]{\def\eq@rgi{#1}\ifx\eq@rgi\@empty
+    \let\ckcir@Color\relax\else
+    \def\ckcir@Color{\color{#1}}\fi}\ckcirColor{}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -1988,7 +2130,7 @@
 \newcommand{\optsRadioBtnl}[1]{\def\eqe@optsRadiol{#1}}
 \let\eqe@optsRadiof\@empty\let\eqe@optsRadiol\@empty
 \def\eqExam@Ans@sq@l{\leavevmode
-    \if\eq@listType1\stepcounter{quizno}\else\ifwithsoldoc
+    \if\eq@listType1\stepcounter{quizno}\else\ifwithinsoldoc
     \stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@l}%
     \sbox{\eq@tmpbox}{\eq@l@l}\eq@tmpdima=\wd\eq@tmpbox
@@ -2015,7 +2157,7 @@
     \eq@hspanner\ignorespaces
 }
 \def\eqExam@Ans@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -2026,8 +2168,6 @@
         \ifanswerkey\previewtrue
             \Ans@sq@f@driver
         \else
-%            \ifallowcircmc
-%                \ifx\Bbox\eqe@BboxCirc\symbolchoice{circle}\fi\fi
             \edef\fieldName{%
                 \if\probstar*eqexam.\curr@quiz.\theeqquestionnoi.%
                     part\thepartno%
@@ -2051,7 +2191,7 @@
 \let\eqe@optscbl\@empty\let\eqe@optscbf\@empty
 \def\eqExam@Ans@ck@sq@l{\leavevmode
     \if\eq@listType1\stepcounter{quizno}\else
-    \ifwithsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@l}%
     \sbox{\eq@tmpbox}{\eq@l@l}\eq@tmpdima=\wd\eq@tmpbox
     \def\link@@Content{\linkContentWrapper}%
@@ -2077,7 +2217,7 @@
     \eq@hspanner\ignorespaces
 }
 \def\eqExam@Ans@ck@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -2163,7 +2303,8 @@
 %    \begin{macrocode}
 \AtBeginDocument{%
     \ifvspacewithsolns\writeAllAnsAtEnd\else
-    \ifeqfortextbook\writeAllAnsAtEnd\fi\fi
+    \ifeqfortextbook\writeAllAnsAtEnd\else
+    \writeWithSolDocTrue\fi\fi
 }
 %    \end{macrocode}
 % We execute \cs{vspacewithkeyOff}, which sets \cs{ifkeepdeclaredvspacing} to false,
@@ -2207,13 +2348,9 @@
 %    \end{macrocode}
 % \DescribeMacro{\eqe@Bbox}When the \texttt{preview} option has been used, draw a frame box
 % around the bounding rectangle.
-% \changes{}{2015/06/04}{Added \cs{previewColor}}
-% \DescribeMacro\previewColor\cmd{\previewColor} adds some color to the preview (bounding boxes). The
-% default is \texttt{black}.
 %    \begin{macrocode}
-\providecommand\previewColor{black}
-\def\eqe@BboxRect#1#2{\hbox{\color{\previewColor}\vbox{\hrule width #1
-    \hbox to#1{\vrule height#2\hfill\vrule height#2}\vfill\hrule}}}
+\def\eqe@BboxRect#1#2{\hbox{\ckbox@Color\vbox{\hrule width #1
+  \hbox to#1{\vrule height#2\hfill\vrule height#2}\vfill\hrule}}}
 \def\useRectForMC{\let\Bbox\eqe@BboxRect}
 \def\selectedMC{\useRectForMC}
 %    \end{macrocode}
@@ -2265,14 +2402,13 @@
 % A command to use the circle (h) and the filled circle (x).
 %    \begin{macrocode}
     \def\circ@Glyph#1#2{\hbox{\smash{\raisebox{\eqe@cirRadius}%
-        {\makebox[\eqe@cirDiam]{\llap{\rlap{\eqe@lcir#1}%
-        \hskip#2\relax}}}}}}
+        {\makebox[\eqe@cirDiam]{\llap{\ckcir@Color
+        \rlap{\eqe@lcir#1}\hskip#2\relax}}}}}}
 %    \end{macrocode}
 % Added preview color to the circle version of the bounding box. The color
 % accessed through \cs{previewColor}, its default is \texttt{black}.
 %    \begin{macrocode}
-    \def\eqe@BboxCirc#1#2{\hbox{%
-        \textcolor{\previewColor}{\circ@Glyph{h}{0pt}}}}
+    \def\eqe@BboxCirc#1#2{\hbox{\ckcir@Color{\circ@Glyph{h}{0pt}}}}
 %    \end{macrocode}
 % For proofing purposes, prepare the filled circle in the form of the command
 % \cs{circProofingForCirc}.
@@ -2378,26 +2514,34 @@
 \newcommand{\preExamSolnHead}{\goodbreak\noindent}
 \newcommand{\examSolnHeadFmt}[1]{\textbf{#1}}
 \newcommand{\postExamSolnHead}{\par\medskip}
+%    \end{macrocode}
+% Write to solution file if \emph{not} \textsf{solutions-only}
+% \changes{v5.1.3}{2018/12/13}{Write to solution file if not \string\textsf{solutions-only}}
+%    \begin{macrocode}
+\@ifundefined{ifOKToWriteExamData}{\newif\ifOKToWriteExamData
+  \OKToWriteExamDatatrue}{}
 \newcommand{\writeToSolnFile}[1]{%
+  \ifsolutionsonly\else\ifOKToWriteExamData
     \let\quiz@solns\ex@solns
     \set@display@protect
     \eqe@IWO\quiz@solns{#1}%
     \set@typeset@protect
-}
+  \fi\fi}
+\let\writeT@SolnFile\writeToSolnFile
 %    \end{macrocode}
 % We will write all solutions to the \texttt{.sol} auxiliary file.
 %    \begin{macrocode}
-\def\eqe@writetoSolns#1{%
-    \set@display@protect
-    \eqe@IWO\quiz@solns{\string\preExamSolnHead
-        \string\examSolnHeadFmt{#1}\string\postExamSolnHead}%
-    \set@typeset@protect
-}
+\def\eqe@writetoSolns#1{% dpsD17
+  \ifsolutionsonly\else
+  \ifOKToWriteExamData
+  \set@display@protect
+  \eqe@IWO\quiz@solns{\string\preExamSolnHead
+      \string\examSolnHeadFmt{#1}\string\postExamSolnHead}%
+  \set@typeset@protect\fi\fi}
 \def\eqe@writetoAux#1{%
     \set@display@protect
     \eqe@IWO\@auxout{#1}%
-    \set@typeset@protect
-}
+    \set@typeset@protect}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -2417,22 +2561,30 @@
     \fi\fi
 }
 %    \end{macrocode}
-% This macro gets the page number of the last page of the exam. It is read in through
+% This macro \DescribeMacro\eq@ExamLastPage gets the page number of the last page of the exam. It is read in through
 % a macro definition made and written to the \texttt{.aux} file.
 %    \begin{macrocode}
 \def\eq@ExamLastPage{\csname eqExamLastPage\endcsname}
+%    \end{macrocode}
+%    \DescribeMacro\nPagesOnExam is the number of pages in the exam.
+%    \begin{macrocode}
 \newcommand{\nPagesOnExam}{\csname eqExamLastPage\endcsname}
+%    \end{macrocode}
+%    \DescribeMacro\nPagesOnQues is the number of pages in the questions.
+%    \begin{macrocode}
 \newcommand{\nPagesOfQues}{\ifvspacewithsolns
     \csname eqExamQuesLastPage\endcsname\else
     \csname eqExamLastPage\endcsname\fi}
+%    \end{macrocode}
+%    \DescribeMacro\nPagesOnSols is the number of pages of solutions.
+%    \begin{macrocode}
 \newcommand{\nPagesOfSols}{\def\eqExamNumPagesSolns{0}%
     \csarg\ifx{eqExamLastPage}\relax\else
     \csarg\ifx{eqExamLastPage}\relax\else
     {\count\z@=\nPagesOnExam\relax\advance
      \count\z@-\nPagesOfQues\relax
      \xdef\eqExamNumPagesSolns{\the\count\z@}}\fi\fi
-     \eqExamNumPagesSolns
-}
+     \eqExamNumPagesSolns}
 %    \end{macrocode}
 %    \begin{macro}{\lastPageOfExam}
 %\changes{v2.0l}{2011/05/05}{%
@@ -2502,7 +2654,7 @@
 %    \begin{macrocode}
 \newcommand{\makeRefsNums}{%
     \@ifundefined{thePartNames}{}{\begingroup
-        \def\\##1{\typeout{processing ##1}%
+        \def\\##1{\PackageInfo{eqexam}{processing exam: ##1}%
             \eqe@defNumRefii
             {##1PageEnd}\eqe@defNumRefii{##1PageBegin}}%
         \thePartNames
@@ -2924,33 +3076,33 @@
 %    for each part.
 %    \begin{macrocode}
 \newcommand{\cpSumrybyparts}{%
-    \eqe@@SumryVert\cp@Usefbox{%
-    \ifx\cp@Usefbox\fbox
-        \def\cp@sumryWdth{\cp@SetSumryWidth-2\fboxrule-2\fboxsep}\else
-    \def\cp@sumryWdth{\cp@SetSumryWidth}\fi
-    \begin{minipage}[b]{\cp@sumryWdth}\kern0pt
-        \begin{flushleft}
-            \setlength{\eqetmplengtha}{\cprulelength}%
-            \edef\eqe@cprulelength{\the\eqetmplengtha}%
-            \csarg\ifx{NumberOfParts}\relax
-            \else
-                \count2=0
-                \medskip
-                \cpSumryHeader\par\parskip\bigskipamount
-                \def\\##1{\advance\count2by\csname ##1total\endcsname
-                \underbar{\makebox[0pt][l]{%
-                \cp@IsertNaming{##1}}\hspace*{\eqe@cprulelength}}%
-                / $\eqe@ptsFmt{\csname ##1total\endcsname}%
-                \cpSumryPts$\par}\thePartNames
-            \fi
-            \underbar{\makebox[0pt][l]{\cpSumryTotal}%
-                \hspace{\eqe@cprulelength}}/
-                $\eqe@ptsFmt{\the\count2\relax}\cpSumryPts$ \par
-            \underbar{\makebox[0pt][l]{\cpSumryGrade}%
-                \hspace{\eqe@cprulelength}}%
-            \ifx\cp@Usefbox\fbox\medskip\fi
-        \end{flushleft}\kern0pt
-    \end{minipage}}\par
+  \eqe@@SumryVert\cp@Usefbox{%
+  \ifx\cp@Usefbox\fbox
+    \def\cp@sumryWdth{\cp@SetSumryWidth-2\fboxrule-2\fboxsep}\else
+  \def\cp@sumryWdth{\cp@SetSumryWidth}\fi
+  \begin{minipage}[b]{\cp@sumryWdth}\kern0pt
+    \begin{flushleft}
+      \setlength{\eqetmplengtha}{\cprulelength}%
+      \edef\eqe@cprulelength{\the\eqetmplengtha}%
+      \csarg\ifx{NumberOfParts}\relax
+        \else
+          \count2=0
+          \medskip
+          \cpSumryHeader\par\parskip\bigskipamount
+          \def\\##1{\advance\count2by\csname ##1total\endcsname
+          \underbar{\makebox[0pt][l]{%
+          \cp@IsertNaming{##1}}\hspace*{\eqe@cprulelength}}%
+          / $\eqe@ptsFmt{\csname ##1total\endcsname}%
+          \cpSumryPts$\par}\thePartNames
+        \fi
+        \underbar{\makebox[0pt][l]{\cpSumryTotal}%
+          \hspace{\eqe@cprulelength}}/
+            $\eqe@ptsFmt{\the\count2\relax}\cpSumryPts$ \par
+          \underbar{\makebox[0pt][l]{\cpSumryGrade}%
+            \hspace{\eqe@cprulelength}}%
+        \ifx\cp@Usefbox\fbox\medskip\fi
+      \end{flushleft}\kern0pt
+  \end{minipage}}\par
 }
 %    \end{macrocode}
 %    \DescribeMacro{\cpSumrybypages}
@@ -2958,49 +3110,49 @@
 %    for each page.
 %    \begin{macrocode}
 \newcommand{\cpSumrybypages}{%
-    \eqe@@SumryVert\cp@Usefbox{%
-    \ifx\cp@Usefbox\fbox
-        \def\cp@sumryWdth{\cp@SetSumryWidth-2\fboxrule-2\fboxsep}\else
-    \def\cp@sumryWdth{\cp@SetSumryWidth}\fi
-    \begin{minipage}[b]{\cp@sumryWdth}\kern0pt
-        \begin{flushleft}
-            \setlength{\eqetmplengtha}{\cprulelength}%
-            \edef\eqe@cprulelength{\the\eqetmplengtha}%
-            \csarg\ifx{NumberOfParts}\relax
-            \else\medskip\count0=0\relax\count2=0\relax
-                \cpSumryHeader\par\parskip\bigskipamount
-                \ifsolutionsAtEnd
-                    \@ifundefined{eqExamQuesLastPage}{\def\NUMPAGES{0}}
-                    {\edef\NUMPAGES{\@nameuse{eqExamQuesLastPage}}}%
-                \else
-                    \@ifundefined{eqExamLastPage}{\def\NUMPAGES{0}}
-                    {\edef\NUMPAGES{\@nameuse{eqExamLastPage}}}%
-                \fi
-                \@whilenum\count0<\NUMPAGES\relax\do{%
-                    \advance\count0by1\relax
-                    \@ifundefined{Page\the\count0total}{\count4=0\relax}
-                    {\count4=\@nameuse{Page\the\count0total}\relax}%
-                    \csarg\ifx{Page\the\count0spilltotal}\relax
-                    \else\advance\count4by\csname%
-                        Page\the\count0spilltotal\endcsname\relax\fi
-                    \advance\count2by\count4\relax\underbar{%
-                    \makebox[0pt][l]{\cpSumryPage~\the\count0}%
-                    \hspace*{\eqe@cprulelength}}/
-                        $\eqe@ptsFmt{\the\count4\relax}%
-                        \cpSumryPts$\csarg\ifx{Page\the\count0spilltotal}\relax
-                        \else\ $(\@nameuse{Page\the\count0spilltotal}%
-                            \cpSumryPts+\@nameuse{Page\the\count0total}%
-                            \cpSumryPts)$\fi\par
-                }%
-            \fi
-            \underbar{\makebox[0pt][l]{\cpSumryTotal}%
-                \hspace{\eqe@cprulelength}}/
-                $\eqe@ptsFmt{\the\count2\relax}\cpSumryPts$\par
-            \underbar{\makebox[0pt][l]{\cpSumryGrade}%
-                \hspace{\eqe@cprulelength}}%
-            \ifx\cp@Usefbox\fbox\medskip\fi
-        \end{flushleft}\kern0pt
-    \end{minipage}}\par
+  \eqe@@SumryVert\cp@Usefbox{%
+  \ifx\cp@Usefbox\fbox
+    \def\cp@sumryWdth{\cp@SetSumryWidth-2\fboxrule-2\fboxsep}\else
+  \def\cp@sumryWdth{\cp@SetSumryWidth}\fi
+  \begin{minipage}[b]{\cp@sumryWdth}\kern0pt
+    \begin{flushleft}
+      \setlength{\eqetmplengtha}{\cprulelength}%
+      \edef\eqe@cprulelength{\the\eqetmplengtha}%
+      \csarg\ifx{NumberOfParts}\relax
+        \else\medskip\count0=0\relax\count2=0\relax
+          \cpSumryHeader\par\parskip\bigskipamount
+          \ifsolutionsAtEnd
+            \@ifundefined{eqExamQuesLastPage}{\def\NUMPAGES{0}}
+              {\edef\NUMPAGES{\@nameuse{eqExamQuesLastPage}}}%
+          \else
+            \@ifundefined{eqExamLastPage}{\def\NUMPAGES{0}}
+              {\edef\NUMPAGES{\@nameuse{eqExamLastPage}}}%
+          \fi
+            \@whilenum\count0<\NUMPAGES\relax\do{%
+              \advance\count0by1\relax
+              \@ifundefined{Page\the\count0total}{\count4=0\relax}
+              {\count4=\@nameuse{Page\the\count0total}\relax}%
+              \csarg\ifx{Page\the\count0spilltotal}\relax
+              \else\advance\count4by\csname%
+                Page\the\count0spilltotal\endcsname\relax\fi
+              \advance\count2by\count4\relax\underbar{%
+              \makebox[0pt][l]{\cpSumryPage~\the\count0}%
+              \hspace*{\eqe@cprulelength}}/
+                $\eqe@ptsFmt{\the\count4\relax}%
+                \cpSumryPts$\csarg\ifx{Page\the\count0spilltotal}\relax
+                \else\ $(\@nameuse{Page\the\count0spilltotal}%
+                  \cpSumryPts+\@nameuse{Page\the\count0total}%
+                  \cpSumryPts)$\fi\par
+            }% while
+          \fi
+          \underbar{\makebox[0pt][l]{\cpSumryTotal}%
+              \hspace{\eqe@cprulelength}}/
+              $\eqe@ptsFmt{\the\count2\relax}\cpSumryPts$\par
+          \underbar{\makebox[0pt][l]{\cpSumryGrade}%
+              \hspace{\eqe@cprulelength}}%
+          \ifx\cp@Usefbox\fbox\medskip\fi
+      \end{flushleft}\kern0pt
+  \end{minipage}}\par
 }
 %    \end{macrocode}
 % If the author takes the \texttt{coverpage} option, \cs{eqex@coverpage} is set equal
@@ -3221,7 +3373,7 @@
 %    \begin{macrocode}
 \newcommand{\eqeomarginboxright}[2]{\makebox[0pt][l]{%
         \setlength\tabcolsep{0pt}%
-        \setlength{\@tempdima}{\textwidth+\marginparsep-\parindent}%-\parindent
+        \setlength{\@tempdima}{\textwidth+\marginparsep-\parindent}%
         \hspace*{\@tempdima}%
         \raisebox{-.5\height}[0pt][0pt]{%
             \marginboxdesign[\insertTotalsBoxPDF]%
@@ -3313,7 +3465,8 @@
 % And save to the auxiliary file for later usage.
 %    \begin{macrocode}
             \xdef\lastparttotaled{\argii}%
-            \eqe@IWO\@auxout{\string\csarg\string\gdef{Page\thepage total}%
+            \eqe@IWO\@auxout{\string\csarg\string
+              \gdef{Page\thepage total}%
                 {\theeqpointsthispage}}%
 %    \end{macrocode}
 % Finally, place the totals box.
@@ -3586,26 +3739,73 @@
 %    \end(quote)
 %    \begin{macrocode}
 \newsavebox{\workareasb}
+%    \end{macrocode}
+%     \changes{v5.0}{2017/11/08}{Added \string\cs{workareaVadj}}
+%     \DescribeMacro{\workareaVadj}\hskip-\marginparsep\darg{\ameta{skip}} adjusts the vertical skip
+%     of the first line that appears in the \env{workarea} environment.
+%    \begin{macrocode}
+\def\workareaVadj#1{\bgroup\def\eqe@rgi{#1}\ifx\eqe@rgi\@empty
+  \def\eqe@rgi{0pt}\fi\setlength{\@tempdima}{\eqe@rgi}%
+  \xdef\workareaV@dj{\the\@tempdima}\egroup
+} % dps1
+\workareaVadj{3pt}
+\def\workareaCmds#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\work@reaCmds\relax\else
+  \def\work@reaCmds{#1}}
+\let\work@reaCmds\relax
+\def\priorworkareaCmds#1{\def\@rgi{#1}\ifx\@rgi\@empty % dpsj6
+  \let\priorWorkAreaCmds\relax\else
+  \def\priorWorkAreaCmds{#1}\fi}
+\let\priorWorkAreaCmds\relax
+%    \end{macrocode}
+%    \begin{macrocode}
 \newenvironment{workarea}[2][\linewidth]
 {%
     \removelastparskip
     \edef\workareadepth{\if\currhideopt H0pt\else#2\fi}%
     \begin{lrbox}{\workareasb}\setlength{\eqetmplengtha}{#1}%
-    \begin{minipage}[b][\workareadepth][t]{\eqetmplengtha}\vspace*{3pt}%
+%    \end{macrocode}
+%     A change in support of \cs{fillTypeGrid}. When \cs{ifforceEqualCells} is true,
+%     we adjust the width of this \env{minipage} to conform to the shorter line
+%     produced by the grid.
+%     \changes{v5.0}{2017/11/08}{Changes in \string\env{workarea} to support
+%     \string\cs{fillTypeGrid}}
+%    \begin{macrocode}
+    \ifx\makeVgrid\relax\else % dps2
+      \ifforceEqualCells
+        \ifx\fillLinesLineWidth\@empty\else
+        \setlength{\eqetmplengtha}{\fillLinesLineWidth}\fi
+      \fi
+    \fi
+    \begin{minipage}[b][\workareadepth][t]{\eqetmplengtha}%
+%    \end{macrocode}
+%     Apply vertical skip \cs{workareaV@dj} here, set by \cs{workareaVadj}.
+%    \begin{macrocode}
+      \vglue\workareaV@dj
+%    \end{macrocode}
+%     Adjust \cs{leftskip} when the problem is a lead-in.
+%     \changes{v5.0}{2017/11/08}{Within \string\env{workarea}, adjust \string\cs{leftskip}
+%     when the problem is a lead-in type}
+%    \begin{macrocode}
+      \@ifundefined{leadinIndentPrtSep}{}{\ifx\solutionparshape\@empty
+        \else\leftskip\leadinIndentPrtSep\fi}\work@reaCmds
 }{%
     \end{minipage}\end{lrbox}%
 %    \end{macrocode}
 % \texttt{4/5/11} Changed the logic here, so the \texttt{workarea} is available
 % for the \texttt{vspace\-with\-solns} option.
+% \changes{v5.1.3}{2018/12/13}{added \string\textsf{solutions-after} condition to
+% displaying \string\texttt{workarea}}
 %    \begin{macrocode}
+    \ifeq@solutionsafter\else
     \par\ifdisplayworkarea
             \ifx\eq@insertverticalspace\eqe@YES
             \removelastparskip
-            \vspace{-\baselineskip}%
+            \vglue-\baselineskip
             \if\currhideopt H\else
                 \noindent\strut\smash{\usebox{\workareasb}}%
             \fi\fi
-    \fi
+    \fi\fi
 }
 %    \end{macrocode}
 %    \end{environment}
@@ -3698,17 +3898,18 @@
 %    \begin{macrocode}
 }
 \def\endsplitsolution{%
-    \ifeq@solutionsafter\strut\par\fi
+    \ifeq@solutionsafter\solutionsafterSkip\fi % dpsj10
     \ifx\solutionparshape\@empty\else
         \advance\linewidth-\leadinIndentPrtSep\fi %%dps
     \edef\eqe@workwidth{\if\ss@Argi l\noexpand\ss@Argiii
         \else\noexpand\linewidth\fi}%
     \edef\eqe@workfill{\if\ss@Argi l\else\hfill\fi}%
-    \begin{workarea}[\eqe@workwidth]{\eqedepth}%
-    \let\panelGetDimen\relax%
-    \eqe@workfill\input{panel\thepanel@cnt.cut}%
-    \end{workarea}
-    \strut\par
+    \ifeq@solutionsafter\else
+      \begin{workarea}[\eqe@workwidth]{\eqedepth}%
+        \let\panelGetDimen\relax%
+        \eqe@workfill\input{panel\thepanel@cnt.cut}%
+      \end{workarea}
+    \fi\ifeq@solutionsafter\else\solutionsafterSkip\fi
 }
 %    \end{macrocode}
 %    \end{environment}
@@ -3853,14 +4054,11 @@
 \newenvironment{@ssSolution}[1][\ss@Argii]%
 {%
     \def\eqe@argi{#1}\ifx\eqe@argi\@empty\else
-%        \setlength{\eq@tmpdima}{#1}%
-%
         \let\soln@keys@nLines\@empty
         \edef\panelheight{\the\panelheight}%
         \edef\panelwidth{\the\panelwidth}%
         \edef\temp@exp{\noexpand
             \setkeys*{soln@keys}{#1}}\temp@exp
-%        \setkeys*{soln@keys}{#1}%
         \ifx\soln@keys@nLines\@empty
             \edef\ss@Argii{\XKV@rm}%
         \else
@@ -3983,7 +4181,19 @@
      \ifx\soln@keys@nLines\@empty
         \edef\passedss@Argii{\ss@Argii}\else
         \edef\passedss@Argii{\ss@Argii,nLines=\soln@keys@nLines}\fi
-     \expandafter\@sssolution\expandafter[\passedss@Argii]%
+%    \end{macrocode}
+%    For a split solution, cannot allow align left
+%    \begin{macrocode}
+     \if\ss@Argi l\fillerLinesAlignDef\fi % dpsj10
+%    \end{macrocode}
+%    I cannot get the filler lines to work when the anserkey is in effect. The next
+%    few lines locally turns off filler lines for this problem.
+%    \begin{macrocode}
+     \ifanswerkey % dpsj10
+        \gdef\p@ssToFLs{\let\eq@insertverticalspace\eqe@NO
+        \@eqlinedfillerfalse}\fi % dpsj10
+    \eqe@flextendedfalse
+    \expandafter\@sssolution\expandafter[\passedss@Argii]%
 }{%
     \eqe@IW{\string\endminipage\eqe@rPanel\egroup}%
     \ifeq@solutionsafter\endminipage\eqe@rPanel\egroup\fi
@@ -4164,7 +4374,7 @@
     \advance\eq@pointboxtotalheight\dpPtBox\relax
     \advance\eq@pointboxtotalheight\pointsmarginparpush
     \vspace*{\eq@pointboxtotalheight}\fi}
-\def\eqe@afterexamsepcode{% dps7
+\def\eqe@afterexamsepcode{%
     \if\eq@parttotals\eqe@YES
         \@actionsAtPageBreak{\global\let\@spacetobreak1}%
             {\global\let\@spacetobreak0}%
@@ -4173,7 +4383,7 @@
             \advance\@tempdima\eq@pointboxtotalheight
             \ifdim\@tempdima>\pagegoal\aftergroup\newpage
             \else\ifnum\arabic{eq@count}>0\relax
-                \removelastskip\vskip6pt\kern0pt %dps7
+                \removelastskip\vskip6pt\kern0pt
                 \if\@reportpoints\eqe@One\else\@checkSpacing{0}\fi
                     \textcolor{\endexamtotal@color}%
                     {\eqeomarginbox{\arabic{eq@count}}{0}}\fi
@@ -4201,7 +4411,7 @@
 % See if there is enough room at the bottom of the page to place the end of exam
 % totals and to start a new exam, if any. If not, forget it, and start a new page.
 %    \begin{macrocode}
-            \global\let\afterexamsepcode\eqe@afterexamsepcode % dps7
+            \global\let\afterexamsepcode\eqe@afterexamsepcode
         \fi
     \fi
     \ifeqfortextbook\global\examenvfalse\fi
@@ -4244,7 +4454,7 @@
 % can be used within a textbook.
 %    \begin{macrocode}
 \def\eqe@hspannerPrb{\ }
-\@ifundefined{ifwithsoldoc}{\newif\ifwithsoldoc\withsoldocfalse}{}
+\@ifundefined{ifwithinsoldoc}{\newif\ifwithinsoldoc\withinsoldocfalse}{}
 \newcommand{\eqequestopsep}[1]{\def\eqeques@topsep{#1}}
 \providecommand{\eqequesparsep}[1]{\def\eqeques@parsep{#1}}
 \newcommand{\eqequesitemsep}[1]{\def\eqeques@itemsep{#1}}
@@ -4258,17 +4468,17 @@
     \let\eqe@next\@empty\else\let\eqe@next\item\fi\eqe@next\relax}
 \newenvironment{eqequestions}{%
     \begin{list}{}{%
-    \ifwithsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
+    \ifwithinsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
     \setlength{\labelwidth}{\eqemargin}%
     \setlength{\parsep}{\eqeques@parsep}%
     \setlength{\itemsep}{\eqeques@itemsep}%
     \setlength{\topsep}{\eqeques@topsep}%
     \setlength{\itemindent}{0pt}%
     \setlength{\listparindent}{\eqeques@listparindent}%dps%
-    \ifwithsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
+    \ifwithinsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
     \settowidth{\labelsep}{\eqe@hspannerPrb}\fi
     \setlength{\leftmargin}{\labelwidth}%
-    }\ifwithsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
+    }\ifwithinsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
 %    \end{macrocode}
 %    \begin{environment}{exam}
 % Each part of the exam is enclosed in an \texttt{exam} environment. The one
@@ -4288,8 +4498,24 @@
 \def\noExamTitleInSolns{\let\eqeWrtExamTitleToSolns\eqe@NO}
 \let\thisexamlabel\@empty
 \let\isInExamEnv\eqe@NO
+%    \end{macrocode}
+%    \DescribeMacro{\RecordThisExamOff} causes \pkg{eqexam} to place \cs{iffalse} and \cs{fi}
+%    around the solutions to this exam in the solution file. This makes the solution results
+%    of this exam invisible. \cs{RecordThisExamOff} sets an internal switch \cs{ifDoNotRecordThisExam}
+%    to \texttt{true}. This switch is set back to \texttt{false} at the end of the environment.
+%    \changes{v5.1d}{2018/02/02}{Added \string\cs{RecordThisExamOff}}
+%    \begin{macrocode}
+\newif \ifDoNotRecordThisExam \DoNotRecordThisExamfalse % dpsf02
+\def\RecordThisExamOff{\DoNotRecordThisExamtrue} % dpsf02
+\def\bIFFalseWrtSolns{\writeT@SolnFile{\protect\iffalse^^J}}
+\def\eIFFalseWrtSolns{\writeT@SolnFile{\protect\fi^^J}}
+%    \end{macrocode}
+%    The beginning of the \env{exam} environment.
+%    \begin{macrocode}
 \newenvironment{exam}[2][]
 {%
+  \ifDoNotRecordThisExam % dpsf02
+    \expandafter\bIFFalseWrtSolns\fi
     \makeRoomForProb{\@fvsizeskip\textheight}{0}%
     \let\isInExamEnv\eqe@YES
     \stepcounter{eq@numparts}%
@@ -4328,8 +4554,11 @@
 %    \begin{macrocode}
     \vskip\eqeques@parsep\relax\kern0pt %dps88
     \endshortquiz
-    \aftergroup\afterexamsepcode % dps7
+    \aftergroup\afterexamsepcode
     \par\penalty-100\vskip0pt
+    \ifDoNotRecordThisExam % dpsf02
+      \expandafter\eIFFalseWrtSolns\fi
+  \global\DoNotRecordThisExamfalse
 }
 %    \end{macrocode}
 %    \end{environment}
@@ -4564,13 +4793,22 @@
     \string\eqe@wordNums.}}
 %    \end{macrocode}
 %    \end{macro}
+%    Added two hooks \cs{priorPNPAction} and
+%    \cs{postPNPAction} to \cs{makeRoomForProb} to allow some defined actions
+%    before and after a page break generated by \cs{makeRoomForProb}.
+%    \changes{v5.0}{2017/11/08}{Added hooks \string\cs{priorPNPAction} and
+%    \string\cs{postPNPAction} to \string\cs{makeRoomForProb}}. Examples of usage
+%    are found in \cs{vspaceFillerLines} and \cs{eq@linesXPgs}.
 %    \begin{macrocode}
+\let\priorPNPAction\relax % dps1
+\let\postPNPAction\relax
+\def\eqe@mkRoomPgBrk{\priorPNPAction\newpage\postPNPAction}
 \def\makeRoomForProb#1#2{\par %\endgraf % dps 11/11/10
     \bgroup\@nobreakfalse\addpenalty{-500}%
     \setlength{\@tempdimb}{#1}%
     \@tempdima \pagegoal \advance \@tempdima -\pagetotal
     \ifdim \@tempdima<\@tempdimb\ifnum\col@number>\@ne\columnbreak
-        \else\newpage\fi\fi\egroup
+        \else\aftergroup\eqe@mkRoomPgBrk\fi\fi\egroup
     \ifnum\@reportpoints>1
         \ifx\eqe@prevProbZero\eqe@YES
             \if\eqe@isPts0\else\vskip-\halfHtPtBox\relax\fi
@@ -4597,22 +4835,23 @@
         {\def\eqe@emnb{\ifnum\col@number>\@ne\columnbreak
             \else\newpage\fi\insertContAnnot}\eq@emitMessageNearBottom}
         {\let\eqe@emnb\relax\eq@emitMessageNearBottom}}
-\newcommand{\eq@emitMessageNearBottom}[2][\iacvspace]{%
+\newcommand{\eq@emitMessageNearBottom}[2][2\wlVspace]{%
     \eq@@emitMessageNearBottom{#1}{#2}}
 \def\eq@@emitMessageNearBottom#1#2{\par
     \bgroup\@nobreakfalse\addpenalty{-500}%
     \setlength{\@tempdimb}{#1}%
     \@tempdima \pagegoal \advance \@tempdima -\pagetotal
-    \ifdim \@tempdima<\@tempdimb #2 \eqe@emnb\fi\egroup}
+    \ifdim \@tempdima<\@tempdimb #2 \eqe@emnb
+    \xdef\eq@currProbStartPage{0}\fi\egroup} % dps4
 %    \end{macrocode}
 %    \end{macro}
 %    \DescribeMacro{\getSpaceLeftOnPage}\cmd{\getSpaceLeftOnPage} calculates
 %    the amount of space left on the current page. It saves the calculation
-%    in the text macro \DescribeMacro{\amtSpaceOnLeftOnPage}\cmd{\amtSpaceOnLeftOnPage}.
+%    in the text macro \DescribeMacro{\amtSpaceLeftOnPage}\cmd{\amtSpaceLeftOnPage}.
 %    \begin{macrocode}
 \newcommand{\getSpaceLeftOnPage}{\par\bgroup
     \@tempdima \pagegoal \advance \@tempdima -\pagetotal
-    \xdef\amtSpaceOnLeftOnPage{\the\@tempdima}\egroup}
+    \xdef\amtSpaceLeftOnPage{\the\@tempdima}\egroup}
 %    \end{macrocode}
 %    \begin{macro}{\promoteNewPage}
 %\changes{v2.0n}{2011/05/13}{%
@@ -4696,22 +4935,48 @@
 \rowsepDefault{3pt}\partstabcolsep{1.5pt}%
 \partstabtopsep{3pt}\partstabrowsep{3pt}
 \renewcommand\belowexsolnskip{{}}%
-%    \end{macrocode}
-% The \textsf{problem} environment now begins.
-%    \begin{macrocode}
 \let\isProbEnv\eqe@NO
 \let\topofprobhook\relax
-\newenvironment{problem}[1][]{\let\isProbEnv\eqe@YES
+%    \end{macrocode}
+%    Normally, you don't leave a blank line between the beginning
+%    of \env{problem} and the statement of problem. If you're in the habit
+%    of doing that, we can absorb that blank space. See similar
+%    command above the definition of \env{problem*} for more information.
+%    \changes{v5.1a}{2018/01/21}{added \string\cs{eqe@p@gobnxtp@r}}
+%    \begin{macrocode}
+\def\eqe@p@gobnxtp@rDef{\@ifnextchar\par{\eqe@p@gobtop@rnext}{}}
+\def\eqe@p@gobtop@rnext#1\par{}
+\def\applyparfixesp{\let\eqe@p@gobnxtp@r\eqe@p@gobnxtp@rDef}
+%\def\cancelparfixesp{\let\eqe@p@gobnxtp@r\relax}
+\def\cancelparfixesp{\let\eqe@p@gobnxtp@r\ignorespaces}
+%    \end{macrocode}
+% The \env{problem} environment now begins.
+% \changes{v5.1f}{2018/02/09}{modify problem env to analyze two optional args}
+%    \begin{macrocode}
+\newcommand{\problem}[1][]{\lowercase{\def\@rgi{#1}}%
+%    \end{macrocode}
+%    Support for h and H argument when it is the first argument.
+%    \changes{v5.1e}{2018/02/09}{Support for h and H argument}
+%    \changes{v5.1j}{2018/04/15}{Change comparison to \string\cs{ifx}, \string\cs{if}
+%    give incorrect result when points are of the form 11, 22, 33, etc.}
+%    \begin{macrocode}
+    \ifx\@rgi\eqe@h
+      \def\hidden@ttr{[#1]}\let\numpoints\@empty\else
+      \let\hidden@ttr\relax\def\numpoints{#1}\fi
+    \problem@cont}
+\newcommand{\problem@cont}[1][]{\let\isProbEnv\eqe@YES
+  \def\@rgi{#1}\ifx\hidden@ttr\relax % assume a number or empty
+    \ifx\@rgi\@empty\else\def\hidden@ttr{[#1]}\fi\fi
     \if\eqe@isPts0\global\let\eqe@prevProbZero\eqe@YES\else
         \global\let\eqe@prevProbZero\eqe@NO\fi
     \global\thereissolutionfalse
-    \def\numpointsEmpty{0}\def\numpoints{#1}%
+    \def\numpointsEmpty{0}%
     \ifx\numpoints\@empty\def\numpoints{0}\def\numpointsEmpty{1}%
         \gdef\eqe@isPts{0}\else\gdef\eqe@isPts{1}\fi
     \makeRoomForProb{\@nbaselineskip\baselineskip}{\eqe@isPts}%
     \gdef\probstar{x}\let\afterlabelhskip\@empty
-    \ifx\marginpoints\@empty\else %\def\numpoints{#1}%
-        \if\numpointsEmpty\eqe@One\let\marginpoints\@gobbletwo\fi
+    \ifx\marginpoints\@empty\else
+      \if\numpointsEmpty\eqe@One\let\marginpoints\@gobbletwo\fi
 %    \end{macrocode}
 %\changes{v2.0n}{2011/05/13}{%
 % Added \texttt{*<num>} to signal in-line display of points.
@@ -4720,20 +4985,23 @@
 % \texttt{[*3]}, it is a three point problem, but the value is expressed
 % in-line, not in the margins.
 %    \begin{macrocode}
-        \@ifstar{\let\@isitstar\eqe@One\eqe@grabarg}%
-            {\let\@isitstar\eqe@Zero\eqe@gobbletoend}#1\end
-        \if\@isitstar\eqe@One\addtocounter{eqpointvalue}{\numpoints}%
-            \@marktotalvalue
-            \ifdispl@yPoints
-            \def\marginparafterhook{\PTs{\numpoints}\space}\else
-            \def\marginparafterhook{\PTs*{\numpoints}\space}\fi\else
-            \def\marginparpriorhook{\noindent
-                \probvalue{\numpoints}{0}}\fi
-    \fi\setcounter{eq@count}{\value{eqquestionnoi}}%
+      \def\@lti{\let\@isitstar\eqe@One\eqe@grabarg}%
+      \def\@ltii{\let\@isitstar\eqe@Zero\eqe@gobbletoend}%
+      \expandafter\@ifstar\expandafter\@lti
+        \expandafter\@ltii\numpoints\end
+      \if\@isitstar\eqe@One\addtocounter{eqpointvalue}{\numpoints}%
+        \@marktotalvalue
+        \ifdispl@yPoints
+          \def\marginparafterhook{\PTs{\numpoints}\space}\else
+          \def\marginparafterhook{\PTs*{\numpoints}\space}\fi\else
+          \def\marginparpriorhook{\noindent
+            \probvalue{\numpoints}{0}}\fi
+    \fi
+    \setcounter{eq@count}{\value{eqquestionnoi}}%
     \addtocounter{eq@count}{1}%
     \ifnum\value{eq@count}=1\relax
-        \eqe@IWO\@auxout{\string
-            \csarg\string\gdef{pagenofirstprob\thisexamlabel}{\thepage}}%
+      \eqe@IWO\@auxout{\string
+        \csarg\string\gdef{pagenofirstprob\thisexamlabel}{\thepage}}%
     \fi
 %    \end{macrocode}
 % \changes{}{2015/06/01}{Added the hook \cs{topofprobstarhook}}
@@ -4742,23 +5010,29 @@
 % \texttt{eqequestions} environment.
 %    \begin{macrocode}
     \topofprobhook
-%    \end{macrocode}
-% \changes{v3.1e}{2012/11/10}{Removed hard-wired \cs{proofingsymbol}}
-%    \begin{macrocode}
-%    \proofingsymbol{\ding{52}}%
     \begin{eqequestions}%
-    \begin{exercise}[eqquestionnoi]%
-}{\end{exercise}%
+%    \end{macrocode}
+%    \textbf{Begin exercise env.} Insert h or H when it is the first argument through \cs{hidden@ttr},
+%    then begin the \texttt{exercise} environment using the counter
+%    \texttt{eqquestionnoi}.
+%    \changes{v5.1e}{2018/02/09}{Support for h and H argument}
+%    \begin{macrocode}
+    \edef\ctrld@exp@exercise{\noexpand
+      \begin{exercise}[eqquestionnoi]\hidden@ttr}%
+    \ctrld@exp@exercise\ignorespaces\eqe@p@gobnxtp@r}
+%    \end{macrocode}
+%    \textbf{end problem env.} The code for the end of the problem environment.
+%    \begin{macrocode}
+\def\endproblem{\end{exercise}%
   \end{eqequestions}%
-    \ifeqlocalversion\ifeqglobalversion
-        \xdef\eqe@tmp{\noexpand\forVersion{\eq@selectedVersion}}%
-        \aftergroup\eqe@tmp
-    \fi\fi
-    \global\eqlocalversionfalse
-    \ifdispl@yPoints\global\l@stDispl@yPointstrue
-    \else\global\l@stDispl@yPointsfalse\fi
-    \global\let\eqe@fpmrk\@empty
-}
+  \ifeqlocalversion\ifeqglobalversion
+    \xdef\eqe@tmp{\noexpand\forVersion{\eq@selectedVersion}}%
+    \aftergroup\eqe@tmp
+  \fi\fi
+  \global\eqlocalversionfalse
+  \ifdispl@yPoints\global\l@stDispl@yPointstrue
+  \else\global\l@stDispl@yPointsfalse\fi
+  \global\let\eqe@fpmrk\@empty}
 %    \end{macrocode}
 %    \end{environment}
 %    \begin{macro}{\PTs}
@@ -4873,11 +5147,37 @@
     {Using the star (*) in front of the points\MessageBreak
      designator is not allowed when there is a
      \MessageBreak\string\tableadin}}
+\let\isProbStarEnv\eqe@NO
+\let\topofprobstarhook\relax
+%    \end{macrocode}
+%    Added \cs{eqe@gobnxtpar} to hopefully, eliminate the need to leave
+%    no pars (blank lines) between |\begin{parblem*}| and either \cs{leadinitem}
+%    or \cs{tableadin}. The default is to not affect the old behavior. You have
+%    to declare \DescribeMacro{\applyparfixes}\cs{applyparfixes} to apply the
+%    fix; revert back to the old behavior with \DescribeMacro{\cancelparfixes}\cs{cancelparfixes}
+%    \changes{v5.1a}{2018/01/21}{added \string\cs{eqe@gobnxtpar}}
+%    \begin{macrocode}
+\def\eqe@ps@gobtop@r#1\par{\eqe@isle@dinnext}
+\def\eqe@isle@dinnext{\@ifnextchar\leadinitem{}{\vskip-\baselineskip}}
+\def\restorele@dinpfixDef{\@ifnextchar\par{\eqe@ps@gobtop@r}{}}
+\let\eqe@ps@gobnxtpar\restorele@dinfixDef
+\def\applyleadinfix{\let\eqe@gobnxtpar\restorele@dinpfixDef}
+\def\cancelleadinfix{\let\eqe@gobnxtpar\relax}
+\def\applyparfixes{\PackageInfo{eqexam}
+  {Applying paragraph fixes to problem\MessageBreak
+  and problem* environments}\applyparfixesp\applyleadinfix}
+\def\cancelparfixes{\PackageInfo{eqexam}
+  {Cancelling paragraph fixes to problem\MessageBreak
+  and problem* environments}\cancelparfixesp
+  \cancelleadinfix}
+%    \end{macrocode}
+%    The default behavior is to do nothing about blank lines.
+%    \begin{macrocode}
+\cancelparfixesp\cancelleadinfix
+\let\neutralizeparfixes\cancelparfixes
 %    \end{macrocode}
 % We now begin the code for the \texttt{problem*} environment.
 %    \begin{macrocode}
-\let\isProbStarEnv\eqe@NO
-\let\topofprobstarhook\relax
 \csarg\def{problem*}{\let\isProbEnv\eqe@YES
     \let\isProbStarEnv\eqe@YES
     \global\thereissolutionfalse
@@ -4962,9 +5262,10 @@
 %    \begin{macrocode}
     \topofprobstarhook
     \ifeqfortextbook
-    \writeToSolnFile{\protect\global\protect\frstProbNumShownfalse}\fi
+    \writeT@SolnFile{\protect\global
+      \protect\frstProbNumShownfalse}\fi
     \begin{eqequestions}%
-    \begin{exercise}[eqquestionnoi]*}%
+    \begin{exercise}[eqquestionnoi]*\eqe@gobnxtpar}%
 %    \end{macrocode}
 %    \begin{macrocode}
 \def\ftb@endprobstarCks{%
@@ -4978,13 +5279,13 @@
 %\DescribeMacro{\endproblem*} begins here.
 %    \begin{macrocode}
 \csarg\def{endproblem*}{%
-    \eqe@IWO\@auxout{\string
-        \csarg\string\gdef{nPartsThisProb\thisexamlabel.\theeqquestionnoi}%
-            {\arabic{partno}}}%
+    \eqe@IWO\@auxout{\string\csarg\string
+      \gdef{nPartsThisProb\thisexamlabel.\theeqquestionnoi}%
+        {\arabic{partno}}}%
     \ifx\probpointseach\@empty\else
     \ifx\probpointseach\auto
-        \eqe@IWO\@auxout{\string
-            \csarg\string\gdef{prob\thisexamlabel.\theeqquestionnoi}%
+        \eqe@IWO\@auxout{\string\csarg\string
+          \gdef{prob\thisexamlabel.\theeqquestionnoi}%
             {\theeq@count}}%
     \else
         \setcounter{eq@count}{\value{partno}}%
@@ -5010,9 +5311,8 @@
             \egroup
         \fi
         \multiply\value{eq@count}\argi
-        \eqe@IWO\@auxout{\string
-            \csarg\string\gdef{prob\thisexamlabel.\theeqquestionnoi}%
-                {\theeq@count}}%
+        \eqe@IWO\@auxout{\string\csarg\string
+          \gdef{prob\thisexamlabel.\theeqquestionnoi}{\theeq@count}}%
     \fi\fi
     \end{exercise}%
     \end{eqequestions}%
@@ -5092,7 +5392,7 @@
 % we toss an exception.
 %    \begin{macrocode}
         \def\eqe@next{\eqe@@leadinitem}%
-            \ifeqfortextbook\writeToSolnFile{\protect\bpartsmrk}\fi
+            \ifeqfortextbook\writeT@SolnFile{\protect\bpartsmrk}\fi
         \else
         \def\eqe@next{\PackageError{eqexam}
         {The \string\leadinitem\space command may
@@ -5114,8 +5414,8 @@
 % We signal a \cs{leadinitem} by writing a special command to the AUX file,
 % this is used to disallow the use of the \texttt{*} option of points.
 %    \begin{macrocode}
-    \eqe@writetoAux{\string
-        \csarg\string\gdef{leadinitem\thisexamlabel-\theeqquestionnoi}{}}%
+    \eqe@writetoAux{\string\csarg\string
+      \gdef{leadinitem\thisexamlabel-\theeqquestionnoi}{}}%
     \settowidth{\eq@tmpdima}{\normalfont\parts@indent\eqe@prtsepPrb}%
     \xdef\leadinIndentPrtSep{\the\eq@tmpdima}%
     \setlength{\eq@tmpdima}{\eqemargin+\eq@tmpdima}%
@@ -5168,10 +5468,12 @@
 %    \end{macrocode}
 % The final step. If the solution is hidden, we do not write the header.
 % \changes{v3.3a}{2013/05/03}{Changed name of \cs{eq@writeexheader} to \cs{eqExerSolnHeader}}
+% \changes{v4.9a}{2017/04/05}{Added a test for solutions after within lead-in item}
 %    \begin{macrocode}
 \def\eq@leadin@item{\eq@ckglobalhide\ifeq@hidesolution\else
     \global\let\eqExerSolnHeader\eq@@writeexheaderlist\fi
     \ifeq@nosolutions\eq@nolinktrue\fi
+    \ifeq@solutionsafter\eq@nolinktrue\fi
     \unskip\noindent\makebox[\partsleadinIndent]{\eqexlisttabheader}%
     \eqe@prtsepPrb\ignorespaces
 }
@@ -5182,7 +5484,7 @@
 % \textsf{exerquiz}.
 %    \begin{macrocode}
 \def\eqe@tableadin{\@tableadinitemtrue\eqe@writetoAux{\protect
-        \csarg\protect\gdef{tableadin\thisexamlabel-\theeqquestionnoi}{}}%
+  \csarg\protect\gdef{tableadin\thisexamlabel-\theeqquestionnoi}{}}%
 }
 %    \end{macrocode}
 %    \begin{macro}{\pushProblem}
@@ -5486,27 +5788,27 @@
 % page is different than the starting page, \cs{eq@currProbStartPage}, we
 % insert \cs{annotContStr}.
 %    \begin{macrocode}
-%\newcommand{\priorAnnotInsert}[1]{\def\eq@priorAnnotInsert{#1}}
-%\let\eq@priorAnnotInsert\relax
+\def\@nnotContStrSkip{\vskip3pt}
 \newcommand{\eqe@insertContAnnot}[1][\iacvspace]{\promoteNewPage[#1]%
-    \ifnum\arabic{page}>\eq@currProbStartPage
-        \xdef\eq@currProbStartPage{\arabic{page}}%
-        {\settowidth{\eq@tmplength}{\parts@indent\eqe@prtsepPrb}%
-        \xdef\eqe@partsIndent{\the\eq@tmplength}}%
-        \ifwithinparts
+  \ifnum\arabic{page}>\eq@currProbStartPage
+    \xdef\eq@currProbStartPage{\arabic{page}}%
+    {\settowidth{\eq@tmplength}{\parts@indent\eqe@prtsepPrb}%
+    \xdef\eqe@partsIndent{\the\eq@tmplength}}%
+    \ifwithinparts
 %    \end{macrocode}
 % \cs{eq@item} is the \texttt{list} definition of \cs{item} which has been
 % \cs{let} to \cs{eq@item} within the \texttt{parts} environment.
 %    \begin{macrocode}
-        \@ifundefined{eq@item@latex}{\item[]\hspace*{-\eqemargin}%
-        \ifx\solutionparshape\@empty\else\hspace*{-\eqe@partsIndent}\fi}
-        {\eq@item@latex[]\hspace*{-\eqemargin}%
-        \hspace{-\eqe@partsIndent}}\else
+      \@ifundefined{eq@item@latex}{\item[]\hspace*{-\eqemargin}%
+      \ifx\solutionparshape\@empty\else\hspace*{-\eqe@partsIndent}\fi}
+      {\eq@item@latex[]\hspace*{-\eqemargin}%
+      \hspace{-\eqe@partsIndent}}\else
 %    \end{macrocode}
 % If placed between problem sets, we indent as appropriate.
 %    \begin{macrocode}
-        \hspace*{-\eqemargin}\fi\annotContStr
-    \fi
+      \hspace*{-\eqemargin}\fi
+    \annotContStr\@nnotContStrSkip % dpsj20
+  \fi
 }
 \edef\eq@currProbStartPage{\arabic{page}}
 %    \end{macrocode}
@@ -5516,9 +5818,11 @@
 %    \begin{macro}{\turnContAnnotOn}
 % Turn off and on this feature. The default is off.
 %    \begin{macrocode}
+\newif\ifcont@nnot \cont@nnotfalse
 %\newcommand{\@gobbloptone}[1][]{}
-\newcommand{\turnContAnnotOff}{\global\let\eq@insertContAnnot\relax}
-\newcommand{\turnContAnnotOn}{%
+\newcommand{\turnContAnnotOff}{\global\cont@nnotfalse
+    \global\let\eq@insertContAnnot\relax}
+\newcommand{\turnContAnnotOn}{\global\cont@nnottrue
     \global\let\eq@insertContAnnot\eqe@insertContAnnot}
 \turnContAnnotOff
 %    \end{macrocode}
@@ -5594,13 +5898,81 @@
 %    \end{macrocode}
 %    \end{macro}
 %
-%\subsection{Vertical Space Filling Options}
+%\section{Vertical Space Filling Options}
 %
-% When the \texttt{nosolutions} or the \texttt{vspacewithsolns} is used, a
-% vertical space is generated by the \texttt{solution} environment.
+% When the \opt{nosolutions} or the \opt{vspacewithsolns} is used, a
+% vertical space is generated by the \env{solution} environment.
 % Previously, this has just been a vertical white space, now, we provide
 % the ability to fill the space with horizontal rules of different types.
 % Below is the implementation of this.
+%
+% \subsection{General filler lines commands and controls}
+%    \begin{macro}{\useFillerLines}
+% When used, the vertical space is written with lines (rules, dashes, dots, grids ).
+%\changes{v2.0e}{2011/03/07}
+%{%
+%  Added the feature of filling the vertical space with ruled lines of
+%  different types. This feature is available for paper options and for
+%  \texttt{nosolutions} and \texttt{vspacewithsolution} options.
+%}
+%    \begin{macrocode}
+\newcommand{\useFillerLines}{\ifx\vspaceFiller % dpsj8
+  \vspaceFillerLines\else\@eqlinedfillertrue
+  \let\vspaceFiller\vspaceFillerLines\fillTypeDefault
+\fi}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\useFillerDefault}
+% Resets the vertical space to the original white space.
+%    \begin{macrocode}
+\newcommand{\useFillerDefault}{\@eqlinedfillerfalse
+    \let\vspaceFiller\vspaceFillerDefault
+    \let\eqWriteLine\hfill}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeHRule}
+% Writes the line as a solid line (\cs{hrulefill}).
+%    \begin{macrocode}
+\newcommand{\fillTypeHRule}{\let\eqWriteLine\eqWriteLineFill
+  \let\makeVgrid\relax}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeDots}
+% Writes the line as a dotted line (\cs{dotfill}).
+%    \begin{macrocode}
+\newcommand{\fillTypeDots}{\let\eqWriteLine\eqWriteLineDots
+  \let\makeVgrid\relax}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeDashLine}
+% Writes the line as a dotted line (\cs{eqdashrulefill}).
+%    \begin{macrocode}
+\newcommand{\fillTypeDashLine}{\let\eqWriteLine\eqWriteLineDashFill
+  \let\makeVgrid\relax}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeBlankLine}
+% Fills the line
+%    \begin{macrocode}
+\newcommand{\fillTypeBlankLine}{\let\eqWriteLine\eqWriteLineBlankFill
+  \let\makeVgrid\relax}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeDefault}
+% Resets fill type back to the default, \cs{hrulefill}.
+%    \begin{macrocode}
+\newcommand{\fillTypeDefault}{\let\eqWriteLine\eqWriteLineFill
+  \let\makeVgrid\relax}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\fillTypeGrid}
+% Fills the space with a grid, horizontal and vertical lines.
+% \changes{v4.9c}{2017/11/03}{Added \string\cs{fillTypeGrid}}
+%    \begin{macrocode}
+\newcommand{\fillTypeGrid}{\ifx\vspaceFiller\vspaceFillerLines
+  \let\eqWriteLine\eqWriteLineFill\let\makeVgrid\eqe@makeVgrid\fi}
+%    \end{macrocode}
+%    \end{macro}
 %    \begin{macro}{\eqWriteLineColor}
 % The color of the rule to use.
 %    \begin{macrocode}
@@ -5613,7 +5985,7 @@
 %    \begin{macrocode}
 \newlength\wlVspace
 \newcommand{\eqWLSpacing}[1]{\setlength\wlVspace{#1}}
-\eqWLSpacing{14pt}
+\eqWLSpacing{14.0pt}
 %    \end{macrocode}
 %    \end{macro}
 % \paragraph*{Fill Types.} We have three types of line fill:
@@ -5623,151 +5995,1080 @@
 % \cs{let} to \cs{eqWriteLine}, which is used in \cs{vspaceFillerLines}.
 %    \begin{macrocode}
 \newcommand{\eqWriteLineFill}{%
-    \textcolor{\eq@WriteLineColor}{\hrulefill}}
-%\newcommand{\eqWriteLineDots}{%
-%    \textcolor{\eq@WriteLineColor}{\dotfill}}
-\def\eqdotrulefile{\leavevmode
-    \cleaders\hb@xt@ .44em{\hbox to0pt{\hss.\hss}\hss}\hfill\kern\z@}
-\newcommand{\eqWriteLineDots}{%
-    \textcolor{\eq@WriteLineColor}{\eqdotrulefile}}
-%\def\eqdashrulefill{\leavevmode
-%    \cleaders\hb@xt@ .44em{\hss\rule{.22em}{.4pt}\hss}\hfill\kern\z@}
-\def\eqdashrulefill{\leavevmode%\kern-.11em
-    \cleaders\hb@xt@ .44em{\rule{.22em}{.4pt}\hss}\hfill\kern\z@}
-\newcommand{\eqWriteLineDashFill}{%
-    \textcolor{\eq@WriteLineColor}{\eqdashrulefill}}
-\newcommand{\eqWriteLineBlankFill}{\hfill}
+  \textcolor{\eq@WriteLineColor}{\leaders
+    \hrule height \flfboxrule\hfill}}
 %    \end{macrocode}
-% Use \DescribeMacro{\fillerLinesAlignDef}\cs{fillerLinesAlignDef} and
-% \DescribeMacro{\fillerLinesOnLeftMargin}\cs{fillerLinesOnLeftMargin} to adjust
-% the alignment of the rule lines for this feature. The first is the default,
-% the second one aligns rule lines to the left margin.
+%    The first box is used in \cs{eqdotrulefill}, whereas the second two are
+%    used to split off content using \cs{vsplit}. These are active when
+%    the options flextended and answerkey are in force, and when
+%    \cs{useFillerLines} and \cs{turnflanskeyOn} have been expanded.
+%    \begin{macrocode}
+\newbox\eqe@tempbox
+\newbox\eqe@nskeyflsplit
+\newbox\eqe@nskeyfltop
+\def\eqdotrulefill{\leavevmode
+  \cleaders\hb@xt@ .44em{\copy\eqe@tempbox\hss}\hfill} % dps16
+%  \cleaders\hb@xt@ .44em{\unhcopy\eqe@tempbox\hss}\hfill} % dps8
+\newcommand{\eqWriteLineDots}{%
+  \textcolor{\eq@WriteLineColor}{\eqdotrulefill}}
+\def\eqdashrulefill{\leavevmode
+  \cleaders\hb@xt@ .44em{\rule{.22em}{\flfboxrule}\hss}\hfill\kern\z@}
+\newcommand{\eqWriteLineDashFill}{%
+  \textcolor{\eq@WriteLineColor}{\eqdashrulefill}}
+%\newcommand{\eqWriteLineBlankFill}{\hfill}
+\newcommand{\eqWriteLineBlankFill}{\vphantom{\hrulefill}}
+%    \end{macrocode}
+%    Vertical counterparts to those above, excepting blank fill.
+%    \changes{v5.0}{2017/11/08}{Added vertical rules}
+%    \begin{macrocode}
+\newcommand{\eqWriteLineVFill}{\leaders\vrule width\flfboxrule\vfill}
+\def\eqdotruleVfill{\cleaders\vbox to .44em{\vss
+  \hbox to0pt{\hss.\hss}}\vfill}
+\newcommand{\eqWriteLineVDots}{\eqdotruleVfill}
+\def\eqdashruleVfill{\cleaders\vbox to .44em{\vss
+  \hbox to0pt{\hss\rule{\flfboxrule}{.22em}\hss}}\vfill}
+\newcommand{\eqWriteLineDashVFill}{\eqdashruleVfill}
+%    \end{macrocode}
+%     When the \env{solution} environment contains both an \texttt{nLines} and a dimension,
+%     by default, the dimension is used; however, if \DescribeMacro{\usenLineDimen}\cs{usenLineDimen}
+%     is specified, we force the use of the \texttt{nLines} specification. Switch back to the default
+%     using \DescribeMacro{\useVspaceDimen}\cs{useVspaceDimen}.
 %    \begin{macrocode}
 \newif\if@equsedim \@equsedimtrue
 \newcommand{\useVspaceDimen}{\@equsedimtrue}
 \newcommand{\usenLineDimen}{\@equsedimfalse}
 \newif\if@eqalignfilllinestoleft\@eqalignfilllinestoleftfalse
+%    \end{macrocode}
+% Use \DescribeMacro{\fillerLinesAlignDef}\cs{fillerLinesAlignDef} and
+% \cs{fillerLinesOnLeftMargin} to adjust
+% the alignment of the rule lines for this feature.\DescribeMacro{\fillerLinesOnLeftMargin}
+% The first is the default, the second one aligns rule lines to the left margin.
+%    \begin{macrocode}
 \newcommand{\fillerLinesOnLeftMargin}{\@eqalignfilllinestolefttrue}
 \newcommand{\fillerLinesAlignDef}{\@eqalignfilllinestoleftfalse}
 \newcommand\priorPageBreakMsg[1]{\def\priorP@geBre@kMsg{#1}}
 \let\priorP@geBre@kMsg\@empty
-\newcommand{\flPageBreakMsg}[1]{%\acvspace{2\wlVspace}%
-    \priorPageBreakMsg{\emitMessageNearBottom[2\wlVspace]
+\newcommand{\flPageBreakMsg}[1]{%
+    \priorPageBreakMsg{\emitMessageNearBottom[\iacvspace]
     {\eqfititin{{\Large\strut}#1}}}%
 }
-\newcommand{\vspaceFillerLines}[1]{\begingroup\offinterlineskip
-    \parindent0pt\relax\parskip0pt
-    \@tempdima\wlVspace\eqetmplengtha0pt
-    \def\eqe@fillwidth{\linewidth+\eqetmplengtha}%
-    \settowidth{\eqetmplengthb}{\eqe@decPointPrb}%
-    \@whiledim\@tempdima<#1\relax\do{\priorP@geBre@kMsg
-        \eq@insertContAnnot\vskip\wlVspace\eqe@wrtLineKernal
-        \makebox[0pt][l]{\makebox[\eqe@fillwidth]{\eqWriteLine}}%
-    \addtolength{\@tempdima}{.4pt+\wlVspace}\par
-    }\endgroup
+%    \end{macrocode}
+%     The command \cs{makeVgrid} is an internal macro that is let to either
+%     \cs{relax}, as below, or to \cs{eqe@makeVgrid}. The latter creates a grid of fill lines.
+%    \begin{macrocode}
+\let\makeVgrid\relax %dps1
+%    \end{macrocode}
+%    \paragraph*{Key-values for fill lines}
+%     We define the \texttt{eqefillLines} \pkg{xkeyval} family, the keys are set through the
+%     command \cs{setFillLinesFmt}. We define nine keys
+%     \texttt{numbers}, \texttt{numbersep}, \texttt{color}, \texttt{topline}, \texttt{gridtype},
+%     \texttt{fltype}, \texttt{align}, \texttt{outlineonly}, \texttt{bgonly}, and \texttt{bgcolor}. The first two are used
+%     to number the fill lines, the \texttt{color} is to color the fill lines, the last two
+%     concerning the grid type filler lines.
+%     \changes{v5.0}{2017/11/08}{Added support for \string\cs{fillTypeGrid}, added keys
+%     numbers, numbersep, and color as well}\medskip
+%
+%    \noindent\IndexKey{numbers}\hskip-\marginparsep\texttt{=\ameta{\upshape{none\string|left\string|right}}}
+%    This is a
+%    \texttt{numbers} is a choice key with possible values of \texttt{none}, \texttt{left}
+%    and \texttt{right}. It places a line numbering to the left or right of the line, or no line number is used
+%    if \texttt{none} is selected.
+%    \begin{macrocode}
+\define@choicekey+{eqefillLines}{numbers}[\val\nr]%
+  {none,left,right}[none]{\ifcase\nr\relax
+    \let\eqe@numLinesL\relax\let\eqe@numLinesR\relax\or
+    \let\eqe@numLinesL\eqe@@numLinesL\let\eqe@numLinesR\relax\or
+    \let\eqe@numLinesL\relax\let\eqe@numLinesR\eqe@@numLinesR
+  \fi
+}{\PackageWarning{aeb}{Bad choice for numbers, permissible values
+   are none, left, and right. Try again}}
+\let\eqe@numLinesL\relax\let\eqe@numLinesR\relax
+%    \end{macrocode}
+%       \noindent\IndexKey{numbersep}\hskip-\marginparsep\texttt{=\ameta{dimen}}
+%       When \texttt{numbers} is either \texttt{left} or \texttt{right}, the separation between
+%       the line and the number is \texttt{numbersep}. The default value is
+%       2pt.
+%    \begin{macrocode}
+\define@key{eqefillLines}{numbersep}[2pt]{%
+  \setlength{\eqetmplengtha}{#1}%
+  \edef\eqe@numbersep{\the\eqetmplengtha}}
+\def\eqe@numbersep{2pt}
+%    \end{macrocode}
+%       \noindent\IndexKey{color}\hskip-\marginparsep\texttt{=\ameta{color-spec}}
+%       The \texttt{color} key paints the lines the specified color, for example,
+%       \texttt{color=red!20}. It simply defines \cs{eq@WriteLineColor} to be this color.
+%    \begin{macrocode}
+\define@key{eqefillLines}{color}[]{\def\eq@WriteLineColor{#1}}
+%    \end{macrocode}
+%       \noindent\IndexKey{topline}\hskip-\marginparsep\texttt{=\ameta{\upshape{true\string|false}}}
+%       When \cs{fillTypeGrid} is in effect, \texttt{topline=true} writes
+%       an additional line above the top most line, this line is not numbered.
+%    \begin{macrocode}
+\define@boolkey{eqefillLines}{topline}[true]{}
+\KV@eqefillLines@toplinefalse
+%    \end{macrocode}
+%    \noindent \IndexKey{gridtype}\hskip-\marginparsep\texttt{=\ameta{\upshape{line\string|dash\string|dots}}}
+%    The \texttt{gridtype} key determines the line style for the grid,
+%    choices are \texttt{line} (the default), \texttt{dash}, and \texttt{dots}. This key also
+%    sets the line style when the \texttt{outlineonly} key is specified.
+%    \begin{macrocode}
+\let\eqe@usedeffboxrule\eqe@NO % dps20
+\let\gridtypeselected\@empty % dps26
+\define@choicekey+{eqefillLines}{gridtype}[\val\nr]%
+  {line,dash,dots}[line]{\edef\gridtypeselected{\val}% dps26
+  \ifcase\nr\relax
+    \let\gridHLineFill\eqWriteLineFill
+    \let\gridVLineFill\eqWriteLineVFill
+  \or
+    \let\gridHLineFill\eqWriteLineDashFill
+    \let\gridVLineFill\eqWriteLineDashVFill
+  \or
+    \let\gridHLineFill\eqWriteLineDots
+    \let\gridVLineFill\eqWriteLineVDots
+    \let\eqe@usedeffboxrule\eqe@YES %dps20
+  \fi
+}{\PackageWarning{aeb}{Bad choice for numbers, permissible values
+   are line, dash, and dots. Try again}}
+\let\gridHLineFill\eqWriteLineFill
+\let\gridVLineFill\eqWriteLineVFill
+%    \end{macrocode}
+%    \noindent\IndexKey{fltype}\hskip-\marginparsep\texttt{=\ameta{\upshape{line\string|dash\string|dots\string|blank}}}
+%    The \texttt{fltype} key determines the type of line style for the horizontal rendering. This key simply
+%    executes the various command versions.
+%    \begin{macrocode}
+\define@choicekey+{eqefillLines}{fltype}[\val\nr]%
+  {line,dash,dots,blank,grid}[line]{\ifcase\nr\relax
+    \fillTypeHRule\or
+    \fillTypeDashLine\or
+    \fillTypeDots
+    \let\eqe@usedeffboxrule\eqe@YES\or % dps20
+    \fillTypeBlankLine\or
+    \fillTypeGrid\fi
+}{\PackageWarning{aeb}{Bad choice for numbers, permissible values
+   are line, dash, dots, blank, and grid. Try again}}
+%    \end{macrocode}
+%    \noindent\IndexKey{align}\hskip-\marginparsep\texttt{=\ameta{\upshape{left\string|default}}}
+%    Another convenience key, \texttt{align} simply executes the command versions.
+%    \begin{macrocode}
+\define@choicekey+{eqefillLines}{align}[\val\nr]%
+  {default,left}[default]{\ifcase\nr\relax
+    \fillerLinesAlignDef\or
+    \fillerLinesOnLeftMargin\fi
+}{\PackageWarning{aeb}{Bad choice for numbers, permissible values
+   are line, dash, dots, blank, and grid. Try again}}
+\define@choicekey*{eqefillLines}{equalcells}[\val\nr]%
+  {true,false}[true]{\ifcase\nr\relax
+    \equalCellSizesOn\or
+    \equalCellSizesOff\fi
 }
-\def\eq@linesXPgs{\begingroup\offinterlineskip
-    \parindent0pt\relax\parskip0pt
-    \@tempcnta=0 \eqetmplengtha0pt
-    \settowidth{\eqetmplengthb}{\eqe@decPointPrb}%
-    \def\eqe@fillwidth{\linewidth+\eqetmplengtha}%
-    \@whilenum\@tempcnta<\soln@keys@nLines\relax\do{\priorP@geBre@kMsg
-        \eq@insertContAnnot\vskip\wlVspace\eqe@wrtLineKernal
-        \makebox[0pt][l]{\makebox[\eqe@fillwidth]{\eqWriteLine}}%
-        \advance\@tempcnta1\relax}\par\endgroup
-}
-\def\eqe@wrtLineKernal{%
-    \ifx\solutionparshape\@empty
-        \if@eqalignfilllinestoleft
-             \setlength{\eqetmplengtha}{\labelwidth+\eqemargin}%
-             \setlength{\eqetmplengtha}
-                {\eqetmplengtha+\eqetmplengthb}%
-             \ifwithinparts
-                \setlength{\eqetmplengtha}{\labelwidth}%
-                 \setlength{\eqetmplengtha}
-                    {\eqetmplengtha+\eqetmplengthb}%
-                \ifx\eq@item\item@part@tabular
-                  \hspace*{-\eqemargin}\eqetmplengtha\eqemargin\else
-                  \hspace*{-\eqetmplengtha}\fi
-             \else
-                  \hspace*{-\eqemargin}\eqetmplengtha\eqemargin
-             \fi
+%    \end{macrocode}
+%       \noindent\IndexKey{outlineonly*}\hskip-\marginparsep\texttt{=\ameta{\upshape{true\string|false}}}
+%       outlines the work area only, does not create horizontal or vertical lines, other than the lines
+%       to outline the region. Obeys the \texttt{gridtype} key.
+%       \changes{v5.0c}{2017/11/18}{Added the outlineonly, bgonly, and bgcolor keys to the
+%       eqefileLines family.}
+%    \begin{macrocode}
+\define@boolkey{eqefillLines}{outlineonly}[true]{}
+\KV@eqefillLines@outlineonlyfalse
+\define@choicekey{eqefillLines}{outlineonly*}{true,false}[true]{% dps26
+  \@nameuse{KV@eqefillLines@outlineonly#1}%
+  \def\eqefillLines@outlineonlystar{#1}}%
+\let\eqefillLines@outlineonlystar\@empty
+%    \end{macrocode}
+%       \noindent\IndexKey{bgonly*}\hskip-\marginparsep\texttt{=\ameta{\upshape{true\string|false}}}
+%       colors the work area with a color of your choice, see \texttt{bgcolor} below.
+%    \begin{macrocode}
+\define@boolkey{eqefillLines}{bgonly}[true]{} % dps11
+\KV@eqefillLines@bgonlyfalse
+\define@choicekey{eqefillLines}{bgonly*}{true,false}[true]{% dps26
+  \@nameuse{KV@eqefillLines@bgonly#1}%
+  \def\eqefillLines@bgonlystar{#1}}
+\let\eqefillLines@bgonlystar\@empty
+%    \end{macrocode}
+%       \noindent\IndexKey{bgcolor}\hskip-\marginparsep\texttt{=\ameta{color-spec}}
+%       The color to be used when \texttt{bgcolor} is in force.
+%       If no color has been assigned, the color will be white.
+%    \begin{macrocode}
+\define@key{eqefillLines}{bgcolor}[]{\def\eqe@BGColor{#1}} % dps11
+\let\eqe@BGColor\@empty
+%    \end{macrocode}
+%     \DescribeMacro{\fillLinesNumFmt}\hskip-\marginparsep\darg{\ameta{cmds}}
+%     is used to specify the format for line numbers. Within the \ameta{cmds} argument,
+%     use \texttt{\#1} to indicate the placement of the number. For example, the code
+%     |\fillLinesNumFmt{\textbf{#1}}| puts the line numbers in bold font.
+%    \begin{macrocode}
+\def\fillLinesNumFmt#1{\def\eqe@fillLinesNumFmt##1{\def\flnum{##1}#1}}
+\fillLinesNumFmt{\flnum} % set to default values
+\define@key{eqefillLines}{numfmt}[]{\fillLinesNumFmt{#1}} % dps21
+\define@key{eqefillLines}{linegap}[14pt]{\def\fl@wlspacing{#1}} % dps21
+\def\fl@wlspacing{14pt}
+%    \end{macrocode}
+%     \DescribeMacro{\setFillLinesFmt}\hskip-\marginparsep\darg{\ameta{KV-pairs}}
+%     Set the format of the fill lines, use the keys from the \texttt{eqefillLines}
+%     defined and described above. Changes outside a group are global.
+%     An example of the usage is given here: |\setFillLinesFmt{numbers=left,color=red}|.
+%     \changes{v5.0}{2017/11/08}{Added \string\cs{setFillLinesFmt}}
+%
+%     Other important notes: To produce horizontal lines only, use \texttt{fltype=line\string|\penalty0dash\string|\penalty0dots},
+%     to produce blank space, use \texttt{fltype=blank} and to produce a grid \texttt{fltype=grid}.
+%    \begin{macrocode}
+\newcommand{\setFillLinesFmt}[1]{\def\@rgi{#1}%
+  \let\eqe@usedeffboxrule\eqe@NO %dps20
+  \let\gridtypeselected\@empty
+  \ifx\@rgi\@empty
+    \setkeys{eqefillLines}{numbers,numbersep,color,
+      gridtype,fltype,align}%
+  \else
+    \let\is@outlineonly\eqe@NO\let\is@bgonly\eqe@NO
+    \ifKV@eqefillLines@outlineonly\let\is@outlineonly\eqe@YES\fi
+    \ifKV@eqefillLines@bgonly\let\is@bgonly\eqe@YES\fi
+    \setkeys{eqefillLines}{#1}%
+    \eqWLSpacing{\fl@wlspacing}%
+    \ifx\makeVgrid\relax
+      \KV@eqefillLines@toplinefalse
+%      \forceEqualCellsfalse % dps21
+      \equalCellSizesOff % dpsj15
+      \ifx\is@bgonly\eqe@YES % carryover from prev prob
+        \ifKV@eqefillLines@bgonly
+          \KV@eqefillLines@bgonlyfalse
         \else
-             \ifwithinparts
-                 \setlength{\eqetmplengtha}{\labelwidth}%
-                 \setlength{\eqetmplengtha}
-                    {\eqetmplengtha-\eqetmplengthb}%
-                \setlength{\eqetmplengtha}{\labelwidth}%
-                \setlength{\eqetmplengtha}
-                    {\eqetmplengtha+\eqetmplengthb}%
-                \ifx\eq@item\item@part@tabular
-                    \hspace*{\eqetmplengtha}%
-                    \settowidth{\eqetmplengthb}{\eqe@prtsepPrb}%
-                    \setlength{\eqetmplengtha}
-                        {-\labelwidth-\eqetmplengthb}\else
-                    \eqetmplengtha0pt\fi
-             \else
-                \eqetmplengtha0pt
-             \fi
+          \PackageWarning{eqexam}{You must specify fltype=grid for
+          bgonly to work.\MessageBreak
+          Ignoring this key for now}%
+          \KV@eqefillLines@bgonlyfalse
+          \let\is@bgonly\eqe@NO
         \fi
+      \else % not continuation
+        \ifKV@eqefillLines@bgonly
+          \PackageWarning{eqexam}{You must specify fltype=grid for
+          bgonly to work.\MessageBreak
+          Ignoring this key for now}%
+          \KV@eqefillLines@bgonlyfalse
+          \let\is@bgonly\eqe@NO
+        \fi
+      \fi
+% same for outline
+      \ifx\is@outlineonly\eqe@YES % carryover from prev prob
+        \ifKV@eqefillLines@outlineonly
+          \KV@eqefillLines@outlineonlyfalse
+        \else % dps18
+          \PackageWarning{eqexam}{You must specify fltype=grid for
+          outlineonly to work.\MessageBreak
+          Ignoring this key for now}%
+          \KV@eqefillLines@outlineonlyfalse
+          \let\is@outlineonly\eqe@NO
+        \fi
+      \else % not continuation
+        \ifKV@eqefillLines@outlineonly
+          \PackageWarning{eqexam}{You must specify fltype=grid for
+          outlineonly to work.\MessageBreak
+          Ignoring this key for now}%
+          \KV@eqefillLines@outlineonlyfalse
+          \let\is@outlineonly\eqe@NO
+        \fi
+      \fi
+      \let\gridHLineFill\eqWriteLine
+      \let\gridVLineFill\eqWriteLine
     \else
-        \if@eqalignfilllinestoleft
-            \setlength{\eqetmplengtha}
-            {\eqemargin+\leadinIndentPrtSep}%
-            \hspace*{-\eqetmplengtha}\else\hspace*{0pt}\fi
+      \ifx\gridtypeselected\@empty % dps26
+        \let\gridHLineFill\eqWriteLineFill
+        \let\gridVLineFill\eqWriteLineVFill
+      \fi
     \fi
+  \fi
 }
 %    \end{macrocode}
-%    \begin{macro}{\useFillerLines}
-% When used, the vertical space is written with lines (rules, dashes, dots).
-%\changes{v2.0e}{2011/03/07}
-%{%
-%  Added the feature of filling the vertical space with ruled lines of
-%  different types. This feature is available for paper options and for
-%  \texttt{nosolutions} and \texttt{vspacewithsolution} options.
-%}
+%    The next two definitions place line numbers on the left and right, respectively.
 %    \begin{macrocode}
-\newcommand{\useFillerLines}{\let\vspaceFiller\vspaceFillerLines
-    \fillTypeDefault\@eqlinedfillertrue}
+\def\eqe@@numLinesL{\ifKV@eqefillLines@topline\ifnum\@tempcntb>0  % dps5
+  \smash{\llap{\tiny
+    \eqe@fillLinesNumFmt{\the\@tempcntb}\hglue\eqe@numbersep\relax}}\fi
+  \else\smash{\llap{\tiny
+    \eqe@fillLinesNumFmt{\the\@tempcntb}\hglue\eqe@numbersep\relax}}\fi}
+\def\eqe@@numLinesR{\smash{\rlap{\tiny
+  \hglue\eqe@numbersep\relax\eqe@fillLinesNumFmt{\the\@tempcntb}}}}
+%    \end{macrocode}
+%    The \cs{fillLinesLineWidth} is a special command used for adjusting the length of
+%    the horizontal lines, and is used only when \cs{fillTypeGrid} is in effect and when
+%    \cs{forceEqualCells} is true.
+%    \begin{macrocode}
+\let\fillLinesLineWidth\@empty
+%    \end{macrocode}
+%     A switch to signal that a grid has broken across pages. This is only set to true
+%     when the \texttt{topline=true} is specified through \cs{setFillLinesFmt}.
+%     \changes{v5.0}{2017/11/08}{Added switch \cs{ifgridpgbrk}}
+%    \begin{macrocode}
+\newif\ifgridpgbrk\gridpgbrkfalse % dps7
+%    \end{macrocode}
+%    \begin{macro}{\vspaceFillerLines}\hskip-\marginparsep\,\darg{\ameta{dimen}}
+%    This is an internal command, though we declare is publicly. It writes the
+%    horizontal lines (lines, dots, dashes) when the \env{solution} environment
+%    uses a \ameta{dimen} to specify space (as opposed to using the \texttt{nLines} key).
+%    \begin{macrocode}
+\newif\ifwriteVertic@lFLines \writeVertic@lFLinestrue % dps16
+\def\fl@set@nnotContStrSkip{\def\@nnotContStrSkip{\vskip6pt}} % dpsj23
+\let\p@ssToFLs\relax
+\newif\iffl@firstpass % dps27
+\newcommand{\vspaceFillerLines}[1]{\begingroup\offinterlineskip %dps1
+  \global\fl@firstpasstrue % dps27
+  \fl@set@nnotContStrSkip   % dpsj20
+  \p@ssToFLs\if@eqlinedfiller
+    \def\eqe@next{\vspaceFillerLines@i{#1}}\else
+    \expandafter\def\expandafter\eqe@next
+    \expandafter{\expandafter\endgroup\p@ssToFLs}\fi
+    \global\let\p@ssToFLs\relax\eqe@next}
+\def\vspaceFillerLines@i#1{\advance\wlVspace-\flfboxrule % dps25
+  \ifx\eqe@usedeffboxrule\eqe@YES\flfboxrule=.4pt\fi  % dps20
+  \ifKV@eqefillLines@outlineonly\KV@eqefillLines@toplinetrue %dps10
+    \KV@eqefillLines@bgonlyfalse % dps11
+%    \forceEqualCellsfalse % dpsj15
+    \equalCellSizesOff\let\makeVgrid\eqe@makeVgrid\fi %dps10
+  \ifKV@eqefillLines@bgonly\KV@eqefillLines@toplinetrue
+    \KV@eqefillLines@outlineonlyfalse\flfboxrule=.4pt % dps20
+%    \forceEqualCellsfalse % dpsj15
+    \equalCellSizesOff\let\makeVgrid\eqe@makeVgrid\fi %dps11
+  \parindent0pt\relax\parskip0pt
+  \@tempdima\wlVspace\eqetmplengtha0pt
+  \@tempcnta=0 \@tempcntb=1
+%    \end{macrocode}
+%     \cs{eqe@fillwidth} is the width of the line, it is \cs{linewidth} plus a fudge factor, which
+%     is determined dynamically by \cs{eqe@wrtLineKernal}.
+%    \begin{macrocode}
+  \def\eqe@fillwidth{\linewidth+\eqetmplengtha}%
+%    \end{macrocode}
+%     If we are creating a grid (\cs{fillTypeGrid}), and \cs{forceEqualCells} is true, we modify
+%     the length of the line to make equal cell sizes. \cs{forceEq@lCells} determines
+%     the value of \cs{fillLinesLineWidth}.
+%    \begin{macrocode}
+  \eqe@wrtLineKernal
+  \setbox\eqe@tempbox\hbox{\hb@xt@0pt{\hss.\hss}}\ht\eqe@tempbox.33pt
+    \dp\eqe@tempbox0pt % dps16
+  \ifx\makeVgrid\relax
+%    \forceEqualCellsfalse % dpsj15
+    \equalCellSizesOff
+  \else % dps2
+    \let\eqWriteLine\gridHLineFill
+    \forceEqu@lCells % dps2
+    \ifx\flEqu@lLineWidth\@empty\else
+      \linewidth=\flEqu@lLineWidth\relax\fi
+    \ifKV@eqefillLines@bgonly\else
+      \ifKV@eqefillLines@topline\bgroup\@tempcntb=0% dps5
+        \makebox[0pt][l]{\eqe@x
+          \makebox[\eqe@fillwidth]{\eqWriteLine}}\egroup
+    \fi\fi % dps5
+  \fi
+  \settowidth{\eqetmplengthb}{\eqe@decPointPrb}\def\vfGo@l{#1}%
+  \ifx\makeVgrid\relax\else
+    \def\priorPNPAction{\xdef\fl@nRows{\the\@tempcnta}% dps27
+      \if@eqalignfilllinestoleft\eqe@x\fi % dpsj12
+      \makeVgrid\priorP@geBre@kMsg\global\fl@firstpassfalse}% dps4
+    \def\postPNPAction{\global\gridpgbrktrue % dps27
+    \setlength{\@tempdima}
+      {(\vfGo@l+\wlVspace)-\depthtodate}% dps25
+    \edef\vfGo@l{\the\@tempdima}\@tempdima=\wlVspace\relax
+    \@tempcnta=0\relax}% dps18
+  \fi
+  \@whiledim\@tempdima<\vfGo@l\relax\do
+    {\edef\depthtodate{\the\@tempdima}%
+    \ifx\eqe@insert@more@content\relax\ifx\makeVgrid\relax
+      \priorP@geBre@kMsg\fi\fi %dps15
+    \eq@insertContAnnot\vskip\wlVspace\eqe@x
+%    \end{macrocode}
+%     Draw the horizontal line: a rule, dotted line, dashed line
+%    \begin{macrocode}
+    \ifKV@eqefillLines@bgonly\vglue\flfboxrule\else % dpsj11 dpsj21
+      \ifKV@eqefillLines@outlineonly\vglue\flfboxrule\else %dps10
+          \makebox[0pt][l]{\eqe@numLinesL
+            \makebox[\eqe@fillwidth]{\eqWriteLine}\eqe@numLinesR}\fi
+    \fi
+    \advance\@tempcnta1\relax\advance\@tempcntb1\relax
+    \edef\depthtodate{\the\@tempdima}%
+    \addtolength{\@tempdima}{\wlVspace}%\par dps25
+%    \end{macrocode}
+%     At the conclusion of the \cs{do} loop, we insert \cs{makeVgrid}, which
+%     is either \cs{relax} or is \cs{eqe@makeVgrid}, the latter is a complicated
+%     command to draw vertical lines across the horizontal ones, and to perform
+%     other tasks.
+%    \begin{macrocode}
+  }\xdef\fl@nRows{\the\@tempcnta}\makeVgrid % dps27
+  \ifx\makeVgrid\relax\else %dps15
+%    \end{macrocode}
+%    When there is insufficient space to accommodate the content, we
+%    place a small blank box in the lower left corner, put a information
+%    message in the log, and reset the color.
+%    \changes{v5.1b}{2018/01/24}{Added \string\reset@color}
+%    \begin{macrocode}
+    \ifvoid\eqe@nskeyflsplit\else\PackageWarning{eqexam}
+      {Some material from a solution environment does not\MessageBreak
+       appear. Increase space allotted}{\normalcolor
+       \llap{\smash{\rule{5pt}{5pt}}}}\aftergroup
+       \reset@color\fi % dpsj24
+  \fi
+%    \end{macrocode}
+%     We conclude by adding some vertical space to better align
+%     the \env{workarea} environment. When a fill type is used,
+%     the space created by not be exactly \ameta{dimen} the dimension
+%     specified.
+%    \begin{macrocode}
+  \setlength{\@tempdima}{\vfGo@l-\depthtodate}\vskip\@tempdima
+%  \vskip\flfboxrule\vskip3pt
+  \dimen0=\sameVspace\relax
+  \dimen2=\fboxrule\advance\dimen0by\dimen2
+  \xdef\sameVspace{\the\dimen0 }\endgroup
+  \global\flfrstsplittrue
+}
 %    \end{macrocode}
 %    \end{macro}
-%    \begin{macro}{\useFillerDefault}
-% Resets the vertical space to the original white space.
+%    \begin{macro}{\eq@linesXPgs}
+%    Does the same as \cs{vspaceFillerLines} but is used instead of that command when the optional
+%    argument for \env{solution} specified a value for \texttt{nLines}. Code comments are the same
+%    as those just given for \cs{vspaceFillerLines}.
 %    \begin{macrocode}
-\newcommand{\useFillerDefault}{\let\vspaceFiller\vspaceFillerDefault
-    \let\eqWriteLine\hfill\@eqlinedfillerfalse}
+\def\eq@linesXPgs{\@tempdimb\wlVspace % dpsj20
+  \advance\@tempdimb-\flfboxrule
+  \@tempdimb=\soln@keys@nLines\@tempdimb
+  \advance\@tempdimb\flfboxrule
+  \expandafter\vspaceFillerLines\expandafter{\the\@tempdimb}}
 %    \end{macrocode}
 %    \end{macro}
-%    \begin{macro}{\fillTypeHRule}
-% Writes the line as a solid line (\cs{hrulefill}).
+%    \cs{eqe@wrtLineKernal}, based on a case analysis, sets the register
+%    \cs{eqetmplengha} and makes some horizontal glue adjustments as well.
 %    \begin{macrocode}
-\newcommand{\fillTypeHRule}{\let\eqWriteLine\eqWriteLineFill}
+%\def\eq@linesXPgs{\@tempdimb\wlVspace
+%  \@tempdimb=\soln@keys@nLines\@tempdimb
+%  \expandafter\vspaceFillerLines\expandafter{\the\@tempdimb}}
+\def\eqe@wrtLineKernal{\let\eqe@x\relax\let\eqe@y\relax  % dpsj9
+  \ifx\solutionparshape\@empty % not lead-in
+    \if@eqalignfilllinestoleft % align on left
+      \setlength{\eqetmplengtha}{\labelwidth+\eqemargin}%
+      \setlength{\eqetmplengtha}
+        {\eqetmplengtha+\eqetmplengthb}%
+      \ifwithinparts
+        \ifx\istabularexer\eq@YES  % tabular mode
+          \setlength{\eqetmplengtha}{\prtsIndntSep}% dps27
+          \eq@tmplengthA\eqetmplengtha
+          \def\eqe@x{\hglue-\prtsIndntSep}% dps27
+          \ifKV@eqefillLines@outlineonly\let\eqe@y\eqe@x\fi
+        \else
+          \settowidth{\eqetmplengtha}{\eqe@prtsepPrb}%
+          \setlength{\eqetmplengtha}{\eqetmplengtha+\widthOfParts}% dps9
+          \setlength{\eq@tmplengthA}{\eqetmplengtha}% dps9
+          \def\eqe@x{\hspace*{-\eqetmplengtha}\hglue-\flfboxrule}% dps27
+        \fi
+      \else % not parts, still align left
+        \def\eqe@x{\hspace*{-\eqemargin}}%
+          \eqetmplengtha\eqemargin
+          \eq@tmplengthA\eqemargin
+      \fi
+    \else % not lead-in, not align on left
+      \ifwithinparts
+        \setlength{\eqetmplengtha}{\labelwidth}%
+        \setlength{\eqetmplengtha}
+          {\eqetmplengtha+\eqetmplengthb}%
+        \ifx\istabularexer\eq@YES  % tabular mode
+          \eqetmplengtha0pt
+          \eq@tmplengthA\eqetmplengtha % dps27
+        \else %dps2
+          \def\eqe@x{\hglue-\flfboxrule}% dps4
+          \eqetmplengtha0pt
+          \eq@tmplengthA\eqetmplengtha
+        \fi
+      \else % not parts, not align left
+        \eqetmplengtha0pt
+        \eq@tmplengthA\eqetmplengtha
+      \fi
+    \fi
+  \else % lead-in
+    \if@eqalignfilllinestoleft
+      \setlength{\eqetmplengtha}{\leadinIndentPrtSep}% dps27
+      \eq@tmplengthA\eqetmplengtha
+    \else
+      \eqetmplengtha0pt
+      \eq@tmplengthA\eqetmplengtha
+    \fi
+  \fi
+}
 %    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{\fillTypeDots}
-% Writes the line as a dotted line (\cs{dotfill}).
+%     \DescribeMacro{\equalCellSizesOn} set the switch \cs{ifforceEqualCells} to true, while
+%     \DescribeMacro{\equalCellSizesOff}\cs{equalCellSizesOff} sets the same switch to false.
+%     Additionally, the latter command resets \cs{fillLines\-Line\-Width} to its default value
+%     of \cs{@empty}. It is therefore important not to use the switch directly, but to use
+%     these two convenience commands.
 %    \begin{macrocode}
-\newcommand{\fillTypeDots}{\let\eqWriteLine\eqWriteLineDots}
+\newif\ifforceEqualCells
+\def\equalCellSizesOn{\global\let\flEqu@lLineWidth\@empty
+    \global\forceEqualCellstrue}
+\def\equalCellSizesOff{\global\let\flEqu@lLineWidth\@empty
+    \global\forceEqualCellsfalse}
+\equalCellSizesOff
 %    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{\fillTypeDashLine}
-% Writes the line as a dotted line (\cs{eqdashrulefill}).
+%     \cs{forceEqu@lCells} determines the value of \cs{fillLinesLineWidth}. It successively
+%     adds \cs{wlVspace} until it exceeds \cs{linewidth}, it then subtracts off one \cs{wlVspace}
+%     to get the value for \cs{fillLinesLineWidth}.
 %    \begin{macrocode}
-\newcommand{\fillTypeDashLine}{\let\eqWriteLine\eqWriteLineDashFill}
+\def\forceEqu@lCells{\bgroup
+  \ifforceEqualCells
+    \dimen6\wlVspace % reduced from \vspaceFillerLines
+    \advance\dimen6\flfboxrule
+    \dimen2=\z@
+    \dimen4\linewidth
+    \advance\dimen4by-\flfboxrule
+    \if@eqalignfilllinestoleft % dps8
+      \advance\dimen4\eq@tmplengthA
+    \fi
+    \@tempcnta0
+    \@whiledim \dimen2 < \dimen4 \do{%
+      \advance\@tempcnta1
+      \advance\dimen2by\dimen6
+    }%
+    \advance\@tempcnta-1
+    \advance\dimen2-\dimen6
+    \advance\dimen2\flfboxrule
+    \advance\dimen2by-\eq@tmplengthA
+    \xdef\flEqu@lLineWidth{\the\dimen2}%
+  \fi
+\egroup}
+\let\eqe@insert@more@content\relax
+\def\gobtodot#1.#2\@nil{\def\intPrt{#1}\def\fracPrt{#2}}
 %    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{\fillTypeBlankLine}
-% Fills the line
+%      \DescribeMacro{\eqe@makeVgrid} A command that is executed when the document author expands \cs{fillTypeGrid}.
+%      The command itself draws vertical rule lines, which intersect with horizontal
+%      rule lines to form a grid.
+%      When \cs{fillTypeGrid} is active, \cs{makeVgrid} is \cs{let}
+%      to \cs{eqe@makeVgrid}. \cs{makeVgrid} appears twice in each of the macros
+%      \cs{vspaceFillerLines} and \cs{eq@linesXPgs}. The first instance of \cs{makeVgrid}
+%      draws the vertical line, assuming there is no page break. If there is a page break,
+%      the second instance of \cs{makeVgrid} continues to draw vertical lines with the correct
+%      height and number. To make the grid break across a page, the low level command
+%      \cs{makeRoomForProb} was modified; now prior and post actions (\cs{priorPNPAction} and \cs{priorPNPAction})
+%      can be defined. \medskip
+%
+%      \noindent The \cs{dbMrk} is used to debug this portion of the code, view the debugging marks
+%      by setting \cs{ifeqedb} to true.
+%      \changes{v5.0a}{2017/11/14}{Placed \cs{eqe@makeVgrid} in a group, \string\cs{count0}
+%      was leaking out.}
 %    \begin{macrocode}
-\newcommand{\fillTypeBlankLine}{\let\eqWriteLine\eqWriteLineBlankFill}
+\def\dbMrk#1{\textsf{\footnotesize#1}}
+\@ifundefined{ifeqedb}{\newif\ifeqedb \eqedbfalse}{}
 %    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{\fillTypeDefault}
-% Resets fill type back to the default, \cs{hrulefill}.
+%    \noindent\DescribeMacro{\fillerCustomBg}\hskip-\marginparsep\darg{\ameta{alt-bg}}
+%    Add a custom background feature, only available when the key \texttt{bgonly} is active.
+%    The argument \ameta{alt-bg} uses \texttt{\#1} and \texttt{\#2} to refer to the width
+%    and height of the work area. Use \DescribeMacro{\resetFillerCustomBg}\cmd{\resetFillerCustomBg}
+%    to reset the method of coloring the background to its default method.
+%    \changes{v5.0d}{2017/11/19}{Added a custom background feature}
 %    \begin{macrocode}
-\newcommand{\fillTypeDefault}{\let\eqWriteLine\eqWriteLineFill}
+\def\fillerCustomBg#1{\def\fillerBgIm@ge##1##2{#1}}
+\def\resetFillerCustomBg{\let\fillerBgIm@ge\@empty}
+\resetFillerCustomBg
 %    \end{macrocode}
-%    \end{macro}
+%       \DescribeMacro{\gridIndentAdj}\hskip-\marginparsep\darg{\ameta{dimen}} is an adjustment
+%       in the horizontal positioning of the vertical lines of the grid. Under normal
+%       conditions, \cs{gridIndentAdj} is not needed. If the \env{exam} environment
+%       is embedded in environments that change some basic parameters, the alignment
+%       of the grid may not be right, in which case you can use
+%       \cs{gridIndentAdj} to shift the grid horizontially.
+%    \begin{macrocode}
+\def\gridIndentAdj#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\gridIndent@dj\relax\else % dps4
+  \setlength{\@tempdima}{#1}\edef\gridIndent@dj{\the\@tempdima}\fi}
+\let\gridIndent@dj\relax
+\def\eqe@makeVgrid{\begingroup
+  \@tempcnta=\fl@nRows\relax
+  \advance\wlVspace\flfboxrule % dps25
+  \setlength{\@tempdima}{\eqe@fillwidth}%
+  \setlength{\@tempdimb}{\wlVspace}%
+  \edef\eqe@tmp{\strip@pt\@tempdimb}%
+  \expandafter\gobtodot\eqe@tmp.\@nil
+  \divide\@tempdima by\intPrt\relax
+  \dimen2=\@tempdima
+  \dimen4=1pt
+  \advance\dimen2 by 0.5\dimen4
+  \divide\dimen2 by \dimen4
+  \multiply\dimen2 by \dimen4
+  \edef\eqe@tmp{\strip@pt\dimen2}%
+  \expandafter\gobtodot\eqe@tmp.\@nil
+  \advance\@tempcnta-1\relax % dps21
+  \multiply\@tempdimb\@tempcnta
+  \edef\eqe@HOfVrule{\the\@tempdimb}% dps7
+  \ifKV@eqefillLines@topline % dps21
+    \advance\@tempdimb\wlVspace
+    \advance\@tempdimb\flfboxrule
+    \edef\eqe@HOfVruleFrstRow{\the\@tempdimb}%
+    \def\eqe@setVRule{\vbox
+      to\eqe@HOfVruleFrstRow\relax{\gridVLineFill}}% dps8
+  \else
+    \def\eqe@setVRule{\vbox
+      to\eqe@HOfVrule\relax{\gridVLineFill}}% dps8
+  \fi
+  \eqe@tempcnta=0
+  \dimen2=\wlVspace
+  \count4=\intPrt\relax
+  \setlength{\dimen4}{\eqe@fillwidth}%
+  \multiply\dimen2by\count4
+  \@whiledim \dimen2 > \dimen4 \do{%
+    \advance\count4by-1\relax
+    \edef\intPrt{\the\count4 }%
+    \dimen2\wlVspace
+    \multiply\dimen2by\count4
+  }%
+  \dimen2\wlVspace
+  \if@eqalignfilllinestoleft % dps27
+    \let\fl@oSmash\smash\let\fl@iSmash\relax
+  \else
+    \let\fl@iSmash\smash\let\fl@oSmash\relax
+  \fi
+  \fl@oSmash{%
+  \makebox[0pt][l]{\makebox[\eqe@fillwidth][l]{\fl@iSmash{% dps27
+    \ifx\gridIndent@dj\relax\else
+      \hglue\gridIndent@dj\relax\fi
+    \eqe@y\ifeqedb\rlap{\dbMrk{D}}\fi % dpsj9 \eqe@y (fudge)
+    \rlap{\ifeqedb\rlap{\dbMrk{B}}\fi
+    \ifwriteVertic@lFLines % dps16
+      \setlength{\@tempdima}{\eqe@fillwidth}%
+      \ifKV@eqefillLines@bgonly % dps11
+        \ifx\fillerBgIm@ge\@empty
+          \ifx\eqe@BGColor\@empty\else
+            \rlap{\textcolor{\eqe@BGColor}
+              {\rule{\eqe@fillwidth}{\eqe@HOfVruleFrstRow}}}\fi
+        \else
+          \rlap{\fillerBgIm@ge{\eqe@fillwidth}{\eqe@HOfVruleFrstRow}}\fi
+      \else
+        \dimen2=\wlVspace
+        \dimen0=0pt
+        \@whilenum\eqe@tempcnta<\count4\do{\rlap{\hglue\dimen0
+          \ifKV@eqefillLines@outlineonly %dps10
+            \ifnum\eqe@tempcnta=0 \else\let\gridVLineFill\vfill\fi\fi
+          \textcolor{\eq@WriteLineColor}{\eqe@setVRule % dps27
+          \ifeqedb\rlap{\advance\eqe@tempcnta by1\relax\scriptsize
+             \raisebox{1pt}{\kern1pt\the\eqe@tempcnta}}\fi}}%
+          \advance\dimen0by\dimen2
+          \advance\eqe@tempcnta by1
+        }% dps27
+      \fi % dps11
+      \advance\dimen2by\flfboxrule
+      \ifKV@eqefillLines@bgonly\else % dps11
+        \rlap{\hglue\@tempdima
+          \textcolor{\eq@WriteLineColor}{\eqe@setVRule
+          \ifeqedb\rlap{\thinspace\dbMrk{R}}\fi}}%
+        \ifKV@eqefillLines@outlineonly %dps10
+          \makebox[0pt][l]{\makebox[\eqe@fillwidth]{\eqWriteLine}}%dps10
+        \fi
+        \ifKV@eqefillLines@topline% dps7
+          \ifgridpgbrk\@tempdima\eqe@HOfVruleFrstRow\relax % dps21
+            \raise\@tempdima\hbox{\makebox[0pt][l]{%
+              \makebox[\eqe@fillwidth]{\eqWriteLine}}}%
+              \global\gridpgbrkfalse
+          \fi
+        \fi
+      \fi
+      \ifx\eqefillLines@outlineonlystar\@empty\else % dps26
+        \global\let\eqefillLines@outlineonlystar\@empty
+        \global\KV@eqefillLines@outlineonlyfalse
+      \fi
+      \ifx\eqefillLines@bgonlystar\@empty\else % dps26
+        \global\let\eqefillLines@bgonlystar\@empty
+        \global\KV@eqefillLines@bgonlyfalse
+      \fi
+    \fi % ifwriteVertic@lFLines
+    \eqe@insert@more@content
+    }% rlap
+  }% smash (fl@iSmash)
+}}}% makeboxes and \fl@oSmash
+  \endgroup
+}% \eqe@makeVgrid
+%    \end{macrocode}
+%    In preparation for the \opt{flextended} option, we define several commands and one environment
+%    that emit a package warning if the \opt{flextended} option is not taken.
+%    \begin{macrocode}
+\def\turnfl@nskeyMsg{\PackageWarning{eqexam}
+  {You must first take the flextended\MessageBreak
+   option for this command to have any\MessageBreak effect}}
+\def\turnflanskeyOn{\turnfl@nskeyMsg}
+\def\priorw@Msg{\PackageWarningNoLine{eqexam}
+  {The priorworkarea environment does nothing\MessageBreak
+   without the flextended option. All such content\MessageBreak in these
+   environments are absorbed}\global\let\priorw@Msg\@empty}
+\newenvironment{priorworkarea}{\priorw@Msg
+    \setbox\eqe@nskeyflsplit\vbox\bgroup}
+    {\egroup\setbox\eqe@nskeyflsplit\box\voidb@x}
+\let\turnflanskeyOff\turnflanskeyOn
+\newif\ifflfrstsplit \flfrstsplittrue
+\newif\ifeqe@flnosolns \eqe@flnosolnsfalse
+\def\turnflnosolnsOn{\eqe@flnosolnstrue\turnflanskeyOn}
+\def\turnflnosolnsOff{\eqe@flnosolnsfalse\turnflanskeyOn}
+%\let\turnflnosolnsOn\turnflanskeyOn
+%\let\turnflnosolnOff\turnflanskeyOn
+\newdimen\flfboxrule \flfboxrule=.4pt
+\def\tweakBreakPoint#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \gdef\twe@kBre@kPoint{0pt}\else
+  {\setlength{\@tempdima}{#1}%
+    \xdef\twe@kBre@kPoint{\the\@tempdima}}\fi}
+\def\twe@kBre@kPoint{0pt}
+%    \end{macrocode}
+%    When \opt{flextended} option is not loaded, we make a minimal definition
+%    of \cs{eq@b@ddCodeSpecial}. This redefinition is needed when \texttt{bgonly}
+%    is in effect.
+%    \begin{macrocode}
+\def\eq@b@ddCodeSpecial#1{\if@eqlinedfiller
+    \ifKV@eqefillLines@bgonly\leavevmode
+        \vskip-\baselineskip\kern\lineskip\fi\fi#1}
+%    \end{macrocode}
+%    For debug, or whatever reason, \DescribeMacro\flSeparateCutNames
+%    \cs{flSeparateCutNames} gives each flx cut file a distinct
+%    name.
+%    \begin{macrocode}
+\def\flSeparateCutNames{\def\fl@CutName{flx\fl@Cnt-\jobname.cut}}
+%</package>
+%<*flextended>
+%    \end{macrocode}
+%    \subsection{Utility commands used with the \texttt{flextended} option}
+%    \begin{macrocode}
+\def\fls@vebaselinelineskip{% dps22
+  \xdef\flbaselineskip{\the\baselineskip}}
+\def\fl@Cnt{0}
+\def\fl@CutName{flx-\jobname.cut}
+\def\flwriteexsol@fter{% dpsj23
+  \ifx\exsolafter\@empty
+    \immediate\write\verbatim@out{\string\ignorespaces}% dpsj23
+  \else
+    \immediate\write\verbatim@out{\string\exsolafter
+      \string\space\string\ignorespaces}%
+  \fi
+}
+\def\fl@getcontent#1{\begingroup
+  {\count0=\fl@Cnt\relax
+    \advance\count0by1\relax
+    \xdef\fl@Cnt{\the\count0 }}%
+%  \let\save@wlog\wlog\let\wlog\@gobble
+%  \let\save@message\message\let\message\@gobble
+  \global\let\verbatim@out\CommentStream
+  \immediate\openout\verbatim@out=#1
+  \ifwithinparts
+    \ifx\istabularexer\eq@YES
+      \immediate\write\verbatim@out{\string\hfuzz\string\hsize}%
+      \immediate\write\verbatim@out{\string\minipage[t]{\string\hsize}}%
+      \ifanswerkey
+        \immediate\write\verbatim@out{\string\expandafter
+          \string\noindent\string\eqSolnExCmds}% dps23
+        \flwriteexsol@fter
+      \else
+        \immediate\write\verbatim@out{\string\expandafter
+          \string\noindent\string\priorWorkAreaCmds
+          \string\ignorespaces}% dps23
+      \fi
+    \else
+      \ifanswerkey\flwriteexsol@fter\fi
+    \fi
+  \else
+    \ifanswerkey\flwriteexsol@fter\fi
+  \fi
+  \verbatimwrite
+}
+\def\fl@vsplitandplace#1{%
+  \iffl@firstpass
+  \global\setbox\eqe@nskeyflsplit\color@vbox
+    \normalbaselines
+    \predisplaypenalty=-50
+    \postdisplaypenalty=-50
+    \setlength{\hsize}{\eqe@fillwidth}%
+    \expandafter\noindent % dpsj23
+    \ifanswerkey\expandafter\eqSolnExCmds\else
+      \expandafter\priorWorkAreaCmds\fi
+    \ignorespaces\input{#1}\fls@vebaselinelineskip
+    \color@endbox\global\fl@firstpassfalse\fi
+  \@tempdima\eqe@HOfVrule\relax
+%    \end{macrocode}
+%     I'm getting a black box when there is one line left on the second page
+%     and there is less than one line of text. The following three lines attempt to get
+%     that last line to appear when there is enough room for it.
+%     \changes{v5.1c}{2018/01/31}{Added additional lines to get a better break point}
+%    \begin{macrocode}
+  \advance\@tempdima\flfboxrule
+  \advance\@tempdima\lineskip
+  \ifflfrstsplit\else\advance\@tempdima\wlVspace\fi
+  \advance\@tempdima\maxdepth
+  \advance\@tempdima by\twe@kBre@kPoint\relax
+  \eq@tmplengthB\@tempdima % target height
+  \splittopskip\wlVspace
+  \splitmaxdepth\maxdepth
+  \advance\splitmaxdepth by\twe@kBre@kPoint\relax
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \setbox\eqe@nskeyfltop=\vsplit\eq@pointbox to \@tempdima
+  \setbox\eqe@nskeyfltop=\vbox{\unvbox\eqe@nskeyfltop}%
+  \ifvoid\eq@pointbox\else
+    \setlength{\@tempdimb}
+        {\eq@tmplengthB-\dp\eqe@nskeyfltop}%
+    \ifdim\@tempdimb<0pt
+      \@tempdimb=-\@tempdimb
+      \ifdim\@tempdimb>\maxdepth
+        \advance\@tempdima-\flbaselineskip\relax
+      \else
+      \fi
+    \else
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \advance\@tempdima by\flbaselineskip\relax
+  \setbox\eqe@nskeyfltop=\vsplit\eq@pointbox to \@tempdima
+  \setbox\eqe@nskeyfltop=\vtop{\unvbox\eqe@nskeyfltop}%
+  \setlength{\@tempdimb}{\eq@tmplengthB-\dp\eqe@nskeyfltop}%
+    \ifdim\@tempdimb<0pt % too much
+        \advance\@tempdima-\flbaselineskip\relax
+      \else
+      \fi
+    \fi
+  \fi
+  \splittopskip\wlVspace
+  \lineskip1pt
+  \setbox\eq@pointbox=\copy\eqe@nskeyflsplit
+  \global\setbox\eqe@nskeyfltop=\vsplit\eqe@nskeyflsplit to \@tempdima
+  \global\setbox\eqe@nskeyfltop\vtop{\unvbox\eqe@nskeyfltop\vskip0pt}%
+  \ifvoid\eqe@nskeyflsplit
+    \ifeqedb\llap{Bot}\fi
+    \ifeqedb\raise\eqe@HOfVrule\llap{Top}\fi
+    \ifeqedb\llap{V\qquad}\fi
+    \ifflfrstsplit\global\flfrstsplitfalse
+      \ifeqedb\llap{FP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eqe@nskeyfltop\vfil}}}\else
+      \ifeqedb\llap{SP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\wlVspace+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eq@pointbox\vfil}}}%
+        \global\setbox\eqe@nskeyflsplit\box\voidb@x
+    \fi
+  \else
+    \ifeqedb\llap{Bot}\fi
+    \ifeqedb\raise\eqe@HOfVrule\llap{Top}\fi
+    \ifeqedb\llap{nV\qquad}\fi
+    \ifflfrstsplit\global\flfrstsplitfalse
+    \ifeqedb\llap{FP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+        \unvbox\eqe@nskeyfltop\vfil}}}\else
+      \ifeqedb\llap{SP\hskip.5in}\fi
+      \rlap{\raisebox{\eqe@HOfVrule+\flfboxrule+\wlVspace+\lineskip}
+        {\vtop{\vsize=\eqe@HOfVrule\relax
+%    \end{macrocode}
+%    To have the filler lines/grid with prior and solution content to space
+%    more than one page, we unbox \cs{eqe@anskeyfltop} but do not void it.
+%    \begin{macrocode}
+        \unvbox\eqe@nskeyfltop\vfil}}}%
+%        \unvbox\eq@pointbox\vfil}}}%
+%        \global\setbox\eqe@nskeyflsplit\box\voidb@x
+    \fi
+  \fi
+  \setbox\eq@pointbox\box\voidb@x
+%  \gdef\twe@kBre@kPoint{0pt}% dpsj21
+}
+%    \end{macrocode}
+%
+%    \subsection{Filler lines with \texttt{answerkey} option}
+%
+%    When using the \opt{flextended} option and the
+%    \cs{turnflanskeyOn} command, we always use the grid filler type.
+%    In the case of the basic filler types of line, dash, dots, and blank,
+%    the code threads passes to \cs{makeVgrid}, but in the case of the
+%    \opt{answerkey} option, \cs{makeVgrid} writes no vertical lines. Hopefully,
+%    the spacing between the statement of the question and the solution are then
+%    consistent.
+%    \begin{macrocode}
+\let\turnfl@nskeyOnOff\relax
+%    \end{macrocode}
+%   The \DescribeMacro{\turnflanskeyOn}\cs{turnflanskeyOn} command turns \emph{on} the
+%   feature of superimposing the solution over the filler lines. Does nothing unless
+%   the \opt{answerkey} option is in force.
+%    \begin{macrocode}
+\def\turnflnosolnsOn{\eqe@flnosolnstrue}
+\def\turnflnosolnsOff{\eqe@flnosolnsfalse}
+\def\turnflanskeyOn{%
+  \def\turnfl@nskeyOnOff{%
+    \ifanswerkey
+      \ifx\makeVgrid\relax % already in grid mode, do nothing
+        \ifwriteVertic@lFLines\KV@eqefillLines@toplinefalse\fi % dps16
+        \writeVertic@lFLinesfalse
+        \let\makeVgrid\eqe@makeVgrid % dpsj5
+      \fi % dps17
+      \let\eqe@insert@more@content\eqe@insertSolns % dpsj5
+      \eqe@flextendedtrue % dps16
+      \fillTypeGrid % dps16
+      \global\let\eq@insertverticalspace\eq@YES
+      \global\vspacewithsolnstrue
+    \fi
+  }%
+}
+%    \end{macrocode}
+%   The \DescribeMacro{\turnflanskeyOff}\cs{turnflanskeyOff} command turns \emph{off} the
+%   feature of superimposing the solution over the filler lines. Does nothing unless
+%   the \opt{answerkey} option is in force.
+%    \begin{macrocode}
+\def\turnflanskeyOff{%
+  \def\turnfl@nskeyOnOff{%
+    \ifanswerkey
+      \writeVertic@lFLinestrue
+      \eqe@flextendedfalse
+      \let\eq@insertverticalspace\eq@NO
+      \@eqlinedfillerfalse
+      \global\let\eqe@insert@more@content\relax
+      \global\let\eq@insertverticalspace\eq@YES
+      \ifvspacewithsolns\else
+      \global\vspacewithsolnsfalse\fi
+      \global\displayworkareafalse
+    \fi
+  }%
+}
+\turnflanskeyOff
+%    \end{macrocode}
+%    \begin{macrocode}
+\let\p@ssToSolns\relax % dps30
+\def\eqe@insertSolns{\clubpenalty=50
+  \widowpenalty=50 \vbadness=10000
+  \fl@vsplitandplace{s\fl@CutName}}
+\def\eq@b@ddCodeSpecial#1{\global\gridpgbrkfalse % dpsj15
+  \global\let\eq@e@ddCodeSpecial\relax
+  \gdef\eqe@flnexti{#1}% dpsj5
+  \if@eqlinedfiller
+    \ifKV@eqefillLines@bgonly\leavevmode
+        \vskip-\baselineskip\kern\lineskip\fi % dpsj11
+    \ifKV@eqefillLines@outlineonly\leavevmode
+        \vskip-\baselineskip\kern\lineskip\fi
+    \ifanswerkey %\turnfl@nskeyOnOff % dps16
+      \ifeqe@flextended
+        \ifcont@nnot
+          \ifx\makeVgrid\relax
+            \gdef\p@ssToFLs{\turnfl@nskeyOnOff
+              \let\eqe@insert@more@content\eqe@insertSolns
+              \writeVertic@lFLinesfalse
+              \KV@eqefillLines@toplinefalse
+              \let\makeVgrid\eqe@makeVgrid
+            }%
+          \else
+            \gdef\p@ssToFLs{\turnfl@nskeyOnOff
+              \let\eqe@insert@more@content\eqe@insertSolns
+              \writeVertic@lFLinestrue}%
+          \fi
+          \gdef\eqe@flnexti{\turnfl@nskeyOnOff
+            \global\fl@firstpasstrue % dpsj5
+            \p@ssToSolns
+            \global\gridpgbrkfalse
+            \eqe@setStartSolns
+%    \end{macrocode}
+%    We are with a good two deep, but we need to pass \cs{vspacewithkeyOff},
+%    so we save its current state and declare a global call to
+%    \cs{vspacewithkeyOff}. The state is restored by \cs{eq@e@ddCodeSpecial}.
+%    \begin{macrocode}
+            \xdef\kdvsp@SAVE{\ifkeepdeclaredvspacing
+                true\else false\fi}%
+            \gdef\kdvsp@Restore{\@nameuse
+              {keepdeclaredvspacing\kdvsp@SAVE}%
+              \gdef\twe@kBre@kPoint{0pt}\global
+              \let\kdvsp@Restore\relax}% dpsj21
+          \expandafter\global\vspacewithkeyOff
+          \vbadness=10000
+          \fl@getcontent{s\fl@CutName}}%
+          \gdef\eq@e@ddCodeSpecial{\endverbatimwrite\endgroup
+%            \kdvsp@Restore % dpsj20
+            \ifwithinparts\ifx\istabularexer\eq@YES
+            \immediate\write\verbatim@out{\string\endminipage}\fi\fi
+            \immediate\closeout\verbatim@out
+            \global\let\eq@e@ddCodeSpecial\relax
+          }%
+        \else
+          \PackageWarningNoLine{eqexam}{For solutions to appear
+            using filler lines\MessageBreak
+            (with flextexded and answerkey options),\MessageBreak
+            you must first expand \string\turnContAnnotOn\MessageBreak
+            prior to line \the\inputlineno.\MessageBreak
+            Switching to \string\useFillerDefault}%
+          \useFillerDefault
+          \let\eq@insertverticalspace\eq@NO
+        \fi
+      \fi
+    \fi
+  \fi
+  \eqe@flnexti
+}% dpsj4
+%    \end{macrocode}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \subsection{Filler lines with \texttt{nosolutions} option}
+%    Just as we can supply filler lines for the \texttt{answerkey} option, we can do the
+%    same for the \texttt{nosolutions} option and superimpose content on the filler lines.
+%   \changes{v5.0g}{2017/12/05}{Added filler lines with \string\texttt{nosolutions} option}
+%    \begin{environment}{priorworkarea}
+%   \changes{v5.0g}{2017/12/05}{Added the \string\texttt{priorworkarea} environment}
+%    Place the \env{priorworkarea} environment \emph{prior to} the solution environment. It has not
+%    arguments, but gets dimensions from the \env{solution} environment that follows.
+%    \begin{macrocode}
+\def\eqe@priorw@content{%
+      \clubpenalty=50 % dps15
+      \widowpenalty=50
+      \vbadness=10000
+      \fl@vsplitandplace{p\fl@CutName}%
+}%
+\renewenvironment{priorworkarea}{\par
+  \ifx\solutionparshape\@empty\else % dps28
+    \pushEnvir
+        \everypar{}\if@eqalignfilllinestoleft\else
+        \parshape=1 \leadinIndent \linewidth\fi
+    \popEnvir
+  \fi
+  \global\let\p@ssToFLs\relax
+  \global\let\p@ssToSolns\relax
+  \vspacewithkeyOff
+  \ifeq@nosolutions\else\sloppy\fi
+  \def\eqe@flnexti{\eqSavedComment}%
+  \ifeqe@flnosolns\ifdisplayworkarea
+    \def\eqe@flnexti{\fl@getcontent{p\fl@CutName}}\fi\fi % dpsj21
+  \gdef\eqe@flnextii{\eqSavedEndCommet}%
+  \ifeqe@flnosolns\ifdisplayworkarea
+    \gdef\eqe@flnextii{\endverbatimwrite\endgroup
+    \ifwithinparts\ifx\istabularexer\eq@YES
+      \immediate\write\verbatim@out{\string\endminipage}\fi\fi
+    \immediate\closeout\verbatim@out}\fi\fi
+  \eqe@flnexti
+}{%
+  \eqe@flnextii
+  \ifcont@nnot
+    \ifeqe@flnosolns
+      \ifdisplayworkarea
+        \ifx\eq@insertverticalspace\eqe@YES
+          \ifx\makeVgrid\relax
+            \gdef\p@ssToFLs{%
+              \let\eqe@insert@more@content\eqe@priorw@content
+              \writeVertic@lFLinesfalse
+              \KV@eqefillLines@toplinefalse
+              \let\makeVgrid\eqe@makeVgrid}%
+          \else
+            \gdef\p@ssToFLs{%
+              \let\eqe@insert@more@content\eqe@priorw@content
+              \writeVertic@lFLinestrue}%
+          \fi
+          \gdef\kdvsp@Restore{\gdef\twe@kBre@kPoint{0pt}\global
+            \let\kdvsp@Restore\relax}% dpsj21
+        \fi
+      \fi
+    \else
+      \global\setbox\eqe@nskeyflsplit\box\voidb@x
+      \global\setbox\eqe@nskeyfltop\box\voidb@x
+    \fi
+  \else
+    \PackageWarningNoLine{eqexam}{For priorworkarea to appear
+      using filler lines\MessageBreak
+      (with flextexded and nosolutions options),\MessageBreak
+      you must first expand \string\turnContAnnotOn\MessageBreak
+      prior to line \the\inputlineno.\MessageBreak
+      Switching to \string\useFillerDefault}%
+    \gdef\p@ssToSolns{\useFillerDefault}%
+  \fi
+}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{macrocode}
+% end of segment
+%</flextended>
+%<*package>
+%    \end{macrocode}
 % Set the \textsf{eqexam} page style, if not otherwise indicated.
 %    \begin{macrocode}
 \ifeqfortextbook\else
@@ -6346,7 +7647,7 @@
 %    \begin{macrocode}
 \renewcommand{\setSolnMargins}[1]{%
     \ifdim\solnGutter=0pt \setlength\eqemargin{#1}\else
-    \setlength\eqemargin{\solnGutter}\fi}
+    \setlength\eqemargin{\solnGutter}\fi\ignorespaces}
 %\newcommand{\defaultSolnIndent}{\gdef\solnGutter{0pt}}
 \newcommand{\defaultSolnIndent}{\global\solnGutter=0pt}
 \defaultSolnIndent
@@ -6428,9 +7729,9 @@
 %    \begin{macrocode}
     \def\prior@parts@hook{%
         \ifisleadin\else
-        \writeToSolnFile{^^J\protect\bpartsmrk}\fi}%
+        \writeT@SolnFile{^^J\protect\bpartsmrk}\fi}%
     \def\post@parts@hook{%
-        \writeToSolnFile{\protect\epartsmrk^^J}}%
+        \writeT@SolnFile{\protect\epartsmrk^^J}}%
     \def\bpartsmrk{\global\firstitemtrue\begin{eqepartsquestions}}%
     \def\epartsmrk{\end{eqepartsquestions}\global\firstitemfalse}%
 %    \end{macrocode}
@@ -7144,6 +8445,7 @@
 %    \end{environment}
 %    \end{macro}
 %    \begin{macrocode}
+% End of textbook segment
 %</textbook>
 %<*package>
 %    \end{macrocode}
@@ -7169,17 +8471,17 @@
 \eqequeslistparindent{0pt}
 \renewenvironment{eqequestions}{%
     \begin{list}{}{%
-    \ifwithsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
+    \ifwithinsoldoc\let\solnItemMngt\eqeSolnItemMngt\fi
     \setlength{\labelwidth}{\eqemargin}%
     \setlength{\parsep}{\eqeques@parsep}%
     \setlength{\itemsep}{\eqeques@itemsep}
     \setlength{\topsep}{\eqeques@topsep}%
     \setlength{\itemindent}{0pt}%
-    \setlength{\listparindent}{\eqeques@listparindent}%dps%
-    \ifwithsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
+    \setlength{\listparindent}{\eqeques@listparindent}%
+    \ifwithinsoldoc\settowidth{\labelsep}{\eqe@hspannerSoln}\else
     \settowidth{\labelsep}{\eqe@hspannerPrb}\fi
     \setlength{\leftmargin}{\labelwidth}%
-    }\ifwithsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
+    }\ifwithinsoldoc\global\firstitemtrue\fi\item\relax}{\end{list}}
 %    \end{macrocode}
 %    \begin{environment}{eqepartsquestions}
 % This environment is used in the SOL file with problems with parts to hang indent
@@ -7219,14 +8521,14 @@
 \let\fillInFormatDefault\@empty
 \def\exerSolnsHeadnToc{}
 \renewcommand{\exerSolnInput}{%
-    \let\webnewpage\relax
+    \global\let\webnewpage\relax
     \ifsolutionsonly\else\immediate\closeout\ex@solns\fi
     \ifeq@nosolutions\else\newpage % 2012-03-14
         \iftherearesolutions\eq@solutionshook\eqsolutionshook
             \ifsolutionsonly\else\newpage\eq@solutionshook
             \eqsolutionshook\fi
             \ifx\webnewpage\relax
-                \def\webnewpage{\let\webnewpage\newpage}%
+                \gdef\webnewpage{\global\let\webnewpage\newpage}%
             \fi
             \priorexsectitle\exerSolnsHeadnToc\priorexslinput
             \InputIfFileExists{\jobname.sol}{}{\PackageWarning{exerquiz}
@@ -7247,7 +8549,7 @@
 % but it not working yet.
 %    \begin{macrocode}
 \newif\iffrstProbNumShown\frstProbNumShownfalse
-\def\tb@insertDecPoint{\ifwithsoldoc\eqedecPointSoln\else
+\def\tb@insertDecPoint{\ifwithinsoldoc\eqedecPointSoln\else
     \eqe@decPointMrg\fi}
 \newcommand{\eqedsplyOnlyFrst}[2]{\def\thisPart{#2}%
     \ifx\thisPart\firstPartLtr\global\frstProbNumShowntrue
@@ -7331,7 +8633,7 @@
 %\end{verbatim}
 %    \begin{macrocode}
 \newcommand{\wrtChapSolnHead}[1]{%
-    \writeToSolnFile{%
+    \writeT@SolnFile{%
     \protect\preChapSolnHead
     \protect\chapHeadSolnFmt{\protect\ftbFmtChapter{\thechapter}#1}%
     \protect\postChapSolnHead
@@ -7568,6 +8870,7 @@
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macrocode}
+% End of textbook segment
 %</textbook>
 %<*ftbsty>
 %    \end{macrocode}
@@ -7602,6 +8905,7 @@
 % when compiling). I've also defined a special option \texttt{nocustomdesign} which
 % cancels out the \texttt{usecustomdesign} option.
 %    \begin{macrocode}
+% End of ftbsty segment
 %</ftbsty>
 %<*package>
 %    \end{macrocode}
@@ -7708,6 +9012,18 @@
     are tiny, scriptsize, footnotesize, small, normalsize,
     large, Large, LARGE, huge and Huge. Try again}}
 \def\eq@eqFillin@boxsize{\text{\normalsize\strut}}
+%    \end{macrocode}
+%    \changes{v5.1g}{2018/02/14}{Added \string\texttt{fontsize} and \string\texttt{fboxsep} keys}
+%    \begin{macrocode}
+\define@key{eqFillin}{fboxsep}[3pt]{\def\eq@fillin@fboxsep{#1}}
+\def\eq@fillin@fboxsep{3pt}
+\define@choicekey+{eqFillin}{fontsize}{tiny,scriptsize,footnotesize,%
+    small,normalsize,large,Large,LARGE,huge,Huge}[normalsize]{%
+    \def\eq@eqFillin@fontsize{\csname#1\endcsname}%
+}{\PackageWarning{eqexam}{Bad choice for boxsize, permissible values
+    are tiny, scriptsize, footnotesize, small, normalsize,
+    large, Large, LARGE, huge and Huge. Try again}}
+\def\eq@eqFillin@fontsize{\ifmmode\else\normalsize\fi}
 \define@key{eqFillin}{color}[\eq@fillinColor]{\edef\eq@fillin@color{#1}}
 %    \end{macrocode}
 % \changes{v3.0x}{2012/04/03}{Added \cs{eqe@align@hfill} to \texttt{align} property.
@@ -7877,8 +9193,49 @@
     \def\eqe@setfillinDefaults{#1}\fi}
 \let\eqe@setfillinDefaults\@empty
 %    \end{macrocode}
+%    The \DescribeMacro\fillineol\cs{fillineol} command is used to extend the \cs{fillin} box or line
+%    to the end of the line.
+%\begin{flushleft}\ttfamily
+%\quad\string\fillineol*\darg{\ameta{phrase}}[\ameta{opts}]\darg{\ameta{ans}}
+% \end{flushleft}
+% Normally, \cs{fillineol} is placed at the beginning of a line. The command measures the length
+% of \texttt{\darg{\ameta{phrase}}}, subtracts this from \cs{linewidth} and uses this value
+% as the width of the underlying \cs{fillin}. When the star-form is used, the \textsf{collectbox} package
+% is required; in the star-form, \ameta{phrase} can contain verbatim text.
+%    \changes{v5.1h}{2018/02/18}{Added \string\cs{mtoeol}}
+%    \changes{v5.1i}{2018/02/19}{Changed name to \string\cs{fillineol} and changed order of arguments}
 %    \begin{macrocode}
-\renewcommand{\fillin}[3][]{\begingroup%
+\AtBeginDocument{\@ifpackageloaded{collectbox}
+  {\let\eqe@cb\eqe@YES}{\let\eqe@cb\eqe@NO}}
+\def\fillineolTooLongMsg{\PackageWarning{eqexam}{%
+  The 'phrase' you are measuring is longer than\MessageBreak
+  \string\linewidth. Changing length to 0pt in hopes you\MessageBreak
+  can fix things}}
+\def\fillineolNoCBMsg{\PackageWarning{eqexam}{%
+  For the \string\fillineol*\space form, the
+    collectbox package\MessageBreak
+  is required, but not loaded at this time.\MessageBreak
+  Switching to \string\fillineol\space in hopes you
+    load collectbox\MessageBreak
+  next time or you remove the star-option if not\MessageBreak
+  really needed}}
+\newcommand\fillineol{\@ifstar{\ifx\eqe@cb\eqe@YES
+  \let\eqe@next\cbfillineol\else
+  \def\eqe@next{\fillineolNoCBMsg\fillineol@i}\fi
+  \eqe@next}{\fillineol@i}}
+\newcommand{\fillineol@i}[1]{\bgroup\setbox\z@\hbox{#1}\fillineol@ii}
+\newcommand\fillineol@ii[2][]{\setlength\eqetmplengthb{\linewidth-\wd\z@}%
+  \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
+  \unhbox\z@\fillin[#1]{\eqetmplengthb}{#2}\egroup}
+\newcommand\cbfillineol{\bgroup\collectboxto{\@tempboxa}
+  {\setlength{\eqetmplengthb}{\linewidth-\wd\@tempboxa}%
+  \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
+    \unhbox\@tempboxa\cbfillineol@i}}
+\newcommand\cbfillineol@i[2][]{\fillin[#1]{\eqetmplengthb}{#2}\egroup}
+%    \end{macrocode}
+%    We finally begin the \DescribeMacro\fillin\cs{fillin} command.
+%    \begin{macrocode}
+\renewcommand{\fillin}[3][]{\begingroup
 %    \end{macrocode}
 %    \cs{ifsp@expand} is defined in \textsf{spdef} package. This is a version
 %    if \cs{ifsp} that expands correctly in an \cs{edef}.
@@ -7897,6 +9254,7 @@
     \fi
     \protected@edef\eq@temp@exp{\noexpand\setkeys{eqFillin}{#1}}%
     \eq@temp@exp
+    \fboxsep\eq@fillin@fboxsep\relax
 %    \end{macrocode}
 % If boxed, we turn underlining off
 %    \begin{macrocode}
@@ -7909,8 +9267,10 @@
     \ifKV@eqFillin@autolift\def\eq@fillin@lift{-2sp}\fi
 %    \end{macrocode}
 % Get the second parameter.
+% \changes{v5.1h}{2018/02/18}{Added test, 0pt same as empty width}
 %    \begin{macrocode}
-    \edef\eqe@argii{#2}%
+    \edef\eqe@argii{#2}\ifx\eqe@argii\@empty\else
+    \ifdim\eqe@argii=0pt\let\eqe@argii\@empty\fi\fi
 %    \end{macrocode}
 % We reset \cs{fboxrule} and \cs{fboxsep} as needed.
 %    \begin{macrocode}
@@ -7988,8 +9348,9 @@
 %    If no \texttt{parbox} option and if the second argument is empty,
 %    we set width based on the natural width of \texttt{\#3}
 %    \begin{macrocode}
-            \settowidth{\eqetmplengthb}{\@eqmath{\eq@fillin@format
-            \ifKV@eqFillin@boxed\eq@fillintext\fi\eqe@argiii}}%
+            \settowidth{\eqetmplengthb}{\@eqmath{\eq@eqFillin@fontsize
+            \eq@fillin@format\ifKV@eqFillin@boxed\eq@fillintext\fi
+            \eqe@argiii}}%
             \ifKV@eqFillin@boxed
                 \setlength{\eqetmplengthb}{%
                 \eqetmplengthb+2\fboxsep+2\fboxrule}%
@@ -8077,7 +9438,7 @@
             \setbox\z@\hbox{\@eqmath{\eq@fillin@boxcmd{%
 %                \eq@fillin@format\ensuremath{\eq@fillin@boxcmd{%
             \eq@eqFillin@boxsize
-            \@fillinFmt{%
+            \@fillinFmt{\eq@eqFillin@fontsize % dpsf0214
                 \ifKV@eqFillin@boxed
                     \edef\eqe@bw{\eqe@fbox@corr{\eqe@bw}}%
                 \fi
@@ -8102,7 +9463,7 @@
 %    The content is not to be boxed.
 %    \begin{macrocode}
             \ifmmode\let\@eqmath\ensuremath\else\let\@eqmath\relax\fi
-            \setbox\z@\hbox{%
+            \setbox\z@\hbox{\eq@eqFillin@fontsize % dpsf0214
 %    \end{macrocode}
 % A value of \texttt{-1sp} signals that \texttt{lift} has not been specified,
 % nor has \texttt{autofill} been specified. So we use the usual code for underlining.
@@ -8144,10 +9505,13 @@
         \ifKV@eqFillin@boxed
 %            \mbox{\eq@fillin@format\ensuremath{\boxed{%
 %            \eq@fillin@format\ensuremath{\eq@fillin@boxcmd{%
-            \setbox\z@\hbox{\@eqmath{\eq@fillin@format
+            \setbox\z@\hbox{\eq@eqFillin@fontsize % dpsf0214
+              \@eqmath{\eq@fillin@format
                 \eq@fillin@boxcmd{\eq@eqFillin@boxsize\ifeq@nosolutions
-                \rlap{\@eqmath{\eq@fillintext}}\fi
-            \ifvspacewithsolns\rlap{\@eqmath{\eq@fillintext}}\fi
+                \rlap{\@eqmath{\eq@eqFillin@fontsize % dpsf0214
+                  \eq@fillintext}}\fi
+            \ifvspacewithsolns % dpsf0214 \eq@eqFillin@fontsize
+              \rlap{\@eqmath{\eq@eqFillin@fontsize\eq@fillintext}}\fi
             \@fillinFmt{%
 %    \end{macrocode}
 %    We do a similar thing if proofing is not active (\texttt{nosolutions} is taken).
@@ -8168,7 +9532,7 @@
 %    \end{macrocode}
 %    This is the case where the field is \emph{not} boxed.
 %    \begin{macrocode}
-            \setbox\z@\hbox{%
+            \setbox\z@\hbox{\eq@eqFillin@fontsize % dpsf0214
             \ifdim\eq@fillin@lift=-1sp\relax
                 \@fillinFmt{\makebox[\eqe@bw]{%
 %                    \phantom{\@eqmath{\eqe@argiii}}
@@ -8235,7 +9599,11 @@
                 \fi
             \fi
         }%
-    \fi\endgroup\space\ignorespaces}
+%    \end{macrocode}
+%    \changes{v5.1d}{2018/02/02}{removed \string\cs{space}\string\cs{ignorespaces} from \string\cs{fillin}}
+%    Removed |\space\ignorespaces|
+%    \begin{macrocode}
+    \fi\endgroup}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\TF}
@@ -8256,3 +9624,65 @@
 %</package>
 %    \end{macrocode}
 \endinput
+
+
+
+\renewenvironment{solnexer@woparts}[1][]{\gdef\sameVspace{#1}%
+  \def\eqe@next{\expandafter\solutionFLSAVE\expandafter[#1]}%
+  \global\gridpgbrkfalse
+  \if@eqlinedfiller
+    \ifKV@eqefillLines@bgonly\leavevmode\fi
+    \ifanswerkey\turnfl@nskeyOnOff % dps16
+      \ifeqe@flextended
+        \def\eqe@next{\vspacewithkeyOff
+          \vbadness=10000
+%    \end{macrocode}
+%     When conditions are right (\opt{answerkey} is in force and \cs{ifeqe@flextended} is true),
+%     we take the contents of the \env{solution} environment and place it in the
+%     box \cs{eqe@anskeyflsplit}.
+%    \begin{macrocode}
+          \fl@getcontent
+            \ifx\exsolafter\@empty\else
+              \noindent\exsolafter\space\ignorespaces\fi
+          }%
+      \fi
+    \fi
+  \fi
+  \eqe@next
+}{%
+  \let\eqe@next\endsolutionFLSAVE
+  \if@eqlinedfiller
+    \ifanswerkey
+      \ifeqe@flextended
+        \ifcont@nnot
+          \def\eqe@next{\fls@vebaselinelineskip % dps22
+            \egroup % end of \setbox\eqe@nskeyflsplit
+            \let\exsolafter\@empty
+            \def\solnsafterSkipAmt{-\baselineskip}%
+            \expandafter\solutionFLSAVE
+            \expandafter[\sameVspace]\endsolutionFLSAVE
+          }%
+        \else
+          \PackageWarning{eqexam}{For solutions to appear,
+            you must first\MessageBreak
+            expand \string\turnContAnnotOn}%
+        \fi
+      \fi
+    \fi
+  \fi
+  \eqe@next
+}
+
+        \ifcont@nnot
+          \def\eqe@next{\fls@vebaselinelineskip % dps22
+            \egroup % end of \setbox\eqe@nskeyflsplit
+            \let\exsolafter\@empty
+            \def\solnsafterSkipAmt{-\baselineskip}%
+            \expandafter\solutionFLSAVE
+            \expandafter[\sameVspace]\endsolutionFLSAVE
+          }%
+        \else
+          \PackageWarning{eqexam}{For solutions to appear,
+            you must first\MessageBreak
+            expand \string\turnContAnnotOn}%
+        \fi

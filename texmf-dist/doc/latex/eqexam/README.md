@@ -1,5 +1,5 @@
 The eqexam Package 
-Dated: 2017-03-16
+Dated: 2018-12-13
 Author: D. P. Story
 
 eqExam is a LaTeX package for writing exams, tests, quizzes,
@@ -39,6 +39,14 @@ this package are as follows:
         authors. Documentation for this option is found in the doc/fortextbook
         folder. See also the series of blogs at
         http://www.acrotex.net/blog/?tag=fortextbook
+
+What's New (2018-12-13) Changes to support the mi-solns package
+
+What's New (2018-04-15) Minor bug fixes
+
+What's New (2018-02-19): Extended the vertical space fill types 
+and added \fillineol. Refer to the table of contents under Sections 10.11
+and 10.12.
 
 Sample files, previous distributed with eqexam are now available from
 

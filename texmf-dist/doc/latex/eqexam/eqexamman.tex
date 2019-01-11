@@ -8,6 +8,9 @@
     centertitlepage},
     eforms
 ]{aeb_pro}
+\usepackage[bypasspkgpagestyle,nomarginwrite,usecustomdesign,
+    useclassmaketitle,flextended
+]{eqexam}
 %\usepackage[designv,
 %    latextoc,forcolorpaper,
 %    centertitlepage]{web}
@@ -19,9 +22,10 @@
 
 \usepackage{eqexaman}
 
-%\usepackage{srcltx}
+\usepackage{srcltx}
 
 \hfuzz=1pt
+
 
 \def\AEBBook{\textsl{{Acro\!\TeX} eDucation System Tools: {\LaTeX} for interactive PDF documents}}
 \def\AEBP{\textsf{AeB Pro}}
@@ -33,13 +37,19 @@
 
 \font\zqacr=zqacr at 8pt
 
-
+\newcommand\Com[2][]{\texttt{#2}}
+\newcommand\sCom[2][]{}
+\newif\ifusebw \usebwfalse
 
 \setlength{\mathindent}{\leftmargini}
+
+\edef\amtIndent{\the\parindent}
+
 %\def\meta#1{\textit{$\langle$#1$\rangle$}}
 
 \makeatletter
 
+\let\ipkg\@gobble
 %\def\numberline#1{{\setlength{\fboxsep}{0pt}\fbox{\hb@xt@\@tempdima{#1\hfil}}}}
 
 %\renewcommand*\l@section{\addvspace{2pt}\@dottedtocline{1}{1.5em}{2.5em}}
@@ -53,6 +63,12 @@
 %\renewcommand*\l@subsubsection{\@dottedtocline{3}{8.2em}{1.2em}}
 %\renewcommand*\l@subsubsection{\@dottedtocline{3}{7em}{1.2em}}
 
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
 
 \newcommand{\exAeBBlogPDF}[2][\urlAcroTeXBlog/]{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
 \vskip\medskipamount\noindent\makebox[0pt][r]{%
@@ -82,16 +98,18 @@
 \def\AcroBlog{{Acro\!\TeX} Blog}
 \newlength{\aebdimen}
 \def\anglemeta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\let\ameta\anglemeta
 \def\meta#1{\textit{\texttt{#1}}}
 \let\pkg\textsf
 \let\env\texttt
 \let\opt\texttt
 \let\app\textsf
+\def\lp{(}\def\rp{)}
 \def\AEB{\textsf{AeB}}
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
-\let\amtIndent\leftmargini
+%\let\amtIndent\leftmargini
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
 \def\nhnameref#1{\bNH\nameref{#1}\eNH}
 \def\nhNameref#1{\bNH\Nameref{#1}\eNH}
@@ -118,11 +136,12 @@
 \def\FitItIn{\eq@fititin}
 \def\endredpoint{\FitItIn{{\large\ifusebw\color{black}\else\color{red}\fi$\blacktriangleleft$}}}
 
+\reversemarginpar
 
 %\makeindex
 
-\title{The \texorpdfstring{\textsf{eqexam} Package\\}{eqexam Package, }
-part of the\texorpdfstring{\\Acro\TeX}{AcroTeX} eDucation Bundle}
+\title[dps]{The \texorpdfstring{\textsf{eqexam} Package\\}{eqexam Package, }
+part of the\texorpdfstring{\\}{ }\texorpdfstring{\AcroTeX}{AcroTeX} eDucation Bundle}
 \author{D. P. Story}
 \subject{%
     A LaTeX package for creating Test, quizzes, both for paper and for
@@ -131,8 +150,11 @@ part of the\texorpdfstring{\\Acro\TeX}{AcroTeX} eDucation Bundle}
 \keywords{LaTeX, hyperref, PDF, exercises, quizzes}
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
-\version{v4.9, 2017/03/16}
+\version{5.1.3, 2018/12/13}
 \copyrightyears{2005-\the\year}
+
+\renewcommand{\exsectitletext}{Solutions to exams in this manual}
+
 
 \chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
@@ -178,7 +200,7 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
 
 \section{Forward}
 
-For the past several years (this year is 2016), I've been writing a book
+For the past several years (this year is \the\year), I've been writing a book
 titled,
 \begin{quote}
 \AEBBook.
@@ -199,7 +221,7 @@ on this documentation. \verb!:-{)!
 
 \begin{flushright}
 Dr. D. P. Story\\[3pt]
-January 16, 2016
+\today
 \end{flushright}
 
 \section{Introduction}
@@ -434,7 +456,7 @@ conform to a book style. The following are some basics on formatting for
 
 The following two commands appear in \textsf{eqexam}, the first sets some basic
 page parameters.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand{\eqeSetExamPageParams}{%
     \setlength{\headheight}{12pt}
     \setlength{\topmargin}{-.5in}
@@ -448,7 +470,7 @@ page parameters.
 \end{Verbatim}
 The second command calculates values for \cs{textwidth} and \cs{textheight}
 based on the the settings of the first command.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand{\eqExamPageLayout}{%
     \setlength\textwidth\paperwidth
     \addtolength{\textwidth}{-2in}
@@ -480,7 +502,7 @@ neither \cs{eqeSetExamPageParams} nor \cs{eqExamPageLayout} should be executed.
 \newtopic The following commands directly effect how the problems are
 displayed within an \textsf{eqexam} environment.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \eqexammargin{\normalsize\normalfont\bfseries00.\ }
 \end{Verbatim}
 The command \cs{eqexammargin} is a convenient way of specifying the
@@ -492,7 +514,7 @@ even between problems, though this is not a intuitive option). Normally it
 is executed once for the entire document; but may be executed multiple
 times to change margins.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand{\widthtpboxes}{35pt}
 \end{Verbatim}
 This command sets the width of the boxes that appear in the right margin
@@ -501,7 +523,7 @@ when one of more of the options \texttt{pointsonright},
 used. These boxes are used for exams, and not relevant for problem sets of
 textbooks. Normally, this parameter is not redefined.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newenvironment{eqequestions}{%
     \begin{list}{}{%
         \setlength{\labelwidth}{\eqemargin}%
@@ -524,14 +546,14 @@ examples.
 
 Of course, we begin with the standard article class, and the
 \textsf{eqexam} package:
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \documentclass{article}
 \usepackage[!meta(options)]{eqexam}
 \end{Verbatim}
 \noindent The \meta{options} are discussed in
 section~\ref{eqoptions}.  Next comes a exam identification
 information:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \title[T1]{Test 1}
 \subject[C1]{Calculus I}
 \author{D. P. Story}
@@ -592,7 +614,7 @@ environments.\footnote{Remember, this was originally a personal
 package, meant to suit my own needs.}
 
 \newtopic After the preamble, we then say
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{document}
 
 \maketitle
@@ -644,7 +666,7 @@ environment. It has one optional argument, heading text for the
 instructions; if this optional parameter is not provided, then the default
 word is used, the default word is determined by \cs{defaultInstructions},
 its default definition is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \defaultInstructions{Instructions.}
 \end{Verbatim}
 Following this label, the total number of points for this part is
@@ -655,7 +677,7 @@ environment has a color associated with it, and is visible when you
 compile the document with the \texttt{forcolorpaper} option. This
 color can be set by the command \cs{instructionsColor}; this command
 takes a single argument, a named color:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \instructionsColor{blue}
 \end{Verbatim}
 \noindent The above is the default definition.
@@ -684,13 +706,13 @@ itself may contain special constructs such as one or more fill-in
 the blanks.
 
 The syntax for \texttt{problem} is
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont,
     commandchars=!()]
 \begin{problem}[!meta(num)|*!meta(num)|empty][h|H]
 !anglemeta(Statement of question, which may contain special constructs)
 ...
 ...
-\begin{solution}[!meta(vspace)]
+\begin{solution}[!meta(vspace),nLines=!meta(n)]
 ...
 ...
 \end{solution}
@@ -731,7 +753,7 @@ specify the \texttt{solutionsafter} option.
 To make things work correctly, if you do not want to have points
 for a question and want to hide the solution, use `\texttt{[]}'
 (empty brackets with no spaces) for the first argument.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[][H]
 ($5$ Points Extra Credit) Solve this problem for extra credit.
 \begin{solution}
@@ -744,12 +766,18 @@ the solution appears just for \texttt{solutonsafter}.
 \noindent Here, this problem has no points that will be added into
 the total number of points for the test.
 
-The \texttt{solution} environment encloses the solutions. This environment
-is optional. The environment takes one optional parameter, namely the
-vertical space to leave for the student to work the problem. This vertical
+The \texttt{solution} environment encloses the solutions. This environment is
+optional. The environment takes at most two optional parameters,
+\meta{vspace} and \texttt{nLines=\meta{n}}. The \meta{vspace} parameter is a
+length that determines the amount of vertical space to leave for the student
+to work the problem. The
+\texttt{nLines=\meta{n}}\FmtMP{\texttt{nLines=\meta{n}} explained}
+specification signals \pkg{eqexam} to leave \meta{n} lines of vertical space;
+each line is \cs{wlVspace} in height. (For more information on \cs{wlVspace},
+read about the \texttt{linegap} key in Section~\ref{ss:VSFT}.) This vertical
 space is \emph{created only} when the document author takes the
-\texttt{nosolutions} option. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\texttt{nosolutions} or \texttt{vspacewithsolns} option. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[10]
 Do this problem.
 \begin{solution}[2in]
@@ -757,9 +785,10 @@ This is the solution.
 \end{solution}
 \end{problem}
 \end{Verbatim}
-\noindent This defines a $10$ point problem and leaves $2$ inches
-of vertical space following the problem statement for the student
-to respond, provided the \texttt{nosolutions} option has been taken.
+This defines a $10$ point problem and leaves $2$ inches of vertical space
+following the problem statement for the student to respond. The vertical
+space is generated provided the \texttt{nosolutions} or \opt{vspacewithsolns}
+option has been taken.
 
 Be aware that the solution environment searches for its optional
 parameter, and will expand macros looking for a left bracket (\texttt{[}).
@@ -773,19 +802,19 @@ can lead to compilation stopping. Suggested workarounds:
     \item Supply empty brackets: \verb!\begin{solution}[]!
     \item Use \cs{relax}: \verb!\begin{solution}\relax\textbf{...}!.
     The \cs{relax} should not be on the line by itself.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{solution}\relax  % Not this
 \textbf{...}
 ...
 \end{Verbatim}
 The above causes an unwanted newline. The next two examples show the
 ``correct'' method.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{solution}\relax\textbf{...}  % correct
 ...
 \end{Verbatim}
 \noexpand The \cs{relax} appearing on the second line.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{solution}
 \relax\textbf{...}  % correct
 ...
@@ -796,7 +825,7 @@ these workarounds is too much trouble, you can use a global solution. Use
 \cs{noSolnOpt} to globally turn off the check for the option parameter by
 the \texttt{solution} environment; \cs{ckSolnOpt} turns on parameter
 checking (the default). To summarize:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \ckSolnOpt  % turn on checking for the optional argument (the default)
 \noSolnOpt  % turn off checking for the optional argument
 \end{Verbatim}
@@ -806,6 +835,12 @@ parameter checking.
 \redpoint See \Nameref{eqoptions} for more details on
 the two options \texttt{nosolutions} and \texttt{solutionsafter}.
 
+\paragraph*{Optional arguments of \env{solution} environment.}
+The \env{solution} environment takes at most two optional arguments \meta{vspace} and \texttt{nLines=\meta{n}}.
+If both are specified, by default the \meta{vspace} parameter is used. The command
+\cs{usenLineDimen} changes the preference to the line specification; \cs{useVspaceDimen} switches
+the preference back to the \meta{vspace} dimension.
+
 \subsubsection{\texttt{problem*}}\label{problemstar}
 
 This environment is used when you want to ask a multi-part
@@ -813,19 +848,19 @@ question, a series of related questions that are to be treated as
 a group.
 
 The syntax is
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont,
     commandchars=!()]
 \begin{problem*}[!meta(num)|!anglemeta(num)ea|\auto|empty][\Do!anglemeta(do_num)]
 Do each of the following problems, and be quick about it.
 \begin{parts}
 
 \item[h|H] The first question.
-\begin{solution}[1.5in]
+\begin{solution}[!meta(vspace),nLines=!meta(n)]
 This is the solution to the first problem.
 \end{solution}
 
 \item[h|H] The second question.
-\begin{solution}[3in]
+\begin{solution}[!meta(vspace),nLines=!meta(n)]
 This is the solution to the second problem.
 \end{solution}
 
@@ -860,7 +895,7 @@ the first one takes one of four values:
     \item[*\cs{auto}] The points appear ``in-line'' rather than
         in the margin.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[\auto]
 Do each of the following problems, and be quick about it.
 \begin{parts}
@@ -900,7 +935,7 @@ This is what \texttt{[\cs{Do}\anglemeta{do\_num}]} does. When you specify
 added into the exam total. This second parameter is only checked
 if the first parameter is \texttt{[\anglemeta{num}ea]}. For example,
 specifying
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[5ea][\Do3]
 \end{Verbatim}
 creates a $15$ point question. This assumes there are $3$ or
@@ -911,7 +946,7 @@ is used, they are \cs{DoNum} and \cs{OutOfNum}; these expand to
 the (English) word for the number of problems to do, and the
 (English) word for the total number of problems. For example, if
 there were five parts to the problem below,\dots
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[5ea][\Do3]
 Solve exactly \textit{\DoNum} of the following {\OutOfNum}
 problems. ....
@@ -940,7 +975,7 @@ have asked to be able to pose multi-part questions without the
 introductory sentence. This is harder request than it sounds, but now
 there is the \cs{leadinitem} command. Study the code below.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[\auto]
 \leadinitem\PTs{3} The first question.
 \begin{solution}[1.5in]
@@ -978,6 +1013,37 @@ from appearing at the end of the document (but it appears with
 \texttt{solutionsafter} or with \texttt{answerkey}), and \texttt{H} removes the solution in
 all cases.
 
+\paragraph{\texorpdfstring{\cs{tableadin}}{\CMD{tableadin}}} There is a
+tabular version of the \cs{leadinitem} command just discussed. Consider the following code:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
+\autotabOn
+\begin{problem*}[\auto]
+\tableadin
+\begin{parts}[2}
+\item\PTs{4} The first question.
+\begin{solution}[1.5in]
+This is the solution to the first problem.
+\end{solution}
+%
+\item\PTs{4} The second question.
+\begin{solution}[3in]
+This is the solution to the second problem.
+\end{solution}
+...
+\end{parts}
+\end{problem*}
+\end{Verbatim}
+The results of this code is viewed as follows, when typeset.
+
+\bigskip
+\noindent\hfill\begin{minipage}{\linewidth-2\leftmargini}
+\noindent\llap{($10^{\text{pts}}$)\quad}\textbf{1.}\ (a)\ The first question.\qquad\hskip2\tabcolsep
+(b)\ The second question.\\[3pt]
+\phantom{\textbf{1.}\ }\dots
+\end{minipage}
+\bigskip
+
+
 \subsubsection{Page Breaking}
 
 The \texttt{exam}, \texttt{problem} and \texttt{problem*}
@@ -988,7 +1054,7 @@ If an \texttt{exam} environment begins at the lower third of the
 page, it is moved to the next page. You can influence this page
 break by using \cs{fvsizeskip} just before the beginning of the
 \texttt{exam} environment, like so,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \fvsizeskip{.4}
 \end{Verbatim}
 \noindent \cs{fvsizeskip} takes a decimal number between $0$ and
@@ -999,7 +1065,7 @@ default value is $.3$.
 There is a similar algorithm for \texttt{problem} and
 \texttt{problem} but is measured as a multiple of
 \cs{baselineskip}. If you place
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \nbaselineskip{8}
 \end{Verbatim}
 \noindent just before a problem that appears near the bottom of
@@ -1055,7 +1121,7 @@ will appear when you compile the document with the
 
 \redpoint An example of \cs{fillin}.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[5]
 It is well known that \fillin{1in}{Newton} and \fillin{1in}{Leibniz}
 are jointly credited as the founders of modern calculus.
@@ -1111,13 +1177,13 @@ formatting options: This one:
 \newtopic The first alignment is the default. To get the second
 alignment, you need to set the value of \cs{fillinWidth} to the
 common width value of the \cs{TF} fields. For example:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \fillinWidth\defaultTFwidth
 \end{Verbatim}
 \noindent When \cs{fillinWidth} is set to a positive length (the
 common width of the \cs{TF} field), the second alignment above is
 created.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[3ea]
 \textit{True} or \textit{False}.
 
@@ -1158,7 +1224,7 @@ option, \cs{TF} generates a text field.
 There is no special command for a longer response question, just
 leave enough vertical white space for the student to respond, for
 example,
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[5]
 Do this problem
 \begin{solution}[1.5in]
@@ -1182,7 +1248,7 @@ taken, the choices are made into radio button fields so that
 are permitted, the \texttt{manswers} environment can be used, see
 \Nameref{multiSelect}.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[\auto] Answer each of the following.
 \begin{parts} %\sqLinks
     \item\PTs{5} In what year did Columbus sail the ocean blue?
@@ -1227,7 +1293,7 @@ Beginning with Version 1.3, an alternate style of specifying the
 alternatives is defined. A new pair of commands are defined: \cs{bChoices}
 and \cs{eChoices}. These two enclose the alternatives like so:
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{exam}{Exam1}
 \begin{instructions}
 Select the ``best'' answer and darken the corresponding oval on
@@ -1293,7 +1359,7 @@ Then the package option \texttt{allowcirc4mc} is used, the font standard
 can use it to create circles, instead of rectangles, to indicate the parts
 in a multiple choice (MC) question. To use circles in a multiple choice
 question, execute the command,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \useCircForMC
 \end{Verbatim}
 prior to the MC question.
@@ -1301,7 +1367,7 @@ prior to the MC question.
 \goodbreak
 
 To return to the use of rectangles, execute the command,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \useRectForMC
 \end{Verbatim}
 prior to the MC question.
@@ -1330,7 +1396,7 @@ proofing symbols.
     \hskip#2\relax}}}}}}
 \makeatother
 
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \useCheckForProof       (!normalfont Check !ding(52), the default)
 \useCrossForProof       (!normalfont Cross !ding(56), alternative to check)
 \useCircForProof        (!normalfont Circle !circGlyph(x)(1pt), appropriate with )\useCircForMC
@@ -1338,7 +1404,7 @@ proofing symbols.
 All of these user friendly commands are based on the \cs{proofingsymbol}
 command. For example, the definitions of \cs{useCheckForProof} and
 \cs{useCrossForProof} are,
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \newcommand{\useCheckForProof}{\symbolchoice{check}%
     \proofingsymbol{\ding{52}}}
 \newcommand{\useCrossForProof}{\symbolchoice{cross}%
@@ -1376,7 +1442,7 @@ the back of the document and markup up as they are with the
 have the same choices, you must write to the solutions file using
 \cs{writeToSolnFile}. Below is an example.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \useCircForMC\useCircForProof
 \writeToSolnFile{\protect\useCircForMC\protect\useCircForProof}
 \begin{problem}[5] In what year did Columbus sail the ocean blue?
@@ -1394,7 +1460,7 @@ Any multiple choice question that follows will also draw circles for
 multiple choice questions, and mark them with a filled circle.
 To shift back to the default, expand the following commands prior the next
 question.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \useRectForMC\useCheckForProof
 \writeToSolnFile{\protect\useRectForMC\protect\useCheckForProof}
 ...
@@ -1412,7 +1478,7 @@ and \texttt{email} options.
 Use the \texttt{manswers} environment in the same way you use
 \texttt{answers}, except code in more than one correct answer. For
 example,
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[5]
 Which of the following are primary colors?
 \begin{manswers}{6} % specify tabular with 6 columns
@@ -1462,7 +1528,7 @@ pair \cs{bChoices} and \cs{eChoices}. The
 \end{itemize}
 
 \newtopic The following is an example of the \texttt{random} option of \cs{bChoices}.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[5]
 Try to guess the correct answer.
     \begin{answers}{3}
@@ -1492,7 +1558,7 @@ these) will placed at the end of the list.
 \newtopic Additionally, there are five other commands that support the
 randomization feature.
 
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \saveRandomSeed
 \inputRandomSeed
 \end{Verbatim}
@@ -1540,7 +1606,7 @@ of the choices as you expect it to, it could be that
 \textsf{eqexam} is reading an old \texttt{.sav} file. Either delete that file
 in your source folder, or comment out \cs{inputRandomSeed} in your document.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \useRandomSeed{!meta(num)}
 \end{Verbatim}
 
@@ -1550,13 +1616,13 @@ questions rearranged for each.  Save the seed value used by
 and copy and paste line you see into your document, for example, it
 could read \cs{randomi=132088850}. Then use \cs{useRandomSeed} to
 use that seed value for that class, for example
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \useRandomSeed{132088850}   % 11:00 class
 % \useRandomSeed{634952429} % 12:30 class
 \end{Verbatim}
 Of course comment out \cs{inputRandomSeed}.
 
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \turnOnRandomize
 \obeyLocalRandomize
 \end{Verbatim}
@@ -1564,7 +1630,7 @@ Of course comment out \cs{inputRandomSeed}.
 The command \cs{turnOnRandomize} overrides all local settings of \cs{bChoices}
 and causes all choice lists to be randomized. While \cs{obeyLocalRandomize}
 returns control to the local settings. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \turnOnRandomize
 ...
 \bChoices
@@ -1575,7 +1641,7 @@ returns control to the local settings. For example,
 \end{Verbatim}
 will cause the choice list to be randomized, even though the
 \texttt{random} option was not specified. Whereas, in this code
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \turnOnRandomize
 ...
 \obeyLocalRandomize
@@ -1669,7 +1735,7 @@ mark up this vertical space with additional instructions, a
 diagram or a figure. The problem is how can the author write over
 the provided white space. For this, \textsf{eqexam} provides the
 \texttt{workarea} environment. The syntax is:
-%\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+%\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \settowidth{\aebdimen}{\ttfamily\anglemeta{Material that will overwrite the solutions vertical space}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{workarea}[!meta(width)]{!meta(depth)}
@@ -1687,7 +1753,7 @@ The required \meta{depth} parameter is the depth of the work area and it
 should match the optional parameter of the \texttt{solutions} environment,
 directly above it.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[3]
 This is a question.
 
@@ -1739,7 +1805,7 @@ environment (when the \texttt{nosolutions} option is in effect).
 As with \texttt{workarea}, \cs{placeAtxy} does nothing if the
 \texttt{nosolutions} option has not been taken.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[3]
 This is a question.
 \begin{solution}[2in]
@@ -1821,7 +1887,7 @@ default value of the optional parameter for the \texttt{panel} environment
 is now \texttt{r} rather than \texttt{l}.
 
 \redpoint Consider the following example.
-\begin{Verbatim}[numbers=left,xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[numbers=left,xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[7]
 This is a question worth $7$ points.
 \begin{splitsolution}
@@ -1871,7 +1937,7 @@ parameter.
 There is a small gap of \texttt{3pt} (the default) inserted between the
 panel and the solution. The value of this gap is contained in the
 \cs{panelgap} command,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\panelgap{3pt}
 \end{Verbatim}
 which can be redefined.
@@ -1884,7 +1950,7 @@ overlap the next problem. This is because, unlike the solutions inside a
 environment) are typeset in a \texttt{minipage} with a specified depth.
 
 To extend the height of the solution, use the following method.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{splitsolution}[\panelheight+1in]
 ...
 \end{splitsolution}
@@ -1894,13 +1960,13 @@ This sets the total height to be the natural height of the panel plus 1 inch.
 \section{\textsf{eqexam} Options}\label{eqoptions}
 
 The options documented here are entered as optional arguments of the eqexam package:
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[!meta(optionals)]{eqexam}
 \end{Verbatim}
 The optional arguments can also be introduced through \texttt{exambuilder.cfg}, the configuration file.
 Create a text file with the name of \texttt{exambuilder.cfg}
 and create the line shown below.
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \ExecuteOptionsX{!meta(optionals)}
 \end{Verbatim}
 Place \texttt{exambuilder.cfg} in the folder of the source file and not on the {\LaTeX}
@@ -2028,7 +2094,7 @@ number of new ones.
 
     The design of the separation rule may be modified by the document author
     by redefining \cs{separationrule}, its definition is given below:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\separationrule}{\makebox[\linewidth]%
 {\centering\rule{.67\linewidth}{.4pt}}}
 \end{Verbatim}
@@ -2107,7 +2173,7 @@ See \Nameref{solutionsonly} for further details.
     \cs{jobname.sol} file and when \cs{jobname.sol} are input back
     in, the command \cs{showAllAnsAtEnd} is executed. The definition
     of \cs{showAllAnsAtEnd} is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\showAllAnsAtEnd}{%
     \makeAnsEnvForSolnsAtEnd
     \answerkeytrue\eq@proofingtrue
@@ -2135,6 +2201,10 @@ See \Nameref{vspacewithsolns} for further details.
     these commands outside a \texttt{problem} environment will
     globally change the default, from within, it will only change the
     default locally.
+
+\item[\texttt{flextended}] When this option is taken, additional code is
+    input to support filler lines, refer to Section~\ref{ss:VSFT} for
+    details; in particular, read \Nameref{sss:flxtnd}.
 
 \item[\texttt{myconfig}] If this option is taken, \textsf{eqexam}
     looks for the configuration file \texttt{eqexam.cfg}. This
@@ -2290,7 +2360,7 @@ The first one \texttt{web.cfg} may be already present on your hard
 drive if you use the {\AcroB}. Typically, desired default driver
 option is placed in here, for example, \texttt{web.cfg} might
 contain the single line,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \ExecuteOptions{dvips}
 \end{Verbatim}
 \noindent for users of the \textsf{dvips} application for
@@ -2371,7 +2441,7 @@ folder. See the file \texttt{fortextbook.pdf} and its source file
 \texttt{fortextbook.ltx}.
 
 To use the \texttt{fortextbook} option, a whole panoply of options are needed,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \usepackage[%
     fortextbook,ftbsolns,usecustomdesign,
     forcolorpaper,noseparationrule,usexkv
@@ -2381,7 +2451,7 @@ Accompanying the \textsf{eqexam} is a simple wrapper package called
 \texttt{fortextbook}, which basically calls \textsf{eqexam} with all the above
 options. So, the textbook author needs only to specify,
 
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \usepackage{fortextbook}
 \end{Verbatim}
 The documentation for this option is quite extensive and is
@@ -2449,7 +2519,7 @@ minimum of two pieces of information: the path to the server-side
 script \textsf{eqAttach.asp} and the email address of the person
 the results are to be sent. The command \cs{SubmitInfo} is used to
 supply this info, for example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \SubmitInfo{http://localhost/scripts}{dpstory@uakron.edu}
 \end{Verbatim}
 This command takes two arguments, the first is the URL to the
@@ -2480,14 +2550,14 @@ student ``John Q. Student''.
 
 \begin{flushleft}
 Message Subject:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Exam Results: Test 1 of U. S. History
 \end{Verbatim}
 \end{flushleft}
 
 \begin{flushleft}
 Message Body:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Exam Information:
     Course Name: U. S. History
     Exam: Test 1
@@ -2505,13 +2575,13 @@ course. The default value for this is \cs{websubject}, obtained
 from the \cs{subject} macro used in the preamble; however, if you
 want a different name in the email, perhaps with more information
 included, you can redefine the value using this macro.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \EmailCourseName{\websubject} % the default
 \end{Verbatim}
 
 \noindent\textbf{\color{red}Important:} When you use {\TeX}
 formatting in the subject, such as
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \subject{\bfseries Calculus 1}
 \end{Verbatim}
 and you are using the \texttt{email} option, it will
@@ -2525,13 +2595,13 @@ the course. The default value for this is \cs{webtitle}, obtained
 from the \cs{title} macro used in the preamble; however, if you
 want a different name in the email, perhaps with more information
 included, you can redefine the value using this macro.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \EmailExamName{\webtitle} % the default
 \end{Verbatim}
 
 \noindent\textbf{\color{red}Important:} If you use some {\TeX}
 formatting in the title, such as
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \title{\bfseries Test 1}
 \end{Verbatim}
 and you are using the \texttt{email} option, it will be necessary
@@ -2543,11 +2613,11 @@ email!
 \redpoint\cs{EmailSubject} The document author might want a custom
 subject in the email, instead of the standard one. By using this
 macro, he can design his own email subject.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \EmailSubject{} % the default
 \end{Verbatim}
 \noindent In this case \textsf{eqAttach.asp} inserts the standard one.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Exam Results: \webtitle of \websubject
 \end{Verbatim}
 \noindent The email would read ``\texttt{Exam Results: Test 1 of
@@ -2555,7 +2625,7 @@ Calculus I}'', for example.
 
 To change the email subject we would put the following command in
 the preamble:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \EmailSubject{Another Set of Cool Results}
 \end{Verbatim}
 
@@ -2563,7 +2633,7 @@ the preamble:
 (\textsf{eqAttach.asp}) returns a message acknowledging the
 receipt of the data, this command allows the document author to
 customize the return message. The default definition is:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \ServerRetnMsg{}
 \end{Verbatim}
 \noindent In this case \textsf{eqAttach.asp} inserts the standard
@@ -2571,14 +2641,14 @@ one, ``Exam results successfully sent to your instructor!''.
 
 To change the return message to something more meaningful, put
 this command in the preamble, for example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \ServerRetnMsg{Your responses to the \\TeX Survey have been
     received, thank you!}
 \end{Verbatim}
 
 \redpoint\cs{SubmitButtonLabel} is the label that appears on the
 submit button.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \SubmitButtonLabel{Submit} % the default
 \end{Verbatim}
 
@@ -2640,7 +2710,7 @@ two methods of sending e-mail:
 The script needs to be modified appropriate to your server, in
 particular, search down in \texttt{eqAttach.asp} for the
 configuration line
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 eqMail.Configuration.Fields.Item
     ("http://schemas.microsoft.com/cdo/configuration/smtpserver")
         = "mySMTP"
@@ -2654,14 +2724,14 @@ message to the document that indicates the receipt of the data,
 this message is``Exam results successfully sent to your
 instructor!'' The message, as explained earlier, can be changed
 using the \cs{ServerRetnMsg}, like so
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \ServerRetnMsg{Your TeX survey results have been received, thank you.}
 \end{Verbatim}
 \noindent Now, if for whatever reason you don't want this
 confirmation message to return to the document for display in
 alert box, you can sent the \texttt{silent} as part of the query
 string. For example, if
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \SubmitInfo{http://myWebSite/scripts/eqAttach.asp?silent\#FDF}
     {myname@mymailprovider}
 \end{Verbatim}
@@ -2677,7 +2747,7 @@ to the document that sent the \texttt{FDF}, it may be a url (an
 address on the Internet) or it could be a file specification of a
 local hard drive. If you specify \texttt{nopath} in the query
 string, like so
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \SubmitInfo{http://myWebSite/scripts/eqAttach.asp?nopath\#FDF}
     {myname@mymailprovider}
 \end{Verbatim}
@@ -2733,14 +2803,14 @@ information.
 to enter his/her name, and also defines the text box form field,
 in the case the \texttt{online} or \texttt{email} options are
 taken. There are two (design) parameters for \cs{eqexamName}
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \eqexamName[!meta(eforms_opts)]{!meta(width)}
 \end{Verbatim}
 \noindent The first optional parameter can be used to modify the
 appearance of the text field, see the \href{eformman.pdf}{eForms}
 documentation for details. The second parameter is the width of
 the field. The default definition is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \eqexamName[\Ff\FfRequired]{2.25in}
 \end{Verbatim}
 \noindent Here, the text field that will be generated (when
@@ -2758,14 +2828,14 @@ student Identification number (SID), and also defines the text box
 form field, in the case the \texttt{online} or \texttt{email}
 options are taken. There are two (design) parameters for
 \cs{eqSID}
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \newcommand\eqSID[!meta(eforms_opts)]{!meta(width)}
 \end{Verbatim}
 \noindent The first optional parameter can be used to modify the
 appearance of the text field, see the \href{eformman.pdf}{eForms}
 documentation for details. The second parameter is the width of
 the field. The default definition is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \eqSID[\Ff\FfRequired]{2.25in}
 \end{Verbatim}
 \noindent Here, the text field that will be generated (when
@@ -2782,14 +2852,14 @@ enter his/her student email address, and also defines the text box
 form field, in the case the \texttt{online} or \texttt{email}
 options are taken. There are two (design) parameters for
 \cs{eqEmail}
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \newcommand\eqEmail[!meta(eforms_opts)]{!meta(width)}
 \end{Verbatim}
 \noindent The first optional parameter can be used to modify the
 appearance of the text field, see the \href{eformman.pdf}{eForms}
 documentation for details. The second parameter is the width of
 the field. The default definition is
-\begin{Verbatim}[xleftmargin=\leftmargini,]
+\begin{Verbatim}[xleftmargin=\amtIndent,]
 \eqEmail{2.25in}
 \end{Verbatim}
 \noindent Here, the text field that will be generated (when
@@ -2810,7 +2880,7 @@ of the first page of the exam is created by the {\LaTeX}
 (redefined) command \cs{maketitle}. The \cs{maketitle} has some
 code to place the email button in the top margin, followed by the
 expansion of the command \cs{maketitledesign}, whose definition is
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand\maketitledesign
 {%
     \makebox[\textwidth]{\normalsize
@@ -2820,7 +2890,7 @@ expansion of the command \cs{maketitledesign}, whose definition is
 }
 \end{Verbatim}
 This command can be redefined using \cs{renewcommand} to suite your needs, for example,
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \makeatletter
 \renewcommand\maketitledesign
 {%
@@ -2882,7 +2952,7 @@ can be designed in so many different ways.
 \cs{place\-Cover\-Page\-Logo}, a simple command used to insert a logo on the cover page.
 The logo can be used to cover the score in the next page if the
 instructor places the score under the logo. Example of usage
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \placeCoverPageLogo{5in}{-1.5in}{\includegraphics{nwfsc_logo}}
 \end{Verbatim}
 Working from the upper left corner, the first parameter is the amount to move to logo
@@ -2911,7 +2981,7 @@ still hold. Generally, it is recommended that the new command be used,
 \end{Verbatim}
 Changes the left header text of the running header. This command defines an
 internal macro \cs{eq@lhead} that actually contains the text. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \lheadeqe{\shortwebsubject/\shortwebtitle}
 \end{Verbatim}
 
@@ -2921,7 +2991,7 @@ internal macro \cs{eq@lhead} that actually contains the text. The default is
 Changes the center header text of the running header.
 This command defines an internal macro \cs{eq@chead} that actually
 contains the text. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \cheadeqe{-- Page \arabic{page}\space of \nPagesOnExam\space--}
 \end{Verbatim}
 
@@ -2935,7 +3005,7 @@ contains the text.
 \end{enumerate}
 If you want to redesign the layout of the running
 header, here is the macro that the above components fill.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand\runExamHeader{\eq@lhead\hfill\eq@chead\hfill\eq@rhead}
 \end{Verbatim}
 
@@ -2951,7 +3021,7 @@ and right of each header are defined by the commands \cs{lheadSol},
 \noindent Changes the left header text of the running header. This
 command defines an
 internal macro \cs{eq@lheadSol} that actually contains the text. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \lheadSol{\shortwebsubject/\shortwebtitle}
 \end{Verbatim}
 
@@ -2962,7 +3032,7 @@ internal macro \cs{eq@lheadSol} that actually contains the text. The default is
 \noindent Changes the center header text of the running header.
 This command defines an internal macro \cs{eq@cheadSol} that
 actually contains the text. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \cheadSol{-- Page \arabic{page}\space of \nPagesOnExam\space--}
 \end{Verbatim}
 
@@ -2976,7 +3046,7 @@ actually contains the text. The default definition is
 \end{enumerate}
 \noindent If you want to redesign the layout of the running
 header, here is the macro that the above components fill.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\runExamHeaderSol
     {\eq@lheadSol\hfill\eq@cheadSol\hfill\eq@rheadSol}
 \end{Verbatim}
@@ -3003,7 +3073,7 @@ three comprise the definition of \cs{runExamFooter}
 \end{dCmd}
 \noindent The \cs{settotalsbox} and \cs{runExamFooter} then appear in the definition
 of \cs{@oddfoot} in the definition of the \texttt{eqExamheadings} page style.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \renewcommand{\@oddfoot}{\settotalsbox\runExamFooter}
 \end{Verbatim}
 When doing any re-definition of the running footers at the \cs{@oddfoot} command,
@@ -3030,7 +3100,7 @@ exam. The command takes an optional argument, the \meta{exam\_name}
 (this is the name given the exam as the required argument of the
 \texttt{exam} environment). If the argument is not given, the name of the
 current exam is used (when executed within an \texttt{exam} environment).
-When \cs{nQuesInExam} outside an \texttt{exam} environment, the value of
+If \cs{nQuesInExam} appears outside an \texttt{exam} environment, the value of
 the optional argument needs to be specified.
 
 \newtopic There are several commands are useful for documents that have several
@@ -3060,7 +3130,7 @@ final exam has two parts:
 \end{eqComments}
 \end{Verbatim}
 
-\promoteNewPageHere{10pt}
+%\promoteNewPageHere{10pt}
 
 \handpoint The calculation of \cs{percentForPart} is done in one of two ways:
 \begin{enumerate}
@@ -3108,14 +3178,14 @@ or in one of the \texttt{.cfg} files.
 \item\cs{examNameLabel}: On each page of the exam, there is a place
 for the student to enter her/his name. \cs{examNameLabel} can be
 used to define the name label, the default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \examNameLabel{Name:}
 \end{Verbatim}
 \item \cs{examAnsKeyLabel}: When the \texttt{answerkey} option is in
     effect, the line in which the student enters her/his name (labeled by
     \cs{examNameLabel}) is filled by the value of the text macro
     \cs{examAnsKeyLabel}. The default definition is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \examAnsKeyLabel{Answer Key}
 \end{Verbatim}
 Thus, when the \texttt{answerkey}
@@ -3126,31 +3196,31 @@ option is used, the name field appears as follows:
 
 \item\cs{ptLabel} and \cs{ptsLabel}: Labels for indicating the points of a problem, the first is
 the singular form of the second. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \ptLabel{pt}            % singular form
 \ptsLabel{pts}          % plural form
 \end{Verbatim}
 \item\cs{eachLabel}: Label for indicating the common point value of each of several parts
 of the same problem.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \eachLabel{ea.}
 \end{Verbatim}
 \item\cs{pointLabel} and \cs{pointsLabel}: The word for `points' used in the \texttt{instructions} environment
     that lists the number of points in this exam. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \pointLabel{point}      % singular form
 \pointsLabel{points}    % plural form
 \end{Verbatim}
 The \cs{pointsLabel} command defines \cs{eq@pointsLabel}, which,
 in turn, is used in the \cs{summaryTotalsTxt}, the definition of
 which follows:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\summaryTotalsTxt}
     {($\summaryPointTotal\,\text{\eqpointsLabel}$)}
 \end{Verbatim}
 \item\cs{defaultInstructions}: The \texttt{instructions} environment has a default heading.
 The command \cs{defaultInstructions} allows you to change this heading. The default is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \defaultInstructions{Instructions.}
 \end{Verbatim}
 \end{itemize}
@@ -3165,7 +3235,7 @@ When the \texttt{forcolorpaper} option is used, various elements---such as
 section titles, instruction headers, color for fill-in problems, and so on---have default colors. In
 this section we list the color controls, along with their default definitions.
 
-\begin{Verbatim}[numbers=left,xleftmargin=\leftmargini,fontsize=\fontsize{10}{14}\selectfont]
+\begin{Verbatim}[numbers=left,xleftmargin=\amtIndent,fontsize=\fontsize{10}{14}\selectfont]
 \proofingsymbolColor{red}
 \instructionsColor{blue}
 \eqCommentsColor{blue}
@@ -3236,7 +3306,7 @@ For small variations in text, there is the \cs{ifAB} macro,
 \ifAB{!anglemeta(Version A text)}{!anglemeta(Version B text)}
 \end{dCmd}
 \noindent for example, one could say,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{problem}[2]
 Compute $\frac{d}{dx}\ifAB{x^2}{x^3}$.
 \end{problem}
@@ -3244,7 +3314,7 @@ Compute $\frac{d}{dx}\ifAB{x^2}{x^3}$.
 \noindent For longer variations, the \texttt{comments} package is
 used to create comment environments that are included or excluded.
 The two environments are \texttt{verA} and \texttt{verB}.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{problem}[2]
 Compute $\frac{d}{dx}\ifAB{x^2}{x^3}$.
 
@@ -3285,7 +3355,7 @@ another macro \cs{nExam}, which has no arguments, but expands to
 The \textsf{eqexam} package defines two commands \cs{Exam} and
 \cs{sExam} to automatically enter the test information for the
 current version. In the preamble, you can say,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \title[\sExam]{\Exam}
 \end{Verbatim}
 \noindent \cs{Exam} is the long version of the test name, and takes as its
@@ -3298,27 +3368,27 @@ commands,
 \begin{enumerate}
 \item \cs{VersionAtext\darg{\meta{text}}} This is the text for the long
 version of the exam name for ``Version A''. The default text is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \VersionAtext{Exam~\nExam--Version A}
 \end{Verbatim}
 
 \item \cs{VersionBtext\darg{\meta{text}}} This is the text for the long
 version of the exam name for ``Version B''. The default text is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \VersionAtext{Exam~\nExam--Version B}
 \end{Verbatim}
 
 \item \cs{shortVersionAtext\darg{\meta{text}}} This is the text for the
 short version of the exam name for ``Version A''. The default text
 is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \VersionAtext{Exam~\nExam A}
 \end{Verbatim}
 
 \item \cs{shortVersionBtext\darg{\meta{text}}} This is the text for the
 short version of the exam name for ``Version B''. The default text
 is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \VersionAtext{Exam~\nExam B}
 \end{Verbatim}
 \end{enumerate}
@@ -3329,7 +3399,7 @@ appear before \cs{title} in the preamble.\medskip
 
 \noindent Below is a ``typical'' example of how to correctly
 redefine all the version text.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage[forpaper,pointsonleft,noparttotals,nosolutions]{eqexam}
@@ -3362,7 +3432,7 @@ The steps for creating a multiple version \textsf{eqexam} document are as follow
 \end{dCmd}
 \noindent In the preamble, declare the number of versions for this document
  using \cs{numVersions}, e.g., \verb|\numVersions{3}|.
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \longTitleText
     {!anglemeta(Text_1)}
     {!anglemeta(Text_2)}
@@ -3370,7 +3440,7 @@ The steps for creating a multiple version \textsf{eqexam} document are as follow
     {!anglemeta(Text_n)}
 \endlongTitleText
 \end{Verbatim}
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \shortTitleText
     {!anglemeta(Text_1)}
     {!anglemeta(Text_2)}
@@ -3387,7 +3457,7 @@ generated.
 \newtopic Next, state the long and short titles for the document,
 one for each of the declared number of versions given earlier in \cs{numVersions}.
 For example, we can use the value \cs{nExam} in our titles. Usage:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \longTitleText
     {Test~\nExam--Version A}
     {Test~\nExam--Version B}
@@ -3412,7 +3482,7 @@ text macros for each of the versions declared using \cs{numVersions}. The syntax
 \end{dCmd}
 For example, assuming \verb|\numVersions{3}|, \verb|\forVersion{a}| (or \verb|\forVersion{A}|) defines $3$ text commands \cs{vA}, \cs{vB} and
 \cs{vC}, each taking one argument, the text you want to display:
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
  Name the \vA{place}\vB{date}\vC{year} of the signing
  of the Magna Carta.
 \end{Verbatim}
@@ -3422,7 +3492,7 @@ does more than that! It also creates a series of comment environments
 \verb|\begin{verA}/\end{verA}|, \verb|\begin{verB}/\end{verB}|, \verb|\begin{verC}/\end{verC}|, etc.,
 where only the version for which this compile applies will be typeset,
 the others are commented out.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \numVersions{3}
 \forVersion{b}
 ...
@@ -3445,7 +3515,7 @@ Solve the equation for $\vA{x}\vB{y}\vC{z}$:
 \noindent Here is a final example of the multiple version scheme, taken from the preamble of one of
 my Calculus tests.
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \documentclass{article}
 \usepackage{amsmath,graphicx}
 \usepackage[forpaper,pointsonleft,nototals,nosolutions]{eqexam}
@@ -3491,7 +3561,7 @@ which version that is typeset in the  document.
 You can place the \cs{selectVersion} command in front of a question or a part of a question
 that has multiple versions. Through this command you can select which version to typeset,
 provided the option \texttt{obeylocalversions} is set. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \selectVersion{3}{4}
 \begin{problem}[10]
 ...
@@ -3527,11 +3597,11 @@ localizations, for example.
 \redpoint Points that appear in the left margin (the
 \texttt{pointsonleft} or \texttt{pointsonboth} options). There are two text macros
 that are used,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\leftmarginPtsTxt[1]{(\small$#1^{\text{pts}}$)}
 \end{Verbatim}
 \noindent when the total points for that problem are shown, and the other
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\leftmarginPtsEaTxt[1]
     {(\small$#1_{\text{ea.}}^{\text{pts}}$)}
 \end{Verbatim}
@@ -3543,7 +3613,7 @@ environment with \verb+\begin{problem*}[3ea]+, for example).
 \texttt{pointsonright} or \texttt{pointsonboth}). These points appear
 in the bottom half of a box, the text for that box is determined by the
 following definition.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\marginpointsboxtext[2]{\small$#1\,\text{pts}$}
 \end{Verbatim}
 \noindent By the way, the purpose of the upper part of the box is
@@ -3553,14 +3623,14 @@ received for that problem.
 \redpoint Points specified by the \cs{PTs} command. This text is
 defined by \cs{itemPTsTxt} as follows. See the paragraphs on
 \Nameref{problemstar} for a discussion of the use of \cs{PTs}.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\itemPTsTxt[1]{($#1$ pts)}
 \end{Verbatim}
 
 \redpoint \textbf{The totals box.}  When you specify either option
 \texttt{totalsonleft} or \texttt{totalsonright}, you get a page totals
 box appearing in the lower left or right bottom corner.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \newcommand\totalsboxtext{\small$\theeqpointsthispage\,\text{pts}$}
 \end{Verbatim}
 where \texttt{eqpointsthispage} is a counter whose value
@@ -3585,7 +3655,7 @@ environment to give initial instructions for an exam, the total
 points appears automatically in the text, unless you specify the
 \texttt{nosummarytotals} option. This text is defined by
 \cs{summaryTotalsTxt}, whose definition follows:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \newcommand\summaryTotalsTxt{($\summaryPointTotal\,\text{points}$)}
 \end{Verbatim}
 \noindent where \cs{summaryPointTotal} is a macro that expands to
@@ -3599,7 +3669,7 @@ additional instructions from within the body or the exam, use the
 \cs{eqComments} environment. The \cs{eqComments} environment has
 one optional argument, a formatted heading for the comments you
 want to make. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{eqComments}[Proofs.]
 Solve each of the problems~5--8 on a separate sheet of paper,
 do not write on the back of the paper. Follow the instructions
@@ -3615,7 +3685,7 @@ is visible when you compile the document with the
 \texttt{forcolorpaper} option. \cs{eqCommentsColor} colors the text that may appear
 in the optional argument of the environment; \cs{eqCommentsColorBody} colors the body
 of the text. Each take a single named color argument.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \eqCommentsColor{blue}
 \eqCommentsColorBody{black}
 \end{Verbatim}
@@ -3626,7 +3696,7 @@ The above are the default definition.
 In order to reduce the number of pages needed for an exam, I often
 cheat by asking the student to work on the back of one of the test
 pages.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\bopText{on the back of page~\boPage}
 \newcommand\bopCoverPageText{(the cover page)}
 \newcommand\OnBackOfPage[1][\bopText]{%
@@ -3640,7 +3710,7 @@ For this, I use the \cs{OnBackOfPage} command
 \noindent The optional argument allows you to enter variational
 text, text that varies from the default text. The default text is
 contained in \cs{bopText} macro, its definition is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\bopText{on the back of page~\boPage}
 \end{Verbatim}
 \noindent where \cs{boPage} is the page the student is instructed
@@ -3669,16 +3739,16 @@ In the case of working on the back of the cover page, there is a variation on th
 instructions, \cs{OnBackOfPage} expands to ``on the back of page 1 (the cover page)''.
 The phrase ``(the cover page)'' can be redefined using the \cs{bopCoverPageText} command.
 The definition of this command is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\bopCoverPageText{\space(the cover page)}
 \end{Verbatim}
 \noindent We could change this as follows,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \renewcommand\bopCoverPageText{, the cover page}
 \end{Verbatim}
 \noindent so that it would now read, ``on the back of page 1, the cover page''. To remove this feature
 altogether, you could redefine as
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \renewcommand\bopCoverPageText{}
 \end{Verbatim}
 
@@ -3695,7 +3765,7 @@ counter value, and ends the \texttt{parts} environment. The pop restarts the
 
 \newtopic
 In the \texttt{multicols} environment below, we \cs{pushProblem}, then close \texttt{multicols}, we execute \cs{popProblem}, and then continue with the multi-parts in single column.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[\auto]
 Do each of the following without error.
 \begin{multicols}{2}
@@ -3716,7 +3786,7 @@ Do each of the following without error.
 \newtopic In the example, the first two questions appear in two
 column format, while the third appears in single column format. The
 same thing can be done in reverse, like so:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem*}[\auto]
 Do each of the following without error.
     \begin{parts}
@@ -3753,7 +3823,7 @@ The command \cs{qNewPage} (questions newpage) and \cs{aNewPage}
 The first one expands to \cs{newpage} when the \cs{ifanswerkey} is
 false and the second one expands to \cs{newpage} when the
 \cs{ifanswerkey} is true; their definitions are
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\qNewPage{\ifanswerkey\else\newpage\fi}
 \newcommand\aNewPage{\ifanswerkey\newpage\fi}
 \end{Verbatim}
@@ -3785,7 +3855,7 @@ problems which include \textbf{2}, \textbf{6} and \textbf{12(b)(d)} and
 it is desired to provide solutions to these problem. For this
 purpose, \textsf{eqexam} provides \cs{forproblem} and \cs{foritem}. These
 commands are used as follows:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{exam}{HW\nExam}
 \begin{instructions}[Description] (10 points)
 Selected solutions from Assignments~24, 25, \S7.1.
@@ -3854,7 +3924,7 @@ link; \cs{REF*} does the same.  When \cs{aebshowgraylettersfalse} is
 in effect, \cs{REF} does not capitalize the reference.
 
 \redpoint Below is an example of this.
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{problem}[5]
 Answer this if you can!
 \begin{answers}{2}
@@ -3904,7 +3974,7 @@ Place \cs{placeMarkerHere} outside of a \texttt{problem}/\texttt{problem*} envir
 a unique name; for example \verb!\placeMarkerHere{bQForm}!. Place
 \cs{calcFromMarkers} wherever you wish a calculation to be displayed, for example,
 
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \placeMarkerHere{bQForm}
 \begin{eqComments}[Quadratic Formula\calcFromMarkers{eQForm}{bForm}.]
 Solve each of the following equations using the quadratic formula.
@@ -3929,7 +3999,7 @@ The formatting for the total points between markers is determined by the optiona
 of \cs{calcFromMarkers}, and if there is no optional first parameter, by a global command,
 \cs{markerTotalFmt}, which sets the default formatting. The default definition of
 \cs{markerTotalFmt} is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \markerTotalFmt{ (\themarkerCnt\space points)}
 \end{Verbatim}
 The command \cs{themarkerCnt} references the counter \texttt{markerCnt} in which the calculations are made.
@@ -3937,7 +4007,7 @@ Any redefinition of \cs{markerTotalFmt} should use \cs{themarkerCnt} to referenc
 
 You use the optional first parameter the same way as the definition of \cs{marker\-Total\-Fmt}. You can say, for
 example, you can type
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \calcFromMarkers[ $\themarkerCnt^{\text{pts}}$]{eQForm}{bForm}
 \end{Verbatim}
 to get a formatted total \verb*! $12^{\text{pts}}$!, which typesets to ` $12^{\text{pts}}$'.
@@ -3945,13 +4015,13 @@ to get a formatted total \verb*! $12^{\text{pts}}$!, which typesets to ` $12^{\t
 You might have noticed that I've inserted a space character at the beginning of the definition
 \verb*!\markerTotalFmt{ (\themarkerCnt\space points)}!, and place \cs{calc\-From\-Markers} up against
 the previous word, as in
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Quadratic Formula\calcFromMarkers{eQForm}{bForm}.
 \end{Verbatim}
 This is so that when the required totals are not defined---early in the {\LaTeX}ing process---there
 is no space between \texttt{Formula} and the period (.); this is nothing but a cosmetic trivial point. After
 you {\LaTeX} enough times, the full expansion appears as,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Quadratic Formula (12 points).
 \end{Verbatim}
 
@@ -3962,7 +4032,7 @@ When the document author uses the \texttt{usexkv} option, and the
 \textsf{xkeyval} package is found on the document author's system,
 the \cs{fillin} command is redefined to use key-value pairs in the
 optional first argument. The syntax for \cs{fillin} now is,
-%\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\fontsize{9}{11}\selectfont]
+%\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
 \begin{dCmd}[commandchars=!(),fontsize=\small]{\linewidth}
 \fillin[
     underline=true|false,u,b,boxed=true|false,boxpretext=!anglemeta(text),
@@ -3978,7 +4048,7 @@ to set the appearance and behavior of the field. The keys are described below.
 
 \item The second parameter \meta{width} is the amount of horizontal
 space to leave for the student to write in the response. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \fillin[boxed,boxsize=Large]{1.5in}{$2x - 3$}
 \end{Verbatim}
 Yields the following results, depending on the option.
@@ -3991,7 +4061,7 @@ Yields the following results, depending on the option.
 If this parameter is left empty,
 the \textsf{eqexam} uses the \meta{answer} parameter to determine the width of the field.
 The code
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \fillin[boxed,boxsize=Large]{}{$2x - 3$}
 \end{Verbatim}
 gives a box the same width as the answer, $2x-3$, which is not very wide
@@ -4000,7 +4070,7 @@ the student would see this box
 $\boxed{\text{\Large\strut}\text{\phantom{$2x-3$}}}$. Though we can typeset the
 answer into this box, it is too narrow for the student to write the answer
 into; a better strategy is as follows:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \fillin[boxed,boxsize=Large]{\ifNoSolutions{1.5in}{}}{$2x - 3$}
 \end{Verbatim}
 Now, when the file is compiled under different options, we obtain
@@ -4065,7 +4135,7 @@ appears when the document is compiled with the \texttt{answerkey} option.
       This key allows you to create a box or arbitrary dimension.
 
 A simple example would be
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \fillin[boxed,enclosesoln,parbox={[t][1in]}]{2.4in}{%
     The box is 2.4 inch wide and 1 inch high. The solution to
     this problem appears when \texttt{answerkey} is in effect.
@@ -4128,7 +4198,7 @@ example appears below.
       enclosed in braces, as just illustrated.
 
 Here is an example of the use of this key-value pair:
-\begin{Verbatim}[xleftmargin=\leftmargini,fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \fillin[parbox={[t][.5in]},boxed,hiddenbox,
     boxpretext={\textbf{\textcolor{black}{Conclusion: }}},
     format=\normalfont,enclosesoln]{\linewidth}{%
@@ -4181,7 +4251,7 @@ or additional spacing appears around the box.
   the \meta{answer} and \meta{text} (the value of \texttt{boxpretext}). Several formatting commands can appear
   as the value; thus, \verb!format={\bfseries\Large}! makes the answer, when \texttt{answerkey} is in effect, appear in large bold font.
   The default is \verb!format={\fillInFormatDefault}!, where the definition of the command \cs{fillInFormatDefault} is
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\fillInFormatDefault}{\bfseries}
 \end{Verbatim}
 \end{description}
@@ -4197,7 +4267,7 @@ point of the content. For example, \texttt{lift=10pt} lowers the underlining by 
 \frac{1}{2}+\frac{1}{3} = \raisebox{-10pt}{\underbar{\raisebox{10pt}{\makebox[1in]{\ensuremath{\displaystyle\frac{3}{4}}}}}}
 \end{equation*}
 The expression on the right corresponds to
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 $...\fillin[lift=10pt]{1in}{\frac{3}{4}}...$
 \end{Verbatim}
 The underline is lowered to include the baseline of the denominator of the fraction.
@@ -4225,11 +4295,11 @@ the number three-fourths is underlined plus \texttt{3pt} more.
 \end{description}
 The keys are processed by an \cs{edef}, this allows you to define a
 command with your favorite options; for example, you can define
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\myBoxOpts}{boxed,boxsize=Large,align=l}
 \end{Verbatim}
 then in the exam, type
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 $\frac{\sqrt{-18}}{\sqrt{6}}=\fillin[\myBoxOpts]{1.5in}{3\imath}$
 \end{Verbatim}
 
@@ -4242,7 +4312,7 @@ command is in math mode, then \cs{fillin} puts the \meta{answer} and
 \texttt{boxpretext} in math mode too; if \cs{fillin} command \emph{not in
 math mode} (i.e., it is in text mode), \cs{fillin} typesets the
 \meta{answer} and \texttt{boxpretext} in text mode. For example,
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 Let $ x = 4 $ and $ y = -3 $ and let $ z = 2x - 4y $ then
     $\fillin[boxed,align=l,boxpretext={z=}]{1in}{20}$
 \end{Verbatim}
@@ -4252,7 +4322,7 @@ Let $ x = 4 $ and $ y = -3 $ and let $ z = 2x - 4y $ then
     \fbox{\makebox[1in][l]{$ z=20 $ }}
 \end{quote}
 Here is an example in text mode
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 The first president of the US is
     \fillin[boxed,align=c]{1.5in}{Washington}
 \end{Verbatim}
@@ -4262,7 +4332,7 @@ The first president of the US is
     \fbox{\makebox[1.5in][c]{Washington}}
 \end{quote}
 Here is an example of mixed mode
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 The width of a rectangle is 20 feet and length is 15 feet.
 Find the area: $\fillin[boxed,align=l,
     boxpretext={\text{Area: }}]{1in}{300\,\text{feet}}$
@@ -4278,17 +4348,49 @@ Find the area: \fbox{\makebox[1in][l]{Area: $300\,\text{feet}$}}
 \paragraph*{\cs{fillin} not boxed.} The \cs{fillin} command will typeset
 the answer in math mode if \cs{fillin} is in math mode, and in text mode,
 otherwise. For example, each of the following typesets the same.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 The area of a circle of radius $2$ is \fillin[u]{.5in}{$4\pi$}
 The area of a circle of radius $2$ is $\fillin[u]{.5in}{4\pi}$
 \end{Verbatim}
 
-\subsection{Vertical Space Fill Types}
+\subsubsection{\texorpdfstring{\protect\cs{fillineol}}{\CMD{fillineol}}: Fill-in to end-of-line}
+
+The \cs{fillineol} is a variant of \cs{fillin}, its main feature is that the
+width parameter of the \cs{fillin} command is automatically calculated to the
+end of the line.
+\settowidth{\aebdimen}{\small\ttfamily\string
+  \fillineol*\darg{\ameta{phrase}}[\ameta{fillin-opts}]\darg{\ameta{answer}}}%
+\begin{dCmd}[commandchars=!(),fontsize=\small]{\aebdimen+2\fboxsep+2\fboxrule}
+\fillineol*{!ameta(phrase)}[!ameta(fillin-opts)]{!ameta(answer)}
+\end{dCmd}
+\fillineol{Calculus originator, Isaac }[boxed,align=l,boxsize=Large]{Newton}
+\begin{Verbatim}[fontsize=\small]
+\fillineol{Calculus originator, Isaac }[boxed,align=l,boxsize=Large]{Newton}
+\end{Verbatim}
+The star-option allows \ameta{phrase} to contain verbatim text; in this case,
+the \textsf{collectbox} package is required.
+
+The \cs{fillineol} command takes the \ameta{phrase}, measures its width, and
+uses the result as the value of \ameta{width} in the \cs{fillin} command.
+Usually, the \ameta{phrase} occurs at the beginning of the sentence. However,
+that is not always convenient.
+
+For this next example, the fill-in occurs at the end of the sentence, which
+wraps around to the next line. Enter the name of your professor for the
+course you are cur\-\fillineol{rently taking, his name is }{Dr.\ D. P. Story}
+
+\exAeBBlogPDF{p=1356} The demo file for this feature is named
+\texttt{\href{\urlAcroTeXBlog/?p=1356}{fillineol.pdf}}, found on the {\AcroTeX} Blog website.
+
+
+\subsection{Vertical Space Fill Types}\label{ss:VSFT}
 
 When the \texttt{nosolutions} or the \texttt{vspacewithsolns} is used, a
-vertical space is generated by the \texttt{solution} environment.
-Previously, this has just been a vertical white space, now, we provide
-the ability to fill the space with horizontal rules of different types.
+vertical space is generated by the \texttt{solution} environment. Previously,
+this has just been a vertical white space, now, we provide the ability to
+fill the space with horizontal rules of different types.\footnote{The filler
+line feature has been rewritten and extended from previous versions of
+\pkg{eqexam}.}
 
 %\redpoint The demo file for these features is \texttt{hw03.tex}.
 
@@ -4306,6 +4408,7 @@ the ability to fill the space with horizontal rules of different types.
 vertical white space, the second command reverts back to the default,
 plain vertical white space.
 
+\begin{comment}
 \newtopic The next set of commands determine the type of line to be drawn
 in the white space.
 \settowidth{\aebdimen}{\ttfamily\string\fillTypeDashLine}
@@ -4327,6 +4430,387 @@ dashed lines; draw dotted lines; draw the default line type (\cs{fillTypeHRule)}
 \noindent The default color is \texttt{gray} and the default vertical
 spacing between lines is
 \texttt{14pt}.
+\end{comment}
+
+The \cs{setFillLinesFmt} command is used to set the design parameters
+of filler lines.
+\settowidth{\aebdimen}{\ttfamily\string\setFillLinesFmt\darg{\meta{KV-pairs}}}
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\setFillLinesFmt{!meta(KV-pairs)}
+\end{dCmd}
+There is an extensive list of key-value pairs.
+
+\begin{comment}
+%The default values are shown in parentheses above.
+%The \cs{eqWLSpacing} command sets the length register \Com[, length\ipkg{eqexam}|textbf]{wlVspace}
+%to its argument \meta{vskip}; \cs{wlVspace} is the vertical space between lines.
+%
+%The \cs{eqWriteLineColor} command passes a color to the fill lines.
+%
+%Properties of fill lines are set through key-value pairs of the command
+%\cs{fillLinesNumFmt}; the properties are not local, but continue to be
+%applied until they are explicitly changed. The properties are,
+%\bVerb\columnseprule0pt\columnsep0pt
+\end{comment}
+
+\newtopic\noindent
+\textbf{Key-value pairs of \cs{setFillLinesFmt}.} These key-values
+document-wide scope \emph{if not declared within a group}.
+
+\begin{description}
+\item[\texttt{fltype=\ameta{\upshape{line|dash|dots|blank|grid}}}] When the
+    value of \texttt{fltype} is different from \texttt{grid}, the key
+    determines the type of horizontal line drawn (including a
+    ``blank'' line); when \texttt{fltype=grid}, the type of line drawn is
+    determined by \texttt{gridtype}, described below. The default
+    is \texttt{line}.
+
+    When \texttt{fltype=grid} and neither \texttt{bgonly} nor
+    \texttt{outlineonly} are specified, a grid is drawn consisting of
+    horizontal and vertical lines. The thickness of the lines drawn is
+    determined by the length. The
+    default is \cs{setlength\darg{\string\flfboxrule}\darg{.4pt}}. Any dotted
+    line is unaffected by the value of \cs{flfboxrule}.
+\end{description}
+The rest of the keys are listed in alphabetical order. The \texttt{fltype} key
+is separated out due to its importance.
+\begin{description}
+
+%\item[\texttt{fontfamily=\anglemeta{family}}{\sIndexttKey[\ipkg{web}|textbf]{fontfamily}}]
+%    Font family to use for section titles, permitted values are
+%    \texttt{rmfamily}, \texttt{sffamily}, \texttt{ttfamily}.
+
+\item [\texttt{align=\ameta{\upshape{default|left}}}] This key sets the
+    horizontal alignment of the filler lines; a key-value of
+    \texttt{align=default} is the natural way of aligning the filler lines,
+    while \texttt{align=left} shifts the lines to the left margin. The
+    default is \texttt{default}, \texttt{align} is equivalent to
+    \texttt{align=default}.
+
+%    Refer to the paragraph \textbf{\nhnameref{para:fl-align}} on
+%    page~\pageref{para:fl-align} and Example~\ref{exmpl:aligntypes} that
+%    follows it.
+
+\item [\texttt{bgcolor=\ameta{named\_color}}] The color of the background,
+    when \texttt{bgonly} is in effect.
+
+\item [\texttt{bgonly*=\ameta{\upshape{true|false}}}] When the key is set to
+    true, \pkg{eqexam} colors the targeted region with the color determined
+    by the \texttt{bgcolor} key. This key\FmtMP{\texttt{fltype=grid}
+    required} is \emph{ignored} unless \texttt{fltype=grid}.
+
+    If \texttt{bgonly[=true]} is declared, \texttt{bgonly=false} must be
+    declared later to turn off this effect, as \pkg{eqexam} cannot determine
+    the intention. If the star-form is used (\texttt{bgonly*[=true]}),
+    \texttt{bgonly} is automatically set to false after the next region is
+    drawn.
+    Use the \texttt{bgonly} key to create backgrounds for several consecutive
+    regions. Use the \texttt{bgonly*} form of the key for a single region.
+%    See Problem~1\,(g) of Example~\ref{exmpl:fillertypes}.
+
+% for example, \setFillLinesFmt{fltype=grid,bgonly} then later we say
+% \setFillLinesFmt{fltype=grid,gridtype=dash}, do we continue with bgonly,
+% or switch over to a true grid?
+
+\item [\texttt{equalcells=\ameta{\upshape{true|false}}}] This key is only
+    effective when \texttt{fltype=grid}, but the keys \texttt{bgonly} and
+    \texttt{outlineonly} are both false. When the key \texttt{equalcells} (or
+    the key-value \texttt{equalcells=true}) is specified, grid cells of equal
+    width are drawn; the total width of a row may not be equal to the
+    \cs{linewidth}, however. The key is initially set to \texttt{false}.
+
+%    An example of the default (cells not necessarily equal) is found in
+%    problem 1\,(\ref{item:gridtype}) on page~\pageref{item:gridtype}.
+
+    The command versions of this key may also be expanded explicitly; these are
+    \Com[\ipkg{eqexam}|textbf]{equalCellSizesOn} and
+    \Com[\ipkg{eqexam}|textbf]{equalCellSizesOff}.
+
+\item [\texttt{color=\ameta{named\_color}}] The value of the \texttt{color}
+    key sets the color to be used when drawing filler lines (both horizontal
+    and vertical).
+
+\item [\texttt{gridtype=\ameta{\upshape{line|dash|dots}}}] The value of
+    the key \texttt{gridtype} determines the line type when
+    \texttt{fltype=grid}, otherwise, the value of this key is ignored. Values
+    of \texttt{line} and \texttt{dash} obey the value of \cs{flfboxrule}.
+
+\item [\texttt{linegap=\ameta{dimen}}] The ``gap'' between two horizontal or
+    vertical lines; the \texttt{linegap} key sets the length register \Com[,
+    length\ipkg{eqexam}|textbf]{wlVspace}\FmtMP{the gap is \cs{wlVspace}} to
+    \ameta{dimen}. This key executes the command
+    \Com[\ipkg{eqexam}|textbf]{eqWLSpacing}\texttt{\darg{\ameta{dimen}}}. The
+    default is 14pt.
+
+\item [\texttt{numbers=\ameta{\upshape{none|left|right}}}] The
+    \texttt{numbers} key controls whether the lines are numbered and their
+    relative position to the line; the default is not to number the lines (\texttt{numbers=none}).
+
+\item [\texttt{numbersep=\ameta{dimen}}] The value of \texttt{numbersep} sets
+    the separation between the line and the number, the default is 2pt.
+
+\item [\texttt{numfmt=\ameta{num-fmt}}] This key-value pair formats the line
+    numbers. Within the value \ameta{num-fmt}, the macro \cs{flnum} refers
+    to the number itself; for example,\[
+    \texttt{numfmt=\string\textcolor\darg{red}\darg{\string\flnum}}\]
+    produces red line numbers. The initial declaration for
+    this key is \texttt{numfmt=\cs{flnum}}, which creates a black line
+    number.
+
+    The font size\FmtMP{font size of the numbers} of the line numbers is
+    \cs{tiny}, but this can be overwritten by incorporating a size into the
+    \texttt{numfmt} (\texttt{numfmt=\string\small\string\flnum}).
+
+%\promoteNewPage[2\baselineskip]
+
+\item [\texttt{outlineonly*=\ameta{\upshape{true|false}}}]\label{item:outlineonly} If this key is
+    true\FmtMP{\texttt{fltype=grid} required}, an outline of the region is drawn using line type determined by
+    \texttt{gridtype}. This key is \emph{ignored} unless
+    \texttt{fltype=grid}.
+
+    If \texttt{outlineonly[=true]} is declared, \texttt{outlineonly=false}
+    must be declared later to turn off this effect, as \pkg{eqexam} cannot
+    determine the intention. If the star-form is used
+    (\texttt{outlineonly*}), \texttt{outlineonly} is automatically set
+    to false after the next region is drawn. Use the \texttt{outlineonly} key
+    to create backgrounds for several consecutive regions. Use the
+    \texttt{outlineonly*} form of the key for a single region.
+
+%    See Problem
+%    1\,(f) of Example~\ref{exmpl:fillertypes} for an illustration of this feature.
+
+\item [\texttt{topline=\ameta{\upshape{true|false}}}] If true, \pkg{eqexam}
+    draws an extra horizontal line above the topmost line. Any vertical lines
+    are extended to meet this additional line.
+
+%    See Problem 1\,(b) of Example~\ref{exmpl:fillertypes}.
+\end{description}
+
+\begingroup
+
+%\writeToSolnFile{^^J\protect\iffalse^^J}%
+
+
+\useFillerLines
+\turnflnosolnsOn
+\turnContAnnotOn
+\setFillLinesFmt{fltype=line,numbers=left}
+
+\noindent
+The following is an example of filler lines under the \env{nosolutions} assumption.
+\separationruleOff
+\chngToNoSolns
+%\solutionsonlytrue
+\RecordThisExamOff
+\begin{exam}[Filler Lines 1]{fl1}
+\begin{problem}
+Expound on all you know on the subject.
+%\priorworkareaCmds{\baselineskip\wlVspace}
+\begin{priorworkarea}\baselineskip\wlVspace
+When the \opt{flextended} option is not in force, these three lines are blank. However, in this example,
+\opt{flextended} is active, and I can write to these lines. Refer to `\nameref{sss:flxtnd}' below.
+\end{priorworkarea}
+\begin{solution}[42pt]
+Your guess is as good as mine.
+\end{solution}
+\end{problem}
+
+\turnflnosolnsOff
+\setFillLinesFmt{fltype=grid,gridtype=line,numbers=right,topline,color=lightgray}
+
+\begin{problem}
+Expound on all you know on the subject.
+\begin{priorworkarea}
+Essay area.
+\end{priorworkarea}
+\begin{solution}[\sameVspace]
+Your guess is as good as mine.
+\end{solution}
+\belowexskip{0pt}
+\end{problem}
+%\belowsqskip{\vskip0pt}
+\end{exam}
+\noindent
+The verbatim listing of this example is presented and discussed in the next section.
+
+%\writeToSolnFile{\protect\fi^^J}%
+\endgroup \therearesolutionsfalse % do not record this as a solution at the end
+
+\subsubsection{On the \texttt{flextended} option}\label{sss:flxtnd}
+
+The \texttt{flextended} option brings in code that extends filler lines. It
+defines one new environment \env{priorworkarea}, and several commands. One
+significant enhancement is the ability to write to the lined regions in the
+\opt{nosolutions}\FmtMP{\opt{nosolutions}}, \opt{vspacewithsolns}\FmtMP{\opt{vspacewith\-solns}}, and
+\env{answerkey} options are in effect.
+
+The contents of the \env{priorworkarea} environment will be superimposed on the filler lines
+when the \opt{nosolution} or \opt{vspacewithsolns} option is in effect. It is placed prior to
+the \env{solution} environment.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\begin{priorworkarea}
+!quad!ameta(content)
+\end{priorworkarea}
+\begin{solution}[!meta(vspace)]
+!quad!ameta(solution)
+\end{solution}
+\end{Verbatim}
+For the \ameta{content} to be superimposed on the vertical space specified by
+the optional parameter \meta{vspace} of the \env{solution} environment,
+\cs{useFillerLines} must be in force and \cs{turnflnosolnsOn} must be
+expanded prior to the statement of the problem. (Turn off the writing to the
+vertical space with \cs{turnflnosolnsOff}).
+The verbatim listing of the example above, which does use the
+\opt{flextended} option as well as the \env{priorworkarea}
+environment is presented below.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{exam}{fl1}\chngToNoSolns
+
+\begin{problem}
+Expound on all you know on the subject.
+\begin{priorworkarea}\baselineskip\wlVspace
+When the \texttt{flextended} option is not in force, these three
+lines are blank. However, in this example, \textsf{flextended} is
+active, and I can write to these lines. Refer to ...
+\end{priorworkarea}
+
+\begin{solution}[nLines=3]
+Your guess is as good as mine. ...
+\end{solution}
+\end{problem}
+
+\turnflnosolnsOff
+\setFillLinesFmt{fltype=grid,gridtype=line,
+  numbers=right,topline,color=lightgray}
+\begin{problem}
+Expound on all you know on the subject.
+\begin{priorworkarea}
+Essay area.
+\end{priorworkarea}
+
+\begin{solution}[nLines=3]
+Your guess is as good as mine.
+\end{solution}
+\end{problem}
+\end{exam}
+\end{Verbatim}
+
+%\vspace{3\wlVspace}
+
+For the \opt{answerkey} option\FmtMP{\opt{answerkey}}, content of the
+\env{solution} environment is written to the vertical space allotted by is
+optional parameter, \meta{vspace}. As with \env{priorworkarea} there is a
+gatekeeper command \cs{turnflanskeyOn}. For the content to be written to the
+vertical space, \cs{userFillerLines} and \cs{turnflanskeyOn} must be
+expanded. To turn off writing to the vertical space, expand
+\cs{turnflanskeyOff}.
+
+\newtopic\noindent
+The last example is repeated, but under the assumption of the \opt{answerkey} option.
+
+\useFillerLines
+\turnflanskeyOn
+\turnContAnnotOn
+\DoNotFitItIn
+\acvspace{2\wlVspace}
+
+\fvsizeskip{.1}
+\noExamTitleInSolns
+\begin{exam}[Filler Lines 2]{fl2}\AnswerKey
+\flPageBreakMsg{\textbf{Problem~{\eqeCurrProb} continues on next page\strut}}%
+
+\begin{problem}
+Expound on all you know on the subject.
+%\priorworkareaCmds{\baselineskip\wlVspace}
+\begin{priorworkarea}\baselineskip\wlVspace
+When the \opt{flextended} option is not in force, these three lines are blank. However, in this example,
+\opt{flextended} is active, and I can write to these lines. Refer to `\nameref{sss:flxtnd}' below.
+\end{priorworkarea}
+\solutionafterExCmds{\baselineskip\wlVspace
+  \parindent\wlVspace}%\tweakBreakPoint{5pt}
+\begin{solution}[nLines=10] %\baselineskip\wlVspace\parindent\wlVspace
+Your guess is as good as mine. The content has the capability of breaking across pages.
+
+I've added more lines because this problem has a chance breaking across a page boundary.
+Let's prattle on until we go to the next page.\vspace{2\baselineskip}
+
+We'll jump down a couple of lines cause I don't have much to say. Gotta keep
+going to get to the next page. If all works as it should, I'll see you one
+the other side! Perfect! As mentioned in the `\nameref{sss:BAP}' below. There
+are limitations to this wonder.
+\end{solution}
+\end{problem}
+
+\turnflnosolnsOff
+\setFillLinesFmt{fltype=grid,gridtype=line,numbers=right,topline,color=lightgray}
+
+\begin{problem}
+Expound on all you know on the subject.
+\begin{priorworkarea}
+Essay area.
+\end{priorworkarea}
+\begin{solution}[42pt]
+Your guess is as good as mine.
+\end{solution}
+\end{problem}
+All in all, this is very cool.
+\belowsqskip{\vskip0pt}
+\end{exam}
+
+
+\subsubsection{Breaking across pages}\label{sss:BAP}
+When the vertical space of the \env{solution} environment is filled with
+filler lines (assuming \cs{useFillerLines} is in force), \emph{the lines and the
+content can break across pages}, provided the content is not within a box. It
+has limited capabilities of breaking across columns (for
+\texttt{fltype=line|dash|dots}), but when the \opt{flextended} option is in
+effect, may fail dramatically at superimposing the content over the filler
+lines.
+
+When \cs{turnContAnnotOn} is expanded prior to the problem, should the fill
+lines break across a page boundary, the annotation string
+(\Com[\ipkg{eqexam}]{annotContStr}) appears at the top of the next page. The
+topic of annotating solutions is taken up again in the next section.
+
+\subsubsection{Annotating a continuing problem with
+\texorpdfstring{\cs{useFillerLines}}{\CMD{\useFillerLines}}}\label{para:cnwithFL}
+
+When the command \Com[\ipkg{eqexam}]{useFillerLines} is expanded, any vertical
+space declared with the optional argument of \env{solution} is created one
+line at a time. Just before each of the lines is drawn, two commands are
+expanded, the first just prior to the a page break, if one occurs, and the
+second just after the page break, if one occurs. The second command is the internal
+version of \Com[\ipkg{eqexam}]{insertContAnnot}, the first command is accessed through
+the command \cs{priorPageBreakMsg}.
+\settowidth{\aebdimen}{\ttfamily\string\priorPageBreakMsg\darg{\meta{msg}}}
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\priorPageBreakMsg{!meta(msg)}
+\flPageBreakMsg{!meta(msg)}
+\end{dCmd}
+The \cs{priorPageBreakMsg} command allows you to insert \meta{msg} at the
+beginning of each line, but does not determine whether a page break is near.
+The \cs{flPageBreakMsg} command, which uses both \cs{priorPageBreakMsg} and
+\Com[\ipkg{eqexam}]{emitMessageNearBottom}, is the appropriate vehicle for
+writing \meta{msg} just prior to a page break. Its definition is found next.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\newcommand{\flPageBreakMsg}[1]{%
+    \priorPageBreakMsg{\emitMessageNearBottom[\iacvspace]
+    {\eqfititin{{\Large\strut}#1}}}}
+\end{Verbatim}
+The command may be redefined for your needs. Notice that the star-option of
+the command \cs{emitMessageNearBottom} \emph{is not taken}, so the command does not
+create a new page if near the bottom, but it does create a message
+(\texttt{\#1}). The optional argument of \cs{emitMessageNearBottom} is set to
+\texttt{\cs{iacvspace}}, this is the interpretation of `near the bottom' of
+the page. A recommended value for \cs{iavspace} is \texttt{2\cs{wlVspace}}
+(\cs{acvspace\darg{2\cs{wlVspace}}}). A typical declaration might be,
+\begin{Verbatim}[xleftmargin=15pt,fontsize=\small,commandchars=!()]
+% Set \iacvspace for \insertContAnnot and \emitMessageNearBottom
+\acvspace{2\wlVspace} %!sffamily(<-- the recommended value)
+\flPageBreakMsg{\textbf{Problem~{\eqeCurrProb}!lp(\thepartno)!rp\space
+    continues on next page}}
+\end{Verbatim}
+At the top of the next page the \cs{annotContStr} string appears as well.
 
 \subsection{Keep vertical space with \texttt{answerkey}}
 
@@ -4344,7 +4828,7 @@ a time.
 
 Below is a simple example to illustrate the above points. In the example below,
 we simulate
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{solution}[1in]
 $ x+1 = 4 \implies x = 3 $
 \end{solution}
@@ -4379,7 +4863,7 @@ reverts to the old behavior of \textsf{eqexam}.
 
 Here is a representation of the effects of the command \cs{vspacewithkeyOn}.
 
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{solution}[1in]
 $ x+1 = 4 \implies x = 3 $
 \end{solution}
@@ -4460,9 +4944,8 @@ or between \texttt{exam} environments.
 \cs{annotContStr} may be redefined, but be sure to include the problem
 number \cs{eqeCurrProb}.
 
-The insertion of the continuation annotation uses \cs{promoteNewPage}, see
-Section~\ref{aqpNewPage} on page~\pageref{aqpNewPage} for a description of
-\cs{promoteNewPage}.
+The insertion of the continuation annotation uses the \cs{promoteNewPage} command, see
+Section~\ref{aqpNewPage} on page~\pageref{aqpNewPage} for a description of this command.
 
 \settowidth{\aebdimen}{\ttfamily\string\newcommand\darg{\string\ic@vspacedefault}\darg{1in}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
@@ -4470,13 +4953,59 @@ Section~\ref{aqpNewPage} on page~\pageref{aqpNewPage} for a description of
 \resetacvspace
 \newcommand{\ic@vspacedefault}{1in}
 \end{dCmd}
-\noindent The above three lines describes some commands for controlling the generation of a new page
-through the use of \cs{promoteNewPage}. The first one \cs{acvspace} is used to set the option
-parameter of \cs{promoteNewPage}. The default value for promoting a new page is \texttt{.25in}, as
-defined by \cs{ic@vspacedefault}, which can be redefined. The command \cs{resetacvspace} resets
-the optional argument of \cs{promoteNewPage} back to its default. All definitions are local, so the revert to
-their original values when a group is exited.
+\noindent The above three lines describes some commands for controlling the
+generation of a new page through the use of \cs{promoteNewPage}. The first
+one \cs{acvspace} defines the value of the length
+\cs{iacvspace}\FmtMP{\cs{iacvspace}}, which is used to set the option
+parameter of \cs{promoteNewPage}. The default value for promoting a new page
+is \texttt{1in}, as defined by \cs{ic@vspacedefault}, which can be
+redefined. The command \cs{resetacvspace} resets the optional argument of
+\cs{promoteNewPage} back to its default. All definitions are local, so the
+revert to their original values when a group is exited.
 
+\paragraph*{Automatic annotation.}\label{para:autoAnnot}\leavevmode
+\index{annotating a continuing problem!automatic}%
+Just prior to an \cs{item} within a \env{parts} environment\FmtMP{for items
+in a \env{parts} env.}, the command \Com[\ipkg{eqexam}]{promoteNewPage} is
+expanded with optional argument of \cs{iacvspace} in this case. This command
+calculates the amount of space remaining on the page, if it is less than
+\cs{iacvspace}, a \cs{newpage} is emitted and \cs{annotContStr} is typeset at
+the top of the next page. As a result of this algorithm, if there is more
+space than \cs{iacvspace}, but a page break occurs by the {\TeX} page
+breaking algorithm, the continuation string does not
+appear.\footnote{Remember, after each \cs{item} a \env{solution} environment
+may request vertical space for the student to do his work.} If you don't get
+the continuation annotation at the page break, change \cs{iacvspace}
+(possibly to a smaller value) through its \cs{acvspace} interface command.
+
+When the \Com[\ipkg{eqexam}]{useFillerLines} command is used, there are
+additional automatic automation commands, refer to the paragraph
+\textbf{\nhnameref{para:cnwithFL}} on page~\pageref{para:cnwithFL}.
+
+\paragraph*{Manual annotation.}\label{para:manAnnot}\leavevmode
+\index{annotating a continuing problem!automatic}%
+There are two commands for manually inserting
+annotations into the document.
+\settowidth{\aebdimen}{\ttfamily\string\emitMessageNearBottom*[\meta{vspace}]\darg{\meta{msg}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\insertContAnnot[!meta(vspace)]
+\emitMessageNearBottom*[!meta(vspace)]{!meta(msg)}
+\end{dCmd}
+For both commands, the default value for the optional argument \meta{vspace}
+is \cs{iacvspace}. Both commands start with a \cs{par}, meaning they must be
+in vertical mode to work, so they should not be used within a paragraph. Each
+command determines the amount of space left (\meta{spaceleft}) on the page.
+
+For \cs{insertContAnnot}, if $\meta{spaceleft} < \meta{vspace}$, a
+\cs{newpage} command is expanded and the continuation string
+\cs{annotContStr} is inserted at the top of the next page; otherwise, it does
+nothing.
+
+The action of \cs{emitMessageNearBottom} is similar but it \emph{does not
+insert} start a new page (\cs{newpage}) unless the star-option (\texttt*) is
+specified. If $\meta{spaceleft} < \meta{vspace}$, then \meta{msg} is typeset
+(at the bottom of the page). If the star-option is specified, a \cs{newpage}
+is invoked and \cs{annotContStr} is typeset at the top of the next page.
 
 \subsection{The Exam Record}\label{examrecord}
 
@@ -4495,7 +5024,7 @@ found at the \textbf{\ulSetLink{http://www.acrotex.net/blog}{Acro\TeX{} Blog}}
 See Figure~\ref{fig:ExamRecord}, page~\pageref{fig:ExamRecord}.
 
 There are several commands that can be used to customize the layout of the \textbf{Exam Record}
-\begin{Verbatim}[xleftmargin=\leftmargini,numbers=left]
+\begin{Verbatim}[xleftmargin=\amtIndent,numbers=left]
 \eqeSumryHoriz
 \eqeSumryVert
 \end{Verbatim}
@@ -4505,7 +5034,7 @@ arrangement, the latter is a vertical arrangement, \cs{eqeSumryVert} is the defa
 
 \newtopic Below are several text commands for customizing the text in the \textbf{Exam Record}
 box:
-\begin{Verbatim}[xleftmargin=\leftmargini,numbers=left]
+\begin{Verbatim}[xleftmargin=\amtIndent,numbers=left]
 \newcommand{\cpSumryHeader}{\textbf{Exam Record}}
 \newcommand{\cpSumryPts}{\,\text{pts}}
 \newcommand{\cpSumryPage}{Page}
@@ -4533,14 +5062,14 @@ to put in the \textbf{Exam Record}, in this case, you can executed
 \cs{useCustomPartNames} in the preamble. This allows you to define your own names
 that are to appear in the \textbf{Exam Record}. To define your custom names, use
 the \cs{customNaming} command:
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=+\(\)]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=+\(\)]
 \customNaming{+meta(name)}{+meta(text)}
 \end{Verbatim}
 where, \meta{name} is the name of the exam, and \meta{text} is the text to appear
 in the \textbf{Exam Record}. For example, the following definitions might be made
 for a two part final exam, the first part the instructor is free to pose questions,
 the second part are Department supplied questions.
-\begin{Verbatim}[xleftmargin=\leftmargini]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \customNaming{Part1}{Instr Qs:}
 \customNaming{Part2}{Dept Qs:}
 \end{Verbatim}
@@ -4550,7 +5079,7 @@ the second part are Department supplied questions.
 I have defined the command In response to a user who wanted more
 information about problem ranges between two marks, the command
 \cs{calcQsBtwnMarkers} is the proposed solution. The syntax is\dots
-\begin{Verbatim}[xleftmargin=\leftmargini,commandchars=+\(\)]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=+\(\)]
 \calcQsBtwnMarkers[+meta(Mrk2)]{+meta(Mrk1)}
 \end{Verbatim}
 The required parameter (\meta{Mrk1}) is called the \emph{primary mark}.

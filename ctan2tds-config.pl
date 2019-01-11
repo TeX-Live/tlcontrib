@@ -28,6 +28,7 @@ $special{'aeb-mlink'}   = '&MAKEdps';
 $special{'aeb-minitoc'} = '&MAKEdps';
 $special{'graphicxsp'}  = '&MAKEdps';
 $special{'icon-appr'}   = '&MAKEdps';
+$special{'eqexam'}      = '&MAKEdps';
 
 
 sub MAKEdps {

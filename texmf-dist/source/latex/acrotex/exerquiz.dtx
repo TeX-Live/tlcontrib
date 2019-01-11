@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2018/10/03 v8.2.5 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2018/12/13 v8.2.8 %
 %<package>  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver>  Exerquiz documentation driver file (dps)]
 %<aebjs>  Exerquiz document level JavaScript (dps)]
@@ -47,6 +47,14 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
+\def\darg#1{\texttt{\{#1\}}}
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription  % comment out for implementation details
 \EnableCrossrefs
@@ -55,6 +63,9 @@
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{exerquiz}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{exerquiz}{aebdocfmt.def cannot be found}}
+\makeatletter
+  \let\@latex@warning\@gobble
+\makeatother
 \begin{document}
   \let\env\texttt\let\pkg\textsf
   \let\app\textsf
@@ -84,6 +95,7 @@
 %    {\PackageInfo{exerquiz}{aebdonotindex.def cannot be found}}
 %    \begin{macrocode}
 %    \end{macrocode}
+%\changes{v8.2.8}{2018/12/13}{The SOL file is now written entirely when there is no solution option specified}
 % (v8.0 dated 2017/08/08) This version introduces multi-letter variables and what I'll term `alternate appearances'.
 %   This is a major addition, changes are marked by \texttt{dps17} for future reference in case something goes wrong.
 % \changes{v8.0}{2017/08/08}{Introduce multi-letter variables and alternate appearances. Changes
@@ -232,9 +244,13 @@
 }{}
 %    \end{macrocode}
 %    \changes{v8.1m}{2018/02/09}{\string\cs{ifdisplayworkarea} conditionally defined}
+%    \changes{v8.2.8}{2018/12/13}{defined \string\cs{displayworkareaOn} and
+%    \string\cs{displayworkareaOff}}
 %    \begin{macrocode}
 \@ifundefined{ifdisplayworkarea}{\newif\ifdisplayworkarea
   \displayworkareafalse}{}
+\providecommand\displayworkareaOn{\displayworkareatrue}
+\providecommand\displayworkareaOff{\displayworkareafalse}
 %    \end{macrocode}
 %    \IndexOpt{nodljs}
 %    An option for excluding all DLJS from the document. Useful with the
@@ -557,6 +573,9 @@
 %    \begin{macrocode}
 \let\iterate\relax
 \newif\ifeq@solutionsafter \eq@solutionsafterfalse
+\def\ifsolutionsafter{\csname ifeq@solutionsafter\endcsname}
+  \let\solutionsaftertrue\eq@solutionsaftertrue
+  \let\solutionsafterfalse\eq@solutionsafterfalse
 \newif\ifeq@hidesolution \eq@hidesolutionfalse
 \newif\ifeq@globalshowsolutions \eq@globalshowsolutionsfalse
 \newif\ifeq@nosolutions \eq@nosolutionsfalse
@@ -568,25 +587,23 @@
 %<*package|eqexam>
 \newif\ifeq@noforms \eq@noformsfalse
 \newif\ifeq@noquizsolutions \eq@noquizsolutionsfalse
-% changed \ifeq@nocorrections to \ifnocorrections
-%\newif\ifeq@nocorrections \eq@nocorrectionsfalse
 \newif\ifnocorrections \nocorrectionsfalse
 %    \end{macrocode}
-%    Added \string\cs{ifeqe@flextended} to support \string\pkg{eqexam}
+%    Added \cs{ifeqe@flextended} to support \pkg{eqexam}
 %    \changes{v8.1h}{2018/01/03}{Added \string\cs{ifeqe@flextended} to support \string\pkg{eqexam}}
 %    \changes{v8.1o}{2018/02/12}{Added \string\cs{ifcont@nnot} to support \string\pkg{eqexam}}
 %    \begin{macrocode}
 \@ifundefined{ifeqe@flextended}{\newif\ifeqe@flextended
   \eqe@flextendedfalse}{}
 \@ifundefined{ifcont@nnot}{\newif\ifcont@nnot \cont@nnotfalse}{}
-\@ifundefined{if@eqalignfilllinestoleft}{\newif\if@eqalignfilllinestoleft
-  \@eqalignfilllinestoleftfalse}{}
+\@ifundefined{if@eqalignfilllinestoleft}
+  {\newif\if@eqalignfilllinestoleft\@eqalignfilllinestoleftfalse}{}
 %    \end{macrocode}
+%   \changes{v6.3z}{2011/04/28}{Created a switch \cs{ifkeepdeclaredvspacing},
+%     used primarily by \textsf{eqexam}}
 % (4/28/11) A switch to control whether the declared vertical space
-% for the \texttt{solution} environment will be preserved during the \texttt{answerkey}
+% for the \texttt{solution} environment is preserved during the \texttt{answerkey}
 % option. This is an \textsf{eqexam} feature.
-%\changes{v6.3z}{2011/04/28}{%
-%Created a switch \cs{ifkeepdeclaredvspacing}, used primarily by \textsf{eqexam}}
 %    \begin{macrocode}
 \newif\ifkeepdeclaredvspacing \keepdeclaredvspacingfalse
 \newif\ifeq@nolink \eq@nolinkfalse
@@ -614,8 +631,16 @@
 % the vertical space in the solutions environment when the \texttt{nosolutions}
 % option is in effect. Concerning leaving space to work, the default is to
 % leave space to work (\cs{SpaceToWork}).
+%    \changes{v8.2.8}{2018/12/13}{Set \string\cs{displayworkareafalse} in definition
+%     of \string\cs{SolutionsAfter}; also, inserted \string\cs{eq@proofingfalse}}
 %    \begin{macrocode}
-\def\SolutionsAfter{\eq@solutionsaftertrue\eq@nolinktrue}
+\def\SolutionsAfter{\solutionsAtEndfalse\eq@solutionsaftertrue
+  \displayworkareafalse\eq@proofingfalse\eq@nolinktrue}
+%    \end{macrocode}
+%    The \DescribeMacro\ifcqSA\cs{ifcaSA} switch is used with the \env{cq*} environment
+%    to create conditional content. It is true when the \env{solution} environment
+%    is in a \textsf{solutions-after} state.
+%    \begin{macrocode}
 \newif\ifcqSA\cqSAfalse
 %    \end{macrocode}
 %    Modified \cs{SolutionsAtEnd} (2018/02/02) to include \cs{eq@nosolutionsfalse}
@@ -623,19 +648,21 @@
 %    \changes{v8.1j}{2018/02/02}{Added \string\cs{eq@nosolutionsfalse}
 %    and \string\cs{eq@proofingfalse} to the
 %    definition of \string\cs{SolutionsAtEnd}}
+%    \changes{v8.2.8}{2018/12/13}{Removed \string\cs{therearesolutionstrue}
+%    from \string\cs{SolutionsAtEnd}}
 %    \begin{macrocode}
-%\def\SolutionsAtEnd{\eq@solutionsafterfalse\eq@nolinkfalse}
-%\def\SolutionsAtEnd{\eq@solutionsafterfalse\eq@nolinkfalse
-%  \eq@nosolutionsfalse\eq@proofingfalse\answerkeyfalse}
-\def\SolutionsAtEnd{\eq@solutionsafterfalse\eq@nolinkfalse
+\def\SolutionsAtEnd{\solutionsAtEndtrue\vspacewithsolnstrue
+  \eq@solutionsafterfalse\eq@nolinkfalse
 %    \end{macrocode}
 %    Now, if |\ifvspacewithsolns| is true, we set |\eq@nosolutionsfalse| so solutions appear
 %    at the end of the file; otherwise, we set |\eq@nosolutionstrue|.
 %    \changes{v8.1k}{2018/02/04}{Added a conditional within \string\cs{SolutionsAtEnd}}
 %    \changes{v8.1m}{2018/02/09}{Include \string\cs{displayworkareatrue} in definition
 %    of \string\cs{SolutionsAtEnd}}
+%    \changes{v8.2.8}{2018/12/13}{Set \string\cs{displayworkareafalse} in definition
+%     of \string\cs{SolutionsAtEnd}}
 %    \begin{macrocode}
-  \displayworkareatrue\ifvspacewithsolns\eq@nosolutionsfalse\else
+  \displayworkareafalse\ifvspacewithsolns\eq@nosolutionsfalse\else
   \eq@nosolutionstrue\fi\eq@proofingfalse\answerkeyfalse}
 \def\NoSpaceToWork{\let\eq@insertverticalspace\eq@NO}
 \def\SpaceToWork{\let\eq@insertverticalspace\eq@YES}
@@ -646,8 +673,7 @@
 %    \begin{macrocode}
 \long\def\ifNoSolutions#1#2{%
     \ifeq@nosolutions\expandafter#1\else
-    \expandafter#2\fi
-}
+    \expandafter#2\fi}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -678,8 +704,9 @@
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
-% These\DescribeMacro{\saveRandomSeed}\DescribeMacro{\inputRandomSeed} two commands are used when the \texttt{allowrandomize} option is in effect,
-% Until then, they do nothing. See the definition in \autoref{randomize}.
+% These\DescribeMacro{\saveRandomSeed}\DescribeMacro{\inputRandomSeed} two
+% commands are used when the \texttt{allowrandomize} option is in effect, Until
+% then, they do nothing. See the definition in \autoref{randomize}.
 %    \begin{macrocode}
 \let\saveRandomSeed\relax
 \let\inputRandomSeed\relax
@@ -718,8 +745,7 @@
 % level JavaScript are not inserted, they are cleared out by the \cs{clearpage}.
 % So, we'll only to a \cs{clearpage} if the driver is not dvipdfm.
 %    \begin{macrocode}
-    \if\eq@drivernum2\else\clearpage\fi
-}
+    \if\eq@drivernum2\else\clearpage\fi}
 %    \end{macrocode}
 % \subsection{Load Configuration File: exerquiz.cfg}
 % Look for configuration file, exerquiz.cfg.
@@ -758,10 +784,15 @@
 %     Changed order of loading, comment package first, then verbatim package; prior to the change, anomalous
 %     errors, which were traced to these two packages.
 %     \changes{v7.8k}{2017/07/25}{Changed order of loading, comment package first, then verbatim package}
+%     \changes{v8.2.7}{2018/12/05}{require \string\pkg{aeb-comment} (version 3.1 of comment)}
 %    \begin{macrocode}
-\RequirePackage{comment}
+\RequirePackage{aeb-comment}
+\def\eq@commentChkMsg{\@ifpackageloaded{comment}
+  {\PackageWarningNoLine{exerquiz}
+    {The comment package is incompatible with the\MessageBreak
+     aeb-comment package, do not use the comment package}}{}}
+\AtBeginDocument{\eq@commentChkMsg}
 \RequirePackage{verbatim}
-%\RequirePackage{comment}
 \RequirePackage{hyperref}
 \RequirePackage{amssymb}% used for return symbols
 \RequirePackage{eforms}[2012/06/20]
@@ -1258,35 +1289,65 @@
 %    \subsection{Handles, counters and such}
 % Handles to write solutions to quizzes and exercises to a file.
 %    \begin{macrocode}
+\newcommand{\writeToExSolns@}[1]{%
+  \ifsolutionsonly\else
+    \ifOKToWriteExamData
+      \set@display@protect
+      \immediate\write\ex@solns{#1}\set@typeset@protect
+  \fi\fi}%
 \ifsolutionsonly
-\InputIfFileExists{\jobname_xdefs.cut}{%
+  \InputIfFileExists{\jobname_xdefs.cut}{%
     \typeout{^^JExerquiz|Eqexam: Reading \jobname_xdefs.cut^^J}}
     {\PackageWarningNoLine{exerquiz|eqexam}{%
     \jobname_xdefs.cut not found.\MessageBreak
      Recompile file under the vspacewithsolns\MessageBreak
      option, then compile with the solutionsonly\MessageBreak
      option}}
+  \let\writeToExSolns\@gobble
 \else
-\newwrite\ex@solns \immediate\openout \ex@solns \jobname.sol
-\newcommand{\writeToExSolns}[1]{%
-    \set@display@protect
-    \immediate\write\ex@solns{#1}%
-    \set@typeset@protect
-}
+  \newwrite\ex@solns \immediate\openout \ex@solns \jobname.sol
+  \let\writeToExSolns\writeToExSolns@
 %    \end{macrocode}
 % If we are not in \cs{ifsolutionsonly} mode, we write some definitions to a .def
 % file to be read back in at the beginning of the document.
 %    \begin{macrocode}
-\newwrite\eq@xrefdefns \immediate\openout\eq@xrefdefns\jobname_xdefs.cut
+  \newwrite\eq@xrefdefns
+  \immediate\openout\eq@xrefdefns\jobname_xdefs.cut
 \fi
+\let\writeT@ExSolns\writeToExSolns
 \newwrite\quiz@solns \immediate\openout \quiz@solns \jobname.qsl
-\newcommand{\writeToQzSolns}[1]{%
-    \set@display@protect
-    \immediate\write\quiz@solns{#1}%
-    \set@typeset@protect
-}
+\newcommand{\writeToQzSolns}[1]{\ifOKToWriteExamData\set@display@protect
+  \immediate\write\quiz@solns{#1}\set@typeset@protect\fi}
+\let\writeT@QzSolns\writeToQzSolns
 \def\eq@IWAuxOut#1{\immediate\write\@auxout{#1}}
 \def\eq@IWDefs#1{\immediate\write\eq@xrefdefns{#1}}
+%    \end{macrocode}
+%   \changes{v8.2.8}{2018/12/13}{more controls for solution files}
+%   Two sets of controls for the solution files. If \DescribeMacro\normalSolnWrites
+%   \cs{normalSolnWrites} is expanded (the default), solutions are written to the solution files
+%   as they normally do; if \DescribeMacro\noSolnWrites\cs{noSolnWrites} is in force, nothing is written
+%   to the solution file, except for verbatim content from the \env{solution}
+%   environments. When all else fails, when verbatim content is written to the solution files that
+%   you don't want to appear, use \DescribeMacro\bHideSolnIn\cs{bHideSolnIn\darg{\ameta{wrt-cmd}}}
+%   to write \cs{iffalse} then \DescribeMacro\eHideSolnIn\cs{eHideSolnIn\darg{\ameta{wrt-cmd}}}
+%   to close off the conditional. Where, \ameta{wrt-cmd} is either \cs{writeToSolnFile} (or \cs{writeToExSolns}), or
+%   \cs{writeToQzSolns}.
+%   For example,
+%\begin{verbatim}
+%   \bHideSolns\writeToSolnFile % for eqexam
+%   \begin{exam}{test}
+%   ...
+%   \end{exam}
+%   \eHideSolns\writeToSolnFile
+%\end{verbatim}
+%Now this exam has no footprint within the solution file.
+%    \begin{macrocode}
+\@ifundefined{ifOKToWriteExamData}{\newif\ifOKToWriteExamData
+  \OKToWriteExamDatatrue}{}
+\def\noSolnWrites{\OKToWriteExamDatafalse}
+\def\normalSolnWrites{\OKToWriteExamDatatrue}
+\def\bHideSolnIn#1{#1{\protect\iffalse}\noSolnWrites}
+\def\eHideSolnIn#1{\normalSolnWrites#1{\protect\fi^^J}}
 %    \end{macrocode}
 % Counters to keep track of exercise questions.
 %    \begin{macrocode}
@@ -1300,9 +1361,9 @@
 %</package|eqexam>
 %<*package>
 \def\theHquizno{\curr@quiz.\theeqquestionnoi.%
-    \ifcase\@eqquestiondepth\or\or\arabic{eqquestionnoii}.%
-    \or\arabic{eqquestionnoii}.\roman{eqquestionnoiii}.%
-    \else\fi\alph{quizno}}
+  \ifcase\@eqquestiondepth\or\or\arabic{eqquestionnoii}.%
+  \or\arabic{eqquestionnoii}.\roman{eqquestionnoiii}.%
+  \else\fi\alph{quizno}}
 %    \end{macrocode}
 % (2016/05/17) \cs{eqemargin} is used in \textsf{eqexam}, but some calculations use it for the list version of
 % answers. We declare this length to be 0pt. The \textsf{eqexam} resets this value.
@@ -1704,15 +1765,18 @@
 \def\eqCQDeclarations{\cqqsfalse\eq@turnMessageOff
     \includecomment{sPage}\excludecomment{qPage}%
     \eq@turnMessageOn}
-\def\eqTopOfSolnPage{\cqSAfalse
+\def\eqTopOfSolnPage{\withinsoldoctrue\cqSAfalse
     \eqCQDeclarations}
+\def\eqTopOfQslPage{\withinqsldoctrue}
 \eq@turnMessageOff
 \includecomment{qPage}\excludecomment{sPage}
 \eq@turnMessageOn
 %</package|eqexam>
 %<*package>
-\def\writecqQSfalse{\writeToExSolns{\protect\eqTopOfSolnPage}}
-\AtBeginDocument{\writecqQSfalse}
+\def\writecqQSfalse{%
+  \writeT@ExSolns{\protect\eqTopOfSolnPage}}
+\def\writeTopOfQslPage{\writeT@QzSolns{\protect\eqTopOfQslPage}}
+\AtBeginDocument{\writecqQSfalse\writeTopOfQslPage}
 %</package>
 %<*package|eqexam>
 \newenvironment{cq@CQ}
@@ -1803,24 +1867,28 @@
 %    \end{macrocode}
 %    Inform the system that the definition of \cs{eqterminex} is changing. This to prevent
 %    writing the same line multiple times.
+%    \changes{v8.2.8}{2018/12/13}{write \cs{declareterminex} only if not solutionsafter}
 %    \begin{macrocode}
     \global\terminexchangedtrue % dps cq
-    \writeToExSolns{\protect
-        \decleqterminex{\protect\cqFmtPasteQues{\cq@CutName}}}\fi}
+    \ifeq@solutionsafter\else
+    \writeT@ExSolns{\protect\decleqterminex{\protect
+      \cqFmtPasteQues{\cq@CutName}}\eq@commentchar}\fi\fi}
 \def\declCopyQues#1{\def\cqCopiedQues{#1}}
 \def\def@QuesToSoln{\restoreNormalSolns
 %    \end{macrocode}
 %    Here we restore \cs{eqterminex} to its default value, we set the stitch to false.
 %    \begin{macrocode}
     \global\terminexchangedfalse % dps cq
-    \ifeq@hidesolution\else\writeToExSolns{\protect
+    \ifeq@hidesolution\else\writeT@ExSolns{\protect
         \declCopyQues{\protect\input{\cq@CutName}}}\fi}
 %    \end{macrocode}
 %    \cs{restoreNormalSolns}\DescribeMacro{\restoreNormalSolns} restores \cs{eqterminex} to  its
 %    default definition. It is place between exercises.
+%    \changes{v8.2.8}{2018/12/13}{write \cs{declareterminex} only if not solutionsafter}
 %    \begin{macrocode}
-\newcommand\restoreNormalSolns{%
-    \writeToExSolns{\protect\decleqterminex{\protect\eqterminexDEF}}}
+\newcommand\restoreNormalSolns{\ifeq@solutionsafter\else
+    \writeT@ExSolns{\protect\decleqterminex{\protect
+      \eqterminexDEF}\eq@commentchar}\fi}
 %    \end{macrocode}
 %    \begin{environment}{exercise}
 % With some of the preliminaries out of the way, we begin the exercise `environment'.
@@ -1967,7 +2035,6 @@
 % \changes{v6.7a}{2013/05/03}{Change name of \cs{eq@writeexheader} to \cs{eqExerSolnHeader}}
 %    \begin{macrocode}
 \let\eqExerSolnHeader\@empty
-%\let\eq@writeexheader\@empty
 %    \end{macrocode}
 % The \cs{solutionparshape} is a command that supports the \cs{leadinitem} command
 % of \texttt{eqexam}. Its normal value is \cs{@empty}.
@@ -1985,9 +2052,8 @@
 \let\eq@setPrbSolnAftrIndnt\relax
 \newcommand{\setPrbSolnAftrIndent}[1]{\ifdim#1=0pt
     \def\eq@pslnaindnt{0pt}\let\eq@setPrbSolnAftrIndnt\relax\else
-    \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{%
-    \expandafter\noexpand\expandafter\parindent#1\noexpand\relax}\fi
-}
+    \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{\expandafter
+    \noexpand\expandafter\parindent#1\noexpand\relax}\fi}
 %    \end{macrocode}
 %\changes{v7.2}{2015/03/22}{added \cs{restorejustify}}
 %The command \DescribeMacro\restorejustify\cmd{\restorejustify} is designed
@@ -2054,8 +2120,7 @@
     \ifeq@exerciseheading
     \prior@questionsHook\marginparpriorhook\noindent\eqexheader@wrapper
     \afterlabelhskip\marginparafterhook\gEx@CommonCmd
-    \eq@setPrbSolnAftrIndnt\ignorespaces\fi
-}
+    \eq@setPrbSolnAftrIndnt\ignorespaces\fi}
 %    \end{macrocode}
 %    \end{environment}
 % \changes{v6.4z}{2012/11/28}{Extracted code to make it available elsewhere.}
@@ -2086,32 +2151,34 @@
 \newif\ifmakeExSlLocal \makeExSlLocalfalse
 \def\makeExSolnsLocalOn{\makeExSlLocaltrue}
 \def\makeExSolnsLocalOff{\makeExSlLocalfalse}
+\let\eqMrkSoln\@gobble
 \def\eqExerSolnHeaderSngl{%
     \ifmakeExSlLocal\protect\begingroup^^J\fi
+    \ifx\eqMrkCpyArg\@empty\else
+      \protect\eqMrkSoln{\eqMrkCpyArg}\fi
     \protect\eqEXt{\eqExtArg}{\eqFilterArg}\protect
     \solnItemMngt\protect\exerSolnHeader{\exsecrunhead}{ex.\the@exno}%
     {\exsllabelformat}\exer@solnheadhook
-    \exersolnheadhook\protect\eqterminex
-}
-\def\eq@@writeexheader{\set@display@protect
-    \immediate\write\verbatim@out{\eqExerSolnHeaderSngl}%
-    \set@typeset@protect
-}
+    \exersolnheadhook\protect\eqterminex}
+\def\eq@@writeexheader{\ifeq@hidesolution\else\ifOKToWriteExamData
+  \set@display@protect
+  \immediate\write\verbatim@out{\eqExerSolnHeaderSngl}%
+  \set@typeset@protect\fi\fi}
 %    \end{macrocode}
 %\changes{v6.7}{2013/04/07}{Inserted another argument into \cs{eqEXt}}
 % Added another argument into \cs{eqEXt}, used for filtering.
 %    \begin{macrocode}
 \def\eqExerSolnHeaderList{%
     \ifmakeExSlLocal\protect\begingroup^^J\fi
+    \ifx\eqMrkCpyArg\@empty\else
+      \protect\eqMrkSoln{\eqMrkCpyArg}\fi
     \protect\eqEXt{\eqExtArg}{\eqFilterArg}\protect
     \solnItemMngt\protect\exerSolnHeader{\exsecrunhead}%
     {ex.\the@exno\thepartno}{\exsllabelformatwp}%
-    \exer@solnheadhook\exersolnheadhook\protect\eqterminex
-}
-\def\eq@@writeexheaderlist{\set@display@protect
-    \immediate\write\verbatim@out{\eqExerSolnHeaderList}%
-    \set@typeset@protect
-}
+    \exer@solnheadhook\exersolnheadhook\protect\eqterminex}
+\def\eq@@writeexheaderlist{\ifeq@hidesolution\else\ifOKToWriteExamData
+  \set@display@protect\immediate
+  \write\verbatim@out{\eqExerSolnHeaderList}\set@typeset@protect\fi\fi}
 %    \end{macrocode}
 %    \subsection{Define \texttt{solution} Environment for \texttt{exercise}}
 %    \begin{macro}{solution}
@@ -2186,8 +2253,7 @@
 %        \def\eq@next{\solnexer@@@woparts}\fi
 %\end{verbatim}
 %    \begin{macrocode}
-    \eq@next
-}
+    \eq@next}
 \let\eqPriorVspace\@gobble
 \newif\if@eqlinedfiller \@eqlinedfillerfalse
 \newcommand{\vspaceFiller}[1]{\vfill}
@@ -2198,8 +2264,7 @@
     \@tempcnta=0
     \@whilenum\@tempcnta<\soln@keys@nLines\relax\do
     {\vskip0pt\penalty-50\vglue\wlVspace\eqWriteLine
-        \advance\@tempcnta1\relax}\par\endgroup
-}
+        \advance\@tempcnta1\relax}\par\endgroup}
 \let\leavevspace\relax % dpsj5
 \newcommand{\vspaceFmt}[1]{%
   \ifx\solutionparshape\@empty\else
@@ -2226,9 +2291,8 @@
               {\vspaceFiller{#1}}}%
           \fi\eq@lines@next}%
         \fi
-      }\expandafter\leavevspace % dpsj6
-  \fi
-}
+      }\expandafter\leavevspace
+  \fi}
 %    \end{macrocode}
 % \changes{v6.8g}{2014/04/08}{Added key-val here for \textsf{eqexam}.}
 % New option for the \texttt{solution} environment, \IndexKey{nLines}\texttt{nLines}.
@@ -2369,7 +2433,6 @@
 % starts in vertical mode or not.
 %    \begin{macrocode}
     \reset@doendpe{\parshape \@ne 0pt \linewidth}%
-%    \expandafter\def\expandafter\@par\expandafter{\@par\everyparShape}%
     \parshape \@ne 0pt \linewidth
     \everyparShape
 }
@@ -2382,13 +2445,13 @@
   \let\eqSolnExCmds\relax\else
   \def\eqSolnExCmds{#1}\fi}
 \let\eqSolnExCmds\relax
-\def\eq@b@ddCodeSpecialDef#1{#1}% dpsj4
-\let\eq@b@ddCodeSpecial\eq@b@ddCodeSpecialDef % dpsj4
+\def\eq@b@ddCodeSpecialDef#1{#1}%
+\let\eq@b@ddCodeSpecial\eq@b@ddCodeSpecialDef
 \def\solnexer@@@woparts{\ifeq@solutionsafter\else
-    \expandafter\begingroup\fi %dpsj10
+    \expandafter\begingroup\fi
   \global\thereissolutiontrue
-  \global\let\procsoln\relax    % dpsj6
-  \global\let\endprocsoln\relax % dpsj6
+  \global\let\procsoln\relax
+  \global\let\endprocsoln\relax
   \def\exerwparts@cols{0}%
   \let\verbatim@out\ex@solns
   \if\currhideopt\eq@Hid
@@ -2406,7 +2469,6 @@
       \let\procsoln\eqSavedComment
       \let\endprocsoln\eqSavedEndCommet
     \else
-%     \ifx\bLeaveVspace\@empty\leavevspace\fi % dpsj5
       \ifeq@solutionsafter\else
           \ifx\eq@@CommonCmd\@empty\else
               \set@display@protect
@@ -2419,7 +2481,7 @@
     \fi
     \def\eq@next{%
       \ifeq@solutionsafter
-        \let\procsoln\relax % dpsj6
+        \let\procsoln\relax
         \let\endprocsoln\relax
         \removelastskip\removelastparskip
         \cqSAtrue\eqCQDeclarations
@@ -2437,12 +2499,12 @@
 %    of the solution with \cs{eqe@setStartSolns}.
 %    \begin{macrocode}
             \solutionsafterSkip
-            \@@solnafterSkipOnce % dpsj3
+            \@@solnafterSkipOnce
             \eqe@setStartSolns
           \fi
         \else\par\kern0pt
           \solutionsafterSkip
-          \@@solnafterSkipOnce % dpsj3
+          \@@solnafterSkipOnce
           \noindent\strut\eqe@setStartSolns
         \fi
         \parskip\eqeques@parsep
@@ -2462,7 +2524,7 @@
 %    \end{macrocode}
 % The solution after label, followed by a space.
 %    \begin{macrocode}
-%        \eqSolnExCmds % dpsj8
+%        \eqSolnExCmds
         \exsolafter\space\ignorespaces
 %    \end{macrocode}
 % We set the shape of the solutionafter.
@@ -2474,7 +2536,10 @@
 %    Write the solution header 11/03/05
 %    \begin{macrocode}
         \eqExerSolnHeader
-        \global\let\eqExerSolnHeader\@empty
+%    \end{macrocode}
+%     Write \cs{eqExerSolnHeader} after all.
+% \changes{v8.2.8}{2018/12/13}{write \string\cs{eqExerSolnHeader} after all}
+%    \begin{macrocode}
         \global\therearesolutionstrue\expandafter\procsoln
       \fi
     }%
@@ -2502,9 +2567,14 @@
 %</package>
 %    \end{macrocode}
 %    \begin{macro}{\eqExerSolnTrailer}
-% The material that follows the solution in the .sol file.
+% The material that follows the solution in the SOL file.
 %    \begin{macrocode}
 %<*package|eqexam>
+%    \end{macrocode}
+%   \changes{v8.2.6}{2018/12/03}{defined \string\cs{eq@commentchar}}
+%    \begin{macrocode}
+\bgroup\catcode`\%=12\relax
+\gdef\eq@commentchar{%}\egroup
 \newcommand\eqExerSolnTrailer{%
 %</package|eqexam>
 %<*package>
@@ -2513,13 +2583,19 @@
     \else\protect\ReturnTo{qex.\the@exno}\fi
     {\protect\mbox{\if\exerstar*\exrtnlabelformatwp\else
         \exrtnlabelformat\fi}}%
-    \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi^^J%
+    \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi
+%    \end{macrocode}
+%    Tack on comment character at the end of the line.
+%   \changes{v8.2.6}{2018/12/03}{defined \string\cs{eq@commentchar}}
+%    \begin{macrocode}
+    \eq@commentchar^^J% %dpsd03
 %</package>
 %<*eqexam>
     \protect\ReturnTo{page.\the\c@page}%
     {\protect\mbox{\if\exerstar*\exrtnlabelformatwp\else
         \exrtnlabelformat\fi}}%
-    \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi^^J%
+    \protect\endeqEXt\ifeqforpaper\protect\par{\belowexsolnskip}\fi
+    \eq@commentchar^^J%
 %</eqexam>
 %<*package|eqexam>
 %    \end{macrocode}
@@ -2542,32 +2618,34 @@
 %    \changes{v8.1i}{2018/01/20}{Added \string\cs{kdvsp@Restore} to support
 %    the \texttt{flextended} option from \string\textsf{eqexam}}
 %    \begin{macrocode}
-\let\kdvsp@Restore\relax % dpsj20
+\let\kdvsp@Restore\relax
+\def\eq@clearMrkCpy{\if@targetforextr
+  \global\let\eqMrkCpyArg\@empty
+  \global\@targetforextrfalse\fi
+}
 \def\endsolnexer@woparts{\endprocsoln\eq@e@ddCodeSpecial
-  \pkg@endsolnexerhook % djsj8 moved from the end of the macro
+  \pkg@endsolnexerhook
+  \eq@clearMrkCpy
   \ifeq@solutionsafter\else
     \expandafter\endgroup\fi % from \begingroup at \solnexer@@@woparts
   \global\let\exsolnonceonlytophook\relax
-  \ifx\sameVspace\@empty\gdef\sameVspace{0pt}\fi % dpsj5
+  \ifx\sameVspace\@empty\gdef\sameVspace{0pt}\fi
   \ifvspacewithsolns\vspaceFmt{\sameVspace}\else
   \ifeq@nosolutions\ifeq@solutionsafter\else
     \vspaceFmt{\sameVspace}\fi\fi\fi
   \if\currhideopt H%
-  \ifkeepdeclaredvspacing\vskip\sameVspace\fi
-%    \csname endprocsoln\endcsname
+    \ifkeepdeclaredvspacing\vskip\sameVspace\fi
   \else
 %    \end{macrocode}
 % If solutions after, we start a new paragraph, then add some kerning glue,
 % this gives a better gauge for calculating the \cs{pagetotal}.
 %    \begin{macrocode}
     \ifeq@solutionsafter
-      \ifx\isitleadin\eq@YES\parshape=0 \fi % dpsj9
+      \ifx\isitleadin\eq@YES\parshape=0 \fi
       \if\exerstar*%
       \eq@fititin{\mbox{\exrtnlabelformatwp}}\else
       \eq@fititin{\mbox{\exrtnlabelformat}}\fi
-      \ifx\istabularexer\eq@YES\unskip\kern0pt\else\par\fi % dpsj6
-%      \ifx\istabularexer\eq@YES\kern0pt\else\par\fi
-%     \ifnum\exerwparts@cols>0\relax\kern0pt\else\par\fi
+      \ifx\istabularexer\eq@YES\unskip\kern0pt\else\par\fi
 %    \end{macrocode}
 % if \cs{ifkeepdeclaredvspacing} is true, we attempt
 % to preserve the vertical space declared by the \textsf{solution} environment when
@@ -2609,8 +2687,8 @@
 %    \begin{macrocode}
             \ifdim\@tempdimb>0pt\vglue\@tempdimb\kern0pt
               \let\eqe@showEndHere\@gobble
-              \edef\tmp@exp{\noexpand\marginpar{%
-                \noexpand\smash{e: adj \the\@tempdimb}}}%
+              \edef\tmp@exp{\noexpand\marginpar{\noexpand
+                \smash{e: adj \the\@tempdimb}}}%
                 \eqe@debugVertSkip{\tmp@exp}%
             \fi
           \fi
@@ -2618,21 +2696,18 @@
         \eqe@showEndHere{\eqe@debugVertSkip{\marginpar{\smash{e}}}}%
         \fi
       \else
-%        \endprocsoln
         \eq@ckglobalhide
         \ifeq@hidesolution\else
           \endsolnexerhookaux
 %    \end{macrocode}
 % Here's were we write the trailer for the solution
+%   \changes{v8.2.6}{2018/12/03}{if \string\cs{@targetforextrfalse}, set \string\cs{@targetforextrfalse}}
 %    \begin{macrocode}
-          \let\verbatim@out\ex@solns
-          \set@display@protect
-          \immediate\write\verbatim@out{\eqExerSolnTrailer}%
-          \set@typeset@protect
+          \writeT@ExSolns{\eqExerSolnTrailer}%
         \fi
       \fi
     \fi
-    \kdvsp@Restore % dpsj20
+    \kdvsp@Restore
     \endsolnexerhook\penalty0\relax}
 %    \end{macrocode}
 %    \end{macro}
@@ -2640,7 +2715,7 @@
 % Exercises with parts are enclosed within a \texttt{parts} environment. There are two types
 % of parts listing: list-type and tabular-type.
 %    \begin{environment}{exercise*}
-% For the exercise* environment, we set a flag to indicate that the \cs{exerstar}
+% For the \texttt{exercise*} environment, we set a flag to indicate that the \cs{exerstar}
 % has been set in the star environment, the begin the \cs{exercise} and finished with
 % \cs{endexercise}.
 %\changes{v6.07}{2007/05/05}
@@ -2713,7 +2788,6 @@
 % When there is a \cs{tableadin}, we remove \cs{removelastparskip} because it does not occur above.
 %    \begin{macrocode}
    \if@tableadinitem\else\removelastparskip\fi
-%   \keepdeclaredvspacingfalse
    \let\endparts\endexercise@parts@tabular\exercise@parts@tabular@}%
   {\let\endparts\endexercise@parts@list\exercise@parts@list}}
 %    \end{macrocode}
@@ -2785,16 +2859,14 @@
     {The \string\leadinitem\space command is designed to be\MessageBreak
      the first item in the problem*\MessageBreak
      environment above the parts environment}
-     {Use \string\leadinitem\space in the problem* environment.}%
-}
+     {Use \string\leadinitem\space in the problem* environment.}}
 \let\leadinitem\leadinitem@external
 \let\itsforleadinitem\eq@NO
 \newcommand{\eq@leadinitemparts}{\item\relax
     \PackageError{exerquiz/eqexam}{The \string\leadinitem\space
         command is not allowed in the\MessageBreak
         parts environment}
-     {Use \string\leadinitem\space in the problem* environment.}%
-}
+     {Use \string\leadinitem\space in the problem* environment.}}
 %    \end{macrocode}
 % (2014/03/23) Problems when description env is used with parts env. The
 % hook \cs{exlisttabheaderafterhook} is interfering with the optional argument.
@@ -2814,6 +2886,11 @@
 \newenvironment{exercise@parts@list}{%
     \settowidth{\eq@tmplength}{\parts@indent}%
     \edef\widthOfParts{\the\eq@tmplength}%
+%    \end{macrocode}
+%    Write to SOL file, unless solutions-after.
+%    \changes{v8.2.8}{2018/12/13}{Write to SOL file, unless solutions-after}
+%    \begin{macrocode}
+    \global\let\eqExerSolnHeader\eq@@writeexheaderlist
     \eq@initializeContAnnot\eq@nolinkfalse\prior@parts@hook
     \abovepartshook\list{\normalfont
     \if\Hidesymbol h\eq@nolinkfalse\ifeq@solutionsafter
@@ -2847,26 +2924,20 @@
 % \cs{leadinitem}, so we increment \texttt{partno}.
 %    \begin{macrocode}
     \if\isitleadin\eq@YES
-        \settowidth{\eq@tmplength}{\parts@indent\eqe@prtsepPrb}%
-        \xdef\prtsIndntSep{\the\eq@tmplength}%
-%        \advance\linewidth-\prtsIndntSep\relax
-        \if\itsforleadinitem\eqe@YES\setcounter{partno}{\fliPartNo}\else
-        \setcounter{partno}{1}\fi\fi
+      \settowidth{\eq@tmplength}{\parts@indent\eqe@prtsepPrb}%
+      \xdef\prtsIndntSep{\the\eq@tmplength}%
+      \if\itsforleadinitem\eqe@YES\setcounter{partno}{\fliPartNo}\else
+      \setcounter{partno}{1}\fi\fi
     \let\leadinitem\eq@leadinitemparts
     \let\tableadin\eq@tableadinparts
     \global\let\solutionparshape\@empty
-%    \setlength{\topsep}{3pt}%
     \setlength{\topsep}{\eqparts@topsep}%
-%    \ifdim\parskip>\z@
-%        \addtolength{\topsep}{-\parskip}\fi
     \setlength{\parskip}{0pt}%
     \setlength{\partopsep}{0pt plus 1pt minus 1pt}%
     \ifdim\eqeques@parsep=0pt
         \setlength{\parsep}{\eqparts@parsep}%
-%        \setlength{\itemsep}{\eqparts@itemsep-\eqparts@parsep}%
     \else
         \setlength{\parsep}{\eqeques@parsep}%
-%        \setlength{\itemsep}{\eqparts@itemsep-\eqeques@parsep}%
     \fi
     \setlength{\itemsep}{\eqparts@itemsep-\parsep}%
     \setlength{\itemindent}{0pt}%
@@ -2876,7 +2947,6 @@
 % This is done for \textsf{eqexam}, what effect does it have on a straight
 % \textsf{exerquiz} file?
 %    \begin{macrocode}
-%    \setlength{\itemsep}{\eqparts@itemsep-\eqparts@parsep}%
     \settowidth{\labelsep}{\normalfont\eqe@prtsepPrb}%
     \addtolength{\labelsep}{\eq@extralabelsep}%
     \settowidth{\labelwidth}{\parts@indent}%
@@ -2888,7 +2958,6 @@
 % redefined. We try to correct this.
 %    \begin{macrocode}
     \let\eq@item@latex\item
-%    \def\eq@item{\eq@item@latex\exlisttabheaderafterhook}%
 %    \end{macrocode}
 % We handle the problem of seeing the optional argument by getting the argument,
 % if there is one, and switching commands around.
@@ -2911,18 +2980,17 @@
 \def\eq@initializeContAnnot{\@ifundefined{eqequestions}
     {\global\let\eqeCurrProb\relax}
     {\xdef\eqeCurrProb{\theeqquestionnoi}}%
-    \xdef\eq@currProbStartPage{\arabic{page}}%
-}
+    \xdef\eq@currProbStartPage{\arabic{page}}}
 %    \end{macrocode}
 % \subsubsection{Tabular-type Parts Question}
 % Now for the tabular style of multi-part exercise, the argument
 % \#1 is the number of columns requested.\medskip
 %
-%    (2017/02/09) Added xkeyvals to optional argument of \texttt{parts}. Syntax is now
+%    \noindent(2017/02/09) Added \pkg{xkeyval} to optional argument of \texttt{parts}. Syntax is now
 %\begin{verbatim}
 %    \begin{parts}[<num>|nCols=<num>,minVspace=<length>]
 %\end{verbatim}
-%    \changes{v7.8e}{2017/02/09}{Added xkeyvals to optional argument of \string\texttt{parts}}
+%    \changes{v7.8e}{2017/02/09}{Added xkeyval to optional argument of \string\texttt{parts}}
 %    \begin{macrocode}
 \define@key{tabp@rts}{nCols}{\def\exerwparts@cols{#1}}
 \define@key{tabp@rts}{minVspace}{\def\minVspacet@bs{#1}}
@@ -3016,8 +3084,7 @@
         \fi
     \fi
     \eq@next
-    \global\advance\eq@extabColCnt1\relax
-}
+    \global\advance\eq@extabColCnt1\relax}
 %    \end{macrocode}
 %    Set up the tabular environment, after making a lot of decisions.
 %    \begin{macrocode}
@@ -3030,9 +3097,11 @@
     \edef\eqparts@tabrowsep{\the\@tempdima}}
 \partstabrowsep{0pt}
 \newenvironment{exercise@parts@tabular}{%
-%    \ifx\eq@tabMarkChk\@gobble
-%        \partstabrowsep{\@rowskip}\fi % detecting autotab off or on
     \setcounter{partno}{0}%
+%    \end{macrocode}
+%    \changes{v8.2.8}{2018/12/13}{Write to SOL file, unless solutions-after}
+%    \begin{macrocode}
+    \global\let\eqExerSolnHeader\eq@@writeexheaderlist
 %    \end{macrocode}
 % (2015/01/10) If \cs{solutionparshape} is nonempty, the user has used
 % \cs{leadinitem}, so we increment \texttt{partno}.
@@ -3072,27 +3141,19 @@
 %\end{verbatim}
 %    \begin{macrocode}
     \eq@tmpdima=\linewidth
-%    \ifx\isitleadin\eq@NO
     \advance\eq@tmpdima-\prtsIndntSep\relax
-%    \fi
     \@tempcnta\exerwparts@cols\relax
     \advance\@tempcnta-1\relax
     \multiply\@tempcnta2\relax
     \@tempdima\prtsIndntSep\relax
     \divide\@tempdima 2\relax
     \edef\halfWidth{\the\@tempdima}%
-%    \ifx\isitleadin\eq@YES\@tempdima0pt\fi
     \advance\@tempdima\eq@partstabcolsep\relax
-%    \@tempdima\eq@partstabcolsep\relax
     \tabcolsep\@tempdima
     \multiply\@tempdima\@tempcnta
     \advance\eq@tmpdima-\@tempdima
     \divide\eq@tmpdima by\exerwparts@cols\relax %dpsj3
-%    \ifx\isitleadin\eq@NO
-%    \advance\eq@tmpdima\prtsIndntSep\relax % dpsj3
     \edef\widthOfPartsBox{\the\eq@tmpdima}% dpsj2
-%    \advance\eq@tmpdima\halfWidth\relax
-%        \else\advance\eq@tmpdima\halfWidth\relax\fi
 %    \end{macrocode}
 % If there is a \cs{tableadin}, we do not perform a \cs{vskip}.
 %    \begin{macrocode}
@@ -3105,7 +3166,6 @@
 % \changes{v7.4}{2015/03/23}{inserted \cmd\setTabulrSolnEnv}%
 %    \begin{macrocode}
     \tablrIndent\tabular[t]{@{}*{\exerwparts@cols}{>{\setTabulrSolnEnv
-%        \ifanswerkey\eqSolnExCmds\fi %dpsj2
         \parskip\eqeques@parsep\relax
         \parindent0pt\relax\strut}p{\eq@tmpdima}}@{\hidewidth}}%
 }{\endtabular\kern0pt
@@ -3114,11 +3174,7 @@
     \post@parts@hook\belowpartshook
 %    \end{macrocode}
 % \changes{v7.4}{2015/03/23}{added an adjustment to the command \cs{endexercise@parts@tabular}}
-% A vertical space adjustment
-%    \begin{macrocode}
-%    \ifeq@solutionsafter\adjDisplayBelow
-%        \ifthereissolution\else\vskip\baselineskip\fi\fi
-%    \end{macrocode}
+% A vertical space adjustment\par\medskip\noindent
 % (201/05/09) There is a problem of communicating the totals through
 % the \cs{mark} command (use in \textsf{eqexam}). In \textsf{eqexam}
 % the command \cs{eqe@innermarkpts} is defined. Once the group is closed
@@ -3139,8 +3195,8 @@
 % As of 2013/03/25, I am allowing solutions after for tabular parts. I'm commenting
 % out the following line.\\
 % |%\eq@solutionsafterfalse % no solutionsafter are allowed|
+% \changes{v8.2.8}{2018/12/13}{write \string\cs{eqExerSolnHeader} after all}
 %    \begin{macrocode}
-  \global\let\eqExerSolnHeader\@empty
   \ifeq@solutionsafter
     \eq@nolinktrue  % no link to solution
   \else\ifeq@nosolutions
@@ -3160,7 +3216,6 @@
   \eq@tmpdima=\wd\eq@tmpbox
   \addtolength\eq@tmplength{\eq@extralabelsep}%
   \xdef\partshangamount{\the\eq@tmplength}%
-%  \advance\linewidth-\eq@tmplength %dpsj3
   \parshape \@ne 0pt \linewidth
   \everypar{\parshape \@ne 0pt \linewidth}%
   \eq@setPrbSolnAftrIndnt
@@ -3169,26 +3224,24 @@
 %    \begin{macrocode}
   \makebox[0pt][r]{\eqexlisttabheader\eqe@prtsepPrb}%
     \ex@listtabheader@fterhook
-    \exlisttabheaderafterhook\ignorespaces
-}
+    \exlisttabheaderafterhook\ignorespaces}
 %    \end{macrocode}
 %    \begin{macrocode}
 \def\@ckhide[#1]{\edef\eq@arg{#1}%
-    \def\currhideopt{x}%
-    \ifx\eq@arg\@empty\else
-    \if\eq@arg\eq@Hid
-        \eq@hidesolutiontrue\eq@nolinktrue%
-        \edef\currhideopt{\Hidesymbol}%
-    \else
-        \ifeq@globalshowsolutions\else
-            \if\eq@arg\eq@hid
-                \eq@hidesolutiontrue\eq@nolinktrue%
-                \def\currhideopt{h}%
-            \fi
-        \fi
-    \fi\fi
-    \eq@item
-}
+  \def\currhideopt{x}%
+  \ifx\eq@arg\@empty\else
+  \if\eq@arg\eq@Hid
+      \eq@hidesolutiontrue\eq@nolinktrue%
+      \edef\currhideopt{\Hidesymbol}%
+  \else
+      \ifeq@globalshowsolutions\else
+          \if\eq@arg\eq@hid
+              \eq@hidesolutiontrue\eq@nolinktrue%
+              \def\currhideopt{h}%
+          \fi
+      \fi
+  \fi\fi
+  \eq@item}
 %    \end{macrocode}
 % End of the \texttt{parts} environment.
 %    \end{environment}
@@ -3196,21 +3249,23 @@
 % equal to \cs{eq@xtabularcr}.
 %    \begin{macrocode}
 \def\tabControlOn{\@ifundefined{@xtabularcr}
-    {\let\save@@xtabularcr\@xarraycr}
-    {\let\save@@xtabularcr\@xtabularcr}}
+  {\let\save@@xtabularcr\@xarraycr}
+  {\let\save@@xtabularcr\@xtabularcr}}
 %    \end{macrocode}
 %\changes{v7.0}{2014/11/05}{Added \cs{tabControlOn} and \cs{tabControlOff}.
 % Tab control is interfering with regular tabular environments, or anywhere
 % \texttt{d} is used.}
 %    \begin{macrocode}
 \def\tabControlOff{\@ifundefined{@xtabularcr}
-    {\let\@xarraycr\save@@xtabularcr}
-    {\let\@xtabularcr\save@@xtabularcr}}
+  {\let\@xarraycr\save@@xtabularcr}
+  {\let\@xtabularcr\save@@xtabularcr}}
 \AtBeginDocument{\tabControlOn}
 \def\eq@xtabularcr{\@ifnextchar[{\save@@xtabularcr}
-    {\eqe@tab@parts@rowsep}}%
+  {\eqe@tab@parts@rowsep}}%
 \def\eqe@tab@parts@rowsep{\save@@xtabularcr
-    \noalign{\expandafter\kern\eqparts@tabrowsep}}%
+  \noalign{\expandafter\kern\eqparts@tabrowsep}}%
+\let\eqgrii\relax
+\let\eqgriii\relax
 %</package|eqexam>
 %<*package>
 %    \end{macrocode}
@@ -3244,6 +3299,8 @@
 % to \cs{setkeys}; therefore you can pass a command of key-value options through
 % the optional argument:
 % |\def\myOpts{topsep=0pt}|, |\begin{exEnumerate}[\myOpts]|.
+% \changes{v8.2.6}{2018/12/03}{Inserted \string\cs{eqprior} prior to exEnumerate env}
+% The \cs{eqprior} command normally does nothing unless it is redefined.
 %    \begin{macrocode}
 \newenvironment{exEnumerate}[1][]{\everypar{}%
     \toks@=\expandafter{#1}%
@@ -3264,8 +3321,8 @@
 %    \begin{macrocode}
     \def\setENum{\Elabel\if\exerstar*\thequestionno(\thepartno)\else
         \thequestionno\fi}%
-    \ifExSolutionsSet\else
-    \writeToExSolns{^^J\protect\begin{exEnumerate}^^J}\fi
+    \ifExSolutionsSet\else\writeT@ExSolns{^^J\string\eqgrii
+      \protect\begin{exEnumerate}\eq@commentchar^^J}\fi
     \list{}{%
         \ifx\exE@labelwidth\@empty
         \settowidth{\labelwidth}{\exE@labelwidthTo}\else
@@ -3277,11 +3334,11 @@
         \setlength{\itemindent}{0pt}%
         \setlength{\listparindent}{0pt}%
         \setlength{\itemindent}{0pt}%
-%        \setlength{\labelsep}{0pt}%
         \settowidth{\labelsep}{\normalfont\ }%
         \setlength{\leftmargin}{\labelwidth}%
     }\item\relax}{\ifExSolutionsSet\else
-        \writeToExSolns{\protect\end{exEnumerate}^^J}\fi
+        \writeT@ExSolns{\string\eqgrii
+          \protect\end{exEnumerate}\eq@commentchar^^J}\fi
 \endlist}
 %    \end{macrocode}
 %    \end{environment}
@@ -3318,19 +3375,16 @@
 % elsewhere, \cmd{\include@solutions} is called, then put is to
 % \cmd{\relax}.
 %    \begin{macrocode}
-%\def\includeexersolutions{%
 \def\includeexersolutions{\@ifstar
-    {\let\resetEXsolns\relax\includeexersolutionsi}
-    {\def\resetEXsolns{\global\let\include@solutions\relax}%
-     \includeexersolutionsi}%
-}
+  {\let\resetEXsolns\relax\includeexersolutionsi}
+  {\def\resetEXsolns{\global\let\include@solutions\relax}%
+   \includeexersolutionsi}}
 \newcommand{\includeexersolutionsi}[1][]{%
-    \filterFor{#1}\includeexersolutionsii
-}
+  \filterFor{#1}\includeexersolutionsii}
 \def\includeexersolutionsii{%
 %</package|eqexam>
 %<*package>
-   \if\exerSolns@ExtFile\eq@NO
+  \if\exerSolns@ExtFile\eq@NO
 %</package>
 %<*package|eqexam>
 %    \end{macrocode}
@@ -3339,12 +3393,12 @@
 % solutions, unless it has been redefined to \cmd{\relax} by
 % \cmd{\includesolutions}.
 %    \begin{macrocode}
-        \include@solutions
-        \resetEXsolns
-        \let\eqFilterArg\@empty
+    \include@solutions
+    \resetEXsolns
+    \let\eqFilterArg\@empty
 %</package|eqexam>
 %<*package>
-   \fi
+  \fi
 %</package>
 %<*package|eqexam>
 }
@@ -3356,12 +3410,21 @@
 % solutions to exercises. The demo document is \texttt{filter\_exercises.tex},
 % but basically, we can include the solutions several times, once for each set filtered set.
 %    \begin{macrocode}
-\long\def\gobbleToEndEXt#1\endeqEXt{%
-    \ifeqforpaper\expandafter\@gobbletwo\fi}
+\long\def\gobbleToEndEXt#1\endeqEXt{\ifeqforpaper
+  \expandafter\@gobbletwo\fi}
 %    \end{macrocode}
 % \DescribeMacro\filterFor is used to mark a exercise with a name
 %    \begin{macrocode}
+\newif\if@targetforextr \@targetforextrfalse
 \newcommand\filterFor[1]{\def\eqFilterArg{#1}}
+\newcommand{\mrkForIns}[1]{\def\eqMrkCpyArg{#1}\global
+  \@targetforextrtrue\@ifundefined{#1@mfc}
+    {\global\@namedef{#1@mfc}{}}
+    {\PackageWarning{exerquiz/eqexam}
+    {The name '#1' has already been used.\MessageBreak
+      Please choose another, otherwise results may\MessageBreak
+      be as unexpected}}\ignorespaces}
+\let\eqMrkCpyArg\@empty
 \newcommand\inclEXtFilter[2]{\def\eqargii{#2}\ifx\eqargii\eqFilterArg
     \else\expandafter\gobbleToEndEXt\fi}
 %    \end{macrocode}
@@ -3375,13 +3438,13 @@
 % of exercises by a name, for example, \verb!\filterFor{Problems}!. Now, at the end of the document, we can
 % say
 %\begin{verbatim}
-%\useEXtFilter
-%\renewcommand\exsectitle{Solutions to Exercises}
-%\includeexersolutions*[Exercises]
-%\renewcommand\exsectitle{Solutions to Examples}
-%\includeexersolutions*[Examples]
-%\renewcommand\exsectitle{Solutions to Problems}
-%\includeexersolutions[Problems]
+%   \useEXtFilter
+%   \renewcommand\exsectitle{Solutions to Exercises}
+%   \includeexersolutions*[Exercises]
+%   \renewcommand\exsectitle{Solutions to Examples}
+%   \includeexersolutions*[Examples]
+%   \renewcommand\exsectitle{Solutions to Problems}
+%   \includeexersolutions[Problems]
 %\end{verbatim}
 % \DescribeMacro{\eqsolutionshook}\DescribeMacro{\priorexsectitle}
 % \DescribeMacro{\priorexslinput} These are commands that can be
@@ -3412,34 +3475,31 @@
     {\let\eq@defaultlheader\relax}
 %    \end{macrocode}
 % \DescribeMacro{\exerSolnInput} is the macro that formats the opening page
-% of the solutions page and inputs \cmd{\jobname.sol}.
+% of the solutions page and inputs \cmd{\jobname.sol}. Defined \DescribeMacro\eqExSolFileName
+% \cs{eqExSolFileName} in support of the \texttt{solutionsonly} option and the \pkg{ci-solns} package.
+% \changes{v8.2.8}{2018/12/13}{Defined \string\cs{eqExSolFileName}}
 %    \begin{macrocode}
 \newif\ifExSolutionsSet \ExSolutionsSetfalse
+\def\eqExSolFileName{\jobname.sol}
 \newcommand{\exerSolnInput}
 {%
-    \@ifundefined{eqe@IWO}{}{\ifsolutionsAtEnd%\ifvspacewithsolns
-        \eqe@IWO\@auxout{\string\expandafter\string\gdef
-        \string\csname\space eqExamQuesLastPage\string\endcsname
-        {\arabic{page}}}\fi}
-    \let\webnewpage\relax
-    \ifsolutionsonly\else\immediate\closeout\ex@solns\fi
-    \ifeq@nosolutions\else
+  \@ifundefined{eqe@IWO}{}{\ifsolutionsAtEnd
+    \eqe@IWO\@auxout{\string\expandafter\string\gdef
+    \string\csname\space eqExamQuesLastPage\string\endcsname
+    {\arabic{page}}}\fi}\let\webnewpage\relax
+  \ifsolutionsonly\else
 %    \end{macrocode}
-%\changes{v6.3w}{2011/03/15}{%
-%   Moved \cs{eqsolutionshook} from below to a higher position
-%   in the macro \cs{exerSolnInput} so the running header for
-%   the solution page appears on the first page of the solutions.
-%}%
-% Moved the following line to two location below.
+%   \changes{v8.2.6}{2018/12/03}{place \string\cs{endinput} at end of sol file}
+%   place \cs{endinput} at end of sol file
 %    \begin{macrocode}
-%       \eqsolutionshook % moved 2012/02/24
-%    \end{macrocode}
-% \changes{v6.4p}{2012/02/24}{Moved location of \cs{eqsolutionshook} again}%
-%    \begin{macrocode}
-        \iftherearesolutions
-            \ifsolutionsonly\eq@solutionshook
-                \eqsolutionshook
-            \else
+    \bgroup\OKToWriteExamDatatrue
+    \writeT@ExSolns{\string\endinput}\egroup
+    \immediate\closeout\ex@solns\fi
+  \ifeq@nosolutions\else
+    \iftherearesolutions
+      \ifsolutionsonly\eq@solutionshook
+        \eqsolutionshook
+      \else
 %    \end{macrocode}
 % If there are solutions and this is not the \texttt{solutionsonly} option,
 % we start a new page, clear the right mark and start a normal header.
@@ -3448,42 +3508,41 @@
 % Inserted |\markright{}| and \cs{eq@normalheader} to fix a problem with
 % disappearing running headers.
 %    \begin{macrocode}
-            \newpage\eq@solutionshook
-            \eqsolutionshook\markright{}\eq@normallheader
-        \fi
+        \newpage\eq@solutionshook
+        \eqsolutionshook\markright{}\eq@normallheader
+      \fi
 %    \end{macrocode}
 % We are still under the assumption that there are solutions to be input.
 % We set the mark of \cs{exsectitle}.
 %    \begin{macrocode}
-        \markright{\exsectitle}%
-            \ifx\webnewpage\relax
+      \markright{\exsectitle}%
+      \ifx\webnewpage\relax
 %    \end{macrocode}
 % \cs{webnewpage} is a mechanism to initially do nothing, then
 % to be redefined to \cs{newpage}. It is used in \cs{exerSolnHeader}.
 % The reasons for this definition are lost in time.
 %    \begin{macrocode}
-                \def\webnewpage{\global\let\webnewpage\newpage}%
-            \fi
+        \def\webnewpage{\global\let\webnewpage\newpage}\fi
 %    \end{macrocode}
 % We have a prior command, followed by the section title
 % \cs{exerSolnsHeadnToc}, followed by a post command. The prior and
 % post commands may be defined as the document author wishes.
 % Both of these are used in the \textsf{APB} pacakge.
 %    \begin{macrocode}
-            \priorexsectitle\exerSolnsHeadnToc\priorexslinput
+      \priorexsectitle\exerSolnsHeadnToc\priorexslinput
 %    \end{macrocode}
 % Finally, we input the solutions file, \cs{jobname.sol}, if one exists.
 %    \begin{macrocode}
-            \InputIfFileExists{\jobname.sol}
-            {\global\ExSolutionsSettrue}{\PackageWarning{exerquiz}
-            {!!! Solutions to exercises not found}}%
-            \global\ExSolutionsSetfalse
+      \InputIfFileExists{\eqExSolFileName}
+      {\global\ExSolutionsSettrue}{\PackageWarning{exerquiz}
+      {!!! Solutions to exercises not found}}%
+      \global\ExSolutionsSetfalse
 %    \end{macrocode}
 % Convert back to \cs{eq@defaultlheader} cleanly by first executing \cs{newpage}
 %    \begin{macrocode}
-            \newpage\eq@defaultlheader
-        \fi
+      \newpage\eq@defaultlheader
     \fi
+  \fi
 }
 %    \end{macrocode}
 % The \cs{include@solutions} is a wrapper command for \cs{exerSolnInput}
@@ -3587,8 +3646,7 @@
         \def\eqex@next{\subpdfbookmark{\exbookmarkfmt#1}%
             {qex.\the@exno}}%
     \fi
-    \eqex@next\ignorespaces
-}
+    \eqex@next\ignorespaces}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -3623,10 +3681,6 @@
 %    \begin{macrocode}
 \newcommand{\proofingsymbolColor}[1]{\def\@proofingsymbolColor{#1}}
 \proofingsymbolColor{red}
-%\newcommand{\proofingsymbol}[1]{%
-%    \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
-%\proofingsymbol{$\bullet$}
-%\proofingsymbol{\ding{52}}
 \let\@proofsymbolredefined=0
 \newcommand{\proofingsymbol}[1]{\let\@proofsymbolredefined=1%
     \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
@@ -3634,8 +3688,7 @@
 \def\setproofingsymbol{%
     \if\@proofsymbolredefined1\else
     \@ifpackageloaded{pifont}{\proofingsymbol{\ding{52}}}
-    {\proofingsymbol{$\bullet$}}\fi
-}
+    {\proofingsymbol{$\bullet$}}\fi}
 \AtBeginDocument{\setproofingsymbol}
 %    \end{macrocode}
 %    \end{macro}
@@ -3749,8 +3802,7 @@
     \setlength{\itemsep}{\propQ@itemsep}%
     \setlength{\itemindent}{0pt}%
     \setlength{\leftmargin}{\labelwidth}%
-    }%
-%    \setlength{\labelsep}{\propQ@labelsep}}%
+  }%
 }{\endlist}
 %    \end{macrocode}
 %    \begin{macro}{\pushquestions}
@@ -3761,11 +3813,11 @@
 % to return to questioning where you left off.
 %    \begin{macrocode}
 \def\pushquestions{\expandafter\xdef\csname save\@quesctr\endcsname
-    {\expandafter\the\csname c@\@quesctr\endcsname}\end{questions}}
+  {\expandafter\the\csname c@\@quesctr\endcsname}\end{questions}}
 \def\popquestions{%
-    \begin{questions}[\csname quesOpts\@quesctr\endcsname]%
-    \setcounter{\@quesctr}{\csname save\@quesctr\endcsname}%
-    \@ifnextchar\popquestions{\item[]}{\@ifnextchar\begin{\item[]}{}}}
+  \begin{questions}[\csname quesOpts\@quesctr\endcsname]%
+  \setcounter{\@quesctr}{\csname save\@quesctr\endcsname}%
+  \@ifnextchar\popquestions{\item[]}{\@ifnextchar\begin{\item[]}{}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -3821,13 +3873,13 @@
 % question label, i.e., \texttt{2(a)(ii)}. These two lines are repeated for
 % the \texttt{oQuestion} and \texttt{quiz} environments.
 %    \begin{macrocode}
-    \xdef\eq@pageThisQ{\the\c@page}%
-    \let\@currentQues\@empty
-    {\count0=\@shortquizCnt \advance\count0by1\relax
-        \xdef\@shortquizCnt{\the\count0}}%
-    \goodbreak\@ifstar{\sqForms\@shortquiz}%
-        {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
-          \def\sqstar{}\sqLinks\fi\@shortquiz}%
+  \xdef\eq@pageThisQ{\the\c@page}%
+  \let\@currentQues\@empty
+  {\count0=\@shortquizCnt \advance\count0by1\relax
+    \xdef\@shortquizCnt{\the\count0}}%
+  \goodbreak\@ifstar{\sqForms\@shortquiz}%
+    {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
+     \def\sqstar{}\sqLinks\fi\@shortquiz}%
 }{\aeb@endshortquiz}
 %    \end{macrocode}
 %    \end{environment}
@@ -4080,7 +4132,7 @@
     \if!\sqsolafter!\else
     \sqsolafter\sqsolafterhspace\fi\ignorespaces
   \else
-    \global\therearequizsolutionstrue\let\verbatim@out=\quiz@solns
+    \global\therearequizsolutionstrue\let\verbatim@out\quiz@solns
     \set@display@protect
     \immediate\write\verbatim@out{%
       \ifmakeQzSlLocal\protect\begingroup^^J\fi
@@ -4089,8 +4141,12 @@
 %    \begin{macrocode}
       \if\eqQuizType\isQZ
             \ifx\prior@eqQt\@empty\else\prior@eqQt\fi
+    \ifx\eqMrkCpyArg\@empty\else
+      \protect\eqMrkSoln{\eqMrkCpyArg}\fi
             \protect\eqQt{\eqFilterArg}\else
             \ifx\prior@eqSQt\@empty\else\prior@eqSQt\fi
+    \ifx\eqMrkCpyArg\@empty\else
+      \protect\eqMrkSoln{\eqMrkCpyArg}\fi
             \protect\eqSQt{\eqFilterArg}\fi
       \protect\quizSolnHeader\if\eqQuizType\isQZ\ifx\allow@peek\eq@NO
         [{\curr@quiz}{\currQuizStartPage}]\fi\fi
@@ -4110,6 +4166,7 @@
         \aftergroup\ignorespaces
     \else
         \endverbatimwrite
+        \eq@clearMrkCpy
         \ifx\@qzsolndest\@empty\else\set@display@protect
             \immediate\write\verbatim@out{\eqSqSolnTrailer}%
          \set@typeset@protect
@@ -4277,16 +4334,12 @@
 \def\includequizsolutions{\@ifstar
     {\let\resetQZtsolns\relax\includequizsolutionsi}
     {\def\resetQZtsolns{\global\let\include@quizsolutions\relax}%
-     \includequizsolutionsi}%
-}
+     \includequizsolutionsi}}
 \newcommand{\includequizsolutionsi}[1][]{%
-    \filterFor{#1}\includequizsolutionsii
-}
-\def\includequizsolutionsii{%
-    \include@quizsolutions
+    \filterFor{#1}\includequizsolutionsii}
+\def\includequizsolutionsii{\include@quizsolutions
     \resetQZtsolns
-    \let\eqFilterArg\@empty
-}
+    \let\eqFilterArg\@empty}
 %</package|eqexam>
 %<*package>
 %    \end{macrocode}
@@ -4309,10 +4362,14 @@
 %    \end{macrocode}
 % \DescribeMacro{\quizSolnInput} is the command that actually inputs
 % the solutions file \cmd{\jobname.qsl}.
+% \changes{v8.2.6}{2018/12/03}{Placed \string\cs{endinput} at the end of
+% the quiz solutions file}
 %    \begin{macrocode}
 \newcommand{\quizSolnInput}
 {%
     \global\let\webnewpage\relax
+    \bgroup\OKToWriteExamDatatrue
+    \writeT@QzSolns{\string\endinput}\egroup
     \immediate\closeout\quiz@solns
     \ifeq@noquizsolutions\else
 %    \end{macrocode}
@@ -4537,8 +4594,7 @@
 %    \begin{macrocode}
     \q@aboveskip\q@priorhook\noindent\hypertarget{qzH\@currentHref}{}%
     \eq@beginQuiz\qhspace{\set@typeset@protect\aebtitleQuiz}%
-    \ignorespaces
-}
+    \ignorespaces}
 %    \end{macrocode}
 % Here is the end for the \texttt{quiz} and \texttt{quiz*} environments. The
 % \cs{eq@prior@endQuiz} can be used for whatever purposes a
@@ -4546,19 +4602,19 @@
 %    \begin{macrocode}
 \def\aeb@endquiz
 {%
-    \eq@prior@endQuiz\noindent\eq@endQuiz
-    \global\let\eqQuizType\relax
-    \global\let\aebtitleQuiz\@empty
-    \global\let\aebTitleQuiz\@empty
-    \global\let\bqlabel\eq@bqlabel % reset beginning label to default
-    \global\let\eqlabel\eq@eqlabel % reset ending label to default
+  \eq@prior@endQuiz\noindent\eq@endQuiz
+  \global\let\eqQuizType\relax
+  \global\let\aebtitleQuiz\@empty
+  \global\let\aebTitleQuiz\@empty
+  \global\let\bqlabel\eq@bqlabel % reset beginning label to default
+  \global\let\eqlabel\eq@eqlabel % reset ending label to default
 %    \end{macrocode}
 % (2013/10/18) Added \cs{sqsllabel} to list of commands that are reset.
 %    \begin{macrocode}
-    \global\let\sqsllabel\eq@sqsllabel
-    \global\let\sqslrtnlabel\eq@sqslrtnlabel
-    \global\let\bqlabelISO\eq@bqlabelISO
-    \eq@belowqskip
+  \global\let\sqsllabel\eq@sqsllabel
+  \global\let\sqslrtnlabel\eq@sqslrtnlabel
+  \global\let\bqlabelISO\eq@bqlabelISO
+  \eq@belowqskip
 }
 %    \end{macrocode}
 %    \end{environment}
@@ -4684,24 +4740,15 @@
 %    \begin{macro}{\eq@BeginQuizLink}
 % Begin quiz with links
 %    \begin{macrocode}
-\def\eq@@BeginQuizLinkActions
-{%
-    \A{\JS{%
-%        \ifx\priorInitQuiz\@empty\else\priorInitQuiz\jsR\fi
-        \@initQuiz
-%        \ifx\postInitQuiz\@empty\else\jsR\postInitQuiz\fi
-    }}%
-}
+\def\eq@@BeginQuizLinkActions{\A{\JS{\@initQuiz}}}
 \def\eq@BeginQuizLinkDefaults{\Border{0 0 0}}
 \let\bqlabelFmt\@empty
-\def\eq@BeginQuizLink
-{%
-    \qz@IDTxtField
-    \set@@Link{}{}{}{\color{\@linkcolor}\bqlabelFmt\bqlabel}{}%
-    {\eq@setWidgetProps\setLink@driver}%
-    {\eq@BeginQuizLinkDefaults\eq@@BeginQuizLinkActions\every@Link}%
-    \space\ignorespaces
-}
+\def\eq@BeginQuizLink{%
+  \qz@IDTxtField
+  \set@@Link{}{}{}{\color{\@linkcolor}\bqlabelFmt\bqlabel}{}%
+  {\eq@setWidgetProps\setLink@driver}%
+  {\eq@BeginQuizLinkDefaults\eq@@BeginQuizLinkActions\every@Link}%
+  \space\ignorespaces}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\eq@EndQuizLink}
@@ -4757,35 +4804,24 @@
 % This is the button when the user wants button rather than link for the
 % \texttt{quiz} environment.
 %    \begin{macrocode}
-\def\BeginQuizButtonDefaults
-{%
+\def\BeginQuizButtonDefaults{%
     \CA{\bqlabel}\H{P}\F{\FPrint}
-    \BC{1 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}
-}
-\def\eq@@BeginQuizButtonActions
-{%
-    \A{\JS{%
-        \@initQuiz
-    }}%
-}
-\newcommand\eq@BeginQuizButton[1][]
-{%
-    \mbox{\qz@IDTxtField\push@@Button{#1}{beginQuiz.\curr@quiz}{}%
-        {\DefaultHeightOfWidget}{\eq@protect\A}%
-        {\eq@setButtonProps\eq@Button@driver}%
-        {\BeginQuizButtonDefaults\eq@@BeginQuizButtonActions
-         \every@ButtonField\every@BeginQuizButton}}%
-}
+    \BC{1 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}}
+\def\eq@@BeginQuizButtonActions{\A{\JS{\@initQuiz}}}
+\newcommand\eq@BeginQuizButton[1][]{%
+  \mbox{\qz@IDTxtField\push@@Button{#1}{beginQuiz.\curr@quiz}{}%
+    {\DefaultHeightOfWidget}{\eq@protect\A}%
+    {\eq@setButtonProps\eq@Button@driver}%
+    {\BeginQuizButtonDefaults\eq@@BeginQuizButtonActions
+     \every@ButtonField\every@BeginQuizButton}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\eq@EndQuizButton}
 % The `End Quiz' code for Links
 %    \begin{macrocode}
-\def\EndQuizButtonDefaults
-{%
+\def\EndQuizButtonDefaults{%
     \CA{\eqlabel}\F{\FPrint}\BC{1 0 0}
-    \BG{.7529 .7529 .7529}\W{1}\S{B}\H{P}
-}
+    \BG{.7529 .7529 .7529}\W{1}\S{B}\H{P}}
 \def\eq@@EndQuizButtonActions{\A{\JS{%
   if (!isQuizInitialized("\curr@quiz"))\jsR\jsT
     eqAppAlert(InitMsg("\bqlabelISO"),3);\jsR
@@ -4811,20 +4847,18 @@
 }
 \newcommand{\eq@hiddenScoreData}{\makebox[0pt][r]{%
   \textField[\BC{}\F{\FHidden}]{ScoreData.\curr@quiz}{0bp}{0bp}}}
-\newcommand\eq@EndQuizButton[1][]
-{%
-    \ifx\eq@CGI\@empty
-        \let\eq@submitURL\@empty
-        \let\eq@insertHiddenFields\@empty
-    \fi
-    \mbox{\push@@Button{#1}{endQuiz.\curr@quiz}{}%
-        {\DefaultHeightOfWidget}{\eq@protect\A}%
-        {\eq@setButtonProps\eq@Button@driver}%
-        {\EndQuizButtonDefaults\eq@@EndQuizButtonActions
-         \every@ButtonField\every@EndQuizButton}}%
-    \makebox[0pt][r]{\eq@hiddenScoreData\eq@insertHiddenFields}%
-    \global\let\eq@CGI\@empty
-}
+\newcommand\eq@EndQuizButton[1][]{%
+  \ifx\eq@CGI\@empty
+    \let\eq@submitURL\@empty
+    \let\eq@insertHiddenFields\@empty
+  \fi
+  \mbox{\push@@Button{#1}{endQuiz.\curr@quiz}{}%
+    {\DefaultHeightOfWidget}{\eq@protect\A}%
+    {\eq@setButtonProps\eq@Button@driver}%
+    {\EndQuizButtonDefaults\eq@@EndQuizButtonActions
+     \every@ButtonField\every@EndQuizButton}}%
+  \makebox[0pt][r]{\eq@hiddenScoreData\eq@insertHiddenFields}%
+  \global\let\eq@CGI\@empty}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\databaseName}
@@ -4867,16 +4901,13 @@
 % #2 = title of textfield that contains the score.
 %\end{verbatim}
 %    \begin{macrocode}
-\def\eqButtonDefaults
-{%
-    \CA{\eq@local@CA}\AC{}\H{P}\W{1}\S{B}
-    \BC{1 0 0}\BG{.7529 .7529 .7529}
-}
-\def\@@eqButtonActions
-{%
-    \A{\JS{if (isEndQuizPushed("\eqBaseName")){\jsR\jsT%
-            correctQuiz("\eqBaseName",\thequestionno);%
-            \ifusesumrytbls\jsR\jsT\else\jsR\fi
+\def\eqButtonDefaults{%
+  \CA{\eq@local@CA}\AC{}\H{P}\W{1}\S{B}
+  \BC{1 0 0}\BG{.7529 .7529 .7529}}
+\def\@@eqButtonActions{%
+  \A{\JS{if (isEndQuizPushed("\eqBaseName")){\jsR\jsT%
+      correctQuiz("\eqBaseName",\thequestionno);%
+      \ifusesumrytbls\jsR\jsT\else\jsR\fi
 %    \end{macrocode}
 % (06/13/10) Added the quiz summary table, and the function
 % \texttt{correctSumryTbl}. If a summary table is not present
@@ -4884,21 +4915,19 @@
 %    \begin{macrocode}
         if (typeof correctSumryTbl == "function")\jsR\jsT\jsT
             correctSumryTbl("\eqBaseName",\thequestionno);\jsR
-    }
-    }}%
+  }}}%
 }
-\newcommand\eqButton[2][]
-{%
+\newcommand\eqButton[2][]{%
 %    \end{macrocode}
 % If nocorrections is true, then this button does not appear.
 %    \begin{macrocode}
-    \ifnocorrections\else
-        \def\eqBaseName{#2}%
-        \mbox{\push@@Button{#1}{correct.#2}{}{\DefaultHeightOfWidget}%
-        {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
-        {\eqButtonDefaults\@@eqButtonActions\every@ButtonField
-        \every@eqButton}}%
-    \fi
+  \ifnocorrections\else
+    \def\eqBaseName{#2}%
+    \mbox{\push@@Button{#1}{correct.#2}{}{\DefaultHeightOfWidget}%
+    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
+    {\eqButtonDefaults\@@eqButtonActions\every@ButtonField
+    \every@eqButton}}%
+  \fi
 }
 %    \end{macrocode}
 % \changes{v6.7n}{2013/09/17}{\cs{CorrButton} is now an alias for \cs{eqButton}}
@@ -4913,22 +4942,19 @@
 % \cs{CorrAnsButton}. When the correct button is pressed, this check box will show a
 % green check or a red cross (by default).
 %    \begin{macrocode}
-\def\rbMarkup@Defaults
-{%
+\def\rbMarkup@Defaults{%
     \BC{}\F{\FHidden}\Ff{\FfReadOnly}\textSize{12}
-    \textColor{0 g}\symbolchoice{check}\W{}
-}
+    \textColor{0 g}\symbolchoice{check}\W{}}
 \newcommand\rbMarkup[1][]{%
-    \ifx\grpquestions\eq@One
-        \def\Fld@name{%
-            \oField.\thequestionno.\thegrpquestionno}\else
-        \def\Fld@name{\oField.\thequestionno}\fi
-    \mbox{\check@@Box{#1\V{Yes}\DV{Yes}}%
-    {rbmarkup.\Fld@name}%
-%    {rbmarkup.\curr@quiz.\thequestionno}%
-    {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-    {\eq@setWidgetProps\eq@RadioCheck@driver}%
-    {\rbMarkup@Defaults\every@CheckBox\every@rbMarkup}}}%
+  \ifx\grpquestions\eq@One
+    \def\Fld@name{%
+        \oField.\thequestionno.\thegrpquestionno}\else
+    \def\Fld@name{\oField.\thequestionno}\fi
+  \mbox{\check@@Box{#1\V{Yes}\DV{Yes}}%
+  {rbmarkup.\Fld@name}%
+  {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
+  {\eq@setWidgetProps\eq@RadioCheck@driver}%
+  {\rbMarkup@Defaults\every@CheckBox\every@rbMarkup}}}%
 %    \end{macrocode}
 %    \end{macro}
 %
@@ -4960,14 +4986,12 @@
 % This question type is entered into the ``\texttt{tagged}'' data, and is meant to be
 % used for classifying and in tracking the problem types. Example: \verb+\QT{limits}+.
 %    \begin{macrocode}
-\newcommand\QT[1]
-{%
-    \gdef\eq@qT{#1}\ifx\eq@qT\@empty\global\let\eq@qT\eq@na\fi
+\newcommand\QT[1]{%
+  \gdef\eq@qT{#1}\ifx\eq@qT\@empty\global\let\eq@qT\eq@na\fi
 %    \end{macrocode}
 %    \cs{eqQT} saves the value, then we put \cs{eq@qT} back to its default.
 %    \begin{macrocode}
-    \global\let\eqQT\eq@qT\global\let\eq@qT\eq@na
-}
+  \global\let\eqQT\eq@qT\global\let\eq@qT\eq@na}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macrocode}
@@ -5039,29 +5063,23 @@
     \Ff{\FfReadOnly}\BC{1 0 0}\BG{}\S{S}
     \DV{\eqScore}\V{\eqScore}\W{1}
 }
-\newcommand\ScoreField[2][]
-{%
-    \mbox{\text@@Field{#1}{ScoreField.#2}{\SFW}%
-        {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
-        {\ScoreFieldDefaults\every@eqTextField\every@ScoreField}}%
-}
+\newcommand\ScoreField[2][]{%
+  \mbox{\text@@Field{#1}{ScoreField.#2}{\SFW}%
+    {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
+    {\ScoreFieldDefaults\every@eqTextField\every@ScoreField}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\GradeField}
 % This command creates a text field that shows the letter grade of the user's
 % effort on the current quiz.
 %    \begin{macrocode}
-\def\GradeFieldDefaults
-{%
-    \textColor{0 0 1 rg}\BC{1 0 0}\BG{1 1 1}\S{S}
-    \Ff{\FfReadOnly}\Q{1}\W{1}
-}
-\newcommand\GradeField[2][]
-{%
-    \mbox{\text@@Field{#1}{GradeField.#2}{\GFW}%
-        {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
-        {\GradeFieldDefaults\every@eqTextField\every@GradeField}}%
-}
+\def\GradeFieldDefaults{%
+  \textColor{0 0 1 rg}\BC{1 0 0}\BG{1 1 1}\S{S}
+  \Ff{\FfReadOnly}\Q{1}\W{1}}
+\newcommand\GradeField[2][]{%
+  \mbox{\text@@Field{#1}{GradeField.#2}{\GFW}%
+    {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
+    {\GradeFieldDefaults\every@eqTextField\every@GradeField}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\AnswerField}
@@ -5072,23 +5090,19 @@
 %    \begin{macro}{\noResetAnsFieldOnClose}
 % When expanded, the \cs{AnswerField}s will not be reset, this is the default behavior.
 %    \begin{macrocode}
-\def\AnswerFieldDefaults
-{%
-   \BC{0 0 0}\S{S}\Ff{\FfReadOnly}\W{1}%
-   \presets{\eq@resetAnsFieldOnClose}%
-}
+\def\AnswerFieldDefaults{%
+  \BC{0 0 0}\S{S}\Ff{\FfReadOnly}\W{1}
+  \presets{\eq@resetAnsFieldOnClose}}
 \let\eq@resetAnsFieldOnClose\@empty
 \newcommand{\noResetAnsFieldOnClose}{%
     \global\let\eq@resetAnsFieldOnClose\@empty}
 \newcommand{\resetAnsFieldOnClose}{%
-    \gdef\eq@resetAnsFieldOnClose{%
-        \AApageclose{this.resetForm(["\Fld@name"]);}}}
-\newcommand\AnswerField[2][]
-{%
-    \mbox{\text@@Field{#1}{Ans.#2}{\RBW}{\DefaultHeightOfWidget}%
-        {}{\eq@setWidgetProps\eq@TextField}%
-        {\AnswerFieldDefaults\every@eqTextField\every@AnswerField}}%
-}
+  \gdef\eq@resetAnsFieldOnClose{%
+    \AApageclose{this.resetForm(["\Fld@name"]);}}}
+\newcommand\AnswerField[2][]{%
+  \mbox{\text@@Field{#1}{Ans.#2}{\RBW}{\DefaultHeightOfWidget}%
+    {}{\eq@setWidgetProps\eq@TextField}%
+    {\AnswerFieldDefaults\every@eqTextField\every@AnswerField}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -5097,37 +5111,33 @@
 % An attempt at putting \cs{AnswerField} in the left running footer on each page where there
 % is a response box.
 %    \begin{macrocode}
-%
 \newcommand\autoAnswerField{%
-    \@ifundefined{lfooter}{\def\eq@next{\eq@autoAnswerFieldgobble}%
-    \PackageError{exerquiz}{The \string\autoAnswerField\space
-        command\MessageBreak requires the web package}{Use web package}
-    }{%
-        \PackageInfo{exerquiz}{%
-        For this auto answer field feature to run\MessageBreak
-        the webheadings pagestyle of the web package\MessageBreak
-        is required}\def\eq@next{\eq@autoAnswerField}%
-        \ifx\web@lfoot\@empty\else
-        \PackageWarning{exerquiz}{The left running footer already in
-        use\MessageBreak Will overwrite what is there now.
-        Better fix it.}\fi
-    }%
-    \eq@next
-}
+  \@ifundefined{lfooter}{\def\eq@next{\eq@autoAnswerFieldgobble}%
+  \PackageError{exerquiz}{The \string\autoAnswerField\space
+    command\MessageBreak requires the web package}{Use web package}
+  }{%
+    \PackageInfo{exerquiz}{%
+    For this auto answer field feature to run\MessageBreak
+    the webheadings pagestyle of the web package\MessageBreak
+    is required}\def\eq@next{\eq@autoAnswerField}%
+    \ifx\web@lfoot\@empty\else
+    \PackageWarning{exerquiz}{The left running footer already in
+    use\MessageBreak Will overwrite what is there now.
+    Better fix it.}\fi
+  }%
+  \eq@next}
 \newcommand\eq@autoAnswerFieldgobble[1][]{\relax}
 \newcommand\autoAnsFldRaiseBox[1]{\def\ef@aAFRB{#1}}
 \autoAnsFldRaiseBox{0pt}
 \let\autoAFOpts\@empty
 \newcommand\eq@autoAnswerField[1][]{\gdef\autoAFOpts{#1}%
-    \def\eq@insertAnswerField{\AnswerField[#1]{\currQuiz}}%
-    \eq@@autoAnswerField
-}
+  \def\eq@insertAnswerField{\AnswerField[#1]{\currQuiz}}%
+  \eq@@autoAnswerField}
 \newcommand\eq@@autoAnswerField{\lfooter{\ifIsRespBox
-    \raisebox{\ef@aAFRB}{\eq@insertAnswerField}%
-    \global\IsRespBoxfalse\fi}%
-}
+  \raisebox{\ef@aAFRB}{\eq@insertAnswerField}%
+  \global\IsRespBoxfalse\fi}}
 \newcommand\manualAnswerField[1][\autoAFOpts]{%
-    \expandafter\AnswerField\expandafter[#1]{\currQuiz}}
+  \expandafter\AnswerField\expandafter[#1]{\currQuiz}}
 %    \end{macrocode}
 %    \end{macro}
 % Now let's define some additional text fields for the quiz environment.
@@ -5135,45 +5145,36 @@
 % This command creates a text field which displays the number of points in the
 % quiz scored by the user of the \texttt{quiz}.
 %    \begin{macrocode}
-\def\PointsFieldDefaults
-{%
-   \rawPDF{}\BC{1 0 0}\BG{}\W{1}\S{S}\Ff{\FfReadOnly}
- }
-\newcommand\PointsField[2][]
-{%
-    \mbox{\text@@Field{#1}{PointsField.#2}{\PtFW}%
-        {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
-        {\PointsFieldDefaults\every@eqTextField\every@PointsField}}%
-}
+\def\PointsFieldDefaults{%
+  \rawPDF{}\BC{1 0 0}\BG{}\W{1}\S{S}\Ff{\FfReadOnly}}
+\newcommand\PointsField[2][]{%
+  \mbox{\text@@Field{#1}{PointsField.#2}{\PtFW}%
+    {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
+    {\PointsFieldDefaults\every@eqTextField\every@PointsField}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\PercentField}
 % This command creates a text field which displays user's score in percent
 % form.
 %    \begin{macrocode}
-\def\PercentFieldDefaults
-{%
-    \rawPDF{}\BC{1 0 0}\BG{}\W{1}\S{S}\Ff{\FfReadOnly}%
-}
-\newcommand\PercentField[2][]
-{%
-    \mbox{\text@@Field{#1}{PercentField.#2}{\PcFW}%
-        {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
-        {\PercentFieldDefaults\every@eqTextField\every@PercentField}}%
-}
+\def\PercentFieldDefaults{%
+  \rawPDF{}\BC{1 0 0}\BG{}\W{1}\S{S}\Ff{\FfReadOnly}}
+\newcommand\PercentField[2][]{%
+  \mbox{\text@@Field{#1}{PercentField.#2}{\PcFW}%
+    {\DefaultHeightOfWidget}{}{\eq@setWidgetProps\eq@TextField}%
+    {\PercentFieldDefaults\every@eqTextField\every@PercentField}}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\RestoreScoreField}
 % Reset the score field to its default, in case some author
 % changed things.
 %    \begin{macrocode}
-\newcommand\RestoreScoreField
-{%
-    \global\let\eqScore\eq@Score
-    \global\let\eqOutOf\eq@OutOf
-}
+\newcommand\RestoreScoreField{%
+  \global\let\eqScore\eq@Score
+  \global\let\eqOutOf\eq@OutOf}
 %    \end{macrocode}
 %    \end{macro}
+%
 % \subsection{Floating and Docking a Quiz}
 %
 %    \begin{macro}{\DeclareQuiz}
@@ -5190,8 +5191,7 @@
 %    \begin{macrocode}
 \def\DeclareQuiz#1{\edef\oField{#1}%
     \edef\thisQuiz{#1}\edef\curr@quiz{#1}%
-    \edef\currQuiz{#1}\edef\curr@quiz{#1}%
-}
+    \edef\currQuiz{#1}\edef\curr@quiz{#1}}
 \let\Quiz\DeclareQuiz
 %    \end{macrocode}
 %    \end{macro}
@@ -5231,22 +5231,22 @@
 \let\endQuizHere\relax
 \let\dockQuiz\relax
 \newcommand\floatQuiz{%
-    \global\let\eq@beginQuiz@saved\eq@beginQuiz
-    \global\let\eq@endQuiz@saved\eq@endQuiz
-    \global\let\startQuizHere\eq@beginQuiz
-    \global\let\endQuizHere\eq@endQuiz
-    \global\let\eq@beginQuiz\aeb@noindgobble
-    \global\let\eq@endQuiz\@empty
-    \global\let\dockQuiz\eq@dockQuiz
+  \global\let\eq@beginQuiz@saved\eq@beginQuiz
+  \global\let\eq@endQuiz@saved\eq@endQuiz
+  \global\let\startQuizHere\eq@beginQuiz
+  \global\let\endQuizHere\eq@endQuiz
+  \global\let\eq@beginQuiz\aeb@noindgobble
+  \global\let\eq@endQuiz\@empty
+  \global\let\dockQuiz\eq@dockQuiz
 }
 \newcommand\eq@dockQuiz{%
-    \global\let\eq@beginQuiz\eq@beginQuiz@saved
-    \global\let\eq@endQuiz\eq@endQuiz@saved
-    \global\let\startQuizHere\relax
-    \global\let\endQuizHere\relax
-    \global\let\eq@beginQuiz@saved\relax
-    \global\let\eq@endQuiz@saved
-    \global\let\dockQuiz\relax
+  \global\let\eq@beginQuiz\eq@beginQuiz@saved
+  \global\let\eq@endQuiz\eq@endQuiz@saved
+  \global\let\startQuizHere\relax
+  \global\let\endQuizHere\relax
+  \global\let\eq@beginQuiz@saved\relax
+  \global\let\eq@endQuiz@saved
+  \global\let\dockQuiz\relax
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -5266,19 +5266,18 @@
 % short quizzes.
 %    \begin{macrocode}
 \def\fancyQuizHeaders{%
-    \global\let\eq@sqsllabel@fancy@save\eq@sqsllabel
-    \gdef\eq@sqsllabel{\eq@fancyQuizHeaders}}
+  \global\let\eq@sqsllabel@fancy@save\eq@sqsllabel
+  \gdef\eq@sqsllabel{\eq@fancyQuizHeaders}}
 \def\eq@fancyQuizHeaders{%
-    \if\eqQuizType\isQZ\expandafter\eq@fancyQuizHeadersfmt\else
-    \expandafter\eq@fancyShrtQuizHeadersfmt\fi
-}
+  \if\eqQuizType\isQZ\expandafter\eq@fancyQuizHeadersfmt\else
+  \expandafter\eq@fancyShrtQuizHeadersfmt\fi}
 \let\eq@sqsllabel@fancy@save\@empty
 %    \end{macrocode}
 % We set \cs{eq@sqsllabel} back to its value when \cs{fancyQuizHeaders} was last
 % invoked.
 %    \begin{macrocode}
 \def\restoreDefaultQuizHeaders{%
-    \global\let\eq@sqsllabel\eq@sqsllabel@fancy@save}
+  \global\let\eq@sqsllabel\eq@sqsllabel@fancy@save}
 %    \end{macrocode}
 % Here is the definition of the format for quizzes. This can be redefined, a few
 % suggestions are made in the documentation. \DescribeMacro{\dfltFncyQHdrsFmt}
@@ -5292,17 +5291,16 @@
 \newcommand\FncyHdrsFmtNoTitleQuiz{Solution to Quiz:}
 \newcommand\FncyHdrsFmtQuestion{Question}
 \newcommand\dfltFncyQHdrsFmt{%
-    \protect\bfseries\protect\color{\fncyQHdrsColor}%
-    \ifx\aebTitleQuiz\@empty
-    \ifnum\@eqquestiondepth>0\relax\FncyHdrsFmtNoTitleQuiz\fi
-    \else\aebTitleQuiz:\ifnum\@eqquestiondepth=0\else\protect\ %
-    \FncyHdrsFmtQuestion\fi\fi\ifcase\@eqquestiondepth
-    \ifx\aebTitleQuiz\@empty\FncyHdrsFmtNoTitleQuiz\fi
-    \or\space\arabic{eqquestionnoi}.%
-    \or\space\arabic{eqquestionnoi}(\alph{eqquestionnoii})%
-    \or\space\arabic{eqquestionnoi}(\alph{eqquestionnoii})%
-        (\roman{eqquestionnoiii})\fi
-}
+  \protect\bfseries\protect\color{\fncyQHdrsColor}%
+  \ifx\aebTitleQuiz\@empty
+  \ifnum\@eqquestiondepth>0\relax\FncyHdrsFmtNoTitleQuiz\fi
+  \else\aebTitleQuiz:\ifnum\@eqquestiondepth=0\else\protect\ %
+  \FncyHdrsFmtQuestion\fi\fi\ifcase\@eqquestiondepth
+  \ifx\aebTitleQuiz\@empty\FncyHdrsFmtNoTitleQuiz\fi
+  \or\space\arabic{eqquestionnoi}.%
+  \or\space\arabic{eqquestionnoi}(\alph{eqquestionnoii})%
+  \or\space\arabic{eqquestionnoi}(\alph{eqquestionnoii})%
+    (\roman{eqquestionnoiii})\fi}
 %    \end{macrocode}
 % \DescribeMacro{\dclrFncyQzHdrsFmt}\cmd{\dclrFncyQzHdrsFmt} is used to declare the formatting for quizzes.
 %    \begin{macrocode}
@@ -5349,9 +5347,9 @@
     \@ifstar{\def\eq@tq@star{*}\eq@titleQuiz}%
 {\def\eq@tq@star{x}\eq@titleQuiz}}
 \def\eq@titleQuiz#1{%
-    \gdef\aebTitleQuiz{#1}\def\@currentlabelname{#1}%
-    \gdef\aeb@@titleQuiz{#1}%
-    \gdef\aebtitleQuiz{\mbox{\titleQuizfmt{#1}}\tqhspace}%
+  \gdef\aebTitleQuiz{#1}\def\@currentlabelname{#1}%
+  \gdef\aeb@@titleQuiz{#1}%
+  \gdef\aebtitleQuiz{\mbox{\titleQuizfmt{#1}}\tqhspace}%
 \makeatother}
 %</package>
 %<package|eqexam>\let\aebtitleQuiz\@empty
@@ -5373,14 +5371,13 @@
 % Outside the \texttt{shortquiz} environment, \cs{ifstaroption} is \cs{@gobbletwo}
 %    \begin{macrocode}
 \def\eq@ifstaroption#1#2{\if\eq@tq@star*\def\sq@next{#1}%
-    \else\def\sq@next{#2}\fi\sq@next}
+  \else\def\sq@next{#2}\fi\sq@next}
 \let\eq@tq@star\relax
 \def\ifstaroption{\PackageWarning{exerquiz}
-    {\protect\ifstaroption\space is only defined within the\MessageBreak
-    shortquiz environment. Gobbling up its two\MessageBreak
-    arguments, sorry. This occurred}%
-    \@gobbletwo
-}
+  {\protect\ifstaroption\space is only defined within the\MessageBreak
+  shortquiz environment. Gobbling up its two\MessageBreak
+  arguments, sorry. This occurred}%
+  \@gobbletwo}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -5442,11 +5439,11 @@
 % \cmd\aeb@creditmarkup creates the text field that appears in the margins.
 %    \begin{macrocode}
 \newcommand{\aeb@creditmarkup}{%
-    \textField[\Ff\FfReadOnly\BC{}\F\FHidden
-    \textColor{\pcMarkupColor}\textSize{\markupTextSize}\autoCenter{n}%
-    \DV{0 \eqptsLabel}\V{0 \eqptsLabel}]%
-    {qMark.\currQuiz.\thequestionno.\arabic{qMarkCnt}}%
-    {\markupWidth}{\markupHeight}%
+  \textField[\Ff\FfReadOnly\BC{}\F\FHidden
+  \textColor{\pcMarkupColor}\textSize{\markupTextSize}\autoCenter{n}%
+  \DV{0 \eqptsLabel}\V{0 \eqptsLabel}]%
+  {qMark.\currQuiz.\thequestionno.\arabic{qMarkCnt}}%
+  {\markupWidth}{\markupHeight}%
 }
 %    \end{macrocode}
 % The \cs{showCreditMarkup} command defines \cs{qMark} and \cs{qMark@Hook}.
@@ -5457,15 +5454,14 @@
 % the command \cs{multipartquestion} has been expanded, \cs{aeb@multipart} is one, otherwise
 % it is zero. If zero we do place the markup, otherwise, no.
 %    \begin{macrocode}
-    \def\qMark{\if\aeb@multipart\eq@Zero\aeb@creditmarkup
-    \stepcounter{qMarkCnt}\else\global\let\aeb@multipart\eq@Zero\fi}%
+  \def\qMark{\if\aeb@multipart\eq@Zero\aeb@creditmarkup
+  \stepcounter{qMarkCnt}\else\global\let\aeb@multipart\eq@Zero\fi}%
 %    \end{macrocode}
 % \cs{qMark@Hook} is a hook that is normally \cs{@empty}. The hook is strategically
 % placed at the beginning of each question \cs{item}. Here we define it to be
 % \cs{aeb@creditmarkupfmt}.
 %    \begin{macrocode}
-    \def\qMark@Hook{\aeb@creditmarkupfmt}%
-}
+  \def\qMark@Hook{\aeb@creditmarkupfmt}}
 %    \end{macrocode}
 % Turn off partial credit markup by putting \cs{qMark@Hook} back to its default.
 %    \begin{macrocode}
@@ -5490,7 +5486,7 @@
 %    \begin{macrocode}
 \long\def\gobbleToEndQt#1\endeqQt{\ifeqforpaper\expandafter\@gobble\fi}
 \long\def\gobbleToEndSQt#1\endeqSQt{%
-    \ifeqforpaper\expandafter\@gobble\fi}
+  \ifeqforpaper\expandafter\@gobble\fi}
 %    \end{macrocode}
 % The \DescribeMacro{\inclQtFilter}\cmd{\inclQtFilter} operates on the quizzes. If the argument \texttt{\#1}
 % matches the optional argument of \cs{filterFor}, we include, otherwise, we gobble
@@ -5498,7 +5494,7 @@
 % \cmd{\gobbleToEndQt}.
 %    \begin{macrocode}
 \newcommand\inclQtFilter[1]{\def\eqarg{#1}\ifx\eqarg\eqFilterArg
-    \else\expandafter\gobbleToEndQt\fi}
+  \else\expandafter\gobbleToEndQt\fi}
 %    \end{macrocode}
 % The \DescribeMacro{\exclQt}\cmd{\exclQt} command exclude all quiz solutions.
 %    \begin{macrocode}
@@ -5508,16 +5504,15 @@
 % \cs{inclQtFilter}, and it also \cs{let}s \cs{eqSQt} to
 % \cs{exclSQt}.
 %    \begin{macrocode}
-\newcommand{\useQtFilter}{%
-    \let\eqQt\inclQtFilter\let\eqSQt\exclSQt
-}
+\newcommand{\useQtFilter}{\let\eqQt\inclQtFilter
+  \let\eqSQt\exclSQt}
 %    \end{macrocode}
 % Now we repeat the same sequence of construct for short quizzes.
 %  The command \DescribeMacro{\inclSQtFilter}\cmd{\inclSQtFilter} includes a short quiz
 % solution if it meets the filter criteria.
 %    \begin{macrocode}
 \newcommand\inclSQtFilter[1]{\def\eqarg{#1}\ifx\eqarg\eqFilterArg
-    \else\expandafter\gobbleToEndSQt\fi}
+  \else\expandafter\gobbleToEndSQt\fi}
 %    \end{macrocode}
 % The \DescribeMacro{\exclSQt}\cmd{\exclSQt} command excludes all short quiz solutions.
 %    \begin{macrocode}
@@ -5545,18 +5540,18 @@
 \newcommand{\sqbookmarkfmt}{Short Quiz \@shortquizCnt.\space}
 \newcommand{\qzbookmarkfmt}{Quiz \@quizCnt.\space}
 \newcommand{\quizpdfbookmark}[1]{\relax\def\argi{#1}%
-    \if\eqQuizType\isSQZ\edef\aeb@bmmrkdest{sqbm.\@shortquizCnt}%
-    \def\aeb@thisbkmrkfmt{\sqbookmarkfmt}\else
-    \edef\aeb@bmmrkdest{qzbm.\@quizCnt}%
-    \def\aeb@thisbkmrkfmt{\qzbookmarkfmt}\fi
-    \def\quizpdfbookmarktitle{#1}%
-    \def\eqex@next{\belowpdfbookmark{\aeb@thisbkmrkfmt#1}%
-        {\aeb@bmmrkdest}}%
-    \ifx\aebTitleQuiz\@empty\else\ifx\argi\@empty
-        \def\quizpdfbookmarktitle{\aebTitleQuiz}%
-        \def\eqex@next{\belowpdfbookmark{\aebTitleQuiz}%
-        {\aeb@bmmrkdest}}\fi\fi
-    \eqex@next\ignorespaces
+  \if\eqQuizType\isSQZ\edef\aeb@bmmrkdest{sqbm.\@shortquizCnt}%
+  \def\aeb@thisbkmrkfmt{\sqbookmarkfmt}\else
+  \edef\aeb@bmmrkdest{qzbm.\@quizCnt}%
+  \def\aeb@thisbkmrkfmt{\qzbookmarkfmt}\fi
+  \def\quizpdfbookmarktitle{#1}%
+  \def\eqex@next{\belowpdfbookmark{\aeb@thisbkmrkfmt#1}%
+    {\aeb@bmmrkdest}}%
+  \ifx\aebTitleQuiz\@empty\else\ifx\argi\@empty
+    \def\quizpdfbookmarktitle{\aebTitleQuiz}%
+    \def\eqex@next{\belowpdfbookmark{\aebTitleQuiz}%
+    {\aeb@bmmrkdest}}\fi\fi
+  \eqex@next\ignorespaces
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -5591,22 +5586,20 @@
 % The \texttt{answers} environment needs to go into horizontal mode for the
 % \cs{linelength} to be correct when using \cs{leadinitem}.
 %    \begin{macrocode}
-    \ifx\solutionparshape\@empty\else
-% ?? remove the \par, why is it there to begin with?
-        \pushEnvir\par\noindent\expandafter\popEnvir\fi
-%        \pushEnvir\par\noindent\expandafter\popEnvir\fi
-    \stepcounter{questionno}%
-    \if\sqstar*\relax
-        \if\aeb@FLOverride\eq@l
-            \let\@Ans\Ans@sq@l\else
-            \let\@Ans\Ans@sq@f\fi
-    \else
-        \if\aeb@FLOverride\eq@f
-            \let\@Ans\Ans@sq@f\else
-            \let\@Ans\Ans@sq@l\fi
-    \fi
-    \def\aeb@answerType{r}\@ifnextchar[{\answers@@sq}%
-    {\@ifstar{\answers@@sq[\curr@quiz.\thequestionno]}{\answers@@sq[]}}}
+  \ifx\solutionparshape\@empty\else
+    \pushEnvir\par\noindent\expandafter\popEnvir\fi
+  \stepcounter{questionno}%
+  \if\sqstar*\relax
+    \if\aeb@FLOverride\eq@l
+      \let\@Ans\Ans@sq@l\else
+      \let\@Ans\Ans@sq@f\fi
+  \else
+    \if\aeb@FLOverride\eq@f
+      \let\@Ans\Ans@sq@f\else
+      \let\@Ans\Ans@sq@l\fi
+  \fi
+  \def\aeb@answerType{r}\@ifnextchar[{\answers@@sq}%
+  {\@ifstar{\answers@@sq[\curr@quiz.\thequestionno]}{\answers@@sq[]}}}
 \def\manswers@sq{\parindent0pt
 %    \end{macrocode}
 % \cs{ifuserectforms} is defined in \textsf{eqexam},
@@ -5621,7 +5614,6 @@
         \if\aeb@FLOverride\eq@l
         \let\@Ans\Ans@ck@sq@l\else
         \let\@Ans\Ans@ck@sq@f\fi
-%        \if\aeb@FLOverride l\let\@Ans\Ans@ck@sq@f\fi
     \else
         \if\aeb@FLOverride\eq@f
             \let\@Ans\Ans@ck@sq@f\else
@@ -5639,15 +5631,14 @@
 %    \begin{macrocode}
 \let\sq@hwdest\@empty % hard-wired destination
 \def\answers@@sq[#1]#2{%
-    \xdef\aeb@numCols{#2}%
-    \ifx\sq@hwdest\@empty
-        \xdef\@qzsolndest{#1}\else
-        \gdef\@qzsolndest{\sq@hwdest}\fi
-    \if\aeb@numCols1\gdef\eq@listType{1}\expandafter\answers@sq@list
-    \else
-        \gdef\eq@listType{0}\expandafter\answers@@sq@tabular
-    \fi{\aeb@numCols}%
-}
+  \xdef\aeb@numCols{#2}%
+  \ifx\sq@hwdest\@empty
+    \xdef\@qzsolndest{#1}\else
+    \gdef\@qzsolndest{\sq@hwdest}\fi
+  \if\aeb@numCols1\gdef\eq@listType{1}\expandafter\answers@sq@list
+  \else
+      \gdef\eq@listType{0}\expandafter\answers@@sq@tabular
+  \fi{\aeb@numCols}}
 %    \end{macrocode}
 %    \begin{macro}{\setMClabelsep}
 % \changes{v6.05e}{2006/18/06 v6.05e}
@@ -5668,7 +5659,7 @@
 \def\setMClabelsep#1{\def\eq@hspanner{#1}}
 \setMClabelsep{\ }\setMClabelsepDefault{\ }
 \def\resetMClabelsep{\expandafter\setMClabelsep\expandafter
-    {\eq@hspanner@default}}
+  {\eq@hspanner@default}}
 \def\eq@lw@l{\eq@l@l\eq@hspanner}
 %    \end{macrocode}
 % For the link-style MC question, the default width, \cs{eq@l@l}, of the label is the normalsize width of
@@ -5693,63 +5684,63 @@
 % These parameters are saved in the commands \cs{eq@pPTs} and
 % \cs{Ans@choice}.
 %    \begin{macrocode}
-\@ifundefined{ifwithsoldoc}{\newif\ifwithsoldoc\withsoldocfalse}{}
+\@ifundefined{ifwithinsoldoc}{\newif\ifwithinsoldoc\withinsoldocfalse}{}
+\@ifundefined{ifwithinqsldoc}{\newif\ifwithinqsldoc\withinqsldocfalse}{}
 \let\eq@ansChoiceArray\@empty
 \def\eq@recordAnsChoice{%
-    \ifx\eq@ansChoiceArray\@empty
-        \edef\tmp@exp{\noexpand\g@addto@macro
-            \noexpand\eq@ansChoiceArray{"\alph{quizno}"}}\else
-        \edef\tmp@exp{\noexpand\g@addto@macro
-            \noexpand\eq@ansChoiceArray{,"\alph{quizno}"}}\fi
-        \tmp@exp
-}
+  \ifx\eq@ansChoiceArray\@empty
+    \edef\tmp@exp{\noexpand\g@addto@macro
+      \noexpand\eq@ansChoiceArray{"\alph{quizno}"}}\else
+    \edef\tmp@exp{\noexpand\g@addto@macro
+      \noexpand\eq@ansChoiceArray{,"\alph{quizno}"}}\fi
+  \tmp@exp}
 \newcommand\Ans@list[2][0]{\gdef\eq@pPTs{#1}\xdef\Ans@choice{#2}%
-    \item\relax\noindent\if\eq@listType\eq@One
-    \addtocounter{quizno}{-1}\@ifundefined{ifwithsoldoc}
-        {\refstepcounter{quizno}}{\ifwithsoldoc\stepcounter{quizno}\else
-        \refstepcounter{quizno}\fi}\fi
-        \ignorespaces}
+  \item\relax\noindent\if\eq@listType\eq@One
+  \addtocounter{quizno}{-1}\@ifundefined{ifwithinsoldoc}
+    {\refstepcounter{quizno}}{\ifwithinsoldoc\stepcounter{quizno}\else
+    \refstepcounter{quizno}\fi}\fi
+    \ignorespaces}
 %    \end{macrocode}
 % Answers environment for a list environment.
 %    \begin{macrocode}
-\newenvironment{answers@sq@list}[1]
-{%
-    \ifx\aeb@answerType\eq@r
-        \let\endanswers\endanswers@sq@list\else
-        \let\endmanswers\endanswers@sq@list\fi
-    \list{\strut\@Ans}{%
-        \if\sqstar*\relax
-            \settowidth{\labelwidth}{\eq@lw@f}\else
-            \settowidth{\labelwidth}{\eq@lw@l}\fi
+\newenvironment{answers@sq@list}[1]{%
+  \ifx\aeb@answerType\eq@r
+    \let\endanswers\endanswers@sq@list\else
+    \let\endmanswers\endanswers@sq@list\fi
+  \list{\strut\@Ans}{%
+    \if\sqstar*\relax
+      \settowidth{\labelwidth}{\eq@lw@f}\else
+      \settowidth{\labelwidth}{\eq@lw@l}\fi
 %    \end{macrocode}
 %    (2013/05/17) Incorporated \cs{aboveanswersSkip} into \cs{topsep}
 %    \begin{macrocode}
-        \setlength{\topsep}{-\parskip+\aboveanswersSkip}%
-        \setlength{\parsep}{0pt}\setlength{\itemindent}{0pt}%
+    \setlength{\topsep}{-\parskip+\aboveanswersSkip}%
+    \setlength{\parsep}{0pt}\setlength{\itemindent}{0pt}%
 %    \end{macrocode}
 %    (2014/04/05) Added a specification for \cs{itemsep} so that the
 % \cs{rowsep} acts identically for tabular and list.
 %    \begin{macrocode}
-        \setlength{\itemsep}{0pt}\setlength{\partopsep}{0pt}%
-        \setlength{\listparindent}{\parindent}%
+    \setlength{\itemsep}{0pt}\setlength{\partopsep}{0pt}%
+    \setlength{\listparindent}{\parindent}%
 %    \end{macrocode}
 %    (2013/05/17) When inside the parts environment in tabular-mode,
 %    we need to add in \cs{eqemargin}. For \textsf{exerquiz} defaults
 %    to 0pt; when \textsf{eqexam} is used, it has a nonzero value.
 %    \begin{macrocode}
-        \ifnum\exerwparts@cols>1\relax
-            \ifx\itsExerParts\eq@YES
-             \setlength{\leftmargin}{\labelwidth}\else
-             \setlength{\leftmargin}{\labelwidth+\eqemargin}\fi
-        \else
+    \ifnum\exerwparts@cols>1\relax
+      \ifx\itsExerParts\eq@YES
+        \setlength{\leftmargin}{\labelwidth}\else
+        \setlength{\leftmargin}{\labelwidth+\eqemargin}\fi
+    \else
 %    \end{macrocode}
 %    (2013/05/17) Some adjustments depending on whether \cs{solutionparshape}
 %    is empty or not. If empty, \cs{leftmargin} is its usual value; otherwise
 %    we add in \cs{eqemargin} (0pt in \textsf{exerquiz}, nonzero in \textsf{eqexam}).
 %    \begin{macrocode}
-        \ifx\solutionparshape\@empty
-            \setlength{\leftmargin}{\labelwidth}\else
-            \setlength{\leftmargin}{\labelwidth+\eqemargin}\fi\fi
+      \ifx\solutionparshape\@empty
+        \setlength{\leftmargin}{\labelwidth}\else
+        \setlength{\leftmargin}{\labelwidth+\eqemargin}\fi
+    \fi
 %    \end{macrocode}
 % (2013/10/10) I'm changing the \cs{labelsep}, one definition for \texttt{eqexam}
 % another for \texttt{exerquiz}.
@@ -5757,14 +5748,12 @@
 %    \begin{macrocode}
 % Begin joint package and eqexam
 %</package|eqexam>
-%<package>       \setlength{\labelsep}{0pt}%
-%<package>%      \settowidth{\labelsep}{\eq@hspanner}%
-%<eqexam>        \setlength{\labelsep}{0pt}%
+%<package>    \setlength{\labelsep}{0pt}%
+%<eqexam>     \setlength{\labelsep}{0pt}%
 %<*package|eqexam>
-        \def\Ans{\Ans@list}%
-    }%
-}%
-{\endlist\setcounter{quizno}{0}\eq@answersEndHook}
+    \def\Ans{\Ans@list}%
+  }% list
+}{\endlist\setcounter{quizno}{0}\eq@answersEndHook}
 %    \end{macrocode}
 % Answers environment for a tabular environment. This command picks
 % up the arguments of \cs{Ans}, then passes on the \cs{@Ans}
@@ -5788,12 +5777,11 @@
 \sqtabsep{1.5pt}
 \def\sqTabPos#1{\def\sq@TabPos{[#1]}}\sqTabPos{}
 \def\answers@@sq@tabular#1{%
-%    \ifinner\else\par\vskip-\parskip\vspace{\aboveanswersSkip}\fi
-    \ifinner
-        \ifx\itsExerParts\eq@YES\par\removelastskip
-            \removelastparskip\vskip\aboveanswersSkip\fi
+  \ifinner
+    \ifx\itsExerParts\eq@YES\par\removelastskip
+      \removelastparskip\vskip\aboveanswersSkip\fi
     \else\par\removelastskip\removelastparskip
-        \vskip\aboveanswersSkip\fi
+      \vskip\aboveanswersSkip\fi
 %    \end{macrocode}
 %    (2013/05/17) If within a parts environment in tabular mode, the tab env
 %    needs to be shifted over by an amount of \cs{eqemargin}, for
@@ -5921,8 +5909,8 @@
 \def\linkContentWrapper{(\hfil\linkContentFormat\hfil)}%
 \def\Ans@sq@l{%
     \leavevmode\if\eq@listType\eq@One\stepcounter{quizno}\else
-        \@ifundefined{ifwithsoldoc}{\refstepcounter{quizno}}
-        {\ifwithsoldoc\stepcounter{quizno}\else
+        \@ifundefined{ifwithinsoldoc}{\refstepcounter{quizno}}
+        {\ifwithinsoldoc\stepcounter{quizno}\else
         \refstepcounter{quizno}\fi}\fi\PBS\raggedright
     \settowidth{\eq@tmplength}{\eq@lw@l}\sbox{\eq@tmpbox}{\eq@l@l}%
     \eq@tmpdima=\wd\eq@tmpbox
@@ -6058,8 +6046,8 @@
 \let\rbf@Opts\@empty
 \def\Ans@sq@f{%
     \if\eq@listType\eq@One\stepcounter{quizno}\else
-        \@ifundefined{ifwithsoldoc}{\refstepcounter{quizno}}
-        {\ifwithsoldoc\stepcounter{quizno}\else
+        \@ifundefined{ifwithinsoldoc}{\refstepcounter{quizno}}
+        {\ifwithinsoldoc\stepcounter{quizno}\else
         \refstepcounter{quizno}\fi}\fi\PBS\raggedright
 %</package|eqexam>
 %    \end{macrocode}
@@ -6164,8 +6152,8 @@
   \AAmousedown{updateTally.downState=!!event.target.isBoxChecked(0);}}
 \def\Ans@ck@sq@f{%
     \if\eq@listType\eq@One\stepcounter{quizno}\else
-        \@ifundefined{ifwithsoldoc}{\refstepcounter{quizno}}
-        {\ifwithsoldoc\stepcounter{quizno}\else
+        \@ifundefined{ifwithinsoldoc}{\refstepcounter{quizno}}
+        {\ifwithinsoldoc\stepcounter{quizno}\else
         \refstepcounter{quizno}\fi}\fi\PBS\raggedright
     \if\Ans@choice1%
         \def\rbf@Opts{\symbolchoice{\sq@corrsymch}%
@@ -7206,7 +7194,7 @@ if (_bOK) {\jsR\jsT
 %    in the solution file in the same order they were randomized in the main document.
 %    \changes{v7.8h}{2017/04/14}{Added \string\cs{writeSeedToSolnFile}}
 %    \begin{macrocode}
-\def\writeSeedToSolnFile{\writeToExSolns{\string\randomi=\the\randomi}}
+\def\writeSeedToSolnFile{\writeT@ExSolns{\string\randomi=\the\randomi}}
 %    \end{macrocode}
 % The \cs{bChoices} command is now processed by the \texttt{keyval} package. There
 % are two keys: \texttt{nCols} and \texttt{random}. The first key
@@ -10168,9 +10156,9 @@ if (!isQuizInitialized("@currQuiz")) {
 %    Implement a local version of full corrections of MS and MS
 %    \changes{v8.1l}{2018/02/07}{Add local version of \string\cs{corrChoiceFullOn}}
 %    \begin{macrocode}
-\def\corrLocalChoiceFullyOn{\def\eqCorrLocalChoiceFully{true}} % dpsf07
-\def\corrLocalChoiceFullyOff{\def\eqCorrLocalChoiceFully{false}} % dpsf07
-\def\resetLocalChoiceFully{\let\eqCorrLocalChoiceFully\@empty} % dpsf07
+\def\corrLocalChoiceFullyOn{\def\eqCorrLocalChoiceFully{true}}
+\def\corrLocalChoiceFullyOff{\def\eqCorrLocalChoiceFully{false}}
+\def\resetLocalChoiceFully{\let\eqCorrLocalChoiceFully\@empty}
 \resetLocalChoiceFully % no local implementation
 \begin{insDLJS*}[exerquizLoaded]{exerquiz}
 %    \end{macrocode}
@@ -11459,7 +11447,7 @@ function getSubstValue(v,s){
   v=v.replace(re,'$2');
 %    \end{macrocode}
 %  Now, develop an array of all variables and their substitutes.
-%  ie,\\|getSubstValue.aSubsts=[ ["theta","\u03B8"], ["alpha","\u03B1"],...];|
+%  ie,\\|getSubstValue.aSubsts=[ ["theta","\u03B8"],["alpha","\u03B1"],...];|
 %    \begin{macrocode}
   getSubstValue.aSubsts=[]; // dps17
   var start=0;

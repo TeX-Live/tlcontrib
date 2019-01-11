@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2018-11-27
+Dated: 2018-12-13
 
 AeB contains the following:
 
@@ -18,6 +18,12 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2018/12/13) More changes in exerquiz to support mi-solns; misc. bug fixes.
+
+What's New (2028/12/05) Some changes in exerquiz to support mi-solns. Require aeb-comment
+(version 3.2 of comment.sty). The newer versions of comment.sty are incompatible with
+eqexam (which is supported by exerquiz) and introduces spurious spaces.
 
 What's New (2018/11/27) Some changes to eforms package to support the new icon-appr
 package.

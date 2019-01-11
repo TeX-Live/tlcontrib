@@ -24,7 +24,7 @@
 %%---------------------------------------------------------
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{web}
- [2017/03/20 v6.0o web: A Screen Design Package (dps)]
+ [2017/12/05 v6.1.1 web: A Screen Design Package (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -577,7 +577,12 @@
 \ifx\u@web@ddtoHySetup\@empty\else\edef\x{\noexpand\hypersetup
     {\u@web@ddtoHySetup}}\expandafter\x\fi
 \def\@pdfcreator{The AcroTeX eDucation Bundle}
-\RequirePackage{comment}
+\RequirePackage{aeb-comment}
+\def\web@commentChkMsg{\@ifpackageloaded{comment}
+  {\PackageWarningNoLine{web}
+    {The comment package is incompatible with the\MessageBreak
+     aeb-comment package, do not use the comment package}}{}}
+\AtBeginDocument{\web@commentChkMsg}
 \ifnum\@usetemplates=1\relax
     \def\x{\RequirePackage{graphicx}}\expandafter\x\fi
 \ifnum\@usetemplates=1\relax

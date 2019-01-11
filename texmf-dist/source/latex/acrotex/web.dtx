@@ -21,7 +21,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{web}
-%<package> [2017/03/20 v6.0o web: A Screen Design Package (dps)]
+%<package> [2017/12/05 v6.1.1 web: A Screen Design Package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -1025,8 +1025,14 @@
 \def\@pdfcreator{The AcroTeX eDucation Bundle}
 %    \end{macrocode}
 %    The \pkg{comment} package is required to this package's success.
+%    \changes{v6.1.1}{2017/12/05}{require aeb-comment (version 3.1 of comment)}
 %    \begin{macrocode}
-\RequirePackage{comment}
+\RequirePackage{aeb-comment}
+\def\web@commentChkMsg{\@ifpackageloaded{comment}
+  {\PackageWarningNoLine{web}
+    {The comment package is incompatible with the\MessageBreak
+     aeb-comment package, do not use the comment package}}{}}
+\AtBeginDocument{\web@commentChkMsg}
 %    \end{macrocode}
 % If the user specifies the use of templates, we assume they are going
 % to do some graphical work, so we include \textsf{graphicx}.

@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2018-nonfree
-depend revision/166
+depend revision/169
 
 name 00texlive.installation
 category TLCore
@@ -201,7 +201,7 @@ catalogue-version 1.5
 
 name acrotex
 category Package
-revision 161
+revision 168
 shortdesc The AcroTeX education bundle
 longdesc The bundle contains: the web package to redefine page layout to
 longdesc web-friendly dimensions; the exerquiz package for defining
@@ -211,7 +211,7 @@ longdesc inserting document-level JavaScript in LaTeX documents; the
 longdesc dljslib library of JavaScript functions for use with exerquiz;
 longdesc and the eq2db package for converting an exerquiz quiz for
 longdesc processing by a ASP server-side script.
-docfiles size=1009
+docfiles size=1012
  texmf-dist/doc/latex/acrotex/README.md details="Readme"
  texmf-dist/doc/latex/acrotex/aeb.js
  texmf-dist/doc/latex/acrotex/aeb_man.pdf details="Bundle documentation"
@@ -229,7 +229,7 @@ docfiles size=1009
  texmf-dist/doc/latex/acrotex/examples/webeqtst.pdf
  texmf-dist/doc/latex/acrotex/examples/webeqtst.tex
  texmf-dist/doc/latex/acrotex/install_jsfiles.pdf
-srcfiles size=304
+srcfiles size=305
  texmf-dist/source/latex/acrotex/acrotex.ins
  texmf-dist/source/latex/acrotex/contsolns.dtx
  texmf-dist/source/latex/acrotex/dljslib.dtx
@@ -244,7 +244,8 @@ srcfiles size=304
  texmf-dist/source/latex/acrotex/taborder.ins
  texmf-dist/source/latex/acrotex/web.dtx
  texmf-dist/source/latex/acrotex/web.ins
-runfiles size=191
+runfiles size=177
+ texmf-dist/tex/latex/acrotex/aeb-comment.sty
  texmf-dist/tex/latex/acrotex/aebdocfmt.def
  texmf-dist/tex/latex/acrotex/aebdonotindex.def
  texmf-dist/tex/latex/acrotex/aebjs.def
@@ -264,7 +265,6 @@ runfiles size=191
  texmf-dist/tex/latex/acrotex/eqda.def
  texmf-dist/tex/latex/acrotex/eqde.def
  texmf-dist/tex/latex/acrotex/eqes.def
- texmf-dist/tex/latex/acrotex/eqexam.def
  texmf-dist/tex/latex/acrotex/eqfin.def
  texmf-dist/tex/latex/acrotex/eqfr.def
  texmf-dist/tex/latex/acrotex/eqit.def
@@ -287,7 +287,7 @@ runfiles size=191
  texmf-dist/tex/latex/acrotex/websec.def
 catalogue-contact-home http://www.acrotex.net
 catalogue-ctan /macros/latex/contrib/acrotex
-catalogue-date 2018-11-28 17:09:56 +0100
+catalogue-date 2019-01-09 18:36:31 +0100
 catalogue-license lppl
 catalogue-topics collection pdf-forms
 
@@ -1850,14 +1850,16 @@ catalogue-version 2.0
 
 name eqexam
 category Package
-revision 42
+revision 169
 shortdesc A stand-alone exam package
 longdesc eqExam is a LaTeX package for writing exams, tests, quizzes,
 longdesc homework assignments, etc. It is a stand alone package, yet is
 longdesc tightly integrated with the AcroTeX eDucation Bundle (AeB).
-docfiles size=769
+docfiles size=1086
  texmf-dist/doc/latex/eqexam/README.md details="Readme"
+ texmf-dist/doc/latex/eqexam/eqecus.opt
  texmf-dist/doc/latex/eqexam/eqexamman.pdf details="Package documentation"
+ texmf-dist/doc/latex/eqexam/eqexamman.tex
  texmf-dist/doc/latex/eqexam/examples/coorplane.eps
  texmf-dist/doc/latex/eqexam/examples/coorplane.pdf
  texmf-dist/doc/latex/eqexam/examples/eqex_solnsonly.pdf
@@ -1866,6 +1868,8 @@ docfiles size=769
  texmf-dist/doc/latex/eqexam/examples/fig1.eps
  texmf-dist/doc/latex/eqexam/examples/fig1.jpg
  texmf-dist/doc/latex/eqexam/examples/fig1.pdf
+ texmf-dist/doc/latex/eqexam/examples/flextended-opt.pdf
+ texmf-dist/doc/latex/eqexam/examples/flextended-opt.tex
  texmf-dist/doc/latex/eqexam/examples/graph.eps
  texmf-dist/doc/latex/eqexam/examples/graph.pdf
  texmf-dist/doc/latex/eqexam/examples/hw.cfg
@@ -1880,14 +1884,10 @@ docfiles size=769
  texmf-dist/doc/latex/eqexam/examples/markqs.tex
  texmf-dist/doc/latex/eqexam/examples/quiz.cfg
  texmf-dist/doc/latex/eqexam/examples/quiz.cfg.txt
- texmf-dist/doc/latex/eqexam/examples/quiz01.pdf
  texmf-dist/doc/latex/eqexam/examples/quiz01.tex
  texmf-dist/doc/latex/eqexam/examples/quiz02.pdf
  texmf-dist/doc/latex/eqexam/examples/quiz02.tex
- texmf-dist/doc/latex/eqexam/examples/selectversion_tst.pdf
  texmf-dist/doc/latex/eqexam/examples/selectversion_tst.tex
- texmf-dist/doc/latex/eqexam/examples/test01.pdf
- texmf-dist/doc/latex/eqexam/examples/test01.synctex
  texmf-dist/doc/latex/eqexam/examples/test01.tex
  texmf-dist/doc/latex/eqexam/examples/test02.pdf
  texmf-dist/doc/latex/eqexam/examples/test02.tex
@@ -1897,24 +1897,24 @@ docfiles size=769
  texmf-dist/doc/latex/eqexam/examples/test_matching.tex
  texmf-dist/doc/latex/eqexam/examples/tex_survey.tex
  texmf-dist/doc/latex/eqexam/examples/tex_survey_h.tex
-srcfiles size=453
- texmf-dist/source/latex/eqexam/doc/eqexamman.tex
- texmf-dist/source/latex/eqexam/doc/fortextbook.zip
- texmf-dist/source/latex/eqexam/doc/fortextbook/fortextbook.pdf
+ texmf-dist/doc/latex/eqexam/fortextbook.zip
+ texmf-dist/doc/latex/eqexam/fortextbook/fortextbook.pdf
+ texmf-dist/doc/latex/eqexam/script/eqAttach.asp
+srcfiles size=100
+ texmf-dist/source/latex/eqexam/eqexam.drv
  texmf-dist/source/latex/eqexam/eqexam.dtx
  texmf-dist/source/latex/eqexam/eqexam.ins
- texmf-dist/source/latex/eqexam/script/eqAttach.asp
-runfiles size=61
+runfiles size=69
  texmf-dist/tex/latex/eqexam/aebrandom.def
  texmf-dist/tex/latex/eqexam/eqalone.def
- texmf-dist/tex/latex/eqexam/eqecus.opt
  texmf-dist/tex/latex/eqexam/eqexam.def
  texmf-dist/tex/latex/eqexam/eqexam.sty
  texmf-dist/tex/latex/eqexam/eqtextb.def
+ texmf-dist/tex/latex/eqexam/flextended.def
  texmf-dist/tex/latex/eqexam/fortextbook.sty
 catalogue-contact-home http://www.math.uakron.edu/~dpstory/eqexam.html
 catalogue-ctan /macros/latex/contrib/eqexam
-catalogue-date 2018-04-23 15:50:03 +0200
+catalogue-date 2019-01-09 19:08:13 +0100
 catalogue-license lppl1.2
 catalogue-topics exam
 

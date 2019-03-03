@@ -2,7 +2,7 @@
 #
 # cjk-gs-integrate-macos - wrapper for cjk-gs-integrate on macOS
 #
-# Copyright 2017-2018 by Japanese TeX Development Community
+# Copyright 2017-2019 by Japanese TeX Development Community
 #
 # This file is licensed under GPL version 3 or any later version.
 # For copyright statements see end of file.
@@ -35,6 +35,8 @@ if (macosx()) {
   $macos_ver_major =~ s/^(\d+)\.(\d+).*/$1/;
   my $macos_ver_minor = $macos_ver;
   $macos_ver_minor =~ s/^(\d+)\.(\d+).*/$2/;
+  chomp($macos_ver_major);
+  chomp($macos_ver_minor);
   if ($macos_ver_major==10) {
     if ($macos_ver_minor==8) {
       $addname = "mountainlion";
@@ -48,6 +50,11 @@ if (macosx()) {
       $addname = "sierra";
     } elsif ($macos_ver_minor==13) {
       $addname = "highsierra";
+    } elsif ($macos_ver_minor==14) {
+      $addname = "highsierra"; # mojave
+    } elsif ($macos_ver_minor>=15) {
+      print STDERR "Warning: macOS 10.$macos_ver_minor is untested.\n";
+      $addname = "highsierra"; # (the most recent one)
     }
   }
 }

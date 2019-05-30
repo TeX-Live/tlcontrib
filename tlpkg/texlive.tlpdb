@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2019-nonfree
-depend revision/182
+depend revision/186
 
 name 00texlive.installation
 category TLCore
@@ -3970,6 +3970,36 @@ catalogue-date 2018-11-28 22:31:33 +0100
 catalogue-license lppl
 catalogue-topics graphics-incl
 catalogue-version 1.0
+
+name harftex
+category Package
+revision 186
+depend harftex.ARCH
+execute AddFormat name=harftex engine=harftex options="luatex.ini"   patterns=language.def,language.dat.lua
+execute AddFormat name=harflatex engine=harftex options="lualatex.ini"   patterns=language.dat,language.dat.lua
+docfiles size=1244
+ texmf-dist/doc/generic/harftex/BungeeColor1.ttf
+ texmf-dist/doc/generic/harftex/Makefile
+ texmf-dist/doc/generic/harftex/test-latex.pdf
+ texmf-dist/doc/generic/harftex/test-latex.tex
+ texmf-dist/doc/generic/harftex/test.pdf
+ texmf-dist/doc/generic/harftex/test.tex
+runfiles size=17
+ texmf-dist/tex/generic/harftex/harf-base.lua
+ texmf-dist/tex/generic/harftex/harf-load.lua
+ texmf-dist/tex/generic/harftex/harf-luaotfload.lua
+ texmf-dist/tex/generic/harftex/harf-node.lua
+ texmf-dist/tex/generic/harftex/harf-plain.lua
+ texmf-dist/tex/generic/harftex/harf.lua
+ texmf-dist/tex/generic/harftex/harfload.sty
+
+name harftex.x86_64-linux
+category Package
+revision 185
+shortdesc x86_64-linux files of harftex
+binfiles arch=x86_64-linux size=6686
+ bin/x86_64-linux/harflatex
+ bin/x86_64-linux/harftex
 
 name icon-appr
 category Package

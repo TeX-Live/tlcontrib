@@ -1,5 +1,5 @@
 %\listfiles
-\RequirePackage[!use=preview,!use=usebw]{spdef}
+\RequirePackage[!use=preview,!use=efpmca,!use=usebw]{spdef}
 \documentclass{article}
 %\usepackage{makeidx,showidx}
 \usepackage[fleqn]{amsmath}
@@ -20,8 +20,6 @@
 \usepackage{xbmks}
 \DeclareInitView{layoutmag={navitab:UseOutlines}}
 \xbmksetup{colors={int=red},styles={intbf}}
-
-
 
 \newbox\aebbox
 
@@ -168,7 +166,8 @@
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
-\let\amtIndent\leftmargini
+%\let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent}
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
 \def\nhnameref#1{\bNH\nameref{#1}\eNH}
 \def\nhNameref#1{\bNH\Nameref{#1}\eNH}
@@ -233,10 +232,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2018/12/13}
+\version{2019/03/16}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2018/12/13}
+\prepared{2019/03/16}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -5646,14 +5645,11 @@ well for the \texttt{quiz} environment.
 
 \begin{shortquiz*}[TestSQ]
 Answer this if you can!
-\begin{answers}{2}
+\begin{answers}{2}\rowsep{3pt}
 \bChoices
     \Ans0\label{testsqFirst}  This is a possible answer.\eAns
-
     \Ans1\label{testsqSecond} Try this one (the correct one)\eAns
-
     \Ans0  This is an answer.\eAns
-
     \Ans0  Another alternative.\eAns
 \eChoices
 \end{answers}
@@ -5668,7 +5664,7 @@ Answer this if you can!
 \graylettersOn
 \begin{shortquiz*}[TestSQ]
 Answer this if you can!
-\begin{answers}{2}
+\begin{answers}{2}\rowsep{3pt}
 \bChoices
     \Ans0\label{testsqFirst} This is a possible answer.\eAns
     \Ans1\label{testsqSecond} Try this one (the correct one).\eAns
@@ -6259,7 +6255,7 @@ following questions.
 \Ans0 none &\Ans0 one &\Ans1 two
 \end{answers}
 \end{questions}
-\end{quiz}\par
+\end{quiz}\vcgBdry
 \ScoreField\currQuiz
 %\TextField[name=qz:discr,width=3in,default=\eqScore]{}
 
@@ -6339,7 +6335,7 @@ following questions.
 \Ans0 none &\Ans0 one &\Ans1 two
 \end{answers}
 \end{questions}
-\end{quiz*}
+\end{quiz*}\vcgBdry
 
 \ScoreField{qzdiscrf}
 
@@ -6563,7 +6559,7 @@ answers.
 \newtopic The arguments of the \cs{Ans} command is the same as
 those of \cs{Ans} in the \texttt{answers} environment.
 
-\newtopic When the \cs{ScoreField} is used to display results, a manswers
+When the \cs{ScoreField} is used to display results, a `manswers'
 question is correct if and only if all correct answers are checked, and none
 of the incorrect answers are checked.
 
@@ -6606,22 +6602,22 @@ correction button. The correction button with
 
 \begin{quiz}{qzdiscr1l} Using the discriminant, $b^2-4ac$,
 respond to each of the following questions.
-\begin{questions}
+\begin{questions}[itemsep=0pt]
 \item Is the quadratic polynomial $x^2-4x + 3$ irreducible?
-\begin{answers}4
+\begin{answers}{4}
 \Ans0 Yes &\Ans1 No
 \end{answers}
 \item Is the quadratic polynomial $2x^2 - 4x + 3 $ irreducible?
-\begin{answers}4
+\begin{answers}{4}
 \Ans1 Yes &\Ans0 No
 \end{answers}
 \item How many solutions does the equation $2x^2 - 3x - 2= 0$ have?
-\begin{answers}4
+\begin{answers}{4}
 \Ans0 none &\Ans0 one &\Ans1 two
 \end{answers}
 \end{questions}
-\end{quiz}\par
-\ScoreField{qzdiscr1l}\CorrButton{qzdiscr1l}%
+\end{quiz}\quad
+\ScoreField{qzdiscr1l}\olBdry\CorrButton{qzdiscr1l}%
 
 \medskip
 %\fcolorbox{blue}{webyellow}{%
@@ -6646,9 +6642,9 @@ respond to each of the following questions.
     \end{center}
 \end{comment}
 
-\medskip
+\newtopic
 A partial verbatim listing of this quiz follows:
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \begin{quiz}{qzdiscr1l} Using the discriminant, $b^2-4ac$,
 respond to each of the following questions.
 \begin{questions}
@@ -6656,9 +6652,7 @@ respond to each of the following questions.
 ............................
 ............................
 \end{questions}
-\end{quiz}
-
-\ScoreField{qzdiscr1l}\CorrButton{qzdiscr1l}
+\end{quiz}\quad\ScoreField{qzdiscr1l}\olBdry\CorrButton{qzdiscr1l}
 \end{Verbatim}
 
 
@@ -6706,14 +6700,14 @@ respond to each of the following questions.
 \Ans0 none &\Ans0 one &\Ans1 two
 \end{answers}
 \end{questions}
-\end{quiz*}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz*}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 
 \redpoint In the partial verbatim listing that follows, notice the field
 name has been changed from \texttt{qzdiscr1l}, which is the name of the
 quiz previous to his one, to \texttt{qzdiscr1f}.  Different quizzes must
 have unique field names.
 
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \begin{quiz*}{qzdiscr1f} Using the discriminant, $b^2-4ac$,
 respond to each of the following questions.
 \begin{questions}
@@ -6721,7 +6715,7 @@ respond to each of the following questions.
 ............................
 ............................
 \end{questions}
-\end{quiz*}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz*}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 \end{Verbatim}
 
 \redpoint Notice that in this example, the \cs{ScoreField} and the
@@ -6833,7 +6827,7 @@ Yes, Donald Knuth was the creator of \TeX.
 Yes, Leslie Lamport was the creator of \LaTeX.
 \end{solution}
 \end{questions}
-\end{quiz*}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz*}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 
 \AllowPeeking
 
@@ -6854,7 +6848,7 @@ Here is a partial listing of the above example.
 Passing is 100\%.
 \begin{questions}
 \item Who created \TeX?
-\begin{answers}[knuth]4
+\begin{answers}[knuth]{4}
 \Ans1 Knuth &\Ans0 Lamport &\Ans0 Carlisle &\Ans0 Rahtz
 \end{answers}
 \begin{solution}
@@ -6862,7 +6856,7 @@ Yes, Donald Knuth was the creator of \TeX.
 \end{solution}
 ....
 \end{questions}
-\end{quiz*}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz*}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 \end{Verbatim}
 
 \redpoint Notice that in the \texttt{answers} environment, an
@@ -6947,7 +6941,7 @@ is 100\%.
 \Ans0 Knuth &\Ans1 Lamport &\Ans0 Carlisle &\Ans0 Rahtz
 \end{answers}
 \end{questions}
-\end{quiz*}\quad\ScoreField{qzTeX}\CorrButton{qzTeX}
+\end{quiz*}\quad\ScoreField{qzTeX}\olBdry\CorrButton{qzTeX}
 
 \noindent If desired, we can return to the defaults:
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -7094,7 +7088,7 @@ how to use the ``every'' command.${}^{\text{\fnEFormi}}$\def\fnEFormi{\thefootno
 
 \begin{quiz*}{qzTeXc} Answer each of the following. Passing
 is 100\%.
-\begin{questions}
+\begin{questions}[parsep=0pt]
 \item What \TeX\ System does Thomas Esser maintain?
 \begin{answers}4
 \Ans0 MiK\TeX &\Ans0 cs\TeX &\Ans1 te\TeX &\Ans0 fp\TeX
@@ -7109,8 +7103,8 @@ is 100\%.
 \end{answers}
 \end{questions}
 \end{quiz*}\quad%
-\ScoreField[\BC{0 0 1}]{qzTeXc}%
-   \CorrButton[\BC{0 0 1}%    blue border color
+\ScoreField[\BC{0 0 1}]{qzTeXc}\olBdry
+   \CorrButton[\BC{0 0 1}%  blue border color
    \CA{TeX}%                Button text
    \RC{Users}%              rollover text
    \AC{Group}%              pushed text
@@ -7123,9 +7117,10 @@ is 100\%.
 \noindent The new part is the customized scoring and correction button. Here
 is a verbatim listing of the \cs{ScoreField} and \cs{CorrButton}
 macros.
+\goodbreak
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\ScoreField[\BC{0 0 1}]{qz:TeXc}%
-   \CorrButton[\BC{0 0 1}     % blue border color
+\ScoreField[\BC{0 0 1}]{qz:TeXc}\olBdry
+   \CorrButton[\BC{0 0 1}   % blue border color
    \CA{TeX}                 % Button text
    \RC{Users}               % rollover text
    \AC{Group}               % pushed text
@@ -7181,7 +7176,7 @@ Answer each of these to the best of your ability.
   The answer is false, statistics is interesting but not fun.
 \end{solution}
 \end{questions}
-\end{quiz}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 
 \noindent The partial verbatim code for the above quiz follows:
 
@@ -7192,7 +7187,7 @@ Answer each of these to the best of your ability.
 \begin{questions}
 ...
 \end{questions}
-\end{quiz}\quad\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 \end{Verbatim}
 
 \restoreDefaultQuizHeaders
@@ -7376,17 +7371,13 @@ is 100\%.\hfill\smash{\GradeField[\rectH{30bp}\rectW{30bp}\textSize{0}]\currQuiz
 
 \item\PTs{6} Name \emph{one} of the two people recognized as a founder of
 Calculus.\\[1ex]
-\RespBoxTxt{0}{0}{4}{Isaac Newton}{Newton}{Gottfried Leibniz}{Leibniz}%
+\RespBoxTxt{0}{0}{4}{Isaac Newton}{Newton}{Gottfried Leibniz}{Leibniz}\olBdry
 \CorrAnsButton{Isaac Newton or Gottfried Leibniz}
 
 \end{questions}
-\end{quiz*}\quad\ScoreField\currQuiz\CorrButton\currQuiz
-
-\noindent
-Answers: \AnswerField\currQuiz
-
-\medskip\noindent
-Points: \PointsField\currQuiz\ Percent: \PercentField\currQuiz
+\end{quiz*}\quad\ScoreField\currQuiz\olBdry\CorrButton\currQuiz\hfill
+Answers: \AnswerField\currQuiz\vcgBdry[.5em]
+Points:\cgBdry[.5em]\PointsField\currQuiz\cgBdry[.5em]Percent:\cgBdry[.5em]\PercentField\currQuiz
 
 %\exPDF{quizpts} See the sample file
 %\href{\bUrl/webeq_ex.html\#quizpts}{quizpts.tex} for a more
@@ -7531,7 +7522,7 @@ Answer these questions truthfully.
     \end{solution}
   \end{answers}
 \end{questions}
-\end{quiz}\ScoreField\currQuiz\CorrButton\currQuiz
+\end{quiz}\ScoreField\currQuiz\olBdry\CorrButton\currQuiz
 
 \begin{flushleft}
 \fcolorbox{blue}{webyellow}{\begin{minipage}{.67\linewidth}
@@ -7621,10 +7612,9 @@ question, however.
 You can also pose questions that require a text answer:
 
 \redpoint\begin{oQuestion}{exTxt2}
-Name the probability
-distribution popularly referred to as the ``bell-shaped curve''.\\
+Name the probability distribution popularly referred to as the ``bell-shaped curve''.\\[3pt]
 \RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}{Gaussian}{Gaussian Distribution}
-\end{oQuestion}
+\end{oQuestion}\vcgBdry[3pt]
 
 See \Nameref{ss:respboxtxt} for details.
 
@@ -7932,12 +7922,12 @@ basic command for posing this type of question is
 earlier:
 \begin{oQuestion}{exTxt1}
 \redpoint Name the probability
-distribution popularly referred to as the ``bell-shaped curve''.\\
+distribution popularly referred to as the ``bell-shaped curve''.\\[3pt]
 \mbox{\strut\RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}%
 {Gaussian}{Gaussian Distribution}}
 %\raisebox{-3bp}{\RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}%
 %{Gaussian}{Gaussian Distribution}}
-\end{oQuestion}
+\end{oQuestion}\vcgBdry[3pt]
 
 The underlying JavaScript compares the user's response against
 acceptable alternatives, as supplied by the author of the
@@ -8120,7 +8110,7 @@ than the default variable of $x$.
 \begin{oQuestion}{sine2}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dt} \sin^2(t) =$
-\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(t)*cos(t)}
+\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
 
 \medskip\noindent
@@ -8128,7 +8118,7 @@ The listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{oQuestion}{sine2}\\[1ex]
 \redpoint Differentiate $\dfrac d{dt} \sin^2(t) =$
-\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\kern1bp
+\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry
 \CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
 \end{Verbatim}
@@ -8155,7 +8145,7 @@ to the solution.
 \begin{oQuestion}{sine3}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dt} \sin^2(t) =$
-\RespBoxMath{2*sin(t)*cos(t)}(t)[sine3]{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(t)*cos(t)}
+\RespBoxMath{2*sin(t)*cos(t)}(t)[sine3]{4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(t)*cos(t)}
 \begin{solution}
 \[
     \frac d{dx}\sin^2(x) = 2\sin(x)\cos(x) = \sin(2x)
@@ -8206,7 +8196,7 @@ An example of this optional parameter is
 \redpoint Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ \text{9} + \text{8} =$
-\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\kern1bp\CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\kern1bp
+\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 
@@ -8217,8 +8207,8 @@ The listing follows:
 \redpoint Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ 9 + 8 = $
-\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\kern1bp
-    \CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\kern1bp
+\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry
+    \CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 \end{Verbatim}
@@ -8234,7 +8224,7 @@ For example,
 \begin{oQuestion}{sine4}
 \redpoint \hypertarget{exofT}{Differentiate}\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(x)*cos(x)}\kern1bp
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 
@@ -8244,8 +8234,8 @@ The listing follows:
 \begin{oQuestion}{sine4}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp
-\CorrAnsButton{2*sin(x)*cos(x)}\kern1bp
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\cgBdry
+\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 \end{Verbatim}
@@ -8264,8 +8254,8 @@ insert \cs{sqClearButton}.
 \begin{oQuestion}{sine5}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(x)*cos(x)}\kern1bp
-\sqTallyBox\kern1bp\sqClearButton
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
+\sqTallyBox\cgBdry\sqClearButton
 \end{oQuestion}
 
 
@@ -8276,8 +8266,8 @@ The listing follows:
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}%
-\CorrAnsButton{2*sin(x)*cos(x)}\kern1bp
-\sqTallyBox\kern1bp\sqClearButton
+\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
+\sqTallyBox\cgBdry\sqClearButton
 \end{oQuestion}
 \end{Verbatim}
 
@@ -8409,7 +8399,7 @@ Answer each of the following. Passing is 100\%.
 \item $\displaystyle\frac d{dx} \sin^2(x) =$
 \RespBoxMath{2*sin(x)*cos(x)}[sinsqx]{4}{.0001}{0}{1}%
 \hfill\CorrAnsButton{2*sin(x)*cos(x)}%
-\kern1bp\sqTallyBox
+\cgBdry\sqTallyBox
 \begin{solution}
 \[
     \frac d{dx}\sin^2(x) = 2\sin(x)\cos(x) = \sin(2x)
@@ -8420,7 +8410,7 @@ Answer each of the following. Passing is 100\%.
 Calculus.\vadjust{\kern3pt}\newline
 \RespBoxTxt{2}{0}[newton]{5}%
 {Isaac Newton}{Newton}{I. Newton}{Gottfried Leibniz}{Leibniz}\hfill
-\CorrAnsButton{Isaac Newton or Gottfried Leibniz}\kern1bp\sqTallyBox
+\CorrAnsButton{Isaac Newton or Gottfried Leibniz}\cgBdry\sqTallyBox
 \end{questions}
 \begin{solution}
 Yes, Isaac Newton and Gottfried Leibniz are considered founders of
@@ -8535,9 +8525,8 @@ founders of Calculus.
 \end{solution}
 
 \end{questions}
-\end{quiz*}\quad\ScoreField{oQq}\CorrButton{oQq}
-
-\noindent Answers: \AnswerField{oQq}
+\end{quiz*}\quad\ScoreField{oQq}\olBdry\CorrButton{oQq}\vcgBdry
+Answers: \AnswerField{oQq}
 
 \redpoint The buttons created by \cs{CorrAnsButton} are hidden
 until the user ends the quiz (and gets scored) and clicks on the
@@ -8662,7 +8651,7 @@ Compute the following cross product:
 %
 \end{equation*}
 \end{quiz*}\ $\underset{\text{ScoreField}}{\underbrace{\ScoreField[\DV{}\V{}\rectW{1in}]\currQuiz}}$%
-    \kern1bp$\underset{\text{PointsField}}{\underbrace{\PointsField[\rectW{1in}]\currQuiz}}$\CorrButton[\CA{Correct}\AC{}\RC{}]\currQuiz
+    \cgBdry$\underset{\text{PointsField}}{\underbrace{\PointsField[\rectW{1in}]\currQuiz}}$\olBdry\CorrButton[\CA{Correct}\AC{}\RC{}]\currQuiz
     \hfill Ans: \AnswerField[\rectW{.5in}]\currQuiz
 \end{minipage}
 
@@ -8950,7 +8939,7 @@ Simplify the following radial expression by factoring out all perfect squares.
         ),%
         postParse:\Array(\postDenyForm(/sqrt(\refac{72}|\refac{8})/)%
         )%
-    }]\CorrAnsButton{6sqrt(2)}\kern1bp\sqTallyBox
+    }]\CorrAnsButton{6sqrt(2)}\cgBdry\sqTallyBox
 \end{equation*}
 \end{questions}
 \end{shortquiz}
@@ -9111,7 +9100,7 @@ Simplify the following radial expression by factoring out all perfect squares.
         ),%
         postParse:\Array(\postDenyForm(/sqrt(\refac{72}|\refac{8})/)%
         )%
-    }]\CorrAnsButton{6sqrt(2)}\kern1bp\sqTallyBox
+    }]\CorrAnsButton{6sqrt(2)}\cgBdry\sqTallyBox
 \end{equation*}
 \end{questions}
 \end{shortquiz}
@@ -11677,15 +11666,16 @@ features of the \pkg{web} and \textsf{exerquiz} packages.
  \texttt{insdljs\_ex.tex} that can be used as a startup test file.
 
 \begin{questions}
-    \item (Version 2.0f) Added a command \cs{previewMiKTeX} which redefines \cs{jsR} and
-    \cs{jsT} that enables, I hope, the \textsf{yap} previewer to preview
-    an \textsf{AeB} document.
-     \item Added the \texttt{defineJS} environment. Use this environment to
-     write JavaScript for buttons and other form fields.
-     \item Added the \texttt{execJS} environment. Use this environment to write
-     ``discardable'' JavaScript that will execute when the newly created document is opened
-     in the Acrobat Viewer.  (The Acrobat Viewer, not the Reader, is required.)
-     See the demo file \texttt{execjstst.tex}.
+  \item (Version 2.0f) Added a command \cs{previewMiKTeX} which redefines
+      \cs{jsR} and \cs{jsT} that enables, I hope, the \textsf{yap}
+      previewer to preview an \textsf{AeB} document.
+   \item Added the \texttt{defineJS} environment. Use this environment to
+       write JavaScript for buttons and other form fields.
+   \item Added the \texttt{execJS} environment. Use this environment to
+       write ``discardable'' JavaScript that will execute when the newly
+       created document is opened in the Acrobat Viewer.  (The Acrobat
+       Viewer, not the Reader, is required.) See the demo file
+       \texttt{execjstst.tex}.
 \end{questions}
 
 \subsection{dljslib}

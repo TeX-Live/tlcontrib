@@ -10,6 +10,10 @@
 \usepackage[altbullet]{lucidbry}
 %\usepackage{myriadpro}
 
+\setlength{\marginparpush}{3pt}
+
+%\previewOn\pmcaOn
+
 \usepackage{graphicx,array,longtable}
 %\usepackage[usecmtt]{myriadpro}
 
@@ -17,7 +21,12 @@
 \DeclareInitView{layoutmag={navitab:UseOutlines}}
 \xbmksetup{colors={int=red},styles={intbf}}
 
-%\addtolength{\marginparwidth}{20pt}
+
+\def\STRUT{\rule{0pt}{14pt}}
+\def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
+\def\mSTRUT{\makebox[0pt][l]{\phantom{$\frac00$}}}
+\let\vrbnormal\sffamily
+\let\uif\sffamily
 
 
 %\makeatletter
@@ -70,7 +79,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2018/12/05},
+    prepared={2019/03/16},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -80,7 +89,9 @@
 %\revisionLabel{Distribution Dated:}
 \def\AEBBook{\textsl{{Acro\!\TeX} eDucation System Tools: {\LaTeX} for interactive PDF documents}}
 
-\setlength{\marginparwidth}{31.25pt}
+\setlength{\marginparwidth}{62.5pt}
+%\addtolength{\marginparwidth}{6pt}
+
 
 \renewcommand\hproportionwebtitle{.75}
 \universityLayout{fontsize=Large,fontfamily=sffamily}
@@ -150,7 +161,8 @@
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
-\let\amtIndent\leftmargini
+%\let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent}
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
 \def\nhnameref#1{\bNH\nameref{#1}\eNH}
 \def\nhNameref#1{\bNH\Nameref{#1}\eNH}
@@ -165,19 +177,21 @@
 \newenvironment{aebQuote}
    {\list{}{\leftmargin\amtIndent}%
     \item\relax}{\endlist}
-\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{%
+\def\parboxValign{t}
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{%\raggedleft
     \raisebox{.5\baselineskip+#1}{%
     \expandafter\parbox\expandafter[\parboxValign]%
         {\marginparwidth}{\aebbkFmtMp#2}}}}
 \def\aebbkFmtMp{\kern0pt\itshape\small
-    \ifusebw\color{gray}\else\color{blue}\fi
-    \raggedleft\hspace{0pt}}
+    \color{blue}\raggedleft\hspace{0pt}}
 \def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
    \kern-.6em \hbox{$\mathcal S$}}$}
 \def\FitItIn{\eq@fititin}
 \def\endredpoint{\FitItIn{{\large\ifusebw\color{black}\else\color{red}\fi$\blacktriangleleft$}}}
 
-\advance\marginparwidth16pt
+\def\pb{pushbutton}
+
+%\advance\marginparwidth16pt
 
 \makeatother
 
@@ -408,11 +422,11 @@ or \textsf{exerquiz} package is used, \textsf{eforms} will use the driver
 defined in these earlier included packages.
 
 \newtopic A minimal document is
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!()}]
 \documentclass{article}
-\usepackage{eforms}  % <-- the driver is pdftex or xetex
+\usepackage{eforms}  % <--!uif( the driver is pdftex, lualatex, or xetex)
 \begin{document}
-    % Content containing form fields, such as...
+    %!uif( Content containing form fields, such as!dots)
     Don't \pushButton[\CA{Push Me}]{myButton}{}{12bp},
     I fall down easily.
 \end{document}
@@ -422,17 +436,62 @@ and passes it the driver, so there is no need to specify
 \textsf{hyperref}, usually. If you wish to introduce \textsf{hyperref}
 yourself with specific options, place it before \textsf{eforms}.
 
-If you use the \textsf{exerquiz} package, \textsf{exerquiz} brings
-in the \textsf{eforms} package and passes it to the driver.
+If you use the \textsf{exerquiz} package, \textsf{exerquiz} brings in the
+\textsf{eforms} package and passes the driver to it.
 
 \subsection{The \texttt{preview} option}
 
-Use the \texttt{preview} option if you use a \texttt{dvi} previewer
-to view your document. When \texttt{preview} is taken, a frame box
-is drawn around any form field created by \textsf{eforms}, making
-the position of the field visible in the previewer. This makes it
-easy to make any additional adjustments for the position of the
-field. Turn off this option when you build a PDF file.
+%Use the \texttt{preview} option if you use a \texttt{dvi} previewer
+%to view your document.
+
+When the \opt{preview} option is taken, a frame box is drawn around any form
+field created by \pkg{eforms}, making the position of the field visible in
+the DVI previewer or {\PDF} viewer. Being see to view the position on a form
+element enables you to determine whether any additional adjustments are
+needed to the position of the field. \emph{Turn off this option} when you build the
+final version of your {\PDF} file.
+
+This option was originally developed for those using a DVI previewer, it is
+also useful for those using PDF creators \app{pdflatex}, \app{xelatex}, or
+\app{lualatex}. Modern {\LaTeX} users employ quicker {\PDF} viewers such as \app{sumatraPDF} or
+\app{PDF-Exchange}; these PDF viewers do not create form appearances as \app{Adobe Reader} and \app{Acrobat}
+do; consequently, an outline of the positions of the fields is most welcome.
+
+The \texttt{preview} option just sets a switch (\cs{ifpreview}\FmtMP{\cs{ifpreview}}), which can conveniently be
+turned off and on using the commands \cs{previewOn}\FmtMP{\cs{previewOn}} and \cs{previewOff}
+within the document itself. Related to \cs{previewOn} and \cs{previewOff}\FmtMP{\cs{previewOff}} is
+the command \cs{pmcaOn}, covered in the next paragraph.
+
+\paragraph*{Poor man's captions.}\label{para:pmca}
+
+The \cs{pushButton} command of \pkg{eforms} produces a push
+button;\footnote{Push buttons are covered in Section~\ref{s:BtnFlds}, beginning on
+page~\pageref{ss:Pbs}.} a common key to use is the \cs{CA} key, the
+value of which captions the button. As a companion to \cs{previewOn},
+\pkg{eforms} defines \cs{pmcaOn}\FmtMP{\cs{pmcaOn}} and
+\cs{pmcaOff}\FmtMP{\cs{pmcaOff}}; when \cs{previewOn} is in effect,
+expanding \cs{pmcaOn} causes the value of the \cs{CA} key to be typeset into
+the {\pb} preview; for example,\bgroup\makeatletter
+\def\@PMCA{Push Me}\settowidth{\@tempdima}{\,Push Me\,}\edef\x{\the\@tempdima}%
+\def\1{\makebox[0pt][l]{\hskip\linewidth\makebox[0pt][r]
+{\previewOff\pmcaOff\pushButton[\autoCenter{n}\CA{Push Me}]{pbDemo}{}{13bp}\quad
+  \previewOn\pmcaOn\ef@Bbox{\x}{13bp}\hspace{40pt}}}}%
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+!1\pushButton[\CA{Push Me}]{pbDemo}{}{13bp}
+\end{Verbatim}
+The button on the left is the normal appearance of the push button after
+\app{Reader/Acrobat} has supplied its appearance, the ``button'' on the right
+is how the button would appear in \app{sumatraPDF}, for example, just after
+{\PDF} creation using \app{pdflatex}, \app{xelatex}, or \app{lualatex}, or in
+a DVI previewer after latexing.\egroup
+
+In the modern era of {\LaTeX}, it is customary by some to use
+\app{sumatraPDF} or some other {\PDF} viewer during development; however, you
+should always open your final {\PDF} (which was built with
+\cs{previewOff}\cs{pmcaOff}) in \app{Adobe Reader DC} (or in \app{Acrobat}),
+save it to obtain the correct appearances of the fields placed in the
+document.
+
 
 \subsection{The \texttt{useui} option}
 
@@ -529,13 +588,13 @@ characters that have special meaning to {\LaTeX}, these are \texttt{\string~}, \
 and \texttt{\&}; each of these may appear as part of a URL, or may appear in JavaScript code.
 Within the first parameter, these three character can be used freely, without escaping them.
 
-\subsection{Button Fields}
+\subsection{Button Fields}\label{s:BtnFlds}
 
 Buttons are form elements that the user interacts with using only a
 mouse. There are three types of buttons: push buttons, check boxes
 and radio buttons.
 
-\subsubsection{Push Buttons}
+\subsubsection{Push Buttons}\label{ss:Pbs}
 
 The push button is a button field that has no
 value, it is neither on nor off. Generally, push buttons are used
@@ -2565,7 +2624,7 @@ format={app.alert("Thank you for signing this field.");}
 
 \part{Setting the Tab Order}
 
-The \hypertarget{\pkg{taborder}}{taborderPkg} package is an internal AeB package that is called by
+The \hypertarget{taborderPkg}{\pkg{taborder}} package is an internal AeB package that is called by
 both the \textsf{eforms} and the \texttt{annot\_pro packages}. The
 \texttt{taborder} package sets the tab order for form fields and link
 annotations (when the link is created by the command \cs{setLink}, defined
@@ -3243,23 +3302,21 @@ file, but saves the contents in a token register. The contents of
 the register are used in defining a macro that expands to the
 verbatim listing.
 
-\settowidth{\aebdimen}{\ttfamily\string\begin\darg{defineJS}[\anglemeta{tex/latex\_cmds}]\darg{\meta{Cmd}}}
+\settowidth{\aebdimen}{\ttfamily\string\begin\darg{defineJS}[\ameta{chngCats}]\darg{\cs{\ameta{cmd}}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\begin{defineJS}[!anglemeta(tex/latex_cmds)]{!meta(Cmd)}
-...
-!anglemeta(JavaScript code)
-...
+\begin{defineJS}[!ameta(chngCats)]{\!ameta(cmd)}
+!qquad!ameta(script)
 \end{defineJS}
 \end{dCmd}
 
-\PD The \texttt{defineJS} environment takes two parameters, the
-first optional. the required parameter is the command name to be
-defined. Use the optional first parameter to modify the verbatim
-environment, as illustrated in the example below.  The
-\texttt{defineJS} is a complete verbatim environment: no escape, and
-no comment characters are defined. You can use the optional
-parameter to create an escape character.  You can pretty much use
-any character you wish, \emph{except} the usual one `\verb+\+',
+\PD The \texttt{defineJS} environment takes two parameters, the first
+optional. the required parameter is the command name to be defined. Use the
+optional first parameter (\ameta{chngCats}) to modify the verbatim
+environment, as illustrated in the example below. The \ameta{script} is saved
+under the command name \cs{\ameta{cmd}}. The \texttt{defineJS} is a complete
+verbatim environment: no escape, and no comment characters are defined. You
+can use the optional parameter to create an escape character;  you can pretty
+much use any character you wish, \emph{except} the usual one `\verb+\+',
 backslash.
 
 \Example The following example illustrates the usage of the \texttt{defineJS} environment.
@@ -3287,10 +3344,74 @@ console.println("Exiting the button area");
         \AAMouseExit{\JS{\JSAAX}}}
 ]{myButton}{30bp}{15bp}
 \end{dCmd*}
-\newtopic The code of \cs{JSAAE} and \cs{JSAAX} are so simple, the \texttt{defineJS} environment
-was really not needed. A simple \cs{newcommand} definition would have been sufficient.
+\newtopic The code lines of \cs{JSAAE} and \cs{JSAAX} are so simple, \texttt{defineJS} environment
+was really not needed.
 
 \newtopic See \Nameref{lengthyJS} for an additional example of the use of the \texttt{defineJS} environment.
+
+The \pkg{insdljs} package defines two ``silent'' versions of \env{defineJS},
+\env{@defineJS} and \env{defineJS*}.
+\settowidth{\aebdimen}{\ttfamily\string\begin\darg{@defineJS}[\ameta{chngCats}]\darg{\cs{\ameta{cmd}}}}
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\begin{@defineJS}[!ameta(chngCats)]{\!ameta(cmd)}
+!qquad!ameta(script)
+\end{@defineJS}
+!STRUT!vrbnormal !texttt(defineJS*) is a public version !texttt(@defineJS)
+!STRUT\begin{defineJS*}[!ameta(chngCats)]{\!ameta(cmd)}
+!qquad!ameta(script)
+\end{defineJS*}
+\end{dCmd}
+\medskip\noindent
+Use \env{defineJS*} in the body of the document; the command argument \cs{\ameta{cmd}} can be silently
+used and redefined in a later \env{defineJS*} environment.
+The \env{@defineJS} environment is for package authors.
+
+\paragraph*{The \texorpdfstring{{\protect\env{defineJS}}}{defineJS}-type environments with arguments.}\label{para:defineJSwArgs}
+%\index{defineJS with arguments@\env{defineJS} with arguments}
+The \env{defineJS}-type environments do not have parameters/arguments as
+normal environments (or commands) do. To enable the ability to  modify the
+JavaScript code within the environment of \env{defineJS}, the command pair
+\cs{bParams}/\allowbreak\cs{eParams} is defined.
+\settowidth{\aebdimen}{\ttfamily\string\bParams\darg{\ameta{token\SUB1}}\darg{\ameta{token\SUB2}}...\darg{\ameta{token\SUB{n}}}\string\eParams}
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bParams{!ameta(token!SUB1)}{!ameta(token!SUB2)}...{!ameta(token!SUB(n))}\eParams
+\end{dCmd}
+\medskip\noindent When you use one of the \env{defineJS} environments to define field level
+JavaScript, you can include symbolic parameters/arguments \cs{p(1)}, \cs{p(2)}, and so
+on, within the body of the environment. At the time of expansion of the
+command \cs{\ameta{cmd}}, a substitution is made: \cs{p(1)} expands to
+\ameta{token\SUB1}, \cs{p(2)} expands to \ameta{token\SUB1}, and so on. Note
+that the argument of \cs{p}, which is only locally defined, is enclosed with
+\emph{parentheses}. Before continuing with the discussion, consider the following
+example.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={@^\%}]
+\begin{defineJS*}[\catcode`\!=0\relax]{\myCode}
+var p1=@textbf^!p(1)%, p2=@textbf^!p(2)%;
+app.alert("p1 + p2 = " + Number(p1+p2) );
+\end{defineJS*}
+\end{Verbatim}
+Within the body of a \env{defineJS} environment, there is no escape character
+unless you change catcode of another character within the optional argument
+of the \env{defineJS} environment. In the above example, the exclamation mark
+is declared as the escape.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\pushButton[\cmd{!textbf(\bParams{1}{16}\eParams)}
+  \A{\JS{\myCode}}]{pbfld1}{.5in}{11bp}
+\end{Verbatim}
+When this button is pressed, an alert message appears `\uif{p1 + p2 = 17}'.
+We can reuse this code later with other parameters:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\pushButton[\cmd{!textbf(\bParams{77}{11}\eParams)}
+  \A{\JS{\myCode}}]{pbfld2}{.5in}{11bp}
+\end{Verbatim}
+Now the message is `\uif{p1 + p2 = 88}'.
+
+In both examples, the special key \cs{cmd} is used to pass the
+\cs{bParams}/\allowbreak\cs{eParams} command pair into \pkg{eforms}' parsing
+stream; this keeps the declaration local. The \hyperlink{cmd}{\cs{cmd}} key is described in
+\hyperref[supportedKVs]{Appendix~\ref*{supportedKVs}}, titled `\nameref{supportedKVs}', beginning on \pageref*{supportedKVs}; specifically,
+\cs{cmd} is listed in under the heading \textcolor{blue}{Specialized, non-PDF Spec commands}.
+
 
 \newpage
 %\appendix
@@ -3376,7 +3497,7 @@ FfRichText?           &  rich text (PDF 1.5)           & text\\
 
 \newpage
 
-\appendixsubsection{Supported Key Variables}
+\appendixsubsection{Supported Key Variables}\label{supportedKVs}
 %\addcontentsline{toc}{appendixsubsection}{\protect\numberline{}Supported Key Variables}
 
 Below is a list of the keys supported for modifying the appearance
@@ -3539,7 +3660,7 @@ Lock?   & This key is used to lock fields after the signature field is
             &\verb+\Lock{}+\\\hline
 %-------------------------------------------------------------------
 %\pagebreak
-\multicolumn{3}{l}{\color{blue}Specialized, non-PDF Spec, commands:}\\
+\multicolumn{3}{l}{\color{blue}Specialized, non-PDF Spec commands:}\\
 rawPDF?  & \texttt{\darg{\ameta{PDF-KVPs}}} If all else fails, you can always introduce key-value pairs
           through this variable. &\verb+\rawPDF{}+\\
 autoCenter? &\texttt{\darg{y|n}} There is a centering code that attempts to give a pleasant
@@ -3558,6 +3679,8 @@ symbolchoice? & \texttt{\darg{\ameta{symbol-choice}}} Use this variable to speci
                be used to globally change the symbol choice as well; for
                example, \verb+\symbolchoice{check}+, which is the
                default value.\\
+cmd? &\texttt{\darg{\ameta{cmd-args}}} Passes its argument into the key-value parsing stream, refer
+to page~\pageref{para:defineJSwArgs} for an example.\\
 linktxtcolor? & \texttt{\darg{\ameta{named-color{\upshape|empty}}}} The value of this variable is a named color and is the
                color of the link text. Only recognized
                in link annotations. A value of

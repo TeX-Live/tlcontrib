@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2018/07/21 v2.4 Insert Document Level JavaScripts (dps)]
+%<package> [2019/03/16 v2.4.2 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -571,6 +571,11 @@
     \def\pdfpageref{\pdffeedback pageref}\fi\fi
 \RequirePackage{verbatim}
 %    \end{macrocode}
+%\changes{v2.4.1}{2019/02/11}{Save \string\cs{comment}\space as \string\cs{dlcomment}}
+%    \begin{macrocode}
+\let\dlcomment\comment
+\let\enddlcomment\endcomment
+%    \end{macrocode}
 %    (2017/01/03) The \pkg{insdljs} package does not use \pkg{conv-xkv} but
 %    is fundamental to other packages (\pkg{eforms}, \pkg{aeb\_pro}) that require
 %    \pkg{insdljs} and \pkg{conv-xkv}.
@@ -776,6 +781,24 @@
 \gdef\js@@R{\noexpand
 }}
 %    \end{macrocode}
+% We define space\DescribeMacro\pdfSp, left\DescribeMacro\pdfLBr\space and right\DescribeMacro\pdfRBr\space
+% braces in pdf (PDFDocEncoding); these are also defined
+% in \pkg{exerquiz} but under different names (\cs{eqSP}, \cs{eqLBr}, and \cs{eqRBr}).
+% \changes{v2.4.2}{2019/03/16}{Added \string\cs{pdfSP}, and others, and \string\cs{dl@sp@ce}}
+%    \begin{macrocode}
+\def\pdfSPDef{\string\040}
+\let\pdfSP\pdfSPDef
+\def\pdfLBr{\string\173}
+\def\pdfRBr{\string\175}
+\def\dl@sp@ce{ }
+%    \end{macrocode}
+%   \DescribeMacro\dl@restorespcs restores the obey spaces space to its default,
+%   saved earlier. This command is placed at the end of each of the form field
+%   commands to reverse the earlier change to \cs{pdfSP}.
+%    \begin{macrocode}
+\bgroup\obeyspaces
+\gdef\dl@restorespcs{\global\let =\dl@sp@ce}\egroup
+%    \end{macrocode}
 %    \begin{macrocode}
 \let\dljstfor\@tfor
 %    \end{macrocode}
@@ -817,40 +840,37 @@
 %{
 %  A simple command for creating JS strings with unicode \cs{uXXXX}.
 %}
-% The following is the old definition, it is superseded by the ones below.
-%\begin{verbatim}
-%\newcommand{\defineJSStr}[2]{{%
-%    \let\protect\noexpand
-%    \let\jslit\string
-%    \def\\{\eqbs\eqbs}\def\cs##1{\\\\##1}%
-%    \def\r{\\r}\def\t{\\t}%
-%    \def\n{\\n}\def\u{\\u}%
-%    \xdef#1{"#2"}%
-%}}
-%\end{verbatim}
 % \changes{v2.0m}{2013/12/23}{Added \cs{jscsDflt} and \cs{jscsDLJS}, incorporated into \cs{dl@defJSStr}.}
 % Added \cs{jscsDflt} and \cs{jscsDLJS}, incorporated them into \cs{dl@defJSStr}.
 %    \begin{macrocode}
 \def\dl@lparen{(}\def\dl@rparen{)}
+\def\genericNL{^^J}
+\def\defjsLB{\expandafter\pdfmarkLB\@gobblefour}
+\def\genericLB{\eqbs\eqbs^^J}
+\def\pdfmarkLB{\eqbs^^J}
 \def\jscsDflt{\let\protect\noexpand\let\jslit\string
-    \let\~\dl@tilda\let\^\dl@sup
-    \def\\{\eqbs\eqbs}\def\cs##1{\\\\##1}%
-    \def\r{\\r}\def\t{\\t}\def\n{\\n}%
-    \let\{\dl@lBrace\let\}\dl@rBrace
-    \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
-    \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
-        \let\r@paren\dl@rparen\else
-    \let\l@paren\@empty\let\r@paren\@empty\fi
+  \let\~\dl@tilda\let\^\dl@sup
+  \def\\{\eqbs\eqbs}\def\cs##1{\\\\##1}%
+  \def\r{\\r}\def\t{\\t}\def\n{\\n}%
+  \let\{\dl@lBrace\let\}\dl@rBrace
+  \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
+  \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
+    \let\r@paren\dl@rparen\else
+  \let\l@paren\@empty\let\r@paren\@empty\fi
+  \dl@paramlocal\let\LB\genericLB\let\NL\genericNL
 }
 \def\jscsDLJS{\let\protect\noexpand\let\jslit\string
-    \let\~\dl@tilda\let\^\dl@sup
-    \ifxetex\def\\{\eqbs\eqbs}\else\def\\{\eqbs}\fi\def\cs##1{\\\\##1}%
-    \def\r{\\r}\def\t{\\t}\def\n{\\n}%
-    \let\{\dl@lBrace\let\}\dl@rBrace
-    \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
-    \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
-        \let\r@paren\dl@rparen\else
-    \let\l@paren\@empty\let\r@paren\@empty\fi
+  \let\~\dl@tilda\let\^\dl@sup
+  \ifxetex\def\\{\eqbs\eqbs}\else\def\\{\eqbs}\fi\def\cs##1{\\\\##1}%
+  \def\r{\\r}\def\t{\\t}\def\n{\\n}%
+  \let\{\dl@lBrace\let\}\dl@rBrace
+  \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
+  \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
+    \let\r@paren\dl@rparen\else
+  \let\l@paren\@empty\let\r@paren\@empty\fi
+  \ifpdfmarkup\let\LB\pdfmarkLB\else
+    \let\LB\genericLB\fi
+  \let\NL\genericNL
 }
 \ifpdf\let\jscsDLJS\jscsDflt\fi
 \let\dl@JSCS\jscsDflt
@@ -859,11 +879,13 @@
 % at the field level.
 % When the \texttt{*}-form is used, \texttt{\#2} is passed through \cs{pdfstringdef},
 % needed if there are some latex to pdf strings to be converted.
+% \changes{v2.4.2}{2019/03/16}{Implement tex to pdf spacing}
 %    \begin{macrocode}
-\newcommand{\flJSStr}{\bgroup
-    \let\dl@JSCS\jscsDflt
-    \@ifstar{\def\isStar{*}\dl@defJSStr}
-    {\let\isStar\relax\dl@defJSStr}}
+\bgroup\obeyspaces
+\gdef\flJSStr{\bgroup\global\let =\pdfSP
+\let\dl@JSCS\jscsDflt
+\obeyspaces\@ifstar{\def\isStar{*}\dl@defJSStr}%
+{\let\isStar\relax\dl@defJSStr}}\egroup
 \let\fieldJSStr\flJSStr
 %    \end{macrocode}
 % For backward compatibility, we \cs{let} \cs{defineJSStr} to \cs{flJSStr}.
@@ -876,8 +898,8 @@
 % needed if there are some latex to pdf strings to be converted.
 %    \begin{macrocode}
 \newcommand{\dlJSStr}{\bgroup
-    \@ifstar{\def\isStar{*}\let\dl@JSCS\jscsDLJS\dl@defJSStr}
-    {\let\isStar\relax\let\dl@JSCS\jscsDLJS\dl@defJSStr}}
+  \@ifstar{\def\isStar{*}\let\dl@JSCS\jscsDLJS\dl@defJSStr}
+  {\let\isStar\relax\let\dl@JSCS\jscsDLJS\dl@defJSStr}}
 %    \end{macrocode}
 % Some simple key-values for both commands above. Both commands, by default,
 % insert double quotations marks at the beginning and end of the string as a convenience.
@@ -894,22 +916,24 @@
 \define@key{jsstr}{noquotes}[]{\let\jsstr@quotes\dl@Zero}
 \define@key{jsstr}{parens}[]{\let\jsstr@parens\dl@One}
 \define@key{jsstr}{noparens}[]{\let\jsstr@parens\dl@Zero}
-\let\jsstr@quotes\dl@One\let\jsstr@parens\dl@One
+\let\jsstr@quotes\dl@One\let\jsstr@parens\dl@Zero % noparens the default
 \define@key{jsstr}{useUni}[]{\let\jsstr@useUni\dl@One}
 \let\jsstr@useUni\dl@Zero
 %    \end{macrocode}
 % The common part to both \cs{flJSStr} and \cs{dlJSStr}.
+% \changes{v2.4.2}{2019/03/16}{Implement tex to pdf spacing. Remove the use of
+% parentheses in \string\cs{dl@defJSStr}.}
 %    \begin{macrocode}
 \newcommand{\dl@defJSStr}[3][quotes]{\def\dl@argi{#1}\ifx\dl@argi\@empty
-    \else\ifx\dl@JSCS\jscsDLJS\let\jsstr@parens\dl@Zero\fi
-    \setkeys{jsstr}{#1}\fi\dl@JSCS
-    \ifx\jsstr@quotes\dl@One
-        \xdef#2{\l@paren"#3"\r@paren}\else
-        \xdef#2{\l@paren#3\r@paren}\fi
-    \if\isStar*\gdef\dl@afterAction{{\Hy@unicodefalse\expandafter
-        \pdfstringdef\expandafter#2\expandafter{#2}}}\else
-        \global\let\dl@afterAction\relax\fi
-    \aftergroup\dl@afterAction\egroup}
+  \else\ifx\dl@JSCS\jscsDLJS\let\jsstr@parens\dl@Zero\fi
+  \setkeys{jsstr}{#1}\fi\dl@JSCS
+  \ifx\jsstr@quotes\dl@One
+    \xdef#2{\l@paren"#3"\r@paren}\else
+    \xdef#2{\l@paren#3\r@paren}\fi
+  \if\isStar*\gdef\dl@afterAction{{\Hy@unicodefalse\expandafter
+    \pdfstringdef\expandafter#2\expandafter{#2}}}\else
+    \global\let\dl@afterAction\relax\fi
+  \aftergroup\dl@afterAction\egroup\dl@restorespcs}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -923,7 +947,7 @@
 %    \end{macro}
 %
 % \subsection{A Macro for Debugging JS}
-%    \begin{macro}{\db...\db}
+%    \begin{macro}{\db}\hskip-\marginparsep{\,\texttt{...\cs{db}}}
 % The \cs{db} macro can be used within the \texttt{insDLJS} to insert
 % addition JS commands to help debug the code. Usage:
 %\begin{verbatim}
@@ -1745,42 +1769,148 @@
 %\end{description}
 % The material within the environment is read verbatim and a new command by the name of \#2
 % is defined.
+% \changes{v2.4.2}{2019/03/16}{Changed space token to \string\cs{pdfSP} in \string\env{defineJS}}
 %    \begin{macrocode}
 \newtoks\JStoks
-\newenvironment{defineJS}[2][]
-{%
-    \expandafter\@ifundefined\expandafter{%
-        \expandafter\@gobble\string#2}{}{%
-            \PackageWarning{insdljs}{The command
-                \string#2 already defined}}%
-    \gdef\defineJSArg{#2}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
-}{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \aftergroup\eq@JStemp}
 %    \end{macrocode}
+%   \leavevmode\DescribeMacro{\bParams}\hskip-\marginparsep\texttt{\darg{\ameta{token\SUB1}}\darg{\ameta{token\SUB2}}...\darg{\ameta{token\SUB{n}}}\cs{eParams}}
+%   The \env{defineJS} environments do not
+%   have parameters/arguments as a normal environment (or command) do. To enable the ability
+%   to  modify the JavaScript code within the environment of \env{defineJS}, we introduce
+%   the \cs{bParams}/\allowbreak\cs{eParams} construct. When you use one of the \env{defineJS} environments
+%   to define field level JavaScript, you can include parameters \cs{p(1)}, \cs{p(2)}, etc., within the body
+%   of the environment. (Note, within the body, there is no escape character unless you change catcode of another character
+%   within the optional argument of the \env{defineJS} environments.)
+%\begin{verbatim}
+%   \begin{defineJS}[\catcode`\!=0\relax]{\myCode}
+%   var p1=!p(1), p2=!p(2);
+%   app.alert("p1 + p2 = " + Number(p1+p2) );
+%   \end{defineJS}
+%\end{verbatim}
+%   The substitution of the parameter values does not take place until the code is expanded (\cs{myCode})
+%\begin{verbatim}
+%   \bParams{1}{16}\eParams
+%   \pushButton[\A{\JS{\myCode}}]{pbfld1}{.5in}{11bp}
+%\end{verbatim}
+%When the button is pressed, an alert box appears and states that `\texttt{p1 + p2 = 17}'. The same code
+%can be used later in another button, for example,
+%\begin{verbatim}
+%   \bParams{77}{11}\eParams
+%   \pushButton[\A{\JS{\myCode}}]{pbfld2}{.5in}{11bp}
+%\end{verbatim}
+%Using the (new) \cs{cmd} key for \pkg{eforms}, all these declarations can be made locally:
+%\begin{verbatim}
+%   \pushButton[\cmd{\bParams{77}{11}\eParams}
+%     \A{\JS{\myCode}}]{pbfld3}{.5in}{11bp}
+%\end{verbatim}
+% The definitions of the parameters are made using an \cs{edef} (using a control
+% name, \cs{p@r@m\ameta{cnt}}, that is probably not otherwise used). This last
+% command is generally accessed through \DescribeMacro\dl@param\cs{dl@param}.
+% Within all
+% the form fields, as defined in \pkg{eforms},
+% \DescribeMacro\dl@paramlocal\cs{dl@paramlocal} is expanded within a group; it is
+% also expanded within \cs{flJSStr}. Expansion of \cs{dl@paramlocal} \cs{let}s
+% \cs{p} to \cs{dl@param}; hence, \cs{p(1)}, \cs{p(2)}, etc., are defined.  Great
+% care must be used in managing the use of this feature; if you are not careful
+% an earlier definition of a parameter is used when it was not meant to be so;
+% or a \cs{p(n)} is not defined.
+%    \begin{macrocode}
+\def\dl@param(#1){\csname p@r@m#1\endcsname}
+\def\dl@paramlocal{\let\p\dl@param}
+%    \end{macrocode}
+%    This command uses the counter \texttt{dljs@cnt} and the token register
+%    \cs{JStoks}, both of which are used elsewhere in this package; however,
+%    there should be no conflict in using them here.
+%    \begin{macrocode}
+\let\eParams\relax
+%    \end{macrocode}
+%    When there is only one token, the braces, if any, get lost. To avoid
+%    this, we determine how many tokens there are: one or more. If only one, we
+%    handle separately, otherwise, we pass the flow on to \cs{bParams@i}.
+%    \begin{macrocode}
+\def\bParams#1{\def\p@r@m{p@r@m}\c@dljs@cnt\z@
+  \@ifnextchar\eParams{\expandafter
+    \def\csname\p@r@m1\endcsname{#1}}
+    {\bParams@i{#1}}}
+%    \end{macrocode}
+%    The main definition of \cs{bParams}, we \cs{def\cs{p@r@m}\ameta{cnt}\darg{\ameta{token}}}
+%    \begin{macrocode}
+\def\bParams@i#1\eParams{\@tfor\x:=#1\do{\advance\c@dljs@cnt\@ne
+  \JStoks=\expandafter{\x}\expandafter
+  \edef\csname\p@r@m\the\c@dljs@cnt\endcsname{\the\JStoks}}}
+%    \end{macrocode}
+%    Beginning with \pkg{insdljs} dated 2019/03/16, we solve an age-old problem with \app{dvips}: This problem
+%    is that is wraps code around to th next line, according to some unknown algorithm. Normally this is not
+%    a problem, but occassionally it will wrap some JavaScript code that breaks the code. Solve this problem,
+%    we make the space character active, and replace it with \cs{pdfSP} (\cs{040}), which is octal for the space
+%    character. Now there are no free spaces for \app{dvips} to break the line at in the PS file. The feature
+%    is turned on by default, and may be turned off with \DescribeMacro\pdfSpacesOff\cs{pdfSpacesOff}
+%    and back on by \DescribeMacro\pdfSpacesOn\cs{pdfSpacesOn}.
+%    \begin{macrocode}
+\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
+\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+%    \end{macrocode}
+%    When you declare a character to be an escape within the optional argument of \env{defineJS},
+%    that character may be needed in the code; for example if we say |\catcode`\!=0\relax|, and
+%    within the JavaScript code you have \texttt{if (x != 0 ) ...}, there is a problem: the JavaScript
+%    code is broken. As a fix for this problem, you can declare \DescribeMacro\escIs|\escIS{!}|,
+%    which in turn defines \DescribeMacro\Eschr\cs{Eschr}. the above code
+%    should then be written as \texttt{if (x !Eschr= 0 ) ...}; messy, but it works. The lines
+%    below is the recommended method of declaring \cs{escIs}:
+%\begin{verbatim}
+%   \pushButton[\cmd{\escIs{!}\bParams{77}{11}\eParams}
+%     \A{\JS{\myCode}}]{pbfld2}{.5in}{11bp}
+%\end{verbatim}
+%   These declarations makes everything local to the group within which the button is built.
+%    \begin{macrocode}
+\def\escIs#1{\def\Eschr{#1}}
+%    \end{macrocode}
+%    Finally, we get to the definition of \env{defineJS}, and its compatriates.
+%    \begin{macrocode}
+\newenvironment{defineJS}[2][]{%
+  \expandafter\@ifundefined\expandafter{%
+  \expandafter\@gobble\string#2}{}{%
+  \PackageWarning{insdljs}{The command
+    \string#2 already defined}}%
+  \gdef\defineJSArg{#2}\JStoks={}%
+  \def\verbatim@processline{%
+    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
+    \global\JStoks=\expandafter{\JS@temp}}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active
+%    \end{macrocode}
+%   We let \cs{space} to \cs{pdfSP}, and declare \cs{obeyspaces}, in this way, the space
+%   character is active and is equal to \cs{040} (space).
+%    \begin{macrocode}
+  \global\let\space\pdfSP\makeatletter\obeyspaces
+  #1%
+  \verbatim@start
+}{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
+    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{environment}{@defineJS}
 % Silent version of \texttt{defineJS}, can repeatedly be used to redefine the same
 % macro.
 %    \begin{macrocode}
 \newenvironment{@defineJS}[2][]
 {%
-    \gdef\defineJSArg{#2}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
+  \gdef\defineJSArg{#2}\JStoks={}%
+  \def\verbatim@processline{%
+    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
+    \global\JStoks=\expandafter{\JS@temp}}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active
+  \global\let\space\pdfSP\makeatletter\obeyspaces
+  #1%
+  \verbatim@start
 }{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \aftergroup\eq@JStemp}
+    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{environment}{defineJS*}
+%    We declare a public version of \env{@defineJS}
+% \changes{v2.4.2}{2019/03/16}{define \string\env{defineJS*} a public version of \string\env{@defineJS}}
+%    \begin{macrocode}
+\newenvironment{defineJS*}{\@defineJS}{\end@defineJS}
 %    \end{macrocode}
 %    \end{environment}
 % An author might want these definitions to be local in definition, so the
@@ -2598,7 +2728,7 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 %    creating custom keystroke and formatting events.
 %    \changes{v2.3f}{2017/03/02}{Alternate names for Adobe functions added}
 %    \begin{macrocode}
-\begin{insDLJS}{altadbfncs}{eforms: Alternate Adobe Function Names}
+\begin{insDLJS}{altadbfncs}{indljs: Alternate Adobe Function Names}
 var EFNumber_Keystroke=AFNumber_Keystroke;
 var EFNumber_Format=AFNumber_Format;
 var EFPercent_Keystroke=AFPercent_Keystroke;

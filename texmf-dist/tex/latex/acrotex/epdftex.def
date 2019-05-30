@@ -31,45 +31,49 @@
 \def\eq@choice@driver
 {%
     \Hy@pdfstringtrue
-    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
         \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
     \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
     \hbox{\pdfstartlink user{\common@choiceCode}%
     \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
     \HyField@AddToFields
     \endgroup
+    \dl@restorespcs
 }
 \def\eq@Button@driver
 {%
     \Hy@pdfstringtrue
     \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
-    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
         \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
     \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
     \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-    \hbox{\pdfstartlink user{ \common@pushButtonCode }%
+    \hbox{\pdfstartlink user{\common@pushButtonCode}%
     \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
     \endgroup
+    \dl@restorespcs
 }
 \def\eq@RadioCheck@driver
 {%
     \Hy@pdfstringtrue
-    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
         \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
     \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
     \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
     \hbox{\pdfstartlink user{\common@RadioCheckCode}%
     \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
     \endgroup
+    \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
     \pdfstartlink user{\common@RadioCheckCode}%
     \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
     \pdfendlink\endgroup
+    \dl@restorespcs
 }
 \def\eq@TextField{\Hy@pdfstringtrue
-    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
         \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
     \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
     \leavevmode
@@ -77,14 +81,16 @@
     \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
     \HyField@AddToFields
     \endgroup
+    \dl@restorespcs
 }
 \def\eq@SigField{\Hy@pdfstringtrue
-    \if\@vertRotate1 \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
         \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
     \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
     \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
     \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
     \endgroup
+    \dl@restorespcs
 }
 \def\setLink@driver
 {%
@@ -95,6 +101,7 @@
     \Hy@colorlink{\@linkcolor}\link@@Box
     \close@pdflink
     \endgroup
+    \dl@restorespcs
 }
 \def\ef@setTabOrder{\ifx\ef@taborder\@empty\else
     \edef\ef@tmp@toks{\the\pdfpageattr\space/Tabs/\ef@taborder}%

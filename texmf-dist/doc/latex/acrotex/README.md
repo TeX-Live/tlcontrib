@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2018-12-13
+Dated: 2019-03-16
 
 AeB contains the following:
 
@@ -18,6 +18,10 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2019/03/16) minor bug fixes; added \bParams/\eParams command pair to pass
+arguments to JS code snippets declared within the defineJS environment. Fixed the spacing
+problem when dvips is used to compile a doc containing the defineJS environment.
 
 What's New (2018/12/13) More changes in exerquiz to support mi-solns; misc. bug fixes.
 

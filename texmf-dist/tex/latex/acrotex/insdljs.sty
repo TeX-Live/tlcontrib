@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2018/07/21 v2.4 Insert Document Level JavaScripts (dps)]
+ [2019/03/16 v2.4.2 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -90,6 +90,8 @@
     \protected\def\pdfnames{\pdfextension names }
     \def\pdfpageref{\pdffeedback pageref}\fi\fi
 \RequirePackage{verbatim}
+\let\dlcomment\comment
+\let\enddlcomment\endcomment
 \usepackage{conv-xkv}[2017/01/03]
 \@ifundefined{dljs@drivernum}{%
     \@ifundefined{eq@drivernum}{%
@@ -146,6 +148,13 @@
 {\obeylines %
 \gdef\js@@R{\noexpand
 }}
+\def\pdfSPDef{\string\040}
+\let\pdfSP\pdfSPDef
+\def\pdfLBr{\string\173}
+\def\pdfRBr{\string\175}
+\def\dl@sp@ce{ }
+\bgroup\obeyspaces
+\gdef\dl@restorespcs{\global\let =\dl@sp@ce}\egroup
 \let\dljstfor\@tfor
 \def\jsR{\string\r\string\n}
 \def\defineJSjsR{\string\r\eqbs^^J}
@@ -158,54 +167,63 @@
 \newwrite\js@verbatim@out
 \def\iwvo#1{\immediate\write\js@verbatim@out{#1}}
 \def\dl@lparen{(}\def\dl@rparen{)}
+\def\genericNL{^^J}
+\def\defjsLB{\expandafter\pdfmarkLB\@gobblefour}
+\def\genericLB{\eqbs\eqbs^^J}
+\def\pdfmarkLB{\eqbs^^J}
 \def\jscsDflt{\let\protect\noexpand\let\jslit\string
-    \let\~\dl@tilda\let\^\dl@sup
-    \def\\{\eqbs\eqbs}\def\cs##1{\\\\##1}%
-    \def\r{\\r}\def\t{\\t}\def\n{\\n}%
-    \let\{\dl@lBrace\let\}\dl@rBrace
-    \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
-    \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
-        \let\r@paren\dl@rparen\else
-    \let\l@paren\@empty\let\r@paren\@empty\fi
+  \let\~\dl@tilda\let\^\dl@sup
+  \def\\{\eqbs\eqbs}\def\cs##1{\\\\##1}%
+  \def\r{\\r}\def\t{\\t}\def\n{\\n}%
+  \let\{\dl@lBrace\let\}\dl@rBrace
+  \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
+  \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
+    \let\r@paren\dl@rparen\else
+  \let\l@paren\@empty\let\r@paren\@empty\fi
+  \dl@paramlocal\let\LB\genericLB\let\NL\genericNL
 }
 \def\jscsDLJS{\let\protect\noexpand\let\jslit\string
-    \let\~\dl@tilda\let\^\dl@sup
-    \ifxetex\def\\{\eqbs\eqbs}\else\def\\{\eqbs}\fi\def\cs##1{\\\\##1}%
-    \def\r{\\r}\def\t{\\t}\def\n{\\n}%
-    \let\{\dl@lBrace\let\}\dl@rBrace
-    \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
-    \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
-        \let\r@paren\dl@rparen\else
-    \let\l@paren\@empty\let\r@paren\@empty\fi
+  \let\~\dl@tilda\let\^\dl@sup
+  \ifxetex\def\\{\eqbs\eqbs}\else\def\\{\eqbs}\fi\def\cs##1{\\\\##1}%
+  \def\r{\\r}\def\t{\\t}\def\n{\\n}%
+  \let\{\dl@lBrace\let\}\dl@rBrace
+  \ifx\jsstr@useUni\dl@One\def\Uni{\\u}\else\def\u{\\u}\fi
+  \ifx\jsstr@parens\dl@One\let\l@paren\dl@lparen
+    \let\r@paren\dl@rparen\else
+  \let\l@paren\@empty\let\r@paren\@empty\fi
+  \ifpdfmarkup\let\LB\pdfmarkLB\else
+    \let\LB\genericLB\fi
+  \let\NL\genericNL
 }
 \ifpdf\let\jscsDLJS\jscsDflt\fi
 \let\dl@JSCS\jscsDflt
-\newcommand{\flJSStr}{\bgroup
-    \let\dl@JSCS\jscsDflt
-    \@ifstar{\def\isStar{*}\dl@defJSStr}
-    {\let\isStar\relax\dl@defJSStr}}
+\bgroup\obeyspaces
+\gdef\flJSStr{\bgroup\global\let =\pdfSP
+\let\dl@JSCS\jscsDflt
+\obeyspaces\@ifstar{\def\isStar{*}\dl@defJSStr}%
+{\let\isStar\relax\dl@defJSStr}}\egroup
 \let\fieldJSStr\flJSStr
 \let\defineJSStr\flJSStr
 \newcommand{\dlJSStr}{\bgroup
-    \@ifstar{\def\isStar{*}\let\dl@JSCS\jscsDLJS\dl@defJSStr}
-    {\let\isStar\relax\let\dl@JSCS\jscsDLJS\dl@defJSStr}}
+  \@ifstar{\def\isStar{*}\let\dl@JSCS\jscsDLJS\dl@defJSStr}
+  {\let\isStar\relax\let\dl@JSCS\jscsDLJS\dl@defJSStr}}
 \define@key{jsstr}{quotes}[]{\let\jsstr@quotes\dl@One}
 \define@key{jsstr}{noquotes}[]{\let\jsstr@quotes\dl@Zero}
 \define@key{jsstr}{parens}[]{\let\jsstr@parens\dl@One}
 \define@key{jsstr}{noparens}[]{\let\jsstr@parens\dl@Zero}
-\let\jsstr@quotes\dl@One\let\jsstr@parens\dl@One
+\let\jsstr@quotes\dl@One\let\jsstr@parens\dl@Zero % noparens the default
 \define@key{jsstr}{useUni}[]{\let\jsstr@useUni\dl@One}
 \let\jsstr@useUni\dl@Zero
 \newcommand{\dl@defJSStr}[3][quotes]{\def\dl@argi{#1}\ifx\dl@argi\@empty
-    \else\ifx\dl@JSCS\jscsDLJS\let\jsstr@parens\dl@Zero\fi
-    \setkeys{jsstr}{#1}\fi\dl@JSCS
-    \ifx\jsstr@quotes\dl@One
-        \xdef#2{\l@paren"#3"\r@paren}\else
-        \xdef#2{\l@paren#3\r@paren}\fi
-    \if\isStar*\gdef\dl@afterAction{{\Hy@unicodefalse\expandafter
-        \pdfstringdef\expandafter#2\expandafter{#2}}}\else
-        \global\let\dl@afterAction\relax\fi
-    \aftergroup\dl@afterAction\egroup}
+  \else\ifx\dl@JSCS\jscsDLJS\let\jsstr@parens\dl@Zero\fi
+  \setkeys{jsstr}{#1}\fi\dl@JSCS
+  \ifx\jsstr@quotes\dl@One
+    \xdef#2{\l@paren"#3"\r@paren}\else
+    \xdef#2{\l@paren#3\r@paren}\fi
+  \if\isStar*\gdef\dl@afterAction{{\Hy@unicodefalse\expandafter
+    \pdfstringdef\expandafter#2\expandafter{#2}}}\else
+    \global\let\dl@afterAction\relax\fi
+  \aftergroup\dl@afterAction\egroup\dl@restorespcs}
 \def\dlTC#1{try{#1}catch(e){}}
 \def\js@R{\ifcase\dljs@drivernum^^J\else\jsR\fi}
 \def\db#1\db{\ifx\dljs@debug\dl@YES\space\space\space#1\js@R\fi}
@@ -584,36 +602,47 @@
         \noexpand\input{\js@Path\dljsBase.djs}}}\@dljstmp
 }
 \newtoks\JStoks
-\newenvironment{defineJS}[2][]
-{%
-    \expandafter\@ifundefined\expandafter{%
-        \expandafter\@gobble\string#2}{}{%
-            \PackageWarning{insdljs}{The command
-                \string#2 already defined}}%
-    \gdef\defineJSArg{#2}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
+\def\dl@param(#1){\csname p@r@m#1\endcsname}
+\def\dl@paramlocal{\let\p\dl@param}
+\let\eParams\relax
+\def\bParams#1{\def\p@r@m{p@r@m}\c@dljs@cnt\z@
+  \@ifnextchar\eParams{\expandafter
+    \def\csname\p@r@m1\endcsname{#1}}
+    {\bParams@i{#1}}}
+\def\bParams@i#1\eParams{\@tfor\x:=#1\do{\advance\c@dljs@cnt\@ne
+  \JStoks=\expandafter{\x}\expandafter
+  \edef\csname\p@r@m\the\c@dljs@cnt\endcsname{\the\JStoks}}}
+\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
+\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+\def\escIs#1{\def\Eschr{#1}}
+\newenvironment{defineJS}[2][]{%
+  \expandafter\@ifundefined\expandafter{%
+  \expandafter\@gobble\string#2}{}{%
+  \PackageWarning{insdljs}{The command
+    \string#2 already defined}}%
+  \gdef\defineJSArg{#2}\JStoks={}%
+  \def\verbatim@processline{%
+    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
+    \global\JStoks=\expandafter{\JS@temp}}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active
+  \global\let\space\pdfSP\makeatletter\obeyspaces
+  #1%
+  \verbatim@start
 }{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \aftergroup\eq@JStemp}
+    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
 \newenvironment{@defineJS}[2][]
 {%
-    \gdef\defineJSArg{#2}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
+  \gdef\defineJSArg{#2}\JStoks={}%
+  \def\verbatim@processline{%
+    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
+    \global\JStoks=\expandafter{\JS@temp}}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active
+  \global\let\space\pdfSP\makeatletter\obeyspaces
+  #1%
+  \verbatim@start
 }{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \aftergroup\eq@JStemp}
+    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
+\newenvironment{defineJS*}{\@defineJS}{\end@defineJS}
 \newenvironment{localJS}[1][]{}{\ifvmode\else\unskip\fi}
 \newenvironment{willClose}[1][]
 {\@defineJS[#1]{\will@Close}}

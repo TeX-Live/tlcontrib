@@ -250,10 +250,15 @@
     \ifcase\nr\relax\@eqmlhyph{y}\or
     \@eqmlhyph{n}\fi
 }{}
-\define@key{eforms}{presets}{%
-    \ef@jstoks=\expandafter{#1}%
-    \edef\ef@temp@expand{\noexpand\setkeys{eforms}{\the\ef@jstoks}}%
-    \ef@temp@expand
+\define@key{eforms}{cmd}[]{\@eqcmd{#1}}
+\define@key{eforms}{presets}{\ef@jstoks=\expandafter{#1}%
+  \edef\ef@temp@expand{\noexpand\setkeys{eforms}{\the\ef@jstoks}}%
+  \ef@temp@expand
+}
+\define@key{eforms}{epresets}{\ef@jstoks=\expandafter{#1}%
+  \edef\@rgs{#1}\ef@jstoks=\expandafter{\@rgs}%
+  \edef\ef@temp@expand{\noexpand\setkeys{eforms}{\the\ef@jstoks}}%
+  \ef@temp@expand
 }
 \define@choicekey{eforms}{symbolchoice}[\val\nr]%
     {check,circle,cross,diamond,square,star}

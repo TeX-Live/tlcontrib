@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2018/12/13 v8.2.8 %
+ [2019/02/11 v8.2.9 %
   Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -926,8 +926,8 @@
     \xdef\eq@startSoln{\the\pagetotal}%
     \eqe@debugVertSkip{\marginpar{\smash{b[\sameVspace]}}}%
 }
-\let\eqSavedComment\comment
-\let\eqSavedEndCommet\endcomment
+\let\eqSavedComment\dlcomment
+\let\endeqSavedComment\enddlcomment
 \def\setTabulrSolnEnv{%
     \@ifundefined{@listii@SAVE}{\global\let\@listii@SAVE\@listii}{}%
     \expandafter\def\expandafter\@listii\expandafter{\@listii@SAVE
@@ -959,13 +959,13 @@
   \if\currhideopt\eq@Hid
     \let\minVspacet@bs\@empty
     \let\procsoln\eqSavedComment
-    \let\endprocsoln\eqSavedEndCommet
+    \let\endprocsoln\endeqSavedComment
     \def\eq@next{\procsoln}%
   \else
     \eq@ckglobalhide
     \ifeq@hidesolution
       \let\procsoln\eqSavedComment
-      \let\endprocsoln\eqSavedEndCommet
+      \let\endprocsoln\endeqSavedComment
     \else
       \ifeq@solutionsafter\else
           \ifx\eq@@CommonCmd\@empty\else
@@ -1716,14 +1716,14 @@
         \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
         \ifx\wrngAnsSymbJSLoc\@empty\else\r
         \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
-    }}]{sqID\oField}{0bp}{0bp}}%
+    }}]{sqID\oField}{2bp}{2bp}}%
 }
 \def\qz@IDTxtField{\makebox[0pt][l]{\textField[\autoCenter{n}\BC{}\BG{}
     \S{S}\textSize{0}\Ff{\FfReadOnly}
     \AA{\AAFormat{if(typeof aQuizzesInDoc=="undefined")\r\t
       var aQuizzesInDoc=new Array();\r
     if (aQuizzesInDoc.indexOf("\oField")) aQuizzesInDoc.push("\oField");
-    }}]{qzID\oField}{0bp}{0bp}}}
+    }}]{qzID\oField}{2bp}{2bp}}}
 \let\eqQuizType\relax
 \def\@@shortquiz[#1]{%\begingroup
   \gdef\oField{#1}\gdef\curr@quiz{#1}\gdef\currQuiz{#1}%
@@ -2118,7 +2118,7 @@
     {\eq@setWidgetProps\setLink@driver}%
     {\eq@EndQuizLinkDefaults\eq@@EndQuizLinkActions\every@Link}%
     \makebox[0pt][r]{\textField[\BC{}\autoCenter{n}]%
-        {htxtfld.\curr@quiz}{0bp}{0bp}}%
+        {htxtfld.\curr@quiz}{2bp}{2bp}}%
     \makebox[0pt][r]{\eq@hiddenScoreData\eq@insertHiddenFields}%
     \global\let\eq@CGI\@empty\ignorespaces
 }
@@ -2159,7 +2159,7 @@
   }}}%
 }
 \newcommand{\eq@hiddenScoreData}{\makebox[0pt][r]{%
-  \textField[\BC{}\F{\FHidden}]{ScoreData.\curr@quiz}{0bp}{0bp}}}
+  \textField[\BC{}\F{\FHidden}]{ScoreData.\curr@quiz}{2bp}{2bp}}}
 \newcommand\eq@EndQuizButton[1][]{%
   \ifx\eq@CGI\@empty
     \let\eq@submitURL\@empty

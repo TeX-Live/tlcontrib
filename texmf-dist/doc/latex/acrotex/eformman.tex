@@ -12,7 +12,7 @@
 
 \setlength{\marginparpush}{3pt}
 
-%\previewOn\pmcaOn
+%\previewOn\pmpvOn
 
 \usepackage{graphicx,array,longtable}
 %\usepackage[usecmtt]{myriadpro}
@@ -79,7 +79,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2019/03/16},
+    prepared={2019/05/24},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -161,6 +161,7 @@
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
+\def\DVI{DVI}
 %\let\amtIndent\leftmargini
 \edef\amtIndent{\the\parindent}
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
@@ -190,6 +191,7 @@
 \def\endredpoint{\FitItIn{{\large\ifusebw\color{black}\else\color{red}\fi$\blacktriangleleft$}}}
 
 \def\pb{pushbutton}
+\def\pbs{pushbuttons}
 
 %\advance\marginparwidth16pt
 
@@ -307,6 +309,8 @@ _path=_path.substring(0,pos)+"/"+manualfilename;
     bOnPrint:false,
     cDIPath:_path
 });
+this.removeField("topstxtR");
+this.removeField("pbDemoR");
 \executeSave();
 \end{docassembly}
 \begin{document}
@@ -362,10 +366,10 @@ The field can be signed, either by using \app{Acrobat}, or programmatically
 from a {\LaTeX} source, but you need to use \textsf{aeb\_pro} and to
 create the PDF using \app{Acrobat} Distiller.
 
-The \textsf{hyperref} Package (Rahtz, Oberdiek \textit{et al})
+The \pkg{hyperref} Package (Rahtz, Oberdiek \textit{et al})
 provides support for the same set of form fields; however, not all
 features of these fields can be accessed through the
-\textsf{hyperref} commands.  I was determined to write my own set
+\pkg{hyperref} commands.  I was determined to write my own set
 of commands which would be sufficiently comprehensive and
 extendable to suit all the needs of the \cAcroB.  All the quiz
 environments have been modified to use this new set of form
@@ -400,7 +404,7 @@ an integral part of \textsf{Exerquiz}. I've now separated the two, making
 
 \subsection{Package Requirements}
 
-The \textsf{eforms} package requires \textsf{hyperref} (a newer version)
+The \textsf{eforms} package requires \pkg{hyperref} (a newer version)
 and \textsf{insdljs}, a package that is part of the {\cAcroB}.
 
 \subsection{Package Options}
@@ -431,66 +435,99 @@ defined in these earlier included packages.
     I fall down easily.
 \end{document}
 \end{Verbatim}
-\noindent The \textsf{eforms} package brings in the \textsf{hyperref} package
+\noindent The \textsf{eforms} package brings in the \pkg{hyperref} package
 and passes it the driver, so there is no need to specify
-\textsf{hyperref}, usually. If you wish to introduce \textsf{hyperref}
+\pkg{hyperref}, usually. If you wish to introduce \pkg{hyperref}
 yourself with specific options, place it before \textsf{eforms}.
 
 If you use the \textsf{exerquiz} package, \textsf{exerquiz} brings in the
 \textsf{eforms} package and passes the driver to it.
 
-\subsection{The \texttt{preview} option}
+\subsection{The \texttt{preview} option}\label{s:preview}
 
 %Use the \texttt{preview} option if you use a \texttt{dvi} previewer
 %to view your document.
 
 When the \opt{preview} option is taken, a frame box is drawn around any form
 field created by \pkg{eforms}, making the position of the field visible in
-the DVI previewer or {\PDF} viewer. Being see to view the position on a form
-element enables you to determine whether any additional adjustments are
-needed to the position of the field. \emph{Turn off this option} when you build the
-final version of your {\PDF} file.
+the {\DVI} previewer or {\PDF} reader. Being able to view the position of a
+form element is important to determine whether any additional adjustments in
+position is. \emph{Turn off this option} when you build the final version of
+the document.
 
-This option was originally developed for those using a DVI previewer, it is
-also useful for those using PDF creators \app{pdflatex}, \app{xelatex}, or
-\app{lualatex}. Modern {\LaTeX} users employ quicker {\PDF} viewers such as \app{sumatraPDF} or
-\app{PDF-Exchange}; these PDF viewers do not create form appearances as \app{Adobe Reader} and \app{Acrobat}
+This option was originally developed for those using a {\DVI} previewer, it
+is also useful for those using PDF creators \app{pdflatex}, \app{xelatex}, or
+\app{lualatex}. Modern {\LaTeX} users employ quicker {\PDF} readers such as
+\app{sumatraPDF} or \app{PDF-Exchange}; these non-conforming {\PDF} readers
+may not create form field appearances as \app{Adobe Reader} and \app{Acrobat}
 do; consequently, an outline of the positions of the fields is most welcome.
 
 The \texttt{preview} option just sets a switch (\cs{ifpreview}\FmtMP{\cs{ifpreview}}), which can conveniently be
 turned off and on using the commands \cs{previewOn}\FmtMP{\cs{previewOn}} and \cs{previewOff}
 within the document itself. Related to \cs{previewOn} and \cs{previewOff}\FmtMP{\cs{previewOff}} is
-the command \cs{pmcaOn}, covered in the next paragraph.
+the command \cs{pmpvOn} (poor man's preview), covered in the next paragraph.
 
-\paragraph*{Poor man's captions.}\label{para:pmca}
+\paragraph*{Enhanced preview (Poor man's preview).}\label{para:pmpv}
 
-The \cs{pushButton} command of \pkg{eforms} produces a push
-button;\footnote{Push buttons are covered in Section~\ref{s:BtnFlds}, beginning on
+The \cs{pushButton} command of \pkg{eforms} produces a \pb;\footnote{Pushbuttons are covered in Section~\ref{s:BtnFlds}, beginning on
 page~\pageref{ss:Pbs}.} a common key to use is the \cs{CA} key, the
 value of which captions the button. As a companion to \cs{previewOn},
-\pkg{eforms} defines \cs{pmcaOn}\FmtMP{\cs{pmcaOn}} and
-\cs{pmcaOff}\FmtMP{\cs{pmcaOff}}; when \cs{previewOn} is in effect,
-expanding \cs{pmcaOn} causes the value of the \cs{CA} key to be typeset into
+\pkg{eforms} defines \cs{pmpvOn}\FmtMP{\cs{pmpvOn}} and
+\cs{pmpvOff}\FmtMP{\cs{pmpvOff}}; when \cs{previewOn} is in effect,
+expanding \cs{pmpvOn} causes the value of the \cs{CA} key to be typeset into
 the {\pb} preview; for example,\bgroup\makeatletter
-\def\@PMCA{Push Me}\settowidth{\@tempdima}{\,Push Me\,}\edef\x{\the\@tempdima}%
+\def\@PMPV{Push Me}\settowidth{\@tempdima}{\,Push Me\,}\edef\x{\the\@tempdima}%
 \def\1{\makebox[0pt][l]{\hskip\linewidth\makebox[0pt][r]
-{\previewOff\pmcaOff\pushButton[\autoCenter{n}\CA{Push Me}]{pbDemo}{}{13bp}\quad
-  \previewOn\pmcaOn\ef@Bbox{\x}{13bp}\hspace{40pt}}}}%
+{\previewOff\pmpvOff\pushButton[\autoCenter{n}\CA{Push Me}]{pbDemoL}{}{13bp}\quad
+  \previewOn\pmpvOn\pushButton[\autoCenter{n}\CA{Push Me}]{pbDemoR}{}{13bp}\hspace{40pt}}}}%\ef@Bbox{\x}{13bp}
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\previewOn\pmpvOn % <--!textsf(enhanced preview activated)
+...
 !1\pushButton[\CA{Push Me}]{pbDemo}{}{13bp}
 \end{Verbatim}
-The button on the left is the normal appearance of the push button after
+The button on the left is the normal appearance of the {\pb} after
 \app{Reader/Acrobat} has supplied its appearance, the ``button'' on the right
 is how the button would appear in \app{sumatraPDF}, for example, just after
 {\PDF} creation using \app{pdflatex}, \app{xelatex}, or \app{lualatex}, or in
 a DVI previewer after latexing.\egroup
 
+There are enhanced previews for other fields that support a \cs{V} or \cs{CA}
+key (\pbs, text fields, list boxes, combo boxes, check boxes and
+radio button fields). In each case, the argument of the key is \emph{typeset
+into the document} beneath the field when \cs{pmpvOn} is expanded prior. The
+arguments of \cs{V} and \cs{CA} recognize a local command
+\cs{tops}\FmtMP{\cs{tops}} (\cs{textorpdfstring}) to offer an alternate
+string that is typeset:
+\begin{quote}
+\textField[\V{\tops{preview value}{real value}}]{topstxtL}{1.5in}{13bp}\quad\previewOn\pmpvOn
+\textField[\V{\tops{preview value}{real value}}]{topstxtR}{1.5in}{13bp}\\[6bp]\small
+\verb|\textField[\V{\tops{preview value}{display value}}|\\
+\null\qquad\verb|\DV{real value}]{topstxt}{1.5in}{13bp}|
+\end{quote}
+The field on the left shows how the text field actually appears
+within \app{Adobe Reader}, and the rectangle on the right is how
+that same field appears in a non-conforming PDF reader, such as
+\app{sumatraPDF}. The alias \cs{tops} should only be used within
+the \cs{V} and \cs{CA} keys.
+
+For check box and radio button fields, the \cs{tops} command is not supported
+within the \cs{V} key. For these types of fields, the value key is typically
+a mark: a check, an cross, a star, and so on. The \pkg{eforms} package defines the
+declarative command \cs{pmpvMrk\darg{\ameta{mrk}}} that takes one argument \ameta{mrk}, the (preview) mark
+to be used. The package declares \verb|\pmpvMrk{X}|, another good choice is
+\verb|\pmpvMrk{$\checkmark$}|.
+
+\newtopic\textbf{\textcolor{red}{Final Preparation.}}
 In the modern era of {\LaTeX}, it is customary by some to use
-\app{sumatraPDF} or some other {\PDF} viewer during development; however, you
-should always open your final {\PDF} (which was built with
-\cs{previewOff}\cs{pmcaOff}) in \app{Adobe Reader DC} (or in \app{Acrobat}),
-save it to obtain the correct appearances of the fields placed in the
-document.
+\app{sumatraPDF} or some other non-conforming {\PDF} reader during
+development; however, you should always open your final {\PDF} (which was
+built with \cs{previewOff}\cs{pmpvOff}) in \app{Adobe Reader DC} (or in
+\app{Acrobat}), save it to obtain the correct appearances of the fields
+placed in the document.
+
+%http://www.acrotex.net/blog/?p=1404
+\exAeBBlogPDF{p=1404} Refer to the article titled \textit{\href{\urlAcroTeXBlog/?p=1404}{eforms: Enhanced Previews}} for more technical
+details and examples; the article is found on the \href{\urlAcroTeXBlog}{\AcroBlog} website.
 
 
 \subsection{The \texttt{useui} option}
@@ -502,10 +539,10 @@ more ``user-friendly'' to use. See
 \hyperref[useui]{Section~\ref*{useui}}, page~\pageref*{useui}, for a
 description of these key-value pairs.
 
-\subsection{The \texttt{unicode} option of \textsf{hyperref}}
+\subsection{The \texttt{unicode} option of \texorpdfstring{\protect\pkg}{}{hyperref}}
 
 The \textsf{eforms} package will obey the \texttt{unicode} option of
-\textsf{hyperref}. Whenever this option is taken in hyperref, for
+\pkg{hyperref}. Whenever this option is taken in hyperref, for
 certain keys (namely, \cs{V}, \cs{DV}, \cs{TU}, \cs{CA}, \cs{RC}, and
 \cs{AC}), standard latex markup may be used to enter the values of
 these keys, for example, in a text field, you might set
@@ -515,13 +552,15 @@ value of ``J\"{u}rgen'' in that text field.
 
 \section{Form Fields}
 
-The \texttt{eforms} support for {\eForm} defines seven basic (and internal)
+The \pkg{eforms} support for {\PDF} forms defines seven basic (and internal)
 commands for creating the seven types of form elements. These seven are used
 as ``building blocks'' for defining all buttons, check boxes, radio buttons
 and text fields used in the \texttt{exerquiz} quizzes; and for defining seven
 user-commands: \cs{listBox}, \cs{comboBox}, \cs{pushButton}, \cs{checkBox},
 \cs{radioButton}, \cs{textField}, and \cs{sigField}. These user commands are
-the topic of the subsequent sections.
+the topic of the subsequent sections. Note, viewing these form fields outside of
+\app{Adobe Reader} or \app{Acrobat} itself may be a problem, please review the paragraphs
+on titled \Nameref{s:preview}.
 
 Each of the above listed field commands has an optional first
 parameter that is used to modify the appearance of the field,
@@ -591,14 +630,14 @@ Within the first parameter, these three character can be used freely, without es
 \subsection{Button Fields}\label{s:BtnFlds}
 
 Buttons are form elements that the user interacts with using only a
-mouse. There are three types of buttons: push buttons, check boxes
+mouse. There are three types of buttons: {\pbs}, check boxes
 and radio buttons.
 
-\subsubsection{Push Buttons}\label{ss:Pbs}
+\subsubsection{Pushbutton fields}\label{ss:Pbs}
 
-The push button is a button field that has no
-value, it is neither on nor off. Generally, push buttons are used
-to initiate some action, such as JavaScript action.
+The {\pb} is a button field that has no value, it is neither on nor off.
+Generally, {\pbs} are used to initiate some action, such as JavaScript
+action.
 
 \settowidth{\aebdimen}{\cs{pushButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
@@ -608,13 +647,13 @@ to initiate some action, such as JavaScript action.
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
-\item[\texttt{\#2}:] the title of the button field
+\item[\texttt{\#2}:] the title of the button field (also called the field name)
 \item[\texttt{\#3}:] the width of the bounding rectangle
 \item[\texttt{\#4}:] the height of the bounding rectangle
 \end{enumerate}
 
 \paragraph*{Default Appearance:} The default appearance of
-a push button is determined by the following:
+a {\pb} is determined by the following:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \W{1}\S{B}\F{\FPrint}\BC{0 0 0}
 \H{P}\BG{.7529 .7529 .7529}
@@ -650,7 +689,7 @@ width based on the width of the text given by \Cs{CA}, \Cs{RC} and
 \pushButton[\CA{Push}\AC{Me}\RC{Reset}\A{/S/ResetForm}]
     {myButton}{}{12bp}
 \end{Verbatim}
-Refer to the \pkg{icon-appr} package to supply icon appearances to push buttons created by
+Refer to the \pkg{icon-appr} package to supply icon appearances to {\pbs} created by
 the \pkg{eforms} package.
 
 \subsubsection{Check Boxes}\label{CheckBoxes}
@@ -1206,7 +1245,7 @@ and can perform a wide range of actions.
 The borders of the link commands can be controlled through optional
 parameter, their default appearance follow the same pattern of
 hyperref: If the \texttt{colorlinks} option is used (in
-\textsf{hyperref}) then the border is invisible by default;
+\pkg{hyperref}) then the border is invisible by default;
 otherwise, there is a visible border.
 
 When the \texttt{colorlinks} option is chosen (in hyperref), the
@@ -1216,7 +1255,7 @@ is a named color. \cs{defaultlinkcolor} has a definition of
 \newcommand{\defaultlinkcolor}{\@linkcolor}
 \end{Verbatim}
 \noindent where \cs{@linkcolor} is a command defined in
-\textsf{hyperref}, and is defined to be \texttt{red}. This can be
+\pkg{hyperref}, and is defined to be \texttt{red}. This can be
 redefined as desired.\footnote{The {\Web} package redefines
 \cs{@linkcolor} to be a flavor of green.}
 
@@ -1237,7 +1276,7 @@ parameter takes key-value pairs to change appearance and define
 actions. The default appearance of this link is \verb!\S{S}\Border{0 0 0}!,
 an invisible yet solid border line. (The visibility of the border is
 actually controlled by the \texttt{colorlinks} option of
-\textsf{hyperref}, as explained above.) The second parameter is the
+\pkg{hyperref}, as explained above.) The second parameter is the
 link text. This argument does not have to be text, it can be
 anything that takes up space, such as a graphic or \cs{parbox}.
 
@@ -2045,7 +2084,7 @@ For example,
     uptxt={Push Me}
 }
 \end{Verbatim}
-Later, a push button can use this preset, like so,
+Later, a {\pb} can use this preset, like so,
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \pushButton[\ui{presets=\myFavFive,
     js={app.alert("AcroTeX rocks!")}}]{pb1}{}{11bp}
@@ -2076,7 +2115,7 @@ border line width to zero \verb!\W{0}!. For forms, this key has no
 counterpart in the user interface.
 
 If this key is not specified, the \textsf{eforms}
-follows the rule: If \texttt{colorlinks} option of  \textsf{hyperref} is used, the border is invisible;
+follows the rule: If \texttt{colorlinks} option of  \pkg{hyperref} is used, the border is invisible;
 otherwise, it is visible (and the default \texttt{linewidth} is 1). Use the border key to override
 this behavior.
 
@@ -2173,7 +2212,7 @@ values are ``or-ed'' together.
 
 Normally, a document author would not specify \texttt{radio},
 \texttt{pushbutton} or \texttt{combo}. These properties are used by
-\textsf{eforms} to construct a radio button field, a push button and a combo
+\textsf{eforms} to construct a radio button field, a {\pb} and a combo
 box. The others can be used as appropriate.
 
 \settowidth{\aebdimen}{\ttfamily maxlength=\anglemeta{num}}%
@@ -2256,7 +2295,7 @@ If the \opt{unicode} option of \pkg{hyperref} is in effect, then setting
 % \texttt{eqforms\_pro.tex}
 
 
-\newtopic \textbf{Push buttons only.} The following list of keys are used for
+\newtopic \textbf{Pushbuttons only.} The following list of keys are used for
 creating custom appearances on button faces. \app{Acrobat} Distiller required for
 this set. The example files
 \marginpar{\mbox{\makebox[0pt][l]{\textcolor{blue}{\Pisymbol{webd}{254}}}\raisebox{-2pt}{\color{red}{{\zqacr
@@ -2976,7 +3015,7 @@ the \textsf{eforms} package defines its own \cs{pushButton} command.
 \Example Here is the same example as above, but with \textsf{dvips} as the
 driver and using the \textsf{eforms} package, which calls
 \textsf{insdljs}. Note the  use of the optional argument in the
-\texttt{insDLJS} environment, and the missing \textsf{hyperref} package
+\texttt{insDLJS} environment, and the missing \pkg{hyperref} package
 statement and \texttt{Form} environment, the \textsf{eforms} package
 automatically inserts this code.
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -3481,7 +3520,7 @@ FfMultiline?          &  For Multiline text field      & text\\
 FfPassword?           &  Password field                & text \\
 FfNoToggleToOff?      &  Used with Radio Buttons       & Radio only\\
 FfRadio?              &  Radio Button Flag             & Radio if set\\
-FfPushButton?         &  Push Button Flag              & Push button\\
+FfPushButton?         &  Push Button Flag              & Pushbutton\\
 FfCombo?              &  Combo Flag                    & choice\\
 FfEdit?               &  Edit/NoEdit                   & combo\\
 FfSort?               &  Sort List                     & choice\\
@@ -3593,38 +3632,38 @@ BC?& The boundary color, a list of 0 (transparent), 1 (gray), 3 (RGB) or 4 (CMYK
     &\verb+\BC{}+\newline(transparent)\\
 BG?& Background color. Color specification same as \cs{BC}&\verb+\BG{}+\newline(transparent)\\
 CA?& Button fields (push, check, radio) The widget's normal caption; e.g. \verb+\CA{Push}+,
-    in the case of a push button. For check boxes and radio, the value of
+    in the case of a {\pb}. For check boxes and radio, the value of
     \cs{CA} is a code that indicates whether a check, circle, square, star, etc.
     is used.  These codes are introduced through \cs{symbolchoice}. Obeys \texttt{unicode} option.&\verb+\CA{}+\\
-RC?& Push button fields only. The roll over text caption. Obeys \texttt{unicode} option.&\verb+\RC{}+\\
-AC?& Push button fields only. The down button caption. Obeys \texttt{unicode} option.&\verb+\AC{}+\\
+RC?& Pushbutton fields only. The roll over text caption. Obeys \texttt{unicode} option.&\verb+\RC{}+\\
+AC?& Pushbutton fields only. The down button caption. Obeys \texttt{unicode} option.&\verb+\AC{}+\\
 mkIns?& A variable for introducing into the \texttt{MK} dictionary any other key-value pairs not listed above.
         Principle examples are \texttt{I}, \texttt{RI}, \texttt{IX}, \texttt{IF}, \texttt{TP},
         which are used for displaying icons on a button field. See an
         example in the demo file \textsf{eforms.tex} &\verb+\mkIns{}+\\
-I?   & (push buttons only) an indirect reference to a form XObject defining the buttons's
+I?   & ({\pbs} only) an indirect reference to a form XObject defining the buttons's
       \emph{normal icon}&\verb+\I{nIcon}+\newline(example)\\
-RI?   & (push buttons only) an indirect reference to a form XObject
+RI?   & ({\pbs} only) an indirect reference to a form XObject
         defining the buttons's \emph{rollover icon}&\verb+\RI{rIcon}+\newline(example)\\
-IX?   & (push buttons only) an indirect reference to a form XObject
+IX?   & ({\pbs} only) an indirect reference to a form XObject
         defining the buttons's \emph{down icon}&\verb+\I{dIcon}+\newline(example)\\
-importIcons? & (push buttons only) a special key to signal that this button is the target
+importIcons? & ({\pbs} only) a special key to signal that this button is the target
 of JavaScript that will supply the icons faces. Syntax: \cs{importIcons\darg{y|n}}&\verb|\importIcons{n}|\\
-TP?   & \texttt{\darg{\ameta{\upshape{0|1|2|3|4|5|6}}}} (push buttons only; optional)
+TP?   & \texttt{\darg{\ameta{\upshape{0|1|2|3|4|5|6}}}} ({\pbs} only; optional)
         A code indicating the \texttt{layout} of the text and icon; these codes are
         0~(label only); 1~(icon only); 2~(label below icon); 3~(label above icon); 4~(label to the right of icon);
         5~(label to the left of icon); 6~(label overlaid on the icon). The default is 0.&\verb+\TP{0}+\\
-SW?   & \texttt{\darg{\ameta{\upshape{A|B|S|N}}}} (push buttons only; optional) The \emph{scale when key}. Permissible values are \texttt{A} (always scale),
+SW?   & \texttt{\darg{\ameta{\upshape{A|B|S|N}}}} ({\pbs} only; optional) The \emph{scale when key}. Permissible values are \texttt{A} (always scale),
         \texttt{B} (scale when icon is too big), \texttt{S} (scale when icon is too small), \texttt{N}
         (never scale). The default is \texttt{A}. &\verb+\SW{A}+\\
-ST?     & \texttt{\darg{\ameta{\upshape{A|P}}}} (push buttons only; optional) The \emph{scaling type.} Permissible values are \texttt{A}
+ST?     & \texttt{\darg{\ameta{\upshape{A|P}}}} ({\pbs} only; optional) The \emph{scaling type.} Permissible values are \texttt{A}
             (anamorphic scaling); \texttt{P} (proportional scaling). The default is \texttt{P}.
             &\verb+\ST{P}+\\
-PA?     & \texttt{\darg{\ameta{num\SUB1\space num\SUB2}}} (push buttons only; optional) The \textit{position array.} An array of two numbers, each
+PA?     & \texttt{\darg{\ameta{num\SUB1\space num\SUB2}}} ({\pbs} only; optional) The \textit{position array.} An array of two numbers, each
             between 0 and 1 indicating the fraction of left-over space to allocate at the left and bottom
             of the annotation rectangle. The two numbers should be separated by a space. The default value, \verb!\PA{.5 .5}!,
             centers the icon in the rectangle. & \verb!\PA{.5 .5}!\\
-FB?  &  \texttt{\darg{true|false}} (push buttons only; optional) The \emph{fit bounds} Boolean. If \texttt{true}, the button appearance
+FB?  &  \texttt{\darg{true|false}} ({\pbs} only; optional) The \emph{fit bounds} Boolean. If \texttt{true}, the button appearance
         is scaled to fit fully within the bounds of the annotation without taking into consideration
         the line width of the border. &\verb+\FB{false}+\\\hline
 %--------------------------------------------------------------

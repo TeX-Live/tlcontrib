@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2018  D. P. Story                 %%
+%% Copyright (C) 2002-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2019/03/16 v2.10 Provides general eforms support (dps)]
+%<package> [2019/05/24 v2.11 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -42,7 +42,7 @@
      \PackageInfo{eforms}{aebdocfmt.def cannot be found}}
 \begin{document}
   \GetFileInfo{eforms.sty}
-  \title{eForm: PDF Form support for \LaTeX}
+  \title{\textsf{eforms}: PDF Form support for \LaTeX}
   \author{D. P. Story\\
     Email: \texttt{dpstory@uakron.edu}}
   \date{processed \today}
@@ -72,9 +72,9 @@
 %
 % This {\LaTeX} code was originally part of the \textsf{exerquiz} package.
 % I decided it would be useful to others if I separated the two and make
-% the forms part of \textsf{exerquiz} into a separate package.  The
-% \textsf{eforms} Package is now a part of the \textsf{{Acro\TeX} eDucation
-% Bundle} and is called by \textsf{exerquiz}, but it is  now a stand alone
+% the forms part of \pkg{exerquiz} into a separate package.  The
+% \pkg{eforms} package is now a part of the \textsf{{Acro\TeX} eDucation
+% Bundle} and is called by \pkg{exerquiz}, but it is  now a stand alone
 % package for others who may want to use PDF form fields and JavaScript
 % interactivity.
 %
@@ -104,82 +104,73 @@
 %    \begin{macrocode}
 \let\ef@driver\@empty
 \DeclareOption{dvipsone}{\def\eq@drivernum{0}%
-    \def\eq@drivername{0}\def\ef@driver{dvipsone}%
-    \def\eq@drivercode{epdfmark.def}%
-    \PassOptionsToPackage{dvipsone}{insdljs}%
-    \PassOptionsToPackage{dvipsone}{hyperref}%
+  \def\eq@drivername{0}\def\ef@driver{dvipsone}%
+  \def\eq@drivercode{epdfmark.def}%
+  \PassOptionsToPackage{dvipsone}{insdljs}%
+  \PassOptionsToPackage{dvipsone}{hyperref}%
 }
 \def\eq@drivername{2}
 %    \end{macrocode}
 % Set the driver for \texttt{dvips}\IndexOpt{dvips}
 %    \begin{macrocode}
 \DeclareOption{dvips}{\def\eq@drivernum{0}%
-    \def\eq@drivername{1}\def\ef@driver{dvips}%
-    \def\eq@drivercode{epdfmark.def}%
-    \PassOptionsToPackage{dvips}{insdljs}%
-    \PassOptionsToPackage{dvips}{hyperref}%
+  \def\eq@drivername{1}\def\ef@driver{dvips}%
+  \def\eq@drivercode{epdfmark.def}%
+  \PassOptionsToPackage{dvips}{insdljs}%
+  \PassOptionsToPackage{dvips}{hyperref}%
 }
 %    \end{macrocode}
 % Set the driver for \texttt{pdftex}\IndexOpt{pdftex}
-%    \begin{macrocode}
-\DeclareOption{pdftex}{%
-    \def\eq@drivernum{1}\def\eq@driver{pdftex}%
-    \def\eq@drivercode{epdftex.def}\def\ef@driver{pdftex}%
-%    \end{macrocode}
 % \changes{v2.9b}{2016/07/22}{Do not pass pdftex driver to insdljs or hyperref}
 %    \begin{macrocode}
-%    \PassOptionsToPackage{pdftex}{insdljs}
-%    \PassOptionsToPackage{pdftex}{hyperref}
+\DeclareOption{pdftex}{%
+  \def\eq@drivernum{1}\def\eq@driver{pdftex}%
+  \def\eq@drivercode{epdftex.def}\def\ef@driver{pdftex}%
 }
 %    \end{macrocode}
 % Added \textsf{luatex} option
 % \changes{v2.9m}{2017/09/03}{Add luatex option}
 %    \begin{macrocode}
 \DeclareOption{luatex}{%
-    \def\eq@drivernum{1}\def\eq@driver{luatex}%
-    \def\eq@drivercode{epdftex.def}\def\ef@driver{luatex}%
+  \def\eq@drivernum{1}\def\eq@driver{luatex}%
+  \def\eq@drivercode{epdftex.def}\def\ef@driver{luatex}%
 }
 %    \end{macrocode}%
 % Set the drivers for \texttt{dvipdfm}\IndexOpt{dvipdfm}. \texttt{dvipdfmx}\IndexOpt{dvipdfmx},
 % and \texttt{xetex}\IndexOpt{xetex}.
-%    \begin{macrocode}
-\DeclareOption{dvipdfm}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfm}%
-    \def\eq@drivercode{edvipdfm.def}\def\ef@driver{dvipdfm}%
-    \PassOptionsToPackage{dvipdfm}{insdljs}
-    \PassOptionsToPackage{dvipdfm}{hyperref}
-}
-\DeclareOption{dvipdfmx}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}%
-    \def\eq@drivercode{edvipdfm.def}\def\ef@driver{dvipdfmx}%
-    \PassOptionsToPackage{dvipdfmx}{insdljs}
-    \PassOptionsToPackage{dvipdfmx}{hyperref}
-}
-\DeclareOption{xetex}{%
-    \def\eq@drivernum{2}\def\eq@driver{xetex}%
-    \def\eq@drivercode{edvipdfm.def}\def\ef@driver{xetex}%
-%    \end{macrocode}
 % \changes{v2.9b}{2016/07/22}{Do not pass xetex driver to insdljs or hyperref}
 %    \begin{macrocode}
-%    \PassOptionsToPackage{xetex}{insdljs}
-%    \PassOptionsToPackage{xetex}{hyperref}
+\DeclareOption{dvipdfm}{%
+  \def\eq@drivernum{2}\def\eq@driver{dvipdfm}%
+  \def\eq@drivercode{edvipdfm.def}\def\ef@driver{dvipdfm}%
+  \PassOptionsToPackage{dvipdfm}{insdljs}
+  \PassOptionsToPackage{dvipdfm}{hyperref}
+}
+\DeclareOption{dvipdfmx}{%
+  \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}%
+  \def\eq@drivercode{edvipdfm.def}\def\ef@driver{dvipdfmx}%
+  \PassOptionsToPackage{dvipdfmx}{insdljs}
+  \PassOptionsToPackage{dvipdfmx}{hyperref}
+}
+\DeclareOption{xetex}{%
+  \def\eq@drivernum{2}\def\eq@driver{xetex}%
+  \def\eq@drivercode{edvipdfm.def}\def\ef@driver{xetex}%
 }
 %    \end{macrocode}
 %    \IndexOpt{textures}
 % This option, and testing are due to Ross Moore  3/6/02
 %    \begin{macrocode}
 \DeclareOption{textures}{%
-    \def\eq@drivernum{3}\def\eq@driver{textures}%
-    \def\eq@drivercode{epdfmark.def}\def\ef@driver{textures}%
-    \PassOptionsToPackage{textures}{insdljs}%
-    \PassOptionsToPackage{textures}{hyperref}
+  \def\eq@drivernum{3}\def\eq@driver{textures}%
+  \def\eq@drivercode{epdfmark.def}\def\ef@driver{textures}%
+  \PassOptionsToPackage{textures}{insdljs}%
+  \PassOptionsToPackage{textures}{hyperref}
 }
 %    \end{macrocode}
 % If no driver is passed, assume it is
 % \textsf{dvipsone} or \textsf{dvips}---\textsf{hyperref} defines the specials.
 % Default driver dvipsone/dvips
 %    \begin{macrocode}
-% \def\eq@drivernum{0}
 \def\eq@driver{dvipsone/dvips}
 \def\eq@drivercode{epdfmark.def}
 %    \end{macrocode}
@@ -197,8 +188,12 @@
 \DeclareOption*{\PassOptionsToPackage{\CurrentOption}{insdljs}}
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
 %    \end{macrocode}
-%    (2017/01/01) Added two convenience commands.
+%    (2017/01/01) Added two convenience commands, these are \DescribeMacro\previewOn\cs{previewOn}
+%    and \DescribeMacro\previewOff\cs{previewOff}. Beginning with 2019/05/24, `enhanced preview'
+%    is introduced, see comments \hyperref[pmpv]{below}.
 %    \changes{v2.9f}{2017/01/01}{Added \string\cs{previewOn} and \string\cs{previewOff}}
+%    \changes{v2.11}{2019/05/24}{Introduce `enhanced preview' targeted at users of non-conforming
+%    PDF viewer.}
 %    \begin{macrocode}
 \providecommand{\previewOn}{\previewtrue}
 \providecommand{\previewOff}{\previewfalse}
@@ -213,18 +208,18 @@
 %    \begin{macrocode}
 \DeclareOption{useui}{\AtEndOfPackage{\ef@InputUIeForms}}
 \def\ef@InputUIeForms{\InputIfFileExists{uieforms.def}%
-    {\PackageInfo{eforms}{Inputting code for useui option}}%
-    {\PackageInfo{eforms}{Cannot find uieforms.def.\MessageBreak
-        Reinstall or refresh your file name database.}}}
+  {\PackageInfo{eforms}{Inputting code for useui option}}%
+  {\PackageInfo{eforms}{Cannot find uieforms.def.\MessageBreak
+    Reinstall or refresh your file name database.}}}
 %    \end{macrocode}
 %    The \texttt{setcorder} option\IndexOpt{setcorder} is used to set the calculation order
 %    in a forms document. Normally, the calculation order is the order the fields are created.
 %    \begin{macrocode}
 \DeclareOption{setcorder}{\def\inputCalcOrderJS{%
-    \InputIfFileExists{setcorder.def}%
-    {\PackageInfo{eforms}{Inputting code for setcorder option}}%
-    {\PackageWarning{eforms}{Cannot find setcorder.def.\MessageBreak
-        Reinstall or refresh your file name database.}}}}
+  \InputIfFileExists{setcorder.def}%
+  {\PackageInfo{eforms}{Inputting code for setcorder option}}%
+  {\PackageWarning{eforms}{Cannot find setcorder.def.\MessageBreak
+    Reinstall or refresh your file name database.}}}}
 \let\inputCalcOrderJS\relax
 %    \end{macrocode}
 % \changes{v2.5o}{2012/06/18}{Added automatic test for \string\textsf{pdftex}.}
@@ -247,13 +242,13 @@
 %    \begin{macrocode}
 \ProcessOptions
 \ifx\ef@driver\@empty
-    \PackageError{eforms}%
-        {You have not specified dvips, dvipsone, pdftex,\MessageBreak
-        dvipdfm, dvipdfmx, or xetex in the option list of\MessageBreak
-        the eforms package}
-        {Place one of the drivers dvips, dvipsone, pdftex,  dvipdfm,
-        dvipdfmx, or xetex
-        \MessageBreak in the option list of the eforms package.}%
+  \PackageError{eforms}%
+    {You have not specified dvips, dvipsone, pdftex,\MessageBreak
+    dvipdfm, dvipdfmx, or xetex in the option list of\MessageBreak
+    the eforms package}
+    {Place one of the drivers dvips, dvipsone, pdftex,  dvipdfm,
+    dvipdfmx, or xetex
+    \MessageBreak in the option list of the eforms package.}%
 }{}
 \fi
 \newlength\eflength
@@ -291,11 +286,11 @@
     \AtEndDocument{\csname endForm\endcsname}
 }
 \@ifpackageloaded{aeb_pro}{}{%
-    \newcommand{\taggedPDF}{%
-        \ifnum\eq@drivernum=0\relax
-        \literalps@out{[{Catalog} <<%
-            /MarkInfo<</Marked true>>%
-        >> /PUT pdfmark}\fi}%
+  \newcommand{\taggedPDF}{%
+    \ifnum\eq@drivernum=0\relax
+    \literalps@out{\AEB@psMrk{Catalog} <<%
+        /MarkInfo<</Marked true>>%
+    >> /PUT pdfmark}\fi}%
 }
 \let\ef@YES=y \let\ef@NO=n
 \let\ef@One=1 \let\ef@Zero=0
@@ -327,7 +322,7 @@
 %    \DescribeMacro{\makePDasXDOff}\cs{makePDasXDOff} to set the switch to true and false, respectively.
 %    \changes{v2.9d}{2016/12/22}{Added switches \string\cs{ifmakeXasPD} and \string\cs{ifmakePDasX}}
 %    \begin{macrocode}
-\newif\ifmakeXasPD \makeXasPDtrue % 12/22
+\newif\ifmakeXasPD \makeXasPDtrue
 \newif\ifmakePDasX \makePDasXfalse
 \def\makeXasPDOn{\makeXasPDtrue\makePDasXfalse}
 \def\makeXasPDOff{\makeXasPDfalse}
@@ -345,7 +340,9 @@
   \let\ckbox@Color\relax\else
   \def\ckbox@Color{\color{#1}}\fi}\let\ckbox@Color\relax
 %    \end{macrocode}
-%    The \DescribeMacro\ef@Bbox\cs{ef@Bbox} command places a rule of width
+%   \leavevmode
+%   \DescribeMacro\ef@Bbox\hskip-\marginparsep\texttt{\darg{\ameta{width}}\darg{\ameta{height}}}
+%    places a rule of width
 %    \DescribeMacro\efPreviewOnRule\cs{efPreviewOnRule}. When the specified
 %    dimensions of the bounding rectangle is less than \texttt{2\cs{fboxrule}},
 %    we \emph{do not} reduce the dimensions; otherwise, we reduce the width and height
@@ -354,9 +351,22 @@
 %    \cs{ef@Bbox} is let to \cs{Bbox}.
 %    \begin{macrocode}
 \def\efPreviewOnRule{0.4pt}
-\def\PMCA#1{\def\@rgi{#1}\ifx\@rgi\@empty
-  \let\@PMCA\@empty\else\def\@PMCA{\hb@xt@\z@{\hss#1\hss}}\fi}
-\let\@PMCA\@empty
+%    \end{macrocode}
+%    \leavevmode
+%    \DescribeMacro\PMPV\hskip-\marginparsep\texttt{\darg{\ameta{text}}} provides \ameta{text}
+%    as preview text for a field. Its argument is used to define  the text macro \cs{@PMPV}
+%\changes{v2.11}{2019/05/24}{Define \string\cs{PMPV} to enhance preview}
+%    \begin{macrocode}
+\def\PMPV#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@PMPV\@empty\else\edef\@PMPV{\noexpand
+  \hb@xt@\noexpand\z@{\hss#1\hss}}\fi}
+\let\@PMPV\@empty
+\let\pmpvFmt\@empty
+%    \end{macrocode}
+%    The preview bounding box, visible when \cs{previewOn} is expanded. Incorporated into the center
+%    of the box is \cs{pmpvFmt\darg{\cs{@PMPV}}}. \cs{pmpvFmt} can be used to format its argument (\cs{@PMPV});
+%    while \cs{@PMPV} is a text macro defined by \cs{PMPV} that displays, normally, nothing, or \cs{eq@V} or \cs{eq@CA}.
+%    \begin{macrocode}
 \def\ef@Bbox#1#2{\hbox{\ifpreview
   \setlength\fboxrule{\efPreviewOnRule}\setlength\fboxsep{0pt}%
   \@tempdima=#1\relax
@@ -366,9 +376,12 @@
   \ifdim\@tempdimb<2\fboxrule\else
     \advance\@tempdimb by-2\fboxrule\fi
   \ckbox@Color\fbox{\parbox[b][\@tempdimb][c]{\@tempdima}%
-    {\vfil\hfil\@PMCA\hfil\vfil}}\else
+    {\vfil\hfil\pmpvFmt{\@PMPV}\hfil\vfil}}\else
   \parbox[b][#2][c]{#1}{\vfil\hfil\hfil\vfil}\fi}%
 }
+%    \end{macrocode}
+%   The public version of \cs{ef@Bbox} is simply \DescribeMacro\Bbox\cs{Bbox}.
+%    \begin{macrocode}
 \let\Bbox\ef@Bbox
 %</package>
 %    \end{macrocode}
@@ -405,19 +418,23 @@
 % process the optional arguments of a form field.
 %
 % All legal arguments (see \nameref{eformvariables} for a detailed
-% listing) are of the form |\<name>{arg}|.
+% listing) are of the form \cs{\ameta{name}\darg{\ameta{arg}}}.
 % The macro takes two tokens at a time and constructs a macro
-% |\@eq<name>{arg}|. Each of the macros |\@eq<name>| must be
+% \cs{@eq\ameta{name}\darg{\ameta{arg}}}. Each of the macros \cs{@eq\ameta{name}} must be
 % defined. Such a macro defines another macro as follows
-% |\def\eq@<name>{arg}|. For example if the user enters the token
+% \cs{def\string\eq@\ameta{name}\darg{\ameta{arg}}}. For example if the user enters the token
 % pair  |\RC{Users}|, \cmd{\processAppArgs} will construct
-% |\@eqRC|, with argument \verb+{arg}+, this macro will be
-% executed, which expands to \verb+\def\eq@RC{arg}+.  The macro
+% |\@eqRC|, with argument |{Users}|, this macro will be
+% executed, which expands to |\def\eq@RC{Users}|.  The macro
 % \cmd{\eq@RC} may then be used within the construction of the
-% widget object.
+% widget object.\medskip
 %
-% The macro \cs{processAppArgs} also does the addition operation for
-% \texttt{/F} and \texttt{/Ff} keys.
+% \noindent
+% \DescribeMacro\proccessAppArgs\hskip-\marginparsep\texttt{\darg{\ameta{key}}\darg{\ameta{value}}}
+% The macro takes pairs of key-values and constructs auxiliary macros, as described above.
+% It also does an addition operation for \textsf{\textbf{F}} (\cs{F}) and \textsf{\textbf{Ff}} (\cs{Ff}) entries.
+% Initially, it is called by |\processAppArgs|\texttt{\ameta{KV-pairs}}|\end\@nil|, \cs{end} being the detected
+% end of the stream of key-values.
 %    \begin{macrocode}
 \let\ef@passedArgs\@empty
 \def\processAppArgs#1#2{%
@@ -430,6 +447,8 @@
 % this is done for \cs{A} and \cs{AA} to prevent overwriting critical functionality.
 %    \begin{macrocode}
     \ifx#1\@empty
+%      \@getCmdName{#1}\PackageWarning{eforms}
+%        {Redefining the \eqbs\@CmdName\space key is not allowed}%
       \def\ef@next{\processAppArgs}%
     \else
 %    \end{macrocode}
@@ -468,16 +487,27 @@
         \else
 %    \end{macrocode}
 % If current key is |\F|, we add its value to the current value of |\F|.
-% We basically are ```or-ing'' new value with the old value in the bit field.
+% We basically are `or-ing' the new value with the old value in the bit field.
 %    \begin{macrocode}
           \@getCmdName{\F}\edef\arg@F{\@CmdName}%
           \@getCmdName{#1}%
-          \ifx\arg@F\@CmdName  % if \Ff, let's  add arguments
+          \ifx\arg@F\@CmdName  % if \F, let's  add arguments
             \ifx\eq@F\@empty\def\eq@FValue{0}\else
               \expandafter\getFValue\eq@F\@nil\fi
             \@tempcnta=\eq@FValue
             \def\eq@arg{#2}%
             \ifx\eq@arg\@empty\else
+%    \end{macrocode}
+%    Something included in for `enhanced previews' is we test if this field is hidden
+%    (has a flag of 2 or 32), if yes we \cs{let} \DescribeMacro\ef@isHidden\cs{ef@isHidden} to \cs{ef@YES}, otherwise
+%    it is \cs{let} to \cs{ef@NO}.
+%    \begin{macrocode}
+              \ifnum#2=2\relax % dpstoday
+                \let\ef@isHidden\ef@YES\else
+              \ifnum#2=32\relax
+                \let\ef@isHidden\ef@YES\else
+                \let\ef@isHidden\ef@NO
+              \fi\fi
               \advance\@tempcnta by#2\fi
             \edef\eq@F{/F \the\@tempcnta}%
             \def\ef@next{\processAppArgs}%
@@ -492,6 +522,26 @@
             \ifx\arg@presets\@CmdName
               \def\ef@next{\expandafter\processAppArgs#2}%
             \else
+%    \end{macrocode}
+%      (2019/01/22) Here, we process the \cs{epresets} key. For \cs{epresets}, all
+%      \pkg{eforms} keys should be protected, as we expand fully. This is useful when
+%      the argument of \cs{presets} is a macro of the form \cs{csname}/\cs{endcsname}.
+%      An ordinary \cs{presets} does not work, we must use \cs{epresets}:
+%\begin{verbatim}
+%   \expandafter\def\csname fld1\endcsname#1{\protect\BG{#1}}
+%   \textField[\epresets{\nameuse{fld1}{yellow}}]{mytxt}{2in}{13bp}
+%\end{verbatim}
+%In the above example we use \cs{nameuse} rather than \cs{@nameuse}, since in a recent
+%version of \pkg{eforms}, we \cs{let} \cs{nameuse} to \cs{@nameuse}.
+%We can also say,
+%\begin{verbatim}
+%   \protectedKeys{pKeys}{\BG{red}\BC{blue}}
+%%  \nameuse is expanded within the argument below, where it is defined
+%   \expandafter\def\csname fld2\endcsname{\nameuse{pKeys}}
+%   \pushButton[\CA{Push Me}\epresets{\nameuse{fld2}}]{pb1}{}{13bp}
+%\end{verbatim}
+%where \cs{protectedKeys} is used to protected each of the keys in its argument.
+%    \begin{macrocode}
               \@getCmdName{\epresets}%
               \edef\arg@epresets{\@CmdName}\@getCmdName{#1}%
               \ifx\arg@epresets\@CmdName
@@ -500,8 +550,8 @@
                   \processAppArgs\x}% dps27
               \else
 %    \end{macrocode}
-% This is the last, and the most frequent case. We process a common key, one
-% that is not |\presets|, |\ui|, |\Ff| or |\F|.
+% This is the last, and the most frequent case. We process an ordinary key, one
+% that is not |\presets|, |\epresets|, |\ui|, |\Ff| or |\F|.
 %    \begin{macrocode}
                 \csname @eq%
                 \expandafter\@gobble\string#1\endcsname{#2}%
@@ -571,7 +621,10 @@
 }
 %    \end{macrocode}
 %
-% \subsection{eForm Variables}\label{eformvariables}
+% \subsection{\textsf{eforms} key-values}\label{eformvariables}
+%
+% We maintain two key-value systems: (1) \pkg{eforms} key-values, (2) user-friendly
+% key-value system. The latter requires the option \opt{useui}.
 %
 % \subsubsection{Key-Value Definitions}
 %
@@ -582,7 +635,7 @@
 % appearance.
 %
 % You'll notice, for example, the macros listed are not actually defined. For example
-% \cmd{\CA} is never actually defined; we define instead \cmd{\@eqCA} and \cmd{\eq@CA}.
+% \cmd{\CA} is never defined, we define instead \cmd{\@eqCA} and \cmd{\eq@CA}.
 % The macros \cmd{\processAppArgs} treats \cmd{\CA} as a token, and prefixes with
 % \texttt{@eq} in a clever sort of way. It's done so that these macros cannot be used
 % outside the optional macro arguments of the button and text field macros.
@@ -598,12 +651,12 @@
 % \DescribeMacro{\BS}The \textbf{Border Style} key, \texttt{BS}: \texttt{W}, \texttt{S}, \texttt{D}  (dictionary, optional)
 %    \begin{macrocode}
 \def\@eqBS#1{%
-    \let\eq@BS=0\relax
-    \ifx\eq@W\@empty\else\let\eq@BS=1\fi
-    \ifx\eq@S\@empty\else\let\eq@BS=1\fi
-    \ifx\eq@D\@empty\else\let\eq@BS=1\fi
-    \edef\link@BS{\if\eq@BS1/BS<<\eq@W\eq@S\eq@D>>\fi}%
-    \ifx\eq@W\@empty\let\link@BS\@empty\fi
+  \let\eq@BS=0\relax
+  \ifx\eq@W\@empty\else\let\eq@BS=1\fi
+  \ifx\eq@S\@empty\else\let\eq@BS=1\fi
+  \ifx\eq@D\@empty\else\let\eq@BS=1\fi
+  \edef\link@BS{\if\eq@BS1/BS<<\eq@W\eq@S\eq@D>>\fi}%
+  \ifx\eq@W\@empty\let\link@BS\@empty\fi
 }\def\link@BS{}
 %    \end{macrocode}
 % \changes{v1.0e}{2008/03/04}
@@ -622,13 +675,13 @@
 % \DescribeMacro{\W} The width of the boundary line.
 %    \begin{macrocode}
 \def\@eqW#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@W\@empty\def\eq@W@value{0}\else
-    \def\eq@W@value{#1}\def\eq@W{/W #1}\fi
+  \let\eq@W\@empty\def\eq@W@value{0}\else
+  \def\eq@W@value{#1}\def\eq@W{/W #1}\fi
 %    \end{macrocode}
 %    (2016/12/22) Add a global value for boundary width, used to adjust the spacing between form fields
 %    \changes{v2.9d}{2016/12/22}{Add a global value for boundary width}
 %    \begin{macrocode}
-    \xdef\g@eq@W@value@bp{\eq@W@value bp}}
+  \xdef\g@eq@W@value@bp{\eq@W@value bp}}
 \def\eq@W{}\def\eq@W@value{0}
 \def\g@eq@W@valu@bp{0bp} % dps 12/22
 %    \end{macrocode}
@@ -636,17 +689,17 @@
 %      \texttt{B} (beveled), \texttt{I} (inset), \texttt{U} (underlined)
 %    \begin{macrocode}
 \def\@eqS#1{\def\eq@S@value{#1}\ifx\eq@S@value\@empty
-    \let\eq@S\@empty\else
-    \def\eq@S{/S/#1}\def\eq@temp{D}%
-    \ifx\eq@S@value\eq@temp
-        \ifx\eq@D\@empty\def\eq@D{/D [3]}\fi
-    \fi\fi}\def\eq@S{}
+  \let\eq@S\@empty\else
+  \def\eq@S{/S/#1}\def\eq@temp{D}%
+  \ifx\eq@S@value\eq@temp
+    \ifx\eq@D\@empty\def\eq@D{/D [3]}\fi
+  \fi\fi}\def\eq@S{}
 %    \end{macrocode}
 % \DescribeMacro{\D} The dash array.
 %    \begin{macrocode}
 \def\@eqD#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@D\@empty\else
-    \def\eq@D{/D [#1]}\fi}\def\eq@D{}
+  \let\eq@D\@empty\else
+  \def\eq@D{/D [#1]}\fi}\def\eq@D{}
 %    \end{macrocode}
 % \DescribeMacro{\Border} Used with \emph{link annotations}, an array of three numbers and an optional dash array.
 %   If all three numbers are 0, no border is drawn
@@ -731,67 +784,67 @@
 % number and decrement it.
 %    \begin{macrocode}
 \long\def\ef@searchrPage#1\rPage#2#3\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\rPage{#2}\fi}
+  \ifx\ef@argii\ef@end\else\rPage{#2}\fi}
 %    \end{macrocode}
 % When the user specifies |\mlLink{true}| in the option list, we branch off to
 % \cs{mlhypertext}.
 %    \begin{macrocode}
 \def\ef@searchmlLink#1\mlLink#2#3\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\let\ef@mlLink\ef@Zero\else
-    \ifx\ef@argii\ef@true\let\ef@mlLink\ef@One\else
-    \let\ef@mlLink\ef@Zero\fi\fi}
+  \ifx\ef@argii\ef@end\let\ef@mlLink\ef@Zero\else
+  \ifx\ef@argii\ef@true\let\ef@mlLink\ef@One\else
+  \let\ef@mlLink\ef@Zero\fi\fi}
 %    \end{macrocode}
 % Search for \texttt{/GoToR}, if found, change the link color to |\@filecolor|
 %    \begin{macrocode}
 \def\ef@searchGoToR#1/GoToR#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@filecolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@filecolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 %    \end{macrocode}
 % Search for \texttt{/URI}, if found, change the link color to |\@urlcolor|
 %    \begin{macrocode}
 \def\ef@searchURI#1/URI#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@urlcolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@urlcolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 \def\ef@searchCmdURI#1\URI#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@urlcolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@urlcolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 %    \end{macrocode}
 % Search for \texttt{/Named}, if found, change the link color to |\@menucolor|
 %    \begin{macrocode}
 \def\ef@searchNamed#1/Named#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@menucolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@menucolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 \def\ef@searchCmdNamed#1\Named#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@menucolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@menucolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 %    \end{macrocode}
 % Search for \texttt{/Launch}, if found, change the link color to |\@runcolor|
 %    \begin{macrocode}
 \def\ef@searchLaunch#1/Launch#2\@nil{\def\ef@argii{#2}%
-    \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
-    \def\ef@thislinkcolor{\@runcolor}\fi
-    \expandafter\ef@gobbleToendmarker\fi}
+  \ifx\ef@argii\ef@end\else\ifx\ef@linktxtcolor@set0%
+  \def\ef@thislinkcolor{\@runcolor}\fi
+  \expandafter\ef@gobbleToendmarker\fi}
 %    \end{macrocode}
 % Executed by |\eq@A|, which calls the search routines defined above, at least
 % in the case of links. It also searches for |\rPage|.
 %    \begin{macrocode}
 \def\ef@preprocessA#1{%
-    \let\rPage\relax\edef\ef@argi{#1}%
-    \ifx\annot@type\annot@type@link
-    \expandafter\ef@searchGoToR\ef@argi/GoToR\end\@nil
-    \expandafter\ef@searchURI\ef@argi/URI\end\@nil
-    \expandafter\ef@searchCmdURI\ef@argi\URI\end\@nil
-    \expandafter\ef@searchNamed\ef@argi/Named\end\@nil
-    \expandafter\ef@searchCmdNamed\ef@argi\Named\end\@nil
-    \expandafter\ef@searchLaunch\ef@argi/Launch\end\@nil
-    \ef@endmarker\fi
-    \let\rPage\ef@rPage
-    \expandafter\ef@searchrPage\ef@argi\rPage\end\@nil
+  \let\rPage\relax\edef\ef@argi{#1}%
+  \ifx\annot@type\annot@type@link
+  \expandafter\ef@searchGoToR\ef@argi/GoToR\end\@nil
+  \expandafter\ef@searchURI\ef@argi/URI\end\@nil
+  \expandafter\ef@searchCmdURI\ef@argi\URI\end\@nil
+  \expandafter\ef@searchNamed\ef@argi/Named\end\@nil
+  \expandafter\ef@searchCmdNamed\ef@argi\Named\end\@nil
+  \expandafter\ef@searchLaunch\ef@argi/Launch\end\@nil
+  \ef@endmarker\fi
+  \let\rPage\ef@rPage
+  \expandafter\ef@searchrPage\ef@argi\rPage\end\@nil
 }
 %    \end{macrocode}
 % \DescribeMacro{\A} This is the \emph{action dictionary} (used by links and forms). If the argument
@@ -799,15 +852,15 @@
 % the \texttt{/A <<...>>} dictionary.
 %    \begin{macrocode}
 \def\@eqA#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@A\@empty\else\ef@preprocessA{#1}%
-    \def\eq@A{/A <<#1>>}\fi}\def\eq@A{}
+  \let\eq@A\@empty\else\ef@preprocessA{#1}%
+  \def\eq@A{/A <<#1>>}\fi}\def\eq@A{}
 %    \end{macrocode}
 % \DescribeMacro{\mlLink} This is a key for the \cs{setLink} command. If
 % we say \verb!\mlLink{true}! in the \cs{setLink} option list, we use
 % \cs{mlhypertext} from \texttt{aeb\_mlink}, if that package is loaded.
 %    \begin{macrocode}
 \def\@eqmlLink#1{\def\eq@arg{#1}\ifx\eq@arg\ef@true
-    \let\ef@mlLink\ef@One\else\let\ef@mlLink\ef@Zero\fi}
+  \let\ef@mlLink\ef@One\else\let\ef@mlLink\ef@Zero\fi}
 %    \end{macrocode}
 % \DescribeMacro{\Lock} The Lock key is used with signature fields, currently, there is
 % no nice user interface to this key. Typical entries are
@@ -820,8 +873,8 @@
 %\end{verbatim}
 %    \begin{macrocode}
 \def\@eqLock#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@Lock\@empty\else\def\eq@Lock{/Lock <<#1>>}\fi}
-    \def\eq@Lock{}
+  \let\eq@Lock\@empty\else\def\eq@Lock{/Lock <<#1>>}\fi}
+\def\eq@Lock{}
 %    \end{macrocode}
 %\paragraph*{Additional Actions.}
 % We search for \cs{AACalculate}.
@@ -833,7 +886,7 @@
 %    \begin{macrocode}
 \newif\ifisCalculate\isCalculatefalse
 \def\ef@searchCalc#1\AACalculate#2\@nil{%
-    \ifx#2\end\else\aftergroup\isCalculatetrue\fi
+  \ifx#2\end\else\aftergroup\isCalculatetrue\fi
 }
 %    \end{macrocode}
 % \DescribeMacro{\AA} (02/06/09) The argument of \cs{@eqAA} is nonempty, we search for the token \cs{AACalculate}
@@ -843,15 +896,15 @@
 % that are either empty or expand to the correct code.
 %    \begin{macrocode}
 \def\@eqAA#1{\def\eq@arg{#1}\ifx\eq@arg\@empty\let\eq@AA\@empty
-    \else\begingroup\ef@searchCalc#1\AACalculate\end\@nil\endgroup
-    \def\eq@AA{/AA <<#1>>}\fi}
+  \else\begingroup\ef@searchCalc#1\AACalculate\end\@nil\endgroup
+  \def\eq@AA{/AA <<#1>>}\fi}
 %    \end{macrocode}
 % Begin some additional action definitions for the user interface option
 %    \begin{macrocode}
 \def\eq@AA{/AA <<\eq@AAmouseup\eq@AAmousedown\eq@AAmouseenter%
-    \eq@AAmouseexit\eq@AAonfocus\eq@AAonblur\eq@AAformat%
-    \eq@AAkeystroke\eq@AAvalidate\eq@AAcalculate\eq@AApageopen%
-    \eq@AApageclose\eq@AApagevisible\eq@AApageinvisible>>}
+  \eq@AAmouseexit\eq@AAonfocus\eq@AAonblur\eq@AAformat%
+  \eq@AAkeystroke\eq@AAvalidate\eq@AAcalculate\eq@AApageopen%
+  \eq@AApageclose\eq@AApagevisible\eq@AApageinvisible>>}
 %    \end{macrocode}
 %    \begin{macro}{AAmouseup}
 %    \begin{macro}{AAmousedown}
@@ -863,33 +916,33 @@
 % the uses specifies actions using the user interface (|\ui|).
 %    \begin{macrocode}
 \def\@eqAAmouseup#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAmouseup\@empty\else\def\eq@AAmouseup{/U<<\JS{#1}>>}\fi}
+  \let\eq@AAmouseup\@empty\else\def\eq@AAmouseup{/U<<\JS{#1}>>}\fi}
 \let\eq@AAmouseup\@empty
 \def\@eqAAmousedown#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAmousedown\@empty\else
-    \def\eq@AAmousedown{/D<<\JS{#1}>>}\fi}
+  \let\eq@AAmousedown\@empty\else
+  \def\eq@AAmousedown{/D<<\JS{#1}>>}\fi}
 \let\eq@AAmousedown\@empty
 \def\@eqAAmouseenter#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAmouseenter\@empty\else
-    \def\eq@AAmouseenter{/E<<\JS{#1}>>}\fi}
+  \let\eq@AAmouseenter\@empty\else
+  \def\eq@AAmouseenter{/E<<\JS{#1}>>}\fi}
 \let\eq@AAmouseenter\@empty
 \def\@eqAAmouseexit#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAmouseexit\@empty\else
-    \def\eq@AAmouseexit{/X<<\JS{#1}>>}\fi}
+  \let\eq@AAmouseexit\@empty\else
+  \def\eq@AAmouseexit{/X<<\JS{#1}>>}\fi}
 \let\eq@AAmouseexit\@empty
 \def\@eqAAonfocus#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAonfocus\@empty\else
-    \def\eq@AAonfocus{/Fo<<\JS{#1}>>}\fi}
+  \let\eq@AAonfocus\@empty\else
+  \def\eq@AAonfocus{/Fo<<\JS{#1}>>}\fi}
 \def\@eqAAmousefocus{\@eqAAonfocus}
 \let\eq@AAonfocus\@empty
 \def\@eqAAonblur#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAonblur\@empty\else
-    \def\eq@AAonblur{/Bl<<\JS{#1}>>}\fi}
+  \let\eq@AAonblur\@empty\else
+  \def\eq@AAonblur{/Bl<<\JS{#1}>>}\fi}
 \def\@eqAAmouseblur{\def\@eqAAonblur}
 \let\eq@AAonblur\@empty
 \def\@eqAAformat#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAformat\@empty\else
-    \def\eq@AAformat{/F<<\JS{#1}>>}\fi}
+  \let\eq@AAformat\@empty\else
+  \def\eq@AAformat{/F<<\JS{#1}>>}\fi}
 %    \end{macrocode}
 %    \begin{macro}{AAformat}
 %    \begin{macro}{AAkeystroke}
@@ -899,12 +952,12 @@
 %    \begin{macrocode}
 \let\eq@AAformat\@empty
 \def\@eqAAkeystroke#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAkeystroke\@empty\else
-    \def\eq@AAkeystroke{/K<<\JS{#1}>>}\fi}
+  \let\eq@AAkeystroke\@empty\else
+  \def\eq@AAkeystroke{/K<<\JS{#1}>>}\fi}
 \let\eq@AAkeystroke\@empty
 \def\@eqAAvalidate#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AAvalidate\@empty\else
-    \def\eq@AAvalidate{/V<<\JS{#1}>>}\fi}
+  \let\eq@AAvalidate\@empty\else
+  \def\eq@AAvalidate{/V<<\JS{#1}>>}\fi}
 \let\eq@AAvalidate\@empty
 %    \end{macrocode}
 %Additional calculate code, used to add on prior to the user's code
@@ -928,20 +981,20 @@
 % Page related additional actions.
 %    \begin{macrocode}
 \def\@eqAApageopen#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AApageopen\@empty\else
-    \def\eq@AApageopen{/PO<<\JS{#1}>>}\fi}
+  \let\eq@AApageopen\@empty\else
+  \def\eq@AApageopen{/PO<<\JS{#1}>>}\fi}
 \let\eq@AApageopen\@empty
 \def\@eqAApageclose#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AApageclose\@empty\else
-    \def\eq@AApageclose{/PC<<\JS{#1}>>}\fi}
+  \let\eq@AApageclose\@empty\else
+  \def\eq@AApageclose{/PC<<\JS{#1}>>}\fi}
 \let\eq@AApageclose\@empty
 \def\@eqAApagevisible#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AApagevisible\@empty\else
-    \def\eq@AApagevisible{/PV<<\JS{#1}>>}\fi}
+  \let\eq@AApagevisible\@empty\else
+  \def\eq@AApagevisible{/PV<<\JS{#1}>>}\fi}
 \let\eq@AApagevisible\@empty
 \def\@eqAApageinvisible#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@AApageinvisible\@empty\else
-    \def\eq@AApageinvisible{/PI<<\JS{#1}>>}\fi}
+  \let\eq@AApageinvisible\@empty\else
+  \def\eq@AApageinvisible{/PI<<\JS{#1}>>}\fi}
 \let\eq@AApageinvisible\@empty
 %    \end{macrocode}
 %    \end{macro}
@@ -988,27 +1041,27 @@
 %}
 %    \begin{macrocode}
 \def\eq@RV@Body{<?xml version="1.0"?><body %
-    xfa:APIVersion="Acroform:2.7.0.0" %
-    xfa:contentType="text/html" %
-    xfa:spec="2.1" xmlns="http://www.w3.org/1999/xhtml" %
-    xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">}
+  xfa:APIVersion="Acroform:2.7.0.0" %
+  xfa:contentType="text/html" %
+  xfa:spec="2.1" xmlns="http://www.w3.org/1999/xhtml" %
+  xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/">}
 \def\eq@RV@endBody{</body>}
 \def\@eqRV#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@RV\@empty\else\def\eq@RV{/RV(\eq@RV@Body#1%
-    \eq@RV@endBody)\fi}}\def\eq@RV{}
+  \let\eq@RV\@empty\else\def\eq@RV{/RV(\eq@RV@Body#1%
+  \eq@RV@endBody)\fi}}\def\eq@RV{}
 %    \end{macrocode}
 % \DescribeMacro{\DS} Rich text default style
 %    \begin{macrocode}
 \def\@eqDS#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@DS\@empty\else\def\eq@DS{/DS(#1)\fi}}\def\eq@DS{}
+  \let\eq@DS\@empty\else\def\eq@DS{/DS(#1)\fi}}\def\eq@DS{}
 %    \end{macrocode}
 % \DescribeMacro{\textColor} Text color
 %    \begin{macrocode}
 \def\@eqtextColor#1{\ef@parsePDFColor{#1}%
-    \HyColor@IfXcolor{%
-        \expandafter\HyColor@FieldColor%
-        \expandafter{\ef@colorSpec@out}{\eq@textColor}{}{}%
-    }{\edef\eq@textColor{\ef@colorSpec@out}}%
+  \HyColor@IfXcolor{%
+      \expandafter\HyColor@FieldColor%
+      \expandafter{\ef@colorSpec@out}{\eq@textColor}{}{}%
+  }{\edef\eq@textColor{\ef@colorSpec@out}}%
 }
 \def\eq@textColor{0 g}
 %    \end{macrocode}
@@ -1016,7 +1069,7 @@
 %   \texttt{Q=2} right-justified.
 %    \begin{macrocode}
 \def\@eqQ#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@Q\@empty\else\def\eq@Q{/Q #1}\fi}\def\eq@Q{}
+  \let\eq@Q\@empty\else\def\eq@Q{/Q #1}\fi}\def\eq@Q{}
 %    \end{macrocode}
 % \paragraph*{Entries common to all fields:} \texttt{TU, Ff, V, DV, A, AA}
 % \par\medskip\noindent
@@ -1034,14 +1087,22 @@
 % and \cs{@equV}, respectively.
 %    \begin{macrocode}
 \def\ef@isunicode#1\unicodeStr#2\@nil{\def\argi{#1}%
-    \ifx\argi\@empty\def\ifbool@ef{iftrue}\else
-    \def\ifbool@ef{iffalse}\fi}
+  \ifx\argi\@empty\def\ifbool@ef{iftrue}\else
+  \def\ifbool@ef{iffalse}\fi}
 \def\@eqDV#1{\ef@isunicode#1\unicodeStr\@nil
-    \expandafter\csname\ifbool@ef\endcsname\@equDV{#1}\else
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@DV\@empty\else
-    \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
-    \edef\eq@DV{/DV(\ef@uni@temp)}\makespecialJS\fi\fi}\def\eq@DV{}
+  \expandafter\csname\ifbool@ef\endcsname\@equDV{#1}\else
+  \def\eq@arg{#1}\ifx\eq@arg\@empty
+  \let\eq@DV\@empty\else
+  \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
+  \edef\eq@DV{/DV(\ef@uni@temp)}%
+%    \end{macrocode}
+%   Google Chrome uses the \textsf{\textbf{DV}} entry to display as the initial value
+%   of the combo box (only), the code below \cs{let}s \cs{eq@DV} to \cs{@empty} in enhanced
+%   preview mode, for combo boxes only.
+%    \begin{macrocode}
+%  \ifx\annot@type\annot@type@combobox
+%    \ifefpmpv\let\eq@DV\@empty\fi\fi
+  \makespecialJS\fi\fi}\def\eq@DV{}
 %    \end{macrocode}
 % \DescribeMacro{\nuDV} \cs{@eqnuDV} is the old definition of DV. This version does not
 % use hyperref's unicode option. This version comes in handy
@@ -1049,23 +1110,62 @@
 % the default (and initial values).
 %    \begin{macrocode}
 \def\ef@pdfCRLFTABDefns{%
-    \def\r{\textCR}\def\t{\textHT}\def\n{\textLF}}
+  \def\r{\textCR}\def\t{\textHT}\def\n{\textLF}}
 \def\@eqnuDV#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@DV\@empty\else\def\eq@DV{/DV(#1)}\fi}
+  \let\eq@DV\@empty\else\def\eq@DV{/DV(#1)}\fi}
 %    \end{macrocode}
 % \DescribeMacro{\uDV} Unicoded DV, used in \textsf{acroflex.dtx}
 %    \begin{macrocode}
 \def\@equDV#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@DV\@empty\else\def\eq@DV{/DV<#1>}\fi}
+  \let\eq@DV\@empty\else\def\eq@DV{/DV<#1>}\fi}
 %    \end{macrocode}
-% \DescribeMacro{\V} |\V| is the field value (optional)
+% \DescribeMacro{\V} |\V| is the field value (optional). Beginning with 2019/05/24,
+% the preview is enhanced to show the value in PDF previewers such as \app{sumatraPDF};
+% when \cs{pmpvOn} is expanded, the value of the field is typeset into the document.
+% \cs{eq@Vpv} shall hold the enhanced preview value for \cs{V}.
+% \changes{v2.11}{2019/05/24}{Modified \string\cs{@eqV} to enhance preview}
 %    \begin{macrocode}
-\def\@eqV#1{\ef@isunicode#1\unicodeStr\@nil
-    \expandafter\csname\ifbool@ef\endcsname\@equV{#1}\else
-    \def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@V\@empty\else
-    \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
-    \edef\eq@V{/V(\ef@uni@temp)}\makespecialJS\fi\fi}\def\eq@V{}
+\let\pmpvV\@empty
+\let\eq@VSAVE\@empty
+\def\@eqV#1{\Hy@pdfstringfalse
+%    \end{macrocode}
+%    We define \DescribeMacro\pmpvV\cmd{\pmpvV} to hold the preview value of the field.
+%    \begin{macrocode}
+  \edef\pmpvV{#1}%
+%    \end{macrocode}
+%    There is a problem with detecting unicode, if the author wants to use unicode,
+%    he should use \cs{unicodeStr}, which we try to detect, but we not allow
+%    the use of \cs{tops} (\cs{texorpdfstring}), so we must first remove the
+%    tex string, if there is one. We save the definition of \cs{unicodeStr}
+%    then let it to \cs{relax} to prevent its expansion. \cs{x} holds the
+%    pdf string part of the argument of \cs{texorpdfstring}.
+%    \begin{macrocode}
+  \let\unicodeStrSAVE\unicodeStr
+  \Hy@pdfstringtrue\let\unicodeStr\relax
+  \edef\x{#1}\let\unicodeStr\unicodeStrSAVE
+  \expandafter\ef@isunicode\x\unicodeStr\@nil
+  \expandafter\csname\ifbool@ef\endcsname\Hy@pdfstringtrue
+%    \end{macrocode}
+%     At this point, we have a unicode string. As a design decision, if
+%     \cs{ifefpmpv} is true, the value of the fields will be empty,
+%     otherwise, it is what the value of \cs{V} key.
+%    \begin{macrocode}
+    \ifefpmpv\def\x{FEFF}\let\eq@V\@empty\else\edef\x{#1}\fi
+    \@equV{\x}%
+  \else
+    \def\eq@arg{#1}%
+    \ifx\eq@arg\@empty
+      \let\eq@V\@empty
+    \else
+      \Hy@pdfstringtrue
+      \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
+      \Hy@pdfstringtrue\edef\eq@V{/V(\ef@uni@temp)}%
+      \let\eq@VSAVE\eq@V
+      \ifefpmpv\let\eq@V\@empty\fi
+      \makespecialJS
+    \fi
+  \fi
+}\def\eq@V{}
 %    \end{macrocode}
 % \DescribeMacro{\nuV} No Unicode V
 %    \begin{macrocode}
@@ -1075,28 +1175,28 @@
 % \DescribeMacro{\uV} Unicode version of V
 %    \begin{macrocode}
 \def\@equV#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@V\@empty\else\def\eq@V{/V<#1>}\fi}%
+    \let\eq@V\@empty\else\edef\eq@V{/V<#1>}\fi}%
 %    \end{macrocode}
 % \DescribeMacro{\TU} Tool tip (optional, PDF 1.3)
 %    \begin{macrocode}
 \def\@eqTU#1{\ef@isunicode#1\unicodeStr\@nil
-    \expandafter\csname\ifbool@ef\endcsname\@equTU{#1}\else
-    \def\eq@arg{#1}\let\r@save\r\let\r\textCR
-    \ifx\eq@arg\@empty\let\eq@TU\@empty\else
-    \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
-    \edef\eq@TU{/TU(\ef@uni@temp)}\makespecialJS\fi\fi
-    \let\r\r@save}\def\eq@TU{}
+  \expandafter\csname\ifbool@ef\endcsname\@equTU{#1}\else
+  \def\eq@arg{#1}\let\r@save\r\let\r\textCR
+  \ifx\eq@arg\@empty\let\eq@TU\@empty\else
+  \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
+  \edef\eq@TU{/TU(\ef@uni@temp)}\makespecialJS\fi\fi
+  \let\r\r@save}\def\eq@TU{}
 %    \end{macrocode}
 % \DescribeMacro{\uTU} Tool tip (optional, PDF 1.3), unicode version
 %    \begin{macrocode}
 \def\@equTU#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@TU\@empty\else\def\eq@TU{/TU<#1>}\fi}
+  \let\eq@TU\@empty\else\def\eq@TU{/TU<#1>}\fi}
 %    \end{macrocode}
 % \DescribeMacro{\Ff} The Field flags bit field, these values are listed below.
 %    \begin{macrocode}
 \def\@eqFf#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@Ff\@empty\else\def\eq@Ff{/Ff #1}\fi}
-    \def\eq@Ff{}
+  \let\eq@Ff\@empty\else\def\eq@Ff{/Ff #1}\fi}
+\def\eq@Ff{}
 %    \end{macrocode}
 % \paragraph*{keys specific to text fields:} \texttt{MaxLen}
 %    \begin{macrocode}
@@ -1105,8 +1205,8 @@
 % input. Required if a comb field.
 %    \begin{macrocode}
 \def\@eqMaxLen#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@MaxLen\@empty\else\def\eq@MaxLen{/MaxLen #1}\fi}%
-    \def\eq@MaxLen{}
+  \let\eq@MaxLen\@empty\else\def\eq@MaxLen{/MaxLen #1}\fi}%
+  \def\eq@MaxLen{}
 %    \end{macrocode}
 % \DescribeMacro{\H} Highlight, used in button fields and link annotation. Possible values
 % are None, Push, Outline, Invert (respectively, \verb!\H{N}!, \verb!\H{P}!,
@@ -1114,7 +1214,7 @@
 % The default highlighting is invert (I).
 %    \begin{macrocode}
 \def\@eqH#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@H\@empty\else\def\eq@H{/H/#1}\fi}\def\eq@H{}
+  \let\eq@H\@empty\else\def\eq@H{/H/#1}\fi}\def\eq@H{}
 %    \end{macrocode}
 % \paragraph*{Appearance characteristics dictionary:}
 % \texttt{MK=R, BC, BG, CA, RC, AC, I, RI, IX, IF, TP}
@@ -1123,24 +1223,24 @@
 % \DescribeMacro{\MK} A dictionary containing other keys
 %    \begin{macrocode}
 \def\@eqMK#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@MK\@empty\else\def\eq@MK{/MK << #1 >> }\fi}%
-    \def\eq@MK{}
+  \let\eq@MK\@empty\else\def\eq@MK{/MK << #1 >> }\fi}%
+\def\eq@MK{}
 %    \end{macrocode}
 % \DescribeMacro{\R} Rotation of field, values 0, 90, 180, 270.
 %    \begin{macrocode}
-    \let\@vertRotate=0
-    \def\@eqR#1{\def\eq@R@value{#1}\ifx\eq@R@value\@empty
-        \let\eq@R\@empty\else
+\let\@vertRotate=0
+\def\@eqR#1{\def\eq@R@value{#1}\ifx\eq@R@value\@empty
+  \let\eq@R\@empty\else
 %    \end{macrocode}
-% Determine if we are rotating 90 or 270, if so, set a weak switch
-% \cs{@vertRotate} to 1
+% Determine if we are rotating 90 or 270, if so, set the weak switch
+% \cs{@vertRotate} to~1
 %    \begin{macrocode}
-        \@tempcnta=\eq@R@value\relax
-        \ifnum\@tempcnta<0 \@tempcnta=-\@tempcnta\fi
-        \ifnum\@tempcnta=0 \else\ifnum\@tempcnta=180 \else
-            \let\@vertRotate=1\fi\fi
-        \def\eq@R{/R #1}\fi}
-    \def\eq@R{}
+  \@tempcnta=\eq@R@value\relax
+  \ifnum\@tempcnta<0 \@tempcnta=-\@tempcnta\fi
+  \ifnum\@tempcnta=0 \else\ifnum\@tempcnta=180 \else
+    \let\@vertRotate\ef@One\fi\fi
+  \def\eq@R{/R #1}\fi}
+\def\eq@R{}
 %    \end{macrocode}
 %   \DescribeMacro{\BC} Boundary color
 % \changes{v2.5j}{2011/01/18 }{%
@@ -1149,81 +1249,101 @@
 %    we can exceed {\string\TeX} capacity.
 %}
 %    \begin{macrocode}
-    \def\@eqBC#1{\edef\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@BC\@empty\else % 2010/07/23
-        \expandafter\ef@isitnamed\eq@arg\ef@nil
-        \ifx\ef@latex@color\ef@y\expandafter
-            \HyColor@XZeroOneThreeFour\expandafter{\eq@arg}{\eq@BC}{}{}%
-            \edef\eq@BC{/BC [\eq@BC]}\else
-            \def\eq@BC{/BC [#1]}\fi
-    \fi}
-    \def\eq@BC{}
+\def\@eqBC#1{\edef\eq@arg{#1}\ifx\eq@arg\@empty
+  \let\eq@BC\@empty\else
+  \expandafter\ef@isitnamed\eq@arg\ef@nil
+  \ifx\ef@latex@color\ef@y\expandafter
+    \HyColor@XZeroOneThreeFour\expandafter{\eq@arg}{\eq@BC}{}{}%
+    \edef\eq@BC{/BC [\eq@BC]}\else
+    \def\eq@BC{/BC [#1]}\fi
+  \fi
+}\def\eq@BC{}
 %    \end{macrocode}
 % \DescribeMacro{\BG} Background color
+% \changes{v2.11}{2019/05/24}{Added test for transparency for \string\cs{BG}}
 %    \begin{macrocode}
-    \def\@eqBG#1{\edef\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@BG\@empty\else % 2010/07/23
-        \expandafter\ef@isitnamed\eq@arg\ef@nil
-        \ifx\ef@latex@color\ef@y\expandafter
-            \HyColor@XZeroOneThreeFour\expandafter{\eq@arg}{\eq@BG}{}{}%
-            \edef\eq@BG{/BG [\eq@BG]}\else
-            \def\eq@BG{/BG [#1]}\fi
-        \fi}
-    \def\eq@BG{}
+\def\@eqBG#1{\edef\eq@arg{#1}\ifx\eq@arg\@empty
+    \let\eq@BG\@empty\let\ef@isBGtransparent\ef@YES
+  \else\let\ef@isBGtransparent\ef@NO
+    \expandafter\ef@isitnamed\eq@arg\ef@nil
+    \ifx\ef@latex@color\ef@y\expandafter
+      \HyColor@XZeroOneThreeFour\expandafter{\eq@arg}{\eq@BG}{}{}%
+      \edef\eq@BG{/BG [\eq@BG]}\else
+      \def\eq@BG{/BG [#1]}\fi
+  \fi
+}\def\eq@BG{}
+\let\pmpvCA\@empty
 %    \end{macrocode}
-% \DescribeMacro{\CA} normal appearance text
+% \DescribeMacro{\CA} normal appearance text. Beginning with 2019/05/24 we have
+% enhanced preview, described above in the definition of \cs{@eqV}.
+% \changes{v2.11}{2019/05/24}{Modified \string\cs{@eqCA} to enhance preview}
 %    \begin{macrocode}
-    \def\@eqCA#1{\ef@isunicode#1\unicodeStr\@nil
-    \expandafter\csname\ifbool@ef\endcsname\@equCA{#1}\else
-        \def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@CA\@empty\let\ef@kvCA\@empty
-        \else\ef@pdfCRLFTABDefns
-        \pdfstringdef\ef@uni@temp{#1}%
-        \def\eq@CA{#1}\edef\ef@kvCA{/CA(\ef@uni@temp)}%
-        \makespecialJS\fi\fi}
-    \def\eq@CA{}\def\ef@kvCA{}
+\def\@eqCA#1{\let\unicodeStrSAVE\unicodeStr
+  \Hy@pdfstringtrue\let\unicodeStr\relax
+  \edef\x{#1}\let\unicodeStr\unicodeStrSAVE
+  \expandafter\ef@isunicode\x\unicodeStr\@nil
+  \expandafter\csname\ifbool@ef\endcsname\@equCA{#1}\else
+    \def\eq@arg{#1}\ifx\eq@arg\@empty
+    \let\eq@CA\@empty\let\ef@kvCA\@empty
+    \else\ef@pdfCRLFTABDefns
+      \pdfstringdef\ef@uni@temp{#1}\Hy@pdfstringfalse
+%    \end{macrocode}
+% We define \DescribeMacro\pmpvCA\cs{pmpvCA} as a local macro to hold
+% the caption. It should be something that can be typeset, if not use
+% \cs{tops} to offer an alternative.
+%    \begin{macrocode}
+      \edef\pmpvCA{#1}\def\eq@CA{#1}%
+      \edef\ef@kvCA{/CA(\ef@uni@temp)}%
+      \makespecialJS
+    \fi
+  \fi
+}\def\eq@CA{}\def\ef@kvCA{}
 %    \end{macrocode}
 % \DescribeMacro{\uCA} normal appearance text, unicode version
 %    \begin{macrocode}
-    \def\@equCA#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@CA\@empty\let\ef@kvCA\@empty
-        \else\def\eq@CA{#1}\def\ef@kvCA{/CA<#1>}\fi}
+\def\@equCA#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
+  \let\eq@CA\@empty\let\ef@kvCA\@empty
+  \else\def\eq@CA{#1}\def\ef@kvCA{/CA<#1>}\fi}
 %    \end{macrocode}
 % \DescribeMacro{\RC} Roll over text
 %    \begin{macrocode}
-    \def\@eqRC#1{\ef@isunicode#1\unicodeStr\@nil
-        \expandafter\csname\ifbool@ef\endcsname\@equRC{#1}\else
-        \def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@RC\@empty\let\ef@kvRC\@empty
-        \else\ef@pdfCRLFTABDefns
-        \pdfstringdef\ef@uni@temp{#1}%
-        \def\eq@RC{#1}\edef\ef@kvRC{/RC(\ef@uni@temp)}%
-        \makespecialJS\fi\fi}
-    \def\eq@RC{}\def\ef@kvRC{}
+\def\@eqRC#1{\ef@isunicode#1\unicodeStr\@nil
+  \expandafter\csname\ifbool@ef\endcsname\@equRC{#1}\else
+    \def\eq@arg{#1}\ifx\eq@arg\@empty
+      \let\eq@RC\@empty\let\ef@kvRC\@empty
+    \else
+      \ef@pdfCRLFTABDefns\pdfstringdef\ef@uni@temp{#1}%
+      \def\eq@RC{#1}\edef\ef@kvRC{/RC(\ef@uni@temp)}%
+      \makespecialJS
+    \fi
+  \fi
+}\def\eq@RC{}\def\ef@kvRC{}
 %    \end{macrocode}
 % \DescribeMacro{\uRC} Roll over text, unicode version
 %    \begin{macrocode}
-    \def\@equRC#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@RC\@empty\let\ef@kvRC\@empty
-        \else\def\eq@RC{#1}\def\ef@kvRC{/RC<#1>}\fi}
+\def\@equRC#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
+  \let\eq@RC\@empty\let\ef@kvRC\@empty
+  \else\def\eq@RC{#1}\def\ef@kvRC{/RC<#1>}\fi}
 %    \end{macrocode}
 % \DescribeMacro{\AC} Push text
 %    \begin{macrocode}
-    \def\@eqAC#1{\ef@isunicode#1\unicodeStr\@nil
-        \expandafter\csname\ifbool@ef\endcsname\@equAC{#1}\else
-        \def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@AC\@empty\let\ef@kvAC\@empty
-        \else\ef@pdfCRLFTABDefns
-        \pdfstringdef\ef@uni@temp{#1}%
-        \def\eq@AC{#1}\edef\ef@kvAC{/AC(\ef@uni@temp)}%
-        \makespecialJS\fi\fi}
-    \def\eq@AC{}\def\ef@kvAC{}
+\def\@eqAC#1{\ef@isunicode#1\unicodeStr\@nil
+  \expandafter\csname\ifbool@ef\endcsname\@equAC{#1}\else
+    \def\eq@arg{#1}\ifx\eq@arg\@empty
+      \let\eq@AC\@empty\let\ef@kvAC\@empty
+    \else\ef@pdfCRLFTABDefns
+      \pdfstringdef\ef@uni@temp{#1}%
+      \def\eq@AC{#1}\edef\ef@kvAC{/AC(\ef@uni@temp)}%
+      \makespecialJS
+    \fi
+  \fi
+}\def\eq@AC{}\def\ef@kvAC{}
 %    \end{macrocode}
 % \DescribeMacro{\uAC} Push text, unicode version
 %    \begin{macrocode}
-    \def\@equAC#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-        \let\eq@AC\@empty\let\ef@kvAC\@empty
-        \else\def\eq@AC{#1}\def\ef@kvAC{/AC<#1>}\fi}
+\def\@equAC#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
+  \let\eq@AC\@empty\let\ef@kvAC\@empty
+  \else\def\eq@AC{#1}\def\ef@kvAC{/AC<#1>}\fi}
 %    \end{macrocode}
 % Other keys of \texttt{MK} include: \texttt{I}, \texttt{RI}, \texttt{IX}, \texttt{IF} and \texttt{TP}
 % If I haven't covered everything, use this macro to insert
@@ -1232,12 +1352,12 @@
 % button with an icon appearance, the entries in the \texttt{MK} dictionary that
 % effect an icon of the push button has this form:
 %\begin{verbatim}
-%   \ifx\eq@AP\@empty
-%       /MK <<\eq@R\eq@BC\eq@BG%
-%           \ef@kvCA\ef@kvRC\ef@kvAC\eq@IconMK\eq@mkIns>>
-%   \else
-%       \eq@AP
-%   \fi
+% \ifx\eq@AP\@empty
+%   /MK <<\eq@R\eq@BC\eq@BG%
+%     \ef@kvCA\ef@kvRC\ef@kvAC\eq@IconMK\eq@mkIns>>
+% \else
+%   \eq@AP
+% \fi
 %\end{verbatim}
 % The \cs{eq@IconMK} macro inserts the appropriate code for an icon appearance.
 %    \begin{macrocode}
@@ -1278,8 +1398,7 @@
     \fi
     \eq@define@IconMK
   \fi
-}
-\def\eq@I{}
+}\def\eq@I{}
 %    \end{macrocode}
 % \DescribeMacro{\RI} an indirect reference to a form XObject defining
 % the buttons's \emph{rollover icon}
@@ -1296,8 +1415,7 @@
     \fi
     \eq@define@IconMK
   \fi
-}
-\def\eq@RI{}
+}\def\eq@RI{}
 %    \end{macrocode}
 % \DescribeMacro{\IX} an indirect reference to a form XObject defining
 % the buttons's \emph{down icon}
@@ -1314,15 +1432,14 @@
     \fi
     \eq@define@IconMK
   \fi
-}
-\def\eq@IX{}
+}\def\eq@IX{}
 %    \end{macrocode}
 % \DescribeMacro{\TP} A code indicating the \texttt{layout} of the text and icon; these codes are
 %        0 (label only); 1 (icon only); 2 (label below icon); 3 (label above icon); 4 (label to the right of icon);
 %        5 (label to the left of icon); 6 (label overlaid on the icon). The default is 0.
 %    \begin{macrocode}
 \def\@eqTP#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@TP\@empty\else\def\eq@TP{/TP #1}\fi}
+  \let\eq@TP\@empty\else\def\eq@TP{/TP #1}\fi}
 \def\eq@TP{/TP 0} % default 0
 %    \end{macrocode}
 % \DescribeMacro{\SW} The \emph{scale when key}. Permissible values are \texttt{A} (always scale),
@@ -1330,14 +1447,14 @@
 %   (never scale). The default is \texttt{A}.
 %    \begin{macrocode}
 \def\@eqSW#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@SW\@empty\else\def\eq@SW{/SW/#1}\fi}
+  \let\eq@SW\@empty\else\def\eq@SW{/SW/#1}\fi}
 \def\eq@SW{/SW/A} % the default, always scale
 %    \end{macrocode}
 % \DescribeMacro{\ST} The \emph{scaling type.} Permissible values are \texttt{A}
 %    (anamorphic scaling); \texttt{P} (proportional scaling). The default is \texttt{P}.
 %    \begin{macrocode}
 \def\@eqST#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@ST\@empty\else\def\eq@ST{/S/#1}\fi}
+  \let\eq@ST\@empty\else\def\eq@ST{/S/#1}\fi}
 \def\eq@ST{/S/P} % the default, proportional scaling
 %    \end{macrocode}
 % \DescribeMacro{\PA} The \textit{position array.} An array of two numbers, each
@@ -1345,7 +1462,7 @@
 %  of the annotation rectangle. The two numbers should be separated by a space. The default value, \verb!\PA{.5 .5}!
 %    \begin{macrocode}
 \def\@eqPA#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@PA\@empty\else\def\eq@PA{/A [#1]}\fi}
+  \let\eq@PA\@empty\else\def\eq@PA{/A [#1]}\fi}
 \def\eq@PA{/A [0.5 0.5]} % the default
 %    \end{macrocode}
 % \DescribeMacro{\FB} The \emph{fit bounds} Boolean. If \texttt{true}, the button appearance
@@ -1353,7 +1470,7 @@
 %   the line width of the border. The default is \texttt{false}.
 %    \begin{macrocode}
 \def\@eqFB#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@PA\@empty\else\def\eq@FB{/FB #1}\fi}
+  \let\eq@PA\@empty\else\def\eq@FB{/FB #1}\fi}
 \def\eq@FB{/FB false} % the default
 %    \end{macrocode}
 % \DescribeMacro{\mkIns} used for miscellaneous entries for \texttt{MK} dictionary.
@@ -1364,14 +1481,14 @@
 % An array of options in the list
 %    \begin{macrocode}
 \def\@eqOpt#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@Opt\@empty\else\def\eq@Opt{/Opt [#1]}\fi}
-    \def\eq@Opt{}
+  \let\eq@Opt\@empty\else\ifefpmpv\let\eq@Opt\@empty\else
+    \def\eq@Opt{/Opt [#1]}\fi\fi}\def\eq@Opt{}
 %    \end{macrocode}
 % For scrollable list boxes, the top index.
 %    \begin{macrocode}
 \def\@eqTI#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@TI\@empty\else\def\eq@TI{/TI #1}\fi}
-    \def\eq@TI{}
+  \let\eq@TI\@empty\else\def\eq@TI{/TI #1}\fi}
+\def\eq@TI{}
 %    \end{macrocode}
 % When all else fails, use the \cs{rawPDF} command to modify the widget.
 %    \begin{macrocode}
@@ -1390,25 +1507,25 @@
 % package to create multi-line links.
 %    \begin{macrocode}
 \def\@eqQuadPoints#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@QuadPoints\@empty\else
-    \def\eq@QuadPoints{/QuadPoints {#1}}\fi}
+  \let\eq@QuadPoints\@empty\else
+  \def\eq@QuadPoints{/QuadPoints {#1}}\fi}
 \def\eq@QuadPoints{}
 %    \end{macrocode}
 % \DescribeMacro{\Color} Changed |\def\eq@arg| to |\edef\eq@arg| (01/18/11)
 %    \begin{macrocode}
 \def\@eqColor#1{\edef\eq@arg{#1}\ifx\eq@arg\@empty
-    \let\eq@Color\@empty\else
-    \HyColor@XZeroOneThreeFour{#1}{\eq@Color}{}{}%
-    \edef\eq@Color{/C[\eq@Color]}\fi}
+  \let\eq@Color\@empty\else
+  \HyColor@XZeroOneThreeFour{#1}{\eq@Color}{}{}%
+  \edef\eq@Color{/C[\eq@Color]}\fi}
 \def\eq@Color{}
 %    \end{macrocode}
 % \DescribeMacro{linktxtcolor} key to set the color of the link through
 % the option list.
 %    \begin{macrocode}
 \def\@eqlinktxtcolor#1{%
-    \def\ef@argi{#1}\ifHy@colorlinks
-        \ifx\ef@argi\@empty\let\ef@colorthislink\normalcolor\else
-        \let\ef@linktxtcolor@set=1\def\ef@thislinkcolor{#1}\fi\fi
+  \def\ef@argi{#1}\ifHy@colorlinks
+    \ifx\ef@argi\@empty\let\ef@colorthislink\normalcolor\else
+    \let\ef@linktxtcolor@set=1\def\ef@thislinkcolor{#1}\fi\fi
 }\let\ef@linktxtcolor@set=0
 %    \end{macrocode}
 % \paragraph*{Specialized, non-PDF Spec, commands}
@@ -1419,9 +1536,9 @@
 % Use to set the height and width of a widget.
 %    \begin{macrocode}
 \def\@eqrectH#1{\def\eq@rectH{#1}\ifx\eq@rectH\@empty\else
-    \setlength\eflength\eq@rectH\edef\eq@rectH{\the\eflength}\fi}
+  \setlength\eflength\eq@rectH\edef\eq@rectH{\the\eflength}\fi}
 \def\@eqrectW#1{\def\eq@rectW{#1}\ifx\eq@rectW\@empty\else
-    \setlength\eflength\eq@rectW\edef\eq@rectW{\the\eflength}\fi}
+  \setlength\eflength\eq@rectW\edef\eq@rectW{\the\eflength}\fi}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -1431,8 +1548,8 @@
 % used with setting the tab order using the structure.
 %    \begin{macrocode}
 \def\@eqobjdef#1{\def\ef@arg{#1}\ifx\ef@arg\@empty
-    \let\eq@objdef\@empty\else\def\eq@objdefName{#1}%
-    \def\eq@objdef{/_objdef {#1}}\fi
+  \let\eq@objdef\@empty\else\def\eq@objdefName{#1}%
+  \def\eq@objdef{/_objdef {#1}}\fi
 }
 \let\eq@objdef\@empty
 %    \end{macrocode}
@@ -1441,8 +1558,8 @@
 % determined through structure.
 %    \begin{macrocode}
 \def\@eqtaborder#1{\def\ef@arg{#1}\ifx\ef@arg\@empty
-    \let\eq@taborder\@empty\else
-    \def\eq@taborder{#1}\fi
+  \let\eq@taborder\@empty\else
+  \def\eq@taborder{#1}\fi
 }
 \let\eq@taborder\@empty
 %    \end{macrocode}
@@ -1451,12 +1568,12 @@
 %    \begin{macrocode}
 \def\ef@y{y}\def\ef@n{n}
 \def\@eqautoCenter#1{\def\ef@arg{#1}\ifx\ef@arg\ef@y
-    \let\autoCenter\ef@y\else\ifx\ef@arg\ef@n
-    \let\autoCenter\ef@n\else\let\autoCenter\ef@y
-    \PackageWarning{eforms}{The value of '#1' is not a
-    supported value\MessageBreak for \string\autoCenter.\MessageBreak
-    Using the default of 'y'}%
-    \fi\fi}
+  \let\autoCenter\ef@y\else\ifx\ef@arg\ef@n
+  \let\autoCenter\ef@n\else\let\autoCenter\ef@y
+  \PackageWarning{eforms}{The value of '#1' is not a
+  supported value\MessageBreak for \string\autoCenter.\MessageBreak
+  Using the default of 'y'}\fi
+\fi}
 \let\autoCenter\ef@y
 %    \end{macrocode}
 % \DescribeMacro{\inline} If |\inline{y}|, then we attempt to
@@ -1467,13 +1584,13 @@
 \newif\ifeq@inlineCenter \eq@inlineCenterfalse
 \let\inlineCenter=n
 \def\@eqinline#1{\eq@inlineCenterfalse
-    \def\ef@arg{#1}\ifx\ef@arg\ef@y
-    \let\inlineCenter\ef@y\eq@inlineCentertrue\else
-    \ifx\ef@arg\ef@n\let\inlineCenter\ef@n\else\let\inlineCenter\ef@n
-    \PackageWarning{eforms}{The value of '#1' is not a
-    supported value\MessageBreak for \string\inline.\MessageBreak
-    Using the default of 'n'}%
-    \fi\fi}
+  \def\ef@arg{#1}\ifx\ef@arg\ef@y
+  \let\inlineCenter\ef@y\eq@inlineCentertrue\else
+  \ifx\ef@arg\ef@n\let\inlineCenter\ef@n\else\let\inlineCenter\ef@n
+  \PackageWarning{eforms}{The value of '#1' is not a
+  supported value\MessageBreak for \string\inline.\MessageBreak
+  Using the default of 'n'}\fi
+\fi}
 %    \end{macrocode}
 % \DescribeMacro{\symbolchoice} The symbol used for a check box or radio button.
 % Elsewhere, we have defined,
@@ -1489,14 +1606,14 @@
 % \texttt{cross}, \texttt{diamond}, \texttt{square}, and \texttt{star}.
 %    \begin{macrocode}
 \def\@eqsymbolchoice#1{\expandafter\ifx\csname eq@#1\endcsname\relax
-   \typeout{exerquiz: `#1' is not an acceptable option
-   for \string\symbolechoice, inserting default, `check'.}
-   \edef\symbol@choice{\eq@check}\else
+ \typeout{exerquiz: `#1' is not an acceptable option
+ for \string\symbolechoice, inserting default, `check'.}
+ \edef\symbol@choice{\eq@check}\else
 %    \end{macrocode}
 % We take \texttt{\#1} and form the command \cs{eq@\#1}, to match one of
 % the definitions listed above.
 %    \begin{macrocode}
-   \edef\symbol@choice{\csname eq@#1\endcsname}\fi
+  \edef\symbol@choice{\csname eq@#1\endcsname}\fi
 }
 %    \end{macrocode}
 %\DescribeMacro{\mlfix} When set to \texttt{y}, contiguous boxes are combined. This is for
@@ -1511,12 +1628,12 @@
 \def\mlfixOn{\fixmlinkstrue}
 \def\mlfixOff{\fixmlinksfalse}
 \def\@eqmlfix#1{\def\ef@arg{#1}\ifx\ef@arg\ef@y
-    \mlfixOn\else\ifx\ef@arg\ef@n
-    \mlfixOff\else\mlfixOn
-    \PackageWarning{eforms}{The value of '#1' is not a
-    supported value\MessageBreak for \string\mlfix.\MessageBreak
-    Using the default of 'y'}%
-    \fi\fi}
+  \mlfixOn\else\ifx\ef@arg\ef@n
+  \mlfixOff\else\mlfixOn
+  \PackageWarning{eforms}{The value of '#1' is not a
+  supported value\MessageBreak for \string\mlfix.\MessageBreak
+  Using the default of 'y'}\fi
+\fi}
 \newbox\mlstrutbox
 %    \end{macrocode}
 %     \DescribeMacro{\mlstrut}\hskip-\marginparsep\texttt{\darg{\ameta{strut-amt}}}
@@ -1549,12 +1666,12 @@
 %   \changes{v2.9.19}{2018/03/22}{Added \string\cs{mlhyph}}
 %    \begin{macrocode}
 \def\@eqmlhyph#1{\def\ef@arg{#1}\ifx\ef@arg\ef@y
-    \def\eq@mlhyph{-}\else\ifx\ef@arg\ef@n
-    \let\eq@mlhyph\@empty\else\let\eq@mlhyph\@empty
-    \PackageWarning{eforms}{The value of '#1' is not a
-    supported value\MessageBreak for \string\mlhyph.\MessageBreak
-    Using the default of 'n'}\fi\fi}
-\let\eq@mlhyph\@empty
+  \def\eq@mlhyph{-}\else\ifx\ef@arg\ef@n
+  \let\eq@mlhyph\@empty\else\let\eq@mlhyph\@empty
+  \PackageWarning{eforms}{The value of '#1' is not a
+  supported value\MessageBreak for \string\mlhyph.\MessageBreak
+  Using the default of 'n'}\fi
+\fi}\let\eq@mlhyph\@empty
 %    \end{macrocode}
 %     \leavevmode
 %     \DescribeMacro{\mlignore}\hskip-\marginparsep\texttt{\darg{\upshape0\string|1\string|empty}}
@@ -1582,6 +1699,7 @@
 % \DescribeMacro{\protect} A key for protecting a key from begin changed
 % by the user through the optional arguments.
 %    \begin{macrocode}
+\def\@eqprotect#1{\eq@protect{#1}}
 \def\eq@protect#1{\let#1\@empty}
 %    \end{macrocode}
 %    \leavevmode
@@ -1602,8 +1720,7 @@
 \def\protectedKeys@gettwo#1#2{%
   \ifx#1\ef@stop\else\ef@scratchtoks=\expandafter
     {\the\ef@scratchtoks\protect#1{#2}}\expandafter
-    \protectedKeys@gettwo
-  \fi}
+    \protectedKeys@gettwo\fi}
 %    \end{macrocode}
 %
 % \subsubsection{Support for Hex escapes in PDF names}
@@ -1617,10 +1734,10 @@
 \def\efHxError{\PackageError{eforms}{The glyph is not supported}{}}
 \def\HGERROR{efHxError}
 \ifpdfmarkup
-    \def\HexGlyph#1#2{\def\arg@ii{#2}\ifx\arg@ii\HGERROR
-    \global\@namedef{efHex#1}{\csname#2\endcsname}\else
-    \global\@namedef{efHex#1}{\expandafter
-        \string\csname#2\endcsname}\fi}
+  \def\HexGlyph#1#2{\def\arg@ii{#2}\ifx\arg@ii\HGERROR
+  \global\@namedef{efHex#1}{\csname#2\endcsname}\else
+  \global\@namedef{efHex#1}{\expandafter
+    \string\csname#2\endcsname}\fi}
 \else
   \begingroup\catcode`\#=12 \catcode`*=6
     \gdef\HexGlyph*1*2{\def\arg@ii{*2}\ifx\arg@ii\HGERROR
@@ -2188,10 +2305,10 @@
 %    \end{macrocode}
 %\paragraph*{Notes:}\par
 %\noindent\begin{tabular}{ll}
-% Visible (and printable)       &|\F\FPrint|\\
-%Hidden but printable          &|\F\FNoView\F\FPrint|\\
+% Visible (and printable)      &|\F\FPrint|\\
+%Hidden but printable          &|\F\FNoView|\\
 %Visible but doesn't print     &|\F\FNoPrint|\\
-%Hidden (and does not print)   &|\F\FHidden\F\FPrint|
+%Hidden (and does not print)   &|\F\FHidden|
 %\end{tabular}
 %
 %\subsubsection{Field Flags /Ff Definitions}\label{Ff}
@@ -2314,16 +2431,67 @@
 %\def\ef@btnspcr{\ }
 \def\ef@btnspcr{}
 %    \end{macrocode}
-%     For those that do not use Adobe Acrobat products (AA/AR), we offer a `poor man's'
-%     alternative. When \cs{previewOn} is active, outlines of the form fields are seen
-%     (been around for years); when \cs{pmcaOn} is active, the caption of the push buttons
-%     are typeset into the document, centered within the buttons. If opened in AR, AR will
-%     supply an appearance and these typeset captions are not seen.
-%\changes{v2.10}{2019/03/16}{Added \string\cs{pmcaOn} and \string\cs{pmcaOff}}
+%    \subsubsection{Enhanced preview}\label{pmpv}
+%\changes{v2.10}{2019/03/16}{Added \string\cs{pmpvOn} and \string\cs{pmpvOff}, changed from
+% \string\cs{pmcaOn} and \string\cs{pmcaOff}}
+%\changes{v2.10}{2019/03/16}{Alias for \string\cs{pmcaOn} and \string\cs{pmpvOn}, etc.}
 %    \begin{macrocode}
-\@ifundefined{ifefpmca}{\newif\ifefpmca\efpmcafalse}{}
-\def\pmcaOn{\efpmcatrue}
-\def\pmcaOff{\efpmcafalse}
+\@ifundefined{ifefpmpv}{\newif\ifefpmpv\efpmpvfalse}{}
+\def\pmpvOn{\efpmpvtrue\PackageInfo{eforms}
+  {Turning on enhanced preview (\string\pmpvOn)}}\let\pmcaOn\pmpvOn
+\def\pmpvOff{\efpmpvfalse\PackageInfo{eforms}
+  {Turning off enhanced preview (\string\pvpmOff)}}\let\pmcaOff\pmpvOff
+%    \end{macrocode}
+%    Enhanced preview attempts to typeset into the document the value of the \cs{CA} key (for push buttons)
+%    and the \cs{V} key for text fields and choice fields. This is useful for those using a non-conforming
+%    PDF reader such as \app{sumatraPDF}. The enhanced preview is activated by expanding \cs{pmpvOn}
+%    (\textbf{p}oor \textbf{m}an's \textbf{p}re\textbf{v}iew). A summary of the effects is describe below.\medskip
+%    \begin{description}
+%    \item[push buttons] The \cs{CA} entry is always
+%    displayed; however, when the \emph{background color \emph{(\cs{BG})} is transparent}, the key-value entry generated by \cs{CA}
+%    \emph{is removed}. This is to avoid two overlaying captions, one typeset into the document, the other part
+%    of the button appearance.
+%    \item[text and choice fields] The \cs{V} entry \emph{is set to empty} (when \cs{pmpvOn} is active),
+%    but the value of the \cs{V} key is typeset into the document; this is to avoid two overlaying
+%    values within the field. There is one special case, when the field is \emph{hidden}; in this case,
+%    the value of the field is restored. Hidden text fields are used by the \pkg{acrotex} packages to hold
+%    information that can later be retrieved.
+%    \item[check box and radio button fields] These two cases are handled similar to \textbf{choice fields}. For these
+%    types of fields, the values is typically a mark: a check, an cross, a star, and so on. For preview purposes,
+%    \pkg{eforms} defines the declarative command \cs{pmpvMrk} that takes one argument, the mark to be used. The
+%    package declares |\pmpvMrk{X}|, another good choice is |\pmpvMrk{$\checkmark$}|.
+%    \end{description}
+%    With respect to the enhanced preview, the local command \cs{tops}, used within the argument of \cs{V} or \cs{CA}, is
+%    \cs{let} to \cs{texorpdfstring}. Use \DescribeMacro\tops\cs{tops} to offer an alternate text to the value of \cs{CA}
+%    of \cs{V}. The \cs{V} key of radio button and check box fields do not handle the \cs{tops} command.
+%
+%    For example,
+%    \begin{quote}\small
+%       |\pushButton[\CA{\tops{Tap Me}{Push Me}}]{pbFld}{}{11bp}|
+%    \end{quote}
+%    This button will preview with the caption as `Tap Me', but will appear within
+%    a conforming PDF reader as `Push Me'; however, if the background color is
+%    transparent (|\BG{}|), `Tap Me' will be the (typeset) caption even in a
+%    conforming PDF reader. (This is to avoid overlaying captions.) It is
+%    important\marginpar{\raggedleft \textbf{Important!}} to say that the final
+%    document should be compiled with \cs{previewOff} and \cs{pmpvOff} opened in
+%    \app{Adobe Reader} and saved to obtain proper appearances of the form
+%    fields.
+%
+%    The arguments of \cs{CA} and \cs{V} should be text, and must note have any {\TeX} formatting
+%    like \cs{textbf}, \cs{textit}, and so on. That's not to say such formatting cannot be obtained.
+%    There is an undocumented macro, \DescribeMacro\pmpvFmt\cs{pmpvFmt} that takes one argument, the argument being the
+%    enhanced preview text. To illustrate its usage, we use the above example,
+%    \begin{quote}\small
+%       |\pushButton[\cmd{\let\pmpvFmt\textbf}|\\
+%       \null\quad|\CA{\tops{Tap Me}{Push Me}}]{pbFld}{}{11bp}|
+%    \end{quote}
+%    Now, the enhanced preview will read `\textbf{Tap Me}'. Pass |\let\pmpvFmt\textbf| through
+%    the \cs{cmd} key, the changes are local to the field.
+%    \changes{v2.11}{2019/05/24}{Enhanced preview introduced}
+%
+%    \subsubsection{Set push button properties}
+%    \begin{macrocode}
 \def\eq@setButtonProps#1#2{\makeJSspecials
   \processAppArgs#2\end\@nil  % set widget properties
 %    \end{macrocode}
@@ -2337,7 +2505,7 @@
   \ifx\eq@rectW\@empty
     \ifnum\eq@textSize=0 \else
 %    \end{macrocode}
-% If rectW is nonempty, and textSize is not zero, we calculate with
+% If \cs{rectW} is nonempty, and \cs{textSize} is not zero, we calculate with
 % width of the caption on the button by first adjusting the font size
 % to properly gauge the width of the text. This may not be really accurate
 % because the font used by tex will no doubt be different from the font used
@@ -2358,6 +2526,7 @@
     \else
       \def\eq@btn@sp{\hbox to\dimen@{\hfill}}%
     \fi
+    \Hy@pdfstringtrue
     \expandafter\def\expandafter
       \ef@btnspcr\expandafter{\ef@btnspcr\eq@btn@sp}%
     \sbox{\eq@tmpbox}{\ef@btnspcr\eq@CA\ef@btnspcr}%
@@ -2379,13 +2548,22 @@
   \fi
 %    \end{macrocode}
 %    (2016/12/22) \cs{ef@djXPD} adjusts the size of the field dimensions, if \cs{makeXasPD} is true.\\
-%    (2019/03/16) Insert \cs{PMCA} if \cs{if@efpmca} is true.
-%    \changes{v2.10}{2019/03/16}{Insert \string\cs{PMCA} if \string\cs{if@efpmca} is true}
+%    (2019/03/16) Insert \cs{PMPV} if \cs{if@efpmpv} is true.
+%    \changes{v2.10}{2019/03/16}{Insert \string\cs{PMPV} if \string\cs{if@efpmpv} is true}
+%    \changes{v2.11}{2019/05/24}{Added \string\cs{ef@isBGtransparent}}
 %    \begin{macrocode}
-  \ifefpmca\PMCA{\eq@CA}\fi\ef@djXPD#1%
+  \ifefpmpv\Hy@pdfstringfalse
+%    \end{macrocode}
+%    If this push button has a transparent background, we remove the \texttt{/CA} key.
+%    \begin{macrocode}
+    \ifx\ef@isBGtransparent\ef@YES
+      \let\ef@kvCA\@empty\fi
+   \PMPV{\eq@CA}\fi
+  \ef@djXPD#1%
 }
 %    \end{macrocode}
 %    \end{macro}
+%    \subsubsection{Set other properties of other fields}
 %    \begin{macro}{\eq@setWidgetProps}
 % Same as \cmd{\eq@setButtonProps} but does not measure the width of the
 % field.  Simply lays in the optional parameters that modify the appearance
@@ -2409,6 +2587,21 @@
 %    \end{macrocode}
 %    (2016/12/22) \cs{ef@djXPD} adjusts the size of the field dimensions, if \cs{makeXasPD} is true.
 %    \begin{macrocode}
+  \ifefpmpv\Hy@pdfstringfalse
+%    \end{macrocode}
+%     Having an enhanced preview generates several problems. Text fields are sometimes hidden and their values
+%     are used to store information. So, if the field is hidden, we give no enhanced preview.
+%     \changes{v2.11}{2019/05/24}{Enhanced preview for text and choice fields}
+%    \begin{macrocode}
+    \ifx\ef@isHidden\ef@YES
+%    \end{macrocode}
+%     This is a tricky part. The value \cs{eq@VSAVE} was earlier \cs{let} to the original value
+%     of \cs{eq@V} (at that time, we set \cs{eq@V} to \cs{@empty}), now we restore its original
+%     value now that we know this field is hidden.
+%    \begin{macrocode}
+      \let\eq@V\eq@VSAVE\else
+      \PMPV{\pmpvV}\fi
+  \fi
   \ef@djXPD#1%
 }
 %    \end{macrocode}
@@ -2500,7 +2693,9 @@
 %
 % \subsection{Choice Fields}\label{choice}
 %
-% This is the form template used for all choice fields, list box and combo box.
+% This is the form template used for all choice fields, list box and combo box. Within
+% the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.
 %    \begin{macrocode}
 \def\common@choiceCode{%
   /Subtype/Widget
@@ -2641,17 +2836,20 @@
 %    \end{macrocode}
 % \subsubsection{List Box}\label{listbox}
 % The main list box code that can be used to build list box commands, such as
-% \cs{listBox}, defined below.
+% \cs{listBox}, defined below. Within
+% the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.
 %    \begin{macrocode}
 \def\annot@type@listbox{listbox}
 \newcommand\list@@Box[8]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@listbox}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
 %    \end{macrocode}
 % Run \texttt{\#5} through \cs{ef@pdfstrCLOpt}.
 %    \begin{macrocode}
   \expandafter\ef@pdfstrCLOpt#5\ef@@nil
+  \ifefpmpv\let\eq@Opt\@empty\fi
   \eqf@setDimens{#3}{#4}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#8\end\noindent#6#7{#1}}
@@ -2691,16 +2889,19 @@
 %    \end{macrocode}
 %    \end{macro}
 % \subsubsection{Combo Box}\label{combobox}
+% Within the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.
 %    \begin{macrocode}
 \def\annot@type@combobox{combobox}
 \newcommand\combo@@Box[8]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@combobox}%
   \@eqFf{\FfCombo}\pdfstringdef\Fld@name{#2}\dl@paramlocal
 %    \end{macrocode}
 % Run \texttt{\#5} through \cs{ef@pdfstrCLOpt}.
 %    \begin{macrocode}
   \expandafter\ef@pdfstrCLOpt#5\ef@@nil
+  \ifefpmpv\let\eq@Opt\@empty\fi
   \eqf@setDimens{#3}{#4}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#8\end\noindent#6#7{#1}}
@@ -2732,7 +2933,9 @@
 %    \end{macrocode}
 %    \end{macro}
 % \subsection{Button Fields}\label{button}
-% Here is the field template for push button fields.\par\medskip\noindent
+% Here is the field template for push button fields. Within
+% the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.\par\medskip\noindent
 % (2018/11/10) \cs{eq@APX} determines if \cs{eq@I} is empty, if not we supply the normal appearance
 % for the button to be the same appearance as set by \cs{eq@I}.
 % \changes{v2.9.21}{2018/11/10}{Introduce \string\cs{eq@APX} an `intelligent' AP key}
@@ -2806,7 +3009,7 @@
 %    \begin{macrocode}
 \def\annot@type@button{pushbtn}
 \newcommand\push@@Button[7]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@button}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
   \makeJSspecials\ef@preProcDefns
@@ -2844,19 +3047,28 @@
 %    \end{macrocode}
 %    \end{macro}
 % \subsubsection{Check Box}\label{checkbox}
-% The basic command for creating check boxes.
+% The basic command for creating check boxes. For \emph{enhanced preview} we define
+% \DescribeMacro\pmpvMrk\cs{pmpvMrk\darg{mrk}}, which defines \cs{pmpv@mrk} that is eventually
+% used in the core of \cs{ef@Bbox}.
 %    \begin{macrocode}
+\def\pmpvMrk#1{\def\pmpv@mrk{#1}}
+\pmpvMrk{X}
 \def\annot@type@checkbox{checkbox}
 \newcommand\check@@Box[8]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \let\#\ef@Hx\edef\annot@type{\annot@type@checkbox}%
   \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
   \def\@eqDV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty\let\eq@DV\@empty
-      \else\ifpdfmarkup\def\eq@DV{/DV(##1) cvn }\else
-      \def\eq@DV{/DV/##1}\fi\fi}%
+    \else\ifpdfmarkup\def\eq@DV{/DV(##1) cvn }\else
+    \def\eq@DV{/DV/##1}\fi\fi}%
   \def\@eqV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty
-      \let\eq@V\@empty\else\ifpdfmarkup\def\eq@V{/V(##1) cvn }\else
-      \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi}%
+%    \end{macrocode}
+%    Provide enhanced preview for checkboxes
+%    \begin{macrocode}
+    \let\eq@V\@empty\else\def\pmpvV{\pmpv@mrk}\ifpdfmarkup
+      \def\eq@V{/V(##1) cvn }\else
+      \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi
+      \ifefpmpv\let\eq@V\@empty\fi}%
   \eqf@setDimens{#3}{#4}%
   \ifpdfmarkup\def\eq@On{(#5) cvn }\else
       \def\eq@On{/#5}\fi\@eqtextFont{ZaDb}%
@@ -2894,15 +3106,20 @@
 %    \begin{macrocode}
 \def\annot@type@radio{radiobtn}
 \newcommand\radio@@Button[8]{\begingroup\let\#\ef@Hx
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@radio}%
   \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
   \def\@eqDV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty\let\eq@DV\@empty
     \else\ifpdfmarkup\def\eq@DV{/DV(##1) cvn }\else
     \def\eq@DV{/DV/##1}\fi\fi}%
   \def\@eqV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty
-    \let\eq@V\@empty\else\ifpdfmarkup\def\eq@V{/V(##1) cvn }\else
-    \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi}%
+%    \end{macrocode}
+%    Provide enhanced preview for radio buttons
+%    \begin{macrocode}
+    \let\eq@V\@empty\else\def\pmpvV{\pmpv@mrk}\ifpdfmarkup
+      \def\eq@V{/V(##1) cvn }\else
+      \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi
+    \ifefpmpv\let\eq@V\@empty\fi}%
   \eqf@setDimens{#3}{#4}%
   \ifpdfmarkup\def\eq@On{(#5) cvn }\else\def\eq@On{/#5}\fi
   \def\eq@Ff{/Ff \FfRadio}\@eqtextFont{ZaDb}%
@@ -2939,7 +3156,9 @@
 %
 % \subsection{Text Field}\label{textfield}
 %
-% The template for a text field.
+% The template for a text field. Within
+% the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.
 %    \begin{macrocode}
 \def\common@TextFieldCode
 {%
@@ -2964,7 +3183,7 @@
 %    \begin{macrocode}
 \def\annot@type@text{textfld}
 \newcommand\text@@Field[7]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@text}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
   \def\eq@Title{#2}\eqf@setDimens{#3}{#4}%
@@ -3005,7 +3224,9 @@
 %
 % \subsection{Signature Field}\label{sigfield}
 %
-% The template for a signature field.
+% The template for a signature field. Within
+% the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
+% and \cs{tops} for \cs{texorpdfstring}.
 %    \begin{macrocode}
 \def\common@SigFieldCode
 {%
@@ -3026,7 +3247,7 @@
 %    \begin{macrocode}
 \def\annot@type@sig{sigfld}
 \newcommand\sig@@Field[7]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@sig}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
   \def\eq@Title{#2}\eqf@setDimens{#3}{#4}%
@@ -3087,7 +3308,7 @@
 %    \begin{macrocode}
 \def\annot@type@link{link}
 \newcommand\set@@Link[7]{\begingroup
-  \let\nameuse\@nameuse
+  \let\nameuse\@nameuse\let\tops\texorpdfstring
   \dl@paramlocal
   \makeJSspecials
   \edef\annot@type{\annot@type@link}%
@@ -4132,102 +4353,105 @@
 % Code to hide the solutions page to a quiz that has solutions.
 %    \begin{macrocode}
 \def\noPeek#1#2{\literalps@out{%
-     [ {ThisPage} << \noPeekAction{#1}{#2} >> /PUT pdfmark}}
+  \AEB@psMrk{ThisPage} << \noPeekAction{#1}{#2} >> /PUT pdfmark}}
 %    \end{macrocode}
 % Driver dependent code (distiller) for choice fields, list and combo.
 %    \begin{macrocode}
 \def\eq@choice@driver
 {%
-    \Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \literalps@out{%
-    [ \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-      /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@choiceCode
-    /ANN pdfmark
-    \ifisCalculate[ {corder} {\Fld@name} /APPEND pdfmark\fi
-    }\to@insertStrucTabOrder{Form}\endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
+    /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@choiceCode
+  /ANN pdfmark
+  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+  }\to@insertStrucTabOrder{Form}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 % Driver dependent code (distiller) for push button fields.
 %    \begin{macrocode}
 \def\eq@Button@driver
 {%
-    \Hy@pdfstringtrue
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@pushButtonCode
-    /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
+  \ifx\@vertRotate\ef@One\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+      \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@pushButtonCode
+  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 % Driver dependent code (distiller) for radio and button fields.
 %    \begin{macrocode}
 \def\eq@RadioCheck@driver
 {%
-    \Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@RadioCheckCode
-    /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@RadioCheckCode
+  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+  \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
-    \pdf@rect{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@RadioCheckCode
-    /ANN pdfmark}\endgroup
-    \dl@restorespcs
+  \pdf@rect{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@RadioCheckCode
+  /ANN pdfmark}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 % Driver dependent code for text fields.
 %    \begin{macrocode}
 \def\eq@TextField{\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \literalps@out{%
-    [ \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-       /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@TextFieldCode
-    /ANN pdfmark
-    \ifisCalculate[ {corder} {\Fld@name} /APPEND pdfmark\fi
-    }\to@insertStrucTabOrder{Form}\endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
+     /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@TextFieldCode
+  /ANN pdfmark
+  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+  }\to@insertStrucTabOrder{Form}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 % \changes{v2.5p}{2012/09/25}{Corrected a bug in \string\cs{eq@SigField} for
 % the dvipdfm-type drivers}
 %    \begin{macrocode}
 \def\eq@SigField{\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-%    \centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-        \common@SigFieldCode
-    /ANN pdfmark
-    }\to@insertStrucTabOrder{Form}\endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+      \common@SigFieldCode
+  /ANN pdfmark
+  }\to@insertStrucTabOrder{Form}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 % For processing the \texttt{pdfmark} with distiller, the key \texttt{/Action} is
@@ -4240,17 +4464,17 @@
 %    \begin{macrocode}
 \def\setLink@driver
 {%
-    \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
-    \@eqBS{}%
-    \pdf@rect{\link@@Box}%
-    \literalps@out{%
-    [ \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-    \eq@Border
-    \common@LinkCode
-    /Subtype /Link
-    /ANN pdfmark}%
-    \to@insertStrucTabOrder{Link}\endgroup
-    \dl@restorespcs
+  \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
+  \@eqBS{}%
+  \pdf@rect{\link@@Box}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+  \eq@Border
+  \common@LinkCode
+  /Subtype /Link
+  /ANN pdfmark}%
+  \to@insertStrucTabOrder{Link}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 %   (2018/03/22) Defined \cs{pboxRect} to support
@@ -4266,17 +4490,17 @@
 \def\mllnkcontainer#1{#1}
 \def\setLinkPbox@driver
 {%
-    \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
-    \@eqBS{}%
-    \literalps@out{\mllnkcontainer{%
-    [ \eq@objdef\pboxRect
-    \eq@Border
-    \eq@QuadPoints  % QuadPoints
-    \common@LinkCode
-    /Subtype /Link
-    /ANN pdfmark}}%
-    \to@insertStrucTabOrder{Link}\endgroup
-    \dl@restorespcs
+  \ifx\eq@A\@empty\else\expandafter\convertAToAction\eq@A\@nil\fi
+  \@eqBS{}%
+  \literalps@out{\mllnkcontainer{%
+  \AEB@psMrk\eq@objdef\pboxRect
+  \eq@Border
+  \eq@QuadPoints  % QuadPoints
+  \common@LinkCode
+  /Subtype /Link
+  /ANN pdfmark}}%
+  \to@insertStrucTabOrder{Link}\endgroup
+  \dl@restorespcs
 }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -4315,83 +4539,88 @@
 %    \begin{macrocode}
 \def\eq@choice@driver
 {%
-    \Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \hbox{\pdfstartlink user{\common@choiceCode}%
-    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
-    \HyField@AddToFields
-    \endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \hbox{\pdfstartlink user{\common@choiceCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@Button@driver
 {%
-    \Hy@pdfstringtrue
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-    \hbox{\pdfstartlink user{\common@pushButtonCode}%
-    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
-    \endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \hbox{\pdfstartlink user{\common@pushButtonCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@RadioCheck@driver
 {%
-    \Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-    \hbox{\pdfstartlink user{\common@RadioCheckCode}%
-    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
-    \endgroup
-    \dl@restorespcs
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \hbox{\pdfstartlink user{\common@RadioCheckCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
-    \pdfstartlink user{\common@RadioCheckCode}%
-    \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
-    \pdfendlink\endgroup
-    \dl@restorespcs
+  \pdfstartlink user{\common@RadioCheckCode}%
+  \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
+  \pdfendlink\endgroup
+  \dl@restorespcs
 }
 \def\eq@TextField{\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \leavevmode
-    \hbox{\pdfstartlink user{\common@TextFieldCode}%
-    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
-    \HyField@AddToFields
-    \endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \leavevmode
+  \hbox{\pdfstartlink user{\common@TextFieldCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@SigField{\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
-    \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
-    \endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \endgroup
+  \dl@restorespcs
 }
 \def\setLink@driver
 {%
-    \@eqBS{}%
-    \leavevmode\pdfstartlink
-    attr {\eq@Border}%
-    user{/Subtype/Link \common@LinkCode}%
-    \Hy@colorlink{\@linkcolor}\link@@Box
-    \close@pdflink
-    \endgroup
-    \dl@restorespcs
+  \@eqBS{}%
+  \leavevmode\pdfstartlink
+  attr {\eq@Border}%
+  user{/Subtype/Link \common@LinkCode}%
+  \Hy@colorlink{\@linkcolor}\link@@Box
+  \close@pdflink
+  \endgroup
+  \dl@restorespcs
 }
 \def\ef@setTabOrder{\ifx\ef@taborder\@empty\else
-    \edef\ef@tmp@toks{\the\pdfpageattr\space/Tabs/\ef@taborder}%
-    \global\pdfpageattr=\expandafter{\ef@tmp@toks}%
-    \fi\endgroup
+  \edef\ef@tmp@toks{\the\pdfpageattr\space/Tabs/\ef@taborder}%
+  \global\pdfpageattr=\expandafter{\ef@tmp@toks}%
+  \fi\endgroup
 }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -4413,46 +4642,49 @@
 %    \begin{macrocode}
 \def\eq@choice@driver{\ef@adjHWxetex
     \Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \leavevmode\setbox\pdfm@box=%
-        \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
-    <<\common@choiceCode>>}\unhbox\pdfm@box\relax%
-    \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
-    \ifisCalculate\@pdfm@mark{put @corder @\Fld@name}\fi
-    \dl@restorespcs
-    \endgroup
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \leavevmode\setbox\pdfm@box=%
+      \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
+  <<\common@choiceCode>>}\unhbox\pdfm@box\relax%
+  \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
+  \ifisCalculate\@pdfm@mark{put @corder @\Fld@name}\fi
+  \dl@restorespcs
+  \endgroup
 }
 %    \end{macrocode}
 % (2013/06/09) xelatex apparently includes the boundary in its width and height
 % calculations. So we must too.
 %    \begin{macrocode}
 \def\eq@Button@driver{\Hy@pdfstringtrue
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi % 12/22
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \setbox\pdfm@box=%
-        \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
-    << \common@pushButtonCode >>}\unhbox\pdfm@box\relax%
-    \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
-    \endgroup
-    \dl@restorespcs
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\ef@djXPD\fi
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \setbox\pdfm@box=%
+      \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
+  << \common@pushButtonCode >>}\unhbox\pdfm@box\relax%
+  \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@RadioCheck@driver{\ef@adjHWxetex\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-    \setbox\pdfm@box=%
-        \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \@pdfm@mark{ann \dvipdfm@setdim
-    <<\common@RadioCheckCode>>}\unhbox\pdfm@box\relax%
-    \endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \setbox\pdfm@box=%
+    \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \@pdfm@mark{ann \dvipdfm@setdim
+  <<\common@RadioCheckCode>>}\unhbox\pdfm@box\relax%
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@l@check@driver{%
     \setbox\pdfm@box=%
@@ -4461,41 +4693,43 @@
         \unhbox\pdfm@box\relax\endgroup
 }
 \def\eq@TextField{\ef@adjHWxetex\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \leavevmode\setbox\pdfm@box=%
-        \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
-        << \common@TextFieldCode >>}\unhbox\pdfm@box\relax%
-    \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
-    \ifisCalculate\@pdfm@mark{put @corder @\Fld@name}\fi
-    \endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \leavevmode\setbox\pdfm@box=%
+    \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
+    << \common@TextFieldCode >>}\unhbox\pdfm@box\relax%
+  \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
+  \ifisCalculate\@pdfm@mark{put @corder @\Fld@name}\fi
+  \endgroup
+  \dl@restorespcs
 }
 \def\eq@SigField{\ef@adjHWxetex\Hy@pdfstringtrue
-    \if\@vertRotate1\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
-        \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
-    \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
-    \leavevmode\setbox\pdfm@box=%
-        \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-    \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
-        << \common@SigFieldCode >>}\unhbox\pdfm@box\relax%
-    \endgroup
-    \dl@restorespcs
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \leavevmode\setbox\pdfm@box=%
+    \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
+    << \common@SigFieldCode >>}\unhbox\pdfm@box\relax%
+  \endgroup
+  \dl@restorespcs
 }
 \def\setLink@driver{%
-    \@eqBS{}\leavevmode
-    \@pdfm@mark{bann
-        <</Subtype/Link\eq@Border\common@LinkCode>>}%
-        \Hy@colorlink{\@linkcolor}\link@@Box\Hy@endcolorlink
-    \@pdfm@mark{eann}%
-    \endgroup
-    \dl@restorespcs
+  \@eqBS{}\leavevmode
+  \@pdfm@mark{bann
+    <</Subtype/Link\eq@Border\common@LinkCode>>}%
+    \Hy@colorlink{\@linkcolor}\link@@Box\Hy@endcolorlink
+  \@pdfm@mark{eann}%
+  \endgroup
+  \dl@restorespcs
 }
 \def\ef@setTabOrder{\ifx\ef@taborder\@empty\else
-    \@pdfm@mark{ put @thispage << /Tabs/\ef@taborder >> }%
-    \fi\endgroup
+  \@pdfm@mark{ put @thispage << /Tabs/\ef@taborder >> }%
+  \fi\endgroup
 }
 %</edvipdfm>
 %    \end{macrocode}

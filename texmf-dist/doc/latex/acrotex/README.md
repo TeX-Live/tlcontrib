@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2019-03-16
+Dated: 2019-05-24
 
 AeB contains the following:
 
@@ -18,6 +18,10 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2019-05-24) Added the enhanced preview feature. When in effect along with
+ordinary preview, captions of buttons and initial values of other fields are viewable 
+in non-conforming PDF readers.
 
 What's New (2019/03/16) minor bug fixes; added \bParams/\eParams command pair to pass
 arguments to JS code snippets declared within the defineJS environment. Fixed the spacing

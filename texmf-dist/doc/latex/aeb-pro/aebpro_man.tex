@@ -36,7 +36,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for {\AEBP} from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={v2.9b, 2018/02/17},
+    version={2.9.5, 2019/03/21},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -101,7 +101,7 @@
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
-\let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent} %\leftmargini
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
 \def\nhnameref#1{\bNH\nameref{#1}\eNH}
 \def\nhNameref#1{\bNH\Nameref{#1}\eNH}
@@ -204,7 +204,7 @@ on this documentation. \verb!:-{)!
 
 \begin{flushright}
 Dr. D. P. Story\\[3pt]
-January 20, 2016
+\today
 \end{flushright}
 
 
@@ -1152,10 +1152,9 @@ behave as desired, while the document author can use the above environments to a
 additional scripts.
 
 The correct way of using these commands is
-
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \begin{defineJS}{\my@WillClose}
-    !anglemeta(some willClose script)
+!quad!anglemeta(some willClose script)
 \end{defineJS}
 \let\my@save@developer@will@Close\developer@will@Close
 \def\developer@will@Close{%
@@ -2529,7 +2528,6 @@ button appearances of the buttons used to control the button animation.
     names of the anima created by \cs{btnAnima} that will be using these
     appearance icons.
 \end{description}
-
 \textbf{Example:}
 \settowidth{\aebdimen}{\ttfamily\string\placeAnimeCtrlBtnFaces\darg{btn\_anime\_icons1.pdf}\darg{myclock,mysine}}%
 \begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
@@ -2779,7 +2777,7 @@ left and right braces, and double quotes, or using unicode above
 00FF (Basic Latin + Latin-1). To illustrate, suppose we wish the
 description of \texttt{cooltarget} to be
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-    "$|e^{\ln(17)}|$"
+"$|e^{\ln(17)}|$"
 \end{Verbatim}
 All the bad characters!
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
@@ -2881,11 +2879,11 @@ preset      &\anglemeta{\cs{presetCommand}}
 page~\pageref*{declarations}. In the simplest case, we jump from the parent to the first page of a
 child file given by$\dots$
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-    \ahyperref{attach1}{target1.pdf}
+\ahyperref{attach1}{target1.pdf}
 \end{Verbatim}
 This is the same as
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-    \ahyperref[goto=p2c]{attach1}{target1.pdf}
+\ahyperref[goto=p2c]{attach1}{target1.pdf}
 \end{Verbatim}
 The \texttt{goto} key is one of the key-value pairs taken by the
 optional argument. Permissible values for the \texttt{goto} key are
@@ -2895,8 +2893,8 @@ optional argument. Permissible values for the \texttt{goto} key are
 \Ex{} We assume the declarations as given in \hyperref[declarations]{Example~\ref*{declarations}},
 page~\pageref*{declarations}. Similarly, link to the other embedded files in this parent:
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-    \ahyperref{attach2}{target2.pdf}
-    \ahyperref{cooltarget}{aebpro\_ex2.pdf}
+\ahyperref{attach2}{target2.pdf}
+\ahyperref{cooltarget}{aebpro\_ex2.pdf}
 \end{Verbatim}
 
 In all cases above, the \cs{ahyperlink} command could have been

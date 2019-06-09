@@ -1,6 +1,6 @@
 The AeB Pro Package
 Author: D. P. Story
-Dated: 2018-02-17
+Dated: 2019-03-21
 
 The AeB Pro Package complements and extends AcroTeX eDucation Bundle.
 
@@ -37,6 +37,10 @@ me at dpstory@uakron.edu or dpstory@acrotex.net
 The AcroTeX Blog (http://blog.acrotex.net/) lists the distribution files at
 http://www.acrotex.net/blog/?page_id=835, all demo files that use AeB Pro
 are listed at http://www.acrotex.net/blog/?tag=aeb-pro.
+
+What's New (2019/03/21) This new version requires aeb-comment 
+(version 3.2 of the comment package). Changed the order of 
+loading of the insdljs package. 
 
 What's New (2018-02-17) Added a star-option to \texHelp, added demo files to 
 illustrate rollover animation techniques (http://www.acrotex.net/blog/?tag=rollovers). 

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2018  D. P. Story                %%
+%% Copyright (C) 2006--2019  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{aeb_pro}
- [2018/02/17 v2.9b aeb_pro: A support package (dps)]
+ [2019/03/21 v2.9.5 aeb_pro: A support package (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{xkeyval}
@@ -260,14 +260,14 @@
 {%
     \@ifundefined{aeb@dljslib@opts}{}{\ap@RP{dljslib}}%
 }
-\@ifpackageloaded{insdljs}{\let\execjs\aebp@YES}
-{%
-    \ap@RP[execJS]{insdljs}[2016/07/31]% incls conv-xkv
-}
 \@ifpackageloaded{eforms}{\let\execjs\aebp@YES}
 {%
     \@ifundefined{aeb@eforms@opts}{}
     {\ap@RP[execJS]{eforms}[2017/01/03]}%
+}
+\@ifpackageloaded{insdljs}{\let\execjs\aebp@YES}
+{%
+    \ap@RP[execJS]{insdljs}[2016/07/31]% incls conv-xkv
 }
 \@ifpackageloaded{aebxmp}{\aebp@PkgWarningi{aebxmp}}
 {%
@@ -292,7 +292,7 @@
         \noexpand\aebp@PkgWarningii{rmannot}\fi}\temp@exp}
 }
 \let\execjs\aebp@YES
-\RequirePackage{comment}
+\RequirePackage{aeb-comment}
 \RequirePackage{calc}
 \RequirePackage{eso-pic}
 \ifx\aeb@InputUnicodes\@empty\else\expandafter

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2018  D. P. Story                %%
+%% Copyright (C) 2006--2019  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -77,28 +77,29 @@ function getLayerState(name) {
 \end{insDLJS}
 \newcommand{\texHelpIndicatorColor}{webblue}
 \newcommand{\texHelpIndicator}[1]{#1\thinspace${}^{\mbox
-    {\footnotesize\negthinspace\ding{109}}\raisebox{.225ex}
-    {\llap{\color{\texHelpIndicatorColor}%
-    \tiny?\hspace{1.3ex}}}}$}
+  {\footnotesize\negthinspace\ding{109}}\raisebox{.225ex}
+  {\llap{\color{\texHelpIndicatorColor}%
+  \tiny?\hspace{1.3ex}}}}$}
 \newcommand{\addJStexHelpEnter}[1]{\def\aebp@addJStexHelpEnter{\r#1}}
 \newcommand{\addJStexHelpExit}[1]{\def\aebp@addJStexHelpExit{\r#1}}
 \newcommand{\resetaddJStexHelp}{%
-    \let\aebp@addJStexHelpEnter\@empty
-    \let\aebp@addJStexHelpExit\@empty
+  \let\aebp@addJStexHelpEnter\@empty
+  \let\aebp@addJStexHelpExit\@empty
 }
 \resetaddJStexHelp
 \newif\iftexhelptoggleOff \texhelptoggleOfftrue
 \newcommand{\texHelp}{\@ifstar{\texhelptoggleOfffalse\texHelp@i}
   {\texhelptoggleOfftrue\texHelp@i}}
 \newcommand{\texHelp@i}[2]{%
-    \let\rollormargstring\texorpdfstring
-    \sbox{\aebsavehelp}{\texHelpIndicator{#2}}%
-    \makebox[0pt][l]{\pushButton[\S{S}\BG{}\BC{}\H{N}
-    \AA{\AAMouseEnter{\JS{toggleHelp("#1");\aebp@addJStexHelpEnter}}%
-    \AAMouseExit{\JS{\iftexhelptoggleOff toggleHelp("#1");\fi\aebp@addJStexHelpExit}}}]{#1}%
-        {\wd\aebsavehelp}{\ht\aebsavehelp+\dp\aebsavehelp}}%
-    \usebox{\aebsavehelp}\resetaddJStexHelp
-    \let\rollormargstring\@gobbletwo
+  \let\rollormargstring\texorpdfstring
+  \sbox{\aebsavehelp}{\texHelpIndicator{#2}}%
+  \makebox[0pt][l]{\pushButton[\S{S}\BG{}\BC{}\H{N}
+  \AA{\AAMouseEnter{\JS{toggleHelp("#1");\aebp@addJStexHelpEnter}}%
+  \AAMouseExit{\JS{\iftexhelptoggleOff toggleHelp("#1");\fi
+  \aebp@addJStexHelpExit}}}]{#1}%
+    {\wd\aebsavehelp}{\ht\aebsavehelp+\dp\aebsavehelp}}%
+  \usebox{\aebsavehelp}\resetaddJStexHelp
+  \let\rollormargstring\@gobbletwo
 }
 \newif\ifaeb@SimpleOCOn \aeb@SimpleOCOnfalse
 \newcommand{\@SOC}[2][false]{\global\aeb@SimpleOCOntrue%
@@ -128,38 +129,38 @@ function getLayerState(name) {
 \MessageBreak The problem occurs}\ocOff}
 \newif\ifAEBP@aebpxBld@print \AEBP@aebpxBld@printfalse
 \define@choicekey+{aebpxBld}{print}[\val\nr]{true,false,%
-    visible,always,never}[visible]{%
-        \ifcase\nr\relax
-            \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
-            \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\or
-            \let\aebpxBld@print\@empty\or
-            \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
-            \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\fi
+  visible,always,never}[visible]{%
+  \ifcase\nr\relax
+    \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
+    \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\or
+    \let\aebpxBld@print\@empty\or
+    \def\aebpxBld@print{true}\AEBP@aebpxBld@printtrue\or
+    \def\aebpxBld@print{false}\AEBP@aebpxBld@printfalse\fi
 }{\PackageWarning{aeb_pro}{Bad choice for initState, permissible values
-   are true, false, visible, always, and never. Try again}}
+  are true, false, visible, always, and never. Try again}}
 \let\aebpxBld@print\@empty
 \define@key{aebpxBld}{true}[true]{\def\aebpxBld@visible{#1}}
 \define@key{aebpxBld}{false}[false]{\def\aebpxBld@visible{#1}}
 \define@choicekey+{aebpxBld}{initState}[\val\nr]{on,off,%
-    true,false}[false]{%
-    \ifcase\nr\relax
-        \def\aebpxBld@visible{true}\or
-        \def\aebpxBld@visible{false}\or
-        \def\aebpxBld@visible{true}\or
-        \def\aebpxBld@visible{false}\fi
+  true,false}[false]{%
+  \ifcase\nr\relax
+    \def\aebpxBld@visible{true}\or
+    \def\aebpxBld@visible{false}\or
+    \def\aebpxBld@visible{true}\or
+    \def\aebpxBld@visible{false}\fi
 }{\PackageWarning{aeb_pro}{Bad choice for initState, permissible values
-   are on, off, true and false. Try again}}
+  are on, off, true and false. Try again}}
 \long\def\defineRC#1#2{\csarg\def{RC#1}{#2}}
 \def\insertRC#1{\@nameuse{RC#1}}
 \long\def\definePR#1#2{%
-    \ifeqforpaper\csarg\def{PR#1}{#2}\else
-    \ifeq@proofing\csarg\def{PR#1}{#2}\else
-    \csarg\let{PR#1}\relax\fi\fi
+  \ifeqforpaper\csarg\def{PR#1}{#2}\else
+  \ifeq@proofing\csarg\def{PR#1}{#2}\else
+  \csarg\let{PR#1}\relax\fi\fi
 }
 \def\insertPR#1{%
-    \ifeq@proofing\@nameuse{PR#1}\else
-    \csarg\let{insertPR}\@gobble\fi
-    \csarg\let{PR#1}\relax
+  \ifeq@proofing\@nameuse{PR#1}\else
+  \csarg\let{insertPR}\@gobble\fi
+  \csarg\let{PR#1}\relax
 }
 \@ifundefined{ifeqforpaper}{\newif\ifeqforpaper \eqforpaperfalse}{}
 \@ifundefined{ifeq@proofing}{\newif\ifeq@proofing \eq@proofingfalse}{}

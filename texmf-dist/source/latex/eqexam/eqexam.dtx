@@ -16,8 +16,8 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2018/12/13 v5.1.3 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2018/12/13}
+%<package>  [2019/01/31 v5.1.4 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2019/02/11}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -939,8 +939,11 @@
 % Bring the \texttt{comment} package in early, before \texttt{verbatim}, these two
 % clash a bit.
 % \changes{v5.1.2}{2018/12/05}{Use version 3.2 of comment style under the name of aeb-comment}
+% \changes{v5.1.4}{2019/01/31}{\string\cs{let} \string\cs{comment} and \string\cs{endcomment} to \string\cs{relax}
+% we use the definition of the comment environment given in \string\pkg{verbatim}.}
 %    \begin{macrocode}
 \RequirePackage{aeb-comment}
+%\let\comment\relax\let\endcomment\relax
 \def\eqe@commentChkMsg{\@ifpackageloaded{comment}
   {\PackageWarningNoLine{eqexam}
     {The comment package is incompatible with the\MessageBreak
@@ -1019,6 +1022,12 @@
 % Here, I input the \texttt{verbatim} package after the comment package.
 %    \begin{macrocode}
 \RequirePackage{verbatim}
+\@ifundefined{dlcomment}{\typeout{!! defining dlcomment}%
+  \let\dlcomment\comment
+  \let\enddlcomment\endcomment
+  \let\eqSavedComment\dlcomment
+  \let\endeqSavedComment\enddlcomment
+}{}
 %    \end{macrocode}
 % When constructing paper tests, I often use a multi-column format for some of
 % the questions, so let's require this package
@@ -7020,7 +7029,7 @@
   \def\eqe@flnexti{\eqSavedComment}%
   \ifeqe@flnosolns\ifdisplayworkarea
     \def\eqe@flnexti{\fl@getcontent{p\fl@CutName}}\fi\fi % dpsj21
-  \gdef\eqe@flnextii{\eqSavedEndCommet}%
+  \gdef\eqe@flnextii{\endeqSavedComment}%dps11
   \ifeqe@flnosolns\ifdisplayworkarea
     \gdef\eqe@flnextii{\endverbatimwrite\endgroup
     \ifwithinparts\ifx\istabularexer\eq@YES

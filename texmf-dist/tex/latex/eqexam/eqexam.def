@@ -7,7 +7,7 @@
 %% exerquiz.dtx  (with options: `eqexam')
 %% 
 \ProvidesFile{eqexam.def}
- [2018/12/13 v8.2.8 %
+ [2019/02/11 v8.2.9 %
   Exerquiz support file for eqexam (dps)]
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
@@ -515,8 +515,8 @@
     \xdef\eq@startSoln{\the\pagetotal}%
     \eqe@debugVertSkip{\marginpar{\smash{b[\sameVspace]}}}%
 }
-\let\eqSavedComment\comment
-\let\eqSavedEndCommet\endcomment
+\let\eqSavedComment\dlcomment
+\let\endeqSavedComment\enddlcomment
 \def\setTabulrSolnEnv{%
     \@ifundefined{@listii@SAVE}{\global\let\@listii@SAVE\@listii}{}%
     \expandafter\def\expandafter\@listii\expandafter{\@listii@SAVE
@@ -548,13 +548,13 @@
   \if\currhideopt\eq@Hid
     \let\minVspacet@bs\@empty
     \let\procsoln\eqSavedComment
-    \let\endprocsoln\eqSavedEndCommet
+    \let\endprocsoln\endeqSavedComment
     \def\eq@next{\procsoln}%
   \else
     \eq@ckglobalhide
     \ifeq@hidesolution
       \let\procsoln\eqSavedComment
-      \let\endprocsoln\eqSavedEndCommet
+      \let\endprocsoln\endeqSavedComment
     \else
       \ifeq@solutionsafter\else
           \ifx\eq@@CommonCmd\@empty\else

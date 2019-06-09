@@ -150,7 +150,7 @@ part of the\texorpdfstring{\\}{ }\texorpdfstring{\AcroTeX}{AcroTeX} eDucation Bu
 \keywords{LaTeX, hyperref, PDF, exercises, quizzes}
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
-\version{5.1.3, 2018/12/13}
+\version{5.1.4, 2019/01/31} % 2019/01/31 v5.1.4
 \copyrightyears{2005-\the\year}
 
 \renewcommand{\exsectitletext}{Solutions to exams in this manual}
@@ -387,8 +387,10 @@ distribution are \emph{required}:
 \item \texttt{pifont}: Used when the \texttt{proofread} option is
     used to indicate the correct answers to multiple choice questions.
 
-\item \texttt{comment}: Used to have optional content, useful for
-    developing exams for multiple sections of the same class.
+\item \texttt{aeb-comment}: Used to have optional content, useful for
+    developing exams for multiple sections of the same class.\footnote{\pkg{aeb-comment}
+    is an older version of the \pkg{comment} package by Victor Eijkhout; it is distributed
+    with the \pkg{acrotex} package.}
 
 \item \texttt{multicol}: Used to create questions in multi-column mode.
 
@@ -1896,7 +1898,7 @@ This is a question worth $7$ points.
 \end{panel}
 \begin{solution}
 This a really good  solution. I hope this solution is correct or I
-will be total embarrassed to no end. Even if it is wrong, maybe
+will be totally embarrassed to no end. Even if it is wrong, maybe
 the students will appreciate my tremendous effort. You can see
 from the figure that the solution is obvious.
 \end{solution}
@@ -2334,22 +2336,26 @@ of these last two options.
 driver needs to be specified as well, the choices are\dots
 
 \begin{description}
-\item[\texttt{dvipsone}] For users of the
-    {Y\!{\footnotesize\&}\!Y\TeX} System, such as myself.
 
 \item[\texttt{dvips}] For users of \textsf{dvips}, the
     dvi-to-postscript converter.
 
-\item[\texttt{pdftex}] For users of \textsf{pdftex} application.
+% \item[\texttt{pdftex}] For users of \textsf{pdftex} application.
 
-\item[\texttt{dvipdfm}] For users of \textsf{dvipdfm} application.
+% \item[\texttt{dvipdfm}] For users of \textsf{dvipdfm} application.
 
-\item[\texttt{textures}] For \textsf{textures} users. (This
-option is totally untested.)
+\item[\texttt{dvipsone}] For users of the
+    {Y\!{\footnotesize\&}\!Y\TeX} System, such as myself.
+
+%\item[\texttt{textures}] For \textsf{textures} users. (This
+%  option is totally untested.)
 \end{description}
-\noindent These options are passed on to \textsf{hyperref} and to
-\texttt{eforms}\footnote{A component of \AcroB.} for the proper
-creation of links and form fields.
+The drivers \app{pdftex}, \app{luatex}, and \app{xetex} are automatically detected and need not
+be specified as a driver option.
+
+The driver names are passed on to \pkg{hyperref} and to
+\pkg{eforms}\footnote{A component of \AcroB.} for the proper creation of
+links and form fields.
 
 \subsection{Configuration Files}
 

@@ -19,8 +19,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eqexam}
-  [2018/12/13 v5.1.3 An Exam Construction Package (dps)]
-\def\eqexamdefReq{2018/12/13}
+  [2019/01/31 v5.1.4 An Exam Construction Package (dps)]
+\def\eqexamdefReq{2019/02/11}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \usepackage{xkeyval}
@@ -418,6 +418,12 @@
 \RequirePackage{pifont}
 \RequirePackage{array}
 \RequirePackage{verbatim}
+\@ifundefined{dlcomment}{\typeout{!! defining dlcomment}%
+  \let\dlcomment\comment
+  \let\enddlcomment\endcomment
+  \let\eqSavedComment\dlcomment
+  \let\endeqSavedComment\enddlcomment
+}{}
 \RequirePackage{multicol}
 \setlength\columnseprule{.4pt}
 \raggedcolumns\multicolsep=3pt

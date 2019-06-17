@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2016-2018 Norbert Preining
+# (c) 2016-2019 Norbert Preining
 # License: GPLv3+
 #
 # USAGE:

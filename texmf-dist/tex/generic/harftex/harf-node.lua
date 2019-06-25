@@ -60,6 +60,8 @@ local spaceskip        = 13
 local directmode       = 2
 local fontkern         = 0
 local italiccorrection = 3
+local explicitdisc     = 1
+local regulardisc      = 3
 
 local getscript    = hb.unicode.script
 local sc_common    = hb.Script.new("Zyyy")
@@ -141,6 +143,8 @@ local paired_close = {
 
 local process
 
+local trep = hb.texrep
+
 local function itemize(head, direction)
   -- Collect character properties (font, direction, script) and resolve common
   -- and inherited scripts. Pre-requisite for itemization into smaller runs.
@@ -165,7 +169,9 @@ local function itemize(head, direction)
       end
     elseif id == glueid and getsubtype(n) == spaceskip then
       code = 0x0020 -- SPACE
-    elseif id == discid then
+    elseif id == discid
+      and (getsubtype(n) == explicitdisc
+        or getsubtype(n) == regulardisc) then
       code = 0x00AD -- SOFT HYPHEN
     elseif id == dirid then
       local dir = getdir(n)
@@ -183,7 +189,17 @@ local function itemize(head, direction)
     end
 
     local fontdata = currfontid and font.getfont(currfontid)
-    local hbdata = fontdata and fontdata.hb
+    local hbdata   = fontdata and fontdata.hb
+    local spec     = hbdata and hbdata.spec
+    local options  = spec and spec.options
+    local texlig   = options and options.texlig
+    if texlig then
+      local replacement = trep[code]
+      if replacement then
+        code = replacement
+      end
+    end
+
     if not hbdata then skip = true end
 
     -- Resolve common and inherited scripts. Inherited takes the script of the
@@ -377,6 +393,10 @@ shape = function(run)
   buf:set_language(lang)
   buf:set_cluster_level(buf.CLUSTER_LEVEL_MONOTONE_CHARACTERS)
   buf:add_codepoints(codes, offset - 1, len)
+
+  local hscale = hbdata.hscale
+  local vscale = hbdata.vscale
+  hbfont:set_scale(hscale, vscale)
 
   if hb.shape_full(hbfont, buf, features, shapers) then
     -- LuaTeX wants the glyphs in logical order, so reverse RTL buffers.

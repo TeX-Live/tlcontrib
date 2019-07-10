@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2019-nonfree
-depend revision/207
+depend revision/213
 
 name 00texlive.installation
 category TLCore
@@ -1367,7 +1367,7 @@ catalogue-version 0.6
 
 name collection-contrib
 category Collection
-revision 200
+revision 212
 shortdesc tlcontrib packages
 longdesc collections of all packages in contrib.texlive.info
 depend acmtrans
@@ -1420,6 +1420,7 @@ depend lettergothic
 depend literaturnaya
 depend lmacs
 depend lsabon
+depend luahbtex
 depend lucidabr
 depend lucida-otf
 depend lucold
@@ -4559,6 +4560,87 @@ catalogue-license other-free
 catalogue-topics font-supp
 catalogue-version 1.1
 
+name luahbtex
+category Package
+revision 213
+depend luahbtex.ARCH
+execute AddFormat name=luahbtex engine=luahbtex options="-etex luatex.ini"   patterns=language.def,language.dat.lua
+execute AddFormat name=luahblatex engine=luahbtex options="-etex lualatex.ini"   patterns=language.dat,language.dat.lua
+execute AddFormat name=luajithbtex engine=luajithbtex options="-etex luatex.ini"   patterns=language.def,language.dat.lua
+execute AddFormat name=luajithblatex engine=luajithbtex options="-etex lualatex.ini"   patterns=language.dat,language.dat.lua
+
+name luahbtex.amd64-freebsd
+category Package
+revision 211
+shortdesc amd64-freebsd files of luahbtex
+binfiles arch=amd64-freebsd size=3897
+ bin/amd64-freebsd/luahblatex
+ bin/amd64-freebsd/luahbtex
+ bin/amd64-freebsd/luajithblatex
+ bin/amd64-freebsd/luajithbtex
+
+name luahbtex.armhf-linux
+category Package
+revision 211
+shortdesc armhf-linux files of luahbtex
+binfiles arch=armhf-linux size=3314
+ bin/armhf-linux/luahblatex
+ bin/armhf-linux/luahbtex
+ bin/armhf-linux/luajithblatex
+ bin/armhf-linux/luajithbtex
+
+name luahbtex.i386-freebsd
+category Package
+revision 211
+shortdesc i386-freebsd files of luahbtex
+binfiles arch=i386-freebsd size=3601
+ bin/i386-freebsd/luahblatex
+ bin/i386-freebsd/luahbtex
+ bin/i386-freebsd/luajithblatex
+ bin/i386-freebsd/luajithbtex
+
+name luahbtex.i386-linux
+category Package
+revision 211
+shortdesc i386-linux files of luahbtex
+binfiles arch=i386-linux size=4228
+ bin/i386-linux/luahblatex
+ bin/i386-linux/luahbtex
+ bin/i386-linux/luajithblatex
+ bin/i386-linux/luajithbtex
+
+name luahbtex.win32
+category Package
+revision 211
+shortdesc win32 files of luahbtex
+binfiles arch=win32 size=3041
+ bin/win32/luahblatex.exe
+ bin/win32/luahbtex.dll
+ bin/win32/luahbtex.exe
+ bin/win32/luajithblatex.exe
+ bin/win32/luajithbtex.dll
+ bin/win32/luajithbtex.exe
+
+name luahbtex.x86_64-darwinlegacy
+category Package
+revision 211
+shortdesc x86_64-darwinlegacy files of luahbtex
+binfiles arch=x86_64-darwinlegacy size=3342
+ bin/x86_64-darwinlegacy/luahblatex
+ bin/x86_64-darwinlegacy/luahbtex
+ bin/x86_64-darwinlegacy/luajithblatex
+ bin/x86_64-darwinlegacy/luajithbtex
+
+name luahbtex.x86_64-linux
+category Package
+revision 211
+shortdesc x86_64-linux files of luahbtex
+binfiles arch=x86_64-linux size=4087
+ bin/x86_64-linux/luahblatex
+ bin/x86_64-linux/luahbtex
+ bin/x86_64-linux/luajithblatex
+ bin/x86_64-linux/luajithbtex
+
 name lucida-otf
 category Package
 revision 101
@@ -4630,7 +4712,7 @@ longdesc mode, or all digits in text and math mode. It works both for
 longdesc normal weight and boldface text and math; since the boldface
 longdesc old-style digits are in the Lucida Expert font set, you need it
 longdesc for the boldface digits. Includes a set of AWK programs used to
-longdesc automatically build fd, tfm and vf files from the existing
+longdesc automatically build .fd, .tfm, and .vf files from the existing
 longdesc Lucida PSNFSS distribution, and that may easily changed for the
 longdesc generation of different virtual files for whatever font.
 docfiles size=8
@@ -4658,7 +4740,7 @@ runfiles size=11
  texmf-dist/tex/latex/lucold/t1hlos.fd
 catalogue-also lucida psnfssx-luc
 catalogue-ctan /macros/latex/contrib/lucold
-catalogue-date 2016-06-24 19:18:15 +0200
+catalogue-date 2019-07-06 17:48:18 +0200
 catalogue-license gpl
 catalogue-topics font-supp
 
@@ -5624,10 +5706,10 @@ runfiles size=24
  texmf-dist/fonts/type1/public/webomints/WebOMintsGD.pfb
  texmf-dist/tex/latex/webomints/uwebo.fd
 catalogue-ctan /fonts/webomints
-catalogue-date 2016-06-24 19:18:15 +0200
-catalogue-license pd
+catalogue-date 2019-07-08 08:00:20 +0200
+catalogue-license other-nonfree
 catalogue-topics font font-type1 font-decor
-catalogue-version 1.1
+catalogue-version 1.1c
 
 name yt4pdf
 category Package

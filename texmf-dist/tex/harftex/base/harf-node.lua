@@ -1,3 +1,12 @@
+local module = {
+  name        = "harf-node",
+  description = "Harf text shaping",
+  version     = "0.4.2",
+  date        = "2019-09-07",
+  license     = "GPL v2.0"
+}
+luatexbase.provides_module(module)
+
 local hb = require("harf-base")
 
 local assert            = assert
@@ -72,12 +81,11 @@ local whatsit_t         = node.id("whatsit")
 local pdfliteral_t      = node.subtype("pdf_literal")
 local pdfcolorstack_t   = node.subtype("pdf_colorstack")
 
-local spaceskip         = 13
-local directmode        = 2
-local fontkern          = 0
-local italiccorrection  = 3
-local explicitdisc      = 1
-local regulardisc       = 3
+local explicitdisc_t    = 1
+local fontkern_t        = 0
+local italiccorr_t      = 3
+local regulardisc_t     = 3
+local spaceskip_t       = 13
 
 local getscript         = hb.unicode.script
 
@@ -197,11 +205,11 @@ local function itemize(head, direction)
         code = getchar(n)
         script = getscript(code)
       end
-    elseif id == glue_t and getsubtype(n) == spaceskip then
+    elseif id == glue_t and getsubtype(n) == spaceskip_t then
       code = 0x0020 -- SPACE
     elseif id == disc_t
-      and (getsubtype(n) == explicitdisc  -- \-
-        or getsubtype(n) == regulardisc)  -- \discretionary
+      and (getsubtype(n) == explicitdisc_t  -- \-
+        or getsubtype(n) == regulardisc_t)  -- \discretionary
     then
       code = 0x00AD -- SOFT HYPHEN
     elseif id == dir_t then
@@ -221,8 +229,7 @@ local function itemize(head, direction)
 
     local fontdata = currfontid and font.getfont(currfontid)
     local hbdata   = fontdata and fontdata.hb
-    local spec     = hbdata and hbdata.spec
-    local options  = spec and spec.options
+    local options  = hbdata and hbdata.options
     local texlig   = options and options.texlig
     if texlig then
       local replacement = trep[code]
@@ -255,9 +262,7 @@ local function itemize(head, direction)
     -- If script is not resolved yet, and the font has a "script" option, use
     -- it.
     if (script == common_s or script == inherited_s) and hbdata then
-      local spec = hbdata.spec
-      local features = spec.features
-      local options = spec.options
+      local options = hbdata.options
       script = options.script and hb.Script.new(options.script) or script
     end
 
@@ -407,10 +412,9 @@ shape = function(run)
 
   local fontdata = font.getfont(fontid)
   local hbdata = fontdata.hb
+  local features = hbdata.features
+  local options = hbdata.options
   local palette = hbdata.palette
-  local spec = hbdata.spec
-  local features = spec.features
-  local options = spec.options
   local hbshared = hbdata.shared
   local hbfont = hbshared.font
   local hbface = hbshared.face
@@ -737,7 +741,7 @@ local function tonodes(head, current, run, glyphs, color)
             setprop(n, endactual_p, true)
           end
         end
-      elseif id == glue_t and getsubtype(n) == spaceskip then
+      elseif id == glue_t and getsubtype(n) == spaceskip_t then
         -- If the glyph advance is different from the font space, then a
         -- substitution or positioning was applied to the space glyph changing
         -- it from the default, so reset the glue using the new advance.
@@ -750,7 +754,7 @@ local function tonodes(head, current, run, glyphs, color)
           setfield(n, "shrink", width / 3)
         end
         head, current = insertafter(head, current, n)
-      elseif id == kern_t and getsubtype(n) == italiccorrection then
+      elseif id == kern_t and getsubtype(n) == italiccorr_t then
         -- If this is an italic correction node and the previous node is a
         -- glyph, update its kern value with the glyph’s italic correction.
         -- I’d have expected the engine to do this, but apparently it doesn’t.
@@ -776,7 +780,7 @@ local function tonodes(head, current, run, glyphs, color)
         -- the other discretionary handling, otherwise the discretionary
         -- contents do not interact with the surrounding (e.g. no ligatures or
         -- kerning) as it should.
-        if current and getid(current) == kern_t and getsubtype(current) == fontkern then
+        if current and getid(current) == kern_t and getsubtype(current) == fontkern_t then
           setprev(current, nil)
           setnext(current, nil)
           setfield(n, "replace", current)
@@ -829,7 +833,7 @@ local function shape_run(head, current, run)
     -- shaping.
     local fontid = run.font
     local fontdata = font.getfont(fontid)
-    local options = fontdata.hb.spec.options
+    local options = fontdata.hb.options
     local color = options and options.color and hex_to_rgba(options.color)
 
     local glyphs = shape(run)
@@ -880,7 +884,7 @@ end
 
 local function pdfdirect(data)
   local n = newnode(whatsit_t, pdfliteral_t)
-  setfield(n, "mode", directmode)
+  setfield(n, "mode", 2) -- direct
   setdata(n, data)
   return n
 end

@@ -1,3 +1,12 @@
+local module = {
+  name        = "harf-load",
+  description = "Harf font loading",
+  version     = "0.4.2",
+  date        = "2019-09-07",
+  license     = "GPL v2.0"
+}
+luatexbase.provides_module(module)
+
 local hb = require("harf-base")
 
 local hbfonts = hb.fonts
@@ -9,73 +18,20 @@ local os2tag  = hb.Tag.new("OS/2")
 local posttag = hb.Tag.new("post")
 local glyftag = hb.Tag.new("glyf")
 
-local function trim(str)
-  return str:gsub("^%s*(.-)%s*$", "%1")
-end
-
-local function split(str, sep)
-  if str then
-    local result = string.explode(str, sep.."+")
-    for i, s in next, result do
-      result[i] = trim(result[i])
-    end
-    return result
-  end
-end
-
-local function parse(str, size)
-  local name, options = str:match("%s*(.*)%s*:%s*(.*)%s*")
-  local spec = {
-    specification = str,
-    size = size,
-    variants = {}, features = {}, options = {},
-  }
-
-  name = trim(name or str)
-
-  local filename = name:match("%[(.*)%]")
-  if filename then
-    -- [file]
-    -- [file:index]
-    filename = string.explode(filename, ":+")
-    spec.file = filename[1]
-    spec.index = tonumber(filename[2]) or 0
-  else
-    -- name
-    -- name/variants
-    local fontname, variants = name:match("(.-)%s*/%s*(.*)")
-    spec.name = fontname or name
-    spec.variants = split(variants, "/")
-  end
-  if options then
-    options = split(options, ";+")
-    for _, opt in next, options do
-      if opt:find("[+-]") == 1 then
-        local feature = hb.Feature.new(opt)
-        spec.features[#spec.features + 1] = feature
-      elseif opt ~= "" then
-        local key, val = opt:match("(.*)%s*=%s*(.*)")
-        if key == "language" then val = hb.Language.new(val) end
-        spec.options[key or opt] = val or true
-      end
-    end
-  end
-  return spec
-end
-
 local function loadfont(spec)
-  local path, index = spec.path, spec.index
+  local path = spec.resolved or spec.name
   if not path then
     return nil
   end
 
+  local index = spec.sub and spec.sub or 1
   local key = string.format("%s:%d", path, index)
   local data = hbfonts[key]
   if data then
     return data
   end
 
-  local hbface = hb.Face.new(path, index)
+  local hbface = hb.Face.new(path, index - 1)
   local tags = hbface and hbface:get_table_tags()
   -- If the face has no table tags then it isn’t a valid SFNT font that
   -- HarfBuzz can handle.
@@ -237,7 +193,6 @@ local tlig = hb.texlig
 
 local function scalefont(data, spec)
   local size = spec.size
-  local options = spec.options
   local hbface = data.face
   local hbfont = data.font
   local upem = data.upem
@@ -245,6 +200,32 @@ local function scalefont(data, spec)
 
   if size < 0 then
     size = -655.36 * size
+  end
+
+  -- Extract features (that we pass to HarfBuzz) from the rest of the options.
+  -- Mostly a heuristic.
+  local features = {}
+  local options = {}
+  local rawfeatures = spec.features and spec.features.raw or {}
+  for key, val in next, rawfeatures do
+    if key == "language" then val = hb.Language.new(val) end
+    if key == "colr" then key = "palette" end
+    if key == "tlig" then key = "texlig" end
+    if key:len() == 4 then
+      -- 4-letter options are likely font features, but not always, so we do
+      -- some checks below. We put non feature options in the `options` dict.
+      if val == true or val == false then
+        val = (val and '+' or '-')..key
+        features[#features + 1] = hb.Feature.new(val)
+      elseif tonumber(val) then
+        val = '+'..key..'='..tonumber(val) - 1
+        features[#features + 1] = hb.Feature.new(val)
+      else
+        options[key] = val
+      end
+    else
+      options[key] = val
+    end
   end
 
   -- We shape in font units (at UPEM) and then scale output with the desired
@@ -331,11 +312,11 @@ local function scalefont(data, spec)
 
   return {
     name = spec.specification,
-    filename = spec.path,
+    filename = spec.resolved or spec.name,
     designsize = size,
     psname = sanitize(data.psname),
     fullname = data.fullname,
-    index = spec.index,
+    index = (spec.sub and spec.sub or 1) - 1,
     size = size,
     units_per_em = upem,
     type = "real",
@@ -361,7 +342,8 @@ local function scalefont(data, spec)
     },
     hb = {
       scale = scale,
-      spec = spec,
+      features = features,
+      options = options,
       palette = palette,
       shared = data,
       letterspace = letterspace,
@@ -371,25 +353,9 @@ local function scalefont(data, spec)
   }
 end
 
-local function define_font(name, size)
-  local spec = type(name) == "string" and parse(name, size) or name
-  if spec.file then
-    spec.path = kpse.find_file(spec.file, "truetype fonts") or
-                kpse.find_file(spec.file, "opentype fonts")
-  else
-    -- XXX support font names
-  end
-
-  if spec.specification == "" then return nil end
-
-  local tfmdata = nil
+local function define_font(spec, size)
   local hbdata = loadfont(spec)
-  if hbdata then
-    tfmdata = scalefont(hbdata, spec)
-  else
-    tfmdata = font.read_tfm(spec.specification, spec.size)
-  end
-  return tfmdata
+  return hbdata and scalefont(hbdata, spec)
 end
 
 return define_font

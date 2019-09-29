@@ -2951,8 +2951,10 @@
 %    \end{macrocode}
 %    \begin{macrocode}
 \def\aebwritelastpage{%
-    \immediate\write\@auxout{\string\expandafter\string\gdef
-    \string\csname\space aebLastPage\string\endcsname{\arabic{page}}}%
+    \immediate\write\@auxout{%
+%    \string\expandafter\string\gdef
+%    \string\csname\space aebLastPage\string\endcsname{\arabic{page}}}%
+    \string\w@csarg\string\gdef{aebLastPage}{\arabic{page}}}%
 }
 %    \end{macrocode}
 %    \begin{macrocode}

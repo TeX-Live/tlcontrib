@@ -1545,8 +1545,8 @@
 }
 \ifweb@sectioning\expandafter\web@inputsectiondefs\fi
 \def\aebwritelastpage{%
-    \immediate\write\@auxout{\string\expandafter\string\gdef
-    \string\csname\space aebLastPage\string\endcsname{\arabic{page}}}%
+    \immediate\write\@auxout{%
+    \string\w@csarg\string\gdef{aebLastPage}{\arabic{page}}}%
 }
 \AtEndDocument{%
     \clearpage\addtocounter{page}{-1}\aebwritelastpage

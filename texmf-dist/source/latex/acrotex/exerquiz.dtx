@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2018  D. P. Story                 %%
+%% Copyright (C) 1999-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2019/02/11 v8.2.9 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2019/08/13 v8.3 %
 %<package>  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver>  Exerquiz documentation driver file (dps)]
 %<aebjs>  Exerquiz document level JavaScript (dps)]
@@ -2415,7 +2415,7 @@
 % yet to be determined, there are problems when using the \texttt{fortextbook}
 % option when hiding solutions.
 %}
-%\changes{v8.2.9}{2019/02/11}{\string\let\eqSavedComment\string\dlcomment, \string\dlcomment\space
+%\changes{v8.2.9}{2019/02/11}{\string\cs{eqSavedComment}\string\cs{dlcomment}, \string\cs{dlcomment}\space
 %is not defined in \string\pkg{insdljs}}
 %    \begin{macrocode}
 \let\eqSavedComment\dlcomment
@@ -3927,27 +3927,35 @@
 %</package|eqexam>
 %<*package>
 \def\sq@IDTxtField{\makebox[0pt][l]{\textField[\autoCenter{n}\BC{}\BG{}
-    \S{S}\textSize{0}\Ff{\FfReadOnly}
-    \AA{\AAFormat{%
-        var \oField=new Object;\r
-        \oField.Grp={};
-        \ifx\defaultColorJSLoc\@empty\else\r
-        \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
-        \ifx\rghtColorJSLoc\@empty\else\r
-        \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
-        \ifx\wrngColorJSLoc\@empty\else\r
-        \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
-        \ifx\rghtAnsSymbJSLoc\@empty\else\r
-        \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
-        \ifx\wrngAnsSymbJSLoc\@empty\else\r
-        \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
-    }}]{sqID\oField}{2bp}{2bp}}%
+  \S{S}\textSize{0}\Ff{\FfReadOnly}
+  \AA{\AAFormat{%
+    if (typeof \oField=="undefined")\r\t
+      var \oField=new Object;\r
+    \oField.Grp={};
+    \ifx\defaultColorJSLoc\@empty\else\r
+    \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
+    \ifx\rghtColorJSLoc\@empty\else\r
+    \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
+    \ifx\wrngColorJSLoc\@empty\else\r
+    \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
+    \ifx\rghtAnsSymbJSLoc\@empty\else\r
+    \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
+    \ifx\wrngAnsSymbJSLoc\@empty\else\r
+    \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
+}}]{sqID\oField}{2bp}{2bp}}%
 }
 \def\qz@IDTxtField{\makebox[0pt][l]{\textField[\autoCenter{n}\BC{}\BG{}
     \S{S}\textSize{0}\Ff{\FfReadOnly}
     \AA{\AAFormat{if(typeof aQuizzesInDoc=="undefined")\r\t
       var aQuizzesInDoc=new Array();\r
-    if (aQuizzesInDoc.indexOf("\oField")) aQuizzesInDoc.push("\oField");
+      if (aQuizzesInDoc.indexOf("\oField"))
+        aQuizzesInDoc.push("\oField");\r
+%    \end{macrocode}
+% (2019/06/22) Added in declaration of quiz object.
+%\changes{v8.2.12}{2019/06/22}{Added declaration of quiz object}
+%    \begin{macrocode}
+    if (typeof \oField=="undefined")\r\t
+      var \oField=new Object;\r
     }}]{qzID\oField}{2bp}{2bp}}}
 %</package>
 %<*package|eqexam>
@@ -4955,7 +4963,7 @@
   \mbox{\check@@Box{#1\V{Yes}\DV{Yes}}%
   {rbmarkup.\Fld@name}%
   {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-  {\eq@setWidgetProps\eq@RadioCheck@driver}%
+  {\eq@setWidgetProps\eq@Check@driver}%
   {\rbMarkup@Defaults\every@CheckBox\every@rbMarkup}}}%
 %    \end{macrocode}
 %    \end{macro}
@@ -5193,7 +5201,7 @@
 %    \begin{macrocode}
 \def\DeclareQuiz#1{\edef\oField{#1}%
     \edef\thisQuiz{#1}\edef\curr@quiz{#1}%
-    \edef\currQuiz{#1}\edef\curr@quiz{#1}}
+    \edef\currQuiz{#1}}
 \let\Quiz\DeclareQuiz
 %    \end{macrocode}
 %    \end{macro}
@@ -5957,7 +5965,8 @@
 \def\@@Ans@sq@f@Defaults
 {%
     \BC{0 0 0}\Ff{\FfNoToggleToOff}\W{1}
-    \F{\FPrint}\textSize{12}\textColor{0 g}
+%   \F{\FPrint}
+    \textSize{12}\textColor{0 g}
 }
 %    \end{macrocode}
 % For short quizzes, refine the type of responses: turn off the alert
@@ -6072,16 +6081,13 @@
     \Ans@sq@f@driver
 %</eqexam>
 %<*package>
-%    \end{macrocode}
-%\changes{v6.7d}{2013/05/27}{new \cs{rbf@Opts} option.}
-%    \begin{macrocode}
     \mbox{\expandafter\radio@@Button\expandafter{\rbf@Opts}%
-        {mc.\oField.\thequestionno}%
-        {\RadioFieldSize}% 11/16/05 changed from \oField to mc.\oField
-        {\RadioFieldSize}{\Ans@choice\alph{quizno}}{\eq@protect\A}%
-        {\eq@setWidgetProps\eq@RadioCheck@driver}%
-        {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
-         \every@sqRadioButton}}%
+      {mc.\oField.\thequestionno}%
+      {\RadioFieldSize}{\RadioFieldSize}%
+      {\Ans@choice\alph{quizno}}{\eq@protect\A}%
+      {\eq@setWidgetProps\eq@Radio@driver}%
+      {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
+       \every@sqRadioButton}}%
     \Ans@proofing{\RadioFieldSize}%
 %</package>
 %<*package|eqexam>
@@ -6170,7 +6176,7 @@
         {mc.\oField.\thequestionno.\arabic{quizno}}%
         {\RadioFieldSize}{\RadioFieldSize}
         {\Ans@choice\alph{quizno}}{\eq@protect\A}%
-        {\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@setWidgetProps\eq@Check@driver}%
         {\@@Ans@ck@sq@f@Defaults\Ans@ck@sq@f@Actions\every@CheckBox
          \every@sqCheckBox}}%
     \Ans@proofing{\RadioFieldSize}%
@@ -6607,7 +6613,7 @@ if (_bOK) {\jsR\jsT
     \mbox{\expandafter\radio@@Button\expandafter{\rbf@Opts}%
         {mc.\curr@quiz.\thequestionno}%
         {\RadioFieldSize}{\RadioFieldSize}{\Ans@choice\alph{quizno}}%
-        {\eq@protect\A}{\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@protect\A}{\eq@setWidgetProps\eq@Radio@driver}%
         {\Ans@r@f@Defaults\Ans@r@f@Actions\every@RadioButton
          \every@qRadioButton\insert@circlesymbol}}%
     \let\late@options\@empty
@@ -6642,7 +6648,7 @@ if (_bOK) {\jsR\jsT
         \makebox[0pt][r]{\check@@Box{}%
             {mcq.\curr@quiz.\thequestionno.\arabic{quizno}}%
             {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Check@driver}%
             {\Ans@c@f@Defaults\Ans@c@f@Choice\every@CheckBox
              \every@qCheckBox\late@options}}%
     \fi
@@ -6719,7 +6725,7 @@ if (_bOK) {\jsR\jsT
     \mbox{\expandafter\check@@Box\expandafter{\cbf@Opts}%
         {mck.\curr@quiz.\thequestionno.\arabic{quizno}}%
         {\RadioFieldSize}{\RadioFieldSize}{\Ans@choice\alph{quizno}}%
-        {\eq@protect\A}{\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@protect\A}{\eq@setWidgetProps\eq@Check@driver}%
         {\Ans@ck@f@Defaults\Ans@ck@f@Actions\every@RadioButton
         \every@qckCheckbox}}%
     \ifnocorrections\else
@@ -6751,7 +6757,7 @@ if (_bOK) {\jsR\jsT
         \makebox[0pt][r]{\check@@Box{}%
             {mcq.\curr@quiz.\thequestionno.\arabic{quizno}}%
             {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Check@driver}%
             {\Ans@c@f@Defaults\Ans@c@f@Choice\every@CheckBox
 %    \end{macrocode}
 % (2012/12/22) Replace \cs{every@qRadioButton} with \cs{every@qCheckBox}.
@@ -8482,7 +8488,7 @@ if (!isQuizInitialized("@currQuiz")) {
 % \par\medskip
 % \noindent Usage:
 %\begin{verbatim}
-%   \RespBoxTxt[#1]#2[#3]#4[<num1>]{<word1>}...[<num_n>]{<word_n>}
+%   \RespBoxTxtPC[#1]#2[#3]#4[<num1>]{<word1>}...[<num_n>]{<word_n>}
 %\end{verbatim}
 % \begin{description}
 % \item[\ttfamily\#1 :] Optional parameter used to modify the appearance of the
@@ -8644,7 +8650,17 @@ if (!isQuizInitialized("@currQuiz")) {
 % essay-type questions. This question will not be graded by JavaScript,
 % of course; ideally, the response will be submitted to a CGI for storage
 % in a database. The instructor can later bring up the student's response
-% and assign a grade.
+% and assign a grade. Syntax:
+%\begin{quote}\ttfamily
+%   \string\RespBoxEssay[\ameta{opts}][\ameta{dest}]\darg{\ameta{wd}}\darg{\ameta{ht}}\\[3pt]
+%   \string\RespBoxEssay[\ameta{opts}]*\darg{\ameta{wd}}\darg{\ameta{ht}}
+% \end{quote}
+% The second argument declares the problem has a \env{solution} file; we define the target
+% of the solution twh ways: an explicite \ameta{dest} string, or an star (\texttt*), where
+% the destination is automatically named. If you use \ameta{dest}, you must have
+% a frist optional, even if its only \texttt{[]}, to correctly parse this construction.
+% \changes{v8.3}{2019/08/13}{\string\env{solution} environment now defined for
+% \string\cs{RespBoxEssay}}
 %    \begin{macrocode}
 \def\RespBoxEssayDefaults
 {%
@@ -8656,10 +8672,10 @@ if (!isQuizInitialized("@currQuiz")) {
         \AAKeystroke{%
             if(event.willCommit){\jsR\jsT
             RecordPointValue(\eqPTs,\thequestionno);\jsR\jsT
-            RecordProblemType("\eqQT",\thequestionno);\jsR\jsT
+            RecordProblemType("\eqQT",\thequestionno);\jsR %\jsT
             }\jsR
             if (!isQuizInitialized("\curr@quiz")) {\jsR\jsT
-                @eqObjAlert\space eqAppAlert(%
+                \eqObjAlert\space eqAppAlert(%
                     InitMsg("\bqlabelISO"),3);\jsR\jsT
                 event.rc = false;\jsR
             }%
@@ -8667,14 +8683,29 @@ if (!isQuizInitialized("@currQuiz")) {
     \fi
     }
 }
-\newcommand\RespBoxEssay[3][]
+% \RespBoxEssay[opt][dest]|*{wd}{ht}
+\newcommand\RespBoxEssay[1][]{\def\rbe@rgi{#1}\RespBoxEssay@i}
+\def\RespBoxEssay@i{\@ifnextchar[%]
+  {\RespBoxEssay@ii}
+  {\@ifstar{\RespBoxEssay@ii[\curr@quiz.\thequestionno]}}%
+  {\RespBoxEssay@ii[]}%
+}
+% \RespBoxEssay#1[dest]{wd}{ht}
+\newcommand\RespBoxEssay@ii[3][]
 {%
     \smallskip\addtocounter{eqpointvalue}{\eqPTs}%
+%    \end{macrocode}
+%    (2019/06/26) Added \cs{eq@AddProbToQzQuesList} for \cs{RespBoxEssay}
+%   \changes{v8.2.13}{2019/06/26}{Added \string\cs{eq@AddProbToQzQuesList} for \string\cs{RespBoxEssay}}
+%    \begin{macrocode}
+    \eq@AddProbToQzQuesList
     \stepcounter{questionno}%
-    \mbox{\text@@Field{#1}{essay.\curr@quiz.\thequestionno}{#2}{#3}%
+    \xdef\@qzsolndest{#1}%
     \edef\eqtmp{\aPointType}\xdef\aPointType{\eqtmp,[\eqPTs,"essay"]}%
-    {\eq@protect\AA}{\eq@setWidgetProps\@@RespBoxEssayActions
-     \eq@TextField}{\RespBoxEssayDefaults\every@eqTextField}}%
+    \expandafter\mbox\expandafter{\expandafter\text@@Field\expandafter{\rbe@rgi}{essay.\curr@quiz.\thequestionno}{#2}{#3}%
+    {\eq@protect\AA}{\eq@setWidgetProps
+     \eq@TextField}{\RespBoxEssayDefaults\@@RespBoxEssayActions
+     \every@eqTextField}}%
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -9192,8 +9223,13 @@ if (!isQuizInitialized("@currQuiz")) {
 \let\eqQzQuesList\@empty
 \def\eq@AddProbToQzQuesList{%
     \edef\eq@tmpExp{\noexpand\g@addto@macro%
-        \noexpand\eqQzQuesList{%
-            \noexpand\@eqListExp{\@currentQues}{\thepage}}}%
+%    \end{macrocode}
+%    Cosmetic change replaced \cs{noexpand} with \cs{string}.
+%    \changes{v8.2.15}{2019/08/06}{replace \string\cs{noexpand} with \string\cs{string}}
+%    \begin{macrocode}
+        \noexpand\eqQzQuesList{\string
+          \@eqListExp{\@currentQues}{\the\c@page}}}%
+%          \@eqListExp{\@currentQues}{\thepage}}}%
 %    \end{macrocode}
 % We add to the list only if we are not within a \texttt{mathGrp} environment.
 %    \begin{macrocode}
@@ -9346,22 +9382,22 @@ if (!isQuizInitialized("@currQuiz")) {
         \edef\eq@p{\the\@tempcnta}%
         \@tempcnta=\eq@n
         \advance\@tempcnta-\eq@p\relax
-        \ifnum\@tempcnta=0
-            \@tempcntb=\eq@q \advance\@tempcntb1
+        \ifnum\@tempcnta=\z@
+            \@tempcntb=\eq@q \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\eq@q\relax
             \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=1
-            \@tempcntb=\eq@q \advance\@tempcntb1
+        \else\ifnum\@tempcnta=\@ne
+            \@tempcntb=\eq@q \advance\@tempcntb\@ne
             \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb1\relax
+            \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\eq@q\relax
             \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=2
+        \else\ifnum\@tempcnta=2\relax
             \@tempcntb=\eq@q \advance\@tempcntb1
             \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb1
+            \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\nB@lCols
             \xdef\@beginThrdCol{\the\@tempcntb}%
@@ -9397,8 +9433,7 @@ if (!isQuizInitialized("@currQuiz")) {
 %    \begin{macrocode}
 \def\eq@begintab{%
     \begin{tabular}[t]{lcc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
-    {\Large\strut}%
-}
+    {\Large\strut}}
 %    \end{macrocode}
 % \DescribeMacro{\sthline}\cmd{\sthline}
 % is a user hook to change the appearance of the horizontal line, such
@@ -9512,12 +9547,10 @@ if (!isQuizInitialized("@currQuiz")) {
 % total number of questions.
 %    \begin{macrocode}
 \def\writeProListAux{%
-    \eq@IWAuxOut{\string\expandafter\string\gdef
-    \string\csname\space\currQuiz QzQuesList\string\endcsname
-    {\eqQzQuesList}}%
-    \eq@IWAuxOut{\string\expandafter\string\gdef
-    \string\csname\space\currQuiz nQuestions\string\endcsname
-    {\thequestionno}}%
+    \eq@IWAuxOut{\string
+      \csarg\string\gdef{\currQuiz QzQuesList}{\eqQzQuesList}}%
+    \eq@IWAuxOut{\string
+      \csarg\string\gdef{\currQuiz nQuestions}{\thequestionno}}%
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -12633,6 +12666,11 @@ partialColor:wrongColor;
                 // find the next non-null field
                 var g=this.getField(qtfield+"SanityCheckPts."+i);
                 var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+%    \end{macrocode}
+%   (2019/06/30) if negative points are not allowed, make qpts zero if necessary
+%   \changes{v8.2.14}{2019/06/30}{Added a condition if negPointsAllowed}
+%    \begin{macrocode}
+                if ( !negPointsAllowed && (qpts < 0) ) qpts=0;
                 var thesePts= qpts + (( qpts == 1 )?%
 " \eqptLabel":" \eqptsLabel");
                 g.value = thesePts;
@@ -12648,6 +12686,7 @@ partialColor:wrongColor;
                 // find the next non-null field
                 var g=this.getField(qtfield+"SanityCheckOOPts."+i);
                 var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+                if ( !negPointsAllowed && (qpts < 0) ) qpts=0;
                 var ptValue = oQName.PtValues[i];
                 var probPts = ptValue + (( ptValue == 1 )?%
 " \eqptLabel":" \eqptsLabel");

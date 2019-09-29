@@ -52,10 +52,60 @@
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \hbox{\pdfstartlink user{\common@pushButtonCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }
-\def\eq@RadioCheck@driver
+\def\parentRef#1#2{\csarg\gdef{parent@#1}{#2 0 R}}
+\def\ef@radioData#1#2{\expandafter
+  \HyField@@AddToFields\expandafter{#2}%
+  \immediate\write\@mainaux{\string\parentRef{#1}{#2}}}
+\def\eq@Radio@driver{\Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ifuseNewRadios
+    \ifx\isRadioParent\ef@YES\expandafter
+      \ifx\csname radio@\Fld@name\endcsname\relax\else
+        \immediate\pdfobj{<< \radio@parent\space >>}%
+        \ef@radioData{\Fld@name}{\the\pdflastobj}%
+        \ifx\eq@V\@empty\else
+            \csarg\xdef{value@\Fld@name}%
+              {\@nameuse{OnVal@\Fld@name}}%
+        \fi
+      \fi
+      \ifx\ef@multigroupradios\ef@YES
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@YES}%
+      \else
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@NO}%
+      \fi
+      \ifx\isRadiosInUnison\ef@YES
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@YES}%
+      \else
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@NO}%
+      \fi
+    \fi
+  \fi
+  \ef@NewRadiosLateOpts
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \hbox{\pdfstartlink user{\common@RadioCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \ifuseNewRadios
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ef@KidsArray{\the\pdflastlink\space 0 R\space}}\x
+    \csarg\xdef{kid@\Fld@name}{\ef@KidsArray}%
+  \else
+    \HyField@AddToFields
+  \fi
+  \endgroup
+  \dl@restorespcs
+}
+\def\eq@Check@driver
 {%
   \Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
@@ -63,16 +113,17 @@
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-  \hbox{\pdfstartlink user{\common@RadioCheckCode}%
+  \hbox{\pdfstartlink user{\common@CheckCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
-  \pdfstartlink user{\common@RadioCheckCode}%
+  \pdfstartlink user{\common@CheckCode}%
   \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
-  \pdfendlink\endgroup
+  \pdfendlink\HyField@AddToFields\endgroup
   \dl@restorespcs
 }
 \def\eq@TextField{\Hy@pdfstringtrue
@@ -94,6 +145,7 @@
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
   \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }

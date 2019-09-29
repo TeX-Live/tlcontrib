@@ -6,8 +6,10 @@
         forcolorpaper,latextoc,pro,useui},
     exerquiz,aebxmp
 ]{aeb_pro}
+\usepackage{forms16be}
 \usepackage[dblevel=0]{aeb_mlink}
 \usepackage[altbullet]{lucidbry}
+\usepackage{pifont}
 %\usepackage{myriadpro}
 
 \setlength{\marginparpush}{3pt}
@@ -79,7 +81,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2019/05/24},
+    prepared={2019/08/06},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -517,13 +519,27 @@ declarative command \cs{pmpvMrk\darg{\ameta{mrk}}} that takes one argument \amet
 to be used. The package declares \verb|\pmpvMrk{X}|, another good choice is
 \verb|\pmpvMrk{$\checkmark$}|.
 
+\newtopic\indent\textbf{Finer control over enhanced preview.} When enhanced
+preview is on (\cs{previewOn}\allowbreak \cs{pmpvOn}), the caption for {\pbs}
+may be turned off with \cs{pmpvCAOff}\FmtMP{\cs{pmpvCAOff}} (and may be
+turned back on again with \cs{pmpvCAOn}). Enhanced preview for all other
+field types is controlled with \cs{pmpvVOff}\FmtMP{\cs{pmpvVOff}} (and
+\cs{pmpvVOn}). Turning off enhanced preview may be become an issue when the
+preview text is too wide for the preview rectangle
+{\previewOn\pmpvOn\textField[\autoCenter{y}\BC{}\Ff{\FfReadOnly}\V{We initialize this field}\DV{We
+initialize this field}]{V2Big}{1in}{11bp}}. We can turn off enhanced preview
+for this field only by passing \cs{cmd\darg{\cs{pmpvVOff}}} in the optional
+argument of the field, or turn it off globally by expanding \cs{pmpvVOff}
+prior to expanding the \cs{textField} command.
+
 \newtopic\textbf{\textcolor{red}{Final Preparation.}}
 In the modern era of {\LaTeX}, it is customary by some to use
 \app{sumatraPDF} or some other non-conforming {\PDF} reader during
 development; however, you should always open your final {\PDF} (which was
 built with \cs{previewOff}\cs{pmpvOff}) in \app{Adobe Reader DC} (or in
 \app{Acrobat}), save it to obtain the correct appearances of the fields
-placed in the document.
+placed in the document. Other suggestions can be found in the
+\href{\urlAcroTeXBlog}{\AcroBlog} article cited below.
 
 %http://www.acrotex.net/blog/?p=1404
 \exAeBBlogPDF{p=1404} Refer to the article titled \textit{\href{\urlAcroTeXBlog/?p=1404}{eforms: Enhanced Previews}} for more technical
@@ -2841,7 +2857,7 @@ The \hypertarget{\pkg{insdljs}}{insdljsPkg} package provides support to {\LaTeX}
 for inserting \app{Acrobat} JavaScript into a PDF file created from a
 \LaTeX{} source. This package works correctly for users of \textsf{pdftex}
 (and \app{luatex}), \textsf{dvipdfm}, \textsf{dvipdfmx}, and \texttt{xetex}.
-For\marginpar{\small\raggedleft\app{Acrobat} required for
+For\FmtMP{\app{Acrobat} required for
 \app{dvips}} those who use either \app{dvips} or
 \app{dvipsone} to produce a postscript file, which is then distilled, you are
 required to have \app{Acrobat}~5.0 (or later).
@@ -2862,12 +2878,20 @@ of the JavaScripts.
     JavaScript. This might be useful, for creating a paper document that is
     not interactive. For a non-interactive paper document, no JS is needed.
 
-\item\NH\texttt{execJS} is a very useful option/feature if you know  how to use
-    it.  Any JavaScript that is written in an \env{execJS} environment is
-    executed once when the document is first opened in \app{Acrobat}, then
-    discarded. AeB uses this for post-distillation document processing. The
-    default is that the JavaScript in an \texttt{execJS} environment is not
-    executed; using this option turns on this feature.
+\item\NH\texttt{execJS} is a very useful option/feature if you know  how to
+    use it.  Any JavaScript that is written in an \env{execJS} environment
+    is executed once when the document is first opened in \app{Acrobat},
+    then discarded. AeB uses this for post-creation document processing.
+    The default is that the JavaScript in an \texttt{execJS} environment is
+    not executed; using this option turns on this feature. Two convenience
+    commands are also defined: \FmtMP{\cs{execJSOn}} \cs{execJSOn} (the
+    equivalent of passing the \opt{execJS} option to the \pkg{insdljs}
+    package) and \FmtMP{\cs{execJSOff}}\cs{execJSOff} (for turning off
+    JavaScript execution within an \env{execJS} environment). Both have no
+    effect outside the preamble of the document.
+
+    For information on the \env{execJS} environment, read
+    Section~\ref{s:execJS} on page~\pageref{s:execJS}.
 \end{description}
 
 \section{The \texttt{insDLJS} and \texttt{insDLJS*} Environments}
@@ -3235,8 +3259,20 @@ When \cs{thisPageAction} is executed in the preamble,
 the \texttt{<open\_action>} argument gets passed to
 the \cs{OpenAction} command.
 
-\section{The \textsf{execJS} Environment}
+\section{The \textsf{execJS} Environment}\label{s:execJS}
 
+\textbf{Purpose.} The\FmtMP{`\texttt{\eqbs}' and `\texttt{\%}' characters available} \env{execJS} takes JavaScript as content. This
+JavaScript is executed the first time the newly created PDF is opened in
+\app{Acrobat}. This environment is a variation on \env{insDLJS};
+consequently,
+the escape character is `\texttt{\eqbs}' and the comment character is
+`\texttt{\%}'.
+
+\newtopic
+\textbf{Requirements.} For the script to be executed, the document must be compiled under
+the \opt{execJS} option of \pkg{eforms}.
+
+\newtopic
 This is an environment useful to PDF developers who want to tap into
 the power of JavaScript. To use this environment, the developer
 needs \app{Acrobat}~5.0 or higher. \textsf{pdftex} or \textsf{dvipdfm} can
@@ -3244,8 +3280,8 @@ be used to produce the PDF document, but the developer needs
 the \app{Acrobat} product for this environment to do anything.
 
 The \texttt{execJS} is used primarily for post-distillation
-processing (post-creation processing, in the case of \textsf{pdftex}
-and \textsf{dvipdfm}). The \texttt{execJS} environment can be used,
+processing (post-creation processing, in the case of \textsf{pdflatex}
+and \textsf{xelatex}). The \texttt{execJS} environment can be used,
 for example, to automatically import named icons into the document,
 which can, in turn, be used for an animation.
 
@@ -3259,18 +3295,22 @@ by the \textsf{execJS} environment is imported, and the JavaScript
 executed. This JavaScript is \emph{not} saved with the document.
 The syntax of this environment is\dots
 
-\settowidth{\aebdimen}{\ttfamily\string\begin\darg{execJS}\darg{\meta{name}}}
+\settowidth{\aebdimen}{\ttfamily\string\begin\darg{execJS}[\ameta{\cs{cmd}}]\darg{\meta{name}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\begin{execJS}{!meta(name)}
+\begin{execJS}[!ameta(\cmd)]{!meta(name)}
 ....
-!anglemeta(JavaScript code)
+!ameta(JavaScript code)
 ....
 \end{execJS}
 \end{dCmd}
 
-\PD The environment takes one required argument, the base name of the
-auxiliary files to be generated.
+\PD The environment takes one required argument (\meta{name}), the base name
+of the auxiliary files to be generated. The \env{execJS} environment now has
+an optional argument, the optional argument must be a command
+\ameta{\cs{cmd}}. The purpose of \ameta{\cs{cmd}} is to make special
+definitions at the time the script is expanded.
 
+\newtopic\indent
 Many of the more useful JavaScript methods have security restrictions,
 the developer must create folder JavaScript that can be used to \emph{raise
 the privilege} of the methods.
@@ -3330,6 +3370,31 @@ app.beginPriv();
 app.endPriv();
 \end{Verbatim}
 \newtopic AeB Pro, the {Acro\!\TeX} Presentation Bundle and @EASE use these execJS techniques.
+
+\Example In this example, we give a simple example of the use of the optional argument (\ameta{\cs{cmd}}).
+We define a command \cs{myDefns} which gives a special meaning to \cs{oct}. This definition
+are made within a group so it has no effect outside the environment.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!~@}]
+...
+\execJSOn
+!textbf~\def\myDefns{\let\oct\eqbs}@
+\begin{execJS}[!textbf~\myDefns@]{tst}
+var str="Hello J!textbf~\oct@374rgen! \u263A"; // \u already defined
+console.show();
+console.println(str);
+\end{execJS}
+\begin{document}
+...
+\end{document}
+\end{Verbatim}
+\defUniStr{myInitValue}{Hello J\u00FCrgen! \u263A}%
+%\previewOn\pmpvOn
+When the document is first opened, the console window appears and the message, \ding{172}
+\begin{quote}
+\textField[\cmd{\let\pmpvFmt\footnotesize}\Ff\FfReadOnly\BC{}\V{\tops{Hello J\"{u}rgen! \protect\ding{172}}{\unicodeStr(myInitValue)}}
+\DV{\unicodeStr(myInitValue)}]{HJSmiley}{67.68bp}{11bp}
+\end{quote}
+is written to the console window.
 
 \section{The \textsf{defineJS} Environment}\label{defineJS}
 

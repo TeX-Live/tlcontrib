@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2018  D. P. Story                 %%
+%% Copyright (C) 2001-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2019/03/16 v2.4.2 Insert Document Level JavaScripts (dps)]
+ [2019/08/06 v2.4.6 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -46,8 +46,10 @@
 \let\dljspresent\dl@NO
 \DeclareOptionX{debug}{\let\dljs@debug\dl@YES}
 \let\dljs@debug\dl@NO
-\DeclareOptionX{execJS}{\let\execjs\dl@YES}
-\let\execjs\dl@NO
+\DeclareOptionX{execJS}{\execJSOn}
+\def\execJSOn{\let\execjs\dl@YES}
+\def\execJSOff{\let\execjs\dl@NO}
+\execJSOff
 \DeclareOptionX{nopro}{\let\dl@gopro\dl@NO}
 \let\dl@gopro\dl@YES
 \@ifpackageloaded{web}{%
@@ -65,11 +67,12 @@
 \DeclareOptionX{reqjs}{\let\dl@reqJS\dl@YES}
 \let\dljs@reqJS\dl@YES
 \DeclareOptionX{!reqjs}{\let\dl@reqJS\dl@NO}
-\DeclareOptionX{usealtadobe}{\def\inputAltAdbFncs{%
-    \InputIfFileExists{altadbfncs.def}%
-    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}%
+\DeclareOptionX{usealtadobe}{\let\usedAdbFuncs\dl@YES
+  \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}
+    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}
     {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
         Reinstall or refresh your file name database.}}}}
+\let\usedAdbFuncs\dl@NO
 \let\inputAltAdbFncs\relax
 \ProcessOptionsX
 \edef\dl@dquoteCat{\the\catcode`\"}
@@ -129,7 +132,8 @@
 \ifnum\dljs@drivernum=1\relax
     \RequirePackage{everyshi}
 \fi
-\def\AEB@psMrk{[\space}
+\def\AEB@psMrk{[%]
+  \space}
 \ifx\dl@reqJS\dl@YES
    \def\dl@@reqJS{/Type/Requirement/S/EnableJavaScripts}
    \ifpdf\pdfcatalog{\dl@@reqJS}\else
@@ -343,9 +347,9 @@
         \global\let\aebpFA\dl@YES
         \let\@pdfstartview\@empty
     \else
-            \edef\aebp@dljstmp{\aebp@rightDelimiters}%
-            \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
-            \g@addto@macro\aebpopentoks{/Next << #1 }%
+        \edef\aebp@dljstmp{\aebp@rightDelimiters}%
+        \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
+        \g@addto@macro\aebpopentoks{/Next << #1 }%
     \fi
 }
 \def\dljs@OpenActions{/OpenAction \addActionObj}
@@ -552,10 +556,9 @@
 \endgroup
 \def\ckivspace#1{\if\noexpand#1\space\else\expandafter#1\fi}
 \let\DLspecialDefs\@empty
-\def\fdfAfterheader
-{%
+\def\fdfAfterheader#1{%
     \iwvo{\string\begingroup\string\efdlspecials}
-    \iwvo{\string\DLspecialDefs}
+    \iwvo{\string\DLspecialDefs\string#1}
     \iwvo{\string\isdljstrue}
     \iwvo{\string\makeatletter}
     \iwvo{\string\immediate\string\openout\string
@@ -576,9 +579,11 @@
   \iwvo{<<>>}
   \iwvo{stream}
 }
-\newenvironment{execJS}[1]
+\def\restoreDLspecialDefs{\let\DLspecialDefs\@empty}
+\newenvironment{execJS}[2][\relax]
 {%
-    \gdef\detectdljs{\string_#1}\gdef\dljsBase{#1}%
+    \def\x{#1}\ifx\x\@empty\def\x{\relax}\fi
+    \gdef\detectdljs{\string_#2}\gdef\dljsBase{#2}%
     \global\dljsobjtoks={}%
     \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
     \ifx\importdljs\dl@YES\ifx\execjs\dl@YES
@@ -590,12 +595,13 @@
         \fi\fi
     \fi\fi
     \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \fdfAfterheader
+    \expandafter\fdfAfterheader\expandafter{\x}%
     \js@verbatimwrite
 }{%
     \fdfendstreamobj
     \endjs@verbatimwrite
     \fdftrailer
+    \iwvo{\string\restoreDLspecialDefs}%
     \closejs@verbatim@out
     \expandafter\xdef\csname\dljsBase OBJ\endcsname{\the\dljsobjtoks}%
     \edef\@dljstmp{\noexpand\AtBeginDocument{%
@@ -614,8 +620,11 @@
   \edef\csname\p@r@m\the\c@dljs@cnt\endcsname{\the\JStoks}}}
 \def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
 \def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+\def\dlcombine(#1)(#2){#1#2}
 \def\escIs#1{\def\Eschr{#1}}
+\def\dl@makeesc#1{\catcode`#1=0\relax}
 \newenvironment{defineJS}[2][]{%
+  \let\makeesc\dl@makeesc
   \expandafter\@ifundefined\expandafter{%
   \expandafter\@gobble\string#2}{}{%
   \PackageWarning{insdljs}{The command
@@ -632,6 +641,7 @@
     \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
 \newenvironment{@defineJS}[2][]
 {%
+  \let\makeesc\dl@makeesc
   \gdef\defineJSArg{#2}\JStoks={}%
   \def\verbatim@processline{%
     \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%

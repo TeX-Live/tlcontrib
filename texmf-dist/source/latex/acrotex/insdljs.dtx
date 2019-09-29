@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2018  D. P. Story                 %%
+%% Copyright (C) 2001-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2019/03/16 v2.4.2 Insert Document Level JavaScripts (dps)]
+%<package> [2019/08/06 v2.4.6 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -475,14 +475,22 @@
 \DeclareOptionX{debug}{\let\dljs@debug\dl@YES}
 \let\dljs@debug\dl@NO
 %    \end{macrocode}
-%    \IndexOpt{execJS}
-% If the execution of JavaScript code is permitted following distillation. The default is no.
+% If the option \IndexOpt{execJS}\opt{execJS} is taken, then the JavaScript code for any \env{execJS} environment
+% will be executed following PDF creation (\app{Acrobat} required). The default is no.
+% More recently (2019/08/06) \DescribeMacro\execJSOn\cs{execJSOn} and \DescribeMacro\execJSOff\cs{execJSOff}
+% were added to turn on (or off) execution of JS in this way. Useful when \pkg{insdljs} is loaded by other
+% packages and you cannot access the optional arguments of \cs{usepackage}. These commands are only effective
+% in the preamble.
+% \changes{v2.4.6}{2019/08/06}{Added \string\cs{execJSOn} and \string\cs{execJSOff}}
 %    \begin{macrocode}
-\DeclareOptionX{execJS}{\let\execjs\dl@YES}
-\let\execjs\dl@NO
+\DeclareOptionX{execJS}{\execJSOn}
+\def\execJSOn{\let\execjs\dl@YES}
+\def\execJSOff{\let\execjs\dl@NO}
+\execJSOff
 \DeclareOptionX{nopro}{\let\dl@gopro\dl@NO}
 \let\dl@gopro\dl@YES
 %    \end{macrocode}
+%    We set the driver, according to the following algorithm.
 %    \begin{macrocode}
 \@ifpackageloaded{web}{%
     \ExecuteOptionsX{\eq@driver@name}%
@@ -497,7 +505,7 @@
     }%
 }
 %    \end{macrocode}
-%    \IndexOpt{reqjs}
+%    \leavevmode\IndexOpt{reqjs}
 %    Beginning with PDF 1.7, a document can specify requirements, here we declare
 %    the document uses JavaScripts. The option \texttt{reqjs} is taken by default,
 %    that is, JavaScripts are required for this document
@@ -519,14 +527,18 @@
 %    function is the same, but begins with `\texttt{EF}'. For example, the keystroke function
 %    \texttt{AFNumber\_Keystroke} is also known under the name of \texttt{EFNumber\_Keystroke}.
 %    See \hyperref[s:AltAdbFncs]{Section~\ref*{s:AltAdbFncs}} for the list of functions.
+%    \changes{v2.4.6}{2019/08/06}{Added switch \string\cs{usedAdbFuncs} to help detect
+%    the usealtadobe option}
 %    \begin{macrocode}
-\DeclareOptionX{usealtadobe}{\def\inputAltAdbFncs{%
-    \InputIfFileExists{altadbfncs.def}%
-    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}%
+\DeclareOptionX{usealtadobe}{\let\usedAdbFuncs\dl@YES
+  \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}
+    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}
     {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
         Reinstall or refresh your file name database.}}}}
+\let\usedAdbFuncs\dl@NO
 \let\inputAltAdbFncs\relax
-%    \paragraph*{Process the package options}
+%    \end{macrocode}
+%    \textbf{Process the package options}
 %    \begin{macrocode}
 \ProcessOptionsX
 %    \end{macrocode}
@@ -634,7 +646,8 @@
 % do not. The \textbf{\textsf{Requirements}} dictionary goes in the document \textbf{\textsf{Catalog}}.
 %    \changes{v2.2d}{2016/04/06}{Code to support \texttt{reqjs} and \texttt{{\string\EXPT}reqjs} options.}
 %    \begin{macrocode}
-\def\AEB@psMrk{[\space}
+\def\AEB@psMrk{[%]
+  \space}
 \ifx\dl@reqJS\dl@YES
    \def\dl@@reqJS{/Type/Requirement/S/EnableJavaScripts}
    \ifpdf\pdfcatalog{\dl@@reqJS}\else
@@ -1201,9 +1214,9 @@
         \global\let\aebpFA\dl@YES
         \let\@pdfstartview\@empty
     \else
-            \edef\aebp@dljstmp{\aebp@rightDelimiters}%
-            \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
-            \g@addto@macro\aebpopentoks{/Next << #1 }%
+        \edef\aebp@dljstmp{\aebp@rightDelimiters}%
+        \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
+        \g@addto@macro\aebpopentoks{/Next << #1 }%
     \fi
 }
 \def\dljs@OpenActions{/OpenAction \addActionObj}
@@ -1680,10 +1693,9 @@
 % \textsf{aeb\_pro}.
 %    \begin{macrocode}
 \let\DLspecialDefs\@empty
-\def\fdfAfterheader
-{%
+\def\fdfAfterheader#1{%
     \iwvo{\string\begingroup\string\efdlspecials}
-    \iwvo{\string\DLspecialDefs}
+    \iwvo{\string\DLspecialDefs\string#1}
     \iwvo{\string\isdljstrue}
     \iwvo{\string\makeatletter}
     \iwvo{\string\immediate\string\openout\string
@@ -1710,13 +1722,25 @@
 }
 %    \end{macrocode}
 %    \begin{environment}{execJS}
-% The parameter \texttt{\#1} is the base name for this environment.
-% The base name will be used to create
-% a filename to save the \texttt{.fdf} file under.
+%    \hskip-\marginparsep\texttt{[\ameta{\cs{cmd}}]\darg{\ameta{base-name}}}
+% The parameter \texttt{\#2} (\ameta{base-name}) is the base name for this environment.
+% The base name will be used to create a filename to save the \texttt{.fdf} file under.
 %    \begin{macrocode}
-\newenvironment{execJS}[1]
+%    \end{macrocode}
+%    Added \DescribeMacro\restoreDLspecialsDefs\cs{restoreDLspecialsDefs} to restore
+%    \DescribeMacro\DLspecialDefs\cs{DLspecialDefs} to its default of \cs{@empty}.
+%    \changes{v2.4.4}{2019/07/14}{Added \string\cs{restoreDLspecialsDefs}}
+%    The \env{execJS} environment now has an optional argument, the optional argument must be
+%    a command (\ameta{\cs{cmd}}) that is then passed on to \cs{fdfAfterheader}, which then writes it to
+%    \cs{dljsBase.djs}. The purpose is to make special definitions at the time the script
+%    is expanded.
+%    \changes{v2.4.5}{2019/07/15}{\string\env{execJS} now has an optional argument}
+%    \begin{macrocode}
+\def\restoreDLspecialDefs{\let\DLspecialDefs\@empty}
+\newenvironment{execJS}[2][\relax]
 {%
-    \gdef\detectdljs{\string_#1}\gdef\dljsBase{#1}%
+    \def\x{#1}\ifx\x\@empty\def\x{\relax}\fi
+    \gdef\detectdljs{\string_#2}\gdef\dljsBase{#2}%
     \global\dljsobjtoks={}%
     \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
     \ifx\importdljs\dl@YES\ifx\execjs\dl@YES
@@ -1728,12 +1752,17 @@
         \fi\fi
     \fi\fi
     \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \fdfAfterheader
+    \expandafter\fdfAfterheader\expandafter{\x}%
     \js@verbatimwrite
 }{%
     \fdfendstreamobj
     \endjs@verbatimwrite
     \fdftrailer
+%    \end{macrocode}
+%    Added \cs{restoreDLspecialsDefs} to restore \cs{DLspecialDefs} to its default of \cs{@empty}.
+%    \changes{v2.4.4}{2019/07/14}{Added \string\cs{restoreDLspecialsDefs}}
+%    \begin{macrocode}
+    \iwvo{\string\restoreDLspecialDefs}%
     \closejs@verbatim@out
     \expandafter\xdef\csname\dljsBase OBJ\endcsname{\the\dljsobjtoks}%
     \edef\@dljstmp{\noexpand\AtBeginDocument{%
@@ -1840,7 +1869,7 @@
   \edef\csname\p@r@m\the\c@dljs@cnt\endcsname{\the\JStoks}}}
 %    \end{macrocode}
 %    Beginning with \pkg{insdljs} dated 2019/03/16, we solve an age-old problem with \app{dvips}: This problem
-%    is that is wraps code around to th next line, according to some unknown algorithm. Normally this is not
+%    is that is wraps code around to the next line, according to some unknown algorithm. Normally this is not
 %    a problem, but occassionally it will wrap some JavaScript code that breaks the code. Solve this problem,
 %    we make the space character active, and replace it with \cs{pdfSP} (\cs{040}), which is octal for the space
 %    character. Now there are no free spaces for \app{dvips} to break the line at in the PS file. The feature
@@ -1850,10 +1879,21 @@
 \def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
 \def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
 %    \end{macrocode}
+%    \DescribeMacro{\dlcombine}\hskip-\marginparsep\texttt{(\#1)(\#2)}
+%    Within the \env{defineJS} environment, spaces are obeyed, at time, we want to says
+%    \verb*|@currQuiz MyField|, for example. which within \env{defineJS} gets expanded to
+%    \verb*|q1 MyField|, not \texttt{q1MyField} as it should be. To solve this and other
+%    problems like it, use \verb|@dlcombine(@currQuiz)(MyField)| which does expand
+%    to the intended expression. (In this discussion, it is assumed \texttt{@} is the escape character
+%    within \env{defineJS}.)
+%    \changes{v2.4.3}{2019/06/27}{Added \string\cs{dlcombine}}
+%    \begin{macrocode}
+\def\dlcombine(#1)(#2){#1#2}
+%    \end{macrocode}
 %    When you declare a character to be an escape within the optional argument of \env{defineJS},
 %    that character may be needed in the code; for example if we say |\catcode`\!=0\relax|, and
 %    within the JavaScript code you have \texttt{if (x != 0 ) ...}, there is a problem: the JavaScript
-%    code is broken. As a fix for this problem, you can declare \DescribeMacro\escIs|\escIS{!}|,
+%    code is broken. As a fix for this problem, you can declare \DescribeMacro\escIs|\escIs{!}|,
 %    which in turn defines \DescribeMacro\Eschr\cs{Eschr}. the above code
 %    should then be written as \texttt{if (x !Eschr= 0 ) ...}; messy, but it works. The lines
 %    below is the recommended method of declaring \cs{escIs}:
@@ -1865,9 +1905,18 @@
 %    \begin{macrocode}
 \def\escIs#1{\def\Eschr{#1}}
 %    \end{macrocode}
+%    \DescribeMacro\makeesc\hskip-\marginparsep\texttt{\cs{\ameta{char}}}
+%    \cs{dl@makeesc} is a helper command that sets the escape character,
+%     Within the \env{defineJS} environments, it is \cs{let} to \DescribeMacro\makeesc\cs{makeesc};
+%     eg, |\makeesc\@|
+%    \changes{v2.4.3}{2019/06/27}{Added \string\cs{dl@makeesc}}
+%    \begin{macrocode}
+\def\dl@makeesc#1{\catcode`#1=0\relax}
+%    \end{macrocode}
 %    Finally, we get to the definition of \env{defineJS}, and its compatriates.
 %    \begin{macrocode}
 \newenvironment{defineJS}[2][]{%
+  \let\makeesc\dl@makeesc
   \expandafter\@ifundefined\expandafter{%
   \expandafter\@gobble\string#2}{}{%
   \PackageWarning{insdljs}{The command
@@ -1894,6 +1943,7 @@
 %    \begin{macrocode}
 \newenvironment{@defineJS}[2][]
 {%
+  \let\makeesc\dl@makeesc
   \gdef\defineJSArg{#2}\JStoks={}%
   \def\verbatim@processline{%
     \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%

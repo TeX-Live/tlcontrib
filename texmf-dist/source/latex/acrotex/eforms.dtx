@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2019/05/24 v2.11 Provides general eforms support (dps)]
+%<package> [2019/06/14 v2.3 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -89,6 +89,9 @@
 %    \textsf{web}; in this case, the options below must explicitly included.
 %    Set the driver dependent code for the |quiz| environments.
 %
+% \changes{v2.2v2.2}{2019/06/12}{Added fields to fields dict, conforming to hyperref}
+% \changes{v2.13}{2019/06/10}{Added various fields to the fields dictionary so they
+% can get appearances in non-conforming PDF viewers.}
 % \changes{v2.5o}{2012/06/18}{Added required package \string\textsf{ifpdf}}
 % \changes{v2.9m}{2017/09/03}{Added the ifluatex package}
 %    \begin{macrocode}
@@ -96,6 +99,7 @@
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
 %    \end{macrocode}
+% The \pkg{calc} package is now required (2014/02/18).
 % \changes{v2.6c}{2014/02/18}{Added the \string\textsf{calc} package as required package.}
 %    \begin{macrocode}
 \RequirePackage{calc}
@@ -251,6 +255,8 @@
     \MessageBreak in the option list of the eforms package.}%
 }{}
 \fi
+\edef\ef@CatChngs{\the\catcode`\$}
+\@makeother\$\relax
 \newlength\eflength
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
 \ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
@@ -308,6 +314,7 @@
 % around the \textit{inner} bounding rectangle.
 %    \begin{macrocode}
 %<*package>
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \@ifundefined{eq@tmpbox}{\newsavebox{\eq@tmpbox}}{}
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
 \@ifundefined{eq@tmpdimb}{\newdimen\eq@tmpdimb}{}
@@ -362,6 +369,7 @@
   \hb@xt@\noexpand\z@{\hss#1\hss}}\fi}
 \let\@PMPV\@empty
 \let\pmpvFmt\@empty
+\let\pmpvFmtCtrl\relax
 %    \end{macrocode}
 %    The preview bounding box, visible when \cs{previewOn} is expanded. Incorporated into the center
 %    of the box is \cs{pmpvFmt\darg{\cs{@PMPV}}}. \cs{pmpvFmt} can be used to format its argument (\cs{@PMPV});
@@ -376,7 +384,7 @@
   \ifdim\@tempdimb<2\fboxrule\else
     \advance\@tempdimb by-2\fboxrule\fi
   \ckbox@Color\fbox{\parbox[b][\@tempdimb][c]{\@tempdima}%
-    {\vfil\hfil\pmpvFmt{\@PMPV}\hfil\vfil}}\else
+    {\vfil\hfil\pmpvFmtCtrl\pmpvFmt{\@PMPV}\hfil\vfil}}\else
   \parbox[b][#2][c]{#1}{\vfil\hfil\hfil\vfil}\fi}%
 }
 %    \end{macrocode}
@@ -481,6 +489,9 @@
           \@tempcnta=\eq@FfValue
           \def\eq@arg{#2}%
           \ifx\eq@arg\@empty\else
+            \def\x{\FfRadiosInUnison}%
+            \ifx\eq@arg\x\let\isRadiosInUnison\ef@YES
+            \else\let\isRadiosInUnison\ef@NO\fi
           \advance\@tempcnta by#2\fi
           \edef\eq@Ff{/Ff \the\@tempcnta}%
           \def\ef@next{\processAppArgs}%
@@ -502,7 +513,7 @@
 %    (has a flag of 2 or 32), if yes we \cs{let} \DescribeMacro\ef@isHidden\cs{ef@isHidden} to \cs{ef@YES}, otherwise
 %    it is \cs{let} to \cs{ef@NO}.
 %    \begin{macrocode}
-              \ifnum#2=2\relax % dpstoday
+              \ifnum#2=2\relax
                 \let\ef@isHidden\ef@YES\else
               \ifnum#2=32\relax
                 \let\ef@isHidden\ef@YES\else
@@ -1127,11 +1138,26 @@
 %    \begin{macrocode}
 \let\pmpvV\@empty
 \let\eq@VSAVE\@empty
+%    \end{macrocode}
+% Finer control over enhanced preview: for the \cs{V} entry, we can turn the enhanced
+% preview on with \DescribeMacro\pmpvVOn\cmd{\pmpvVOn} and off again with
+% \DescribeMacro\pmpvVOff\cmd\pmpvVOff.
+% \changes{v2.12}{2019/06/07}{Added finer control: \string\cs{pmpvVOff} and
+% \string\cs{pmpvVOn}}
+%    \begin{macrocode}
+\let\ef@Vpv\ef@YES
+\def\pmpvVOff{\let\ef@Vpv\ef@NO\let\pmpvFmtCtrl\@gobble}
+\def\pmpvVOn{\let\ef@Vpv\ef@YES\let\pmpvFmtCtrl\relax}
+\def\noexpand@iii{\noexpand\noexpand\noexpand}
 \def\@eqV#1{\Hy@pdfstringfalse
 %    \end{macrocode}
 %    We define \DescribeMacro\pmpvV\cmd{\pmpvV} to hold the preview value of the field.
+%    \changes{v2.3}{2019/06/14}{Special definition of \string\cs{protect} to suppress
+%    expansion within first argument of \string\cs{tops} within \string\cs{@eqV}}
 %    \begin{macrocode}
-  \edef\pmpvV{#1}%
+  \let\x\protect
+  \let\protect\noexpand@iii\edef\pmpvV{#1}%
+  \edef\pmpvV{#1}\let\protect\x
 %    \end{macrocode}
 %    There is a problem with detecting unicode, if the author wants to use unicode,
 %    he should use \cs{unicodeStr}, which we try to detect, but we not allow
@@ -1278,6 +1304,18 @@
 % enhanced preview, described above in the definition of \cs{@eqV}.
 % \changes{v2.11}{2019/05/24}{Modified \string\cs{@eqCA} to enhance preview}
 %    \begin{macrocode}
+%    \end{macrocode}
+% Finer control over enhanced preview: for the \cs{CA} entry, we can turn the enhanced
+% preview on with \DescribeMacro\pmpvCAOn\cmd{\pmpvCAOn} and off again with
+% \DescribeMacro\pmpvCAOff\cmd\pmpvCAOff.
+% \changes{v2.12}{2019/06/07}{Added finer control: \string\cs{pmpvCAOff} and
+% \string\cs{pmpvCAOn}}
+% \changes{v2.3}{2019/06/14}{Special definition of \string\cs{protect} to suppress
+% expansion within first argument of \string\cs{tops} within \string\cs{@eqCA}}
+%    \begin{macrocode}
+\let\ef@CApv\ef@YES
+\def\pmpvCAOff{\let\ef@CApv\ef@NO\let\pmpvFmtCtrl\@gobble}
+\def\pmpvCAOn{\let\ef@CApv\ef@YES\let\pmpvFmtCtrl\relax}
 \def\@eqCA#1{\let\unicodeStrSAVE\unicodeStr
   \Hy@pdfstringtrue\let\unicodeStr\relax
   \edef\x{#1}\let\unicodeStr\unicodeStrSAVE
@@ -1292,7 +1330,8 @@
 % the caption. It should be something that can be typeset, if not use
 % \cs{tops} to offer an alternative.
 %    \begin{macrocode}
-      \edef\pmpvCA{#1}\def\eq@CA{#1}%
+      \let\x\protect\let\protect\noexpand@iii
+      \edef\pmpvCA{#1}\def\eq@CA{#1}\let\protect\x
       \edef\ef@kvCA{/CA(\ef@uni@temp)}%
       \makespecialJS
     \fi
@@ -1710,6 +1749,14 @@
 %    early; the keys are not defined so we prevent them from expanding prior to being passed to
 %    the parsing mechanism. \cs{protectedKeys} is used in the \pkg{bargraph-js} package.
 %    \changes{v2.10}{2019/03/16}{Added \string\cs{protectedKeys}}
+%    \begin{macrocode}
+%    \end{macrocode}
+% \DescribeMacro{\multigroupradios} Declares whether there are multiple sets of radio button groups
+% with the same names and values,
+%    \begin{macrocode}
+\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
+\let\ef@multigroupradios\ef@NO
+%    \end{macrocode}
 %    \begin{macrocode}
 \def\ef@stop{\relax} %\def\ef@relax{\relax}
 \def\protectedKeys#1#2{\ef@scratchtoks={}%
@@ -2558,7 +2605,7 @@
 %    \begin{macrocode}
     \ifx\ef@isBGtransparent\ef@YES
       \let\ef@kvCA\@empty\fi
-   \PMPV{\eq@CA}\fi
+    \ifx\ef@CApv\ef@YES\PMPV{\eq@CA}\fi\fi
   \ef@djXPD#1%
 }
 %    \end{macrocode}
@@ -2587,6 +2634,7 @@
 %    \end{macrocode}
 %    (2016/12/22) \cs{ef@djXPD} adjusts the size of the field dimensions, if \cs{makeXasPD} is true.
 %    \begin{macrocode}
+  \ef@lateWidgetOpts
   \ifefpmpv\Hy@pdfstringfalse
 %    \end{macrocode}
 %     Having an enhanced preview generates several problems. Text fields are sometimes hidden and their values
@@ -2600,8 +2648,9 @@
 %     value now that we know this field is hidden.
 %    \begin{macrocode}
       \let\eq@V\eq@VSAVE\else
-      \PMPV{\pmpvV}\fi
+      \ifx\ef@Vpv\ef@YES\PMPV{\pmpvV}\fi\fi
   \fi
+  \global\let\ef@lateWidgetOpts\relax
   \ef@djXPD#1%
 }
 %    \end{macrocode}
@@ -2968,7 +3017,52 @@
 %    \end{macrocode}
 % Here is the field template for check boxes and radio button fields fields.
 %    \begin{macrocode}
-\def\common@RadioCheckCode{%
+\def\radio@parent{%
+  /DA (\eq@DA)%
+  /FT/Btn%
+  \eq@Ff%
+  \eq@TU%
+  \eq@DV%
+\expandafter\ifx\csname kids@\Fld@name\endcsname\relax\else
+  /Kids [\@nameuse{kids@\Fld@name}]%
+\fi
+\ifx\ef@multigroupradios\ef@YES
+\expandafter\ifx\csname radio@\Fld@name\endcsname\relax\else
+  /Opt[\@nameuse{radio@\Fld@name}]\fi\fi
+  /T(\Fld@name)%
+  \eq@V
+}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\common@RadioCode{%
+  /Subtype/Widget
+\ifuseNewRadios
+  \expandafter\ifx\csname radio@\Fld@name\endcsname\relax\else
+  /Parent \@nameuse{parent@\Fld@name}\fi
+\else
+  /T (\Fld@name)
+  /FT/Btn
+  \eq@Ff
+  \eq@F
+  \eq@TU
+  \eq@DV\eq@V
+  /DA (\eq@DA)
+\fi
+  /BS <<\eq@W\eq@S>>
+\ifx\eq@AP\@empty
+  /AP<< /N <<\eq@On<<>>>> >>
+  \eq@MK
+\else
+    \eq@AP
+\fi
+  \eq@AS
+%  \eq@DV\eq@V
+  \eq@A\eq@AA
+  \eq@rawPDF
+}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\common@CheckCode{%
   /Subtype/Widget
   /T (\Fld@name)
   /FT/Btn
@@ -3089,8 +3183,8 @@
 \def\checkBoxDefaults{\F{\FPrint}\W{1}\S{S}\BC{0 0 0}}
 %    \end{macrocode}
 %    \begin{macrocode}
-\bgroup\obeyspaces
-\gdef\checkBox{\begingroup\global\let =\pdfSP
+\bgroup\obeyspaces%
+\gdef\checkBox{\begingroup\global\let =\pdfSP%
 \ef@sanitize@toks\ef@checkbox}\egroup
 %    \end{macrocode}
 %    End the sanitizing group, and get the argument, pass them on to
@@ -3098,30 +3192,204 @@
 %    \begin{macrocode}
 \newcommand{\ef@checkbox}[5][]{\endgroup
   \mbox{\check@@Box{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
-  \eq@RadioCheck@driver}{\checkBoxDefaults\every@CheckBox}}}
+  \eq@Check@driver}{\checkBoxDefaults\every@CheckBox}}}
 %    \end{macrocode}
 %    \end{macro}
 % \subsubsection{Radio Button}\label{radiobutton}
-% The basic command for creating radio button fields.
+% The basic command for creating radio button fields. As of the version dated 2019/06/14,
+% radio button code was re-written so they operate in certain non-conforming PDF readers. The old code,
+% which has proven to be reliable for many years. The old code
+% is  available when \DescribeMacro\useNewRadiosOff\cmd{\useNewRadiosOff} is expanded. This is the default.
+%
+% When \DescribeMacro\useNewRadiosOn\cmd{\useNewRadiosOn} is expanded, the new code for radio buttons is used.
+% As a result, you need t\emph{hree compiles} to bring the AUX files up to date. The AUX files now
+% contain PDF object references to radio buttons. Because this new scheme degrades the experience
+% of creating radio buttons (heavy I/O usage), use this option if you and the consumers of your PDF\emph{ do not use}
+% Adobe PDF viewers (on a desktop/laptop).
+%
+% Use the default setting (\cmd{\useNewRadiosOff}) when you will view the PDF in AA/AR and save it; otherwise, if the PDF is to be viewed in non-conforming
+% PDF readers, never having been saved using AA/AR, use the \cmd{\useNewRadiosOn} setting.
+% \changes{v2.3}{2019/06/14}{Rewrote radio buttons so they work in non-conforming PDF readers}
+%
+% \medskip\noindent\textbf{Discussion.} The default scheme is to create the radio buttons \begin{quote}\footnotesize
+% \cs{radioButton\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{height}}} ...\\
+% ... \cs{radioButton\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{height}}}\end{quote} as separate widgets.
+% When loaded by AA/AR, these viewers do some internal arranging automatically; they build appearances, among other things. Saving
+% the PDF from AA/AR save this appearances within the PDF file, so that those using non-conforming PDF viewers will see
+% a correct representation of the fields. (The fields themselves may not be functional, depending on the PDF viewer.)
+%
+% \def\Odict{<<}\def\Cdict{>>}
+%
+% When \cs{useNewRadiosOn} is expanded, instead of creating separate widgets, we create a radio button field,
+%\begin{quote}\offinterlineskip\ttfamily\obeyspaces\obeylines
+%14 0 obj
+%\Odict\space/DA (/ZaDb 9 Tf 0 g)/FT/Btn/Ff 32768/DV/Three
+%/Kids [15 0 R 16 0 R 17 0 R ]/T(Group1)/V/Two \Cdict
+%endobj
+%\end{quote}
+% \texttt{/FT} and \texttt{Ff} entries declare this field to be a radio button field. Note that
+% the object has a \texttt{/Kids} entry that references the individual widgets. The field contains
+% the default value (\texttt{/DV}), if any, and the initial value (\texttt{/V}), if any.
+% A typical widget referenced by the \texttt{/Kids} entry is,
+%\begin{quote}\offinterlineskip\ttfamily\obeyspaces\obeylines
+%15 0 obj
+%\Odict
+%/Type /Annot
+%/Rect [172.716 654.735 185.716 667.735]
+%/Subtype/Widget /Parent 14 0 R/BS \Odict\space/W 1/S/S\Cdict
+%/AP\Odict\space/N\Odict/One\Odict\Cdict\space\Cdict\space\Cdict /MK \Odict\space/BC [0 0 0]/CA(l) \Cdict
+%/AS/Off
+%\Cdict
+%endobj
+%\end{quote}
+%This is a widget annotation with \texttt{/Rect} entry, as well as other entries. The \cs{/AS} key determines
+%whether this widget is `on' or not. This one is off. Some of the non-conforming PDF viewers parse this
+%structure better than the old scheme.
+%
+%The next six lines are new (2019/06/14), to support the new radio button structure.
 %    \begin{macrocode}
+\newif\ifuseNewRadios \useNewRadiosfalse
+\def\useNewRadiosOn{\useNewRadiostrue}
+\def\useNewRadiosOff{\useNewRadiosfalse}
+\let\ef@OptArray\@empty
+\let\ef@KidsArray\@empty
+\let\ef@lateWidgetOpts\relax
 \def\annot@type@radio{radiobtn}
+%    \end{macrocode}
+% You can create one or more copies of a group of radio buttons, whether more copies of a
+% group is not known until the end of the document, so we must set some properties at
+% the end of the document. This command stores information as a function of the field name
+% for later use at the end of the document.
+%    \begin{macrocode}
+\def\ef@NewRadiosLateOpts{%
+%    \end{macrocode}
+%    We do nothing if the new scheme is not being used.
+%    \begin{macrocode}
+  \ifuseNewRadios
+%    \end{macrocode}
+%     If this is a multi-group radio button field that work independently, we adjust the `on' value, as in this case,
+%     the `on' value is referenced by an index, 0, 1, 2,...
+%    \begin{macrocode}
+    \@nameuse{multigroup@\Fld@name}%
+    \ifx\ef@multigroupradios\ef@YES
+      \ifpdfmarkup
+        \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
+        \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
+      \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
+        \@eqAS{Off}\else % today
+      \ifnum\@nameuse{OnVal@\Fld@name}=%
+        \@nameuse{radioindex@\Fld@name}\relax
+      \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
+    \else
+      \edef\x{\@nameuse{OnVal@\Fld@name}}%
+      \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
+        \@eqAS{Off}\fi
+    \fi
+%    \end{macrocode}
+%    If these are groups of radio button fields that light up in unison, we
+%    take to get the \cs{/AS} entry right.
+%    \begin{macrocode}
+    \@nameuse{uniradios@\Fld@name}%
+    \ifx\isRadiosInUnison\ef@YES
+      \edef\x{\@nameuse{value@\Fld@name}}%
+      \ifx\x\ef@thisChoice\expandafter\@eqAS
+        \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
+    \fi
+  \fi
+}
+%    \end{macrocode}
+%     We track the widget belonging to a given field name (\cs{Fld@name}), these radio
+%     indices are used when we have multiple groups if independent radios.
+%    \begin{macrocode}
+\def\ef@advanceRadioIndex#1{\bgroup
+  \@tempcnta\@nameuse{radioindex@#1}\relax
+  \advance\@tempcnta\@ne
+  \csarg\xdef{radioindex@#1}{\the\@tempcnta}\egroup}
+%    \end{macrocode}
+% Some utility commands that are written to the AUX file.
+%    \begin{macrocode}
+\def\radioChoices#1{\csarg\xdef{radio@#1}}
+\def\radioKids#1{\csarg\xdef{kids@#1}}
+%    \end{macrocode}
+%    A warning message when not all the PDF objects have
+%    been resolved. We try to emit only one message per
+%    compile.
+%    \begin{macrocode}
+\def\ef@radioWarning{\PackageWarningNoLine{eforms}
+  {Not all PDF object references have\MessageBreak
+   been resolved, keep compiling}}
+%    \end{macrocode}
+%     The command that detects whether any object reference is not defined.
+%    \begin{macrocode}
+\def\ef@@radioWarning{%
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{kids@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{radio@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{parent@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+}
+%    \end{macrocode}
+%    Finally, we arrive at the low-level radio button command, where
+%    changes for the 2019/06/14 version have been made.
+%    \begin{macrocode}
 \newcommand\radio@@Button[8]{\begingroup\let\#\ef@Hx
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@radio}%
-  \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
+  \pdfstringdef\Fld@name{#2}%
+%    \end{macrocode}
+%    Additional code for the new scheme.
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \ef@@radioWarning
+    \@ifundefined{rad@\Fld@name}{\let\isRadioParent\ef@YES
+    \global\let\ef@OptArray\@empty
+    \global\let\ef@KidsArray\@empty
+    \csarg\gdef{radioindex@\Fld@name}{-1}\expandafter
+    \global\csarg\let{rad@\Fld@name}\@empty}%
+      {\let\isRadioParent\ef@NO}%
+    \edef\ef@OptArray{\@nameuse{rad@\Fld@name}}%
+    \g@addto@macro\ef@OptArray{(#5)}% opt
+    \csarg\xdef{rad@\Fld@name}{\ef@OptArray}%
+    \ifx\isRadioParent\ef@YES
+      \def\y{\expandafter\string\noexpand}%
+      \edef\x{\noexpand\immediate\noexpand\write\noexpand\@auxout
+        {\y\radioChoices{\Fld@name}{\noexpand
+        \@nameuse{rad@\Fld@name}}}}%
+      \def\z{\expandafter\AtEndDocument\expandafter{\x}}\z
+      \edef\x{\noexpand\immediate\noexpand\write\noexpand\@auxout
+        {\y\radioKids{\Fld@name}{\noexpand
+          \@nameuse{kid@\Fld@name}}}}%
+      \def\z{\expandafter\AtEndDocument\expandafter{\x}}\z
+    \fi
+    \ef@advanceRadioIndex{\Fld@name}%
+    \@nameuse{multigroup@\Fld@name}%
+  \fi
+  \@eqAS{Off}\dl@paramlocal
   \def\@eqDV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty\let\eq@DV\@empty
     \else\ifpdfmarkup\def\eq@DV{/DV(##1) cvn }\else
     \def\eq@DV{/DV/##1}\fi\fi}%
-  \def\@eqV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty
-%    \end{macrocode}
-%    Provide enhanced preview for radio buttons
-%    \begin{macrocode}
-    \let\eq@V\@empty\else\def\pmpvV{\pmpv@mrk}\ifpdfmarkup
-      \def\eq@V{/V(##1) cvn }\else
-      \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi
-    \ifefpmpv\let\eq@V\@empty\fi}%
+  \def\@eqV##1{\Hy@pdfstringfalse\edef\pmpvV{##1}%
+    \Hy@pdfstringtrue
+    \edef\eq@arg{##1}%
+    \if$\eq@arg$\else
+      \ifpdfmarkup
+        \edef\eq@V{/V(##1) cvn }\else
+        \edef\eq@V{/V/##1}\fi
+        \@eqAS{##1}\fi
+    \if$\eq@arg$%
+    \else
+      \csarg\xdef{OnVal@\Fld@name}{##1}\fi
+    \ifefpmpv
+      \gdef\ef@lateWidgetOpts{\if$\pmpvV$\else\def\pmpvV{\pmpv@mrk}\fi}%
+      \let\eq@V\@empty\else\global\let\ef@lateWidgetOpts\relax\fi
+    }%
   \eqf@setDimens{#3}{#4}%
   \ifpdfmarkup\def\eq@On{(#5) cvn }\else\def\eq@On{/#5}\fi
+  \def\ef@thisChoice{#5}%
   \def\eq@Ff{/Ff \FfRadio}\@eqtextFont{ZaDb}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@eqMK{\eq@R\eq@BC\eq@BG/CA(\symbol@choice)\eq@mkIns}%
@@ -3150,7 +3418,7 @@
 %    \begin{macrocode}
 \newcommand{\ef@radiobutton}[5][]{\endgroup
   \mbox{\radio@@Button{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
-  \eq@RadioCheck@driver}{\radioButtonDefaults\every@RadioButton}}}
+  \eq@Radio@driver}{\radioButtonDefaults\every@RadioButton}}}
 %    \end{macrocode}
 %    \end{macro}
 %
@@ -4355,6 +4623,18 @@
 \def\noPeek#1#2{\literalps@out{%
   \AEB@psMrk{ThisPage} << \noPeekAction{#1}{#2} >> /PUT pdfmark}}
 %    \end{macrocode}
+% We create an object definition for each field, there is an option for
+% the author to specify a objdef name, and for a calculation field, this
+% is done automatically.
+%    \begin{macrocode}
+\def\ef@getobjdef{%
+  \HyField@AdvanceAnnotCount
+  \ifisCalculate\edef\eq@objdefName{\Fld@name}\else
+  \ifx\eq@objdef\@empty
+    \edef\eq@objdefName{\annot@type\HyField@TheAnnotCount}\fi\fi
+  \edef\eq@objdef{/_objdef \string{\eq@objdefName\string}}%
+}
+%    \end{macrocode}
 % Driver dependent code (distiller) for choice fields, list and combo.
 %    \begin{macrocode}
 \def\eq@choice@driver
@@ -4364,13 +4644,14 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
-    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-    /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@choiceCode
-  /ANN pdfmark
-  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@choiceCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+    \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
@@ -4384,38 +4665,113 @@
   \ifx\@vertRotate\ef@One\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
       \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@pushButtonCode
-  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+    \common@pushButtonCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
 %    \end{macrocode}
 % Driver dependent code (distiller) for radio and button fields.
 %    \begin{macrocode}
-\def\eq@RadioCheck@driver
+\def\parentRef#1#2{\csarg\gdef{parent@#1}{#2}}
+\def\ef@radioData#1#2{\immediate
+  \write\@mainaux{\string\parentRef{#1}{#2}}}
+\def\eq@Radio@driver
 {%
   \Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
+%    \end{macrocode}
+%    Additional code version dated 2019/06/14 or later.
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \ifx\isRadioParent\ef@YES\expandafter
+      \ifx\csname radio@\Fld@name\endcsname\relax\else
+        \literalps@out{\AEB@psMrk
+          /_objdef{parent@rad\HyField@TheAnnotCount}
+            /type/dict/OBJ pdfmark
+          \AEB@psMrk{parent@rad\HyField@TheAnnotCount}
+            << \radio@parent\space >>/PUT pdfmark
+        }\ef@radioData{\Fld@name}{{parent@rad\HyField@TheAnnotCount}}%
+        \ifx\eq@V\@empty\else
+          \csarg\xdef{value@\Fld@name}%
+            {\@nameuse{OnVal@\Fld@name}}%
+        \fi
+      \fi
+      \ifx\ef@multigroupradios\ef@YES
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@YES}%
+      \else
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@NO}%
+      \fi
+      \ifx\isRadiosInUnison\ef@YES
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@YES}%
+      \else
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@NO}%
+      \fi
+    \fi
+  \fi
+  \ef@NewRadiosLateOpts
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@RadioCheckCode
-  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+    \common@RadioCode
+    /ANN pdfmark
+  \ifuseNewRadios\else
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  \fi
+  }\to@insertStrucTabOrder{Form}%
+%    \end{macrocode}
+%    Save the object reference to this kid
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ef@KidsArray{{\eq@objdefName}\space}}\x
+    \csarg\xdef{kid@\Fld@name}{\ef@KidsArray}%
+  \fi
+  \endgroup
+  \dl@restorespcs
+}
+\def\eq@Check@driver
+{%
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@CheckCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
+  \ef@getobjdef
   \pdf@rect{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@RadioCheckCode
-  /ANN pdfmark}\endgroup
+    \common@CheckCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\endgroup
   \dl@restorespcs
 }
 %    \end{macrocode}
@@ -4426,13 +4782,14 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
-    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-     /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@TextFieldCode
-  /ANN pdfmark
-  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@TextFieldCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+    \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
@@ -4445,11 +4802,13 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@SigFieldCode
-  /ANN pdfmark
+    \common@SigFieldCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
@@ -4561,10 +4920,68 @@
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \hbox{\pdfstartlink user{\common@pushButtonCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }
-\def\eq@RadioCheck@driver
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\parentRef#1#2{\csarg\gdef{parent@#1}{#2 0 R}}
+\def\ef@radioData#1#2{\expandafter
+  \HyField@@AddToFields\expandafter{#2}%
+  \immediate\write\@mainaux{\string\parentRef{#1}{#2}}}
+\def\eq@Radio@driver{\Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+%    \end{macrocode}
+%    Additional code version dated 2019/06/14 or later.
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \ifx\isRadioParent\ef@YES\expandafter
+      \ifx\csname radio@\Fld@name\endcsname\relax\else
+        \immediate\pdfobj{<< \radio@parent\space >>}%
+        \ef@radioData{\Fld@name}{\the\pdflastobj}%
+        \ifx\eq@V\@empty\else
+            \csarg\xdef{value@\Fld@name}%
+              {\@nameuse{OnVal@\Fld@name}}%
+        \fi
+      \fi
+      \ifx\ef@multigroupradios\ef@YES
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@YES}%
+      \else
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@NO}%
+      \fi
+      \ifx\isRadiosInUnison\ef@YES
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@YES}%
+      \else
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@NO}%
+      \fi
+    \fi
+  \fi
+  \ef@NewRadiosLateOpts
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \hbox{\pdfstartlink user{\common@RadioCode}%
+  \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+%    \end{macrocode}
+%    Save the object reference to this kid
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ef@KidsArray{\the\pdflastlink\space 0 R\space}}\x
+    \csarg\xdef{kid@\Fld@name}{\ef@KidsArray}%
+  \else
+    \HyField@AddToFields
+  \fi
+  \endgroup
+  \dl@restorespcs
+}
+\def\eq@Check@driver
 {%
   \Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
@@ -4572,16 +4989,17 @@
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
-  \hbox{\pdfstartlink user{\common@RadioCheckCode}%
+  \hbox{\pdfstartlink user{\common@CheckCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
-  \pdfstartlink user{\common@RadioCheckCode}%
+  \pdfstartlink user{\common@CheckCode}%
   \makebox[\eq@tmpdima]{\phantom{\link@@Content}}%
-  \pdfendlink\endgroup
+  \pdfendlink\HyField@AddToFields\endgroup
   \dl@restorespcs
 }
 \def\eq@TextField{\Hy@pdfstringtrue
@@ -4603,6 +5021,7 @@
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
   \leavevmode\hbox{\pdfstartlink user{\common@SigFieldCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
+  \HyField@AddToFields
   \endgroup
   \dl@restorespcs
 }
@@ -4673,24 +5092,99 @@
   \endgroup
   \dl@restorespcs
 }
-\def\eq@RadioCheck@driver{\ef@adjHWxetex\Hy@pdfstringtrue
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\parentRef#1#2{\csarg\gdef{parent@#1}{#2}}
+\def\ef@radioData#1#2{%\expandafter
+%  \HyField@@AddToFields\expandafter{#2}%
+  \immediate\write\@mainaux{\string\parentRef{#1}{#2}}}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\eq@Radio@driver{\ef@adjHWxetex\Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+%    \end{macrocode}
+%    Additional code version dated 2019/06/14 or later.
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \ifx\isRadioParent\ef@YES\expandafter
+      \ifx\csname radio@\Fld@name\endcsname\relax\else
+        \immediate\@pdfm@mark{obj @parentobj\HyField@TheAnnotCount
+          << \radio@parent\space >>}%
+        \ef@radioData{\Fld@name}{@parentobj\HyField@TheAnnotCount}%
+        \ifx\eq@V\@empty\else
+            \csarg\xdef{value@\Fld@name}%
+              {\@nameuse{OnVal@\Fld@name}}%
+        \fi
+      \fi
+      \ifx\ef@multigroupradios\ef@YES
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@YES}%
+      \else
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@NO}%
+      \fi
+      \ifx\isRadiosInUnison\ef@YES
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@YES}%
+      \else
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@NO}%
+      \fi
+    \fi
+  \fi
+  \ef@NewRadiosLateOpts
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \HyField@AdvanceAnnotCount
+  \setbox\pdfm@box=%
+    \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \ifx\annot@type\annot@type@checkbox\def\btn@type{check}\else
+    \def\btn@type{radio}\fi
+  \@pdfm@mark{ann @\btn@type\HyField@TheAnnotCount\space\dvipdfm@setdim
+  <<\common@RadioCode>>}\unhbox\pdfm@box\relax%
+%    \end{macrocode}
+%    Save the object reference to this kid
+%    \begin{macrocode}
+  \ifuseNewRadios
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ef@KidsArray{@parentobj\HyField@TheAnnotCount\space}}\x
+    \csarg\xdef{kid@\Fld@name}{\ef@KidsArray}%
+  \else
+    \@pdfm@mark{put @afields @\btn@type\HyField@TheAnnotCount}%
+  \fi
+  \endgroup
+  \dl@restorespcs
+}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\eq@Check@driver{\ef@adjHWxetex\Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \HyField@AdvanceAnnotCount
   \setbox\pdfm@box=%
     \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
-  \@pdfm@mark{ann \dvipdfm@setdim
-  <<\common@RadioCheckCode>>}\unhbox\pdfm@box\relax%
+  \ifx\annot@type\annot@type@checkbox\def\btn@type{check}\else
+    \def\btn@type{radio}\fi
+  \@pdfm@mark{ann @\btn@type\HyField@TheAnnotCount\space\dvipdfm@setdim
+  <<\common@CheckCode>>}\unhbox\pdfm@box\relax%
+  \@pdfm@mark{put @afields @\btn@type\HyField@TheAnnotCount}%
   \endgroup
   \dl@restorespcs
 }
 \def\eq@l@check@driver{%
-    \setbox\pdfm@box=%
-      \hbox{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
-        \@pdfm@mark{ann \dvipdfm@setdim<<\common@RadioCheckCode>>}%
-        \unhbox\pdfm@box\relax\endgroup
+  \HyField@AdvanceAnnotCount
+  \setbox\pdfm@box=%
+    \hbox{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
+  \@pdfm@mark{ann @check\HyField@TheAnnotCount\space
+    \dvipdfm@setdim<<\common@CheckCode>>}%
+  \unhbox\pdfm@box\relax
+  \@pdfm@mark{put @afields @check\HyField@TheAnnotCount}%
+  \endgroup
 }
 \def\eq@TextField{\ef@adjHWxetex\Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
@@ -4715,6 +5209,7 @@
     \hbox{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \@pdfm@mark{ann @\Fld@name\space\dvipdfm@setdim
     << \common@SigFieldCode >>}\unhbox\pdfm@box\relax%
+  \@pdfm@mark{put @afields @\Fld@name}% record in @afields array
   \endgroup
   \dl@restorespcs
 }
@@ -4788,6 +5283,7 @@ ef_setCalcOrder(_EfCalcOrder);
 %    \begin{macrocode}
 %<*package>
 \inputCalcOrderJS
+\catcode`\$=\ef@CatChngs
 %</package>
 %    \end{macrocode}
 %  \Finale

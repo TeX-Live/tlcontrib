@@ -20,6 +20,13 @@
 \def\Rect#1{\pdf@rect{\textcolor{\@linkcolor}{#1}}}
 \def\noPeek#1#2{\literalps@out{%
   \AEB@psMrk{ThisPage} << \noPeekAction{#1}{#2} >> /PUT pdfmark}}
+\def\ef@getobjdef{%
+  \HyField@AdvanceAnnotCount
+  \ifisCalculate\edef\eq@objdefName{\Fld@name}\else
+  \ifx\eq@objdef\@empty
+    \edef\eq@objdefName{\annot@type\HyField@TheAnnotCount}\fi\fi
+  \edef\eq@objdef{/_objdef \string{\eq@objdefName\string}}%
+}
 \def\eq@choice@driver
 {%
   \Hy@pdfstringtrue
@@ -27,13 +34,14 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
-    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-    /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@choiceCode
-  /ANN pdfmark
-  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@choiceCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+    \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
@@ -44,35 +52,104 @@
   \ifx\@vertRotate\ef@One\let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
       \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@pushButtonCode
-  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+    \common@pushButtonCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
-\def\eq@RadioCheck@driver
+\def\parentRef#1#2{\csarg\gdef{parent@#1}{#2}}
+\def\ef@radioData#1#2{\immediate
+  \write\@mainaux{\string\parentRef{#1}{#2}}}
+\def\eq@Radio@driver
 {%
   \Hy@pdfstringtrue
   \ifx\@vertRotate\ef@One
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
+  \ifuseNewRadios
+    \ifx\isRadioParent\ef@YES\expandafter
+      \ifx\csname radio@\Fld@name\endcsname\relax\else
+        \literalps@out{\AEB@psMrk
+          /_objdef{parent@rad\HyField@TheAnnotCount}
+            /type/dict/OBJ pdfmark
+          \AEB@psMrk{parent@rad\HyField@TheAnnotCount}
+            << \radio@parent\space >>/PUT pdfmark
+        }\ef@radioData{\Fld@name}{{parent@rad\HyField@TheAnnotCount}}%
+        \ifx\eq@V\@empty\else
+          \csarg\xdef{value@\Fld@name}%
+            {\@nameuse{OnVal@\Fld@name}}%
+        \fi
+      \fi
+      \ifx\ef@multigroupradios\ef@YES
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@YES}%
+      \else
+        \csarg\gdef{multigroup@\Fld@name}%
+          {\let\ef@multigroupradios\ef@NO}%
+      \fi
+      \ifx\isRadiosInUnison\ef@YES
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@YES}%
+      \else
+        \csarg\gdef{uniradios@\Fld@name}%
+          {\let\isRadiosInUnison\ef@NO}%
+      \fi
+    \fi
+  \fi
+  \ef@NewRadiosLateOpts
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@RadioCheckCode
-  /ANN pdfmark}\to@insertStrucTabOrder{Form}\endgroup
+    \common@RadioCode
+    /ANN pdfmark
+  \ifuseNewRadios\else
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  \fi
+  }\to@insertStrucTabOrder{Form}%
+  \ifuseNewRadios
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ef@KidsArray{{\eq@objdefName}\space}}\x
+    \csarg\xdef{kid@\Fld@name}{\ef@KidsArray}%
+  \fi
+  \endgroup
+  \dl@restorespcs
+}
+\def\eq@Check@driver
+{%
+  \Hy@pdfstringtrue
+  \ifx\@vertRotate\ef@One
+    \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
+    \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
+  \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
+  \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
+  \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
+  \literalps@out{\AEB@psMrk
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@CheckCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
 \def\eq@l@check@driver
 {%
+  \ef@getobjdef
   \pdf@rect{\makebox[\eq@tmpdima]{\phantom{\link@@Content}}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@RadioCheckCode
-  /ANN pdfmark}\endgroup
+    \common@CheckCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+  }\endgroup
   \dl@restorespcs
 }
 \def\eq@TextField{\Hy@pdfstringtrue
@@ -80,13 +157,14 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
-    \ifisCalculate/_objdef {\Fld@name}\else\eq@objdef\fi
-     /Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@TextFieldCode
-  /ANN pdfmark
-  \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
+    \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
+    \common@TextFieldCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
+    \ifisCalculate\AEB@psMrk{corder} {\Fld@name} /APPEND pdfmark\fi
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }
@@ -95,11 +173,13 @@
     \let\W@temp\eq@rectW\edef\eq@rectW{\eq@rectH}%
     \edef\eq@rectH{\W@temp}\fi\centerWidget\eq@rectH
   \ifx\autoCenter\ef@n\eqcenterWidget=0pt\fi
+  \ef@getobjdef
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
     \eq@objdef/Rect [pdf@llx pdf@lly pdf@urx pdf@ury]
-      \common@SigFieldCode
-  /ANN pdfmark
+    \common@SigFieldCode
+    /ANN pdfmark
+    \AEB@psMrk{afields} {\eq@objdefName} /APPEND pdfmark
   }\to@insertStrucTabOrder{Form}\endgroup
   \dl@restorespcs
 }

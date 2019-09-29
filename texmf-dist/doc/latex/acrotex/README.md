@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2019-05-24
+Dated: 2019-08-13
 
 AeB contains the following:
 
@@ -18,6 +18,9 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2019-08-13) Use \protect when formatting a enhanced preview value.
+Other minor changes and bug fixes.
 
 What's New (2019-05-24) Added the enhanced preview feature. When in effect along with
 ordinary preview, captions of buttons and initial values of other fields are viewable 

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2018  D. P. Story                 %%
+%% Copyright (C) 1999-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2019/02/11 v8.2.9 %
+ [2019/08/13 v8.3 %
   Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -1702,27 +1702,31 @@
 }
 \let\isQZ=q \let\isSQZ=s
 \def\sq@IDTxtField{\makebox[0pt][l]{\textField[\autoCenter{n}\BC{}\BG{}
-    \S{S}\textSize{0}\Ff{\FfReadOnly}
-    \AA{\AAFormat{%
-        var \oField=new Object;\r
-        \oField.Grp={};
-        \ifx\defaultColorJSLoc\@empty\else\r
-        \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
-        \ifx\rghtColorJSLoc\@empty\else\r
-        \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
-        \ifx\wrngColorJSLoc\@empty\else\r
-        \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
-        \ifx\rghtAnsSymbJSLoc\@empty\else\r
-        \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
-        \ifx\wrngAnsSymbJSLoc\@empty\else\r
-        \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
-    }}]{sqID\oField}{2bp}{2bp}}%
+  \S{S}\textSize{0}\Ff{\FfReadOnly}
+  \AA{\AAFormat{%
+    if (typeof \oField=="undefined")\r\t
+      var \oField=new Object;\r
+    \oField.Grp={};
+    \ifx\defaultColorJSLoc\@empty\else\r
+    \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
+    \ifx\rghtColorJSLoc\@empty\else\r
+    \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
+    \ifx\wrngColorJSLoc\@empty\else\r
+    \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
+    \ifx\rghtAnsSymbJSLoc\@empty\else\r
+    \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
+    \ifx\wrngAnsSymbJSLoc\@empty\else\r
+    \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
+}}]{sqID\oField}{2bp}{2bp}}%
 }
 \def\qz@IDTxtField{\makebox[0pt][l]{\textField[\autoCenter{n}\BC{}\BG{}
     \S{S}\textSize{0}\Ff{\FfReadOnly}
     \AA{\AAFormat{if(typeof aQuizzesInDoc=="undefined")\r\t
       var aQuizzesInDoc=new Array();\r
-    if (aQuizzesInDoc.indexOf("\oField")) aQuizzesInDoc.push("\oField");
+      if (aQuizzesInDoc.indexOf("\oField"))
+        aQuizzesInDoc.push("\oField");\r
+    if (typeof \oField=="undefined")\r\t
+      var \oField=new Object;\r
     }}]{qzID\oField}{2bp}{2bp}}}
 \let\eqQuizType\relax
 \def\@@shortquiz[#1]{%\begingroup
@@ -2214,7 +2218,7 @@
   \mbox{\check@@Box{#1\V{Yes}\DV{Yes}}%
   {rbmarkup.\Fld@name}%
   {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-  {\eq@setWidgetProps\eq@RadioCheck@driver}%
+  {\eq@setWidgetProps\eq@Check@driver}%
   {\rbMarkup@Defaults\every@CheckBox\every@rbMarkup}}}%
 \newcommand\minQuizResp{lowThreshold}
 \newcommand\PTs{\@ifstar{\def\eq@star{*}\@PTs}{\def\eq@star{x}\@PTs}}
@@ -2316,7 +2320,7 @@
   \global\let\eqOutOf\eq@OutOf}
 \def\DeclareQuiz#1{\edef\oField{#1}%
     \edef\thisQuiz{#1}\edef\curr@quiz{#1}%
-    \edef\currQuiz{#1}\edef\curr@quiz{#1}}
+    \edef\currQuiz{#1}}
 \let\Quiz\DeclareQuiz
 \def\aeb@noindgobble{\noindent\@gobbletwo}
 \let\startQuizHere\relax
@@ -2632,7 +2636,7 @@
 \def\@@Ans@sq@f@Defaults
 {%
     \BC{0 0 0}\Ff{\FfNoToggleToOff}\W{1}
-    \F{\FPrint}\textSize{12}\textColor{0 g}
+    \textSize{12}\textColor{0 g}
 }
 \def\sqTurnOffAlerts{\let\@sqTurnOffAlerts\eq@Zero}
 \def\sqTurnOnAlerts{\let\@sqTurnOffAlerts\eq@One}
@@ -2712,12 +2716,12 @@
     \hangindent=\eq@tmplength\hangafter=1\relax
     \insertGrayLetters % 6.3d
     \mbox{\expandafter\radio@@Button\expandafter{\rbf@Opts}%
-        {mc.\oField.\thequestionno}%
-        {\RadioFieldSize}% 11/16/05 changed from \oField to mc.\oField
-        {\RadioFieldSize}{\Ans@choice\alph{quizno}}{\eq@protect\A}%
-        {\eq@setWidgetProps\eq@RadioCheck@driver}%
-        {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
-         \every@sqRadioButton}}%
+      {mc.\oField.\thequestionno}%
+      {\RadioFieldSize}{\RadioFieldSize}%
+      {\Ans@choice\alph{quizno}}{\eq@protect\A}%
+      {\eq@setWidgetProps\eq@Radio@driver}%
+      {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
+       \every@sqRadioButton}}%
     \Ans@proofing{\RadioFieldSize}%
 \eq@hspanner\ignorespaces}
 \def\@@Ans@ck@sq@f@Defaults
@@ -2789,7 +2793,7 @@
         {mc.\oField.\thequestionno.\arabic{quizno}}%
         {\RadioFieldSize}{\RadioFieldSize}
         {\Ans@choice\alph{quizno}}{\eq@protect\A}%
-        {\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@setWidgetProps\eq@Check@driver}%
         {\@@Ans@ck@sq@f@Defaults\Ans@ck@sq@f@Actions\every@CheckBox
          \every@sqCheckBox}}%
     \Ans@proofing{\RadioFieldSize}%
@@ -3094,7 +3098,7 @@ if (_bOK) {\jsR\jsT
     \mbox{\expandafter\radio@@Button\expandafter{\rbf@Opts}%
         {mc.\curr@quiz.\thequestionno}%
         {\RadioFieldSize}{\RadioFieldSize}{\Ans@choice\alph{quizno}}%
-        {\eq@protect\A}{\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@protect\A}{\eq@setWidgetProps\eq@Radio@driver}%
         {\Ans@r@f@Defaults\Ans@r@f@Actions\every@RadioButton
          \every@qRadioButton\insert@circlesymbol}}%
     \let\late@options\@empty
@@ -3124,7 +3128,7 @@ if (_bOK) {\jsR\jsT
         \makebox[0pt][r]{\check@@Box{}%
             {mcq.\curr@quiz.\thequestionno.\arabic{quizno}}%
             {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Check@driver}%
             {\Ans@c@f@Defaults\Ans@c@f@Choice\every@CheckBox
              \every@qCheckBox\late@options}}%
     \fi
@@ -3172,7 +3176,7 @@ if (_bOK) {\jsR\jsT
     \mbox{\expandafter\check@@Box\expandafter{\cbf@Opts}%
         {mck.\curr@quiz.\thequestionno.\arabic{quizno}}%
         {\RadioFieldSize}{\RadioFieldSize}{\Ans@choice\alph{quizno}}%
-        {\eq@protect\A}{\eq@setWidgetProps\eq@RadioCheck@driver}%
+        {\eq@protect\A}{\eq@setWidgetProps\eq@Check@driver}%
         {\Ans@ck@f@Defaults\Ans@ck@f@Actions\every@RadioButton
         \every@qckCheckbox}}%
     \ifnocorrections\else
@@ -3201,7 +3205,7 @@ if (_bOK) {\jsR\jsT
         \makebox[0pt][r]{\check@@Box{}%
             {mcq.\curr@quiz.\thequestionno.\arabic{quizno}}%
             {\RadioFieldSize}{\RadioFieldSize}{Yes}{}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Check@driver}%
             {\Ans@c@f@Defaults\Ans@c@f@Choice\every@CheckBox
             \every@qCheckBox\late@options}}%
     \fi
@@ -4039,10 +4043,10 @@ if (!isQuizInitialized("@currQuiz")) {
         \AAKeystroke{%
             if(event.willCommit){\jsR\jsT
             RecordPointValue(\eqPTs,\thequestionno);\jsR\jsT
-            RecordProblemType("\eqQT",\thequestionno);\jsR\jsT
+            RecordProblemType("\eqQT",\thequestionno);\jsR %\jsT
             }\jsR
             if (!isQuizInitialized("\curr@quiz")) {\jsR\jsT
-                @eqObjAlert\space eqAppAlert(%
+                \eqObjAlert\space eqAppAlert(%
                     InitMsg("\bqlabelISO"),3);\jsR\jsT
                 event.rc = false;\jsR
             }%
@@ -4050,14 +4054,23 @@ if (!isQuizInitialized("@currQuiz")) {
     \fi
     }
 }
-\newcommand\RespBoxEssay[3][]
+\newcommand\RespBoxEssay[1][]{\def\rbe@rgi{#1}\RespBoxEssay@i}
+\def\RespBoxEssay@i{\@ifnextchar[%]
+  {\RespBoxEssay@ii}
+  {\@ifstar{\RespBoxEssay@ii[\curr@quiz.\thequestionno]}}%
+  {\RespBoxEssay@ii[]}%
+}
+\newcommand\RespBoxEssay@ii[3][]
 {%
     \smallskip\addtocounter{eqpointvalue}{\eqPTs}%
+    \eq@AddProbToQzQuesList
     \stepcounter{questionno}%
-    \mbox{\text@@Field{#1}{essay.\curr@quiz.\thequestionno}{#2}{#3}%
+    \xdef\@qzsolndest{#1}%
     \edef\eqtmp{\aPointType}\xdef\aPointType{\eqtmp,[\eqPTs,"essay"]}%
-    {\eq@protect\AA}{\eq@setWidgetProps\@@RespBoxEssayActions
-     \eq@TextField}{\RespBoxEssayDefaults\every@eqTextField}}%
+    \expandafter\mbox\expandafter{\expandafter\text@@Field\expandafter{\rbe@rgi}{essay.\curr@quiz.\thequestionno}{#2}{#3}%
+    {\eq@protect\AA}{\eq@setWidgetProps
+     \eq@TextField}{\RespBoxEssayDefaults\@@RespBoxEssayActions
+     \every@eqTextField}}%
 }
 \let\@@sqTallyBoxActions\@empty
 \@ifundefined{calcOrder}{%
@@ -4414,8 +4427,8 @@ if (!isQuizInitialized("@currQuiz")) {
 \let\eqQzQuesList\@empty
 \def\eq@AddProbToQzQuesList{%
     \edef\eq@tmpExp{\noexpand\g@addto@macro%
-        \noexpand\eqQzQuesList{%
-            \noexpand\@eqListExp{\@currentQues}{\thepage}}}%
+        \noexpand\eqQzQuesList{\string
+          \@eqListExp{\@currentQues}{\the\c@page}}}%
     \ifx\grpquestions\eq@Zero\eq@tmpExp\fi
 }
 \LangRedefinitions

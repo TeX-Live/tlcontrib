@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2019/05/24 v2.11 Provides general eforms support (dps)]
+ [2019/06/14 v2.3 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
@@ -111,6 +111,8 @@
     \MessageBreak in the option list of the eforms package.}%
 }{}
 \fi
+\edef\ef@CatChngs{\the\catcode`\$}
+\@makeother\$\relax
 \newlength\eflength
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
 \ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
@@ -139,6 +141,7 @@
 \let\to@usepdfmark\ef@Zero
 \RequirePackage{taborder}
 \fi
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \@ifundefined{eq@tmpbox}{\newsavebox{\eq@tmpbox}}{}
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
 \@ifundefined{eq@tmpdimb}{\newdimen\eq@tmpdimb}{}
@@ -159,6 +162,7 @@
   \hb@xt@\noexpand\z@{\hss#1\hss}}\fi}
 \let\@PMPV\@empty
 \let\pmpvFmt\@empty
+\let\pmpvFmtCtrl\relax
 \def\ef@Bbox#1#2{\hbox{\ifpreview
   \setlength\fboxrule{\efPreviewOnRule}\setlength\fboxsep{0pt}%
   \@tempdima=#1\relax
@@ -168,7 +172,7 @@
   \ifdim\@tempdimb<2\fboxrule\else
     \advance\@tempdimb by-2\fboxrule\fi
   \ckbox@Color\fbox{\parbox[b][\@tempdimb][c]{\@tempdima}%
-    {\vfil\hfil\pmpvFmt{\@PMPV}\hfil\vfil}}\else
+    {\vfil\hfil\pmpvFmtCtrl\pmpvFmt{\@PMPV}\hfil\vfil}}\else
   \parbox[b][#2][c]{#1}{\vfil\hfil\hfil\vfil}\fi}%
 }
 \let\Bbox\ef@Bbox
@@ -199,6 +203,9 @@
           \@tempcnta=\eq@FfValue
           \def\eq@arg{#2}%
           \ifx\eq@arg\@empty\else
+            \def\x{\FfRadiosInUnison}%
+            \ifx\eq@arg\x\let\isRadiosInUnison\ef@YES
+            \else\let\isRadiosInUnison\ef@NO\fi
           \advance\@tempcnta by#2\fi
           \edef\eq@Ff{/Ff \the\@tempcnta}%
           \def\ef@next{\processAppArgs}%
@@ -211,7 +218,7 @@
             \@tempcnta=\eq@FValue
             \def\eq@arg{#2}%
             \ifx\eq@arg\@empty\else
-              \ifnum#2=2\relax % dpstoday
+              \ifnum#2=2\relax
                 \let\ef@isHidden\ef@YES\else
               \ifnum#2=32\relax
                 \let\ef@isHidden\ef@YES\else
@@ -506,8 +513,14 @@
   \let\eq@DV\@empty\else\def\eq@DV{/DV<#1>}\fi}
 \let\pmpvV\@empty
 \let\eq@VSAVE\@empty
+\let\ef@Vpv\ef@YES
+\def\pmpvVOff{\let\ef@Vpv\ef@NO\let\pmpvFmtCtrl\@gobble}
+\def\pmpvVOn{\let\ef@Vpv\ef@YES\let\pmpvFmtCtrl\relax}
+\def\noexpand@iii{\noexpand\noexpand\noexpand}
 \def\@eqV#1{\Hy@pdfstringfalse
-  \edef\pmpvV{#1}%
+  \let\x\protect
+  \let\protect\noexpand@iii\edef\pmpvV{#1}%
+  \edef\pmpvV{#1}\let\protect\x
   \let\unicodeStrSAVE\unicodeStr
   \Hy@pdfstringtrue\let\unicodeStr\relax
   \edef\x{#1}\let\unicodeStr\unicodeStrSAVE
@@ -582,6 +595,9 @@
   \fi
 }\def\eq@BG{}
 \let\pmpvCA\@empty
+\let\ef@CApv\ef@YES
+\def\pmpvCAOff{\let\ef@CApv\ef@NO\let\pmpvFmtCtrl\@gobble}
+\def\pmpvCAOn{\let\ef@CApv\ef@YES\let\pmpvFmtCtrl\relax}
 \def\@eqCA#1{\let\unicodeStrSAVE\unicodeStr
   \Hy@pdfstringtrue\let\unicodeStr\relax
   \edef\x{#1}\let\unicodeStr\unicodeStrSAVE
@@ -591,7 +607,8 @@
     \let\eq@CA\@empty\let\ef@kvCA\@empty
     \else\ef@pdfCRLFTABDefns
       \pdfstringdef\ef@uni@temp{#1}\Hy@pdfstringfalse
-      \edef\pmpvCA{#1}\def\eq@CA{#1}%
+      \let\x\protect\let\protect\noexpand@iii
+      \edef\pmpvCA{#1}\def\eq@CA{#1}\let\protect\x
       \edef\ef@kvCA{/CA(\ef@uni@temp)}%
       \makespecialJS
     \fi
@@ -791,6 +808,8 @@
 \let\eq@mlcrackinsat\@empty
 \def\@eqprotect#1{\eq@protect{#1}}
 \def\eq@protect#1{\let#1\@empty}
+\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
+\let\ef@multigroupradios\ef@NO
 \def\ef@stop{\relax} %\def\ef@relax{\relax}
 \def\protectedKeys#1#2{\ef@scratchtoks={}%
   \@ifundefined{#1}{}{\PackageWarning{eforms}
@@ -1035,7 +1054,7 @@
   \ifefpmpv\Hy@pdfstringfalse
     \ifx\ef@isBGtransparent\ef@YES
       \let\ef@kvCA\@empty\fi
-   \PMPV{\eq@CA}\fi
+    \ifx\ef@CApv\ef@YES\PMPV{\eq@CA}\fi\fi
   \ef@djXPD#1%
 }
 \def\eq@setWidgetProps#1#2{\makeJSspecials
@@ -1044,11 +1063,13 @@
     \ifx\eq@BC\@empty\@eqW{}\else
     \if\eq@W@value0\let\eq@BC\@empty\fi\fi
   \fi
+  \ef@lateWidgetOpts
   \ifefpmpv\Hy@pdfstringfalse
     \ifx\ef@isHidden\ef@YES
       \let\eq@V\eq@VSAVE\else
-      \PMPV{\pmpvV}\fi
+      \ifx\ef@Vpv\ef@YES\PMPV{\pmpvV}\fi\fi
   \fi
+  \global\let\ef@lateWidgetOpts\relax
   \ef@djXPD#1%
 }
 \def\ef@sanitize@toks{\@makeother\~\@makeother\#\@makeother\&%
@@ -1182,7 +1203,47 @@
   \eq@A\eq@AA
   \eq@rawPDF
 }
-\def\common@RadioCheckCode{%
+\def\radio@parent{%
+  /DA (\eq@DA)%
+  /FT/Btn%
+  \eq@Ff%
+  \eq@TU%
+  \eq@DV%
+\expandafter\ifx\csname kids@\Fld@name\endcsname\relax\else
+  /Kids [\@nameuse{kids@\Fld@name}]%
+\fi
+\ifx\ef@multigroupradios\ef@YES
+\expandafter\ifx\csname radio@\Fld@name\endcsname\relax\else
+  /Opt[\@nameuse{radio@\Fld@name}]\fi\fi
+  /T(\Fld@name)%
+  \eq@V
+}
+\def\common@RadioCode{%
+  /Subtype/Widget
+\ifuseNewRadios
+  \expandafter\ifx\csname radio@\Fld@name\endcsname\relax\else
+  /Parent \@nameuse{parent@\Fld@name}\fi
+\else
+  /T (\Fld@name)
+  /FT/Btn
+  \eq@Ff
+  \eq@F
+  \eq@TU
+  \eq@DV\eq@V
+  /DA (\eq@DA)
+\fi
+  /BS <<\eq@W\eq@S>>
+\ifx\eq@AP\@empty
+  /AP<< /N <<\eq@On<<>>>> >>
+  \eq@MK
+\else
+    \eq@AP
+\fi
+  \eq@AS
+  \eq@A\eq@AA
+  \eq@rawPDF
+}
+\def\common@CheckCode{%
   /Subtype/Widget
   /T (\Fld@name)
   /FT/Btn
@@ -1244,27 +1305,115 @@
   \@eqMK{\eq@R\eq@BC\eq@BG/CA(\symbol@choice)\eq@mkIns}%
   \@processEvery#8\end\noindent#6#7{#1}}
 \def\checkBoxDefaults{\F{\FPrint}\W{1}\S{S}\BC{0 0 0}}
-\bgroup\obeyspaces
-\gdef\checkBox{\begingroup\global\let =\pdfSP
+\bgroup\obeyspaces%
+\gdef\checkBox{\begingroup\global\let =\pdfSP%
 \ef@sanitize@toks\ef@checkbox}\egroup
 \newcommand{\ef@checkbox}[5][]{\endgroup
   \mbox{\check@@Box{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
-  \eq@RadioCheck@driver}{\checkBoxDefaults\every@CheckBox}}}
+  \eq@Check@driver}{\checkBoxDefaults\every@CheckBox}}}
+\newif\ifuseNewRadios \useNewRadiosfalse
+\def\useNewRadiosOn{\useNewRadiostrue}
+\def\useNewRadiosOff{\useNewRadiosfalse}
+\let\ef@OptArray\@empty
+\let\ef@KidsArray\@empty
+\let\ef@lateWidgetOpts\relax
 \def\annot@type@radio{radiobtn}
+\def\ef@NewRadiosLateOpts{%
+  \ifuseNewRadios
+    \@nameuse{multigroup@\Fld@name}%
+    \ifx\ef@multigroupradios\ef@YES
+      \ifpdfmarkup
+        \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
+        \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
+      \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
+        \@eqAS{Off}\else % today
+      \ifnum\@nameuse{OnVal@\Fld@name}=%
+        \@nameuse{radioindex@\Fld@name}\relax
+      \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
+    \else
+      \edef\x{\@nameuse{OnVal@\Fld@name}}%
+      \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
+        \@eqAS{Off}\fi
+    \fi
+    \@nameuse{uniradios@\Fld@name}%
+    \ifx\isRadiosInUnison\ef@YES
+      \edef\x{\@nameuse{value@\Fld@name}}%
+      \ifx\x\ef@thisChoice\expandafter\@eqAS
+        \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
+    \fi
+  \fi
+}
+\def\ef@advanceRadioIndex#1{\bgroup
+  \@tempcnta\@nameuse{radioindex@#1}\relax
+  \advance\@tempcnta\@ne
+  \csarg\xdef{radioindex@#1}{\the\@tempcnta}\egroup}
+\def\radioChoices#1{\csarg\xdef{radio@#1}}
+\def\radioKids#1{\csarg\xdef{kids@#1}}
+\def\ef@radioWarning{\PackageWarningNoLine{eforms}
+  {Not all PDF object references have\MessageBreak
+   been resolved, keep compiling}}
+\def\ef@@radioWarning{%
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{kids@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{radio@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+  \ifx\ef@radioWarning\relax\else
+    \@ifundefined{parent@\Fld@name}
+    {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
+}
 \newcommand\radio@@Button[8]{\begingroup\let\#\ef@Hx
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@radio}%
-  \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
+  \pdfstringdef\Fld@name{#2}%
+  \ifuseNewRadios
+    \ef@@radioWarning
+    \@ifundefined{rad@\Fld@name}{\let\isRadioParent\ef@YES
+    \global\let\ef@OptArray\@empty
+    \global\let\ef@KidsArray\@empty
+    \csarg\gdef{radioindex@\Fld@name}{-1}\expandafter
+    \global\csarg\let{rad@\Fld@name}\@empty}%
+      {\let\isRadioParent\ef@NO}%
+    \edef\ef@OptArray{\@nameuse{rad@\Fld@name}}%
+    \g@addto@macro\ef@OptArray{(#5)}% opt
+    \csarg\xdef{rad@\Fld@name}{\ef@OptArray}%
+    \ifx\isRadioParent\ef@YES
+      \def\y{\expandafter\string\noexpand}%
+      \edef\x{\noexpand\immediate\noexpand\write\noexpand\@auxout
+        {\y\radioChoices{\Fld@name}{\noexpand
+        \@nameuse{rad@\Fld@name}}}}%
+      \def\z{\expandafter\AtEndDocument\expandafter{\x}}\z
+      \edef\x{\noexpand\immediate\noexpand\write\noexpand\@auxout
+        {\y\radioKids{\Fld@name}{\noexpand
+          \@nameuse{kid@\Fld@name}}}}%
+      \def\z{\expandafter\AtEndDocument\expandafter{\x}}\z
+    \fi
+    \ef@advanceRadioIndex{\Fld@name}%
+    \@nameuse{multigroup@\Fld@name}%
+  \fi
+  \@eqAS{Off}\dl@paramlocal
   \def\@eqDV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty\let\eq@DV\@empty
     \else\ifpdfmarkup\def\eq@DV{/DV(##1) cvn }\else
     \def\eq@DV{/DV/##1}\fi\fi}%
-  \def\@eqV##1{\def\eq@arg{##1}\ifx\eq@arg\@empty
-    \let\eq@V\@empty\else\def\pmpvV{\pmpv@mrk}\ifpdfmarkup
-      \def\eq@V{/V(##1) cvn }\else
-      \def\eq@V{/V/##1}\fi\@eqAS{##1}\fi
-    \ifefpmpv\let\eq@V\@empty\fi}%
+  \def\@eqV##1{\Hy@pdfstringfalse\edef\pmpvV{##1}%
+    \Hy@pdfstringtrue
+    \edef\eq@arg{##1}%
+    \if$\eq@arg$\else
+      \ifpdfmarkup
+        \edef\eq@V{/V(##1) cvn }\else
+        \edef\eq@V{/V/##1}\fi
+        \@eqAS{##1}\fi
+    \if$\eq@arg$%
+    \else
+      \csarg\xdef{OnVal@\Fld@name}{##1}\fi
+    \ifefpmpv
+      \gdef\ef@lateWidgetOpts{\if$\pmpvV$\else\def\pmpvV{\pmpv@mrk}\fi}%
+      \let\eq@V\@empty\else\global\let\ef@lateWidgetOpts\relax\fi
+    }%
   \eqf@setDimens{#3}{#4}%
   \ifpdfmarkup\def\eq@On{(#5) cvn }\else\def\eq@On{/#5}\fi
+  \def\ef@thisChoice{#5}%
   \def\eq@Ff{/Ff \FfRadio}\@eqtextFont{ZaDb}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@eqMK{\eq@R\eq@BC\eq@BG/CA(\symbol@choice)\eq@mkIns}%
@@ -1275,7 +1424,7 @@
 \ef@sanitize@toks\ef@radiobutton}\egroup
 \newcommand{\ef@radiobutton}[5][]{\endgroup
   \mbox{\radio@@Button{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
-  \eq@RadioCheck@driver}{\radioButtonDefaults\every@RadioButton}}}
+  \eq@Radio@driver}{\radioButtonDefaults\every@RadioButton}}}
 \def\common@TextFieldCode
 {%
   /Subtype/Widget
@@ -1433,6 +1582,7 @@
     {}{\set@LinkPboxDefaults\every@Link}}
 \input{\eq@drivercode}
 \inputCalcOrderJS
+\catcode`\$=\ef@CatChngs
 \endinput
 %%
 %% End of file `eforms.sty'.

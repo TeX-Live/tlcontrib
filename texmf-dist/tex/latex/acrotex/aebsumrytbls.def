@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2018  D. P. Story                 %%
+%% Copyright (C) 1999-2019  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebsumrytbls.def}
- [2019/02/11 v8.2.9 %
+ [2019/08/13 v8.3 %
  Exerquiz support for summary tables (dps)]
 \def\ccatCurrQzWith(#1){\currQuiz#1}
 \def\pbPopulateSumTable{\pushButton[\W0\BG{}\BC{}\S{S}\autoCenter{n}
@@ -78,22 +78,22 @@
         \edef\eq@p{\the\@tempcnta}%
         \@tempcnta=\eq@n
         \advance\@tempcnta-\eq@p\relax
-        \ifnum\@tempcnta=0
-            \@tempcntb=\eq@q \advance\@tempcntb1
+        \ifnum\@tempcnta=\z@
+            \@tempcntb=\eq@q \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\eq@q\relax
             \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=1
-            \@tempcntb=\eq@q \advance\@tempcntb1
+        \else\ifnum\@tempcnta=\@ne
+            \@tempcntb=\eq@q \advance\@tempcntb\@ne
             \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb1\relax
+            \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\eq@q\relax
             \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=2
+        \else\ifnum\@tempcnta=2\relax
             \@tempcntb=\eq@q \advance\@tempcntb1
             \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb1
+            \advance\@tempcntb\@ne
             \xdef\@beginSecCol{\the\@tempcntb}%
             \advance\@tempcntb\nB@lCols
             \xdef\@beginThrdCol{\the\@tempcntb}%
@@ -106,8 +106,7 @@
 }
 \def\eq@begintab{%
     \begin{tabular}[t]{lcc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
-    {\Large\strut}%
-}
+    {\Large\strut}}
 \def\sthline{\hline}
 \def\eq@endtab{\end{tabular}}
 \def\sumrytblCkMUsep{\kern3bp}
@@ -142,12 +141,10 @@
     \ifnum\eq@rowcnt=\thequestionno\relax\expandafter\eq@endtab\fi
 }
 \def\writeProListAux{%
-    \eq@IWAuxOut{\string\expandafter\string\gdef
-    \string\csname\space\currQuiz QzQuesList\string\endcsname
-    {\eqQzQuesList}}%
-    \eq@IWAuxOut{\string\expandafter\string\gdef
-    \string\csname\space\currQuiz nQuestions\string\endcsname
-    {\thequestionno}}%
+    \eq@IWAuxOut{\string
+      \csarg\string\gdef{\currQuiz QzQuesList}{\eqQzQuesList}}%
+    \eq@IWAuxOut{\string
+      \csarg\string\gdef{\currQuiz nQuestions}{\thequestionno}}%
 }
 \def\setParamSumryTblAux{%
     \edef\eqQzQuesList{\@nameuse{\currQuiz QzQuesList}}%
@@ -214,6 +211,7 @@ partialColor:wrongColor;
                 // find the next non-null field
                 var g=this.getField(qtfield+"SanityCheckPts."+i);
                 var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+                if ( !negPointsAllowed && (qpts < 0) ) qpts=0;
                 var thesePts= qpts + (( qpts == 1 )?%
 " \eqptLabel":" \eqptsLabel");
                 g.value = thesePts;
@@ -225,6 +223,7 @@ partialColor:wrongColor;
                 // find the next non-null field
                 var g=this.getField(qtfield+"SanityCheckOOPts."+i);
                 var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+                if ( !negPointsAllowed && (qpts < 0) ) qpts=0;
                 var ptValue = oQName.PtValues[i];
                 var probPts = ptValue + (( ptValue == 1 )?%
 " \eqptLabel":" \eqptsLabel");

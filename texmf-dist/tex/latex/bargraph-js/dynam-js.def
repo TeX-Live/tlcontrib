@@ -1,0 +1,105 @@
+%%
+%% This is file `dynam-js.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% bargraph-js.dtx  (with options: `copyright,dynam')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bargraph-js.sty package,                              %%
+%% Copyright (C) 2019                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{insDLJS}{dynam}{Display dynamic bar graphs}
+function displayDyBargraph(env,aPr,bPmf,bOptimize) {
+  if (typeof aPr[0]=="undefined") return;
+  var aBars=dataForEnv[env].bgs;
+  var bar=env+"@"+dataForEnv[env].bgs[0];
+  var n=aPr.length;
+  var index=(bPmf)?1:2;
+  var bc=color.red;
+  var fc=color.blue;
+  var lbl=_labelDyBars;
+  if (arguments.length>4) {
+    var o=arguments[4];
+    bc=(o.bc==undefined)?bc:o.bc;
+    fc=(o.fc==undefined)?fc:o.fc;
+    var lbl=(o.lbl==undefined)?_labelDyBars:o.lbl;
+  } else {
+    var f=this.getField(bar+".bar0");
+    if ( f !=null ) {
+      bc=f.strokeColor;
+      fc=f.fillColor;
+    }
+  }
+  var hbar=bar.replace(/@/,"@x"); // dps07
+  this.removeField(bar);
+  var pos=hbar.indexOf("@");
+  var env=hbar.substring(0,pos);
+// get aux info, begin with
+  var hb=this.getField(hbar);
+  var f=hb.getArray()[0];
+  var pg=f.page;
+  var wd=dataForEnv[env].width;
+  var ht=dataForEnv[env].height;
+  var isHoriz=dataForEnv[env].horiz;
+  var frameH=ht; // frameH is one unit high
+  if (bPmf&&bOptimize) {
+    var maxValue=0;
+    for (var i=0; i<n; i++)
+      if (aPr[i][index]>maxValue) maxValue=aPr[i][index];
+  }
+  var w=wd/(n+1);
+  var r=f.rect;
+  var defwidth=r[2]-r[0];
+  if (defwidth*(n+1)>=wd) r[2]=r[0]+w;
+  else w=defwidth;
+  var gap=-1; // contiguous boundaries overlap
+  var sf=(bPmf&&bOptimize)?frameH/maxValue:frameH;
+  for (var i=0; i<n; i++){
+    var g=this.addField(bar+".bar"+i,"button",pg,r);
+    // calculate height
+    var Rect=g.rect;
+    var v=aPr[i][index];
+    this.delay=true;
+    Rect[1]=Rect[3]+(v*sf);
+    var pr=aPr[i][0];
+    g.userName=lbl(pr,v,bPmf);
+    g.display=display.visible;
+    g.rect=Rect;
+    r[0]+=(w+gap);
+    r[2]+=(w+gap);
+    this.delay=false;
+  }
+  if (!bPmf) { // cdf
+    var totalW=(n+1)*(w+gap);
+    var delta=wd-totalW;
+    r[2]+=delta;
+    g=this.addField(bar+".bar"+n,"button",pg,r);
+    var Rect=g.rect;
+    var v=1;
+    this.delay=true;
+    Rect[1]=Rect[3]+(v*sf);
+    g.display=display.visible;
+    g.rect=Rect;
+  }
+// Now set color properties
+  g=this.getField(bar);
+  g.fillColor=fc;
+  g.strokeColor=bc;
+  this.delay=false;
+}
+function _labelDyBars(pr,v,bPmf) {
+  return bPmf?("Pr(X="+pr+")="+v):("Pr(X<="+pr+")="+v);
+}
+\end{insDLJS}
+\endinput
+%%
+%% End of file `dynam-js.def'.

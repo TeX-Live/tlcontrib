@@ -1,0 +1,1189 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,tight*,latextoc,extended},
+    eforms={usealtadobe,setcorder},aebxmp
+]{aeb_pro}
+\usepackage[dynamic]{bargraph-js}
+%\usepackage[ImplMulti]{dljslib}
+\usepackage{graphicx,array,fancyvrb}
+\usepackage{aeb_mlink}
+%\usepackage{myriadpro}
+%\usepackage{calibri}
+\usepackage[altbullet]{lucidbry}
+
+\hfuzz2pt
+\makePDasXOn
+ %\previewOn\pmpvOn
+
+\def\hardspace{{\fontfamily{cmtt}\selectfont\symbol{32}}}
+\let\uif\textsf
+
+\advance\marginparwidth12pt
+
+\usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\edef\amtIndent{\the\parindent}
+
+\addtolength{\marginparwidth}{2pt}
+
+\urlstyle{tt}
+
+\def\STRUT{\rule{0pt}{14pt}}
+
+\makeatletter
+\newcount\hesheCnt \hesheCnt=-1
+\def\heshe{\@ifstar{\heshei}{\global\advance\hesheCnt1\relax\heshei}}
+\def\heshei{\ifodd\hesheCnt she\else he\fi}
+\def\HeShe{\@ifstar{\HeShei}{\global\advance\hesheCnt1\relax\HeShei}}
+\def\HeShei{\ifodd\hesheCnt She\else He\fi}
+\def\hisher{\@ifstar{\hisheri}{\global\advance\hesheCnt1\relax\hisheri}}
+\def\hisheri{\ifodd\hesheCnt her\else his\fi}
+\def\himher{\@ifstar{\himheri}{\global\advance\hesheCnt1\relax\himheri}}
+\def\himheri{\ifodd\hesheCnt her\else him\fi}
+\makeatother
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \textsf{bargraph-js} Package},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject=Documentation for the bargraph-js package,
+    talksite={\url{www.acrotex.net}},
+    version={0.7,2019/04/07},
+    Keywords={LaTeX, form fields, bargraphs using JavaScript, AcroTeX},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\begin{insDLJS*}{lbl}
+\begin{newsegment}{Labeling function}
+function customLabelsForBars(fld,v){
+var pos=fld.indexOf(".");
+var bargraph=fld.substring(0,pos);
+var bar=fld.substring(pos+1);
+  switch(bargraph) {
+    case "vehiclesH@hBar":
+      switch(bar) {
+        case "auto":
+          return "Automobiles: "+v;
+        case "truck":
+         return "Pickup trucks: "+v;
+        case "suv":
+          return "SUV types: "+v+", costing big \$\$s";
+        case "van":
+          return "Family vans: "+v
+            +", these cost some serious \u20AC\u20ACs";
+        default:
+          return simpleBarLabels(fld,v);
+      }
+// other cases can be included
+    default:
+      return simpleBarLabels(fld,v);
+  }
+}
+\end{newsegment}
+\begin{newsegment}{Validate input data}
+function validateArrayNonNegNums(aValue){
+  var bOk=true;
+  for (var i=0; i<aValue.length; i++) {
+    var x=1*aValue[i];
+    if(isNaN(x)) {bOk=false; break;}
+    else if (x<0) {bOk=false; break;}
+  }
+  return bOk
+}
+\end{newsegment}
+\begin{newsegment}{Display Table of Probabilities}
+function displayTable(fld,aDistr) {
+  var tableHead=util.printf("   \%s","k ")
+    +util.printf("     \%s     ","pmf")
+    +util.printf("     \%s     ","cdf")+"\r";
+  var str=tableHead;
+  for (var i=0; i<aDistr.length;i++) {
+    str +=(util.printf("\%4d",aDistr[i][0])
+      + util.printf("\%10.6f",aDistr[i][1])
+      + util.printf("\%10.6f",aDistr[i][2])
+      + "\r"
+    );
+  }
+  var f=this.getField(fld);
+  if (f!=null) f.value=str;
+}
+\end{newsegment}
+\end{insDLJS*}
+\barLabelsTU{customBarLabels} % applies to all bars with a \TU key
+%\barLabelsNoTU{customLabelsForBars} % applies to all other bars
+
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The bargrah-js Package";
+var manualfilename="Manual_BG_Print_bgraph-js.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+
+\section{Introduction}\label{intro}
+
+This package can create bar graphs that represent categorical or quantitative
+data; special techniques can be use to create bargraph representations of a
+discrete probability distribution.
+
+Bar graphs created by this package are \emph{dynamic}; that is, the user
+can enter data and the bar graph changes to reflect this new data. This magic
+is performed using \app{Acrobat} forms and \app{Acrobat} JavaScript. The
+individual ``bars'' of a bar graph are form fields, JavaScript is used to
+change their bounding rectangles.
+
+The document requires, for the dynamic bar graph features to work, the user to
+be viewing the document in \app{AR} (or the \app{Acrobat} application
+(\app{AA}), of course). JavaScript even within \app{AR} is not fully
+supported on all devices, as a result, \app{AR} or \app{AA} on a desktop or
+laptop is required.
+
+Before we start describing this package, we present a simple example. Enter nonnegative numbers
+in the text fields to the right.\vcgBdry[6bp]
+
+\fbox{\begin{bargraphenv}[width=(23bp*4),height=2in,o=vert]{vehiclesV}
+\presetsbarfor{vBar}{auto}{\BG{red}}
+\presetsbarfor{vBar}{truck}{\BG{green}}
+\presetsbarfor{vBar}{suv}{\BG{yellow}}
+\presetsbarfor{vBar}{van}{\BG{magenta}}
+\begin{bargraph}[nbars=4,gap=3]{vBar}
+\barfor{auto}\barfor{truck}\barfor{suv}\barfor{van}
+\end{bargraph}
+\end{bargraphenv}}\hfill
+\begin{minipage}[b][2in][c]
+  {\linewidth-2\fboxsep-2\fboxrule-(23bp*4)-10pt}\kern0pt\parskip3pt
+\makebox[\widthof{Truck:}][l]{Auto:}
+  \inputFor{vehiclesV}{vBar}{auto}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{Truck:}
+  \inputFor{vehiclesV}{vBar}{truck}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{SUV:}
+  \inputFor{vehiclesV}{vBar}{suv}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{Van:}
+  \inputFor{vehiclesV}{vBar}{van}{.5in}{11bp}\vcgBdry[4bp]
+\pushButton[\TU{This button re-scales the bar graph so that the
+tallest bar takes the entire height of the region.}\CA{Optimize}
+  \A{\JS{optimizeScaling("vehiclesV");}
+}]{optimize2}{}{13bp}
+\end{minipage}\vcgBdry[6bp]
+
+Reset vertical bar graph:\marginpar{\small\itshape
+\raisebox{2in+6bp}{\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-basic1.tex}}}}
+  \pushButton[\CA{Reset}\A{\JS{resetBargraphs("vehiclesV");}}
+]{reset}{}{13bp}\vcgBdry[6bp]
+
+\textbf{Motivation.} The motivation for the package comes from the request of
+an {Acro\negthinspace\TeX} user. He wanted a bar graph that summarizes the
+results of a questionnaire. Each of some eighty question is classified into
+one of eight categories. A bar graph is then generated based on the
+responses.
+
+\section{Requirements and options of the package}
+
+The \pkg{bargraph-js} package uses the \pkg{eforms} package
+dated 2019/03/16 or later. Use the package in the usual way,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\documentclass{article}
+\usepackage{bargraph-js}
+\end{Verbatim}
+There are no package options. If you want to use options for the \pkg{eforms} package, load
+it earlier than \pkg{bargraph-js}:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\documentclass{article}
+\usepackage[usealtadobe,setcorder]{eforms}
+\usepackage{bargraph-js}
+\end{Verbatim}
+
+\part{Bar graph with a fixed number of bars}
+
+In this part of the manual, the construction of bar graphs is discussed with a known number
+of bars.
+
+\section{The bar graph environments}
+
+The package defines two environments, these are \env{bargraphenv} and
+\env{bargraph}; the latter environment is placed within the former one.
+\bVerb\takeMeasure{\string\begin\darg{bargraphenv}[\ameta{bgenv-options}]\darg{\ameta{bgenv-name}}}%
+\def\1{\hskip\amtIndent\relax}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{bargraphenv}[!ameta(bgenv-options)]{!ameta(bgenv-name)}
+!1!meta(\presetsbarfor)!sffamily!textsl( commands, optional)
+!1\begin{bargraph}[!ameta(bg-options)]{!ameta(bg-name)}
+!1!1\barfor{!ameta(bar-name!SUB1)}...\barfor{!ameta(bar-name!SUB(n))}
+!1\end{bargraph}
+!1!sffamily!textsl(additional bargraph environments, optional)
+\end{bargraphenv}
+\end{dCmd}
+\eVerb The \ameta{bgenv-name} argument must be unique throughout the
+document, the other names (\ameta{bg-name} and \ameta{bar-name}) may be
+reused in other \env{bargraphenv} environments. Within a \env{bargraphenv}
+environment, however, the \ameta{bg-name} must be unique, that is, not repeated. The
+\cs{presetsbarfor} commands are a way of changing the appearances of the
+individual bars. Within the \env{bargraph} environment, only \cs{barfor}\marginpar{\small\itshape\raggedleft Only \cs{barfor}
+and \cs{cmd} are permitted} or
+\cs{cmd} commands are recognized (the latter is not shown). The \cs{barfor}
+command gives a name to the bar so it can be referenced and manipulated. More
+than one \env{bargraph} environment within a \env{bargraphenv}
+environment is supported.
+
+Before describing the individual components, we present the verbatim listing of
+the example given above.\def\1{\hskip\amtIndent\relax}
+\begin{Verbatim}[fontsize=\small,commandchars={!~@}]
+\fbox{%
+!1\begin{bargraphenv}[width=(23bp*4),height=2in,o=vert]{vehiclesV}
+!1!1\presetsbarfor{vBar}{auto}{\BG{red}}
+!1!1\presetsbarfor{vBar}{truck}{\BG{green}}
+!1!1\presetsbarfor{vBar}{suv}{\BG{yellow}}
+!1!1\presetsbarfor{vBar}{van}{\BG{magenta}}
+!1!1\begin{bargraph}[nbars=4,gap=3]{vBar}
+!1!1!1\barfor{auto}\barfor{truck}\barfor{suv}\barfor{van}
+!1!1\end{bargraph}
+!1\end{bargraphenv}
+}
+\end{Verbatim}
+The key-values of \env{bargraphenv} set the dimensions of the `display
+window' (here, we use \cs{fbox} to enclose it). The option \texttt{o=vert}
+states these bar graphs will be vertically oriented. The next four lines are
+\cs{presetsbarfor} commands that pass appearances on to the bars themselves;
+this accounts for the coloring of the individual bars demonstrated in the
+interactive example above. The optional key-values for the \env{bargraph}
+environment are \texttt{nbars=4} (the number of bars in this bar graph,
+required); and \texttt{gap=3} (distance between bars in big points)
+
+%; and \texttt{order=fl} (the order this bars are placed in the display
+%window, here `first-to-last).
+
+\paragraph*{Description of \protect\env{bargraphenv} arguments.} \env{bargraphenv} is
+a \env{minipage} environment, in which the bars are drawn and
+displayed. The following are the key-values recognized within the optional
+argument of \env{bargraphenv}.
+\begin{aebDescript}
+  \item[\texttt{width=\ameta{length}}] The width of the environment.
+  \item[\texttt{height=\ameta{length}}] The height of the environment.
+  \item[\texttt{o=\ameta{\upshape{horiz|vert}}}] Declares the orientation of
+      the bar graph contained within the environment: \texttt{o=horiz}
+      specifies the bar graphs are to be horizontal; \texttt{o=vert} sets the
+      bar graphs to be vertical. The default is vertical.
+  \item[\texttt{origin=\ameta{\upshape{0|.5}}}] The position of
+      the horizontal axis (when \texttt{o=vert}) or the vertical
+      axis (when \texttt{o=horiz}). A value of \texttt{origin=0}
+      is the default.
+  \item[\texttt{showaxis\ameta{\upshape{true|false}}}] If
+      \texttt{showaxis=true} (or just \texttt{showaxis}, the horizontal rule
+      (if \texttt{o=vert}) or a vertical rule (if \texttt{o=horiz}) is drawn.
+      The default is no axis is drawn.
+
+\end{aebDescript}
+
+\paragraph*{Description of \protect\env{bargraph} arguments.} The \env{bargraph} environment
+is placed within the \env{bargraphenv} environment; it has a name
+(\ameta{bg-name}) and must contain, within its body, only the \cs{barfor} and
+\cs{cmd} commands. The optional arguments (\ameta{bg-options}) are used to
+describe the bars that is contained in the environment.
+
+\begin{aebDescript}
+   \item[\texttt{nbars=\ameta{num}}] (Required) The number of bars to appear in this
+       \env{bargraph} environment. The value \ameta{num} must be a positive
+       integer. There is no enforcement of this restriction; just disaster.
+       The value specified by
+       \texttt{nbars}\marginpar{\small\raggedleft\slshape\cs{nbars}} is saved in the
+       command \cs{nbars}; \cs{nbars} is globally defined and is overwritten
+       then when the next \env{bargraph} environment is expanded. The default
+       for \texttt{nbars} is zero (0); consequently, this is a required key.
+   \item[\texttt{gap=\ameta{num}}] (Optional) The amount space between bars; \ameta{num}
+       is a number of reasonable size; the number is dimensionless, but is
+       interpreted as a big point. No enforcement, its your document. The gap
+       can be access through the command \cs{bargap}\marginpar{\small\raggedleft\slshape\cs{bargap}};
+       if \texttt{gap=3}, then \cs{bargap} expands to \texttt{3bp}. The definition of \cs{bargap}
+       is global, it is overwritten when the next \env{bargraph} environment is expanded. The default
+       is \texttt{gap=0}.
+   \item[\texttt{bardimen=\ameta{num}}] (Optional) A dimensionless positive number
+       interpreted as the width (in the case of \texttt{o=vert}) and height
+       (when \texttt{o=horiz}) in big points. The default is 20. The value of the
+       \texttt{bardimen} key is saved in the \cs{bardimen}\marginpar{\small\raggedleft\slshape\cs{bardimen}}
+       command as \texttt{\ameta{num}bp}; this is  global definition and is overwritten when
+       the next \env{bargraph} environment is expanded.
+%   \item[\texttt{order=\ameta{\upshape{fl|lf}}}] The order the bars are
+%       placed in the \env{bargraphenv} environment; \texttt{o=fl} is the
+%       default, they are built in the same order they are listed; for
+%       \texttt{o=lf}, the bars are built in reverse order to what they are
+%       listed. This option may not really be needed, if you want them displayed in
+%       reverse order, just list them in the order you wish and recompile.
+\end{aebDescript}
+In the example given earlier, the \env{bargraph} environment was,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{bargraph}[nbars=4,gap=3]{vBar}
+\barfor{auto}\barfor{truck}\barfor{suv}\barfor{van}
+\end{bargraph}
+\end{Verbatim}
+We declare this environment to have a name of \texttt{vBar}
+(\ameta{bg-name}). It contains four bars, each with a gap of 3 (3bp). The
+environment contains four \cs{barfor} commands named \texttt{auto},
+\texttt{truck}, \texttt{suv}, and \texttt{van} (these are the
+\ameta{bar-name}s).
+
+
+\paragraph*{Description of \texorpdfstring{\protect\cs{presetsbarfor}}{\textbackslash{presetsbarfor}}.}
+The \cs{barfor} command creates a (rectangular) push button used to represent
+a single `bar' in a bar graph. The \cs{presetsbarfor} commands are the chosen
+way to pass (form field) options to the push buttons created by \cs{barfor}.
+\bVerb\takeMeasure{\string\presetsbarfor\darg{\ameta{bg-name}}\darg{\ameta{bar-name}}\darg{\ameta{KV-pairs}}}%
+\def\1{\hskip\amtIndent\relax}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\presetsbarfor{!ameta(bg-name)}{!ameta(bar-name)}{!ameta(KV-pairs)}
+\end{dCmd}
+\eVerb To uniquely identify which form field these key-value pairs
+(\ameta{KV-pairs}) apply, we supply the name of the \env{bargraph}
+environment (\ameta{bg-name}) the bar is located in, and the name of the
+particular bar (\ameta{bar-name}). The \ameta{KV-pairs} argument consists of
+any key-value pairs supported by the \pkg{eforms} package for form fields.
+\bVerb\def\1{\hskip\amtIndent\relax}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\presetsbarfor{vBar}{auto}{\BG{red}}
+\presetsbarfor{vBar}{truck}{\BG{green}}
+\presetsbarfor{vBar}{suv}{\BG{yellow}}
+\presetsbarfor{vBar}{van}{\BG{magenta}}
+\begin{bargraph}[nbars=4,gap=3]{vBar}
+!1\barfor{auto}\barfor{truck}\barfor{suv}\barfor{van}
+\end{bargraph}
+\end{bargraphenv}}
+\end{Verbatim}
+\eVerb
+These commands reference the bars within the \texttt{vBar} \env{bargraph}
+environment. For example, for the bar named \texttt{auto}, we assign a background
+(or fill) color of red, and so on.
+
+\paragraph*{The \texorpdfstring{\protect\cs{barfor} and \protect\cs{cmd}}{\textbackslash{barfor} and \textbackslash{cmd}} commands.}
+The body of \env{bargraph} consists solely of \cs{barfor} and \cs{cmd}
+commands (\cs{cmd} is a local command, defined for the \env{bargraph}
+environment). The syntax for these are \cs{barfor\darg{\ameta{bar-name}}} and
+\cs{cmd\darg{\ameta{markup}}}, where \ameta{markup} refers to any {\LaTeX}
+markup. The author created \cs{cmd} to add typeset labeling to the bar graph,
+but there are other applications. Illustrations of \cs{cmd} are found in
+\hyperref[multiBars]{Section~\ref{multiBars}} on drawing multiple bar graphs
+and \hyperref[labelBars]{Section~\ref*{labelBars}} on labeling.
+
+
+\section{Inputting data for a bar graph}
+
+Now, given you have set up a \env{bargraphenv} environment with its various
+innards, how do you input data so the bar graph responds? There are several schemes.
+
+\subsection{Individual input via \texorpdfstring{\protect\cs{inputFor}}{\textbackslash{inputFor}}}
+
+The method illustrated in the example on page~\pageref{intro} is for the user to input individual data
+using the package provided command \cs{inputFor}.
+\bVerb\takeMeasure{\small\string
+\inputFor[\ameta{KV-pairs}]\darg{\ameta{bgenv-name}}\darg{\ameta{bg-name}}\darg{\ameta{bar-name}}\darg{\ameta{width}}\darg{\ameta{height}}}%
+\def\1{\hskip\amtIndent\relax}%
+\begin{dCmd}[commandchars=!(),fontsize=\small]{\bxSize}
+\renewcommand\presetinputfor[2]{!ameta(eforms-actions)}
+\inputFor[!ameta(KV-pairs)]{!ameta(bgenv-name)}{!ameta(bg-name)}{!ameta(bar-name)}{!ameta(width)}{!ameta(height)}
+\end{dCmd}
+\eVerb The command \cs{inputFor} doesn't have to reside within a
+\env{bargraphenv} environment, so a full path is needed to characterize which
+of the bars this text field references. Use \ameta{KV-pairs} to change the
+appearance of the field. One such example from page~\pageref{intro} is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\inputFor{vehiclesV}{vBar}{auto}{.5in}{13bp}
+\end{Verbatim}
+You need one \cs{inputFor} command for each of the bars in the targeted \env{bargraphenv} environment.
+%This is the simplest scenario.
+
+Use \cs{presetinputfor} to set any actions you require of your \cs{inputFor}
+commands; any re-definition of \cs{presetinputfor} should occur prior to the
+targeted \cs{inputFor} commands. The package initial definition is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\newcommand{\presetinputfor}[2]{%
+  \AAkeystroke{AFNumber_Keystroke(0, 0, 0, 0, "", true);}
+  \AAformat{AFNumber_Format(0, 0, 0, 0, "", true);}
+  \AAvalidate{AFRange_Validate(true, 0, false, 0);}%!textsf~ remove to allow all numbers@
+}
+\end{Verbatim}
+This requires the entries in the \cs{inputFor} commands to be nonnegative
+numbers. The two arguments of \cs{presetinputfor} are normally not used, but
+for the record \texttt{\#1} is \ameta{bgenv-name} and \texttt{\#2} is
+\texttt{\ameta{bg-name}.\ameta{bar-name}}.
+
+\subsection{Providing comma-delimited data}
+
+Another way to enter data is through a comma-delimited list of numbers.
+
+\medskip\noindent\bgroup\setlength{\fboxrule}{1bp}\fbox
+{\begin{bargraphenv}[width=(14bp*20),height=2in,o=vert]{statdemo}%(\linewidth-2\fboxsep-2\fboxrule)
+\begin{bargraph}[nbars=20,gap=0,bardimen=14]{histogram}
+\barfor{bar1}\barfor{bar2}\barfor{bar3}\barfor{bar4}\barfor{bar5}
+\barfor{bar6}\barfor{bar7}\barfor{bar8}\barfor{bar9}\barfor{bar10}
+\barfor{bar11}\barfor{bar12}\barfor{bar13}\barfor{bar14}\barfor{bar15}
+\barfor{bar16}\barfor{bar17}\barfor{bar18}\barfor{bar19}\barfor{bar20}
+\end{bargraph}%
+\end{bargraphenv}}\egroup\vcgBdry[6pt]
+
+\noindent\hglue1bp\marginpar{\small\itshape
+\raisebox{2in+6bp}{\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-comma1.tex}}}}
+\textField[\TU{Enter up to twenty nonnegative numbers separated by commas}
+  \AAvalidate{resetBargraphs("statdemo");\r
+  \populateCommaData("statdemo","histogram",event.value,validateArrayNonNegNums)}
+]{commaed}{(\bardimen*\nbars+2\fboxsep+2bp)}{13bp}\vcgBdry[6pt]
+
+\hglue1bp\pushButton[\CA{Symmetrical}\AAmouseup{%
+var str="1,2,3,4,5,6,7,8,9,10,10,9,8,7,6,5,4,3,2,1";\r
+\populateCommaData("statdemo","histogram",str);
+}]{symmetrical}{}{13bp}\cgBdry[.5em]
+\pushButton[\CA{Skew left}\AAmouseup{%
+var str="1,2,2,3,3,4,5,6,8,10,12,14,16,19,20,19,17,15,13,11";\r
+\populateCommaData("statdemo","histogram",str);}]{skewleft}{}{13bp}\cgBdry[.5em]
+\pushButton[\CA{Skew right}\AAmouseup{%
+var str="17,18,19,20,19,18,16,14,12,10,8,7,7,6,6,4,4,3,2,1";\r
+\populateCommaData("statdemo","histogram",str);}]{skewright}{}{13bp}\vcgBdry[6pt]
+
+\hglue1bp\pushButton[\TU{This button re-scales the bar graph so that the longest bar
+takes the entire width of the region.}\CA{Optimize}\A{\JS{optimizeScaling("statdemo");}}]{optimize1}{}{13bp}\cgBdry[.5em]
+\displaysfFor{statdemo}{.5in}{13bp}\olBdry
+  \manualsfFor[\CA{Rescale}\TU{Enter a new scale factor in the text field, then press this button}
+  ]{statdemo}{}{13bp} \texttt{\%}\textsf{ Can perform simple arithmetic operations in text field}
+  \vcgBdry[6bp]
+
+\hglue1bp\pushButton[\CA{Reset}\AAmouseup{resetBargraphs("statdemo","commaed","rescale.statdemo")}]{reset}{}{13bp}\vcgBdry[6pt]
+
+Enter comma-delimited nonnegative numbers into the text field above, or press
+any of the three buttons \uif{Symmetrical}, \uif{Skew left}, or
+\uif{Skew right} to populate the bar graph with comma-delimited data. Press
+the \uif{Optimize} button to automatically re-scale the graph; manually
+re-scale the graph by entering a scale factor in the text field, then press
+the \uif{Rescale} button. Clear all fields by pressing the \uif{Reset}
+button. These buttons are discussed in detail in a later section.
+
+\section{Multiple bar graphs within an \texorpdfstring{\protect\env{bargraphenv}}{bargraphenv} environment}\label{multiBars}
+
+More than one \env{bargraph} environment can appear within a \env{bargraphenv}, as illustrated in the next two examples.\medskip
+
+\noindent
+\fbox{\begin{bargraphenv}[width=23bp*10,height=1.4in,o=vert]{math1}
+\presetsbarfor{class1}{A}{\BG{red}\TU{Class1: @v@ students received an 'A'}}
+\presetsbarfor{class1}{B}{\BG{red}\TU{Class1: @v@ students received an 'B'}}
+\presetsbarfor{class1}{C}{\BG{red}\TU{Class1: @v@ students received an 'C'}}
+\presetsbarfor{class1}{D}{\BG{red}\TU{Class1: @v@ students received an 'D'}}
+\presetsbarfor{class1}{F}{\BG{red}\TU{Class1: @v@ students received an 'F'}}
+\presetsbarfor{class2}{A}{\BG{blue}\TU{Class2: @v@ students received an 'A'}}
+\presetsbarfor{class2}{B}{\BG{blue}\TU{Class2: @v@ students received an 'B'}}
+\presetsbarfor{class2}{C}{\BG{blue}\TU{Class2: @v@ students received an 'C'}}
+\presetsbarfor{class2}{D}{\BG{blue}\TU{Class2: @v@ students received an 'D'}}
+\presetsbarfor{class2}{F}{\BG{blue}\TU{Class2: @v@ students received an 'F'}}
+\begin{bargraph}[nbars=5,gap=3]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\begin{bargraph}[nbars=5,gap=3]{class2}\cmd{\hs{\bargap}}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\end{bargraphenv}}\vcgBdry[6pt]
+
+\noindent\marginpar{\small\itshape
+\raisebox{1.4in+6pt}{\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-comma2.tex}}}}%
+\begin{minipage}[c]{222pt}
+class1:
+  \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math1","class1",event.value,validateArrayNonNegNums)}]{txtclass3}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 1}\AAmouseup{%
+    var str="12,15,23,10,15";\r
+    \populateCommaData("math1","class1",str);
+}]{math1class1}{}{13bp}\vcgBdry[4bp]
+class2: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math1","class2",event.value,validateArrayNonNegNums)}]{txtclass4}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 2}\AAmouseup{%
+    var str="10,17,29,10,20";\r
+    \populateCommaData("math1","class2",str);
+}]{math1class1}{}{13bp}
+\end{minipage}\cgBdry[.5em]
+\pushButton[\TU{This button re-scales the bar graph so that the tallest bar
+takes the entire height of the region.}\CA{Optimize}\A{\JS{optimizeScaling("math1");}}]{optimize3}{}{13bp}\cgBdry[.5em]
+\pushButton[\CA{Reset}\A{\JS{resetBargraphs("math1","txtclass3","txtclass4");}}]{reset}{}{13bp}\vcgBdry[6pt]
+A partial verbatim listing is presented below:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\fbox{\begin{bargraphenv}[width=23bp*10,height=1.4in,o=vert]{math1}
+...
+\begin{bargraph}[nbars=5,gap=3]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\begin{bargraph}[nbars=5,gap=3]{class2}!textbf~\cmd{\hs{\bargap}}@
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\end{bargraphenv}}
+...
+class1: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{%
+  var str=event.value;\r
+  \populateCommaData("math1","class1",str,validateArrayNonNegNums)}
+  ]{txtclass3}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 1}\AAmouseup{%
+    var str="12,15,23,10,15";\r
+    \populateCommaData("math1","class1",str);
+  }]{math1class1}{}{13bp}
+\end{Verbatim}
+To populate a bar graph with comma-delimited data, use the \cs{populateCommData} command, a {\LaTeX} helper
+command for an underlying JavaScript function. Its arguments are
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\populateCommaData("!ameta~bgenv-name@","!ameta~bg-name@",!ameta~str@[,!ameta~validate@])
+\end{Verbatim}
+Where, \ameta{str} is a comma-delimited string of numbers; the optional \ameta{validate} argument
+is a name of a validation function. In the example above, the package defined
+\texttt{validateArrayNonNegNums} is used.
+
+One\marginpar{\small\raggedleft\textbf{Important}} more comment on the
+listing above: Observe the markup in bold font; the gap is not applied to the
+last bar for a \env{bargraph} environment, so to get same gap as we move from
+the \texttt{class1} bar graph to the \texttt{class2} bar graph, we insert
+\verb~\cmd{\hs{\bargap}}~ the desired gap. Read the comments following the next example
+for more detailed explanation of the (local) commands \cs{cmd} and \cs{hs}.\medskip
+
+You can adjust the positions of the bar graph to have a more side-by-side comparison.\vcgBdry[4bp]
+
+\fbox{\begin{bargraphenv}[width=33bp*5,height=2in,o=vert]{math2} %+13bp+10bp +13bp
+\presetsbarfor{class1}{A}{\BG{red}}
+\presetsbarfor{class1}{B}{\BG{red}}
+\presetsbarfor{class1}{C}{\BG{red}}
+\presetsbarfor{class1}{D}{\BG{red}}
+\presetsbarfor{class1}{F}{\BG{red}}
+\presetsbarfor{class2}{A}{\BG{blue}}
+\presetsbarfor{class2}{B}{\BG{blue}}
+\presetsbarfor{class2}{C}{\BG{blue}}
+\presetsbarfor{class2}{D}{\BG{blue}}
+\presetsbarfor{class2}{F}{\BG{blue}}
+\begin{bargraph}[nbars=5,gap=13]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}%
+\begin{bargraph}[nbars=5,gap=13]{class2}\cmd{\hs{13bp}}
+\cmd{\color{red}\hs{-33bp*5+10bp}}\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}\cmd{\hs{-13bp}}
+\end{bargraph}
+\end{bargraphenv}}\vcgBdry[6pt]
+
+%\hs{-33bp*5} \hs{-23bp*5}\kern5bp}
+
+\begin{defineJS}{\pbaction}
+var f=this.getField("txtclass5");
+for (var value="",i=0; i<5; i++) value+=(""+(Math.round(Math.random()*200))+",");
+f.value=value.substring(0,value.length-1);
+for (var value="",i=0; i<5; i++) value+=(""+(Math.round(Math.random()*200))+",");
+var g=this.getField("txtclass6");
+g.value=value.substring(0,value.length-1);
+\end{defineJS}
+
+\noindent\marginpar{\small\itshape
+\raisebox{2in+6pt}{\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-comma2.tex}}}}%
+\begin{minipage}[c]{222pt}
+class1: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math2","class1",event.value,validateArrayNonNegNums)}]{txtclass5}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 1}\AAmouseup{%
+    var str="12,15,23,10,15";\r
+    \populateCommaData("math2","class1",str);
+}]{math1class1}{}{13bp}\vcgBdry[4bp]
+class2: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math2","class2",event.value,validateArrayNonNegNums)}]{txtclass6}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 2}\AAmouseup{%
+    var str="10,17,29,10,20";\r
+    \populateCommaData("math2","class2",str);
+}]{math1class1}{}{13bp}
+\end{minipage}\cgBdry[.5em]
+\pushButton[\CA{Test}\TU{Press to automatically enter data into the two fields above}\A{\JS{\pbaction}}]{tstdata}{}{13bp}\cgBdry[.5em]
+\pushButton[\TU{This button re-scales the bar graph so that the tallest bar
+takes the entire height of the region.}\CA{Optimize}\A{\JS{optimizeScaling("math2");}}]{optimize3}{}{13bp}\cgBdry[.5em]
+\pushButton[\CA{Reset}\A{\JS{resetBargraphs("math2","txtclass5","txtclass6");}}]{reset}{}{13bp}\vcgBdry[6pt]
+
+A partial listing is given next:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\begin{bargraph}[nbars=5,gap=13]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\begin{bargraph}[nbars=5,gap=13]{class2}
+!textbf~\cmd{\hs{-33bp*5+10bp}}@
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\end{bargraphenv}
+\end{Verbatim}
+This listing introduces two new commands, shown in bold font:
+\cs{cmd}\marginpar{\small\raggedleft\slshape\cs{cmd}} is a generic command for placing
+{\LaTeX} content into the bar graph; \cs{hs} (and \cs{vs}) are short-hand
+commands for entering a horizontal skip
+(\cs{hs}\marginpar{\small\raggedleft\slshape\cs{hs}}) or a vertical skip
+(\cs{vs}\marginpar{\small\raggedleft\slshape\cs{vs}}) into the page. These two should be
+used only within the \cs{cmd} command argument. In the above listing, we shift
+the contents of the second \env{bargraph} environment to the left to appear as shifted
+over 10bp from the first \env{bargraph}.\medskip
+
+The markup shown in bold font horizontally shifts the second bar graph
+\texttt{33bp*5} to the left ($\texttt{33bp}=\cs{bardimen}+\cs{bargap}$) and
+$5 = \cs{nbars} $. Since $\cs{bardimen}=\texttt{20bp}$ (the default value),
+we shift \texttt{10bp} ($\cs{bardimen}/2$) to the right to get the two first
+bars offset by half their width.
+
+\section{Labeling the bars}\label{labelBars}
+
+Now we come to the difficult topic of labeling (or captioning) the bars.
+Because of the dynamic nature of these bar graphs, there can be no scaling on
+the axis; however, if you rollover any of the bars, you will see labeling
+that provides some information. Throughout this document, so far, the
+``default'' labeling is applied, as exhibited by the red bar graph below;
+there is a richer scheme that is possible when the bars have a \cs{TU} (tool
+tip) markup. When you provide an appropriately coded tool tip you can build a
+much more meaningful labeling of the bars, as illustrated by the blue bar
+graph below.
+
+\noindent
+\fbox{\begin{bargraphenv}[width=23bp*10,height=1.4in,o=vert]{math3}
+\presetsbarfor{class1}{A}{\BG{red}}
+\presetsbarfor{class1}{B}{\BG{red}}
+\presetsbarfor{class1}{C}{\BG{red}}
+\presetsbarfor{class1}{D}{\BG{red}}
+\presetsbarfor{class1}{F}{\BG{red}}
+\presetsbarfor{class2}{A}{\BG{blue}\TU{Class2: @v@ students received an 'A'}}
+\presetsbarfor{class2}{B}{\BG{blue}\TU{Class2: @v@ students received an 'B'}}
+\presetsbarfor{class2}{C}{\BG{blue}\TU{Class2: @v@ students received an 'C'}}
+\presetsbarfor{class2}{D}{\BG{blue}\TU{Class2: @v@ students received an 'D'}}
+\presetsbarfor{class2}{F}{\BG{blue}\TU{Class2: @v@ students received an 'F'}}
+\begin{bargraph}[nbars=5,gap=3]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\begin{bargraph}[nbars=5,gap=3]{class2}\cmd{\hs{\bargap}}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\end{bargraphenv}}\vcgBdry[6pt]
+
+\begin{minipage}[c]{222pt}
+class1: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math1","class1",event.value,validateArrayNonNegNums)}]{txtclass7}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 1}\AAmouseup{%
+    var str="12,15,23,10,15";\r
+    \populateCommaData("math3","class1",str);
+}]{math1class1}{}{13bp}\vcgBdry[4bp]
+class2: \textField[\TU{Enter five natural numbers separated by commas}
+  \AAvalidate{\populateCommaData("math1","class2",event.value,validateArrayNonNegNums)}]{txtclass8}{2in}{13bp}\cgBdry[.5em]
+  \pushButton[\CA{Class 2}\AAmouseup{%
+    var str="10,17,29,10,20";\r
+    \populateCommaData("math3","class2",str);
+}]{math1class1}{}{13bp}
+\end{minipage}\cgBdry[.5em]
+\pushButton[\TU{This button re-scales the bar graph so that the tallest bar
+takes the entire height of the region.}\CA{Optimize}\A{\JS{optimizeScaling("math3");}}]{optimize3}{}{13bp}\cgBdry[.5em]
+\pushButton[\CA{Reset}\A{\JS{resetBargraphs("math3","txtclass7","txtclass8");}}]{reset}{}{13bp}\vcgBdry[6pt]
+A partial verbatim listing is presented below:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!()}]
+\fbox{\begin{bargraphenv}[width=23bp*10,height=1.4in,%
+  o=vert]{math3}
+\presetsbarfor{class1}{A}{\BG{red}}          %!textsf( The !cs(TU) key is not provided)
+...
+\presetsbarfor{class2}{A}{\BG{blue}
+  !textbf(\TU{Class2: @v@ students received an 'A'})} %!textsf( The !cs(TU) key is provided)
+...
+\begin{bargraph}[nbars=5,gap=3]{class1}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\begin{bargraph}[nbars=5,gap=3]{class2}\cmd{\hs{\bargap}}
+\barfor{A}\barfor{B}\barfor{C}\barfor{D}\barfor{F}
+\end{bargraph}
+\end{bargraphenv}}
+\end{Verbatim}
+Shown in bold font above is the \cs{TU} key for the first bar of
+\texttt{class2}. The value of the \cs{TU} key contains the string
+`\texttt{@v@}'; this three-character string is replaced by the actual value
+of the bar. Concepts and methods are outlined in the next section.
+
+\subsection{Methods for labeling bars}
+
+Fundamentally, there are two methods for labeling bars: (1) using the tooltip
+feature of {\PDF} forms; and (2) non-tooltip methods. Within each of these
+two methods, several techniques have been developed, which are explained in
+the next two sections.
+
+\subsubsection{Tooltip techniques}
+
+There are two commands, \cs{barLabelsTUs} and \cs{barLabelsNoTU}, to declare
+how the {\PDF} tooltips are formed. They handle the cases of \cs{TU} key is
+provided and the \cs{TU} key is not provided. We look at each of these in
+turn.
+
+\paragraph*{The \cs{TU} key is provided.} The \cs{barLabelsTU} takes either a
+JavaScript function name or a JavaScript string argument.
+\bVerb\takeMeasure{\string\barLabelsTU\darg{\ameta{JS-function}\string|\ameta{JS-string}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\barLabelsTU{!ameta(JS-function)|!ameta(JS-string)}
+\end{dCmd}
+\eVerb \cs{barLabelsTU} \emph{applies to all bars with a \cs{TU} key}. The
+\cs{barLabelsTU} \emph{can be used within the body of the document} to change the
+method of assigning labels to bars. The tooltip can comprise of the variables
+\texttt{@env@}, \texttt{@barname@}, \texttt{@bar@}, and \texttt{@v@} to
+compose the string; these variables are replaces with their respective values
+\ameta{bgenv-name}, \ameta{bg-name}, \ameta{bar-name} and \ameta{value} when
+the bar is populated with \ameta{value}.
+
+\paragraph*{Description of argument types}
+\subparagraph*{\ameta{JS-function}} Such a JavaScript function takes two
+arguments \texttt{fld} and \texttt{v}; the latter is the current value of the
+bar, the former is the field name of the bar. Such a function should return a
+string that will be displayed as the tooltip of the bar. The default is
+\texttt{customBarLabels},
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\barLabelsTU{customBarLabels} % !textsf(applies to all bars with a !cs(TU) key)
+\end{Verbatim}
+which is part of the \pkg{bargraph-js} package. Note that this declaration
+is equivalent to \verb|\barLabelsTU{}| and \verb|\barLabelsTU{""}|.
+
+\subparagraph*{\ameta{JS-string}} When a string is provided, \emph{the
+\cs{TU} key is ignored}. Instead a formatted string is used.
+Use the variables \texttt{@env@}, \texttt{@barname@}, \texttt{@bar@}, and
+\texttt{@v@} to compose the string, as seen below.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+ \barLabelsTU{"Within the \\"@env@\\" environment, within the
+   \\"@barname@\\" environment, the bar \\"@bar@\\"
+   has a value of @v@"}
+\end{Verbatim}
+When the empty string (\verb|\barLabelsTU{""}|) or the empty argument
+(\verb|\barLabelsTU{}|) is passed, the result is to default to
+\texttt{customBarLabels}.
+
+\paragraph*{No \cs{TU} key is provided.}
+For the case that a bar does not have a \cs{TU} key (no tooltip specified),
+the argument of \cs{barLabelsNoTU}, which is JavaScript function or a
+JavaScript string, provides tooltips for the bar.
+\bVerb\takeMeasure{\string\barLabelsNoTU\darg{\ameta{JS-function}\string|\ameta{JS-string}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\barLabelsNoTU{!ameta(JS-function)|!ameta(JS-string)}
+\end{dCmd}
+\eVerb \cs{barLabelsNoTU} is specified in the preamble\marginpar{\small\itshape
+    \raisebox{2\baselineskip}{\parbox{\marginparwidth}{\raggedleft Declare
+    \cs{barLabelsNoTU} in preamble}}} and cannot be changed in the body of the
+    document. This labeling system applies to all bars with no \cs{TU} key.
+\paragraph*{Description of argument types}
+\subparagraph*{\ameta{JS-function}} When the argument is a JavaScript
+     function, the referenced function must be written. In the sample file
+     \texttt{bgjs-basic1.tex}, the JavaScript function \texttt{customLabelsForBars(fld,v)} is defined;
+     use this function as a template for writing your own custom handlers.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\barLabelsNoTU{customLabelsForBars} %!textsf( applies to all bars without a !cs(TU) key)
+\end{Verbatim}
+
+\subparagraph*{\ameta{JS-string}} When the argument is a JavaScript string,
+    use the variables \texttt{o.env}, \texttt{o.barname}, \texttt{o.bar}, and
+    \texttt{o.value} to compose the string. The default is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\barLabelsNoTU{o.barname+": "+o.bar+", Value: "+o.value}
+\end{Verbatim}
+This is equivalent to \verb|\barLabelsNoTU{}|. Refer to the demo file
+\texttt{bgjs-basic1.tex} for more information.
+
+\subsubsection{Non-tooltip techniques}
+
+In addition to using the {\PDF} form feature of tool tips, the bars can be visually labeled by
+\begin{itemize}
+  \item using typeset text between the bars, refer to \texttt{examples/bgjs-basic2.tex};
+  \item using form fields between the bars, refer to \texttt{examples/bgjs-basic3.tex}, also illustrated below;
+  \item using layers (OCG) between the bars, refer to \texttt{examples/bgjs-pro1.tex}, this example
+    requires a \app{dvips}/\allowbreak\app{Distiller} workflow.
+\end{itemize}\par\vcgBdry
+
+\textbf{Class instructions.} Go to a road of your choice and count the number
+of vehicles of each type during rush hour (for one hour), fill out the form
+below and turn it in for credit.\footnote{It is strongly recommended you read the documentation
+\texttt{bgjs-examples.pdf} on \texttt{bgjs-basic3.tex} as this example uses the
+command \cs{labelFld} not formally documented in this manual.}\marginpar{\small\itshape
+\raisebox{-6bp-\baselineskip}{\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-basic3.tex}}}}\vcgBdry[6bp]
+
+\fbox{\begin{bargraphenv}[width=.67\linewidth,height=2in,
+  o=horiz]{vehiclesH}\def\WD{2in}
+\presetsbarfor{hBar}{auto}{\BG{red}}
+\presetsbarfor{hBar}{truck}{\BG{green}}
+\presetsbarfor{hBar}{suv}{\BG{yellow}}
+\presetsbarfor{hBar}{van}{\BG{magenta}}
+\begin{bargraph}[nbars=4,gap=3]{hBar}
+\barfor{auto}
+\cmd{\vs{-3bp}\labelFld[\textSize{10}]
+  {Automobiles (two or four door)}{hBar.auto}{\WD}{13bp}\vs{3bp}}
+\barfor{truck}
+\cmd{\vs{-3bp}\labelFld[\textSize{10}]
+  {Pickup trucks}{hBar.truck}{\WD}{13bp}\vs{3bp}}
+\barfor{suv}
+\cmd{\vs{-3bp}\labelFld[\textSize{10}]
+  {Sport utility vehicle (SUV)}{hBar.suv}{\WD}{13bp}\vs{3bp}}
+\barfor{van}
+\cmd{\vs{0bp}\labelFld[\textSize{10}]
+  {Passenger van}{hBar.van}{\WD}{13bp}}
+\end{bargraph}
+\end{bargraphenv}}\hfill
+\begin{minipage}[b][2in][c]
+  {.33\linewidth-2\fboxsep-2\fboxrule-10pt}\kern0pt\parskip3pt
+\def\presetinputfor#1#2{%\Ff{\FfReadOnly}
+  \AAkeystroke{EFNumber_Keystroke(0, 0, 0, 0, "", true);}
+  \AAformat{try{EFNumber_Format(0, 0, 0, 0, "", true);\r
+  if(event.rc)toggleFldVisibility("#2@vehiclesH",%
+(event.value!=0));}catch(e){}}
+  \AAvalidate{EFRange_Validate(true, 0, false, 0);}
+}
+\makebox[\widthof{Truck:}][l]{Auto:}
+  \inputFor{vehiclesH}{hBar}{auto}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{Truck:}
+  \inputFor{vehiclesH}{hBar}{truck}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{SUV:}
+  \inputFor{vehiclesH}{hBar}{suv}{.5in}{11bp}\vcgBdry[3bp]
+\makebox[\widthof{Truck:}][l]{Van:}
+  \inputFor{vehiclesH}{hBar}{van}{.5in}{11bp}\vcgBdry[3bp]
+\pushButton[\TU{This button re-scales the bar graph so that the
+longest bar takes the entire width of the region.}\CA{Optimize}
+\A{\JS{optimizeScaling("vehiclesH");}}]{optimize1}{}{13bp}
+\end{minipage}\vcgBdry[6bp]
+
+Reset horizontal bar graph: \pushButton[\CA{Reset}
+  \A{\JS{resetBargraphs("hBar","vehiclesH");\r
+}}]{reset}{}{13bp}\vcgBdry[6bp]
+
+One advantage of using forms over the other two methods is that the labeling can be dynamically
+revised using JavaScript; for example, by inserting the value of a bar (perhaps as a percentage).
+
+\part{Bar graph with an unspecified number of bars}
+
+This package also supports the \env{bargraph} environment that contain no
+\cs{barfor} or \cs{cmd} tokens. These kinds of bar graphs are primarily
+designed to support the creation of probability mass functions (pmf) and
+cumulative distribution functions (cdf).
+
+The creation\marginpar{\small\itshape\raggedleft\opt{dynamic} option} of bar graph with an unspecified number of bars require the
+\opt{dynamic} option:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\usepackage[dynamic]{bargraph-js}
+\end{Verbatim}
+This brings in a JavaScript function \texttt{displayDyBargraph()}.
+
+When used to describe the bar graphs of a discrete probability distribution,
+it is assumed the weights are evenly distributed and contiguous on the number
+line.\footnote{This restriction of contiguous can be bypassed with a little
+trickery.}
+
+
+\section{Dynamic bar graphs}
+
+As in \textbf{Part I}, the package defines two environments,
+\env{bargraphenv} and \env{bargraph}; the latter environment is placed within
+the former one.
+%\bVerb\takeMeasure{\string\begin\darg{bargraphenv}[\ameta{bgenv-options}]\darg{\ameta{bgenv-name}}}%
+\bVerb\def\1{\hskip\amtIndent\relax}\takeMeasure{\1\string\begin\darg{bargraph}\darg{\ameta{bg-name}}%
+\textbf{\string\isdynamic}\string\end\darg{bargraph}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{bargraphenv}[!ameta(bgenv-options)]{!ameta(bgenv-name)}
+!1\begin{bargraph}{!ameta(bg-name)}!textbf(\isdynamic)\end{bargraph}
+\end{bargraphenv}
+\end{dCmd}
+\eVerb The first thing to note is that the \env{bargraph} environment has no
+options; the options \opt{nbars}, \opt{gap}, and \opt{bardimen} are
+automatically assigned. Multiple \env{bargraph} environments are not
+supported within a \env{bargraphenv} environment. As a signal to the package
+that the current \env{bargraph} environment is one that is dynamic, place the
+\cs{isdynamic} command within the \env{bargraph} content, and nothing else.
+
+Multiple \env{bargraph} environments are not supported within the same
+\env{bargrapenv}, but you can have two \env{bargraphenv} environments, one to hold
+the \uif{pmf} and another to hold the \uif{cdf} bar graphs.
+
+The function that does all the work is \texttt{displayDyBargraph}, it has
+four required arguments and one optional one.
+\bVerb\takeMeasure{displayDyBargraph(\ameta{bgenv-name},%
+\ameta{aPr},\ameta{bPmf},\ameta{bOptimize}[,\ameta{object}])}%
+\begin{dCmd}[commandchars={!~@}]{\bxSize}
+displayDyBargraph(!ameta~bgenv-name@,!ameta~aPr@,!ameta~bPmf@,!ameta~bOptimize@[,!ameta~object@])
+\end{dCmd}
+\eVerb
+The arguments are described next.
+\begin{description}
+ \item[\ameta{bgenv-name}] is the name of the target environmet, a JavaScript
+     string that is enclosed in double (or single) quotes
+     (\texttt{"\ameta{bgenv-name}"}).
+ \item[\ameta{aPr}] is an array of probability mass information; each entry
+     in this array has the form \texttt{[k,pmfPr,cdfPr]},  where \texttt{k}
+     is a value of the distribution, \texttt{pmfPr} is the probability mass
+     at that value; and \texttt{cdfPr} is the cumulative mass up to and
+     including the value \texttt{k}.
+ \item[\ameta{bPmf}] is true if we are to draw bar graph for a probability
+     mass function (\uif{pmf}), and false if we are to draw bar graph for a cumulative
+     distribution function (\uif{cdf}).
+ \item[\ameta{bOptimize}] is true if we optimize the graph (applies to \uif{pmf}
+     only), otherwise, we use the current scale factor.
+ \item[\ameta{object}] is a JavaScript object having the following properties:
+ \begin{description}
+      \item[\texttt{bc:\ameta{color}}] is the border color for each of the bars,
+      \ameta{color} is a JavaScript color: \texttt{["RBG",1,0,1]} or \texttt{color.red}.
+      The default is \texttt{color.red}.
+      \item[\texttt{fc:\ameta{color}}] is the fill color for each of the bars,
+      \ameta{color} is a JavaScript color: \texttt{["RBG",1,0,1]} or \texttt{color.blue}.
+      The default is \texttt{color.blue}.
+      \item[\texttt{lbl:\ameta{JS-func}}] is a JavaScript function that provides the tool tips
+      for each of the bars. When this property is not present, the built-in JavaScript
+      function \texttt{\_labelDyBars(pr,v,bPmf)} is used.
+
+    A custom labeling function can be written and specified as the value of
+    the \texttt{lbl} property. The arguments for a labeling function are
+    \texttt{pr} (the current value of the random variable); \texttt{v} (the
+    probability associated with \texttt{pr}, \texttt{v} is a \uif{pmf} or
+    \uif{cdf} value depending on the switch \texttt{bPmf}); and \texttt{bPmf}
+    is \texttt{true} when this is for a \textsf{pmf} and \texttt{false} when
+    this is for a \textsf{cdf}.
+ \end{description}
+\end{description}
+
+\def\displayTable{\textField[\autoCenter{n}\BC{}\BG{}\textSize{6}
+  \Ff{\FfMultiline}]{displayTable}{1in}{2in+6pt+3\baselineskip}}
+
+\begin{center}\bfseries
+   The bar graph for the probability mass function (pmf)
+\end{center}
+\noindent\makebox[0pt][r]{\smash
+  {\raisebox{2\fboxsep+2\fboxrule-6pt-3\baselineskip}{\displayTable}%
+    \hspace{\marginparsep}}}
+\fbox{\begin{bargraphenv}[width=\linewidth-3\fboxsep-3\fboxrule,%
+  height=2in,o=vert]{Pmf}
+\begin{bargraph}{pmfBar}\isdynamic\end{bargraph}
+\end{bargraphenv}}\vcgBdry[\medskipamount]
+\pushButton[\TU{This button re-scales the bar graph so that the
+  tallest bar takes the entire height of the region; shift-click
+  reverts bar graph to its original scaling.}\CA{Optimize}\AAmouseup{%
+  try{displayDyBargraph("Pmf",aPmfCdf,true,!event.shift)}
+    catch(e){};}
+]{optimize}{}{13bp}\cgBdry[1em]
+Under normal scaling, the height of this region is 1 unit, when the
+bar graph is optimized, the height is the height of the tallest bar.
+\begin{flushleft}
+\pushButton[\TU{Randomly generate a probability distribution}
+  \CA{Random}\AAmouseup{%
+  var maxN=40;\r
+  var aPmfCdf=new Array();\r
+  var n=0;
+  while (n==0)\r\t
+    var n=Math.round(Math.random()*maxN);\r
+  var aValues=[],apmfs=[],acdfs=[];\r
+  var total=0;\r
+  for (var i=0; i<n; i++) {\r\t
+    aValues[i]=i;\r\t
+    apmfs[i]=Math.round(Math.random()*maxN);\r\t
+    total+=(apmfs[i]);\r
+  }\r
+  for (var i=0; i<n; i++) {\r\t
+    apmfs[i]=apmfs[i]/total;\r\t
+    acdfs[i]=apmfs[i]+((i==0)?0:acdfs[i-1]);\r\t
+    aPmfCdf[i]=[aValues[i],apmfs[i],acdfs[i]];\r
+  }\r
+  displayTable("displayTable",aPmfCdf);\r
+  displayDyBargraph("Pmf",aPmfCdf,true,true);\r
+}]{Distr3}{}{13bp}\cgBdry[.5em]
+ \pushButton[\CA{Reset}
+    \TU{Press to clear the fields of this page, and shift-press to
+      clear all fields.}
+    \AAmouseup{%
+    this.calculate=true;\r
+    if (event.shift)\r\t
+      this.resetForm();\r
+    else {\r\t
+      this.removeField("Pmf@pmfBar");\r\t
+      this.removeField("Cdf@cdfBar");\r\t
+      this.resetForm("displayTable");\r
+    }
+}]{reset}{}{13bp}\cgBdry[2em]
+\pushButton[\CA{Toggle Border}\AAmouseup{%
+  var f=this.getField("Pmf@pmfBar");\r
+  if ( f!=null ) {\r\t
+    var a=f.getArray();\r\t\t
+    if (f.saveStrokeColor==undefined) f.saveStrokeColor=color.red;\r\t
+    if (!color.equal(a[0].strokeColor,color.transparent))\r\t\t
+      f.saveStrokeColor=a[0].strokeColor;\r\t
+    var g=getField("Cdf@cdfBar");\r\t
+    if (color.equal(a[0].strokeColor,color.transparent)) {\r\t\t
+      f.strokeColor=f.saveStrokeColor;\r\t\t
+      g.strokeColor=f.saveStrokeColor;\r\t
+    } else {\r\t\t
+      f.strokeColor=color.transparent;\r\t\t
+      g.strokeColor=color.transparent;\r\t
+    }\r
+  }
+}]{toggleBdry}{}{13bp}
+\end{flushleft}
+Notice\marginpar{\small\itshape
+\parbox[t]{\marginparwidth}{\raggedleft
+  This example appears in \texttt{examples/\allowbreak bgjs-dyn1.tex}}} that the widths of the bars
+  are automatically adjusted to allow all the bars to be displayed in the bar graph window. The minimum
+  width is \opt{bardimen}, which is set to 20(bp). In this example, maximum weight is randomly chosen less
+  than or equal to 40. In this demo we do not display the \uif{cdf}. Populating a table, as seen in the margin,
+  is optional. Each row is one entry in the \ameta{aPr} array. In the sample file \texttt{bgjs-dyn1.tex}, several
+  techniques are used to create the \ameta{aPr} array.
+
+\part{Postscript}
+
+We finish this documentation with additional miscellaneous commands, comments
+on demonstration files, and notes on my retirement.
+
+\section{Miscellaneous commands}
+
+\subsection{The bar graph data structure}
+
+The \pkg{bargraph-js} package associates with each \env{bargraphenv}
+environment a hidden text field named \texttt{internalData.\ameta{bgenv-name}}.
+This field uses the JavaScript object \texttt{dataForEnv} to store information
+about the environment. The data stored is,
+\begin{Verbatim}[commandchars=!()]
+if (typeof dataForEnv=="undefined")
+  var dataForEnv=new Object;
+dataForEnv["!ameta(bgenv-name)"]=new Object;
+dataForEnv["!ameta(bgenv-name)"].width=!ameta(width);  //!textsf( width in big points)
+dataForEnv["!ameta(bgenv-name)"].height=!ameta(heigh); //!textsf( height in big points)
+dataForEnv["!ameta(bgenv-name)"].horiz=!ameta(!upshape(true)|(false));
+dataForEnv["!ameta(bgenv-name)"].sf=!ameta(scale-factor);
+dataForEnv["!ameta(bgenv-name)"].bgs=[!ameta(list-of-bg-names)];
+dataForEnv["!ameta(bgenv-name)"].origin=!ameta(!upshape0|.5);
+\end{Verbatim}
+
+\subsection{Setting the scale} The initial scale of a \env{bargraphenv} environment is set
+by the command
+\bVerb\takeMeasure{\string\scaleFactorDef\darg{\ameta{pos-num}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\scaleFactorDef{!ameta(pos-num)}
+\end{dCmd}
+\eVerb When placed in the preamble, \cs{scaleFactorDef} sets the default
+scale factor; the \pkg{bargraph-js} declares \cs{scaleFactorDef\darg{2}}.
+When a bar graph is reset (cleared), the value \ameta{pos-num} is used to
+reset the scale value
+
+When executed in
+the body, the initial scale factor of all \env{bargraphenv} environments that
+follow are affected, unless the declaration occurs in a group. For example,
+\cs{scaleFactorDef\darg{3}} sets initial scale factor to 3; a more
+provocative example is found in sample file \texttt{bgjs-adv1.tex} where we
+declare,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\fbox{\scaleFactorDef{dataForEnv["math"].height/100}%
+\begin{bargraphenv}[width=2in,height=2in,o=vert]{math}
+...
+\end{bargraphenv}}
+\end{Verbatim}
+Here we set the scale factor to be the height of the environment (in bp
+points) divided by~100; that way, data are re-scaled as a proportion of the
+height of the bar graph. We make this declaration inside the \cs{fbox} to
+make the declaration local.
+
+\subsection{Optimizing a bar graph}
+
+To optimize all the bar graphs within a \env{bargraphenv} environment, use the built-in
+JavaScript function \texttt{optimizeScaling("\ameta{bgenv-name}")}. Below is a ``generic
+example'' for optimizing an environment.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!~@}]
+\pushButton[\TU{!ameta~tool tip text@}\CA{Optimize}
+  \AAmouseup{optimizeScaling("!ameta~bgenv-name@");}]{optimize}{}{13bp}
+\end{Verbatim}
+The \texttt{optimizeScaling()} function is used in numerous examples of this package.
+
+\subsection{Manually scaling a bar graph}
+
+The user can be allowed to manually re-scale the bar graph. For this purpose,
+\pkg{bargraph-js} defines two commands \cs{displaysfFor} and \cs{manualsfFor},
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!()}]
+\displaysfFor[!ameta(eforms-opts)]{!ameta(bgenv-name)}{.5in}{13bp}
+\manualsfFor[!ameta(eforms-opts)]{!ameta(bgenv-name)}{}{13bp}
+\end{Verbatim}
+where, \ameta{bgenv-name} is the name of the \env{bargraphenv} environment
+that these controls are to re-scale. This pair of commands appear in the
+sample files \texttt{bgjs-basic4.tex} and \texttt{bgjs-comma1.tex}.
+
+Within the text field generated by \cs{displaysfFor}, simple arithmetic
+operations can be made; eg, if current scale factor is \texttt{3.3} (the
+optimized scale value, perhaps) then entering \texttt{3.3\,/\,2} and pressing
+the re-scale button, re-scales the bar graphs to half their height or width,
+depenting on whether \texttt{o=vert} or \texttt{o=horiz}.
+
+
+\subsection{Resetting a bar graph}
+
+Reset one or more bar graphs, as well as other fields using the JavaScript function
+\texttt{resetBargraphs(\ameta{various})}
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!~@}]
+\pushButton[\CA{Reset}!ameta~other-options@
+!quad\AAmouseup{resetBargraphs(!ameta~various@);}
+]{reset}{}{13bp}
+\end{Verbatim}
+The \ameta{various} argument consists of a list of field names and
+\env{bargraphenv} names to be reset. The name of the \env{bargraphenv}
+environment on page~\pageref{intro} is \texttt{vehiclesV}. The code for
+the \uif{Reset} button in that example is,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\pushButton[\CA{Reset}\A{\JS{resetBargraphs("vehiclesV");}}
+]{reset}{}{13bp}\end{Verbatim}
+Notice, the argument of \texttt{resetBargraphs} is \texttt{"vehiclesV"}, this will
+clear not only all bar graphs in the \env{bargraphenv} environment, but also the
+input fields (created by \cs{inputFor}); in the latter case, this is because the
+root name of the \cs{inputFor} fields is \texttt{"vehiclesV"}.
+
+The function \texttt{resetBargraphs} is used extensively in the sample file
+of this distribution.
+
+\section{Demonstration files}
+
+This distribution comes with numerous sample files. The files  are packed
+into the DTX file \texttt{bgjs-examples.dtx} (and can be unpacked by latexing
+\texttt{bgjs-examples.ins}, if not done already). Read the documentation file
+\texttt{bgjs-examples.pdf} for detailed descriptions of each sample file.
+
+\section{My retirement}
+
+Now, I simply must get back to it. \dps
+
+\end{document}

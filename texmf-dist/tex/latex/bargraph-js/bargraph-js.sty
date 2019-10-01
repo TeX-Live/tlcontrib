@@ -1,0 +1,667 @@
+%%
+%% This is file `bargraph-js.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% bargraph-js.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bargraph-js.sty package,                              %%
+%% Copyright (C) 2019                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{bargraph-js}
+ [2019/04/07 v0.8 bargraph-js: Create bar graphs using form fields and JavaScript]
+\RequirePackage{xkeyval}
+\DeclareOptionX{dynamic}{\def\bgjs@importDynamic
+  {\InputIfFileExists{dynam-js.def}{}{\PackageWarning{bargraph-js}
+    {The file dynam-js.def cannot be found}}}}
+\let\bgjs@importDynamic\relax
+\ProcessOptionsX\relax
+\AtEndOfPackage{\bgjs@importDynamic}
+\RequirePackage{xcolor}
+\RequirePackage{eforms}[2019/05/24]
+\edef\bgjs@restoreCats{\catcode`\noexpand\"=\the\catcode`\"\relax}
+\@makeother\"
+\def\scaleFactorDef#1{\def\sc@leF@ctorDef{#1}}
+\scaleFactorDef{2}
+\define@key{bgrphenv}{width}[\linewidth]{\setlength{\@tempdima}{#1}%
+  \ifxetex\else\addtolength{\@tempdima}{2bp}\fi
+  \edef\bgrphenv@width{\the\@tempdima}\@tempdima=.99626\@tempdima
+  \edef\bgrphenv@widthbp{\strip@pt\@tempdima}}
+\define@key{bgrphenv}{height}[2in]{\setlength{\@tempdima}{#1}%
+  \edef\bgrphenv@height{\the\@tempdima}\@tempdima=.99626\@tempdima
+  \edef\bgrphenv@heightbp{\strip@pt\@tempdima}}
+\newif\ifhorizontalbars \horizontalbarsfalse
+\newcount\cntbars \cntbars=0
+\newtoks\bgtoks
+\define@choicekey{bgrphenv}{o}[\val\nr]{horiz,vert}{%
+  \ifcase\nr\relax
+    \horizontalbarstrue\or
+    \horizontalbarsfalse\else
+    \horizontalbarsfalse\fi}
+\define@choicekey+{bgrphenv}{origin}{0,.5}[0]{\def\bgjs@origin{#1}}
+  {\PackageWarning{bargraph-js}{Bad choice for origin,
+  permissible values are 0 and .5.\MessageBreak
+  Will use a value of 0. Try again}}
+\def\bgjs@origin{0}
+\newif\if@bgshowaxis \@bgshowaxisfalse % dps23 \catcode`\%=14\relax
+\define@boolkey{bgrphenv}[@bg]{showaxis}[true]{}
+\begin{defineJS}[\catcode`\!=0\relax]{\hided@t@Fmt}
+if (typeof dataForEnv=="undefined")
+  var dataForEnv=new Object;
+dataForEnv["!p(1)"]=new Object;
+dataForEnv["!p(1)"].width=!bgrphenv@widthbp;
+dataForEnv["!p(1)"].height=!bgrphenv@heightbp;
+dataForEnv["!p(1)"].horiz=!ifhorizontalbars(true)!else(false)!fi;
+dataForEnv["!p(1)"].sf=!sc@leF@ctorDef;
+dataForEnv["!p(1)"].bgs=[!bg@list];
+dataForEnv["!p(1)"].origin=!bgjs@origin;
+var _nO=!bgjs@origin;
+var r=event.target.rect;
+if (dataForEnv["!p(1)"].horiz){
+  var _w1=_nO*dataForEnv["!p(1)"].width;
+  dataForEnv["!p(1)"].maxDim=(_nO==0)?!%
+!bgrphenv@widthbp:Math.min(_w1,!bgrphenv@widthbp-_w1);
+  dataForEnv["!p(1)"].baseline=r[0]+_w1;
+} else {
+  var _h1=_nO*dataForEnv["!p(1)"].height;
+  dataForEnv["!p(1)"].maxDim=(_nO==0)?!%
+!bgrphenv@heightbp:Math.min(_h1,!bgrphenv@heightbp-_h1);
+  dataForEnv["!p(1)"].baseline=r[3]+_h1;
+}
+dataForEnv["!p(1)"].values=new Object;
+\end{defineJS}
+\def\internalD@t@Hidden#1{%
+  \llap{\textField[\cmd{\bParams{#1}\eParams\let\%\defjsLB}
+  \autoCenter{n}\BC{}\BG{}\S{S}\textSize{0}\Ff{\FfReadOnly}
+  \AA{\AAFormat{\hided@t@Fmt}}]{internalData.#1}{2bp}{2bp}}}
+\def\bg@vs#1{\setlength\@tempdima{#1}\vskip\@tempdima}
+\def\bg@hs#1{\setlength\@tempdima{#1}\hskip\@tempdima}
+\let\oBgEnvs\@gobble
+\newif\ifisbgenv\isbgenvfalse
+\let\barNum\ef@Zero
+\def\bg@warning{\PackageWarningNoLine{bargraph-js}
+  {At least one more compile is required}\global\let\bg@warning\@empty}
+\newenvironment{bargraphenv}[2][]{\offinterlineskip
+  \let\vs\bg@vs\let\hs\bg@hs\global\isbgenvtrue
+  \@ifundefined{envname@#2}{\global\@namedef{envname@#2}{#2}}
+    {\PackageWarning{bargraph-js}
+      {The name '#2' has been used in an earlier\MessageBreak
+      bargraphenv environment, please choose another\MessageBreak
+      name for the bargraphenv environment that\MessageBreak
+      appears}}%
+  \g@addto@macro\oBgEnvs{,"#2":\dl@lBrace\dl@rBrace}%
+  \def\bgrphenv@name{#2}\setkeys{bgrphenv}{width,height,#1}%
+  \ifhorizontalbars
+    \@tempdima\bgrphenv@width\relax
+    \@tempdima=\bgjs@origin\@tempdima
+    \edef\bgjs@setorigin{\the\@tempdima}%
+  \else % vertical
+    \@tempdima\bgrphenv@height\relax
+    \@tempdima=\bgjs@origin\@tempdima
+    \edef\bgjs@setorigin{\the\@tempdima}%
+  \fi
+  \@tempdima=.99626\@tempdima
+  \edef\bgrphenv@setoriginbp{\strip@pt\@tempdima}%
+  \let\isdynamic\relax\let\bg@list\@gobble
+  \global\let\barNum\ef@Zero
+  \begin{minipage}[b][\bgrphenv@height][b]{\bgrphenv@width}\hfuzz4pt}
+    {\hfill\end{minipage}\leavevmode
+    \ifx\txtBgValues\relax\else
+      \@ifundefined{OBgEnvs}{\bg@warning}{\txtBgValues
+      \global\let\txtBgValues\relax}\fi
+    \internalD@t@Hidden{\bgrphenv@name}}
+\define@key{bargraph}{nbars}[0]{\gdef\nbars{#1}}
+\def\nb@rsDef{0}
+\def\nbars{0}
+\define@key{bargraph}{gap}[0]{\gdef\bargap{#1bp}}
+\def\b@rgapDef{0}
+\def\bargap{0bp} % in bp units
+\define@key{bargraph}{bardimen}{\gdef\bardimen{#1bp}}
+\def\b@rdimenDef{20}
+\def\bardimen{20bp} % in bp units
+\def\bgjs@seto{\cntbars\@ne
+  \ifx\barNum\ef@Zero\relax
+    \global\let\barNum\ef@One
+    \toks@={\ifhorizontalbars\else\ifxetex\else
+      \hskip2bp\fi\fi}\else\toks@={}\fi\bgjs@gettype}
+\def\bgjs@gettype{\@ifnextchar\relax
+  {\bgjs@dynamic}{\bgjs@@getbartoks}}
+\def\expbarfor#1\@nil{#1}
+\def\bgjs@dynamic{\let\b@rforCommon\dyb@rforCommon
+  \edef\bgrph@name{x\bgrph@name}\leavevmode
+  \rlap{\barfor{bgnoname}}}
+\def\bgjs@@getbartoks{\@ifnextchar\barfor
+  {\bgjs@@getbarfor}{\@ifnextchar\cmd
+    {\bgjs@@getcmd}{\relax}}}%
+\def\hmrk{\hskip\bgjs@setorigin\relax}
+\def\bgjs@@getbarfor\barfor#1{%
+  \ifhorizontalbars % o=horiz
+    \toks@=\expandafter{\the\toks@\leavevmode
+      \rlap{\hmrk\bgjs@adj\barfor{#1}}}%
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@\vcgBdry[0bp]}\else
+      \toks@=\expandafter{\the\toks@\vcgBdry[\bargap]}\fi
+  \else % o=vert
+    \toks@=\expandafter{\the\toks@
+      \raisebox{\bgjs@setorigin+\bgjs@adj}{\barfor{#1}}}%
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@\cgBdry[0bp]}\else
+      \toks@=\expandafter{\the\toks@\cgBdry[\bargap]}\fi
+  \fi
+  \advance\cntbars\@ne
+  \ifnum\cntbars>\nbars
+    \def\bgjs@next{\@ifnextchar\cmd{\bgjs@@getbartoks}
+    {\let\\\expbarfor\the\toks@}}%
+  \else
+    \def\bgjs@next{\bgjs@@getbartoks}\fi
+  \unskip\bgjs@next}
+\def\bgjs@@getcmd\cmd#1{%
+  \toks@=\expandafter{\the\toks@#1}%
+  \ifhorizontalbars % o=horiz
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@}\else
+      \toks@=\expandafter{\the\toks@}\fi
+  \else % o=vert
+    \ifnum\cntbars=\@ne
+      \toks@=\expandafter{\the\toks@}\else
+      \toks@=\expandafter{\the\toks@}\fi
+  \fi
+  \ifnum\cntbars>\nbars
+    \def\bgjs@next{\@ifnextchar\cmd{\bgjs@@getbartoks}
+    {\let\\\expbarfor\the\toks@}}\else
+    \def\bgjs@next{\bgjs@@getbartoks}\fi
+\bgjs@next}
+\newenvironment{bargraph}[2][]{\def\bgrph@name{#2}%
+  \g@addto@macro\bg@list{,"#2"}\setkeys{bargraph}{nbars=\nb@rsDef,
+    bardimen=\b@rdimenDef,gap=\b@rgapDef,#1}%
+  \edef\bg@sign{\ifxetex-\else+\fi}%
+  \edef\bgjs@adj{\ifhorizontalbars
+    \ifxetex\else\hskip2bp\fi\else+\ifxetex0pt\else2bp\fi\fi}%
+  \if@bgshowaxis\ifhorizontalbars\else\leavevmode
+    \smash{\makebox[0pt][l]{\raisebox{\bgjs@setorigin\bg@sign.5pt}%
+      {\rule{\bgrphenv@width}{1pt}}}}\fi\fi
+  \bgjs@seto}{\if@bgshowaxis\ifhorizontalbars
+    \smash{\rlap{\setlength{\@tempdima}
+      {\bgjs@setorigin\bg@sign.5pt}%
+    \hskip\@tempdima\rule{1pt}{\bgrphenv@height}}}\fi\fi}
+\def\txtBgValues{%\leavevmode
+  \llap{\textField[\S{S}\H{N}\BG{}\BC{}\F{\FHidden}%
+  \autoCenter{n}\DV{(\{\OBgEnvs\})}\V{(\{\OBgEnvs\})}
+  ]{bgValues}{2bp}{2bp}}\llap{\textField[\S{S}\H{N}\BG{}\BC{}
+  \F{\FHidden}\autoCenter{n}\DV{}\V{}]{barLabeling}{2bp}{2bp}}%
+}
+\gdef\bg@wrtBbValues{\immediate\write\@auxout{\string
+  \gdef\string\OBgEnvs{\oBgEnvs}}}
+\AtEndDocument{\ifisbgenv\bg@wrtBbValues\fi}
+\def\barforCommon#1{\def\b@rforCommon{#1}}
+\barforCommon{\S{S}\H{N}\BG{}\BC{}\F{\FHidden}\autoCenter{n}}
+\def\dybarforCommon#1{\def\dyb@rforCommon{#1}}
+\dybarforCommon{\S{S}\H{N}\BG{}\BC{}\F{\FHidden}}
+\def\presetsbarfor#1#2#3{\protectedKeys{#1.#2@\bgrphenv@name}{#3}}
+\def\presetsb@rfor#1{\@nameuse{\bgrph@name.#1@\bgrphenv@name}}
+\def\barfor#1{\ifhorizontalbars\def\bgenv@angle{0}\else
+  \def\bgenv@angle{90}\fi
+  \@ifundefined{\bgrph@name.#1@\bgrphenv@name}
+    {\let\@presets\@gobble}{\let\@presets\presetsb@rfor}%
+  \pushButton[\presets{\b@rforCommon\R{\bgenv@angle}}
+    \epresets{\@presets{#1}}
+  ]{\bgrphenv@name @\bgrph@name.#1}{\bardimen}{\bardimen}}
+\def\getBarName(#1,#2,#3){#1+"@"+#2+"."+#3}
+\def\inputFor#1#2#3{% env, bar, name
+  \textField[\cmd{\bParams{#1}{#2.#3}\eParams}
+    \presets{\priorpresetinputfor{#1}{#2.#3}}
+    \presets{\presetinputfor{#1}{#2.#3}}
+    \AAonfocus{updateBG.activegraph="#1@#2.#3";}]%
+    {#1.#2@#3}}
+\def\priorpresetinputfor#1#2{\AddAAcalculate{%
+  updateBG.env=getEnvName(event.targetName);\r
+  updateBG(event.value,"#1@#2",\usebarlabel);\r}
+  \AAcalculate{;}
+}
+\newcommand{\presetinputfor}[2]{%
+  \AAkeystroke{AFNumber_Keystroke(0, 0, 0, 0, "", true);}
+  \AAformat{AFNumber_Format(0, 0, 0, 0, "", true);}
+  \AAvalidate{AFRange_Validate(true, 0, false, 0);}
+}
+\begin{defineJS}{\dsfForKeyStr}
+if(event.willCommit) {
+  var v=event.value;
+  try { v=eval(v) } catch(e){};
+  if(isNaN(v)) {
+    app.beep(0);
+    app.alert("Enter a nonnegative number")
+    event.rc=false;
+  }
+}
+\end{defineJS}
+\newcommand{\displaysfFor}[2][]{%
+  \textField[\DV{2}\V{2}\TU{Current scale factor}
+  \AAkeystroke{\dsfForKeyStr}
+  \AAvalidate{AFRange_Validate(true, 0, false);}
+  #1]{txtRescale.#2}%
+}
+\begin{defineJS}[\catcode`\!=0\relax]{\msfForMU}
+var f=this.getField("txtRescale.!p(1)");
+var v=eval(f.value);
+if (v>0){
+  dataForEnv["!p(1)"].sf=v;
+  rescaleBargraph("!p(1)");
+}
+\end{defineJS}
+\newcommand{\manualsfFor}[2][]{%
+  \pushButton[\cmd{\bParams{#2}\eParams}
+    \AAmouseup{\msfForMU}#1]{btnRescale.#2}%
+}
+\def\barLabelsTU#1{\def\usebarlabel{#1}\ifx\usebarlabel\@empty
+  \def\usebarlabel{""}\fi}
+\barLabelsTU{""}
+\def\barLabelsNoTU#1{\def\@rgi{#1}\ifx\@empty
+  \edef\barLabelsNoTUJS{\barLabelsNoTUJSDef}\else
+  \def\barLabelsNoTUJS{#1}\fi}
+\def\barLabelsNoTUJSDef{o.barname+": "+o.bar+", Value: "+o.value}
+\expandafter\barLabelsNoTU\expandafter{\barLabelsNoTUJSDef}
+\def\simpleBarLabels(#1,#2){"Bar for "+#1+", Value: "+#2;}
+\newcommand\labelFld[4][]{\textField[\Ff{\FfReadOnly}\F{\FHidden}
+  \BC{}\BG{}#1\autoCenter{n}\DV{#2}\V{#2}]{#3@\bgrphenv@name}{#4}}
+\begin{defineJS}[\catcode`\!=0\relax]{\bgOpenAction}
+if(oBarLabeling.needsRestore) {
+  var bgTO=app.setTimeOut("bgRestoreData();!%
+app.clearTimeOut(bgTO);!%
+oBarLabeling.needsRestore=false",1000);
+}
+\end{defineJS}
+\begingroup\@makeother\%\let\%\defjsLB
+\thisPageAction{\JS{\bgOpenAction}}{}
+\endgroup
+\begin{willSave}
+bgSaveData();
+\end{willSave}
+\def\barDefColor{color.blue}
+\newcommand{\populateCommaData}{%
+  populateCommaData.usebarlabel=\usebarlabel;\r
+  populateCommaData
+}
+\begin{insDLJS*}{bgjs}
+\begin{newsegment}{AeB: bargraph-js}
+/*
+        Document Level JavaScript
+        bargraph-js Package
+        D. P. Story copyright \the\year
+*/
+\end{newsegment}
+\begin{newsegment}{Bar Graph of preset bars}
+var _scaleFactorDef=\sc@leF@ctorDef;
+var oBarLabeling = new Object;
+    oBarLabeling.needsRestore=true;
+function updateBG (v,fld,o) {
+  if (typeof v=="undefined") return;
+  if (updateBG.activegraph!=fld) return;
+  var useDefLabeling=(typeof o=="string");
+  var env=updateBG.env;
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var baseline=dataForEnv[env].baseline
+  var isHoriz=dataForEnv[env].horiz;
+  var bRescaleNeeded=false;
+  var f=this.getField(fld);
+  var cachedValue=getBarValue(env,fld);
+  saveBarValue(env,fld,v); // dps13
+  bRescaleNeeded=getNewScaleFactor(env,v);
+  var sf=dataForEnv[env].sf;
+  sf=(sf<0)?-sf:sf;
+  var r=f.rect;
+  if(isHoriz) { // dps01
+    if (v<0) {
+     if (cachedValue<0) // no change in sign
+        r[0]=r[2]+(v*sf);
+      else { // change from pos to neg
+        r[2]=r[0];
+        r[0]=r[2]+(v*sf);
+      }
+    } else {
+      if (cachedValue<0) { // from neg to pos
+        r[0]=r[2];
+        r[2]=r[0]+(v*sf);
+      } else // from pos to pos
+        r[2]=r[0]+(v*sf);
+      }
+  } else { // vertical
+   if (v<0) { // dps01
+   if (cachedValue<0) { // no change in sign
+        r[3]=r[1]+(v*sf);
+   } else { // switching from pos to neg
+        r[1]=r[3];
+     r[3]=r[1]+(v*sf);
+      }
+   } else {
+      if (cachedValue<0)  // change in sign: neg to pos
+     r[3]=r[1]+(v*sf);
+      else // no change
+        r[1]=r[3]+(v*sf);
+    }
+  }
+  f.rect=r;
+  if (typeof oBarLabeling[fld]=="undefined")
+    oBarLabeling[fld]=(f.userName!="")?f.userName:-1;
+  if (oBarLabeling[fld]==-1)f.userName=barLabelsDef(fld,v);
+  else {
+    if (typeof o!="undefined")
+      f.userName=(useDefLabeling)?((o=="")?%
+(simpleBarLabels(fld,v,oBarLabeling[fld])):%
+(simpleBarLabels(fld,v,o))):o(fld,v);
+  } 
+  f.fillColor=(color.equal(f.fillColor,color.transparent))?%
+\barDefColor:f.fillColor;
+  f.display=display.visible;
+  if(bRescaleNeeded) {
+    var g=this.getField(env);
+    if (g!=null)g.readonly=true;
+    app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+  }
+}
+function parseFld(fld,v) {
+  var pos=fld.indexOf("@");
+  var env=fld.substring(0,pos);
+  fld=fld.substring(pos+1);
+  pos=fld.indexOf(".");
+  var barname=fld.substring(0,pos);
+  var bar=fld.substring(pos+1);
+  parseFld.env=env;
+  parseFld.barname=barname;
+  parseFld.bar=bar;
+  parseFld.value=v;
+}
+function barLabelsDef(fld,v){
+  parseFld(fld,v);
+  var o=parseFld;
+  var strOrFnc=\barLabelsNoTUJS;
+  return ((typeof strOrFnc=="string")?strOrFnc:strOrFnc(fld,v));
+}
+function simpleBarLabels(fld,v){
+  if (arguments.length==2)
+     return customBarLabels(fld,v);
+  else {
+    parseFld(fld,v);
+    var s=arguments[2];
+    return replaceLblVars(s);
+  }
+}
+function getNewScaleFactor(env,v) {
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var maxDimen=dataForEnv[env].maxDim;
+  var nO=dataForEnv[env].origin;
+  var sf=dataForEnv[env].sf;
+  var isHoriz=dataForEnv[env].horiz;
+  v=(v<0)?-v:v;
+  if(isHoriz) {
+    maxDimen=(nO==0)?w:maxDimen;
+    if( sf*v > maxDimen ) {
+      sf=maxDimen/v;
+      dataForEnv[env].sf=sf;
+      return true;
+    }
+  } else {
+    maxDimen=(nO==0)?h:maxDimen;
+    if ( sf*v > maxDimen ) {
+      sf=maxDimen/v;
+      dataForEnv[env].sf=sf;
+      return true;
+    }
+  }
+  return false;
+}
+// <env>.<barname>@<name> --> <env>@<barbane>.<name>
+function getBarName(name) {
+  var pos=name.indexOf(".");
+  var env=name.substring(0,pos);
+  name=name.substring(pos+1);
+  return env+"@"+name.replace(/@/,".");
+}
+function getEnvName(name) {
+  var pos=name.indexOf(".");
+  var env=name.substring(0,pos);
+  return env;
+}
+function rescaleBargraph(env) {
+  var oInputFor=this.getField(env);
+  this.delay=true;
+  // date input by the \\inputFor
+  if (oInputFor!=null) {
+    var a=oInputFor.getArray()
+    for (var i=0; i<a.length; i++) {
+      updateBG.activegraph=getBarName(a[i].name);
+      if (a[i].display!=display.hidden) {
+        this.calculate=false;
+        a[i].value=1*a[i].value + 1;
+        this.calculate=true;
+        a[i].value=1*a[i].value - 1;
+      }
+    }
+  } else {
+    var aBars=dataForEnv[env].bgs;
+    for (var i=0; i<aBars.length; i++) {
+      var bars=this.getField(env+"@"+aBars[i]); // dps07
+      var widgets=bars.getArray();
+      for (var j=0; j<widgets.length; j++) {
+        var name=widgets[j].name;
+        var Value=getBarValue(env,name); // dps13
+        updateBG.env=env;
+        updateBG.activegraph=name;
+        updateBG(Value,updateBG.activegraph);
+      }
+    }
+  }
+  var f=this.getField("txtRescale."+env);
+  if (f!=null) f.value=Math.round(dataForEnv[env].sf*1000)/1000;
+  this.delay=false;
+  var g=this.getField(env);
+  if (g!=null)g.readonly=false;
+}
+function optimizeScaling(env) {
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var sf=dataForEnv[env].sf;
+  var isHoriz=dataForEnv[env].horiz;
+  var aBGs=dataForEnv[env].bgs;
+  for (var i=0; i<aBGs.length; i++) {
+    var o=this.getField(env+"@"+aBGs[i]); // dps07
+    var a=o.getArray();
+    maxFldName=a[0].name;
+    if (isHoriz) { // if horizontal bars
+      var maxDim=0; maxFldName="";
+      for (var i=0; i<a.length; i++) {
+        if (a[i].display==display.hidden) continue;
+        var thisDim=a[i].rect[2]-a[i].rect[0];
+        thisDim=(thisDim<0)?-thisDim:thisDim; // dps01
+        if ( thisDim > maxDim ) {
+          maxDim=thisDim;
+          maxFldName=a[i].name;
+        }
+      }
+      if (maxFldName=="") return;
+  // get name of input field env.bar@name
+      var v=getBarValue(env,maxFldName);
+  // now rescale all bars
+     v=(v<0)?-v:v; // dps01
+      if (v !=0) {
+        sf=w/v; // if v !=0
+        dataForEnv[env].sf=sf;
+        var g=this.getField(env);
+        if (g!=null)g.readonly=true;
+        app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+      }
+    } else { // if vertical bars
+      var maxDim=0; maxFldName="";
+      for (var i=0; i< a.length; i++) {
+        if (a[i].display==display.hidden) continue;
+        var thisDim=a[i].rect[1]-a[i].rect[3];
+        thisDim=(thisDim<0)?-thisDim:thisDim; // dps01
+        if ( thisDim > maxDim ) {
+          maxDim=thisDim;
+          maxFldName=a[i].name;
+        }
+      }
+      if (maxFldName=="") return;
+      var v=getBarValue(env,maxFldName); // dps13
+      if ( typeof v == "undefined" ) return;
+  // now rescale all bars
+     v=(v<0)?-v:v; // dps01
+      if (v !=0) {
+        sf=h/v;
+        dataForEnv[env].sf=sf;
+        var g=this.getField(env);
+        if (g!=null)g.readonly=true;
+        app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+      }
+    }
+  }
+}
+function resetBargraphs() {
+  this.calculate=false;
+  this.resetForm(arguments);
+  for (var n=0; n<arguments.length; n++){
+  var f=this.getField("internalData."+arguments[n]);
+  if (f!=null) {
+      dataForEnv[arguments[n]].sf=_scaleFactorDef;
+      var env=arguments[n]; // dps01
+      var isHoriz=dataForEnv[env].horiz;
+     aBGs=dataForEnv[arguments[n]].bgs;
+      // an environment name
+    for (var i=0; i<aBGs.length; i++) {
+        var o=this.getField(env+"@"+aBGs[i]); // dps07
+    var a=o.getArray();
+    o.display=display.hidden;
+        if (isHoriz) {
+          for(j=0;j<a.length;j++) {
+            var name=a[j].name; // dps01
+            var value=getBarValue(env,name); // dps01
+            if (value<0) { // dps01
+              var r=a[j].rect;
+              r[0]=r[2]+20;
+              a[j].rect=r;
+            }
+            saveBarValue(arguments[n],a[j].name,"0");
+          }
+        } else {
+          for(j=0;j<a.length;j++) {
+            var name=a[j].name; // dps01
+            var value=getBarValue(env,name); // dps01
+            if (value<0) { // dps01
+              var r=a[j].rect;
+              r[3]=r[1]+20;
+              a[j].rect=r;
+            }
+            saveBarValue(arguments[n],a[j].name,"0");
+          }
+        }
+      }
+    }
+  }
+  this.calculate=true;
+}
+// fld="<bgenv-name><bg-name>.<bar-name>", v=value of field
+function customBarLabels(fld,v){
+  var f=this.getField(fld);
+  if ( oBarLabeling[fld] != -1 ) {
+    var s=oBarLabeling[fld];
+    if (s.indexOf("@v@")==-1)
+      return barLabelsDef(fld,v);
+    else {
+      parseFld(fld,v);
+      return replaceLblVars(s);
+    }
+  } else return barLabelsDef(fld,v);
+}
+function replaceLblVars(s) {
+  var o=parseFld;
+  s=s.replace(/@env@/g,o.env);
+  s=s.replace(/@barname@/g,o.barname);
+  s=s.replace(/@bar@/g,o.bar);
+  s=s.replace(/@v@/g,o.value);
+  return s;
+}
+function getBarValue(env,name){
+  var f=this.getField("bgValues");
+  var o=eval(f.value);
+  var v=o[env][name];
+  var retn=(typeof v=="undefined")?0:v;
+  return retn;
+}
+function saveBarValue(env,name,v) {
+  var f=this.getField("bgValues");
+  var o=eval(f.value);
+  o[env][name]=v;
+  f.value=o.toSource();
+}
+\end{newsegment}
+\begin{newsegment}{Toggle field visibility}
+function toggleFldVisibility(name,bOk) {
+  var f=this.getField(name);
+  f.display=(bOk)?display.visible:display.hidden;
+}
+\end{newsegment}
+\begin{newsegment}{Comma-delimited Data}
+function populateCommaData(env,bar,str) {
+  var value;
+  var f=this.getField(env+"@"+bar);
+  var g=f.getArray();
+  var aValue=str.split(",");
+  var bOk=(arguments.length>3)?arguments[3](aValue):true;
+  if (bOk) {
+    for (var i=0; i<g.length; i++){
+      updateBG.env=env;
+      updateBG.activegraph=g[i].name;
+      value=(typeof(aValue[i])=="undefined")?0:aValue[i];
+      updateBG(value,updateBG.activegraph,%
+populateCommaData.usebarlabel);
+    }
+  } else app.alert(arguments[3].msg);
+}
+\end{newsegment}
+\begin{newsegment}{Validate input data for comma-delimited data}
+validateArrayNonNegNums.msg="Enter only non-negative numbers";
+function validateArrayNonNegNums(aValue){
+  var bOk=true;
+  for (var i=0; i<aValue.length; i++) {
+    var x=1*aValue[i];
+    if(isNaN(x)) {bOk=false; break;}
+    else if (x<0) {bOk=false; break;}
+  }
+  return bOk
+}
+validateArrayOfNums.msg="Enter only numerical values";
+function validateArrayOfNums(aValue){
+  var bOk=true;
+  for (var i=0; i<aValue.length; i++) {
+    var x=1*aValue[i];
+    if(isNaN(x)) {bOk=false; break;}
+  }
+  return bOk
+}
+\end{newsegment}
+\begin{newsegment}{Restore Data}
+function bgSaveData() {
+  var f=this.getField("barLabeling");
+  if(f!=null)f.value=oBarLabeling.toSource();
+}
+function bgRestoreData(){
+  var f=this.getField("barLabeling");
+  if(f!=null&&f.value!="")oBarLabeling=eval(f.value);
+}
+\end{newsegment}
+\end{insDLJS*}
+\bgjs@restoreCats
+\endinput
+%%
+%% End of file `bargraph-js.sty'.

@@ -1,0 +1,1284 @@
+%\iffalse
+% makeindex -s gglo.ist -o bargraph-js.gls bargraph-js.glo
+% makeindex -s gind.ist -o bargraph-js.ind bargraph-js.idx
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bargraph-js.sty package,                              %%
+%% Copyright (C) 2019                                    %%
+%%   dpstory@uakron.edu                                  %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+%<package>\ProvidesPackage{bargraph-js}
+%<package> [2019/04/07 v0.8 bargraph-js: Create bar graphs using form fields and JavaScript]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage[colorlinks,hyperindex=false,bookmarksopen=false]{hyperref}
+\usepackage{bargraph-js}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\gdef\brpr#1{\texttt{\char123\relax#1\char125\relax}}
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+%\def\cs#1{\texttt{\bslash#1}}
+\DeclareRobustCommand{\tmspace}[3]{%
+  \ifmmode\mskip#1#2\else\kern#1#3\fi\relax}
+\renewcommand{\,}{\tmspace+\thinmuskip{.1667em}}
+\let\thinspace\,
+\renewcommand{\!}{\tmspace-\thinmuskip{.1667em}}
+\let\negthinspace\!
+\renewcommand{\:}{\tmspace+\medmuskip{.2222em}}
+\let\medspace\:
+\newcommand{\negmedspace}{\tmspace-\medmuskip{.2222em}}
+\renewcommand{\;}{\tmspace+\thickmuskip{.2777em}}
+\let\thickspace\;
+\newcommand{\negthickspace}{\tmspace-\thickmuskip{.2777em}}
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewenvironment{quote}[1][]
+   {\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
+    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \item\relax}
+   {\endlist}
+\makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{bargraph-js}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{bargraph-js}{aebdocfmt.def cannot be found}}
+\begin{document}
+\def\CMD#1{\textbackslash#1}
+  \GetFileInfo{bargraph-js.sty}
+  \title{\textsf{bargraph-js}: Create dynamic bar graphs using form fields and JavaScript}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \let\Email\texttt
+  \DocInput{bargraph-js.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o bargraph-js.ind bargraph-js.idx}\\on the command line and recompile
+    \texttt{bargraph-js.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o bargraph-js.gls bargraph-js.glo}\\on the command line and recompile
+    \texttt{bargraph-js.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+%
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%
+%    \begin{macrocode}
+%<*package>
+\RequirePackage{xkeyval}
+%    \end{macrocode}
+%    \section{Introduction}
+%    Through {\LaTeX} markup, a document author can create a PDF with form fields.
+%    \app{Adobe Acrobat Reader DC} (as well as the \app{Acrobat} application itself) allows you to change
+%    the properties of this field through the JavaScript engine; in particular, the dimensions
+%    of the bounding rectangles of the form fields can be changed. Changes to form fields can be saved as well.
+%
+%    An {Acro\negthinspace\TeX} user (GBH) wanted to create a bar graph
+%    reflecting the responses of his students. This package is a generalization
+%    of that solution.
+%
+%    A bar graph is based on qualitative (or categorical) data. The raw data
+%    is classified by some criterion and and a numerical value is assigned (often times the value is a count,
+%    but need not be). Totals for each category are
+%    recorded in the form of a bar graph. Graphs may be vertically or
+%    horizontally oriented. In this package, we address such problems as (1)
+%    creation and coloring of the bar graph; (2) scaling; and (3) labeling.
+%    Conceptually, more than one bar graph can be placed, one superimposed on
+%    top the other.
+%    \section{Options and requirements}
+%    We only have one option, \IndexOpt{dynamic}\opt{dynamic}, this brings in some JavaScript to support
+%    the creation of bar graphs with no explicit use of \cs{barfor} commands; this is
+%    used in creating histograms for discrete probability distributions.
+%    \begin{macrocode}
+\DeclareOptionX{dynamic}{\def\bgjs@importDynamic
+  {\InputIfFileExists{dynam-js.def}{}{\PackageWarning{bargraph-js}
+    {The file dynam-js.def cannot be found}}}}
+\let\bgjs@importDynamic\relax
+\ProcessOptionsX\relax
+\AtEndOfPackage{\bgjs@importDynamic}
+\RequirePackage{xcolor}
+\RequirePackage{eforms}[2019/05/24]
+\edef\bgjs@restoreCats{\catcode`\noexpand\"=\the\catcode`\"\relax}
+\@makeother\"
+%    \end{macrocode}
+%    An initial scale factor. The scale factor is dynamically reset, as needed. However, when a bar graph
+%    is cleared, \DescribeMacro\scaleFactorDef\cs{scaleFactorDef} is used.
+%    \begin{macrocode}
+\def\scaleFactorDef#1{\def\sc@leF@ctorDef{#1}}
+\scaleFactorDef{2}
+%    \end{macrocode}
+%
+%    \section{The \texttt{bargraphenv} and \texttt{bargraph} environments}
+%    A bar graph is built within an \env{bargraphenv} environment that controls it.
+%    \begin{environment}{bargraphenv}
+%    A \env{bargraph} environment (defined later)  is contained within the \env{bargraphenv}
+%    environment. The \env{bargraphenv} has a number of key-values to set.
+%    \paragraph*{Key-values for \env{bargraphenv}} \leavevmode\IndexKey{width}\texttt{width} is the width of the underlying
+%    \texttt{minipage}; similarly, \IndexKey{height}\texttt{height} is its height.
+%    \begin{macrocode}
+\define@key{bgrphenv}{width}[\linewidth]{\setlength{\@tempdima}{#1}%
+  \ifxetex\else\addtolength{\@tempdima}{2bp}\fi
+  \edef\bgrphenv@width{\the\@tempdima}\@tempdima=.99626\@tempdima
+  \edef\bgrphenv@widthbp{\strip@pt\@tempdima}}
+\define@key{bgrphenv}{height}[2in]{\setlength{\@tempdima}{#1}%
+  \edef\bgrphenv@height{\the\@tempdima}\@tempdima=.99626\@tempdima
+  \edef\bgrphenv@heightbp{\strip@pt\@tempdima}}
+%    \end{macrocode}
+% A switch, a counter, and a token register used by this package.
+%    \begin{macrocode}
+\newif\ifhorizontalbars \horizontalbarsfalse
+\newcount\cntbars \cntbars=0
+\newtoks\bgtoks
+%    \end{macrocode}
+%    \leavevmode\IndexKey{o}\hskip-\marginparsep\texttt{=\ameta{{\upshape{horiz\string|vert}}}}
+%    When \texttt{o=vert}, the default, the bars of the bargraph
+%    increase/decrease vertically (height changes); while for
+%    \texttt{o=horiz}, they increase/decrease horizontally (width changes).
+%    \begin{macrocode}
+\define@choicekey{bgrphenv}{o}[\val\nr]{horiz,vert}{%
+  \ifcase\nr\relax
+    \horizontalbarstrue\or
+    \horizontalbarsfalse\else
+    \horizontalbarsfalse\fi}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{origin}\hskip-\marginparsep\texttt{=\ameta{\upshape0\string|.5}} Sets the origin of the bar graph.
+%    When \texttt{origin=0}, the baseline of the bars is the horizontal axis (\texttt{o=vert}) or the vertical
+%    axis (\texttt{o=horiz}); when \texttt{origin=.5}, the baseline of the bars is on a line positioned half-way
+%    up the vertical axis (\texttt{o=vert}) or half-way across the horizontal axis (\texttt{o=horiz}).
+%    \begin{macrocode}
+\define@choicekey+{bgrphenv}{origin}{0,.5}[0]{\def\bgjs@origin{#1}}
+  {\PackageWarning{bargraph-js}{Bad choice for origin,
+  permissible values are 0 and .5.\MessageBreak
+  Will use a value of 0. Try again}}
+\def\bgjs@origin{0}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{showaxis}\hskip-\marginparsep\texttt{=\ameta{\upshape{true\string|false}}}
+%    If true, a horizontal or vertical axis is drawn, depending on the setting of the \texttt{o} key.
+%    \begin{macrocode}
+\newif\if@bgshowaxis \@bgshowaxisfalse % dps23 \catcode`\%=14\relax
+\define@boolkey{bgrphenv}[@bg]{showaxis}[true]{}
+%    \end{macrocode}
+%    The following \env{defineJS} environment defines \cs{hided@t@Fmt}. It declares
+%    some vital data for the current \env{bargraphenv} environment. In this environment
+%    we make exclamation point (\texttt!) the escape, and the comment character as \texttt{\%}.
+%    \begin{macrocode}
+\begin{defineJS}[\catcode`\!=0\relax]{\hided@t@Fmt}
+if (typeof dataForEnv=="undefined")
+  var dataForEnv=new Object;
+dataForEnv["!p(1)"]=new Object;
+dataForEnv["!p(1)"].width=!bgrphenv@widthbp;
+dataForEnv["!p(1)"].height=!bgrphenv@heightbp;
+dataForEnv["!p(1)"].horiz=!ifhorizontalbars(true)!else(false)!fi;
+dataForEnv["!p(1)"].sf=!sc@leF@ctorDef;
+dataForEnv["!p(1)"].bgs=[!bg@list];
+dataForEnv["!p(1)"].origin=!bgjs@origin;
+var _nO=!bgjs@origin;
+var r=event.target.rect;
+if (dataForEnv["!p(1)"].horiz){
+  var _w1=_nO*dataForEnv["!p(1)"].width;
+  dataForEnv["!p(1)"].maxDim=(_nO==0)?!%
+!bgrphenv@widthbp:Math.min(_w1,!bgrphenv@widthbp-_w1);
+  dataForEnv["!p(1)"].baseline=r[0]+_w1;
+} else {
+  var _h1=_nO*dataForEnv["!p(1)"].height;
+  dataForEnv["!p(1)"].maxDim=(_nO==0)?!%
+!bgrphenv@heightbp:Math.min(_h1,!bgrphenv@heightbp-_h1);
+  dataForEnv["!p(1)"].baseline=r[3]+_h1;
+}
+dataForEnv["!p(1)"].values=new Object;
+\end{defineJS}
+%    \end{macrocode}
+%    This text field holds various information about the \env{bargraphenv} named \texttt{\#1}.
+%    In this definition, we say |\cmd{\let\%\defjsLB}|; the format code is passed using
+%    \cs{hided@t@Fmt}, which is defined by a \env{defineJS} environment above. We also pass
+%    a parameter (|\bgrphenv@name=|\ameta{bgenv-name}) to \cs{hided@t@Fmt} through the \cs{bParams}/\cs{eParams} mechanism.
+%    \begin{macrocode}
+\def\internalD@t@Hidden#1{%
+  \llap{\textField[\cmd{\bParams{#1}\eParams\let\%\defjsLB}
+  \autoCenter{n}\BC{}\BG{}\S{S}\textSize{0}\Ff{\FfReadOnly}
+  \AA{\AAFormat{\hided@t@Fmt}}]{internalData.#1}{2bp}{2bp}}}
+%    \end{macrocode}
+%    \DescribeEnv{bargraphenv}\hskip-\marginparsep\texttt{[\ameta{KV-pairs}]\darg{\ameta{env-name}}}
+%    The \env{bargraphenv} simply encloses the \env{bargraph} environment in a
+%    \env{minipage} of dimensions specified by the key-values.
+%    \begin{macrocode}
+\def\bg@vs#1{\setlength\@tempdima{#1}\vskip\@tempdima}
+\def\bg@hs#1{\setlength\@tempdima{#1}\hskip\@tempdima}
+%    \end{macrocode}
+%    \DescribeMacro\oBgEnvs is an internal command that will hold a comma-delimited list
+%    of all \env{bargraphenv}s in the document.
+%    \begin{macrocode}
+\let\oBgEnvs\@gobble
+\newif\ifisbgenv\isbgenvfalse
+\let\barNum\ef@Zero
+\def\bg@warning{\PackageWarningNoLine{bargraph-js}
+  {At least one more compile is required}\global\let\bg@warning\@empty}
+\newenvironment{bargraphenv}[2][]{\offinterlineskip
+%    \end{macrocode}
+% Within the \env{bargraphenv}, we define \DescribeMacro\vs\cs{vs} and \DescribeMacro\hs\cs{hs} to position objects
+% vertically and horizontally.
+% These are local definitions. Syntax: \cs{vs\darg{\ameta{dimen}}} and \cs{hs\darg{\ameta{dimen}}}.
+%    \begin{macrocode}
+  \let\vs\bg@vs\let\hs\bg@hs\global\isbgenvtrue
+  \@ifundefined{envname@#2}{\global\@namedef{envname@#2}{#2}}
+    {\PackageWarning{bargraph-js}
+      {The name '#2' has been used in an earlier\MessageBreak
+      bargraphenv environment, please choose another\MessageBreak
+      name for the bargraphenv environment that\MessageBreak
+      appears}}%
+  \g@addto@macro\oBgEnvs{,"#2":\dl@lBrace\dl@rBrace}%
+  \def\bgrphenv@name{#2}\setkeys{bgrphenv}{width,height,#1}%
+  \ifhorizontalbars
+    \@tempdima\bgrphenv@width\relax
+    \@tempdima=\bgjs@origin\@tempdima
+    \edef\bgjs@setorigin{\the\@tempdima}%
+  \else % vertical
+    \@tempdima\bgrphenv@height\relax
+    \@tempdima=\bgjs@origin\@tempdima
+    \edef\bgjs@setorigin{\the\@tempdima}%
+  \fi
+  \@tempdima=.99626\@tempdima
+  \edef\bgrphenv@setoriginbp{\strip@pt\@tempdima}%
+  \let\isdynamic\relax\let\bg@list\@gobble
+  \global\let\barNum\ef@Zero
+  \begin{minipage}[b][\bgrphenv@height][b]{\bgrphenv@width}\hfuzz4pt}
+    {\hfill\end{minipage}\leavevmode
+    \ifx\txtBgValues\relax\else
+      \@ifundefined{OBgEnvs}{\bg@warning}{\txtBgValues
+      \global\let\txtBgValues\relax}\fi
+    \internalD@t@Hidden{\bgrphenv@name}}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{environment}{bargraph}\hskip-\marginparsep\texttt{[\ameta{KV-pairs}]\darg{\ameta{bar-name}}}
+%    The description of an individual bar graph. This environment is contained
+%    within the \env{bargraphenv} environment. The content of the environment
+%    \emph{must consist exclusively} of the commands
+%    \cs{barfor\darg{\ameta{bar-name}}} and \cs{cmd\darg{\ameta{tex-cmds}}}.
+%    These pairs of tokens are collected and stacked up in their natural order.
+%    The \env{bargraph} environment has number of key-values to set
+%
+%    \paragraph*{Key-values for \env{bargraph}} The environment has several key-value pairs.\medskip
+%
+%    \noindent\IndexKey{nbars}\hskip-\marginparsep\texttt{=\ameta{pos-int}}
+%    \texttt{nbars} is the number of bars in this environment.
+%    \begin{macrocode}
+\define@key{bargraph}{nbars}[0]{\gdef\nbars{#1}}
+\def\nb@rsDef{0}
+\def\nbars{0}
+%    \end{macrocode}
+%    \leavevmode\IndexKey{gap}\hskip-\marginparsep\texttt{=\ameta{pos-num}}
+%    \texttt{gap} is the gap between bars; it is a positive number (\emph{no dimensions}).
+%    It is interpreted as printer points (bp, big points).
+%    \begin{macrocode}
+\define@key{bargraph}{gap}[0]{\gdef\bargap{#1bp}}
+\def\b@rgapDef{0}
+\def\bargap{0bp} % in bp units
+%    \end{macrocode}
+%    \leavevmode\IndexKey{bardimen}\hskip-\marginparsep\texttt{=\ameta{pos-num}}
+%    is the width/height of the bars (measured in bp points). When
+%    \texttt{o=vert}, then the value of \texttt{bardimen} is the width of each bar;
+%    when \texttt{o=horiz}, the value of \texttt{bardimen} is the height of each bar.
+%    The value \ameta{pos-num} is a dimensionless number.
+%    \begin{macrocode}
+\define@key{bargraph}{bardimen}{\gdef\bardimen{#1bp}}
+\def\b@rdimenDef{20}
+\def\bardimen{20bp} % in bp units
+%    \end{macrocode}
+%     \cs{bgjs@seto} begins the process of gathering the command pairs
+%     \cs{barfor\darg{\ameta{name}}} and \cs{cmd\darg{\ameta{cmds}}}.
+%    \begin{macrocode}
+\def\bgjs@seto{\cntbars\@ne
+  \ifx\barNum\ef@Zero\relax
+    \global\let\barNum\ef@One
+    \toks@={\ifhorizontalbars\else\ifxetex\else
+      \hskip2bp\fi\fi}\else\toks@={}\fi\bgjs@gettype}
+%    \end{macrocode}
+%     \cs{bgjs@gettype} continues \cs{bgjs@seto}, it determines if this is a dynamic \env{bargraph} environment or not
+%    \begin{macrocode}
+\def\bgjs@gettype{\@ifnextchar\relax
+  {\bgjs@dynamic}{\bgjs@@getbartoks}}
+\def\expbarfor#1\@nil{#1}
+%    \end{macrocode}
+%     The \cs{bgjs@dynamic} command continues \cs{bgjs@gettype} in the first case. It is the case where JavaScript does it
+%     all. We create only an initial bar, whose name is `\texttt{x\ameta{bar-name}.bgnoname@\ameta{env}}'.
+%    \begin{macrocode}
+\def\bgjs@dynamic{\let\b@rforCommon\dyb@rforCommon
+  \edef\bgrph@name{x\bgrph@name}\leavevmode
+  \rlap{\barfor{bgnoname}}}
+%    \end{macrocode}
+%     The \cs{bgjs@@getbartoks} command continues \cs{bgjs@gettype} in the
+%     second case. We detect two types of tokens:
+%     \cs{barfor\darg{\ameta{arg}}} and \cs{cmd\darg{\ameta{arg}}}. If this
+%     former, we jump to \cs{bgjs@@getbarfor}, otherwise, we jump to
+%     \cs{bgjs@@getcmd}.
+%    \begin{macrocode}
+\def\bgjs@@getbartoks{\@ifnextchar\barfor
+  {\bgjs@@getbarfor}{\@ifnextchar\cmd
+    {\bgjs@@getcmd}{\relax}}}%
+%    \end{macrocode}
+%   The \cs{bgjs@@getbarfor} command handles \cs{barfor} tokens, processing depends on
+%   \texttt{o=\ameta{\upshape{vert\string|horiz}}}.
+%    \begin{macrocode}
+\def\hmrk{\hskip\bgjs@setorigin\relax}
+\def\bgjs@@getbarfor\barfor#1{%
+  \ifhorizontalbars % o=horiz
+    \toks@=\expandafter{\the\toks@\leavevmode
+      \rlap{\hmrk\bgjs@adj\barfor{#1}}}%
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@\vcgBdry[0bp]}\else
+      \toks@=\expandafter{\the\toks@\vcgBdry[\bargap]}\fi
+  \else % o=vert
+    \toks@=\expandafter{\the\toks@
+      \raisebox{\bgjs@setorigin+\bgjs@adj}{\barfor{#1}}}%
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@\cgBdry[0bp]}\else
+      \toks@=\expandafter{\the\toks@\cgBdry[\bargap]}\fi
+  \fi
+  \advance\cntbars\@ne
+  \ifnum\cntbars>\nbars
+    \def\bgjs@next{\@ifnextchar\cmd{\bgjs@@getbartoks}
+    {\let\\\expbarfor\the\toks@}}%
+  \else
+    \def\bgjs@next{\bgjs@@getbartoks}\fi
+  \unskip\bgjs@next}
+%    \end{macrocode}
+%   The \cs{bgjs@@getcmd} command handles \cs{barfor} tokens. Again, the processing depends on
+%   \texttt{o=\ameta{\upshape{vert\string|horiz}}}.
+%    \begin{macrocode}
+\def\bgjs@@getcmd\cmd#1{%
+  \toks@=\expandafter{\the\toks@#1}%
+  \ifhorizontalbars % o=horiz
+    \ifnum\cntbars=\nbars\relax
+      \toks@=\expandafter{\the\toks@}\else
+      \toks@=\expandafter{\the\toks@}\fi
+  \else % o=vert
+    \ifnum\cntbars=\@ne
+      \toks@=\expandafter{\the\toks@}\else
+      \toks@=\expandafter{\the\toks@}\fi
+  \fi
+  \ifnum\cntbars>\nbars
+    \def\bgjs@next{\@ifnextchar\cmd{\bgjs@@getbartoks}
+    {\let\\\expbarfor\the\toks@}}\else
+    \def\bgjs@next{\bgjs@@getbartoks}\fi
+\bgjs@next}
+%    \end{macrocode}
+%    Here we finally define the \DescribeEnv{bargraph}\env{bargraph} environment; it records its name,
+%    processes its key-values, and expands \cs{bgjs@seto}.
+%    \begin{macrocode}
+\newenvironment{bargraph}[2][]{\def\bgrph@name{#2}%
+  \g@addto@macro\bg@list{,"#2"}\setkeys{bargraph}{nbars=\nb@rsDef,
+    bardimen=\b@rdimenDef,gap=\b@rgapDef,#1}%
+  \edef\bg@sign{\ifxetex-\else+\fi}%
+  \edef\bgjs@adj{\ifhorizontalbars
+    \ifxetex\else\hskip2bp\fi\else+\ifxetex0pt\else2bp\fi\fi}%
+  \if@bgshowaxis\ifhorizontalbars\else\leavevmode
+    \smash{\makebox[0pt][l]{\raisebox{\bgjs@setorigin\bg@sign.5pt}%
+      {\rule{\bgrphenv@width}{1pt}}}}\fi\fi
+  \bgjs@seto}{\if@bgshowaxis\ifhorizontalbars
+    \smash{\rlap{\setlength{\@tempdima}
+      {\bgjs@setorigin\bg@sign.5pt}%
+    \hskip\@tempdima\rule{1pt}{\bgrphenv@height}}}\fi\fi}
+%    \end{macrocode}
+%    \end{environment}
+%\paragraph*{Saving the bar data.} We need to save the value of each bar so that
+%  when the user re-opens the document, the bar graphs will work as designed,
+%  including the optimization. We initialize this text field using \cs{OBgEnvs}.
+%    \begin{macrocode}
+\def\txtBgValues{%\leavevmode
+  \llap{\textField[\S{S}\H{N}\BG{}\BC{}\F{\FHidden}%
+  \autoCenter{n}\DV{(\{\OBgEnvs\})}\V{(\{\OBgEnvs\})}
+  ]{bgValues}{2bp}{2bp}}\llap{\textField[\S{S}\H{N}\BG{}\BC{}
+  \F{\FHidden}\autoCenter{n}\DV{}\V{}]{barLabeling}{2bp}{2bp}}%
+}
+%    \end{macrocode}
+%    The definition of \DescribeMacro\OBgEnvs\cs{OBgEnvs} is written the auxiliary
+%    file and is based in \DescribeMacro\oBgEnvs\cs{oBgEnvs}, which is an ongoing comma-delimited list of
+%    all names of \env{bargraphenvs} in the document.
+%    \begin{macrocode}
+\gdef\bg@wrtBbValues{\immediate\write\@auxout{\string
+  \gdef\string\OBgEnvs{\oBgEnvs}}}
+%    \end{macrocode}
+%    At the end of the document, we issued \cs{wrtBgValues}, which defines the command
+%    \cs{OBgEnvs}. The command is a list of all \env{bargraphenv}s in the document and is used
+%    to build a JavaScript object that will hold the values of each bar in the document.
+%    \begin{macrocode}
+\AtEndDocument{\ifisbgenv\bg@wrtBbValues\fi}
+%    \end{macrocode}
+%    \section{Designing the bars}
+%    The bars themselves are pushbuttons (created by \cs{pushButton} of \pkg{eforms}). The problem is to pass
+%    any appearance changes to the \env{bargraph} environment. We pass the bars in two ways:
+%    (1) key-values that are common to all bars; (2) key-values that are individual to a bar.
+%    \begin{macro}{\barforCommon}\leavevmode
+%    \hskip-\marginparsep\texttt{\,\darg{\ameta{KV-pairs}}}
+%    Pass \pkg{eforms} key-values that will be applied to all bars in this environment.
+%    \begin{macrocode}
+\def\barforCommon#1{\def\b@rforCommon{#1}}
+%    \end{macrocode}
+%     Below are the default common key-value properties for a bar.
+%    \begin{macrocode}
+\barforCommon{\S{S}\H{N}\BG{}\BC{}\F{\FHidden}\autoCenter{n}}
+%    \end{macrocode}
+%     \leavevmode\DescribeMacro{\dybarforCommon}
+%    \hskip-\marginparsep\texttt{\,\darg{\ameta{KV-pairs}}}
+%     The properties set by \cs{dybarforCommon} are the properties of the bars when the bars are dynamically generated. Bar
+%     are generated
+%     dynamically when there are no \cs{barfor} commands in the \env{bargraph} environment.
+%    \begin{macrocode}
+\def\dybarforCommon#1{\def\dyb@rforCommon{#1}}
+\dybarforCommon{\S{S}\H{N}\BG{}\BC{}\F{\FHidden}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\presetsbarfor}
+%    \leavevmode
+%    \hskip-\marginparsep\texttt{\,\darg{\ameta{bar-name}}\darg{\ameta{name}}\darg{\ameta{KV-pairs}}}
+%    Pass customizing key-values to an individual bar. A bar (as defined by \cs{barfor}, defined below)
+%    takes a \ameta{name} argument, which is used to reference that bar. For example, to color the
+%    bar \ameta{name}, we say \cs{presetbarfor\darg{\ameta{bar-name}}\darg{\ameta{name}}\darg{\cs{BG\darg{red}}}}.
+%    \begin{macrocode}
+\def\presetsbarfor#1#2#3{\protectedKeys{#1.#2@\bgrphenv@name}{#3}}
+%\toks@={}\bgjs@gettwo#3\bgjs@stop\relax
+%  \expandafter\edef\csname #1.#2@\bgrphenv@name\endcsname{\the\toks@}}
+%\def\bgjs@stop{\relax}\def\bgjs@relax{\relax}
+%    \end{macrocode}
+%    For this preset, we need to fully expand, while protecting the key-values. We store
+%    key-value pairs in \cs{toks@} but we place \cs{noexpand} front of the key; for example
+%    \cs{BG\darg{red}} is stored as \cs{noexpand\cs{BG}\darg{red}}.
+%    \begin{macrocode}
+%\def\bgjs@gettwo#1#2{\ifx#1\bgjs@stop\else
+%  \toks@=\expandafter{\the\toks@\noexpand#1{#2}}\expandafter
+%  \bgjs@gettwo\fi}
+\def\presetsb@rfor#1{\@nameuse{\bgrph@name.#1@\bgrphenv@name}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\barfor}\hskip-\marginparsep\texttt{\,\darg{\ameta{name}}}
+%     Within the \env{bargraph} environment, place the named \cs{barfor} command.
+%    \begin{macrocode}
+\def\barfor#1{\ifhorizontalbars\def\bgenv@angle{0}\else
+  \def\bgenv@angle{90}\fi
+  \@ifundefined{\bgrph@name.#1@\bgrphenv@name}
+    {\let\@presets\@gobble}{\let\@presets\presetsb@rfor}%
+  \pushButton[\presets{\b@rforCommon\R{\bgenv@angle}}
+%    \end{macrocode}
+%     We use \cs{epresets} key, new to \pkg{eforms} (2019/01/22).
+%    \begin{macrocode}
+    \epresets{\@presets{#1}}
+%    \end{macrocode}
+%    The field name of the \cs{pushButton} for the \cs{barfor} command is
+%    \begin{quote}\texttt{\ameta{bar-name}.\ameta{name}@\ameta{env-name}}\end{quote}
+%    \changes{v0.7}{2019/04/07}{Change field name of \string\cs{barfor}}
+%    We change the field name of \cs{barfor} to
+%    \begin{quote}\texttt{\ameta{env-name}@\ameta{bar-name}.\ameta{name}}\end{quote}
+%    In this way, the same \ameta{name} can be used in more than one environments.
+%    \begin{macrocode}
+  ]{\bgrphenv@name @\bgrph@name.#1}{\bardimen}{\bardimen}}
+%    \end{macrocode}
+%\DescribeMacro\getBarName\leavevmode\hskip-\marginparsep
+% \texttt{\darg{\ameta{env-name}}\darg{\ameta{bar-name}}\darg{\ameta{name}}} is the field name of the corresponding
+% to the bar identified by its arguments. The second argument is assumed to be dynamic, not literal. If the second
+% argument is a literal, then you can say \cs{getBarName\darg{\ameta{bar-name}}\darg{"myBar"}\darg{\ameta{name}}}; i.e.,
+% enclosed it in quotation marks.
+%    \begin{macrocode}
+\def\getBarName(#1,#2,#3){#1+"@"+#2+"."+#3}
+%    \end{macrocode}
+%    \end{macro}
+%    \section{Inputting count data into a bar}
+%    \begin{macro}{\inputFor}\hskip-\marginparsep\texttt{\,\darg{\ameta{env}}\darg{\ameta{bar}}\darg{\ameta{name}}}
+%    Use \cs{inputFor} to create a text field to input count data. We need to set up
+%    a correspondence between \cs{inputFor} and a particular bar. The key-value options are passed to this
+%    field using \cs{presetinputfor}; its argument uses \ameta{bar} and \ameta{name}, which are used for labeling purposes
+%    (see the default definition of \cs{presetinptfor}).
+%    \begin{macrocode}
+\def\inputFor#1#2#3{% env, bar, name
+  \textField[\cmd{\bParams{#1}{#2.#3}\eParams}
+    \presets{\priorpresetinputfor{#1}{#2.#3}}
+    \presets{\presetinputfor{#1}{#2.#3}}
+%    \end{macrocode}
+%   This package uses a lot of calculation events, we try to reduce the number of events processed by
+%   registering the current input field as an active graph. All the subsequent calculations are made only
+%   if the active graph (\texttt{updateBG.activegraph}) matches the \texttt{\ameta{env}.\ameta{bar}@\ameta{bgenv}}.
+%    \begin{macrocode}
+    \AAonfocus{updateBG.activegraph="#1@#2.#3";}]%
+%    \end{macrocode}
+%   The field name of this \cs{textField} shall be
+%   \begin{quote}\texttt{\ameta{env-name}.\ameta{bar-name}@\ameta{name}}\end{quote}
+%    \begin{macrocode}
+    {#1.#2@#3}}
+%    \end{macrocode}
+%    \end{macro}
+%    Below is the default definition of \DescribeMacro\presetinputfor\cs{presetinputfor}, it defines calculate, keystroke,
+%    format,
+%    and validate events. In this setup, we accept only natural numbers (or count data). We call the
+%    \pkg{bargraph-js}-defined JavaScript function \texttt{updateGG} (update bar graph). This command
+%    can be redefined. \cs{presetinputfor} takes one argument, which is internally pass as \texttt{\ameta{env-name}.\ameta{bar-name}},
+%     as seen above in the definition of \cs{inputFor}.
+%    \begin{macrocode}
+\def\priorpresetinputfor#1#2{\AddAAcalculate{%
+  updateBG.env=getEnvName(event.targetName);\r
+  updateBG(event.value,"#1@#2",\usebarlabel);\r}
+  \AAcalculate{;}
+}
+\newcommand{\presetinputfor}[2]{%
+  \AAkeystroke{AFNumber_Keystroke(0, 0, 0, 0, "", true);}
+  \AAformat{AFNumber_Format(0, 0, 0, 0, "", true);}
+  \AAvalidate{AFRange_Validate(true, 0, false, 0);}
+}
+%    \end{macrocode}
+% Manually re-scale all bar graphs in a particular bar graph environment,
+% using both \DescribeMacro\displaysfFor\cs{displaysfFor}, which both displays
+% the current scale factor and allows input for a new scale factor, and
+% a push button \DescribeMacro\manualsfFor\cs{manualsfFor} to re-scale. For each
+% of these commands, the first argument is optional arguments to pass to the
+% form field, the second argument is the name of the \env{bargraphenv} to be re-scaled.
+%    \begin{macrocode}
+\begin{defineJS}{\dsfForKeyStr}
+if(event.willCommit) {
+  var v=event.value;
+  try { v=eval(v) } catch(e){};
+  if(isNaN(v)) {
+    app.beep(0);
+    app.alert("Enter a nonnegative number")
+    event.rc=false;
+  }
+}
+\end{defineJS}
+\newcommand{\displaysfFor}[2][]{%
+  \textField[\DV{2}\V{2}\TU{Current scale factor}
+  \AAkeystroke{\dsfForKeyStr}
+  \AAvalidate{AFRange_Validate(true, 0, false);}
+  #1]{txtRescale.#2}%
+}
+\begin{defineJS}[\catcode`\!=0\relax]{\msfForMU}
+var f=this.getField("txtRescale.!p(1)");
+var v=eval(f.value);
+if (v>0){
+  dataForEnv["!p(1)"].sf=v;
+  rescaleBargraph("!p(1)");
+}
+\end{defineJS}
+\newcommand{\manualsfFor}[2][]{%
+  \pushButton[\cmd{\bParams{#2}\eParams}
+    \AAmouseup{\msfForMU}#1]{btnRescale.#2}%
+}
+%    \end{macrocode}
+%
+%\subsection{A labeling scheme}
+% Labeling by typesetting the label is possible, but we also provide labeling through
+% Acrobat forms tool tips property. We have two approaches:\par\medskip\noindent
+% \DescribeMacro\barLabelsTU\hskip-\marginparsep\texttt{\,\darg{\ameta{string}\string|\ameta{function}}}
+% When the argument is a \ameta{string}, the label becomes
+% `\texttt{\ameta{string}\,\ameta{env}.\ameta{bar},\,Value:\,value}',
+% and with it is a \ameta{function}, the function must return a string representing the label. The argument of
+% \cs{barLabelsTU}
+% is used when the bar has a tool tip already defined. In this case, the form of the tool tip
+% is a string which incorporates the token \texttt{@v@}; this token will be replaced by the value of the bar.
+%    \begin{macrocode}
+\def\barLabelsTU#1{\def\usebarlabel{#1}\ifx\usebarlabel\@empty
+  \def\usebarlabel{""}\fi}
+\barLabelsTU{""}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\barLabelsNoTU
+%    \hskip-\marginparsep\texttt{\,\darg{\ameta{string}\string|\ameta{function}}}
+%    When the \cs{barFor} command has no associated tool tip (\cs{TU}), the value of \cs{barLabelsNoTU} is used.
+%    When the argument is a string the tokens \texttt{\#1} and \texttt{\#2} are used as placeholders for
+%    \texttt{\ameta{env}.\env{bar}} and \texttt{\ameta{value}}, respectively. When it is a \ameta{function},
+%    the function returns a string based on its argument of \texttt{fld} (usually \texttt{\ameta{env-name}.\ameta{bar-name}}) and
+%    \texttt{v} (the \texttt{\ameta{value}}.
+%    \begin{macrocode}
+\def\barLabelsNoTU#1{\def\@rgi{#1}\ifx\@empty
+  \edef\barLabelsNoTUJS{\barLabelsNoTUJSDef}\else
+  \def\barLabelsNoTUJS{#1}\fi}
+\def\barLabelsNoTUJSDef{o.barname+": "+o.bar+", Value: "+o.value}
+\expandafter\barLabelsNoTU\expandafter{\barLabelsNoTUJSDef}
+\def\simpleBarLabels(#1,#2){"Bar for "+#1+", Value: "+#2;}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\labelFld\hskip-\marginparsep
+%    \texttt{[\ameta{form-opts}]\darg{\ameta{caption}}\darg{\ameta{bg-name}.\ameta{bar-name}}\darg{\ameta{width}}\darg{\ameta{height}}}\\
+%    The command creates a text field that is used to label horizontal or vertical bars. For vertical bars
+%    use the key \cs{R\darg{90}} in the \ameta{form-opts}.
+%    \begin{macrocode}
+\newcommand\labelFld[4][]{\textField[\Ff{\FfReadOnly}\F{\FHidden}
+  \BC{}\BG{}#1\autoCenter{n}\DV{#2}\V{#2}]{#3@\bgrphenv@name}{#4}}
+%    \end{macrocode}
+%   \subsection{Saving and restoring critical data}
+%    \textbf{Restore critical data with an open action.}
+%    If the first page is opened, and \texttt{oBarLabeling} needs
+%    to be restored, we call \texttt{gbRestoreData()}.
+%    \begin{macrocode}
+\begin{defineJS}[\catcode`\!=0\relax]{\bgOpenAction}
+if(oBarLabeling.needsRestore) {
+  var bgTO=app.setTimeOut("bgRestoreData();!%
+app.clearTimeOut(bgTO);!%
+oBarLabeling.needsRestore=false",1000);
+}
+\end{defineJS}
+\begingroup\@makeother\%\let\%\defjsLB
+\thisPageAction{\JS{\bgOpenAction}}{}
+\endgroup
+%    \end{macrocode}
+%    \textbf{Saving critical data.} We save the object \texttt{oBarLabeling} as a string to
+%    the hidden field \texttt{barLabeling}.
+%    \begin{macrocode}
+\begin{willSave}
+bgSaveData();
+\end{willSave}
+%    \end{macrocode}
+%    \section{Document JavaScript}
+%    JavaScript that supports the creation of bar graphs.
+%    \begin{macrocode}
+\def\barDefColor{color.blue}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\populateCommaData\hskip-\marginparsep\texttt{(env,bar,str[,validate])} is
+%    a convenience command to access the JavaScript function \texttt{populateCommaData}, which is defined in Section~\ref{s:labelcd}
+%    \begin{macrocode}
+\newcommand{\populateCommaData}{%
+  populateCommaData.usebarlabel=\usebarlabel;\r
+  populateCommaData
+}
+\begin{insDLJS*}{bgjs}
+\begin{newsegment}{AeB: bargraph-js}
+/*
+        Document Level JavaScript
+        bargraph-js Package
+        D. P. Story copyright \the\year
+*/
+\end{newsegment}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{updateBG}\hskip-\marginparsep\texttt{(v,fld,o)}
+%    function is designed for bar graph with explicit \cs{barFor} commands
+%   inserted by the document author.
+%    \begin{macrocode}
+\begin{newsegment}{Bar Graph of preset bars}
+var _scaleFactorDef=\sc@leF@ctorDef;
+var oBarLabeling = new Object;
+    oBarLabeling.needsRestore=true;
+function updateBG (v,fld,o) {
+%    \end{macrocode}
+%    If \texttt{updateBG.activegraph} is different from \texttt{fld}, we exit, don't do any calculations.
+%    The form of \texttt{fld} is \texttt{\ameta{env-name}@\ameta{bar-name}.\ameta{name}}.
+%    \begin{macrocode}
+  if (typeof v=="undefined") return;
+  if (updateBG.activegraph!=fld) return;
+  var useDefLabeling=(typeof o=="string");
+  var env=updateBG.env;
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var baseline=dataForEnv[env].baseline
+  var isHoriz=dataForEnv[env].horiz;
+  var bRescaleNeeded=false;
+  var f=this.getField(fld);
+  var cachedValue=getBarValue(env,fld);
+  saveBarValue(env,fld,v); // dps13
+  bRescaleNeeded=getNewScaleFactor(env,v);
+  var sf=dataForEnv[env].sf;
+  sf=(sf<0)?-sf:sf;
+  var r=f.rect;
+%    \end{macrocode}
+%    \textbf{Calculating the new rectangle.}
+%    \texttt{cachedValue} is the previous value of the bar, and \texttt{v} is the new
+%    value. There are several cases: horizontal versus vertical; \texttt{v<0} versus
+%    \texttt{v>=0}; and whether the rectangle is changing direction (neg to pos) or not.
+%    \begin{macrocode}
+  if(isHoriz) { // dps01
+    if (v<0) {
+     if (cachedValue<0) // no change in sign
+        r[0]=r[2]+(v*sf);
+      else { // change from pos to neg
+        r[2]=r[0];
+        r[0]=r[2]+(v*sf);
+      }
+    } else {
+      if (cachedValue<0) { // from neg to pos
+        r[0]=r[2];
+        r[2]=r[0]+(v*sf);
+      } else // from pos to pos
+        r[2]=r[0]+(v*sf);
+      }
+  } else { // vertical
+  	if (v<0) { // dps01
+  		if (cachedValue<0) { // no change in sign
+        r[3]=r[1]+(v*sf);
+  		} else { // switching from pos to neg
+        r[1]=r[3];
+  		  r[3]=r[1]+(v*sf);
+      }
+  	} else {
+      if (cachedValue<0)  // change in sign: neg to pos
+    		r[3]=r[1]+(v*sf);
+      else // no change
+        r[1]=r[3]+(v*sf);
+    }
+  }
+  f.rect=r;
+%    \end{macrocode}
+%   \textbf{Applying a label to current bar.} If a field has an empty \cs{TU} property,
+%   we save this in \texttt{oBarLabeling}, if not already saved. If the field has an
+%   empty \cs{TU} field, we record this with a \texttt{-1}.
+%    \begin{macrocode}
+  if (typeof oBarLabeling[fld]=="undefined")
+    oBarLabeling[fld]=(f.userName!="")?f.userName:-1;
+%    \end{macrocode}
+%   If this field has no \cs{TU} property, we use the default, as expressed through
+%   \texttt{barLabelsDef}.
+%    \begin{macrocode}
+  if (oBarLabeling[fld]==-1)f.userName=barLabelsDef(fld,v);
+  else {
+%    \end{macrocode}
+%   If this field has a nonempty \cs{TU} property, we either use \texttt{simpleBarLabels},
+%   passing a formatting string with it, or we pass the function name with is arguments.
+%   If the \texttt{o} argument is not passed, there is no change to the labeling.
+%    \begin{macrocode}
+    if (typeof o!="undefined")
+      f.userName=(useDefLabeling)?((o=="")?%
+(simpleBarLabels(fld,v,oBarLabeling[fld])):%
+%(simpleBarLabels(fld,v,f.userName)):%
+(simpleBarLabels(fld,v,o))):o(fld,v);
+  }	
+%    \end{macrocode}
+%   \textbf{Default fill color.} If the bar does not have an associated fill color,
+%   we apply the default color of \cs{barDefColor}
+%    \begin{macrocode}
+  f.fillColor=(color.equal(f.fillColor,color.transparent))?%
+\barDefColor:f.fillColor;
+%    \end{macrocode}
+%   Make the bar visible (initially they are hidden)
+%    \begin{macrocode}
+  f.display=display.visible;
+  if(bRescaleNeeded) {
+%    \end{macrocode}
+%   If we must re-scale, we cannot allow the user to enter any more data
+%   until the re-scaling is finished; otherwise, data is occasionally lost.
+%    \begin{macrocode}
+    var g=this.getField(env);
+    if (g!=null)g.readonly=true;
+    app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+  }
+}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{barLabelsDef}\hskip-\marginparsep\texttt{(fld,v)} is the default function for
+%   labeling the bars using the tooltip property of a form field.
+%   inserted by the document author.
+%    \begin{macrocode}
+function parseFld(fld,v) {
+  var pos=fld.indexOf("@");
+  var env=fld.substring(0,pos);
+  fld=fld.substring(pos+1);
+  pos=fld.indexOf(".");
+  var barname=fld.substring(0,pos);
+  var bar=fld.substring(pos+1);
+  parseFld.env=env;
+  parseFld.barname=barname;
+  parseFld.bar=bar;
+  parseFld.value=v;
+}
+function barLabelsDef(fld,v){
+  parseFld(fld,v);
+  var o=parseFld;
+  var strOrFnc=\barLabelsNoTUJS;
+  return ((typeof strOrFnc=="string")?strOrFnc:strOrFnc(fld,v));
+}
+function simpleBarLabels(fld,v){
+%  parseFld(fld,v);
+%  var o=parseFld;
+  if (arguments.length==2)
+%    return o.barname + ": "+o.bar+", Value: "+v;
+     return customBarLabels(fld,v);
+  else {
+    parseFld(fld,v);
+    var s=arguments[2];
+    return replaceLblVars(s);
+  }
+}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{getNewScaleFactor}\hskip-\marginparsep\texttt{(env,v)}
+%   is a utility function for calculating the scale factor of the graph.
+%    \begin{macrocode}
+function getNewScaleFactor(env,v) {
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var maxDimen=dataForEnv[env].maxDim;
+  var nO=dataForEnv[env].origin;
+  var sf=dataForEnv[env].sf;
+  var isHoriz=dataForEnv[env].horiz;
+  v=(v<0)?-v:v;
+  if(isHoriz) {
+    maxDimen=(nO==0)?w:maxDimen;
+    if( sf*v > maxDimen ) {
+      sf=maxDimen/v;
+      dataForEnv[env].sf=sf;
+      return true;
+    }
+  } else {
+    maxDimen=(nO==0)?h:maxDimen;
+    if ( sf*v > maxDimen ) {
+      sf=maxDimen/v;
+      dataForEnv[env].sf=sf;
+      return true;
+    }
+  }
+  return false;
+}
+%    \end{macrocode}
+%   This function converts the field name for a \texttt{\string\inputFor} field
+%   to the field name of corresponding bar.
+%    \begin{macrocode}
+// <env>.<barname>@<name> --> <env>@<barbane>.<name>
+function getBarName(name) {
+  var pos=name.indexOf(".");
+  var env=name.substring(0,pos);
+  name=name.substring(pos+1);
+  return env+"@"+name.replace(/@/,".");
+}
+function getEnvName(name) {
+  var pos=name.indexOf(".");
+  var env=name.substring(0,pos);
+  return env;
+}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{rescaleBargraph}\hskip-\marginparsep\texttt{(env)}
+%   touches each field causing the calculation fields to activate.
+%   Here, \texttt{env} is the name of the \texttt{bargraphenv} that encloses
+%   the active bar graph.
+%    \begin{macrocode}
+function rescaleBargraph(env) {
+  var oInputFor=this.getField(env);
+  this.delay=true;
+  // date input by the \\inputFor
+  if (oInputFor!=null) {
+    var a=oInputFor.getArray()
+    for (var i=0; i<a.length; i++) {
+%    \end{macrocode}
+%    If \texttt{updateBG.activegraph} is the same as \texttt{getBarName(a[i].name)},
+%    we make the calculations.
+%    \begin{macrocode}
+      updateBG.activegraph=getBarName(a[i].name);
+      if (a[i].display!=display.hidden) {
+        this.calculate=false;
+        a[i].value=1*a[i].value + 1;
+        this.calculate=true;
+        a[i].value=1*a[i].value - 1;
+      }
+    }
+  } else {
+%    \end{macrocode}
+%    \texttt{env} does not exist, this means there are no input fields, what to do?
+%    \begin{macrocode}
+    var aBars=dataForEnv[env].bgs;
+    for (var i=0; i<aBars.length; i++) {
+      var bars=this.getField(env+"@"+aBars[i]); // dps07
+      var widgets=bars.getArray();
+      for (var j=0; j<widgets.length; j++) {
+        var name=widgets[j].name;
+        var Value=getBarValue(env,name); // dps13
+        updateBG.env=env;
+        updateBG.activegraph=name;
+        updateBG(Value,updateBG.activegraph);
+      }
+    }
+  }
+  var f=this.getField("txtRescale."+env);
+  if (f!=null) f.value=Math.round(dataForEnv[env].sf*1000)/1000;
+  this.delay=false;
+  var g=this.getField(env);
+  if (g!=null)g.readonly=false;
+%  g.strokeColor=color.black;
+}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{optimizeScaling}\hskip-\marginparsep\texttt{(env)}
+%   calculates the height/length of each bar, selected the largest one, and rescales
+%   the bar graph so that the largest one not extends the entire height/width of the
+%   bar graph region. Here, \env{env} is the name of the \env{bargraphenv}, and
+%   \texttt{bars} is the name of the \env{bargraph} environment. If we ever get
+%   to where we are putting multiple \env{bargraph} environment within a
+%   \env{bargraphenv}, then \texttt{bars} might be an array. At the end of the function,
+%   \texttt{rescaleBargraph()} is called with a timed delay.
+%    \begin{macrocode}
+function optimizeScaling(env) {
+  var w=dataForEnv[env].width;
+  var h=dataForEnv[env].height;
+  var sf=dataForEnv[env].sf;
+  var isHoriz=dataForEnv[env].horiz;
+  var aBGs=dataForEnv[env].bgs;
+  for (var i=0; i<aBGs.length; i++) {
+    var o=this.getField(env+"@"+aBGs[i]); // dps07
+    var a=o.getArray();
+    maxFldName=a[0].name;
+    if (isHoriz) { // if horizontal bars
+      var maxDim=0; maxFldName="";
+      for (var i=0; i<a.length; i++) {
+        if (a[i].display==display.hidden) continue;
+        var thisDim=a[i].rect[2]-a[i].rect[0];
+        thisDim=(thisDim<0)?-thisDim:thisDim; // dps01
+        if ( thisDim > maxDim ) {
+          maxDim=thisDim;
+          maxFldName=a[i].name;
+        }
+      }
+      if (maxFldName=="") return;
+  // get name of input field env.bar@name
+      var v=getBarValue(env,maxFldName);
+  // now rescale all bars
+  	  v=(v<0)?-v:v; // dps01
+      if (v !=0) {
+        sf=w/v; // if v !=0
+        dataForEnv[env].sf=sf;
+        var g=this.getField(env);
+%        g.strokeColor=color.red;
+        if (g!=null)g.readonly=true;
+        app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+      }
+    } else { // if vertical bars
+      var maxDim=0; maxFldName="";
+      for (var i=0; i< a.length; i++) {
+        if (a[i].display==display.hidden) continue;
+        var thisDim=a[i].rect[1]-a[i].rect[3];
+        thisDim=(thisDim<0)?-thisDim:thisDim; // dps01
+        if ( thisDim > maxDim ) {
+          maxDim=thisDim;
+          maxFldName=a[i].name;
+        }
+      }
+      if (maxFldName=="") return;
+      var v=getBarValue(env,maxFldName); // dps13
+      if ( typeof v == "undefined" ) return;
+  // now rescale all bars
+  	  v=(v<0)?-v:v; // dps01
+      if (v !=0) {
+        sf=h/v;
+        dataForEnv[env].sf=sf;
+        var g=this.getField(env);
+        if (g!=null)g.readonly=true;
+%        g.strokeColor=color.red;
+        app.setTimeOut("rescaleBargraph(\""+env+"\")",5);
+      }
+    }
+  }
+}
+%    \end{macrocode}
+%   \leavevmode\IndexJS{resetBargraphs}\hskip-\marginparsep\texttt{(\ameta{various})}
+%   resets the bar graphs and the input fields. The unspecified argument
+%   is a list of names for \env{bargraphenv} and \env{bargraph} names.
+%    \begin{macrocode}
+function resetBargraphs() {
+  this.calculate=false;
+  this.resetForm(arguments);
+  for (var n=0; n<arguments.length; n++){
+	  var f=this.getField("internalData."+arguments[n]);
+	  if (f!=null) {
+      dataForEnv[arguments[n]].sf=_scaleFactorDef;
+      var env=arguments[n]; // dps01
+      var isHoriz=dataForEnv[env].horiz;
+  	  aBGs=dataForEnv[arguments[n]].bgs;
+      // an environment name
+	    for (var i=0; i<aBGs.length; i++) {
+        var o=this.getField(env+"@"+aBGs[i]); // dps07
+		    var a=o.getArray();
+		    o.display=display.hidden;
+        if (isHoriz) {
+          for(j=0;j<a.length;j++) {
+            var name=a[j].name; // dps01
+            var value=getBarValue(env,name); // dps01
+            if (value<0) { // dps01
+              var r=a[j].rect;
+              r[0]=r[2]+20;
+              a[j].rect=r;
+            }
+            saveBarValue(arguments[n],a[j].name,"0");
+          }
+        } else {
+          for(j=0;j<a.length;j++) {
+            var name=a[j].name; // dps01
+            var value=getBarValue(env,name); // dps01
+            if (value<0) { // dps01
+              var r=a[j].rect;
+              r[3]=r[1]+20;
+              a[j].rect=r;
+            }
+            saveBarValue(arguments[n],a[j].name,"0");
+          }
+        }
+      }
+    }
+  }
+  this.calculate=true;
+}
+// fld="<bgenv-name><bg-name>.<bar-name>", v=value of field
+%    \end{macrocode}
+%   \leavevmode\IndexJS{customBarLabels}\hskip-\marginparsep\texttt{(fld,v)}
+%   If you declare \cs{barLabelsTU\darg{customBarLabels}}, then any \cs{barFor}
+%   field that has a non-empty \cs{TU} key will be processed by this built-in function.
+%   An example from \texttt{bargraph-js-cnt-data.tex} declares
+%   \begin{quote}\small|\presetsbarfor{don}{\BG{red}\TU{AcroTeX revenues are \textdollar@v@}}|\end{quote} The function
+%   below, replaces \texttt{@v@} with the actual value of the bar data.
+%    \begin{macrocode}
+function customBarLabels(fld,v){
+  var f=this.getField(fld);
+  if ( oBarLabeling[fld] != -1 ) {
+    var s=oBarLabeling[fld];
+    if (s.indexOf("@v@")==-1)
+      return barLabelsDef(fld,v);
+    else {
+      parseFld(fld,v);
+      return replaceLblVars(s);
+    }
+  } else return barLabelsDef(fld,v);
+}
+function replaceLblVars(s) {
+  var o=parseFld;
+  s=s.replace(/@env@/g,o.env);
+  s=s.replace(/@barname@/g,o.barname);
+  s=s.replace(/@bar@/g,o.bar);
+  s=s.replace(/@v@/g,o.value);
+  return s;
+}
+%    \end{macrocode}
+%    \leavevmode\IndexJS{getBarValue}\hskip-\marginparsep\texttt{(env,name)}
+%    returns the value of the bar, whose field name is \texttt{name} and is part
+%    of the \texttt{env} \env{bargraphenv} environment. The value is retrieved
+%    from the hidden field \texttt{"bgVAlues"}, that holds an object of key-values.
+%    \begin{macrocode}
+function getBarValue(env,name){
+  var f=this.getField("bgValues");
+  var o=eval(f.value);
+  var v=o[env][name];
+  var retn=(typeof v=="undefined")?0:v;
+  return retn;
+}
+%    \end{macrocode}
+%    \leavevmode\IndexJS{saveBarValue}\hskip-\marginparsep\texttt{(env,name,v)}
+%    saves the value of the bar. The value \texttt{v} is saved to the hidden
+%    field \texttt{"bgVAlues"}.
+%    \begin{macrocode}
+function saveBarValue(env,name,v) {
+  var f=this.getField("bgValues");
+  var o=eval(f.value);
+  o[env][name]=v;
+  f.value=o.toSource();
+}
+\end{newsegment}
+%    \end{macrocode}
+%    \leavevmode\IndexJS{toggleFldVisibility}\hskip-\marginparsep\texttt{(name,bOk)}
+%    If \texttt{bOk} is true, display the field whose name is \texttt{name};
+%    otherwise, hide the field.
+%    \begin{macrocode}
+\begin{newsegment}{Toggle field visibility}
+function toggleFldVisibility(name,bOk) {
+  var f=this.getField(name);
+  f.display=(bOk)?display.visible:display.hidden;
+}
+\end{newsegment}
+%    \end{macrocode}
+% \subsection{Support for comma-delimited data}\label{s:labelcd}
+%    \leavevmode\IndexJS{populateCommData}\hskip-\marginparsep\texttt{(env,bar,v[,validate])}
+%    Populates the bars characterized by \texttt{env} and \texttt{bar}. The \texttt{v} argument
+%    is a string of comma-delimited numbers. When the \texttt{validate} argument is passed, it
+%    should be a JS function that validates each entry in the list; for example, passing
+%    \texttt{validateArrayNonNegNums} determines whether each entry is a nonnegative number.
+%    \begin{macrocode}
+\begin{newsegment}{Comma-delimited Data}
+function populateCommaData(env,bar,str) {
+  var value;
+  var f=this.getField(env+"@"+bar);
+  var g=f.getArray();
+  var aValue=str.split(",");
+  var bOk=(arguments.length>3)?arguments[3](aValue):true;
+  if (bOk) {
+    for (var i=0; i<g.length; i++){
+      updateBG.env=env;
+      updateBG.activegraph=g[i].name;
+      value=(typeof(aValue[i])=="undefined")?0:aValue[i];
+      updateBG(value,updateBG.activegraph,%
+populateCommaData.usebarlabel);
+    }
+  } else app.alert(arguments[3].msg);
+}
+\end{newsegment}
+%    \end{macrocode}
+%    Determines whether each entry in the array \texttt{aValue}
+%    is a non-negative number. Returns false if not.
+%    \begin{macrocode}
+\begin{newsegment}{Validate input data for comma-delimited data}
+validateArrayNonNegNums.msg="Enter only non-negative numbers";
+function validateArrayNonNegNums(aValue){
+  var bOk=true;
+  for (var i=0; i<aValue.length; i++) {
+    var x=1*aValue[i];
+    if(isNaN(x)) {bOk=false; break;}
+    else if (x<0) {bOk=false; break;}
+  }
+  return bOk
+}
+%    \end{macrocode}
+%    Determines whether each entry in the array \texttt{aValue}
+%    is a number. Returns false if not.
+%    \begin{macrocode}
+validateArrayOfNums.msg="Enter only numerical values";
+function validateArrayOfNums(aValue){
+  var bOk=true;
+  for (var i=0; i<aValue.length; i++) {
+    var x=1*aValue[i];
+    if(isNaN(x)) {bOk=false; break;}
+  }
+  return bOk
+}
+\end{newsegment}
+%    \end{macrocode}
+% \subsection{Saving and restoring bar graph data}
+%    Save the contents of the \texttt{oBarLabeling} object as a string
+%    to the hidden text field \texttt{barLabeling}.
+%    \begin{macrocode}
+\begin{newsegment}{Restore Data}
+function bgSaveData() {
+  var f=this.getField("barLabeling");
+  if(f!=null)f.value=oBarLabeling.toSource();
+}
+%    \end{macrocode}
+%    Restore \texttt{oBarLabeling} object from
+%    the hidden text field \texttt{barLabeling}.
+%    \begin{macrocode}
+function bgRestoreData(){
+  var f=this.getField("barLabeling");
+  if(f!=null&&f.value!="")oBarLabeling=eval(f.value);
+}
+\end{newsegment}
+\end{insDLJS*}
+%</package>
+%<*dynam>
+%    \end{macrocode}
+%     \subsection{Creating and displaying dynamic bar graph data}\leavevmode
+%     \IndexJS{displayDyBargraph}\unskip
+%     This function is designed for discrete probability distributions,
+%     it can build the probability mass function (pmf) and the cumulative
+%     distribution function (cdf). \texttt{displayDyBargraph}
+%     is a function that creates a (dynamic) bar graph, based on the arguments passed to it.
+%     The arguments are
+%\begin{description}
+% \item[\texttt{bar}] is the name \ameta{bgenv-name}\texttt@\ameta{bg-name}
+% \item[\texttt{aPr}] is the array of probability distributions; \texttt{[k,pmfPr,cdfPr]} is the form of each entry
+% in this array,  where \texttt{k} is a value of the distribution,
+% \texttt{pmfPr} is the probability mass at that value; and \texttt{cdfPr} is the cumulative
+% mass up to and including the value \texttt{k}.
+% \item[\texttt{bPmf}] is true if we are to calculate a probability mass function,
+% and false if we calculate a cumulative distribution function.
+% \item[\texttt{bOptimize}] is true if we optimize the graph (applies to Pmf only),
+% otherwise, we use the current scale factor.
+%\end{description}
+%    \begin{macrocode}
+\begin{insDLJS}{dynam}{Display dynamic bar graphs}
+%function displayDyBargraph(bar,aPr,bPmf,bOptimize) { // bar=env@bar-name
+function displayDyBargraph(env,aPr,bPmf,bOptimize) {
+  if (typeof aPr[0]=="undefined") return;
+  var aBars=dataForEnv[env].bgs;
+  var bar=env+"@"+dataForEnv[env].bgs[0];
+  var n=aPr.length;
+  var index=(bPmf)?1:2;
+  var bc=color.red;
+  var fc=color.blue;
+  var lbl=_labelDyBars;
+  if (arguments.length>4) {
+    var o=arguments[4];
+    bc=(o.bc==undefined)?bc:o.bc;
+    fc=(o.fc==undefined)?fc:o.fc;
+    var lbl=(o.lbl==undefined)?_labelDyBars:o.lbl;
+  } else {
+    var f=this.getField(bar+".bar0");
+    if ( f !=null ) {
+      bc=f.strokeColor;
+      fc=f.fillColor;
+    }
+  }
+%  var hbar="x"+bar;
+  var hbar=bar.replace(/@/,"@x"); // dps07
+%console.println("removing bar: "+bar);
+  this.removeField(bar);
+  var pos=hbar.indexOf("@");
+  var env=hbar.substring(0,pos);
+// get aux info, begin with
+%console.println("hbar: "+ hbar);
+  var hb=this.getField(hbar);
+  var f=hb.getArray()[0];
+  var pg=f.page;
+  var wd=dataForEnv[env].width;
+  var ht=dataForEnv[env].height;
+  var isHoriz=dataForEnv[env].horiz;
+  var frameH=ht; // frameH is one unit high
+  if (bPmf&&bOptimize) {
+    var maxValue=0;
+    for (var i=0; i<n; i++)
+      if (aPr[i][index]>maxValue) maxValue=aPr[i][index];
+  }
+  var w=wd/(n+1);
+  var r=f.rect;
+  var defwidth=r[2]-r[0];
+  if (defwidth*(n+1)>=wd) r[2]=r[0]+w;
+  else w=defwidth;
+  var gap=-1; // contiguous boundaries overlap
+  var sf=(bPmf&&bOptimize)?frameH/maxValue:frameH;
+  for (var i=0; i<n; i++){
+    var g=this.addField(bar+".bar"+i,"button",pg,r);
+    // calculate height
+    var Rect=g.rect;
+    var v=aPr[i][index];
+    this.delay=true;
+    Rect[1]=Rect[3]+(v*sf);
+    var pr=aPr[i][0];
+    g.userName=lbl(pr,v,bPmf);
+%    g.userName=bPmf?("Pr(X="+pr+")="+v):("Pr(X<="+pr+")="+v);
+    g.display=display.visible;
+    g.rect=Rect;
+    r[0]+=(w+gap);
+    r[2]+=(w+gap);
+    this.delay=false;
+  }
+  if (!bPmf) { // cdf
+    var totalW=(n+1)*(w+gap);
+    var delta=wd-totalW;
+    r[2]+=delta;
+    g=this.addField(bar+".bar"+n,"button",pg,r);
+    var Rect=g.rect;
+    var v=1;
+    this.delay=true;
+    Rect[1]=Rect[3]+(v*sf);
+    g.display=display.visible;
+    g.rect=Rect;
+  }
+// Now set color properties
+  g=this.getField(bar);
+  g.fillColor=fc;
+  g.strokeColor=bc;
+  this.delay=false;
+}
+function _labelDyBars(pr,v,bPmf) {
+  return bPmf?("Pr(X="+pr+")="+v):("Pr(X<="+pr+")="+v);
+}
+\end{insDLJS}
+%</dynam>
+%<*package>
+\bgjs@restoreCats
+%</package>
+%    \end{macrocode}
+\endinput

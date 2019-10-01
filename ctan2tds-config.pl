@@ -29,6 +29,7 @@ $special{'aeb-minitoc'} = '&MAKEdps';
 $special{'graphicxsp'}  = '&MAKEdps';
 $special{'icon-appr'}   = '&MAKEdps';
 $special{'eqexam'}      = '&MAKEdps';
+$special{'bargraph-js'} = '&MAKEdps';
 
 
 sub MAKEdps {

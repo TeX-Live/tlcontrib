@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eq-save package,                                     %%
-%% Copyright (C) 2017-2018                              %%
+%% Copyright (C) 2017-2019                              %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{eq-save}
-%<package> [2018/04/07 v1.1 eq-save: save exerquiz quizzes and resume (dps)]
+%<package> [2019/08/07 v1.2.5 eq-save: save exerquiz quizzes and resume (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -60,7 +60,6 @@
 % \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
 %    {\PackageInfo{web}{cannot find aebdonotindex.def}}
 %    \begin{macrocode}
-% Begin Package
 %<*package>
 %    \end{macrocode}
 %    The option \IndexOpt{devmode}\opt{devmode} does not require the user to enter his or  her name
@@ -106,7 +105,7 @@
 %
 %
 %   \section{Commands of this package}
-%   The \DescribeMacro{\nameField}\cs{nameField} command insert a text field into which the student enters
+%   The \DescribeMacro{\nameField}\cs{nameField} command inserts a text field into which the student enters
 %   his name; otherwise, he cannot continue to the next page. Changing your name after you've begun to work
 %   on the questions clears the answer to all quizzes; this is an annoyance factor, a feeble attempt to reduce
 %   cheating. When \cs{nameField} is used, the top of the next page should be \cs{BeginNoPeeking}.
@@ -118,8 +117,7 @@
     try{IhrNameFormat(event);}catch(e){}
   }]{#2}{#3}{#4}}
 %    \end{macrocode}
-%    \DescribeMacro{\hiddenScoreData}\cs{hiddenScoreData} text field.
-%    It has zero dimensions, takes up no (horizontal) {\TeX} space, and is hidden. It is placed under the name field.
+%    \DescribeMacro{\hiddenScoreData}is a text field that has zero dimensions, it takes up no (horizontal) {\TeX} space, and is hidden.
 %    This field, when the document is saved, receive all essential quiz data. It is read again when the document
 %    is opened to restore the quiz data. We give this field an initial value, for otherwise, the PDF viewer will
 %    not scan this field on opening.
@@ -133,14 +131,14 @@
 %    We place this field on the first page, upper left corner. It will be scanned by the PDF viewer (Reader)
 %    and it will define the object \texttt{oRecordOfQuizData} that will hold essential quiz data.
 %
-%    \paragraph*{Displaying and clearing results} As the user/student progresses through the documents, he
+%    \paragraph*{Displaying and clearing results} As the user/student progresses through the document, he
 %    can see his success rate by viewing the text fields below.
 %
 %    The \DescribeMacro{\sooField}\cs{sooField} (soo=score out of) displays the combined score: `12 out of 16', for example.
-%    The phase may be redefined for language purposes by redeclaring the command \cs{declareScorePhrase}, the English
+%    The phase may be redefined for language purposes by redeclaring the command \DescribeMacro{\declareScorePhrase}\cs{declareScorePhrase}, the English
 %    declaration is \verb~\declareScorePhrase{#1+"\space\eqOutOf\space"+#2}~, see the documentation above for this command.
 %
-%    The \DescribeMacro{\sField}\cs{sField} is one that holds only the score, while
+%    The \DescribeMacro{\sField}\cs{sField} is one the field that holds only the score, while
 %    \DescribeMacro{\ooField}\cs{ooField} holds the `out of' value.
 %    \begin{macrocode}
 \newcommand{\sField}[3][]{\textField[\Ff{\FfReadOnly}#1]%
@@ -152,7 +150,7 @@
 %    \end{macrocode}
 %    Now we do the same thing for the points score. \DescribeMacro{\psField}\cs{psField} holds the total
 %    number of points awarded; \DescribeMacro{\pooField}\cs{pooField} is the total number of points;
-%    \DescribeMacro{\psooField}\cs{psooField}
+%    \DescribeMacro{\psooField}\cs{psooField} is the `points out of' field.
 %    \begin{macrocode}
 \newcommand{\psField}[3][]{\textField[\Ff{\FfReadOnly}#1]%
   {\eqsroot.ptScore}{#2}{#3}}
@@ -215,11 +213,16 @@
 }
 %    \end{macrocode}
 %   \paragraph*{Open Page Action} We add a page open event to restore the data as needed. We only do this once
-%   per document session.
+%   per document session. The script used in contained in the command \DescribeMacro\restoreQD\cs{restoreQD}.
+%   \changes{v1.2.3}{2019/27/07}{Made the open doc script into a macro \string\cs{resoreQD}}
+%   \changes{v1.2.4}{2019/08/01}{Changed to page open}
+%   \changes{v1.2.5}{2019/08/07}{added dirty=false to \string\cs{restoreQD}}
 %    \begin{macrocode}
-\thisPageAction{\JS{if(!restoreQuizData.hasRestoredData)\r\t
-  var rqdTO=(app.setTimeOut("restoreQuizData();app.clearTimeOut(rqdTO);%
-  restoreQuizData.hasRestoredData=true",1000));}}{}
+\def\restoreQD{if(!restoreQuizData.hasRestoredData)\r\t
+  var\eqSP rqdTO=(app.setTimeOut("try{restoreQuizData()}catch(e){};%
+  app.clearTimeOut(rqdTO);%
+  restoreQuizData.hasRestoredData=true;dirty=false;",1000));}
+\thisPageAction{\JS{\restoreQD}}{}
 %    \end{macrocode}
 %   \paragraph*{Action prior to saving} It is important to save the quiz data, we can only do that if we save
 %   it to a field, the value of the field will be saved. We save the data to a hidden text field
@@ -246,9 +249,13 @@ if (typeof oRecordOfQuizData !="undefined") collectQuizData();
     this.pageNum=0;\r\t
     NoNameMsg=app.setTimeOut("app.alert('\EnterNameFirstMsg');%
     app.clearTimeOut(NoNameMsg);",25);}}}{}}%
+%    \end{macrocode}
 % Page option for this page
+%    \begin{macrocode}
   \IhrNamePO
-% page open for all other pages
+%    \end{macrocode}
+% Page open for all other pages
+%    \begin{macrocode}
   \AtBeginShipout{\IhrNamePO}%
 }
 %    \end{macrocode}
@@ -579,6 +586,8 @@ function collectQuizData() {
 %    \end{macrocode}
 %   \leavevmode\IndexJS{restoreQuizData()} is called when the document is opened and attempts to
 %   transfer the value of \texttt{holdScoreData} back into \texttt{oRecordOfQuizData}.
+%   \changes{v1.2}{2019/07/02}{Added ProbDist array}
+%   \changes{v1.2.1}{2019/07/05}{Added RightWrong array}
 %    \begin{macrocode}
 restoreQuizData.hasRestoredData=false;
 function restoreQuizData() {
@@ -590,13 +599,26 @@ function restoreQuizData() {
       // name of field is endQuiz.qzname
       var pos=fname.indexOf(".");
       var qzName=fname.substring(pos+1);
-      lstOfQuizzes[qzName]=eval(qzName);
-      Score=1*oRecordOfQuizData[fname][0];
-      NQuestions=1*oRecordOfQuizData[fname][1];
-      ptScore=1*oRecordOfQuizData[fname][2];
-      NPointTotal=1*oRecordOfQuizData[fname][3];
-      var h=this.getField("ScoreData."+qzName);
-      h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
+      var qzRoot=fname.substring(0,pos);
+      switch(qzRoot) {
+        case "ScoreData":
+          lstOfQuizzes[qzName]=eval(qzName);
+          Score=1*oRecordOfQuizData[fname][0];
+          NQuestions=1*oRecordOfQuizData[fname][1];
+          ptScore=1*oRecordOfQuizData[fname][2];
+          NPointTotal=1*oRecordOfQuizData[fname][3];
+          var h=this.getField("ScoreData."+qzName);
+          h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
+          break;
+        case "ProbDist":
+          ProbDist=eval(oRecordOfQuizData[fname]);
+          break;
+        case "RightWrong":
+          RightWrong=eval(oRecordOfQuizData[fname]);
+          break;
+        default:
+          console.println("name not recognized:"+fname);
+      }
     } else f.isCorrect=oRecordOfQuizData[fname];
   }
 }

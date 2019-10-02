@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eq-save package,                                     %%
-%% Copyright (C) 2017-2018                              %%
+%% Copyright (C) 2017-2019                              %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{eq-save}
- [2018/04/07 v1.1 eq-save: save exerquiz quizzes and resume (dps)]
+ [2019/08/07 v1.2.5 eq-save: save exerquiz quizzes and resume (dps)]
 \DeclareOption{devmode}{\def\devMode{true}}
 \DeclareOption{!devmode}{\def\devMode{false}}
 \def\devMode{false}
@@ -83,9 +83,11 @@
     [1*Score,1*NQuestions,1*ptScore,1*NPointTotal];\r\t\t
   cntCorrectResponses();\r
 }
-\thisPageAction{\JS{if(!restoreQuizData.hasRestoredData)\r\t
-  var rqdTO=(app.setTimeOut("restoreQuizData();app.clearTimeOut(rqdTO);%
-  restoreQuizData.hasRestoredData=true",1000));}}{}
+\def\restoreQD{if(!restoreQuizData.hasRestoredData)\r\t
+  var\eqSP rqdTO=(app.setTimeOut("try{restoreQuizData()}catch(e){};%
+  app.clearTimeOut(rqdTO);%
+  restoreQuizData.hasRestoredData=true;dirty=false;",1000));}
+\thisPageAction{\JS{\restoreQD}}{}
 \begin{willSave}
 isAQuizUnfinishedAtSave();
 if (typeof oRecordOfQuizData !="undefined") collectQuizData();
@@ -340,13 +342,26 @@ function restoreQuizData() {
       // name of field is endQuiz.qzname
       var pos=fname.indexOf(".");
       var qzName=fname.substring(pos+1);
-      lstOfQuizzes[qzName]=eval(qzName);
-      Score=1*oRecordOfQuizData[fname][0];
-      NQuestions=1*oRecordOfQuizData[fname][1];
-      ptScore=1*oRecordOfQuizData[fname][2];
-      NPointTotal=1*oRecordOfQuizData[fname][3];
-      var h=this.getField("ScoreData."+qzName);
-      h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
+      var qzRoot=fname.substring(0,pos);
+      switch(qzRoot) {
+        case "ScoreData":
+          lstOfQuizzes[qzName]=eval(qzName);
+          Score=1*oRecordOfQuizData[fname][0];
+          NQuestions=1*oRecordOfQuizData[fname][1];
+          ptScore=1*oRecordOfQuizData[fname][2];
+          NPointTotal=1*oRecordOfQuizData[fname][3];
+          var h=this.getField("ScoreData."+qzName);
+          h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
+          break;
+        case "ProbDist":
+          ProbDist=eval(oRecordOfQuizData[fname]);
+          break;
+        case "RightWrong":
+          RightWrong=eval(oRecordOfQuizData[fname]);
+          break;
+        default:
+          console.println("name not recognized:"+fname);
+      }
     } else f.isCorrect=oRecordOfQuizData[fname];
   }
 }

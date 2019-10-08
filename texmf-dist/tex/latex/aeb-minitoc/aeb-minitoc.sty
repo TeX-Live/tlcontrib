@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{aeb-minitoc}
- [2018/09/29 v1.7 Creates a simple mini-toc]
+ [2019/10/06 v1.9 Creates a simple mini-toc]
 \newif\ifMiniTocListings \MiniTocListingstrue
 \DeclareOption{nominitocs}{\AtEndOfPackage{\MiniTocListingsfalse
   \let\insertminitoc\insertminitocNOT}}
@@ -124,11 +124,17 @@
 \AtEndDocument{\mtoc@start@toc}
 \def\mtoc@TOC{toc}
 \def\mtocCL#1#2{#1}
-\newcommand\addtocontents@mtoc[2]{%
-    \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
-    \global\advance\@minitocCnt\@ne
-    \mtoc@addtocontents{#1}{\protect\mtocCL{#2}{\the\@minitocCnt}}\else
-    \mtoc@addtocontents{#1}{#2}\fi}
+\@ifundefined{add@percent@to@temptokena}
+  {\let\protected@file@percent\@empty\def\mtoc@protect{}}
+  {\def\mtoc@protect{\protect}}
+\newcommand\addtocontents@mtoc[2]{\bgroup
+  \let\protected@file@percent\@empty
+  \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
+  \global\advance\@minitocCnt\@ne
+  \mtoc@addtocontents{#1}{\protect
+    \mtocCL{#2}{\the\@minitocCnt}\mtoc@protect
+    \protected@file@percent}\else
+  \mtoc@addtocontents{#1}{#2}\fi\egroup}
 \AtBeginDocument{\let\mtoc@addtocontents\addtocontents
   \let\addtocontents\addtocontents@mtoc}
 \def\tableofcontents{%

@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{aeb-minitoc}
-%<package> [2018/09/29 v1.7 Creates a simple mini-toc]
+%<package> [2019/10/06 v1.9 Creates a simple mini-toc]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
@@ -343,15 +343,28 @@
 \def\mtoc@TOC{toc}
 \def\mtocCL#1#2{#1}
 %    \end{macrocode}
+%    (2019/10/06) Fix the \cs{protected@file@percent} problem, the solution continues
+%    into the definition of \cs{addtocontents@mtoc}.
+%    \changes{v1.8}{2019/10/05}{\string\cs{LaTeX}/\string\pkg{hyperref} introduced
+%    \string\cs{protected@file@percent}, which breaks this package. We do a fix.}
+%    \changes{v1.9}{2019/10/06}{Additional fix to \string\cs{protected@file@percent} solution}
+%    \begin{macrocode}
+\@ifundefined{add@percent@to@temptokena}
+  {\let\protected@file@percent\@empty\def\mtoc@protect{}}
+  {\def\mtoc@protect{\protect}}
+%    \end{macrocode}
 % Here, we modify the macro \cs{addtocontents} to insert \cs{mtocCL}.
 %    \changes{v1.7}{2018/09/29}{Delay redefinition of \string\cs{addtocontents} until beginning of document,
-%    to avoid incompatability with \string\pkg{siunitx}.}
+%    to avoid incompatibility with \string\pkg{siunitx}.}
 %    \begin{macrocode}
-\newcommand\addtocontents@mtoc[2]{%
-    \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
-    \global\advance\@minitocCnt\@ne
-    \mtoc@addtocontents{#1}{\protect\mtocCL{#2}{\the\@minitocCnt}}\else
-    \mtoc@addtocontents{#1}{#2}\fi}
+\newcommand\addtocontents@mtoc[2]{\bgroup
+  \let\protected@file@percent\@empty
+  \def\mt@rgi{#1}\ifx\mt@rgi\mtoc@TOC
+  \global\advance\@minitocCnt\@ne
+  \mtoc@addtocontents{#1}{\protect
+    \mtocCL{#2}{\the\@minitocCnt}\mtoc@protect
+    \protected@file@percent}\else
+  \mtoc@addtocontents{#1}{#2}\fi\egroup}
 \AtBeginDocument{\let\mtoc@addtocontents\addtocontents
   \let\addtocontents\addtocontents@mtoc}
 %    \end{macrocode}

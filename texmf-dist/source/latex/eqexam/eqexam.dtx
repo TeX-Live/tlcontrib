@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2019/01/31 v5.1.4 An Exam Construction Package (dps)]
+%<package>  [2019/10/29 v5.1.6 An Exam Construction Package (dps)]
 %<package>\def\eqexamdefReq{2019/02/11}
 %<*driver>
 \documentclass{ltxdoc}
@@ -68,7 +68,6 @@
 %</driver>
 % \fi
 %
-% \StopEventually{}
 %
 % \InputIfFileExists{aebDoNotIndex.def}{\PackageInfo{eqexam}{Inputting aebDoNotIndex.def}}
 %    {\PackageInfo{eqexam}{aebDoNotIndex.def cannot be found}}
@@ -716,7 +715,11 @@
 % therefore, contain declaration of options. \texttt{web.cfg} usually only
 % specifies the default driver. \texttt{eqecus.opt} is used by \textsf{@EASE},
 % but can be used locally.
+% \changes{v5.1.5}{2019/10/28}{Insert \string\cs{bWebCustomize} and \string\cs{eWebCustomize}
+% to conform with \string\pkg{web} dated 2019/10/23.}
 %    \begin{macrocode}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \InputIfFileExists{web.cfg}{}{}
 \InputIfFileExists{eqecus.opt}{}{}
 %    \end{macrocode}
@@ -800,7 +803,7 @@
     \makeAnsEnvForSolnsAtEnd\eqTopOfSolnPage
     \answerkeytrue\eq@proofingtrue
     \eq@solutionsaftertrue\vspacewithsolnstrue
-    \displayworkareafalse %\withinsoldoctrue % now within \eqTopOfSolnPage
+    \displayworkareafalse
 }
 %    \end{macrocode}
 %    \begin{macro}{\makeAnsEnvForSolnsAtEnd}
@@ -2165,8 +2168,19 @@
     \Ans@proofing{\eq@tmpdima}%
     \eq@hspanner\ignorespaces
 }
+%    \end{macrocode}
+%   (2019/10/28) Legacy assignment, in case \pkg{eqexam.def}/\allowbreak
+%   \pkg{exerquiz} are still using \cs{eq@RadioCheck@driver}.
+%   \changes{v5.1.5}{2019/10/28}{Replace \string\cs{eq@RadioCheck@driver}
+%   by \string\cs{eq@Radio@driver}}
+%   \changes{v5.1.5}{2019/10/28}{Define \string\cs{eq@Radio@driver} in case \string\pkg{eqexam.def}/\string\allowbreak
+%   \string\pkg{exerquiz} still use \string\cs{eq@RadioCheck@driver}}
+%    \begin{macrocode}
+\@ifundefined{eq@RadioCheck@driver}{}
+  {\let\eq@Radio@driver\eq@RadioCheck@driver}
 \def\eqExam@Ans@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -2187,7 +2201,7 @@
             \radio@@Button{\presets{\eqe@optsRadiof}}%
             {\fieldName}{\RadioFieldSize}%
             {\RadioFieldSize}{\Ans@choice\alph{quizno}}{\eq@protect\A}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Radio@driver}%
             {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
             \every@sqRadioButton\insert@circlesymbol}%
         \fi
@@ -2200,7 +2214,8 @@
 \let\eqe@optscbl\@empty\let\eqe@optscbf\@empty
 \def\eqExam@Ans@ck@sq@l{\leavevmode
     \if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@l}%
     \sbox{\eq@tmpbox}{\eq@l@l}\eq@tmpdima=\wd\eq@tmpbox
     \def\link@@Content{\linkContentWrapper}%
@@ -2226,7 +2241,8 @@
     \eq@hspanner\ignorespaces
 }
 \def\eqExam@Ans@ck@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -2247,7 +2263,7 @@
             \mbox{\check@@Box{\presets{\eqe@optscbf}}{\fieldName}%
                 {\RadioFieldSize}{\RadioFieldSize}%
                 {\Ans@choice\alph{quizno}}{\eq@protect\A}%
-                {\eq@setWidgetProps\eq@RadioCheck@driver}%
+                {\eq@setWidgetProps\eq@Radio@driver}%
                 {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
                 \every@sqRadioButton}}%
         \fi
@@ -2256,7 +2272,7 @@
     \eq@hspanner\ignorespaces
 }
 %    \end{macrocode}
-% \DescribeMacro{\optsMlTextField} is used to pass options to the multiline
+% \DescribeMacro{\optsMlTextField} is used to pass options to the multi-line
 % text field.
 %    \begin{macrocode}
 \def\optsMlTextField#1{\def\eqe@optsmltf{#1}}
@@ -5021,8 +5037,8 @@
     \topofprobhook
     \begin{eqequestions}%
 %    \end{macrocode}
-%    \textbf{Begin exercise env.} Insert h or H when it is the first argument through \cs{hidden@ttr},
-%    then begin the \texttt{exercise} environment using the counter
+%    \textbf{Begin exercise env.} Insert \texttt{h} or \texttt{H} when it is the first argument through \cs{hidden@ttr},
+%    then begin the \texttt{exercise} environment using
 %    \texttt{eqquestionnoi}.
 %    \changes{v5.1e}{2018/02/09}{Support for h and H argument}
 %    \begin{macrocode}
@@ -9233,14 +9249,23 @@
   \def\eqe@next{\fillineolNoCBMsg\fillineol@i}\fi
   \eqe@next}{\fillineol@i}}
 \newcommand{\fillineol@i}[1]{\bgroup\setbox\z@\hbox{#1}\fillineol@ii}
-\newcommand\fillineol@ii[2][]{\setlength\eqetmplengthb{\linewidth-\wd\z@}%
+\newcommand\fillineol@ii[2][]{%
+  \setlength\eqetmplengthb{\linewidth-\wd\z@}%
   \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
   \unhbox\z@\fillin[#1]{\eqetmplengthb}{#2}\egroup}
+%    \end{macrocode}
+%    Allow the third argument to have verbatim text as well.
+%    \changes{v5.1.6}{2019/10/29}{Allow the third argument of \string\cs{fillineol*} to have verbatim text as well.}
+%    \begin{macrocode}
 \newcommand\cbfillineol{\bgroup\collectboxto{\@tempboxa}
   {\setlength{\eqetmplengthb}{\linewidth-\wd\@tempboxa}%
   \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
-    \unhbox\@tempboxa\cbfillineol@i}}
-\newcommand\cbfillineol@i[2][]{\fillin[#1]{\eqetmplengthb}{#2}\egroup}
+    \unhbox\@tempboxa\cbfillineol@ia}}
+\newcommand\cbfillineol@ia[1][]{\def\@rgi{#1}\cbfillineol@ib}
+\newcommand\cbfillineol@ib{\collectboxto{\@tempboxa}%
+  {\cbfillineol@i[\@rgi]}}
+\newcommand\cbfillineol@i[1][]{\fillin[#1]{\eqetmplengthb}%
+  {\unhbox\@tempboxa}\egroup}
 %    \end{macrocode}
 %    We finally begin the \DescribeMacro\fillin\cs{fillin} command.
 %    \begin{macrocode}

@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eqexam}
-  [2019/01/31 v5.1.4 An Exam Construction Package (dps)]
+  [2019/10/29 v5.1.6 An Exam Construction Package (dps)]
 \def\eqexamdefReq{2019/02/11}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -264,6 +264,8 @@
     \InputIfFileExists{eqexam\eqe@tmp@i.cfg}{}{}}%
     \eqe@tmp@exp
 }
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \InputIfFileExists{web.cfg}{}{}
 \InputIfFileExists{eqecus.opt}{}{}
 \InputIfFileExists{rendition.cfg}{}{}
@@ -297,7 +299,7 @@
     \makeAnsEnvForSolnsAtEnd\eqTopOfSolnPage
     \answerkeytrue\eq@proofingtrue
     \eq@solutionsaftertrue\vspacewithsolnstrue
-    \displayworkareafalse %\withinsoldoctrue % now within \eqTopOfSolnPage
+    \displayworkareafalse
 }
 \newcommand{\makeAnsEnvForSolnsAtEnd}{%
   \let\answers\answers@sq
@@ -992,8 +994,11 @@
     \Ans@proofing{\eq@tmpdima}%
     \eq@hspanner\ignorespaces
 }
+\@ifundefined{eq@RadioCheck@driver}{}
+  {\let\eq@Radio@driver\eq@RadioCheck@driver}
 \def\eqExam@Ans@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -1014,7 +1019,7 @@
             \radio@@Button{\presets{\eqe@optsRadiof}}%
             {\fieldName}{\RadioFieldSize}%
             {\RadioFieldSize}{\Ans@choice\alph{quizno}}{\eq@protect\A}%
-            {\eq@setWidgetProps\eq@RadioCheck@driver}%
+            {\eq@setWidgetProps\eq@Radio@driver}%
             {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
             \every@sqRadioButton\insert@circlesymbol}%
         \fi
@@ -1027,7 +1032,8 @@
 \let\eqe@optscbl\@empty\let\eqe@optscbf\@empty
 \def\eqExam@Ans@ck@sq@l{\leavevmode
     \if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@l}%
     \sbox{\eq@tmpbox}{\eq@l@l}\eq@tmpdima=\wd\eq@tmpbox
     \def\link@@Content{\linkContentWrapper}%
@@ -1053,7 +1059,8 @@
     \eq@hspanner\ignorespaces
 }
 \def\eqExam@Ans@ck@sq@f{\if\eq@listType1\stepcounter{quizno}\else
-    \ifwithinsoldoc\stepcounter{quizno}\else\refstepcounter{quizno}\fi\fi
+    \ifwithinsoldoc\stepcounter{quizno}\else
+      \refstepcounter{quizno}\fi\fi
     \PBS\raggedright\settowidth{\eq@tmplength}{\eq@lw@f}%
     \eq@tmpdima=\wd\eq@tmpbox%
     \hangindent=\eq@tmplength\hangafter=1\relax
@@ -1074,7 +1081,7 @@
             \mbox{\check@@Box{\presets{\eqe@optscbf}}{\fieldName}%
                 {\RadioFieldSize}{\RadioFieldSize}%
                 {\Ans@choice\alph{quizno}}{\eq@protect\A}%
-                {\eq@setWidgetProps\eq@RadioCheck@driver}%
+                {\eq@setWidgetProps\eq@Radio@driver}%
                 {\@@Ans@sq@f@Defaults\Ans@sq@f@Actions\every@RadioButton
                 \every@sqRadioButton}}%
         \fi
@@ -3571,14 +3578,19 @@
   \def\eqe@next{\fillineolNoCBMsg\fillineol@i}\fi
   \eqe@next}{\fillineol@i}}
 \newcommand{\fillineol@i}[1]{\bgroup\setbox\z@\hbox{#1}\fillineol@ii}
-\newcommand\fillineol@ii[2][]{\setlength\eqetmplengthb{\linewidth-\wd\z@}%
+\newcommand\fillineol@ii[2][]{%
+  \setlength\eqetmplengthb{\linewidth-\wd\z@}%
   \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
   \unhbox\z@\fillin[#1]{\eqetmplengthb}{#2}\egroup}
 \newcommand\cbfillineol{\bgroup\collectboxto{\@tempboxa}
   {\setlength{\eqetmplengthb}{\linewidth-\wd\@tempboxa}%
   \ifdim\eqetmplengthb<0pt\eqetmplengthb0pt\fillineolTooLongMsg\fi
-    \unhbox\@tempboxa\cbfillineol@i}}
-\newcommand\cbfillineol@i[2][]{\fillin[#1]{\eqetmplengthb}{#2}\egroup}
+    \unhbox\@tempboxa\cbfillineol@ia}}
+\newcommand\cbfillineol@ia[1][]{\def\@rgi{#1}\cbfillineol@ib}
+\newcommand\cbfillineol@ib{\collectboxto{\@tempboxa}%
+  {\cbfillineol@i[\@rgi]}}
+\newcommand\cbfillineol@i[1][]{\fillin[#1]{\eqetmplengthb}%
+  {\unhbox\@tempboxa}\egroup}
 \renewcommand{\fillin}[3][]{\begingroup
     \expandafter\let\expandafter\ifsp\csname ifsp@expand\endcsname
     \setkeys{eqFillin}{boxsize,underline=true,boxed=false,%

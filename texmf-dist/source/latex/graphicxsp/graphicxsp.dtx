@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% graphicxsp.sty package,                              %%
-%% Copyright (C) 2007--2018  D. P. Story                %%
+%% Copyright (C) 2007--2019  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -15,13 +15,24 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{graphicxsp}
-%<package> [2018/11/20 v1.0.2 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
+%<package> [2019/11/13 v1.0.3 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[colorlinks,hyperindex]{hyperref}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+%\def\texorpdfstring#1#2{#1}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
-%\EnableCrossrefs \CodelineIndex
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{graphicxsp}{Inputting aebdocfmt.def}}
+  {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+   \PackageInfo{graphicxsp}{aebdocfmt.def cannot be found}}
 \begin{document}
+\def\CMD#1{\textbackslash#1}
+\let\pkg\textsf
+\let\opt\texttt
+\addtolength{\marginparwidth}{3pt}
   \GetFileInfo{graphicxsp.sty}
   \title{\textsf{GraphicxSP}: Re-using EPS files}
   \author{D. P. Story\\
@@ -31,17 +42,18 @@
   \tableofcontents
   \let\Email\texttt
   \DocInput{graphicxsp.dtx}
-  \PrintIndex
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o graphicxsp.ind graphicxsp.idx} on the command line and recompile
+    \texttt{graphicxsp.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o graphicxsp.gls graphicxsp.glo} on the command line and recompile
+    \texttt{graphicxsp.dtx}.}
 \end{document}
 %</driver>
 % \fi
 % \MakeShortVerb{|}
-% \StopEventually{}
 %
-% \DoNotIndex{\def,\edef,\gdef,\xdef,\global,\long,\let}
-% \DoNotIndex{\expandafter,\string,\the,\ifx,\else,\fi}
-% \DoNotIndex{\csname,\endcsname,\relax,\begingroup,\endgroup}
-% \DoNotIndex{\DeclareTextCommand,\DeclareTextCompositeCommand}
+% \DoNotIndex{\advance}
 % \DoNotIndex{\space,\@empty,\special}
 %
 %    \begin{macrocode}
@@ -73,7 +85,6 @@
 %    \begin{macrocode}
 \providecommand{\previewOn}{\previewtrue}
 \providecommand{\previewOff}{\previewfalse}
-%    \end{macrocode}
 \DeclareOption{preview}{\previewtrue}
 \DeclareOption{dvipsone}{\def\gxsp@drivernum{0}}
 \DeclareOption{dvips}{\def\gxsp@drivernum{1}}
@@ -161,6 +172,8 @@ userdict
 % We use either \textsf{dvips} or \textsf{dvipsone} as the driver, in both cases the following is
 % the special we shall use.
 %    \begin{macrocode}
+\def\gxsp@psMrk{[%]
+  \space}
 \def\gxsp@literalps@out#1{\special{ps:#1}}
 %    \end{macrocode}
 % The following are driver dependent definitions. We begin with \texttt{dvips}.
@@ -564,7 +577,7 @@ userdict
 %    \begin{macrocode}
 \newcommand{\gxsp@embedEPS}[2]{%
     \gxsp@literalps@out{gsave \gxsp@setPSCoor
-    [ /BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
+    \gxsp@psMrk/BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
       \grcxsp@maxDim\space\grcxsp@maxDim]\space/_objdef {Embedded:#2}
     /BP pdfmark grestore}%
     \message{<Embedding #1>}%
@@ -574,7 +587,7 @@ userdict
 % not present, will not display a preview.
 %    \begin{macrocode}
     \includegraphics{#1}%
-    \gxsp@literalps@out{[ /EP pdfmark}%
+    \gxsp@literalps@out{\gxsp@psMrk/EP pdfmark}%
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -600,8 +613,8 @@ userdict
         \fi
     \fi\space
     /BP pdfmark
-        [ {Embedded:#2} /SP pdfmark
-    [/EP pdfmark
+        \gxsp@psMrk{Embedded:#2} /SP pdfmark
+    \gxsp@psMrk/EP pdfmark
     grestore}%
 }
 %    \end{macrocode}
@@ -640,9 +653,11 @@ userdict
 %\changes{v1.0.2}{2018/11/20}{Added convenience command to reference xobjects using commands}
 %    \begin{macrocode}
 \def\ci@undef@msg#1{\PackageWarning{graphicxsp}{The command
-  `\expandafter\string\csname #1\endcsname' is already defined\MessageBreak
+  `\expandafter\string\csname #1\endcsname'
+  is already defined\MessageBreak
   choose a different name instead of\MessageBreak`#1'}}
-\newcommand{\sp@createImage}[3][]{\@ifundefined{#3}{}{\ci@undef@msg{#3}}%
+\newcommand{\sp@createImage}[3][]{%
+    \@ifundefined{#3}{}{\ci@undef@msg{#3}}%
     \x@namedef{#3}{#3}%
     \@ifundefined{#3Gin@llx}{}{%
         \PackageError{graphicxsp}%
@@ -678,12 +693,13 @@ userdict
     \edef\@tempa{%
     \noexpand\AddToEmbeddedEPSs{\noexpand\AtPageLowerLeft{%
         \noexpand\gxsp@literalps@out{gsave \gxsp@setPSCoor
-        [ /BBox [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
+        \gxsp@psMrk/BBox
+          [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
         /_objdef {\Gin@name} \temp@transparencyGroup\space/BP pdfmark
         \ifx\Gin@transparency\@empty\else
-        [ \Gin@transparency\space/SetTransparency pdfmark\fi
+        \gxsp@psMrk\Gin@transparency\space/SetTransparency pdfmark\fi
         {#1} ?pdfmark
-        [ /EP pdfmark
+        \gxsp@psMrk/EP pdfmark
         grestore
         }%
     }}}\@tempa
@@ -841,14 +857,15 @@ userdict
 % pairs for the soft-mask dictionary, see table 7.10 of the PDF Reference, Version 8.
 %    \begin{macrocode}
 \def\sp@setSMask{%
-        \ifx\GinSP@SMask\SMaskSP@None[ /SMask/None /SetTransparency pdfmark
-        \else
-            [ /SMask << /S/\GinSP@subtype\space
-            \ifx\GinSP@bc\@empty\else/BC\GinSP@bc\space\fi
-            \ifx\GinSP@tr\@empty\else\ifx\GinSP@tr\SMaskSP@Identity%
-                /TR/Identity\else/TR {\GinSP@tr}\space\fi\fi
-            /G {\GinSP@group} >> /SetTransparency pdfmark
-        \fi
+  \ifx\GinSP@SMask\SMaskSP@None\gxsp@psMrk/SMask/None
+    /SetTransparency pdfmark
+  \else
+    \gxsp@psMrk/SMask << /S/\GinSP@subtype\space
+    \ifx\GinSP@bc\@empty\else/BC\GinSP@bc\space\fi
+    \ifx\GinSP@tr\@empty\else\ifx\GinSP@tr\SMaskSP@Identity%
+        /TR/Identity\else/TR {\GinSP@tr}\space\fi\fi
+    /G {\GinSP@group} >> /SetTransparency pdfmark
+  \fi
 }
 \newcommand{\setSMask}[2][]{%
         \setkeys{GinSP}{#1}\def\GinSP@group{#2}%
@@ -937,21 +954,25 @@ userdict
         \edef\Gin@ext{#1}\edef\Gin@base{\Gin@name}%dps (08/18/07)
     \else
 %    \end{macrocode}
-% If not named, we need to handle it in the usual way.
+% If not named, we need to handle it in the usual way.\medskip\par\noindent
+% (2019/11/13) The latest {\LaTeX} core defines \cs{IfFileExists@} which broke this
+% package, we try a fix here.
+% \changes{v1.0.3}{2019/11/13}{latex core defines \string\cs{IfFileExists@} which broke this
+% package, we try a fix here.}
 %    \begin{macrocode}
         \IfFileExists{\filename@area\filename@base#1}%
-        {\Gin@tempa
-         \expandafter\@tempa\@filef@und
+        {\@ifundefined{IfFileExists@}{}%
+         {\edef\@filef@und{\filename@area\filename@base#1 }}
+         \Gin@tempa\expandafter\@tempa\@filef@und
          \edef\Gin@ext{#1}}{}%
     \fi
-}%
+}
 %    \end{macrocode}
 %    \begin{macro}{\Gin@computeSF}
 % Based on scaling info provided by graphicx, we compute the scale factors
 % we need.
 %    \begin{macrocode}
-\def\Gin@computeSF{%
-    \def\@tempa{!}%
+\def\Gin@computeSF{\def\@tempa{!}%
     \edef\gxsp@scaleFactor@x{\Gin@scalex}%
     \edef\gxsp@scaleFactor@y{\Gin@scaley}%
     \ifx\Gin@scaley\@tempa      % proportional height
@@ -1016,14 +1037,15 @@ userdict
             /graphicxspretn exch cvx cvn def
             /_objdef {//graphicxspretn} /BP pdfmark
             \ifx\Gin@transparency\@empty\else
-            [ \Gin@transparency\space/SetTransparency pdfmark\fi
-            [ {\Gin@name} /SP pdfmark
-            [ /EP pdfmark
+            \gxsp@psMrk\Gin@transparency\space
+              /SetTransparency pdfmark\fi
+            \gxsp@psMrk{\Gin@name} /SP pdfmark
+            \gxsp@psMrk/EP pdfmark
             \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
             -\Gin@llx\space -\Gin@lly\space moveto
             currentpoint translate
             \Gin@presp
-            [ {//graphicxspretn} /SP pdfmark
+            \gxsp@psMrk{//graphicxspretn} /SP pdfmark
            \Gin@postsp
        grestore
     }%
@@ -1040,15 +1062,16 @@ userdict
             /graphicxspretn exch cvx cvn def
             /_objdef {//graphicxspretn} /BP pdfmark
             \ifx\Gin@transparency\@empty\else
-            [ \Gin@transparency\space/SetTransparency pdfmark\fi
-            [ {\Gin@name} /SP pdfmark
-            [ /EP pdfmark
+            \gxsp@psMrk\Gin@transparency\space
+              /SetTransparency pdfmark\fi
+            \gxsp@psMrk{\Gin@name} /SP pdfmark
+            \gxsp@psMrk/EP pdfmark
             \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
             \ifx\Gin@viewport@code\relax\else
              -\Gin@llx\space-\Gin@lly\space moveto
               currentpoint translate\fi
             \Gin@presp
-             [ {//graphicxspretn} /SP pdfmark
+             \gxsp@psMrk{//graphicxspretn} /SP pdfmark
             \Gin@postsp
         grestore
     }%

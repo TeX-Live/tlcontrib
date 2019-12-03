@@ -33,13 +33,13 @@
 \DeclareDocInfo
 {
     university={\AcroTeX.Net},
-    title={ \texorpdfstring{\pkg{GraphicxSP}\\[1em]}
+    title={\texorpdfstring{\pkg{GraphicxSP}\\[1em]}
         {GraphicxSP: }Using and re-using Embedded Graphics},
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject={Documentation for AeB Pro from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={1.0.2, 2018/11/20},
+    version={1.0.3, 2019/11/13},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -152,14 +152,50 @@
 \end{createImage}
 
 
-\definePath\bgPath{"C:/Users/Public/Documents/%
-    ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\definePath\bgPath{"C:/Users/Public/Documents/%
+%    ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\begin{docassembly}
+%\addWatermarkFromFile({%
+%    bOnTop: false,
+%    cDIPath: \bgPath
+%})
+%\executeSave()
+%\end{docassembly}
+
+\chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
-\addWatermarkFromFile({%
-    bOnTop: false,
-    cDIPath: \bgPath
-})
-\executeSave()
+var titleOfManual="The graphicxsp Package";
+var manualfilename="Manual_BG_Print_graphicxsp.pdf";
+var manualtemplate="Manual_BG_Blue.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+  console.println("Creating new " + manualfilename + " file.");
+  doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+  var _path=this.path;
+  var pos=_path.lastIndexOf("/");
+  _path=_path.substring(0,pos)+"/"+manualfilename;
+  \docSaveAs\newDO ({ cPath: _path });
+  doc.closeDoc();
+  doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+  f=doc.getField("ManualTitle");
+  f.value=titleOfManual;
+  doc.flattenPages();
+  \docSaveAs\newDO({ cPath: manualfilename });
+  doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
 \end{docassembly}
 
 \begin{document}

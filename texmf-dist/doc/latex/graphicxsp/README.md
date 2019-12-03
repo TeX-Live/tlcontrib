@@ -1,6 +1,9 @@
 The GraphicxSP Package
 Author: D. P. Story
-Dated: 2018-11-20
+Dated: 2019-11-13 
+
+What's new (2019-11-13) The latest LaTeX core defines \IfFileExists@, which 
+brakes this package, fix is applied. 
 
 What's new (2018-11-20) Minor changes to support the icon-appr package.
 

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% graphicxsp.sty package,                              %%
-%% Copyright (C) 2007--2018  D. P. Story                %%
+%% Copyright (C) 2007--2019  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -20,7 +20,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{graphicxsp}
- [2018/11/20 v1.0.2 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
+ [2019/11/13 v1.0.3 Graphicxsp: Extension of graphicx for dvips/dvipsone (dps)]
 \@ifundefined{ifpreview}{\newif\ifpreview\previewfalse}{}
 \providecommand{\previewOn}{\previewtrue}
 \providecommand{\previewOff}{\previewfalse}
@@ -66,6 +66,8 @@ userdict
 }if%
 }}}
 \@ifpackageloaded{hyperref}{\let\grcxsp@hideEPS\relax}{\grcxsp@hideEPS}
+\def\gxsp@psMrk{[%]
+  \space}
 \def\gxsp@literalps@out#1{\special{ps:#1}}
 \ifnum\gxsp@drivernum=1\relax
 \special{!userdict begin
@@ -278,12 +280,12 @@ userdict
 \def\grcxsp@maxDim{5000}
 \newcommand{\gxsp@embedEPS}[2]{%
     \gxsp@literalps@out{gsave \gxsp@setPSCoor
-    [ /BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
+    \gxsp@psMrk/BBox [-\grcxsp@maxDim\space-\grcxsp@maxDim\space
       \grcxsp@maxDim\space\grcxsp@maxDim]\space/_objdef {Embedded:#2}
     /BP pdfmark grestore}%
     \message{<Embedding #1>}%
     \includegraphics{#1}%
-    \gxsp@literalps@out{[ /EP pdfmark}%
+    \gxsp@literalps@out{\gxsp@psMrk/EP pdfmark}%
 }
 \def\gcxsp@wrapEmbeddedFigure#1#2#3{%
     \def\Gin@transparencygroup{#1}\def\Gin@transparency{#3}%
@@ -303,14 +305,16 @@ userdict
         \fi
     \fi\space
     /BP pdfmark
-        [ {Embedded:#2} /SP pdfmark
-    [/EP pdfmark
+        \gxsp@psMrk{Embedded:#2} /SP pdfmark
+    \gxsp@psMrk/EP pdfmark
     grestore}%
 }
 \def\ci@undef@msg#1{\PackageWarning{graphicxsp}{The command
-  `\expandafter\string\csname #1\endcsname' is already defined\MessageBreak
+  `\expandafter\string\csname #1\endcsname'
+  is already defined\MessageBreak
   choose a different name instead of\MessageBreak`#1'}}
-\newcommand{\sp@createImage}[3][]{\@ifundefined{#3}{}{\ci@undef@msg{#3}}%
+\newcommand{\sp@createImage}[3][]{%
+    \@ifundefined{#3}{}{\ci@undef@msg{#3}}%
     \x@namedef{#3}{#3}%
     \@ifundefined{#3Gin@llx}{}{%
         \PackageError{graphicxsp}%
@@ -341,12 +345,13 @@ userdict
     \edef\@tempa{%
     \noexpand\AddToEmbeddedEPSs{\noexpand\AtPageLowerLeft{%
         \noexpand\gxsp@literalps@out{gsave \gxsp@setPSCoor
-        [ /BBox [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
+        \gxsp@psMrk/BBox
+          [\Gin@llx\space\Gin@lly\space\Gin@urx\space\Gin@ury]
         /_objdef {\Gin@name} \temp@transparencyGroup\space/BP pdfmark
         \ifx\Gin@transparency\@empty\else
-        [ \Gin@transparency\space/SetTransparency pdfmark\fi
+        \gxsp@psMrk\Gin@transparency\space/SetTransparency pdfmark\fi
         {#1} ?pdfmark
-        [ /EP pdfmark
+        \gxsp@psMrk/EP pdfmark
         grestore
         }%
     }}}\@tempa
@@ -390,14 +395,15 @@ userdict
 \def\SMaskSP@None{}
 \def\SMaskSP@Identity{Identity}
 \def\sp@setSMask{%
-        \ifx\GinSP@SMask\SMaskSP@None[ /SMask/None /SetTransparency pdfmark
-        \else
-            [ /SMask << /S/\GinSP@subtype\space
-            \ifx\GinSP@bc\@empty\else/BC\GinSP@bc\space\fi
-            \ifx\GinSP@tr\@empty\else\ifx\GinSP@tr\SMaskSP@Identity%
-                /TR/Identity\else/TR {\GinSP@tr}\space\fi\fi
-            /G {\GinSP@group} >> /SetTransparency pdfmark
-        \fi
+  \ifx\GinSP@SMask\SMaskSP@None\gxsp@psMrk/SMask/None
+    /SetTransparency pdfmark
+  \else
+    \gxsp@psMrk/SMask << /S/\GinSP@subtype\space
+    \ifx\GinSP@bc\@empty\else/BC\GinSP@bc\space\fi
+    \ifx\GinSP@tr\@empty\else\ifx\GinSP@tr\SMaskSP@Identity%
+        /TR/Identity\else/TR {\GinSP@tr}\space\fi\fi
+    /G {\GinSP@group} >> /SetTransparency pdfmark
+  \fi
 }
 \newcommand{\setSMask}[2][]{%
         \setkeys{GinSP}{#1}\def\GinSP@group{#2}%
@@ -474,13 +480,13 @@ userdict
         \edef\Gin@ext{#1}\edef\Gin@base{\Gin@name}%dps (08/18/07)
     \else
         \IfFileExists{\filename@area\filename@base#1}%
-        {\Gin@tempa
-         \expandafter\@tempa\@filef@und
+        {\@ifundefined{IfFileExists@}{}%
+         {\edef\@filef@und{\filename@area\filename@base#1 }}
+         \Gin@tempa\expandafter\@tempa\@filef@und
          \edef\Gin@ext{#1}}{}%
     \fi
-}%
-\def\Gin@computeSF{%
-    \def\@tempa{!}%
+}
+\def\Gin@computeSF{\def\@tempa{!}%
     \edef\gxsp@scaleFactor@x{\Gin@scalex}%
     \edef\gxsp@scaleFactor@y{\Gin@scaley}%
     \ifx\Gin@scaley\@tempa      % proportional height
@@ -523,14 +529,15 @@ userdict
             /graphicxspretn exch cvx cvn def
             /_objdef {//graphicxspretn} /BP pdfmark
             \ifx\Gin@transparency\@empty\else
-            [ \Gin@transparency\space/SetTransparency pdfmark\fi
-            [ {\Gin@name} /SP pdfmark
-            [ /EP pdfmark
+            \gxsp@psMrk\Gin@transparency\space
+              /SetTransparency pdfmark\fi
+            \gxsp@psMrk{\Gin@name} /SP pdfmark
+            \gxsp@psMrk/EP pdfmark
             \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
             -\Gin@llx\space -\Gin@lly\space moveto
             currentpoint translate
             \Gin@presp
-            [ {//graphicxspretn} /SP pdfmark
+            \gxsp@psMrk{//graphicxspretn} /SP pdfmark
            \Gin@postsp
        grestore
     }%
@@ -543,15 +550,16 @@ userdict
             /graphicxspretn exch cvx cvn def
             /_objdef {//graphicxspretn} /BP pdfmark
             \ifx\Gin@transparency\@empty\else
-            [ \Gin@transparency\space/SetTransparency pdfmark\fi
-            [ {\Gin@name} /SP pdfmark
-            [ /EP pdfmark
+            \gxsp@psMrk\Gin@transparency\space
+              /SetTransparency pdfmark\fi
+            \gxsp@psMrk{\Gin@name} /SP pdfmark
+            \gxsp@psMrk/EP pdfmark
             \gxsp@scaleFactor@x\space\gxsp@scaleFactor@y\space scale
             \ifx\Gin@viewport@code\relax\else
              -\Gin@llx\space-\Gin@lly\space moveto
               currentpoint translate\fi
             \Gin@presp
-             [ {//graphicxspretn} /SP pdfmark
+             \gxsp@psMrk{//graphicxspretn} /SP pdfmark
             \Gin@postsp
         grestore
     }%

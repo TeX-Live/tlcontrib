@@ -622,7 +622,9 @@
 \def\eqExtArg{\theeqquestionnoi}
 \if\load@exerquiz\eqe@NO\DoNotFitItIn\fi
 \let\fillInFormatDefault\@empty
-\def\exerSolnsHeadnToc{}
+\def\fbInsSolnsStyle{\def\exerSolnsHeadnToc{}}
+\def\autoInsSolns{\let\fbInsSolnsStyle\relax}
+\AtBeginDocument{\fbInsSolnsStyle}
 \renewcommand{\exerSolnInput}{%
     \global\let\webnewpage\relax
     \ifsolutionsonly\else\immediate\closeout\ex@solns\fi

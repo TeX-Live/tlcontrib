@@ -1,5 +1,5 @@
 The eqexam Package 
-Dated: 2019-10-29 
+Dated: 2019-12-17
 Author: D. P. Story
 
 eqExam is a LaTeX package for writing exams, tests, quizzes,
@@ -39,6 +39,10 @@ this package are as follows:
         authors. Documentation for this option is found in the doc/fortextbook
         folder. See also the series of blogs at
         http://www.acrotex.net/blog/?tag=fortextbook
+
+What's New (2019-12-17) fortextbook: added \autoInsSolns, as explained in fortextbook.pdf;
+fixed a bug in the use of aeb-comment with the fortextbook option. Updated that custom package,
+now dated 2019/12/18. (aeb-comment is distributed with acrotex.)
 
 What's New (2019-10-29) Fixed a bug with the online option. The  \fillineol*
 command now allows verbatim text in the third argument (as well as the first).

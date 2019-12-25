@@ -16,8 +16,8 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2019/10/29 v5.1.6 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2019/02/11}
+%<package>  [2019/12/17 v5.1.7 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2019/12/17}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -8541,10 +8541,17 @@
 \long\def\gobbletoEndEXt#1\endeqEXt{\@gobbletwo}
 \def\eqExtArg{\theeqquestionnoi}
 %    \end{macrocode}
+%When creating a book, we can manually create a chapter and insert the solutions,
+%of we can automatically have it done. The manual method is the default, emit
+%\DescribeMacro\autoInsSolns\cs{autoInsSolns} in the preamble to have the solutions
+%inserted automatically. Use \cs{InputExrSolnsLevel} to tune the section level (\texttt{eqexam.def}).
+%\changes{v5.1.7}{2019/12/17}{Added \cs{autoInsSolns}}
 %    \begin{macrocode}
 \if\load@exerquiz\eqe@NO\DoNotFitItIn\fi
 \let\fillInFormatDefault\@empty
-\def\exerSolnsHeadnToc{}
+\def\fbInsSolnsStyle{\def\exerSolnsHeadnToc{}}
+\def\autoInsSolns{\let\fbInsSolnsStyle\relax}
+\AtBeginDocument{\fbInsSolnsStyle}
 \renewcommand{\exerSolnInput}{%
     \global\let\webnewpage\relax
     \ifsolutionsonly\else\immediate\closeout\ex@solns\fi

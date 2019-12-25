@@ -12,7 +12,7 @@
 # use tlmgr key add etc, see manual.
 
 TLCHECKOUT=${TLCHECKOUT:-/home/norbert/Development/TeX/texlive.git}
-TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2018}
+TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2019}
 TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 
 # how to sign
@@ -74,7 +74,7 @@ fi
 if $do_tlpdb ; then
   # update tlpdb
   $TLCHECKOUT/Master/tlpkg/bin/tl-update-tlpdb \
-	-with-w32-pattern-warning -from-git \
+	--w32-pattern-warning -from-git \
 	--catalogue=$TLCATALOGUE	\
 	--master=`pwd`
 fi

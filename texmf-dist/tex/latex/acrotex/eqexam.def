@@ -7,8 +7,8 @@
 %% exerquiz.dtx  (with options: `eqexam')
 %% 
 \ProvidesFile{eqexam.def}
- [2019/08/13 v8.3 %
-  Exerquiz support file for eqexam (dps)]
+ [2019/12/17 v8.5.5 %
+ Exerquiz support file for eqexam (dps)]
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
 \def\eq@r{r}\let\eq@f=f \let\eq@l=l
@@ -1025,11 +1025,26 @@
 \let\eq@solutionshook\@empty
 \let\priorexsectitle\@empty
 \let\priorexslinput\@empty
-\def\exerSolnsHeadnToc{\section*{\exsectitle}%
-    \addcontentsline{toc}{section}{%
-    \@ifundefined{web@latextoc}{}{%
-    \ifx\web@latextoc\eq@YES\else
-    \protect\numberline{}\fi}\exsectitle}}
+\def\InputExrSolnsLevel{\@ifstar
+  {\def\eq@ExrSolnsStar{*}\InputExrSolnsLevel@i}
+  {\let\eq@ExrSolnsStar\@empty\InputExrSolnsLevel@i}}
+\newcommand{\InputExrSolnsLevel@i}[2][]{%
+  \def\eq@ExrSolnsLabel{#1}\def\eq@ExrSolnsLevel{#2}}
+\InputExrSolnsLevel*{section}
+\def\exerSolnsHeadnToc{%
+  \edef\eq@mkCmd{\expandafter\noexpand
+    \csname\eq@ExrSolnsLevel\endcsname\eq@ExrSolnsStar}%
+  \eq@mkCmd{\exsectitle}\if!\eq@ExrSolnsLabel!\else
+  \label{\eq@ExrSolnsLabel}\fi
+  \if\eq@ExrSolnsStar*%
+    \addcontentsline{toc}{\eq@ExrSolnsLevel}{%
+      \@ifundefined{web@latextoc}{}{%
+        \ifx\web@latextoc\eq@YES\else
+          \protect\numberline{}\fi
+      }\exsectitle
+    }%
+  \fi
+}
 \@ifpackageloaded{web}{\def\eq@normallheader{\lheader{\rightmark}}}
     {\let\eq@normallheader\relax}
 \@ifpackageloaded{web}{\def\eq@defaultlheader{\lheader{\aeb@setmarks}}}

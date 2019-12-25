@@ -1,6 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This is an unmodified version of comment.sty (version 3.2) that is distributed
 % with acrotex under the name of aeb-comment.sty. D. P. Story (dpstory at acrotex dot net)
+% 2019/12/18 (dps): Defined \CommentCutFile
 %
 % Comment.sty   version 3.2, August 1997
 % selectively in/exclude pieces of text: the user can define new
@@ -117,13 +118,14 @@
 %%%% definitions for LaTeX
 %%%%
 \edef\restoreat{\catcode\noexpand`\noexpand\@=\the\catcode`\@\relax}
+\def\CommentCutFile{comment.cut} % 2019/12/18
 \makeatletter
 \def\AfterIncludedComment
    {\immediate\closeout\CommentStream
-    \input comment.cut
+    \input{\CommentCutFile}\relax
     }%
 \def\WriteCommentLine#1{\immediate\write\CommentStream{#1}}
-\def\BeforeIncludedComment{\immediate\openout\CommentStream=comment.cut
+\def\BeforeIncludedComment{\immediate\openout\CommentStream=\CommentCutFile
     \let\ThisComment\WriteCommentLine}
 \def\includecomment
  #1{\message{Include comment '#1'}%

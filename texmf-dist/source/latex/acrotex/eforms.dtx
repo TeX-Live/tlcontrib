@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2019/06/14 v2.3 Provides general eforms support (dps)]
+%<package> [2019/10/23 v2.3.2 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -414,6 +414,30 @@
 %\item \hyperref[sigfield]{Signature Fields}
 %\end{itemize}
 % \normalcolor
+%
+% \subsection{Some utility commands}
+% The following two commands were created as a convenience to changing the definition of certain
+% JavaScript actions. Use \cs{efsave} to save the original definition of the action, then redefine the action,
+% the later, restore the JS action to its original definition.\par\medskip\noindent
+% \DescribeMacro{\efsave}\hskip-\marginparsep\texttt{\meta{\cs{cmd1}}\cs{as}\meta{\cs{cmd2}}}
+% \cs{let}s \meta{\cs{cmd2}} to \meta{\cs{cmd1}} (that is, saves \meta{\cs{cmd1}} `as' \meta{\cs{cmd2}}).
+% Arguments may contain \texttt{@}.
+% \changes{v2.3.1}{2019/10/14}{Define \string\cs{efsave} and \string\cs{efrestore}}
+%    \begin{macrocode}
+\def\efsave{\bgroup\let\as\relax\makeatletter\efsavei}
+\def\efsavei#1\as#2{\global\let#2#1\egroup}
+%    \end{macrocode}
+% \leavevmode\DescribeMacro{\efrestore}\hskip-\marginparsep\texttt{\meta{\cs{cmd1}}\cs{from}\meta{\cs{cmd2}}}
+% \cs{let}s \meta{\cs{cmd1}} to \meta{\cs{cmd2}} (that is, restores \meta{\cs{cmd1}} `from' \meta{\cs{cmd2}}).
+% Arguments may contain \texttt{@}.
+%    \begin{macrocode}
+\def\efrestore{\bgroup\let\from\relax\makeatletter\efrestorei}
+\def\efrestorei#1\from#2{\global\let#1#2\egroup}
+%    \end{macrocode}
+% For example, expanding |\efsave\x\as\y| (eg, |\let\y\x|), the definition of the macro |\y|
+% has the same definition as |\x| does. Now |\x| is free to be redefined. Later in the document,
+% we can say |\efrestore\x\from\y| (eg, |\let\x\y|). Now the
+% definition of |\x| has its original definition (at the time when it was saved).
 %
 % \subsection{Process Key-Value Pairs: Main Macro}\label{procArgs}
 %
@@ -1156,7 +1180,7 @@
 %    expansion within first argument of \string\cs{tops} within \string\cs{@eqV}}
 %    \begin{macrocode}
   \let\x\protect
-  \let\protect\noexpand@iii\edef\pmpvV{#1}%
+  \let\protect\noexpand@iii
   \edef\pmpvV{#1}\let\protect\x
 %    \end{macrocode}
 %    There is a problem with detecting unicode, if the author wants to use unicode,
@@ -3195,10 +3219,10 @@
   \eq@Check@driver}{\checkBoxDefaults\every@CheckBox}}}
 %    \end{macrocode}
 %    \end{macro}
-% \subsubsection{Radio Button}\label{radiobutton}
+% \subsubsection{Radio Buttons}\label{radiobutton}
 % The basic command for creating radio button fields. As of the version dated 2019/06/14,
 % radio button code was re-written so they operate in certain non-conforming PDF readers. The old code,
-% which has proven to be reliable for many years. The old code
+% which has proven to be reliable for many years,
 % is  available when \DescribeMacro\useNewRadiosOff\cmd{\useNewRadiosOff} is expanded. This is the default.
 %
 % When \DescribeMacro\useNewRadiosOn\cmd{\useNewRadiosOn} is expanded, the new code for radio buttons is used.
@@ -3957,7 +3981,7 @@
 %    \end{macrocode}
 % Set the color of the link text. Ignored if the colorlinks option of hyperref
 % has not been taken.  The value of \texttt{linktxtcolor}\IndexKey{linktxtcolor} is a named color. For example,
-% \texttt{linkcolor=red}. The default is |\@linkcolor| from hyperref. This default
+% \texttt{linktxtcolor=red}. The default is |\@linkcolor| from hyperref. This default
 % can be changed by redefining |\@linkcolor|, or be redefining |\defaultlinkcolor|.
 % If |linktxtcolor={}| (an empty argument), or simply \texttt{linktxtcolor}, no color is applied to the text.
 %    \begin{macrocode}

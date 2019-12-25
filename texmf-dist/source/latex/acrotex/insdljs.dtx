@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2019/08/06 v2.4.6 Insert Document Level JavaScripts (dps)]
+%<package> [2019/10/30 v2.4.8 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -442,6 +442,20 @@
 \let\dl@YES=y \let\dl@NO=n
 \let\dl@One=1 \let\dl@Zero=0
 \let\dljs@YES=y \let\dljs@NO=n
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\dlpkgInfo} A command to identify package date
+%    from within document level Javascript
+%\changes{v2.4.7}{2019/10/23}{Added \string\cs{dlkgInfo} to identify version}
+%    \begin{macrocode}
+\def\dlpkgInfo{\@nameuse{ver@\@currname.\@currext}}
+\def\dlSetPkgInfo{%
+  \edef\dlpkgInfoExpd{\dlpkgInfo}%
+  \expandafter\dlparsePkgInfo\dlpkgInfoExpd\@nil}
+\def\dlparsePkgInfo#1 #2 #3:#4\@nil{%
+  \def\dlPkgInfoDate{#1}%
+  \def\dlPkgInfoVer{#2}%
+  \def\dlPkgInfoPkg{#3}%
+  \def\dlPkgInfoDesc{#4}}
 %    \end{macrocode}
 % When using pdfmarks, the open action is initiated by the document JavaScript code,
 % when there was not document JavaScript, the open action did not get executed.
@@ -1912,6 +1926,35 @@
 %    \changes{v2.4.3}{2019/06/27}{Added \string\cs{dl@makeesc}}
 %    \begin{macrocode}
 \def\dl@makeesc#1{\catcode`#1=0\relax}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\dlgobToFi Used to format \env{defineJS} content
+%    when a conditional leaves an empty space; for example,
+%\begin{verbatim}
+%\begin{defineJS}[%
+%  \makeesc\*\catcode`\%=14\relax]{\X}
+%var w=1;
+%*ifx*Y*@empty*dlgobToFi*else%
+%var x=1;
+%var y=1;*fi
+%var z=1;
+%\end{defineJS}
+%\end{verbatim}
+%When \cs{Y} is empty, the content expands to
+%\begin{verbatim}
+%var w=1;
+%var z=1;
+%\end{verbatim}
+%and when \cs{Y} is nonempty, it expands to,
+%\begin{verbatim}
+%var w=1;
+%var x=1;
+%var y=1;
+%var z=1;
+%\end{verbatim}
+%    \changes{v2.4.8}{2019/10/30}{Added \string\cs{dlgobToFi} to help format
+%    \string\env{defineJS} code}
+%    \begin{macrocode}
+\def\dlgobToFi#1\fi{\defjsLB}
 %    \end{macrocode}
 %    Finally, we get to the definition of \env{defineJS}, and its compatriates.
 %    \begin{macrocode}

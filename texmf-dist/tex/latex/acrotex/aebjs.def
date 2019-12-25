@@ -18,8 +18,8 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2019/08/13 v8.3 %
-  Exerquiz document level JavaScript (dps)]
+ [2019/12/17 v8.5.5 %
+ Exerquiz document level JavaScript (dps)]
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
 \def\redm{\\.}\def\remul{\\*}\def\rediv{\\/}\def\repow{\\^}
@@ -45,9 +45,10 @@
 \begin{insDLJS*}[exerquizLoaded]{exerquiz}
 \begin{newsegment}{AeB: AcroTeX eDucation Bundle}
 /*
-        Document Level JavaScript
-        AcroTeX eDucation Bundle
-        D. P. Story copyright 2000-\the\year
+  Document Level JavaScript
+  AcroTeX eDucation Bundle
+  D. P. Story copyright 2000-\the\year
+  \dlPkgInfoPkg Dated \dlPkgInfoDate
 */
 var exerquizLoaded = true;
 this.disclosed = true;
@@ -797,16 +798,16 @@ function ProcUserResp(key,userresp,probno,notify)
         RightWrong[probno][arguments[4]] = (!!key) ? 1 : 0;
         Responses[probno][arguments[4]] = userresp;
     } else {
-        if ( typeof key == "object" ) {
-            RightWrong[probno][0] = key[0];
-            RightWrong[probno][1] = key[1];
-Responses[probno] = userresp;
-if (Responses[probno].length==0)
-                Responses[probno]=undefined;
-        } else {
-            RightWrong[probno] = (!!key)?1:0;
-Responses[probno] = userresp;
-}
+      if ( typeof key == "object" ) {
+          RightWrong[probno][0] = key[0];
+          RightWrong[probno][1] = key[1];
+          Responses[probno] = userresp;
+          if (Responses[probno].length==0)
+            Responses[probno]=undefined;
+      } else {
+        RightWrong[probno] = (!!key)?1:0;
+        Responses[probno] = userresp;
+      }
     }
     if ( (typeof fieldPopTbl == "function")&&(event.type != "Link") ) {
         var a=reExtractBaseName.exec(event.target.name);
@@ -815,29 +816,29 @@ Responses[probno] = userresp;
 }
 function ProcUserNoResp(key,userresp,probno,notify)
 {
-    if ( arguments.length > 4 ) {
-        RightWrong[probno][arguments[4]] = undefined;
-        Responses[probno][arguments[4]] = undefined;
-var bVoidArray=true;
-for (var i=0; i<Responses[probno].length; i++) {
-if ( typeof Responses[probno][i] != "undefined") {
-bVoidArray=false;
-break;
-}
-}
+  if ( arguments.length > 4 ) {
+    RightWrong[probno][arguments[4]] = undefined;
+    Responses[probno][arguments[4]] = undefined;
+    var bVoidArray=true;
+    for (var i=0; i<Responses[probno].length; i++) {
+      if ( typeof Responses[probno][i] != "undefined") {
+        bVoidArray=false;
+        break;
+  }
+    }
 if (bVoidArray) {
 Responses[probno]=undefined;
 RightWrong[probno]=undefined;
-            ProbValue[probno]=undefined;
+      ProbValue[probno]=undefined;
 }
-    } else {
-        RightWrong[probno] = undefined;
-        Responses[probno] = undefined;
-    }
-    if ( typeof fieldPopTbl == "function" ) {
-        var a=reExtractBaseName.exec(event.target.name);
-        fieldPopTbl(a[1]);
-    }
+  } else {
+      RightWrong[probno] = undefined;
+      Responses[probno] = undefined;
+  }
+  if ( typeof fieldPopTbl == "function" ) {
+    var a=reExtractBaseName.exec(event.target.name);
+    fieldPopTbl(a[1]);
+  }
 }
 function InitializeQuiz(qtfield,mark) {
     var oQName=eval(qtfield);
@@ -947,15 +948,15 @@ function resetQuiz(qtfield)
 }
 function RecordPointValue(ptvalue,probno)
 {
-    if (arguments.length > 2) {
-        if ( typeof ProbValue[probno] == "undefined" ) {
-           ProbValue[probno]=[1,arguments[5],arguments[3],arguments[4]];
-           ProbValue[probno][3+arguments[2]] = ptvalue;
-        } else ProbValue[probno][3+arguments[2]] = ptvalue;
-    }
-    else {
-        ProbValue[probno]=ptvalue;
-    }
+  if (arguments.length > 2) {
+    if ( typeof ProbValue[probno] == "undefined" ) {
+      ProbValue[probno]=[1,arguments[5],arguments[3],arguments[4]];
+      ProbValue[probno][3+arguments[2]] = ptvalue;
+    } else ProbValue[probno][3+arguments[2]] = ptvalue;
+  }
+  else {
+    ProbValue[probno]=ptvalue;
+  }
 }
 function RecordProblemType(qType,probno)
 {
@@ -1126,39 +1127,45 @@ function ProcessQuestion (key,letterresp,probno,
 }
 function correctQuiz(qtfield,nQuestions)
 {
-    var oQName=eval(qtfield);
-    var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
+  var bROQD=(typeof oRecordOfQuizData=="object");
+  if(bROQD && %
+(typeof oRecordOfQuizData["RightWrong."+qtfield]!="undefined")) {
+    RightWrong=oRecordOfQuizData["RightWrong."+qtfield];
+    ProbDist=oRecordOfQuizData["ProbDist."+qtfield];
+  }
+  var oQName=eval(qtfield);
+  var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
 ?\defaultColorJS:oQName.DefaultColorJSLoc;
-        var rightColor=(typeof oQName.RightColorJSLoc=="undefined")%
+  var rightColor=(typeof oQName.RightColorJSLoc=="undefined")%
 ?\rghtColorJS:oQName.RightColorJSLoc;
-        var wrongColor=(typeof oQName.WrongColorJSLoc=="undefined")%
+  var wrongColor=(typeof oQName.WrongColorJSLoc=="undefined")%
 ?\wrngColorJS:oQName.WrongColorJSLoc;
-        var rightAnsSymb=(typeof oQName.RightAnsSymbJSLoc=="undefined")%
+  var rightAnsSymb=(typeof oQName.RightAnsSymbJSLoc=="undefined")%
 ?\rghtAnsSymbJS:oQName.RightAnsSymbJSLoc;
-        var wrongAnsSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
+  var wrongAnsSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
 ?\wrngAnsSymbJS:oQName.WrongAnsSymbJSLoc;
   var bFullyCorrect=(typeof oQName.fullyCorrectLoc=="undefined")%
-?\eqCorrChoiceFully:oQName.fullyCorrectLoc; // dpsf07
-    var f = this.getField("mcq." + qtfield);
-    if ( f != null) {
-      if (bFullyCorrect) { // dpsf07
-        f.display = display.visible;
-      } else {
-        for (var n=1; n<=nQuestions; n++) {
-          var h=this.getField("mc."+qtfield+"."+n);
-          var bOk=(h!=null);
-          if(bOk) var choiceType="mc";
-          else {
-            h=this.getField("mck."+qtfield+"."+n);
-            bOk=(h!=null);
-            var choiceType="mck";
-          }
-          if (bOk) {
-            var mcq=this.getField("mcq."+qtfield+"."+n);
-            var g=mcq.getArray();
-            if (choiceType=="mc") {
-              for (var j=0; j< g.length; j++) {
-                g[j].display=(h.isBoxChecked(j))?%
+?\eqCorrChoiceFully:oQName.fullyCorrectLoc;
+  var f = this.getField("mcq." + qtfield);
+  if ( f != null) {
+    if (bFullyCorrect) { // dpsf07
+      f.display = display.visible;
+    } else {
+      for (var n=1; n<=nQuestions; n++) {
+        var h=this.getField("mc."+qtfield+"."+n);
+        var bOk=(h!=null);
+        if(bOk) var choiceType="mc";
+        else {
+          h=this.getField("mck."+qtfield+"."+n);
+          bOk=(h!=null);
+          var choiceType="mck";
+        }
+        if (bOk) {
+          var mcq=this.getField("mcq."+qtfield+"."+n);
+          var g=mcq.getArray();
+          if (choiceType=="mc") {
+            for (var j=0; j< g.length; j++) {
+              g[j].display=(h.isBoxChecked(j))?%
 display.visible:display.hidden;
               }
             } else {
@@ -1174,86 +1181,82 @@ display.visible:display.hidden;
     }
     f = this.getField("obj." + qtfield);
     if ( f != null ) {
-        var a = f.getArray();
-        var re=/^obj\./;
-        for (var i = 0; i < a.length; i++) {
-            var probno = a[i].name.replace(/.*\./g,"");
-            var rbmuname = a[i].name.replace(re,"rbmarkup\.");
-            var oRBMarkup = this.getField(rbmuname);
-            var bRBMU = ( oRBMarkup != null );
-            if ( RightWrong[probno] == 1 ) {
-                a[i].strokeColor = rightColor;
-                if (bRBMU) {
-                    oRBMarkup.textColor=rightColor;
-                    oRBMarkup.style=rightAnsSymb;
-                }
-            } else {
-                a[i].strokeColor = wrongColor;
-                if (bRBMU) {
-                    oRBMarkup.textColor=wrongColor;
-                    oRBMarkup.style=wrongAnsSymb;
-                }
-            }
+    var a = f.getArray();
+    var re=/^obj\./;
+    for (var i = 0; i < a.length; i++) {
+      var probno = a[i].name.replace(/.*\./g,"");
+      var rbmuname = a[i].name.replace(re,"rbmarkup\.");
+      var oRBMarkup = this.getField(rbmuname);
+      var bRBMU = ( oRBMarkup != null );
+      if ( RightWrong[probno] == 1 ) {
+        a[i].strokeColor = rightColor;
+        if (bRBMU) {
+            oRBMarkup.textColor=rightColor;
+            oRBMarkup.style=rightAnsSymb;
         }
+      } else {
+        a[i].strokeColor = wrongColor;
+        if (bRBMU) {
+            oRBMarkup.textColor=wrongColor;
+            oRBMarkup.style=wrongAnsSymb;
+        }
+      }
     }
-    f = this.getField("grpobj." + qtfield);
-    var re=/^grpobj\./;
-    if ( f != null ) {
-        var a = f.getArray();
-        for ( var i = 0; i < a.length; i++) {
-            var rbmuname = a[i].name.replace(re,"rbmarkup\.");
-            var oRBMarkup = this.getField(rbmuname);
-            var bRBMU = ( oRBMarkup != null );
-            var aX = a[i].name.split(".");
-            var probno = 1*aX[aX.length-2];
-            var grpProbno = 1*aX[aX.length-1];
-            if ( ( RightWrong[probno] != undefined ) %
+  }
+  f = this.getField("grpobj." + qtfield);
+  var re=/^grpobj\./;
+  if ( f != null ) {
+    var a = f.getArray();
+    for ( var i = 0; i < a.length; i++) {
+      var rbmuname = a[i].name.replace(re,"rbmarkup\.");
+      var oRBMarkup = this.getField(rbmuname);
+      var bRBMU = ( oRBMarkup != null );
+      var aX = a[i].name.split(".");
+      var probno = 1*aX[aX.length-2];
+      var grpProbno = 1*aX[aX.length-1];
+      if ( ( RightWrong[probno] != undefined ) %
 && ( RightWrong[probno][grpProbno] == 1 ) ) {
-                a[i].strokeColor = rightColor;
-                if (bRBMU) {
-                    oRBMarkup.textColor=rightColor;
-                    oRBMarkup.style=rightAnsSymb;
-                }
-            } else {
-                a[i].strokeColor = wrongColor;
-                if (bRBMU) {
-                    oRBMarkup.textColor=wrongColor;
-                    oRBMarkup.style=wrongAnsSymb;
-                }
-            }
+        a[i].strokeColor = rightColor;
+        if (bRBMU) {
+            oRBMarkup.textColor=rightColor;
+            oRBMarkup.style=rightAnsSymb;
         }
+      } else {
+        a[i].strokeColor = wrongColor;
+        if (bRBMU) {
+          oRBMarkup.textColor=wrongColor;
+          oRBMarkup.style=wrongAnsSymb;
+        }
+      }
     }
-    f=this.getField("rbmarkup."+qtfield);
-    if ( f != null ) f.display = display.visible;
- %   if ( f != null ) f.strokeColor = defaultColor;
-    f = this.getField("promptButton." + qtfield)
-    if ( f != null ) f.display = display.hidden;
-    f = this.getField("corr." + qtfield);
-    if ( f != null ) f.display = display.noPrint;
-    f = this.getField("qMark."+qtfield);
-    if ( f != null )
-    {
-        for ( var i = 1; i <= nQuestions; i++)
+  }
+  f=this.getField("rbmarkup."+qtfield);
+  if ( f != null ) f.display = display.visible;
+  f = this.getField("promptButton." + qtfield)
+  if ( f != null ) f.display = display.hidden;
+  f = this.getField("corr." + qtfield);
+  if ( f != null ) f.display = display.noPrint;
+  f = this.getField("qMark."+qtfield);
+  if ( f != null ) {
+    for ( var i = 1; i <= nQuestions; i++) {
+      if ( ProbValue[i] == undefined ) ProbValue[i]=0;
+      f = this.getField("qMark."+qtfield+"."+(i-1));
+      if ( f != null ) {
+        // find the next non-null field
+        for ( var j=i; j <= nQuestions; j++)
         {
-            if ( ProbValue[i] == undefined ) ProbValue[i]=0
-            f = this.getField("qMark."+qtfield+"."+(i-1));
-            if ( f != null )
-            {
-                // find the next non-null field
-                for ( var j=i; j <= nQuestions; j++)
-                {
-                    var h = this.getField("qMark."+qtfield+"."+j);
-                    if ( h != null ) break;
-                }
-                var g = f.getArray();
-                var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
-                if ( !negPointsMarkupAllowed && (qpts < 0) ) qpts=0;
-                g[0].value = qpts + (( qpts == 1 ) ? " \eqptLabel\space"
-                    : " \eqptsLabel");
-            }
+            var h = this.getField("qMark."+qtfield+"."+j);
+            if ( h != null ) break;
         }
-        this.getField("qMark."+qtfield).display = display.visible;
+        var g = f.getArray();
+        var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+        if ( !negPointsMarkupAllowed && (qpts < 0) ) qpts=0;
+        g[0].value = qpts + (( qpts == 1 ) ? " \eqptLabel\space"
+            : " \eqptsLabel");
+      }
     }
+    this.getField("qMark."+qtfield).display = display.visible;
+  }
 }
 function getTotalTally(basename) {
     var sqtotal=0;
@@ -1360,27 +1363,26 @@ function notifyField(success, flag, fieldname) {
 ?\wrngColorJS:oQName.WrongColorJSLoc;
   var wrongSymb=(typeof oQName.WrongAnsSymbJSLoc=="undefined")%
 ?\wrngAnsSymbJS:oQName.WrongAnsSymbJSLoc;
-    if (success) {
-        f.strokeColor = rightColor;
-        if (isthereRBUP) {
-            g.style = rightSymb;
-            g.textColor=rightColor;
-            g.display=display.visible;
-        }
-        return true;
-    } else {
-        updateTally.downState=false;
-        updateTally(fieldname);
-        f.strokeColor = wrongColor;
-if (isthereRBUP) {
-            b2 = ( typeof oQName.WrongAnsSymbJSLoc == "undefined" );
-            g.style = wrongSymb;
-            g.textColor=wrongColor;
-            g.display=display.visible;
-        }
-        return false;
+  if (success) {
+    f.strokeColor = rightColor;
+    if (isthereRBUP) {
+      g.style = rightSymb;
+      g.textColor=rightColor;
+      g.display=display.visible;
     }
-//    return null; // remove ?
+      return true;
+  } else {
+    updateTally.downState=false;
+    updateTally(fieldname);
+    f.strokeColor = wrongColor;
+    if (isthereRBUP) {
+      b2 = ( typeof oQName.WrongAnsSymbJSLoc == "undefined" );
+      g.style = wrongSymb;
+      g.textColor=wrongColor;
+      g.display=display.visible;
+    }
+    return false;
+  }
 }
 function updateTally(fieldname)
 {
@@ -1397,22 +1399,21 @@ function updateTally(fieldname)
         if (!updateTally.downState) f.value += 1;
         return true;
     } else return false;
-
 }
 var bNoPeekWait=false;
 var oNoPeekTimer;
 function noPeek(qtfield,rtnPage)
 {
-    if (!bNoPeekWait) {
-        if ( (typeof (aQuizControl[qtfield]) == "undefined") %
+  if (!bNoPeekWait) {
+    if ( (typeof (aQuizControl[qtfield]) == "undefined") %
 || (aQuizControl[qtfield] != -1) ) {
-            bNoPeekWait=true;
-            oNoPeekTimer=app.setTimeOut("bNoPeekWait=false;%
+      bNoPeekWait=true;
+      oNoPeekTimer=app.setTimeOut("bNoPeekWait=false;%
 app.clearTimeOut(oNoPeekTimer);",5);
-            this.pageNum = rtnPage-1;
-            \NoPeekAlert;
-        }
-    } else this.pageNum = rtnPage-1;
+      this.pageNum = rtnPage-1;
+      \NoPeekAlert;
+    }
+  } else this.pageNum = rtnPage-1;
 }
 var oCB=\bcheckboxused
 function OnBlurRespBox (retn)

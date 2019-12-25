@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2019/08/06 v2.4.6 Insert Document Level JavaScripts (dps)]
+ [2019/10/30 v2.4.8 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -38,6 +38,15 @@
 \let\dl@YES=y \let\dl@NO=n
 \let\dl@One=1 \let\dl@Zero=0
 \let\dljs@YES=y \let\dljs@NO=n
+\def\dlpkgInfo{\@nameuse{ver@\@currname.\@currext}}
+\def\dlSetPkgInfo{%
+  \edef\dlpkgInfoExpd{\dlpkgInfo}%
+  \expandafter\dlparsePkgInfo\dlpkgInfoExpd\@nil}
+\def\dlparsePkgInfo#1 #2 #3:#4\@nil{%
+  \def\dlPkgInfoDate{#1}%
+  \def\dlPkgInfoVer{#2}%
+  \def\dlPkgInfoPkg{#3}%
+  \def\dlPkgInfoDesc{#4}}
 \def\dvips@marker{\ifx\dljspresent\dl@NO\@OAction\fi}
 \let\isOpenAction\dl@NO
 \DeclareOptionX{nodljs}{\let\importdljs\dl@NO}
@@ -623,6 +632,7 @@
 \def\dlcombine(#1)(#2){#1#2}
 \def\escIs#1{\def\Eschr{#1}}
 \def\dl@makeesc#1{\catcode`#1=0\relax}
+\def\dlgobToFi#1\fi{\defjsLB}
 \newenvironment{defineJS}[2][]{%
   \let\makeesc\dl@makeesc
   \expandafter\@ifundefined\expandafter{%

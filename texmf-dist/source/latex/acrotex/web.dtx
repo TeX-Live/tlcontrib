@@ -21,7 +21,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{web}
-%<package> [2017/12/05 v6.1.1 web: A Screen Design Package (dps)]
+%<package> [2019/12/16 v6.1.4 web: A Screen Design Package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -909,25 +909,50 @@
 %    \end{macro}
 % If we are running \textsf{pdflatex} or \textsf{xelatex}, execute either the \texttt{pdftex}
 % or \texttt{xetex} option, else input \texttt{web.cfg} and process options.
+% In support of version 6.1.3 (2019/10/23), we \cs{let} \cs{bWebCustomize} and
+% \cs{eWebCustomize} to \cs{endinput} and \cs{relax}, respectively. Also see the
+% definition of \cs{inputWebCfg} below.
 %\changes{v4.2k}{2012/06/18}{Check for \string\texttt{pdftex}}
-%\changes{v6.0h}{2016/04/16}{An attempt to butter guess the driver if
+%\changes{v6.0h}{2016/04/16}{An attempt to better guess the driver if
 %there is no \string\texttt{web.cfg} file.}%
 %    \begin{macrocode}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \ifpdf\ExecuteOptionsX{pdftex}\else
-    \ifxetex\ExecuteOptionsX{xetex}\else
+  \ifxetex\ExecuteOptionsX{xetex}\else
 %    \end{macrocode}
 %    For backward compatibility, we \cs{let} \cs{ExecuteOptions} to
 %    \cs{ExecutedOptionsX}, saving and restoring as we go.
 %    \changes{v6.0l}{2016/08/17}{For backward compatibility, we \string\cs{let} \string\cs{ExecuteOptions} to
 %    \string\cs{ExecutedOptionsX}}
 %    \begin{macrocode}
-        \let\ExecuteOptions@SAVE\ExecuteOptions
-        \let\ExecuteOptions\ExecuteOptionsX
-        \InputIfFileExists{web.cfg}{}
-        {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
-            {\ExecuteOptionsX{dvipsone}}}%
-        \let\ExecuteOptions\ExecuteOptions@SAVE
-    \fi\fi
+    \let\ExecuteOptions@SAVE\ExecuteOptions
+    \let\ExecuteOptions\ExecuteOptionsX
+    \InputIfFileExists{web.cfg}{}
+    {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+      {\ExecuteOptionsX{dvipsone}}}%
+    \let\ExecuteOptions\ExecuteOptions@SAVE
+  \fi
+\fi
+%    \end{macrocode}
+%    We allow \texttt{web.cfg} to be imported in the preamble. Expand
+%    \DescribeMacro\inputWebCfg\cs{inputWebCfg} in the preamble only to
+%    input the \texttt{web.cfg} file again. The \cs{ExecuteOptions} command is ignored.
+%    Redefinitions should be placed between \cs{bWebCustomize} and \cs{eWebCustomize}.
+%    \changes{v6.1.3}{2019/10/23}{Allow \string\texttt{web.cfg} to be imported in the preamble.}
+%    \begin{macrocode}
+\providecommand{\inputWebCfg}{%
+  \let\bWebCustomize\relax
+  \let\eWebCustomize\endinput
+  \let\ExecuteOptions@SAVE\ExecuteOptions
+  \let\ExecuteOptions\@gobble
+  \makeatletter
+  \InputIfFileExists{web.cfg}{}{}\makeatother
+  \let\ExecuteOptions\ExecuteOptions@SAVE
+  \let\bWebCustomize\endinput
+  \let\eWebCustomize\relax
+}
+\@onlypreamble\inputWebCfg
 %    \end{macrocode}
 % \subsection{Process Options}
 %    \begin{macrocode}
@@ -2965,7 +2990,7 @@
 % \subsection{\texorpdfstring{\protect\cs{useFullWidthForPaper}}{\CMD{useFullWidthForPaper}}}
 %
 % We introduce a command of resetting the page layout paper. The primary
-% use is to create standard documents for academics, such as homeworks
+% use is to create standard documents for academics, such as homework
 % and other handouts.
 %
 %    \begin{macro}{\useFullWidthForPaper}
@@ -3205,6 +3230,7 @@
 %    \begin{macro}{\web@toc@subsubsection}
 % The following determine the formatting commands of the various sections,
 % including parts and chapter.
+% \changes{v6.1.4}{2019/12/16}{Modified \string\cs{web@toc@chapter} so it is a link}
 %    \begin{macrocode}
 \def\web@numberline#1{\makebox[0pt]{#1\enspace}}%
 \def\web@contentsline#1#2#3#4{%
@@ -3214,9 +3240,30 @@
 \def\web@toc@part#1#2#3{\par\noindent
     {\bfseries\hyperlink{#3}{#1}}\par\smallskip}
 \def\web@toc@chapter#1#2#3{\global\let\isChapter\web@YES
-    \par\mbox{}{\bfseries\makebox[0pt][r]{\hyperlink{#3}%
-        {\numberline\web@finalDot}\space}\web@title}\par\smallskip
+    \par\mbox{}{\bfseries
+        \ifx\numberline\@empty
+            \@ifundefined{d@DingToc}{\hyperlink{#3}{\web@title}}
+            {%
+                \ifx\d@DingToc\@empty
+                    \hyperlink{#3}{\web@title}%
+                \else
+                    \if\aeb@use@section@numbers0\relax
+                       \makebox[0pt][r]{\color{\d@DingTocColor}%
+                       \d@DingToc\space}\hyperlink{#3}{\web@title}%
+                    \else
+                        \hyperlink{#3}{\web@title}%
+                    \fi
+                \fi
+            }%
+        \else
+            \makebox[0pt][r]{\hyperlink{#3}{%
+                \numberline\web@finalDot}\space}\web@title
+        \fi}\par\smallskip
 }
+%\def\web@toc@chapter#1#2#3{\global\let\isChapter\web@YES
+%    \par\mbox{}{\bfseries\makebox[0pt][r]{\hyperlink{#3}%
+%        {\numberline\web@finalDot}\space}\web@title}\par\smallskip
+%}
 \def\web@toc@section#1#2#3{\penalty-500\par
         \hspace*{\if\isChapter y\parindent\else0pt\fi}\mbox{}{\bfseries
         \ifx\numberline\@empty
@@ -5408,13 +5455,14 @@
 \def\clindx{\ifcodeline@index\expandafter\@firstoftwo\else
     \expandafter\@secondoftwo\fi}
 \GlossaryPrologue{\section{Change History}}
-\IndexPrologue{\section{Index} \parbox{\linewidth}{Numbers written in italic
-    refer to the page where the corresponding entry is described;
-     numbers underlined refer to the
+\IndexPrologue{\section{Index}\hfuzz\linewidth
+  \parbox{\linewidth}{Numbers written in italic
+  refer to the page where the corresponding entry is described;
+  numbers underlined refer to the
 \clindx{code line of the}{}
     definition; numbers in roman refer to the
 \clindx{code lines}{pages}
-    where the entry is used.}\medskip}
+    where the entry is used.}\medskip\par\hfuzz=0.1pt}
 \value{IndexColumns}=2
 \value{GlossaryColumns}=2
 \def\changes@#1#2#3{%

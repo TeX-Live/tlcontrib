@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2019-08-13
+Dated: 2019-12-17
 
 AeB contains the following:
 
@@ -18,6 +18,9 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2019-12-17) Defined \InputExrSolnsLevel and \InputQzSolnsLevel to
+make it easy to change the section-type for the solution pages.
 
 What's New (2019-08-13) Use \protect when formatting a enhanced preview value.
 Other minor changes and bug fixes.

@@ -24,7 +24,7 @@
 %%---------------------------------------------------------
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{web}
- [2017/12/05 v6.1.1 web: A Screen Design Package (dps)]
+ [2019/12/16 v6.1.4 web: A Screen Design Package (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -534,15 +534,30 @@
 \@onlypreamble\noFinalDot
 \def\minPanelWidth#1{\def\web@minpanelwidth{#1}}
 \minPanelWidth{1in}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \ifpdf\ExecuteOptionsX{pdftex}\else
-    \ifxetex\ExecuteOptionsX{xetex}\else
-        \let\ExecuteOptions@SAVE\ExecuteOptions
-        \let\ExecuteOptions\ExecuteOptionsX
-        \InputIfFileExists{web.cfg}{}
-        {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
-            {\ExecuteOptionsX{dvipsone}}}%
-        \let\ExecuteOptions\ExecuteOptions@SAVE
-    \fi\fi
+  \ifxetex\ExecuteOptionsX{xetex}\else
+    \let\ExecuteOptions@SAVE\ExecuteOptions
+    \let\ExecuteOptions\ExecuteOptionsX
+    \InputIfFileExists{web.cfg}{}
+    {\@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+      {\ExecuteOptionsX{dvipsone}}}%
+    \let\ExecuteOptions\ExecuteOptions@SAVE
+  \fi
+\fi
+\providecommand{\inputWebCfg}{%
+  \let\bWebCustomize\relax
+  \let\eWebCustomize\endinput
+  \let\ExecuteOptions@SAVE\ExecuteOptions
+  \let\ExecuteOptions\@gobble
+  \makeatletter
+  \InputIfFileExists{web.cfg}{}{}\makeatother
+  \let\ExecuteOptions\ExecuteOptions@SAVE
+  \let\bWebCustomize\endinput
+  \let\eWebCustomize\relax
+}
+\@onlypreamble\inputWebCfg
 \ProcessOptionsX
 \ifx\web@Hypdfencoding\@empty\else
     \let\aeb@useunicode\@gobble\fi
@@ -1710,8 +1725,25 @@
 \def\web@toc@part#1#2#3{\par\noindent
     {\bfseries\hyperlink{#3}{#1}}\par\smallskip}
 \def\web@toc@chapter#1#2#3{\global\let\isChapter\web@YES
-    \par\mbox{}{\bfseries\makebox[0pt][r]{\hyperlink{#3}%
-        {\numberline\web@finalDot}\space}\web@title}\par\smallskip
+    \par\mbox{}{\bfseries
+        \ifx\numberline\@empty
+            \@ifundefined{d@DingToc}{\hyperlink{#3}{\web@title}}
+            {%
+                \ifx\d@DingToc\@empty
+                    \hyperlink{#3}{\web@title}%
+                \else
+                    \if\aeb@use@section@numbers0\relax
+                       \makebox[0pt][r]{\color{\d@DingTocColor}%
+                       \d@DingToc\space}\hyperlink{#3}{\web@title}%
+                    \else
+                        \hyperlink{#3}{\web@title}%
+                    \fi
+                \fi
+            }%
+        \else
+            \makebox[0pt][r]{\hyperlink{#3}{%
+                \numberline\web@finalDot}\space}\web@title
+        \fi}\par\smallskip
 }
 \def\web@toc@section#1#2#3{\penalty-500\par
         \hspace*{\if\isChapter y\parindent\else0pt\fi}\mbox{}{\bfseries

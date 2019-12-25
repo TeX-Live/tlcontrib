@@ -232,10 +232,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2019/08/13}
+\version{2019/12/17}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2019/08/13}
+\prepared{2019/12/17}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -3585,7 +3585,7 @@ The {\Web} package has several commands for customizing the \cs{part} and
 
 The appearance of the part title can be controlled by \cs{formatPartTitle}.
 
-\settowidth{\aebdimen}{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
+\settowidth{\aebdimen}{\ttfamily\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \formatPartTitle{!anglemeta(tex_code)}
 \noPartNumbers
@@ -4704,7 +4704,7 @@ the questions when the questions are in tabular form.\endredpoint
 website for examples.
 
 
-\subsubsection{Moving the Solution Set}
+\subsubsection{Inputting the Solution Set}
 
 The solution set, by default, comes last in the file.  You can
 move its positioning by including the command
@@ -4712,6 +4712,20 @@ move its positioning by including the command
 exercise.  You'll note that I have moved the solutions in this
 file \emph{before} the \nameref{references} section, as indicated, for
 example, by its position in the table of contents.
+
+By default, the exercise solutions are brought into the document as a
+\cs{section*} titled \cs{exsectitle}. The default settings can be changed
+with the \cs{InputExrSolnsLevel} command :
+\settowidth{\aebdimen}{\ttfamily\string\InputExrSolnsLevel*[\ameta{label}]\darg{\ameta{level}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\InputExrSolnsLevel*[!ameta(label)]{!ameta(level)}
+\end{dCmd}
+\smallskip\noindent
+where, \ameta{level} is the section-level (usually \texttt{section} or
+\texttt{chapter}); if the \texttt*-option is specified, then the solutions
+are placed in a starred-section (\cs{section*} or \cs{chapter*}). If
+\ameta{label} is specified, then \cs{label\darg{\ameta{label}}} is placed
+just after the section title. The default is \cs{InputExrSolnsLevel*\darg{section}}.
 
 \subsubsection{Grouping the solutions at end}\label{ss:grpEx}
 
@@ -4722,7 +4736,6 @@ in one solution, for example, may affect all subsequent solutions.
 You can now declare \cs{makeExSolnsLocalOn} or \cs{makeExSolnsLocalOff}
 anywhere in the document to turn on grouping for all exercises that follow,
 or to turn off this feature again. The default is \cs{makeExSolnsLocalOff}.
-
 
 \subsection{Redesigning the
 \texorpdfstring{\protect\texttt{exercise}}{exercise}
@@ -5688,15 +5701,29 @@ transparent, keep it that way.
 this command can be redefined as desired. See the source file \texttt{exerquiz.dtx}.
 Also see the definition of \Com{bottomOfAnsfStack}.
 
-\subsubsection{Moving the Solution Set}
+\subsubsection{Inputting the Solution Set}
 
-The solution set, by default, comes last in the file.  You can move
-its positioning by including the command \cs{includequizsolutions}
-at any point \emph{after} the last quiz (created by the \texttt{shortquiz} and \texttt{quiz} environments).  You'll note
-that I
-have moved the solutions in this file before the
-\nameref{references} section, as indicated, for example, by its
-position in the table of contents.
+The solution set, by default, comes last in the file.  You can move its
+positioning by including the command \cs{includequizsolutions} at any point
+\emph{after} the last quiz (created by the \texttt{shortquiz} and
+\texttt{quiz} environments).  You'll note that I have moved the solutions in
+this file before the \nameref{references} section, as indicated, for example,
+by its position in the table of contents.
+
+By default, the quiz solutions are brought into the document as a
+\cs{section*} titled \cs{sqslsectitle}. The default settings can be changed
+with the \cs{InputQzSolnsLevel} command:
+\settowidth{\aebdimen}{\ttfamily\string\InputQzSolnsLevel*[\ameta{label}]\darg{\ameta{level}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\InputQzSolnsLevel*[!ameta(label)]{!ameta(level)}
+\end{dCmd}
+\smallskip\noindent
+where, \ameta{level} is the section-level (usually \texttt{section} or
+\texttt{chapter}); if the \texttt*-option is specified, then the solutions
+are placed in a starred-section (\cs{section*} or \cs{chapter*}). If
+\ameta{label} is specified, then \cs{label\darg{\ameta{label}}} is placed
+just after the section title. The default is \cs{InputQzSolnsLevel*\darg{section}}.
+
 
 \subsubsection{Grouping the solutions at end}\label{ss:grpQzs}
 

@@ -1,0 +1,92 @@
+\documentclass{book}
+\usepackage{amstext}
+\usepackage[forcolorpaper]{web}
+\usepackage{exerquiz}[2019/12/17]
+\usepackage[dbmode,!tight]{pmdb}
+
+\reversemarginpar
+
+\def\cs#1{\texttt{\eqbs#1}}
+
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+%\previewOn\pmpvOn
+
+\rfooter{\dirTOCItem} % \dirTOCItem from web
+
+% Make quiz solutions into a chapter* event
+\InputQzSolnsLevel*[ch:Qz]{chapter} % exerquiz 2019/12/17
+
+
+\title{Poor Man's Database}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+
+\optionalPageMatter{\begin{center}
+  \fbox{\begin{minipage}{.67\linewidth}
+    This file demonstrates how to input both quiz items and paragraph content.
+    Two commands are defined \cs{InputQuizItems} and \cs{InputParas} to make it
+    convenient to switch between the two modes of input.
+  \end{minipage}}
+\end{center}}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{The quizzes}
+
+\section{Section 1}
+
+Expand the \cs{InputQuizItems} here.
+
+\InputQuizItems
+
+\begin{quiz*}{myquiz1}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\pmInput{probs/prob1.tex}
+
+\pmInput{probs/prob2.tex}
+
+\pmInput{probs/prob3.tex}
+
+\end{questions}
+\end{quiz*}
+
+\section{Section 2}
+
+\begin{quiz*}{myquiz2}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\pmInput{probs/prob4.tex}
+
+\pmInput{probs/prob6.tex}
+
+\pmInput{probs/prob5.tex}
+
+\end{questions}
+\end{quiz*} %\ScoreField\currQuiz\CorrButton\currQuiz
+
+\medskip\noindent
+\displayChoices{}{11bp}
+
+
+\medskip\noindent
+Expand the \cs{InputParas} here.
+\InputParas
+
+\pmInput{chapters/doc1.tex}
+
+%\input{"my doc2.tex"}
+\pmInput{"C:/Users/Public/Documents/My TeX Files/tex/latex/aeb/pmdb/examples/chapters/doc2.tex"}
+
+\medskip\noindent
+\displayChoices{}{11bp}\cgBdry[1em]\clrChoices{}{11bp}
+
+\end{document} 

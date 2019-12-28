@@ -1,0 +1,476 @@
+%\iffalse
+% makeindex -s gglo.ist -o pmdb.gls pmdb.glo
+% makeindex -s gind.ist -o pmdb.ind pmdb.idx
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% pmdb.sty package,,                                    %%
+%% Copyright (C) 2019  D. P. Story                       %%
+%%   dpstory@uakron.edu  dpstory@acrotex.net             %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesPackage{pmdb}
+%<package> \ProvidesPackage{pmdb}[2019/12/09 v0.4 Mark for input files]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
+\usepackage{calc}
+%\def\texorpdfstring#1#2{#1}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\gdef\brpr#1{\texttt{\char123\relax#1\char125\relax}}
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\let\uif\textsf
+\let\tops\texorpdfstring
+\def\EXCL{!}
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\CMD#1{\textbackslash#1}
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{pmdb}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{pmdb}{aebdocfmt.def cannot be found}}
+\begin{document}
+\addtolength{\marginparwidth}{3pt}
+  \GetFileInfo{pmdb.sty}
+  \title{The  \textsf{pmdb} Package}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\bgroup
+\value{secnumdepth}=3
+\value{tocdepth}=3
+  \tableofcontents
+\egroup
+  \DocInput{pmdb.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}
+  {\paragraph*{Index} The index goes here. Execute
+  \begin{quote}\texttt{makeindex -s gind.ist -o pmdb.ind pmdb.idx}\end{quote}
+  on the command line and recompile
+  \texttt{pmdb.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}
+  {\paragraph*{Change History} The list of changes goes here. Execute
+    \begin{quote}
+    \texttt{makeindex -s gglo.ist -o pmdb.gls pmdb.glo}
+    \end{quote}
+    on the command line and recompile \texttt{pmdb.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%
+%    \section{Introduction}
+%    This package addresses the issue of a poor-man's database. Educators who use {\LaTeX} to construct
+%    exams and homework sometimes have a collection of problems. Each problem is in its own TEX file. The educator
+%    creates a document and \cs{inputs} several of these packaged questions. This package attempts to provide some
+%    ``user interface'' to the questions and provides a mechanism of selecting which questions are to be included in the
+%    document.
+%
+%\paragraph*{What does this package do?} For a document that inputs content using the {\LaTeX} command \cs{input},
+%the same content can be input using the command \cs{pmInput} (capitalized). When content is input by \cs{pmInput}, a check
+%box is created in the margin at the insertion point of the content. The check boxes so created can be checked or cleared.
+%When the user clicks on push button provided by this package, a list of all \emph{selected} \cs{input} statements are listed
+%in the JavaScript console. This list can then be copied and pasted into another document the author is developing. If you
+%\uif{Ctrl+Click} on a check box, the associated content is opened in the default TEX editor. In this way, the document author
+%can see a typeset of the content and decide whether the content should be included in the developing document.
+%
+%\paragraph*{The DB stage:} When you have a collection of questions (or content) in various files and want to use
+%this package to \cs{input} them into your document, the following comments are apropos:
+%
+%\subparagraph*{PDF creators:} Any PDF creator current in the {\LaTeX} world is valid for use with this package.
+%
+%\subparagraph*{PDF viewers:}
+%The ideal viewer is \app{Acrobat}, however, \app{Adobe Reader} and \app{PDF-XChange Editor} can also be used.
+%In the case of \app{Adobe Reader}, there is an annoying security dialog box that appears each time you use the
+%\uif{Ctrl+Click} feature of the check box; the \uif{Ctrl+Click} feature does not WORK with \app{PDF-XChange Editor}.
+%
+%\paragraph*{The production stage:} After the document has been assembled (using \pkg{pmdb}), and you build your final document
+%(perhaps an \pkg{exerquiz} quiz), the end user can use an appropriate PDF reader. If an \pkg{exerquiz} quiz is used, then
+%a minimum of \app{Adobe Acrobat Reader} is required.
+%    \section{The main code}
+%    \begin{macrocode}
+\edef\th@dquoteCat{\the\catcode`\"}
+\catcode`\"=12\relax
+\newif\ifpmdbmode \pmdbmodetrue
+%    \end{macrocode}
+%\subsection{Package options and package requirements}
+%
+%\leavevmode\IndexOpt{dbmode} The default option is \opt{dbmode}. When in effect, check boxes
+%appear in the margins at each \cs{pmInput} point.
+%    \begin{macrocode}
+\DeclareOption{dbmode}{\pmdbmodetrue}
+%    \end{macrocode}
+%\leavevmode\IndexOpt[\protect\EXCL]{!dbmode} A convenient way to turn off the creation of the check boxes
+%is to simply place an exclamation point (!) in front of the \opt{dbmode} option.
+%    \begin{macrocode}
+\DeclareOption{!dbmode}{\pmdbmodefalse}
+%    \end{macrocode}
+%\leavevmode\IndexOpt{tight} When this option is taken, the checkboxes are tight against the text box
+%area.
+%    \begin{macrocode}
+\newif\ifpmdbtight \pmdbtightfalse
+\DeclareOption{tight}{\pmdbtighttrue}
+%    \end{macrocode}
+%\leavevmode\IndexOpt[\protect\EXCL]{!tight} The default for the package, the checkboxes are placed
+%to extreme left (or right) in the margins.
+%    \begin{macrocode}
+\DeclareOption{!tight}{\pmdbtightfalse}
+\ProcessOptions
+\RequirePackage{eforms}
+%    \end{macrocode}
+%\subsection{Special attention to Thor}
+% One motivation for this package is to support the \pkg{thorshammer} package, to that end
+% we make the following assignment, if Thor is not present.
+% This is to prevent stoppage:
+% if your are inputting a \cs{RespBoxEssay} question that is accompanied by the
+% \cs{essayQ} command, defined in \pkg{thorshammer}.\medskip
+%    \begin{macrocode}
+\def\pmdb@ckThor{\@ifundefined{essayQ}{\let\essayQ\@gobble}{}}
+\AtBeginDocument{\pmdb@ckThor}
+%    \end{macrocode}
+%\subsection{Form field creation}
+% \textbf{Some Booleans and counters}
+%    \begin{macrocode}
+\newif\ifpmdbFP \pmdbFPfalse
+\newif\ifpmdbDQs \pmdbDQsfalse
+\newcount\pmdb@Cnt
+%    \end{macrocode}
+%
+%\subsubsection{Check box creation}
+%
+%\DescribeMacro\cbSelectInput\nmpsep{\darg{\ameta{path}}} creates a check box with a tool tip of \ameta{path}
+%The mouse up action \cs{ccBoxMU} fixes up relative paths, and defines a \uif{Ctrl+Click} action. When the check box
+%is so clicked, the \ameta{path} is opened in the default TEX editor. The \ameta{path} can be relative or absolute.
+%This command is used within \cs{insertCkBx}; its \ameta{path} argument is passed to it from \cs{insertCkBx}.
+%    \begin{macrocode}
+\def\pmCBPresets#1{\def\pm@CBPresets{#1}}
+\pmCBPresets{}
+\def\cbSelectInput#1{\checkBox[\TU{#1}\presets{\pm@CBPresets}
+    \cmd{\bParams{#1}{\the\pmdb@Cnt}\eParams}
+    \AAmouseup{\ccBoxMU}
+  ]{pmdbCkBx.\the\pmdb@Cnt}{11bp}{11bp}{On}%
+  \global\advance\pmdb@Cnt\@ne}
+%    \end{macrocode}
+%\leavevmode\DescribeMacro\insertCkBx\nmpsep{\darg{\ameta{method}}} The argument of this macro describes the method
+%of inserting the checkbox. The default definition works well for a straightforward document, where you are inputting
+%ordinary {\LaTeX} code (such as sections or chapters).\smallskip
+%    \begin{macrocode}
+\def\insertCkBx#1{\def\@insertCkBx##1{#1}}
+%    \end{macrocode}
+%    Placement of check boxes in the margin. \DescribeMacro\pmAlignCB\cs{pmAlignCB} controls the marginpar placement.
+%    \DescribeMacro\normalCBMargins\cs{normalCBMargins} places it according to the rules of \cs{marginpar};
+%    \DescribeMacro\altCBMargins\cs{altCBMargins} alternates the margin placement, forces the check box to the
+%    extreme left (on odd pages) and extreme right (on even pages).
+%    \begin{macrocode}
+\def\setCBsMarg{%
+  \ifpmdbtight
+    \if@reversemargin
+      \def\pmAlignCBAlt{\ifodd\value{page}\leavevmode\hfill\else\fi}\else
+      \def\pmAlignCBAlt{\ifodd\value{page}\else\hfill\fi}\fi
+  \else
+    \if@reversemargin
+      \def\pmAlignCBAlt{\ifodd\value{page}\hfil\else\hfil\fi}\else
+      \def\pmAlignCBAlt{\ifodd\value{page}\hfill\else\fi}\fi
+  \fi
+}
+\def\altCBMargins{\let\pmAlignCB\pmAlignCBAlt}
+\def\pmAlignCB{%
+  \if@reversemargin
+    \ifpmdbtight\hfill\else\fi
+  \else
+    \ifpmdbtight\else\hfill\fi
+  \fi
+}
+\@ifundefined{chapter}{}{\AtBeginDocument{\setCBsMarg\altCBMargins}}
+%    \end{macrocode}
+% This is the default declaration. It works well when you are inputting content
+% that goes into horizontal mode. We insert the check box at the beginning of the
+% first paragraph. When you are inputting files that come into a list environment, this method
+% does not work satisfactory.\medskip\par\noindent
+%\DescribeMacro\InputParas declares that the next \cs{pmInput} macros are for paragraph content.
+%This is the default state of the package. %\par\medskip
+%\paragraph*{pmInput states}
+%    \begin{macrocode}
+\def\InputParas{%\let\pmAlignCB\relax
+  \insertCkBx{\ifpmdbmode
+  \everypar{\marginpar{\pmAlignCB\cbSelectInput{##1}}\global\everypar{}}\fi}}
+\InputParas
+%    \end{macrocode}
+%\leavevmode
+%\DescribeMacro\InputQuizItems declares that the next \cs{pmInput} macros are for items in
+%a \env{quiz} environment of \pkg{exerquiz}
+%\changes{v0.4}{2019/12/09}{Modified to work when no points are specified}
+%    \begin{macrocode}
+\newcount\saveQNo \saveQNo\z@
+\def\pmHook@qzItems{%
+  \let\item@pmOld\item
+  \def\item@pnNew{\item@pmOld\itemhook\let\item\item@pmOld}%
+  \let\item\item@pnNew}
+\def\InputQuizItems{\let\pmHook\pmHook@qzItems
+  \saveQNo\z@
+  \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
+  \ItemHook{\leavevmode\ifpmdbmode
+  \ifnum\saveQNo<\value{eqquestionnoi}%
+    \marginpar{\pmAlignCB\cbInQzMargin}\fi
+  \saveQNo=\arabic{eqquestionnoi}\fi}}
+%    \end{macrocode}
+%\leavevmode
+%\DescribeMacro\InputItems declares that the next \cs{pmInput} macros are for items in
+%an list environment 2019/12/09 v0.4
+%\changes{v0.4}{2019/12/09}{Added \string\cs{InputItems}}
+%    \begin{macrocode}
+\def\pmHook@item{\let\item@pmOld\item
+  \def\item@pmNew{%
+    \ifx\pmiarg\@empty
+      \ifx\pm@Brk\ef@YES
+        \def\pm@next{\item@pmOld[]}\else
+        \let\pm@next\item@pmOld
+      \fi
+    \else
+      \def\pm@next{\item@pmOld[\pmiarg]}%
+    \fi\pm@next\itemhook\let\item\item@pmOld}%
+  \let\item\item@pmNew
+}
+\def\ItemHook#1{\def\itemhook{#1}}
+\def\InputItems{\let\pmHook\pmHook@item
+  \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
+  \ItemHook{\leavevmode\ifpmdbmode
+  \marginpar{\pmAlignCB\cbInQzMargin}\fi}}
+%    \end{macrocode}
+%\paragraph*{Place check box and input \ameta{path}}\leavevmode\par\medskip
+%\noindent
+%\DescribeMacro\ckBxInput\nmpsep{\darg{\ameta{path}}} Places the check box and inputs the \ameta{path}.
+%    \begin{macrocode}
+\let\pmHook\relax
+\def\ckBxInput#1{\@insertCkBx{#1}%
+  \ifpmdbDQs\def\donext{\pmHook\input{"#1"}}\else
+    \def\donext{\pmHook\input{#1}}\fi
+  \donext}
+%    \end{macrocode}
+%\subsubsection{Push button creation}
+%This package provides two form fields that are used for the DB step.\par\medskip
+%\noindent
+%\DescribeMacro\displayChoices\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} inserts a push button
+%whose action is to display the selections in the console window. The argument \ameta{wd} can be empty, in which
+%case, the width of the field is determined from the \cs{CA} key.
+%    \begin{macrocode}
+\def\displayChoiceCA#1{\def\displayChoice@CA{#1}}
+\def\displayChoiceTU#1{\def\displayChoice@TU{#1}}
+\displayChoiceCA{Display Choices}
+\displayChoiceTU{Lists all choices in the console window}
+\newcommand{\displayChoices}[3][]{\pushButton[\TU{\displayChoice@TU}
+  \CA{\displayChoice@CA}#1\AAmouseup{\sldInputs}\protect\AA
+]{sldInputs}{#2}{#3}}
+%    \end{macrocode}
+%\DescribeMacro\clrChoices\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} inserts a push button
+% whose action is to clear all check boxes (and underlying JavaScript variables) created by this package.
+% The argument \ameta{wd} can be empty, in which
+% case, the width of the field is determined from the \cs{CA} key.
+%    \begin{macrocode}
+\def\clrChoicesCA#1{\def\clrChoices@CA{#1}}
+\def\clrChoicesTU#1{\def\clrChoices@TU{#1}}
+\clrChoicesCA{Clear Choices}
+\clrChoicesTU{Clears all check boxes created by pmdb}
+\newcommand{\clrChoices}[3][]{\pushButton[\TU{\clrChoices@TU}
+  \CA{\clrChoices@CA}#1\AAmouseup{\clrAction}\protect\AA
+]{sldInputs}{#2}{#3}}
+%    \end{macrocode}
+%
+%\subsection{Defining the \cs{pmInput} command}
+%
+%\DescribeMacro\pmInput\nmpsep{[\ameta{arg}]\darg{\ameta{path}}} is the main user-interface for inputting a file; here,
+%the macros name is \cs{pmInput}, ultimately it calls \cs{input} with the same path. Paths with spaces
+%must be enclosed in double quotes (|\pmInput{my cool problem.tex}|) and the extensions must always be used.
+%    \begin{macrocode}
+\def\pmInput{\@ifnextchar[%]
+  {\let\pm@Brk\ef@YES\inputConta}
+  {\let\pm@Brk\ef@NO\inputConta}}
+\let\pm@Brk\ef@NO
+\def\inputConta{\bgroup\@makeother\"\inputContb}
+\newcommand\inputContb[2][]{\egroup\def\pmiarg{#1}\inputConti#2;;}
+%    \end{macrocode}
+% Determine if double quotation marks are used.
+%    \begin{macrocode}
+\def\inputConti{\@ifnextchar"%
+  {\global\pmdbDQstrue\removedqs}
+  {\global\pmdbDQsfalse\removesemis}}
+\def\removedqs"#1";;{\inputContii{#1}}
+\def\removesemis#1;;{\inputContii{#1}}
+%    \end{macrocode}
+% Determine if this is a full path, we do this by searching for a colon (\texttt:).
+% Following the search for the colon, pass on to the final step of \cs{doinput}.
+%    \begin{macrocode}
+\def\inputContii#1{\isItFullPath#1:\@nil\doinput{#1}}
+%    \end{macrocode}
+% A command to detect presence of a colon.
+%    \begin{macrocode}
+\def\isItFullPath#1:#2\@nil{%
+  \def\@rgii{#2}\ifx\@rgii\@empty
+    \global\pmdbFPfalse\else
+    \global\pmdbFPtrue\fi}
+%    \end{macrocode}
+% Final step, if the switch \cs{ifpmdbmode} is true, we insert the check box
+% \cs{ckBxInput}; otherwise, we pass \ameta{path} to \cs{input}.
+%    \begin{macrocode}
+\def\doinput#1{\ifpmdbmode\def\donext{\ckBxInput{#1}}\else
+  \ifpmdbDQs\def\donext{\input{"#1"}}\else
+    \def\donext{\input{#1}}\fi\fi
+  \donext}
+%    \end{macrocode}
+%    During the development of this package, the original command name used was \cs{Input}.
+%    There are a few users that use this old definition; the command \cs{Input} is defined
+%    in other package, in particular in the \pkg{srcltx}. So we allow the use of \cs{Input}
+%    if \cs{Input} is not otherwise defined.
+%    \begin{macrocode}
+\def\pmInputWarni{\PackageWarningNoLine{pmdb}{The command \string\Input\space
+  is already defined.\MessageBreak
+  The checkboxes may not appear in the margins.\MessageBreak
+  Use the supported command \string\pmInput\space instead}}
+\def\pmInputWarnii{\PackageWarningNoLine{pmdb}{Letting
+  \string\Input\space to \string\pmInput. You are \MessageBreak
+  encouraged to use the supported\MessageBreak
+  command \string\pmInput\space instead}}
+\def\pmInputChk{\@ifundefined{Input}{\let\Input\pmInput\pmInputWarnii}
+  {\pmInputWarni}}
+\AtBeginDocument{\pmInputChk}
+%    \end{macrocode}
+%
+% \section{Field JavaScript}
+% \leavevmode
+%\DescribeMacro\ccBoxMU
+% This is the JavaScript action of the check box, used in \cs{cbSelectInput}
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\ccBoxMU}
+@ifpmdbFP%
+event.target.userName=("@p(1)");
+@else%
+%    \end{macrocode}
+%    This part of the code is Windows specific. Don't know enough about Mac OS
+%    to form the proper path.
+%    \begin{macrocode}
+// device independent path
+var pos=this.path.lastIndexOf("/");
+var thispath=this.path.substring(0,pos+1);
+%    \end{macrocode}
+%    \enspace\verb|/<drive>/user/documents/.../myfolder/|
+%    \begin{macrocode}
+pos=this.path.indexOf("/",1);
+var drive=thispath.substring(0,pos);
+var platform=app.platform;
+if (platform=="WIN")
+%    \end{macrocode}
+%    \hskip\parindent\enspace\verb|/<drive>:/user/documents/.../myfolder/|
+%    \begin{macrocode}
+  thispath=drive+":/"+thispath.substring(pos+1);
+event.target.userName=thispath+("@p(1)");
+@fi%
+if (event.modifier){
+  var _to=app.setTimeOut("_restoreCCState('pmdbCkBx.@p(2)');",.05);
+  try {
+  aebTrustedFunctions(this,aebLaunchURL,
+    {cURL: "file://"+event.target.userName});
+  } catch(e) {
+    console.show();
+    console.println("The Ctrl+Click action is not supported, %
+installation of aeb\_pro.js is required.");
+  }
+} else {
+  if (event.target.isBoxChecked(0)){
+    _oSPaths["pmdbCkBx.@p(2)"]=%
+[("@p(1)"),@ifpmdbDQs true@else false@fi];
+    _aInputs[@p(2)]=true;
+    _numInputs++;
+  }else{
+    _oSPaths["pmdbCkBx.@p(2)"]=null;
+    _aInputs[@p(2)]=false;
+    _numInputs--;
+  }
+  event.target["_boxState"]=!!event.target.isBoxChecked(0);
+}
+\end{defineJS}
+%    \end{macrocode}
+%\leavevmode
+%\DescribeMacro\sldInputs
+% This is the mouse up action for a push button. It lists all selected content
+% and displays them in the console window of \app{Acrobat/Reader}, used in
+% \cs{displayChoices}.
+%    \begin{macrocode}
+\begin{defineJS}[\catcode`\%=14\relax]{\sldInputs}
+console.clear();console.show();
+if (_numInputs==0) console.println("No inputs selected");
+else {
+  for(var i=0;i<_aInputs.length;i++){
+    if (!!_aInputs[i]){
+      if(_oSPaths["pmdbCkBx."+i][1])
+        console.println(%
+'\\\\input\{\\"'+(_oSPaths["pmdbCkBx."+i][0])+'\\"\}');
+      else
+        console.println(%
+'\\\\input\{'+(_oSPaths["pmdbCkBx."+i][0])+'\}');
+    }
+  }
+}
+\end{defineJS}
+%    \end{macrocode}
+%\leavevmode
+%\DescribeMacro\clrAction
+% Mouse up action to clear the check boxes and to re-initialize internal
+% internal JS variables. Used in \cs{clrChoices}.
+%    \begin{macrocode}
+\begin{defineJS}{\clrAction}
+var _oSPaths=new Object;
+var _aInputs=new Array;
+var _numInputs=0;
+this.resetForm("pmdbCkBx");
+\end{defineJS}
+%    \end{macrocode}
+% \section{Document JavaScript}
+%    \begin{macrocode}
+\begin{insDLJS}{mrki}{Supporting JavaScript for pmdb}
+var _oSPaths=new Object;
+var _aInputs=new Array;
+var _numInputs=0;
+function _restoreCCState(fName){
+  var f=this.getField(fName);
+  var _ccState=%
+(typeof f["_boxState"]=="undefined")?false:f["_boxState"];
+  f["_boxState"]=_ccState;
+  return f.checkThisBox(0,_ccState);
+}
+\end{insDLJS}
+%    \end{macrocode}
+%    \begin{macrocode}
+\catcode`\"=\th@dquoteCat
+%</package>
+%    \end{macrocode}
+%\Finale

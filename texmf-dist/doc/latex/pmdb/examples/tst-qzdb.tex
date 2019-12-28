@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{amstext}
+\usepackage[forcolorpaper]{web}
+\usepackage{exerquiz}
+\usepackage[dbmode,!tight]{pmdb}
+
+\reversemarginpar
+
+\pmCBPresets{\textColor{red}}
+
+%\previewOn\pmpvOn
+
+\title{Poor man's DB demo}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\version{1.0}
+\norevisionLabel
+
+
+\PTsHook{($\eqPTs^{\text{pts}}$)}
+
+\def\cs#1{\texttt{\eqbs#1}}
+\rfooter{\dirTOCItem}
+\lfooter{\displayChoices{}{11bp}\cgBdry[1em]\clrChoices{}{11bp}}
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+\useMCCircles
+
+% Declares input for quiz items
+\InputQuizItems
+
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Section 1}
+
+Expand the \cs{InputQuizItems} here.
+
+\begin{quiz*}{myquiz1}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\pmInput{probs/prob1.tex}
+
+\pmInput{probs/prob2.tex}
+
+\pmInput{probs/prob3.tex}
+
+\end{questions}
+\end{quiz*}
+
+\section{Section 2}
+
+%\InputQuizItems
+
+
+\begin{quiz*}{myquiz2}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\pmInput{probs/prob4.tex}
+
+\pmInput{probs/prob6.tex}
+
+\pmInput{probs/prob5.tex}
+
+\end{questions}
+\end{quiz*} %\ScoreField\currQuiz\CorrButton\currQuiz
+
+\section{Section 3}
+
+Here, we input an \textsf{exercise} environment, we do so in `paragraph mode' by expanding
+\cs{InputParas} first.
+
+\InputParas
+
+\pmInput{exrs/ex1.tex}
+
+\end{document} 

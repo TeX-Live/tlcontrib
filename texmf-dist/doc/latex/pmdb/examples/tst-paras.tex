@@ -1,0 +1,40 @@
+% Requires Version 1.7 of aeb_pro.js
+% Checkbox: Maintain an array of paths selected; unchecking removes that item from the path.
+\documentclass{book}
+\usepackage{eforms}
+\usepackage[dbmode]{pmdb}
+
+%\usepackage{srcltx}
+
+%\previewOn\pmpvOn
+
+% The default input mode
+%\InputParas
+
+\def\cs#1{\texttt{\eqbs#1}}
+
+\begin{document}
+
+\chapter*{Preface}
+
+In this package, \cs{pmInput} is defined. This package command places a checkbox
+in the margins and executes an \cs{input} command.
+
+\medskip\noindent\textbf{Rules to live by}\begin{itemize}
+  \item Always include the extension: \texttt{doc1.tex} not \texttt{doc1}.
+  \item If the path contains spaces, enclose the path in double quotes, like so,
+  \texttt{"my doc1.tex"}, not \texttt{my doc1.tex}.
+\end{itemize}
+
+
+% Adjust paths as needed
+\pmInput{chapters/doc1.tex}
+
+%\input{"my doc2.tex"}
+\pmInput{"C:/Users/Public/Documents/My TeX Files/tex/latex/aeb/pmdb/examples/chapters/doc2.tex"}
+
+\medskip\noindent
+\displayChoices{}{11bp}\cgBdry[1em]\clrChoices{}{11bp}
+
+\end{document}
+

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2019  D. P. Story                 %%
+%% Copyright (C) 1999-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebrandom.def}
- [2019/12/17 v8.5.5 %
+ [2020/01/01 v8.5.8 %
  Exerquiz support for randomization (dps)]
 \@ifundefined{nextrandom}{\input{random.tex}}{}
 \def\nextrandom{\begingroup
@@ -89,11 +89,11 @@
 }
 \def\aeb@randomizeChoices#1{%
     \setrannum{\aeb@ranChoice}{1}{#1}
-    \count0=0 \aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
+    \eqtmpcnta\z@\aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
     \expandafter\@tfor\expandafter
         \@temp\expandafter:\expandafter=\the\aeb@hold \do {%
-        \advance\count0by1
-        \ifnum\count0=\aeb@ranChoice
+        \advance\eqtmpcnta\@ne
+        \ifnum\eqtmpcnta=\aeb@ranChoice\relax
             \aeb@hold=\expandafter\expandafter\expandafter
                 {\expandafter\@tempholdrandom\@temp}%
             \edef\@tempholdrandom{\the\aeb@hold}%

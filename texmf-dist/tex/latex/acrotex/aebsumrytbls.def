@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2019  D. P. Story                 %%
+%% Copyright (C) 1999-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebsumrytbls.def}
- [2019/12/17 v8.5.5 %
+ [2020/01/01 v8.5.8 %
  Exerquiz support for summary tables (dps)]
 \def\ccatCurrQzWith(#1){\currQuiz#1}
 \def\pbPopulateSumTable{\pushButton[\W0\BG{}\BC{}\S{S}\autoCenter{n}
@@ -62,17 +62,17 @@
 \newcommand{\displaySumryTbl}[2][]{%
     \begingroup\edef\currQuiz{#2}\edef\oField{#2}\edef\curr@quiz{#2}%
     \setkeys{smrytbl}{#1}%
-    \count0=\smrytbl@ntables
-    \eq@rowcnt=0\relax\@tempcntb=\value{questionno}%
-    \ifnum\count\z@=2\relax
-        \divide\@tempcntb2\relax
+    \eqtmpcnta\smrytbl@ntables\relax
+    \eq@rowcnt\z@\@tempcntb=\value{questionno}%
+    \ifnum\eqtmpcnta=\tw@
+        \divide\@tempcntb\tw@
         \advance\@tempcntb\ifodd\value{questionno}2\else1\fi
         \xdef\@beginSecCol{\the\@tempcntb}%
         \advance\@tempcntb-1\relax
     \fi
-    \ifnum\count\z@=3
+    \ifnum\eqtmpcnta=\thr@@
         \edef\eq@n{\the\@tempcntb}%
-        \divide\@tempcntb\count\z@
+        \divide\@tempcntb\eqtmpcnta
         \edef\eq@q{\the\@tempcntb}%
         \@tempcnta=\@tempcntb\multiply\@tempcnta3
         \edef\eq@p{\the\@tempcnta}%
@@ -127,14 +127,14 @@
 \def\st@thrdclmn#1{%
     \setLink[\linktxtcolor{\@linkcolor}
         \A{\JS{this.pageNum=(#1-1)}}]{\sumrytbllinkHook{#1}}}
-\def\@@eqListExp#1#2{\global\advance\eq@rowcnt1\relax
-    \ifnum\eq@rowcnt=1\relax
+\def\@@eqListExp#1#2{\global\advance\eq@rowcnt\@ne
+    \ifnum\eq@rowcnt=\@ne
         \pbPopulateSumTable\ifsmrytbl@corrections\else
         \pbDoNoCorrectSumryTbl\fi\expandafter\eq@begintab\fi
-    \ifnum\count0>1 \ifnum\eq@rowcnt=\@beginSecCol\relax
+    \ifnum\eqtmpcnta>\@ne\ifnum\eq@rowcnt=\@beginSecCol\relax
         \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
     \fi\fi
-    \ifnum\count0=3 \ifnum\eq@rowcnt=\@beginThrdCol\relax
+    \ifnum\eqtmpcnta=\thr@@\ifnum\eq@rowcnt=\@beginThrdCol\relax
         \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
     \fi\fi
     \sumryTblProbFmt{#1}&\st@scndclmn&\st@thrdclmn{#2}\\[1bp]

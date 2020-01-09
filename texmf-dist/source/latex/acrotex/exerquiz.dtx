@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2019  D. P. Story                 %%
+%% Copyright (C) 1999-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.`def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2019/12/17 v8.5.5 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2020/01/01 v8.5.8 %
 %<package> Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver> Exerquiz documentation driver file (dps)]
 %<aebjs> Exerquiz document level JavaScript (dps)]
@@ -1360,6 +1360,15 @@
 %    \begin{macrocode}
 \newcounter{quizno} \setcounter{quizno}{0}
 \renewcommand\thequizno{\alph{quizno}}
+%    \end{macrocode}
+%    (2020/01/01) In certain circumstances, page numbering is incorrect; traced it to the
+%    use of \cs{count0}/\cs{count\cs{z@}}, possibly not used within a group. As a fix,
+%    replaced this usage with the counter \cs{eqtmpcnta}.
+% \changes{v8.5.7}{2020/01/01}{added public counter \string\cs{eqtmpcnta}}
+% \changes{v8.5.8}{2020/01/01}{Replaced \string\cs{count\cs{z@}} and \cs{count0} with \string\cs{eqtmpcnta},
+% this fixed the page number leakage problem}
+%    \begin{macrocode}
+\newcount\eqtmpcnta
 %</package|eqexam>
 %<*package>
 \def\theHquizno{\curr@quiz.\theeqquestionnoi.%
@@ -3627,8 +3636,8 @@
 % We have to increase the \texttt{tocdepth} so hyperref will create the bookmark at the
 % subsection level.
 %    \begin{macrocode}
-{\count0=\value{tocdepth}
-\advance\count0by2 \xdef\eqbmkmrkdepth{\the\count0}}
+{\eqtmpcnta\value{tocdepth}
+\advance\eqtmpcnta\tw@ \xdef\eqbmkmrkdepth{\the\eqtmpcnta}}
 \@ifundefined{Hy@bookmarksdepth}
     {\setcounter{tocdepth}{\eqbmkmrkdepth}}
     {\hypersetup{bookmarksdepth=\eqbmkmrkdepth}}
@@ -3904,8 +3913,8 @@
 %    \begin{macrocode}
   \xdef\eq@pageThisQ{\the\c@page}%
   \let\@currentQues\@empty
-  {\count0=\@shortquizCnt \advance\count0by1\relax
-    \xdef\@shortquizCnt{\the\count0}}%
+  {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+    \xdef\@shortquizCnt{\the\eqtmpcnta}}%
   \goodbreak\@ifstar{\sqForms\@shortquiz}%
     {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
      \def\sqstar{}\sqLinks\fi\@shortquiz}%
@@ -3926,8 +3935,8 @@
 \newenvironment{shortquiz*}
 {%
     \xdef\eq@pageThisQ{\the\c@page}%
-    {\count0=\@shortquizCnt\advance\count0by1\relax
-        \xdef\@shortquizCnt{\the\count0 }}%
+    {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+        \xdef\@shortquizCnt{\the\eqtmpcnta}}%
     \sqForms\@shortquiz
 }{\aeb@endshortquiz}
 %    \end{macrocode}
@@ -4220,18 +4229,22 @@
 % it issues a \cs{newpage}.
 % \changes{v6.4s}{2012/06/03}{Added \cs{promoteNewPageHere}}
 % \changes{v6.8a}{2014/01/01}{Made an optional argument, but test for required argument as swell.}
+% \changes{v8.5.6}{2020/01/01}{\string\promoteNewPageHere: added condition, first arg must be greater
+% then 0pt; otherwise, do nothing}
 %    \begin{macrocode}
 \newcommand\pnphDflt{.1\textheight}
 \newcommand{\promoteNewPageHere}[1][\pnphDflt]{%
     \@ifnextchar\bgroup{\eq@promoteNewPageHere}
         {\eq@promoteNewPageHere{#1}}%
 }
-\def\eq@promoteNewPageHere#1{\par
+\def\eq@promoteNewPageHere#1{\setlength{\@tempdimb}{#1}%
+    \ifdim\@tempdima>\z@\par
     \bgroup\@nobreakfalse\addpenalty{-500}%
-    \setlength{\@tempdimb}{#1}\@tempdima \pagegoal
+%    \setlength{\@tempdimb}{#1}
+    \@tempdima \pagegoal
     \advance \@tempdima -\pagetotal
     \ifdim \@tempdima<\@tempdimb\ifnum\col@number>\@ne\columnbreak
-        \else\newpage\penalty1\fi\fi\egroup
+        \else\newpage\penalty1\fi\fi\egroup\fi
 }
 %    \end{macrocode}
 % The two macros\DescribeMacro{\saveDest}\cs{saveDest} and \DescribeMacro{\useDest}\cs{useDest} are used,
@@ -4613,8 +4626,8 @@
 %    \end{macrocode}
 %    Update the internal quiz counter.
 %    \begin{macrocode}
-    {\count0=\@quizCnt\advance\count0by1\relax
-        \xdef\@quizCnt{\the\count0 }}%
+    {\eqtmpcnta\@quizCnt\advance\eqtmpcnta\@ne
+        \xdef\@quizCnt{\the\eqtmpcnta}}%
 %    \end{macrocode}
 % We try to support {\LaTeX}'s cross-referencing system by defining
 % \cs{@currentlabel}, \cs{@currentHlabel}, and \cs{@currentlabelname}.
@@ -7151,20 +7164,21 @@ if (_bOK) {\jsR\jsT
 % \changes{v6.7g}{2013/08/09}{Changed \texttt{\#1} to \cs{the}\cs{@temptokena} Fixing
 % a nasty bug. Reported by Christopher C.}
 %    \begin{macrocode}
-\def\defineEachAns#1{\advance\count0by1\relax
+\def\defineEachAns#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-    {SavedAns\bChoiceLabel-Idx\the\count0}{\the\@temptokena}%
+    {SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}{\the\@temptokena}%
     \ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\count0}%
+            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
-\def\defineEachChoice#1{\advance\count0by1\relax
+\def\defineEachChoice#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-        {SavedAlts\bChoiceLabel-Idx\the\count0}%
+        {SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
         {\the\@temptokena}\ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAlts\bChoiceLabel-Idx\the\count0}%
+            \csarg\string
+              \gdef{SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
 \def\processLabeledAns{%
@@ -7183,24 +7197,24 @@ if (_bOK) {\jsR\jsT
         \xdef{SavedAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAns\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachAns\the\toks@
-        \xdef\@currNCntAns{\the\count0 }\csarg
+        \eqtmpcnta\z@\let\\\defineEachAns\the\toks@
+        \xdef\@currNCntAns{\the\eqtmpcnta}\csarg
         \xdef{NumAns\bChoiceLabel}{\@currNCntAns}%
         \ifsolutionsonly\else{\eq@IWDefs{\string
-        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\count0 }}}\fi
+        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\eqtmpcnta}}}\fi
         \toks@=\expandafter{\@tempholdSaveChoice}\csarg
         \xdef{SavedAlts\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAlts\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachChoice\the\toks@
-        \count0=1\relax\toks@={}%{\ignorespaces\@gobble}%
+        \eqtmpcnta\z@\relax\let\\\defineEachChoice\the\toks@
+        \eqtmpcnta\@ne\toks@={}%{\ignorespaces\@gobble}%
         \loop
             \edef\temp@exp{\the\toks@\noexpand\\{%
-            \noexpand\useSavedAlts[\the\count0]{\bChoiceLabel}
-            \noexpand\useSavedAns[\the\count0]{\bChoiceLabel}}}%
+            \noexpand\useSavedAlts[\the\eqtmpcnta]{\bChoiceLabel}
+            \noexpand\useSavedAns[\the\eqtmpcnta]{\bChoiceLabel}}}%
             \toks@=\expandafter{\temp@exp}%
-            \ifnum\count0<\@currNCntAns
-            \advance\count0by1
+            \ifnum\eqtmpcnta<\@currNCntAns\relax
+            \advance\eqtmpcnta\@ne
         \repeat
         \csarg\xdef{SavedAltsAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
@@ -7361,11 +7375,11 @@ if (_bOK) {\jsR\jsT
 %    \begin{macrocode}
 \def\aeb@randomizeChoices#1{%
     \setrannum{\aeb@ranChoice}{1}{#1}
-    \count0=0 \aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
+    \eqtmpcnta\z@\aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
     \expandafter\@tfor\expandafter
         \@temp\expandafter:\expandafter=\the\aeb@hold \do {%
-        \advance\count0by1
-        \ifnum\count0=\aeb@ranChoice
+        \advance\eqtmpcnta\@ne
+        \ifnum\eqtmpcnta=\aeb@ranChoice\relax
             \aeb@hold=\expandafter\expandafter\expandafter
                 {\expandafter\@tempholdrandom\@temp}%
             \edef\@tempholdrandom{\the\aeb@hold}%
@@ -8490,7 +8504,7 @@ if (!isQuizInitialized("@currQuiz")) {
     \def\word##1{\\b##1\\b}\def\any{@any@}\fi
   \xdef\rbTxtAlt{\rbFlag,\eq@argi,\eq@argii}%
   \global\let\txtAltList\@empty
-  \count0=#4 \ifnum\count0 > 0 \expandafter\@argRead\else
+  \eqtmpcnta=#4\relax\ifnum\eqtmpcnta>\z@\expandafter\@argRead\else
   \PackageError{exerquiz}{%
       The fourth required parameter of \string\RespBoxTxt\MessageBreak
       is required to be a positive integer. You entered\MessageBreak
@@ -8499,8 +8513,8 @@ if (!isQuizInitialized("@currQuiz")) {
 \def\@argRead#1{\xdef\jsTempArgs{\txtAltList}%
     \ifx\txtAltList\@empty\xdef\txtAltList{"#1"}\else
     \xdef\txtAltList{\jsTempArgs,"#1"}\fi\@@argRead}
-\def\@@argRead{\advance\count0 by-1\relax
-    \ifnum\count0=0\relax
+\def\@@argRead{\advance\eqtmpcnta\m@ne
+    \ifnum\eqtmpcnta=\z@
         \def\eq@next{\endgroup
             \xdef\rbTxtAlt{\rbTxtAlt,\txtAltList}%
             \if\grpquestions\eq@Zero
@@ -8663,7 +8677,7 @@ if (!isQuizInitialized("@currQuiz")) {
     \def\word##1{\\b##1\\b}\def\any{@any@}
     \gdef\rbTxtAlt{\rbFlag,#1,1}% force sub-string match
     \global\let\txtAltList\@empty
-    \count0=#3 \ifnum\count0>0 \expandafter\@argReadPC\else
+    \eqtmpcnta=#3\relax\ifnum\eqtmpcnta>\z@\expandafter\@argReadPC\else
     \PackageError{exerquiz}{%
         The third required parameter of
         \string\RespBoxTxtPC\MessageBreak
@@ -8677,8 +8691,8 @@ if (!isQuizInitialized("@currQuiz")) {
 \newcommand\@argReadPC[2][0]{\xdef\jsTempArgs{\txtAltList}%
     \ifx\txtAltList\@empty\xdef\txtAltList{["#2",#1]}\else
     \xdef\txtAltList{\jsTempArgs,["#2",#1]}\fi\@@argReadPC}
-\def\@@argReadPC{\advance\count0 by-1\relax
-    \ifnum\count0=0\relax
+\def\@@argReadPC{\advance\eqtmpcnta\m@ne
+    \ifnum\eqtmpcnta=\z@
         \def\eq@next{\endgroup
             \xdef\rbTxtAlt{\rbTxtAlt,\txtAltList}%
             \if\grpquestions\eq@Zero
@@ -9413,22 +9427,22 @@ if (!isQuizInitialized("@currQuiz")) {
 \newcommand{\displaySumryTbl}[2][]{%
     \begingroup\edef\currQuiz{#2}\edef\oField{#2}\edef\curr@quiz{#2}%
     \setkeys{smrytbl}{#1}%
-    \count0=\smrytbl@ntables
+    \eqtmpcnta\smrytbl@ntables\relax
 %    \end{macrocode}
 % We accept only 1 or 2 as an argument, we put it in \cs{count0},
 % if not an integer, we'll stop the compile. If the argument is not 1,
 % we force a value of 2.
 %    \begin{macrocode}
-%    \ifnum\count0=1\relax\else\count0=2\relax\fi
-    \eq@rowcnt=0\relax\@tempcntb=\value{questionno}%
+%    \ifnum\eqtmpcnta=\@ne\else\eqtmpcnta\tw@\fi
+    \eq@rowcnt\z@\@tempcntb=\value{questionno}%
 %    \end{macrocode}
 % We calculate the number of rows in the first column, in case
 % of a two column table. When the number of questions is odd,
 % the the left-hand table will have one more entry than the right-hand
 % column.
 %    \begin{macrocode}
-    \ifnum\count\z@=2\relax
-        \divide\@tempcntb2\relax
+    \ifnum\eqtmpcnta=\tw@
+        \divide\@tempcntb\tw@
         \advance\@tempcntb\ifodd\value{questionno}2\else1\fi
         \xdef\@beginSecCol{\the\@tempcntb}%
         \advance\@tempcntb-1\relax
@@ -9436,9 +9450,9 @@ if (!isQuizInitialized("@currQuiz")) {
 %    \end{macrocode}
 %    Three table support
 %    \begin{macrocode}
-    \ifnum\count\z@=3
+    \ifnum\eqtmpcnta=\thr@@
         \edef\eq@n{\the\@tempcntb}%
-        \divide\@tempcntb\count\z@
+        \divide\@tempcntb\eqtmpcnta
         \edef\eq@q{\the\@tempcntb}%
         \@tempcnta=\@tempcntb\multiply\@tempcnta3
         \edef\eq@p{\the\@tempcnta}%
@@ -9560,13 +9574,13 @@ if (!isQuizInitialized("@currQuiz")) {
 %    \end{macrocode}
 % Now for the definition of \cs{@@eqListExp} which does the work in the table.
 %    \begin{macrocode}
-\def\@@eqListExp#1#2{\global\advance\eq@rowcnt1\relax
+\def\@@eqListExp#1#2{\global\advance\eq@rowcnt\@ne
 %    \end{macrocode}
 % If it is the first row, we insert the push button that will activate
 % when the page becomes visible, and we expand \cs{eq@begintab}, which
 % is a \texttt{tabular} environment.
 %    \begin{macrocode}
-    \ifnum\eq@rowcnt=1\relax
+    \ifnum\eq@rowcnt=\@ne
         \pbPopulateSumTable\ifsmrytbl@corrections\else
         \pbDoNoCorrectSumryTbl\fi\expandafter\eq@begintab\fi
 %    \end{macrocode}
@@ -9574,10 +9588,10 @@ if (!isQuizInitialized("@currQuiz")) {
 % value of the first row of the second table, we emit another
 % \cs{eq@begintab}.
 %    \begin{macrocode}
-    \ifnum\count0>1 \ifnum\eq@rowcnt=\@beginSecCol\relax
+    \ifnum\eqtmpcnta>\@ne\ifnum\eq@rowcnt=\@beginSecCol\relax
         \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
     \fi\fi
-    \ifnum\count0=3 \ifnum\eq@rowcnt=\@beginThrdCol\relax
+    \ifnum\eqtmpcnta=\thr@@\ifnum\eq@rowcnt=\@beginThrdCol\relax
         \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
     \fi\fi
 %    \end{macrocode}
@@ -9588,7 +9602,7 @@ if (!isQuizInitialized("@currQuiz")) {
 % We set the \cs{eq@endtab} at the bottom of the first table,
 % and at the bottom of the second table.
 %    \begin{macrocode}
-%    \ifnum\count0=2 \ifnum\eq@rowcnt=\@tempcntb
+%    \ifnum\count0=\tw@\ifnum\eq@rowcnt=\@tempcntb
 %        \expandafter\eq@endtab\fi\fi
     \ifnum\eq@rowcnt=\thequestionno\relax\expandafter\eq@endtab\fi
 }

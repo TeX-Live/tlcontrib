@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2019  D. P. Story                 %%
+%% Copyright (C) 1999-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2019/12/17 v8.5.5 %
+ [2020/01/01 v8.5.8 %
  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -465,6 +465,7 @@
 \newcounter{@exno} \setcounter{@exno}{0}  % running exno
 \newcounter{quizno} \setcounter{quizno}{0}
 \renewcommand\thequizno{\alph{quizno}}
+\newcount\eqtmpcnta
 \def\theHquizno{\curr@quiz.\theeqquestionnoi.%
   \ifcase\@eqquestiondepth\or\or\arabic{eqquestionnoii}.%
   \or\arabic{eqquestionnoii}.\roman{eqquestionnoiii}.%
@@ -1563,8 +1564,8 @@
 \let\eq@postexerciseHook\relax
 \def\eq@postexerciseHook@BM{%
     \xdef\Hy@currentbookmarklevel{\eq@currentbookmarklevel}}
-{\count0=\value{tocdepth}
-\advance\count0by2 \xdef\eqbmkmrkdepth{\the\count0}}
+{\eqtmpcnta\value{tocdepth}
+\advance\eqtmpcnta\tw@ \xdef\eqbmkmrkdepth{\the\eqtmpcnta}}
 \@ifundefined{Hy@bookmarksdepth}
     {\setcounter{tocdepth}{\eqbmkmrkdepth}}
     {\hypersetup{bookmarksdepth=\eqbmkmrkdepth}}
@@ -1697,8 +1698,8 @@
 {%
   \xdef\eq@pageThisQ{\the\c@page}%
   \let\@currentQues\@empty
-  {\count0=\@shortquizCnt \advance\count0by1\relax
-    \xdef\@shortquizCnt{\the\count0}}%
+  {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+    \xdef\@shortquizCnt{\the\eqtmpcnta}}%
   \goodbreak\@ifstar{\sqForms\@shortquiz}%
     {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
      \def\sqstar{}\sqLinks\fi\@shortquiz}%
@@ -1706,8 +1707,8 @@
 \newenvironment{shortquiz*}
 {%
     \xdef\eq@pageThisQ{\the\c@page}%
-    {\count0=\@shortquizCnt\advance\count0by1\relax
-        \xdef\@shortquizCnt{\the\count0 }}%
+    {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+        \xdef\@shortquizCnt{\the\eqtmpcnta}}%
     \sqForms\@shortquiz
 }{\aeb@endshortquiz}
 \def\@shortquiz{\@ifnextchar[%
@@ -1867,12 +1868,13 @@
     \@ifnextchar\bgroup{\eq@promoteNewPageHere}
         {\eq@promoteNewPageHere{#1}}%
 }
-\def\eq@promoteNewPageHere#1{\par
+\def\eq@promoteNewPageHere#1{\setlength{\@tempdimb}{#1}%
+    \ifdim\@tempdima>\z@\par
     \bgroup\@nobreakfalse\addpenalty{-500}%
-    \setlength{\@tempdimb}{#1}\@tempdima \pagegoal
+    \@tempdima \pagegoal
     \advance \@tempdima -\pagetotal
     \ifdim \@tempdima<\@tempdimb\ifnum\col@number>\@ne\columnbreak
-        \else\newpage\penalty1\fi\fi\egroup
+        \else\newpage\penalty1\fi\fi\egroup\fi
 }
 \newcommand{\saveDest}[1][]{%
     \def\sd@arg{#1}\ifx\sd@arg\@empty
@@ -2023,8 +2025,8 @@
     \global\let\pointValuesArray\@empty
     \global\let\ptypeArray\@empty
      \global\let\corrAnsArray\@empty
-    {\count0=\@quizCnt\advance\count0by1\relax
-        \xdef\@quizCnt{\the\count0 }}%
+    {\eqtmpcnta\@quizCnt\advance\eqtmpcnta\@ne
+        \xdef\@quizCnt{\the\eqtmpcnta}}%
     \edef\@currentlabel{\@quizCnt}%
     \edef\@currentHref{quiz.\@quizCnt}%
     \sq@setCLN{\eq@defaultQuizLabelName}%
@@ -3392,20 +3394,21 @@ if (_bOK) {\jsR\jsT
     \ifx\bChoiceLabel\@empty\else
     \processLabeledAns\fi
     }{\expandafter\@findendans\@gobble}}%
-\def\defineEachAns#1{\advance\count0by1\relax
+\def\defineEachAns#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-    {SavedAns\bChoiceLabel-Idx\the\count0}{\the\@temptokena}%
+    {SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}{\the\@temptokena}%
     \ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\count0}%
+            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
-\def\defineEachChoice#1{\advance\count0by1\relax
+\def\defineEachChoice#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-        {SavedAlts\bChoiceLabel-Idx\the\count0}%
+        {SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
         {\the\@temptokena}\ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAlts\bChoiceLabel-Idx\the\count0}%
+            \csarg\string
+              \gdef{SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
 \def\processLabeledAns{%
@@ -3421,24 +3424,24 @@ if (_bOK) {\jsR\jsT
         \xdef{SavedAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAns\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachAns\the\toks@
-        \xdef\@currNCntAns{\the\count0 }\csarg
+        \eqtmpcnta\z@\let\\\defineEachAns\the\toks@
+        \xdef\@currNCntAns{\the\eqtmpcnta}\csarg
         \xdef{NumAns\bChoiceLabel}{\@currNCntAns}%
         \ifsolutionsonly\else{\eq@IWDefs{\string
-        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\count0 }}}\fi
+        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\eqtmpcnta}}}\fi
         \toks@=\expandafter{\@tempholdSaveChoice}\csarg
         \xdef{SavedAlts\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAlts\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachChoice\the\toks@
-        \count0=1\relax\toks@={}%{\ignorespaces\@gobble}%
+        \eqtmpcnta\z@\relax\let\\\defineEachChoice\the\toks@
+        \eqtmpcnta\@ne\toks@={}%{\ignorespaces\@gobble}%
         \loop
             \edef\temp@exp{\the\toks@\noexpand\\{%
-            \noexpand\useSavedAlts[\the\count0]{\bChoiceLabel}
-            \noexpand\useSavedAns[\the\count0]{\bChoiceLabel}}}%
+            \noexpand\useSavedAlts[\the\eqtmpcnta]{\bChoiceLabel}
+            \noexpand\useSavedAns[\the\eqtmpcnta]{\bChoiceLabel}}}%
             \toks@=\expandafter{\temp@exp}%
-            \ifnum\count0<\@currNCntAns
-            \advance\count0by1
+            \ifnum\eqtmpcnta<\@currNCntAns\relax
+            \advance\eqtmpcnta\@ne
         \repeat
         \csarg\xdef{SavedAltsAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
@@ -3914,7 +3917,7 @@ if (!isQuizInitialized("@currQuiz")) {
     \def\word##1{\\b##1\\b}\def\any{@any@}\fi
   \xdef\rbTxtAlt{\rbFlag,\eq@argi,\eq@argii}%
   \global\let\txtAltList\@empty
-  \count0=#4 \ifnum\count0 > 0 \expandafter\@argRead\else
+  \eqtmpcnta=#4\relax\ifnum\eqtmpcnta>\z@\expandafter\@argRead\else
   \PackageError{exerquiz}{%
       The fourth required parameter of \string\RespBoxTxt\MessageBreak
       is required to be a positive integer. You entered\MessageBreak
@@ -3923,8 +3926,8 @@ if (!isQuizInitialized("@currQuiz")) {
 \def\@argRead#1{\xdef\jsTempArgs{\txtAltList}%
     \ifx\txtAltList\@empty\xdef\txtAltList{"#1"}\else
     \xdef\txtAltList{\jsTempArgs,"#1"}\fi\@@argRead}
-\def\@@argRead{\advance\count0 by-1\relax
-    \ifnum\count0=0\relax
+\def\@@argRead{\advance\eqtmpcnta\m@ne
+    \ifnum\eqtmpcnta=\z@
         \def\eq@next{\endgroup
             \xdef\rbTxtAlt{\rbTxtAlt,\txtAltList}%
             \if\grpquestions\eq@Zero
@@ -4031,7 +4034,7 @@ if (!isQuizInitialized("@currQuiz")) {
     \def\word##1{\\b##1\\b}\def\any{@any@}
     \gdef\rbTxtAlt{\rbFlag,#1,1}% force sub-string match
     \global\let\txtAltList\@empty
-    \count0=#3 \ifnum\count0>0 \expandafter\@argReadPC\else
+    \eqtmpcnta=#3\relax\ifnum\eqtmpcnta>\z@\expandafter\@argReadPC\else
     \PackageError{exerquiz}{%
         The third required parameter of
         \string\RespBoxTxtPC\MessageBreak
@@ -4042,8 +4045,8 @@ if (!isQuizInitialized("@currQuiz")) {
 \newcommand\@argReadPC[2][0]{\xdef\jsTempArgs{\txtAltList}%
     \ifx\txtAltList\@empty\xdef\txtAltList{["#2",#1]}\else
     \xdef\txtAltList{\jsTempArgs,["#2",#1]}\fi\@@argReadPC}
-\def\@@argReadPC{\advance\count0 by-1\relax
-    \ifnum\count0=0\relax
+\def\@@argReadPC{\advance\eqtmpcnta\m@ne
+    \ifnum\eqtmpcnta=\z@
         \def\eq@next{\endgroup
             \xdef\rbTxtAlt{\rbTxtAlt,\txtAltList}%
             \if\grpquestions\eq@Zero

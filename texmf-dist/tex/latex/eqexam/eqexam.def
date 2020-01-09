@@ -7,7 +7,7 @@
 %% exerquiz.dtx  (with options: `eqexam')
 %% 
 \ProvidesFile{eqexam.def}
- [2019/12/17 v8.5.5 %
+ [2020/01/01 v8.5.8 %
  Exerquiz support file for eqexam (dps)]
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
@@ -96,6 +96,7 @@
 \newcounter{@exno} \setcounter{@exno}{0}  % running exno
 \newcounter{quizno} \setcounter{quizno}{0}
 \renewcommand\thequizno{\alph{quizno}}
+\newcount\eqtmpcnta
 \newcounter{eqpointvalue} \setcounter{eqpointvalue}{0}
 \newlength\eq@tmplength
 \newlength\eqtmplength
@@ -1173,8 +1174,8 @@
 {%
   \xdef\eq@pageThisQ{\the\c@page}%
   \let\@currentQues\@empty
-  {\count0=\@shortquizCnt \advance\count0by1\relax
-    \xdef\@shortquizCnt{\the\count0}}%
+  {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+    \xdef\@shortquizCnt{\the\eqtmpcnta}}%
   \goodbreak\@ifstar{\sqForms\@shortquiz}%
     {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
      \def\sqstar{}\sqLinks\fi\@shortquiz}%
@@ -1182,8 +1183,8 @@
 \newenvironment{shortquiz*}
 {%
     \xdef\eq@pageThisQ{\the\c@page}%
-    {\count0=\@shortquizCnt\advance\count0by1\relax
-        \xdef\@shortquizCnt{\the\count0 }}%
+    {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
+        \xdef\@shortquizCnt{\the\eqtmpcnta}}%
     \sqForms\@shortquiz
 }{\aeb@endshortquiz}
 \def\@shortquiz{\@ifnextchar[%
@@ -1674,20 +1675,21 @@
     \ifx\bChoiceLabel\@empty\else
     \processLabeledAns\fi
     }{\expandafter\@findendans\@gobble}}%
-\def\defineEachAns#1{\advance\count0by1\relax
+\def\defineEachAns#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-    {SavedAns\bChoiceLabel-Idx\the\count0}{\the\@temptokena}%
+    {SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}{\the\@temptokena}%
     \ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\count0}%
+            \csarg\string\gdef{SavedAns\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
-\def\defineEachChoice#1{\advance\count0by1\relax
+\def\defineEachChoice#1{\advance\eqtmpcnta\@ne
     \@temptokena={#1}\csarg\xdef
-        {SavedAlts\bChoiceLabel-Idx\the\count0}%
+        {SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
         {\the\@temptokena}\ifsolutionsonly\else
         {\let\\\relax\eq@IWDefs{\string
-            \csarg\string\gdef{SavedAlts\bChoiceLabel-Idx\the\count0}%
+            \csarg\string
+              \gdef{SavedAlts\bChoiceLabel-Idx\the\eqtmpcnta}%
             {\the\@temptokena}}}\fi
 }
 \def\processLabeledAns{%
@@ -1703,24 +1705,24 @@
         \xdef{SavedAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAns\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachAns\the\toks@
-        \xdef\@currNCntAns{\the\count0 }\csarg
+        \eqtmpcnta\z@\let\\\defineEachAns\the\toks@
+        \xdef\@currNCntAns{\the\eqtmpcnta}\csarg
         \xdef{NumAns\bChoiceLabel}{\@currNCntAns}%
         \ifsolutionsonly\else{\eq@IWDefs{\string
-        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\count0 }}}\fi
+        \csarg\string\gdef{NumAns\bChoiceLabel}{\the\eqtmpcnta}}}\fi
         \toks@=\expandafter{\@tempholdSaveChoice}\csarg
         \xdef{SavedAlts\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string
         \csarg\string\gdef{SavedAlts\bChoiceLabel}{\the\toks@}}}\fi
-        \count0=0\relax\let\\\defineEachChoice\the\toks@
-        \count0=1\relax\toks@={}%{\ignorespaces\@gobble}%
+        \eqtmpcnta\z@\relax\let\\\defineEachChoice\the\toks@
+        \eqtmpcnta\@ne\toks@={}%{\ignorespaces\@gobble}%
         \loop
             \edef\temp@exp{\the\toks@\noexpand\\{%
-            \noexpand\useSavedAlts[\the\count0]{\bChoiceLabel}
-            \noexpand\useSavedAns[\the\count0]{\bChoiceLabel}}}%
+            \noexpand\useSavedAlts[\the\eqtmpcnta]{\bChoiceLabel}
+            \noexpand\useSavedAns[\the\eqtmpcnta]{\bChoiceLabel}}}%
             \toks@=\expandafter{\temp@exp}%
-            \ifnum\count0<\@currNCntAns
-            \advance\count0by1
+            \ifnum\eqtmpcnta<\@currNCntAns\relax
+            \advance\eqtmpcnta\@ne
         \repeat
         \csarg\xdef{SavedAltsAns\bChoiceLabel}{\the\toks@}%
         \ifsolutionsonly\else{\let\\\relax\eq@IWDefs{\string

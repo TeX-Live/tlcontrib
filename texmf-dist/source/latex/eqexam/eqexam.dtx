@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2018  D. P. Story                %%
+%% Copyright (C) 2005--2020  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,8 +16,8 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2019/12/17 v5.1.7 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2019/12/17}
+%<package>  [2020/01/06 v5.1.8 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2020/01/01}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -30,6 +30,7 @@
 \let\env\texttt
 \let\opt\texttt
 \let\app\textsf
+\def\lBRK{<}\def\rBRK{>}
 \def\visispace{\symbol{32}}
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
@@ -363,7 +364,7 @@
 %    The \IndexKey{flextended}\opt{flextended} is an (experimental) option
 %    to allow filler lines (fl) to be superimposed under the solutions, when the \opt{answerkey}
 %    option is taken.
-%    \changes{2017/12/05}{v5.0g}{Added option \string\texttt{flextended}.}
+%    \changes{v5.0g}{2017/12/05}{Added option \string\texttt{flextended}.}
 %    \begin{macrocode}
 \DeclareOptionX{flextended}{\AtEndOfPackage{\flextendedInput}}
 \def\flextendedInput{\eqe@flextendedtrue
@@ -944,9 +945,16 @@
 % \changes{v5.1.2}{2018/12/05}{Use version 3.2 of comment style under the name of aeb-comment}
 % \changes{v5.1.4}{2019/01/31}{\string\cs{let} \string\cs{comment} and \string\cs{endcomment} to \string\cs{relax}
 % we use the definition of the comment environment given in \string\pkg{verbatim}.}
+% \changes{v5.1.8}{2020/01/06}{Define \cs{aebc@end} as a work around for \string\pkg{aeb-comment}}
 %    \begin{macrocode}
 \RequirePackage{aeb-comment}
-%\let\comment\relax\let\endcomment\relax
+%    \end{macrocode}
+%    If \cs{BeforeIncludedComment} is defined, the old version of \pkg{aeb-comment} is used;
+%    otherwise, the new version of \pkg{aeb-comment} is being used. The new version supports
+%    \textsf{utf-8}.
+%    \begin{macrocode}
+\@ifundefined{BeforeIncludedComment}{\let\aebc@end\endgroup}
+  {\let\aebc@end\relax}
 \def\eqe@commentChkMsg{\@ifpackageloaded{comment}
   {\PackageWarningNoLine{eqexam}
     {The comment package is incompatible with the\MessageBreak
@@ -963,28 +971,28 @@
 % the web package.
 %    \begin{macrocode}
 \@ifpackageloaded{web}{\let\load@web\eqe@YES}{%
-    \ifx\load@web\eqe@YES\ifnum\eqe@drivernum=5
-        \PackageInfo{eqexam}{You have not selected a driver %
-            for eqexam. Perhaps the \MessageBreak
-             driver is introduced through web.cfg%
-        }\fi\expandafter\RequirePackage\expandafter[\eqe@webOpts]{web}%
-        \edef\@pdfcreator{\@pdfcreator, The eqexam Package}\fi
+  \ifx\load@web\eqe@YES\ifnum\eqe@drivernum=5
+    \PackageInfo{eqexam}{You have not selected a driver %
+      for eqexam. Perhaps the \MessageBreak
+      driver is introduced through web.cfg}\fi
+    \expandafter\RequirePackage\expandafter[\eqe@webOpts]{web}%
+    \edef\@pdfcreator{\@pdfcreator, The eqexam Package}\fi
 }
 %    \end{macrocode}
 % If user has specified links, online or email, we bring in the exerquiz package.
 %    \begin{macrocode}
 \@ifpackageloaded{exerquiz}{\let\load@exerquiz\eqe@YES}{%
-    \let\symbolchoice\@gobble
-    \ifx\load@exerquiz\eqe@YES\expandafter
-        \RequirePackage\expandafter[\eqe@eqOpts]{exerquiz}[2011/08/30]
+  \let\symbolchoice\@gobble
+  \ifx\load@exerquiz\eqe@YES\expandafter
+    \RequirePackage\expandafter[\eqe@eqOpts]{exerquiz}[2011/08/30]
 %    \end{macrocode}
 % We input \textsf{exerquiz} with the \texttt{nodljs}, we don't need all the JavaScript
 % to process interactive shortquizzes or quizzes, but we do want the option of
 % adding in document JavaScript, so after we input \textsf{exerquiz}, we set the
 % switches to allow these features.
 %    \begin{macrocode}
-        \let\importdljs\eqe@YES\let\execjs\eqe@YES
-    \fi
+    \let\importdljs\eqe@YES\let\execjs\eqe@YES
+  \fi
 }
 \@ifpackageloaded{eforms}{}{%
 %    \end{macrocode}
@@ -999,9 +1007,9 @@
 %    \begin{macrocode}
 \def\eqDvipsone{dvipsone}
 \@ifpackageloaded{hyperref}
-    {\ifx\eqDriverName\eqDvipsone
-        \renewcommand\@pdfviewparams{ null null null}\fi
-    }{\let\textorpdfstring\@firstoftwo}
+  {\ifx\eqDriverName\eqDvipsone
+      \renewcommand\@pdfviewparams{ null null null}\fi
+  }{\let\textorpdfstring\@firstoftwo}
 %    \end{macrocode}
 % Now that we have possibly input \textsf{web} or \textsf{exerquiz}, we need to restore the authors options.
 %    \begin{macrocode}
@@ -1600,12 +1608,12 @@
 \newif\ifeqlocalversion \eqlocalversionfalse
 \newif\if@templocalversion \@templocalversionfalse
 \def\eqe@initializeMultiVersions{%
-    \let\save@message\message\let\message\@gobble
-    \@tfor\eqe@tmp:=ABCDEFGHIJKLMNOPQRSTUVWXYZ\do{%
-        \expandafter\let\csname v\eqe@tmp\endcsname\@gobble
-        \expandafter\excludecomment\expandafter{ver\eqe@tmp}%
-        \expandafter\let\csname Afterver\eqe@tmp Comment\endcsname\relax
-    }\let\message\save@message
+  \let\save@message\message\let\message\@gobble
+  \@tfor\eqe@tmp:=ABCDEFGHIJKLMNOPQRSTUVWXYZ\do{%
+    \csarg\let{v\eqe@tmp}\@gobble
+    \edef\exp@temp{\noexpand\excludecomment{ver\eqe@tmp}}\exp@temp
+    \csarg\let{Afterver\eqe@tmp Comment}\aebc@end
+  }\let\message\save@message
 }
 \AtBeginDocument{\let\eqe@initializeMultiVersions\relax}
 %    \end{macrocode}
@@ -1635,7 +1643,7 @@
 \def\eqe@turnOffComment#1{%
     \csarg\let{v#1}\@gobble
     \edef\exp@temp{\noexpand\excludecomment{ver#1}}\exp@temp
-    \csarg\let{Afterver#1Comment}\relax
+    \csarg\let{Afterver#1Comment}\aebc@end
 }
 %    \end{macrocode}
 % Finally, the \cs{forVersion} command. \DescribeMacro{\selVersion}\cmd{\selVersion}
@@ -1816,7 +1824,7 @@
         \let\save@message\message\let\message\@gobble
         \loop
             \stepcounter{eq@count}%
-            \csarg\let{Afterver\Alph{eq@count}Comment}\relax
+            \csarg\let{Afterver\Alph{eq@count}Comment}\aebc@end
             \lowercase
             {%
                 \ifnum\value{eq@count}=\nLocalSelection
@@ -5004,7 +5012,7 @@
       \if\numpointsEmpty\eqe@One\let\marginpoints\@gobbletwo\fi
 %    \end{macrocode}
 %\changes{v2.0n}{2011/05/13}{%
-% Added \texttt{*<num>} to signal in-line display of points.
+% Added \string\texttt{*\string\lBRK{num}\string\rBRK} to signal in-line display of points.
 %}
 % (2011/5/13) We add a \texttt{*} feature. When the author types
 % \texttt{[*3]}, it is a three point problem, but the value is expressed
@@ -5029,7 +5037,7 @@
         \csarg\string\gdef{pagenofirstprob\thisexamlabel}{\thepage}}%
     \fi
 %    \end{macrocode}
-% \changes{}{2015/06/01}{Added the hook \cs{topofprobstarhook}}
+% \changes{4.4a}{2015/06/01}{Added the hook \cs{topofprobstarhook}}
 % \DescribeMacro\topofprobhook is a general purpose hook at the top of the
 % \texttt{problem} environment, before the beginning of the nested
 % \texttt{eqequestions} environment.
@@ -9641,8 +9649,8 @@
             \fi
         }%
 %    \end{macrocode}
+%    (2018/02/02) Removed |\space\ignorespaces| from \cs{fillin}
 %    \changes{v5.1d}{2018/02/02}{removed \string\cs{space}\string\cs{ignorespaces} from \string\cs{fillin}}
-%    Removed |\space\ignorespaces|
 %    \begin{macrocode}
     \fi\endgroup}
 %    \end{macrocode}

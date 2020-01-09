@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2018  D. P. Story                %%
+%% Copyright (C) 2005--2020  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,8 +19,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eqexam}
-  [2019/12/17 v5.1.7 An Exam Construction Package (dps)]
-\def\eqexamdefReq{2019/12/17}
+  [2020/01/06 v5.1.8 An Exam Construction Package (dps)]
+\def\eqexamdefReq{2020/01/01}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \usepackage{xkeyval}
@@ -377,6 +377,8 @@
 \@ifundefined{if@fleqn}{\let\fleqnOn\relax\let\fleqnOff\relax}
     {\def\fleqnOn{\@fleqntrue}\def\fleqnOff{\@fleqnfalse}}
 \RequirePackage{aeb-comment}
+\@ifundefined{BeforeIncludedComment}{\let\aebc@end\endgroup}
+  {\let\aebc@end\relax}
 \def\eqe@commentChkMsg{\@ifpackageloaded{comment}
   {\PackageWarningNoLine{eqexam}
     {The comment package is incompatible with the\MessageBreak
@@ -384,28 +386,28 @@
 \AtBeginDocument{\eqe@commentChkMsg}
 \AtEndDocument{\includeexersolutions}
 \@ifpackageloaded{web}{\let\load@web\eqe@YES}{%
-    \ifx\load@web\eqe@YES\ifnum\eqe@drivernum=5
-        \PackageInfo{eqexam}{You have not selected a driver %
-            for eqexam. Perhaps the \MessageBreak
-             driver is introduced through web.cfg%
-        }\fi\expandafter\RequirePackage\expandafter[\eqe@webOpts]{web}%
-        \edef\@pdfcreator{\@pdfcreator, The eqexam Package}\fi
+  \ifx\load@web\eqe@YES\ifnum\eqe@drivernum=5
+    \PackageInfo{eqexam}{You have not selected a driver %
+      for eqexam. Perhaps the \MessageBreak
+      driver is introduced through web.cfg}\fi
+    \expandafter\RequirePackage\expandafter[\eqe@webOpts]{web}%
+    \edef\@pdfcreator{\@pdfcreator, The eqexam Package}\fi
 }
 \@ifpackageloaded{exerquiz}{\let\load@exerquiz\eqe@YES}{%
-    \let\symbolchoice\@gobble
-    \ifx\load@exerquiz\eqe@YES\expandafter
-        \RequirePackage\expandafter[\eqe@eqOpts]{exerquiz}[2011/08/30]
-        \let\importdljs\eqe@YES\let\execjs\eqe@YES
-    \fi
+  \let\symbolchoice\@gobble
+  \ifx\load@exerquiz\eqe@YES\expandafter
+    \RequirePackage\expandafter[\eqe@eqOpts]{exerquiz}[2011/08/30]
+    \let\importdljs\eqe@YES\let\execjs\eqe@YES
+  \fi
 }
 \@ifpackageloaded{eforms}{}{%
     \let\symbolchoice\@gobble
 }
 \def\eqDvipsone{dvipsone}
 \@ifpackageloaded{hyperref}
-    {\ifx\eqDriverName\eqDvipsone
-        \renewcommand\@pdfviewparams{ null null null}\fi
-    }{\let\textorpdfstring\@firstoftwo}
+  {\ifx\eqDriverName\eqDvipsone
+      \renewcommand\@pdfviewparams{ null null null}\fi
+  }{\let\textorpdfstring\@firstoftwo}
 \let\eq@online\savedeq@online
 \let\ifeq@solutionsafter\savedifeq@solutionsafter
 \def\ifsolutionsafter{\ifeq@solutionsafter} % user interface
@@ -687,12 +689,12 @@
 \newif\ifeqlocalversion \eqlocalversionfalse
 \newif\if@templocalversion \@templocalversionfalse
 \def\eqe@initializeMultiVersions{%
-    \let\save@message\message\let\message\@gobble
-    \@tfor\eqe@tmp:=ABCDEFGHIJKLMNOPQRSTUVWXYZ\do{%
-        \expandafter\let\csname v\eqe@tmp\endcsname\@gobble
-        \expandafter\excludecomment\expandafter{ver\eqe@tmp}%
-        \expandafter\let\csname Afterver\eqe@tmp Comment\endcsname\relax
-    }\let\message\save@message
+  \let\save@message\message\let\message\@gobble
+  \@tfor\eqe@tmp:=ABCDEFGHIJKLMNOPQRSTUVWXYZ\do{%
+    \csarg\let{v\eqe@tmp}\@gobble
+    \edef\exp@temp{\noexpand\excludecomment{ver\eqe@tmp}}\exp@temp
+    \csarg\let{Afterver\eqe@tmp Comment}\aebc@end
+  }\let\message\save@message
 }
 \AtBeginDocument{\let\eqe@initializeMultiVersions\relax}
 \let\eqe@@onVersion\@empty
@@ -709,7 +711,7 @@
 \def\eqe@turnOffComment#1{%
     \csarg\let{v#1}\@gobble
     \edef\exp@temp{\noexpand\excludecomment{ver#1}}\exp@temp
-    \csarg\let{Afterver#1Comment}\relax
+    \csarg\let{Afterver#1Comment}\aebc@end
 }
 \def\forVersion#1%
 {%
@@ -805,7 +807,7 @@
         \let\save@message\message\let\message\@gobble
         \loop
             \stepcounter{eq@count}%
-            \csarg\let{Afterver\Alph{eq@count}Comment}\relax
+            \csarg\let{Afterver\Alph{eq@count}Comment}\aebc@end
             \lowercase
             {%
                 \ifnum\value{eq@count}=\nLocalSelection

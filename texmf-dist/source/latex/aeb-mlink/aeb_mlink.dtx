@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_mlink.sty package,                               %%
-%% Copyright (C) 2006--2018  D. P. Story                %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{aeb_mlink}
-%<package> [2018/08/18 v2.3.4 AeB MLink (dps)]
+%<package> [2020/01/06 v2.3.5 AeB MLink (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
@@ -130,7 +130,7 @@
 \newif\if@ml@dvips \@ml@dvipstrue
 \def\mlcsarg#1#2{\expandafter#1\csname#2\endcsname}
 %    \end{macrocode}
-%    \begin{macro}{dvipsone}
+%    \leavevmode\IndexOpt{dvipsone}^^A
 % Set the driver for \texttt{dvipsone}
 %    \begin{macrocode}
 \DeclareOptionX{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse
@@ -138,25 +138,42 @@
   \PassOptionsToPackage{dvipsone}{hyperref}
 }
 %    \end{macrocode}
-%    \end{macro}
-%    \begin{macro}{dvips}
-% Set the driver for \texttt{dvips}
+% \leavevmode\IndexOpt{dvips}^^A
+% Set the driver for \texttt{dvips}%
 %    \begin{macrocode}
 \DeclareOptionX{dvips}{\def\eq@drivernum{0}\@ml@dvipstrue
   \PassOptionsToPackage{dvips}{eforms}
   \PassOptionsToPackage{dvips}{hyperref}
 }
+%    \end{macrocode}
+% \leavevmode\IndexOpt{urlOpts}^^A
+% The options of the \pkg{url} package may be passed through the value of this key;
+% for example, |urlOpts={hyphens}|.
+% \changes{v2.3.5}{2020/01/06}{Added \string\opt{urlOpts}}
+%    \begin{macrocode}
+\define@key{aeb_mlink.sty}{urlOpts}[]{\def\url@Opts{[#1]}}
+\let\url@Opts\@empty
+%    \end{macrocode}
+%    Undefined options are passed to \pkg{eforms}.
+%    \begin{macrocode}
 \DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{eforms}}
 %    \end{macrocode}
-%    \end{macro}
+%    \leavevmode\IndexOpt{dblevel}^^A
+%    Sets the debug level.
 %    \begin{macrocode}
-\@ifundefined{mldblevel}{\newcount\mldblevel
-  \mldblevel=0 }{}
+\@ifundefined{mldblevel}{\newcount\mldblevel\mldblevel=0 }{}
 \define@key{aeb_mlink.sty}{dblevel}[0]{\mldblevel=#1 }
 %    \end{macrocode}
+%     Package error message when not dvips (or dvispone)
 %    \begin{macrocode}
 \def\ml@err@msg{This package requires the driver dvips and\MessageBreak
   Adobe Distiller as the PDF creator}
+%    \end{macrocode}
+%   (2020/01/06) Conform to the new \texttt{web.cfg} format.
+%    \changes{v2.3.5}{2020/01/06}{Conform to the new \string\texttt{web.cfg} format}
+%    \begin{macrocode}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \ifpdf\PackageError{aeb_mlink}{\ml@err@msg}\else
   \ifxetex\PackageError{aeb_mlink}{\ml@err@msg}\else
     \let\ExecuteOptions@SAVE\ExecuteOptions
@@ -166,7 +183,14 @@
         {\ExecuteOptionsX{dvipsone}}}%
     \let\ExecuteOptions\ExecuteOptions@SAVE
 \fi\fi
+%    \end{macrocode}
+%     (2020/01/06) Now require \pkg{url} package and pass
+%     options to \pkg{url} through \opt{urlOpts}.
+%    \changes{v2.3.5}{2020/01/06}{Now require \string\pkg{url} package and pass
+%    options to \string\pkg{url} through \string\opt{urlOpts}}
+%    \begin{macrocode}
 \ProcessOptionsX
+\expandafter\RequirePackage\url@Opts{url}
 %    \end{macrocode}
 % We require hyperref, eforms and soul.  For eforms, a recent version is needed,
 % \texttt{2008/03/14} or later.
@@ -736,8 +760,9 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 \def\MrkLnkLtr{L}
 \def\ml@MrkLnk#1{\ifmlmarks\bgroup\ifdim\baselineskip=0pt
   \setbox\z@\hbox{T}\gdef\ml@raiseamt{\ht\z@+.4pt}\else
-  \gdef\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalfont\normalcolor\bfseries
-  \raisebox{\ml@raiseamt}{\tiny\strut{\MrkLnkLtr#1}}}}\egroup\fi}
+  \gdef\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalfont
+    \normalcolor\bfseries
+    \raisebox{\ml@raiseamt}{\tiny\strut{\MrkLnkLtr#1}}}}\egroup\fi}
 \newif\iflinknotformed \linknotformedfalse
 \newif\ifcr@ckit \cr@ckitfalse
 \def\ml@underlinded{U}
@@ -1262,7 +1287,8 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 \ifx#3\ml@urlbuildii \advance\@tempcntb by \eq@mlcrackat\relax\fi
   \global\setbox#3=\hbox{%
     \mlh@setQuadSyllable{\@indx}{#2}{#1}{\unhcopy\@ne}%
-    \hbox{\unhcopy\@ne}\relax\ml@typeset@@syl{\@tempcntb}\penalty0\unhcopy#3}%hbox
+    \hbox{\unhcopy\@ne}\relax
+    \ml@typeset@@syl{\@tempcntb}\penalty0\unhcopy#3}%hbox
 }}
 %    \end{macrocode}
 % After the above preliminaries, we finally define \DescribeMacro{\mlurl}\cmd{\mlurl}.

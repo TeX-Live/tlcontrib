@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_mlink.sty package,                               %%
-%% Copyright (C) 2006--2018  D. P. Story                %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{aeb_mlink}
- [2018/08/18 v2.3.4 AeB MLink (dps)]
+ [2020/01/06 v2.3.5 AeB MLink (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -33,12 +33,15 @@
   \PassOptionsToPackage{dvips}{eforms}
   \PassOptionsToPackage{dvips}{hyperref}
 }
+\define@key{aeb_mlink.sty}{urlOpts}[]{\def\url@Opts{[#1]}}
+\let\url@Opts\@empty
 \DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{eforms}}
-\@ifundefined{mldblevel}{\newcount\mldblevel
-  \mldblevel=0 }{}
+\@ifundefined{mldblevel}{\newcount\mldblevel\mldblevel=0 }{}
 \define@key{aeb_mlink.sty}{dblevel}[0]{\mldblevel=#1 }
 \def\ml@err@msg{This package requires the driver dvips and\MessageBreak
   Adobe Distiller as the PDF creator}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \ifpdf\PackageError{aeb_mlink}{\ml@err@msg}\else
   \ifxetex\PackageError{aeb_mlink}{\ml@err@msg}\else
     \let\ExecuteOptions@SAVE\ExecuteOptions
@@ -49,6 +52,7 @@
     \let\ExecuteOptions\ExecuteOptions@SAVE
 \fi\fi
 \ProcessOptionsX
+\expandafter\RequirePackage\url@Opts{url}
 \RequirePackage{hyperref}
 \RequirePackage{refcount}
 \RequirePackage{eforms}[2018/08/16]
@@ -401,8 +405,9 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 \def\MrkLnkLtr{L}
 \def\ml@MrkLnk#1{\ifmlmarks\bgroup\ifdim\baselineskip=0pt
   \setbox\z@\hbox{T}\gdef\ml@raiseamt{\ht\z@+.4pt}\else
-  \gdef\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalfont\normalcolor\bfseries
-  \raisebox{\ml@raiseamt}{\tiny\strut{\MrkLnkLtr#1}}}}\egroup\fi}
+  \gdef\ml@raiseamt{.6\baselineskip}\fi\smash{\rlap{\normalfont
+    \normalcolor\bfseries
+    \raisebox{\ml@raiseamt}{\tiny\strut{\MrkLnkLtr#1}}}}\egroup\fi}
 \newif\iflinknotformed \linknotformedfalse
 \newif\ifcr@ckit \cr@ckitfalse
 \def\ml@underlinded{U}
@@ -705,7 +710,8 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 \ifx#3\ml@urlbuildii \advance\@tempcntb by \eq@mlcrackat\relax\fi
   \global\setbox#3=\hbox{%
     \mlh@setQuadSyllable{\@indx}{#2}{#1}{\unhcopy\@ne}%
-    \hbox{\unhcopy\@ne}\relax\ml@typeset@@syl{\@tempcntb}\penalty0\unhcopy#3}%hbox
+    \hbox{\unhcopy\@ne}\relax
+    \ml@typeset@@syl{\@tempcntb}\penalty0\unhcopy#3}%hbox
 }}
 \newcommand{\mlurl}{\begingroup\@makeother\~\relax% \def~{\string~}%
     \ef@sanitize@toks\mlurl@}

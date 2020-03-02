@@ -31,6 +31,7 @@ $special{'icon-appr'}   = '&MAKEdps';
 $special{'eqexam'}      = '&MAKEdps';
 $special{'bargraph-js'} = '&MAKEdps';
 $special{'pmdb'}        = '&MAKEdps';
+$special{'thorshammer'} = '&MAKEdps';
 
 
 sub MAKEdps {

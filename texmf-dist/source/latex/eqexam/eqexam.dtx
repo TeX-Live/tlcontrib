@@ -16,8 +16,8 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2020/01/06 v5.1.8 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2020/01/01}
+%<package>  [2020/03/14 v5.1.10 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2020/03/14}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -405,7 +405,7 @@
 \def\eqe@auto@chk@drivers{\ifpdf\ExecuteOptionsX{pdftex}\else
     \ifxetex\ExecuteOptionsX{xetex}\fi\fi}
 \newif\ifeqeonline \eqeonlinefalse
-\DeclareOptionX{online}{\eqe@auto@chk@drivers
+\DeclareOptionX{online}{\eqe@auto@chk@drivers\displayworkareafalse
     \let\eq@online\eqe@YES\eqeonlinetrue\ExecuteOptionsX{links}}
 \DeclareOptionX{pdf}{\eqe@auto@chk@drivers\let\load@web\eqe@YES}
 \DeclareOptionX{links}{\eqe@auto@chk@drivers
@@ -676,6 +676,7 @@
 \newif\ifeq@proofing \eq@proofingfalse
 \newif\ifeq@nolink \eq@nolinkfalse
 \@ifundefined{ifpreview}{\newif\ifpreview \previewfalse}{}
+\def\previewOn{\previewtrue}\def\previewOff{\previewfalse}
 \newif\ifeqforpaper \eqforpaperfalse
 %    \end{macrocode}
 % We define the commands for inputting the CFG files.
@@ -836,8 +837,14 @@
     \ifx\eqeAEFormatting\@empty\else
         \eqe@IWO\quiz@solns{\string\eqeAEFormatting}\fi
     \fi
+    \protect\cqqsfalse
 }
-\def\writeWithSolDocTrue{\writeT@SolnFile{\protect\withinsoldoctrue}}
+%    \end{macrocode}
+%    \changes{v5.1.10}{2020/03/14}{Added \string\cs{cqqsfalse} to definition of
+%    \string\cs{writeWithSolDocTrue}}
+%    \begin{macrocode}
+\def\writeWithSolDocTrue{\writeT@SolnFile{%
+  \protect\withinsoldoctrue\protect\cqqsfalse}}
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
@@ -894,6 +901,7 @@
 % \texttt{nosolutions}.
 %    \begin{macrocode}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\let\w@csarg\csarg
 \def\saveIFEQE#1{\def\ARG{#1ifSave}%
   \expandafter\csarg\expandafter
   \let\expandafter\ARG\csname#1\if#1true\else false\fi\endcsname}
@@ -1033,7 +1041,7 @@
 % Here, I input the \texttt{verbatim} package after the comment package.
 %    \begin{macrocode}
 \RequirePackage{verbatim}
-\@ifundefined{dlcomment}{\typeout{!! defining dlcomment}%
+\@ifundefined{dlcomment}{%\typeout{!! defining dlcomment}%
   \let\dlcomment\comment
   \let\enddlcomment\endcomment
   \let\eqSavedComment\dlcomment
@@ -1177,6 +1185,7 @@
     \let\marginpoints\eqrightmarginbox}
 \def\PointsOnBothSides{\def\@reportpoints{3}\relax
     \let\marginpoints\eqbothmargins}
+\let\PointsOnBoth\PointsOnBothSides
 \newif\ifeqe@nopoints \eqe@nopointsfalse
 \def\NoPoints{\if\isInExamEnv\eqe@NO
     \eqe@nopointstrue\def\@reporttotals{0}\let\totalsbox=\hfil
@@ -2280,11 +2289,25 @@
     \eq@hspanner\ignorespaces
 }
 %    \end{macrocode}
-% \DescribeMacro{\optsMlTextField} is used to pass options to the multi-line
+% \DescribeMacro{\optsMlTxtFld} is used to pass options to the multi-line
 % text field.
+% \changes{v5.1.10}{2020/03/14}{Introduced control over width of text field in
+% for \string\texttt{online} option.}
 %    \begin{macrocode}
-\def\optsMlTextField#1{\def\eqe@optsmltf{#1}}
+\def\optsMlTxtFld#1{\def\eqe@optsmltf{#1}}
 \let\eqe@optsmltf\@empty
+%    \end{macrocode}
+% \DescribeMacro{\wdthMlTxtFld}\hskip-\marginparsep\texttt{\darg{\ameta{length}}}
+% sets the underlying multi-line text field, when \texttt{online} option is in effect,
+% to \ameta{length}. The default length of \cs{linewidth} is reset after the field
+% has been created.
+% \changes{v5.1.10}{2020/03/14}{Introduced control over width of text field in
+% for \string\texttt{online} option.}
+%    \begin{macrocode}
+\def\eqeLW{\linewidth}
+\def\wdthMlTxtFld#1{\setlength\eqetmplengtha{#1}%
+  \edef\eqeLW{\the\eqetmplengtha}}
+\def\resetFldWdth{\gdef\eqeLW{\linewidth}}%
 \def\eqExamPriorVspace#1{%
     \edef\fieldName{%
         \if\probstar*eqexam.\curr@quiz.%
@@ -2294,7 +2317,7 @@
         \fi
     }%
     \nobreak\noindent\textField[\BC{}\presets{\eqe@optsmltf}
-        \Ff\FfMultiline]{\fieldName}{\linewidth}{#1}\@gobble
+        \Ff\FfMultiline]{\fieldName}{\eqeLW}{#1}\resetFldWdth\@gobble
 }
 %    \end{macrocode}
 %
@@ -2655,8 +2678,7 @@
 %    If the reference \texttt{r@\#1} is defined, define the value to be
 %    the second argument of \cs{r@\#1} expanded
 %    \begin{macrocode}
-    \expandafter\xdef\csname nRefii@#1\endcsname
-        {\expandafter\expandafter\expandafter
+    \csarg\xdef{nRefii@#1}{\expandafter\expandafter\expandafter
     \@getsecondOf\csname r@#1\endcsname}%
     }%
 }
@@ -3373,7 +3395,7 @@
             new Array("pointsgiven.\curr@quiz.page\thepage"));}}]
     {\fieldName}{\widthtpboxes}{15pt}%
 }
-\ifx\use@email y
+\ifx\use@email\eqe@YES
     \let\insertPointsBoxPDF\@insertPointsBoxPDF
     \let\insertTotalsBoxPDF\@insertTotalsBoxPDF
 \else
@@ -3387,18 +3409,29 @@
 % At the bottom of the box goes the points for the problem, if the \texttt{email} option
 % is used, in the top, a text field is inserted.
 %    \begin{macrocode}
-\newcommand{\eqrightmarginbox}[2]{\makebox[0pt][l]{%
-        \setlength\tabcolsep{0pt}%
+\newcommand{\eqrightmarginbox}[2]{%
+  \makebox[0pt][l]{%
+%    \end{macrocode}
+%     If this problem is in a minipage, (as declared by \cs{probInMinipage}), we adjust
+%     the text width to be the original text width, rather than the text width determined
+%     by the width of the minipage.
+%     \changes{v5.1.9}{2020/13/06}{Allow adjustment of \string\cs{textwidth} with a problem
+%     is within a minipage.}
+%    \begin{macrocode}
+    \ifx\probInMinip@ge\relax
+      \let\eq@TW\textwidth\else
+      \let\eq@TW\eqTWSave\fi
+    \setlength\tabcolsep{0pt}%
 %    \end{macrocode}
 % (2011/05/08) new calculation for the right point box.
 %    \begin{macrocode}
-        \setlength{\@tempdima}{\textwidth-\eqemargin+\marginparsep}%
-        \hspace*{\@tempdima}%
-        \raisebox{-.5\height}[0pt][0pt]{%
-            \marginboxdesign[\insertPointsBoxPDF]%
-                {\marginpointsboxtext{#1}{#2}}%
-        }\hfil
-    }%
+    \setlength{\@tempdima}{\eq@TW-\eqemargin+\marginparsep}%
+    \hspace*{\@tempdima}%
+    \raisebox{-.5\height}[0pt][0pt]
+      {\marginboxdesign[\insertPointsBoxPDF]%
+      {\marginpointsboxtext{#1}{#2}}%
+    }\hfil
+  }\let\probInMinip@ge\relax
 }
 %    \end{macrocode}
 % At the end of each exam \verb!\end{exam}! the part totals can be optionally
@@ -3852,7 +3885,7 @@
 %\textbf{New Syntax}\\[3pt]
 %\begingroup\small
 %    \switchCats\ttfamily
-%    \string\begin{splitsolution}[\meta(width)][\meta(depth)]\\
+%    \string\begin{splitsolution}[\meta(width)][\meta(height)]\\
 %    \string\begin{panel}[l\string|r]\\
 %    ...\\
 %    \string\end{panel}\\
@@ -3866,7 +3899,7 @@
 %\textbf{Old Syntax}\\[3pt]
 %\begingroup\small
 %    \switchCats\ttfamily
-%    \string\begin{splitsolution}{\meta(depth)}\\
+%    \string\begin{splitsolution}{\meta(height)}\\
 %    \string\begin{panel}[l\string|r]{\meta(width)}\\
 %    ...\\
 %    \string\end{panel}\\
@@ -4087,6 +4120,8 @@
 \newenvironment{@ssSolution}[1][\ss@Argii]%
 {%
     \def\eqe@argi{#1}\ifx\eqe@argi\@empty\else
+        \setlength{\@tempdima}{\ss@Argii}% chng
+        \edef\ss@Argii{\the\@tempdima}%
         \let\soln@keys@nLines\@empty
         \edef\panelheight{\the\panelheight}%
         \edef\panelwidth{\the\panelwidth}%
@@ -4193,13 +4228,20 @@
         \string\setlength{\string\panelwidth}{\ss@Argiii}%
         \string\def\string\eqedepth
             {\ifeq@nosolutions\ss@Argii\else\ss@Argii\fi}C}}}%
-    {\lccode`C=`\%\lowercase{\eqe@IW{%
-            \string\strut\string\noindent%
-%            \string\strut\par\string\nobreak\string\noindent%
-                \string\hbox\space to\string\linewidth\bgroup^^J%
-                \eqe@lPanel\string\minipage[b][\string\eqedepth][t]%
-                {\string\linewidth\eqe@subleftgutter%
-                    -\string\panelwidth-\string\panelgap}C
+%    \end{macrocode}
+% (2020/03/14) Change to \verb~\noindent\hskip\eqemargin~ to get the margin
+% correct within the \env{eqequestions} environment on the solutions page.
+%\changes{v5.1.10}{2020/03/14}{Change to reflect \string\env{eqequestions}}
+%    \begin{macrocode}
+    {\lccode`C=`\%\lowercase{\eqe@IW{\string\vskip2pt
+        \string\noindent\string\hskip\string\eqemargin
+%       \string\strut\string\noindent%
+%       \string\strut\par\string\nobreak\string\noindent%
+%        \string\vskip2pt\string\noindent%
+        \string\hbox\space to\string\linewidth\bgroup^^J%
+          \eqe@lPanel\string\minipage[b][\string\eqedepth][t]%
+          {\string\linewidth\eqe@subleftgutter%
+            -\string\panelwidth-\string\panelgap}C
      }}}%
      \ifeq@solutionsafter
         \noindent\strut\hbox to\linewidth\bgroup
@@ -4389,7 +4431,6 @@
     \label{\thisexamlabel PageBegin}%
     \eqe@IWO\@auxout{\string\csarg\string\gdef
     {\thisexamlabel pageno}{\thepage}}%
-%    \let\sq@priorhook\@empty
     \ifeqfortextbook
         \global\examenvtrue\tb@beginexam@code
     \fi
@@ -4402,31 +4443,60 @@
 %    \begin{macrocode}
 \def\tb@insmargmark{\ifisinstred\ifismarginans
     \insMidMarg{\mark{}}\fi\fi}
-\def\eqe@adjForSepRule{\if\eq@parttotals\eqe@YES
+\def\eqe@adjForSepRule{\ifx\eq@parttotals\eqe@YES
     \eq@pointboxtotalheight\halfHtPtBox\relax
     \advance\eq@pointboxtotalheight\dpPtBox\relax
     \advance\eq@pointboxtotalheight\pointsmarginparpush
     \vspace*{\eq@pointboxtotalheight}\fi}
 \def\eqe@afterexamsepcode{%
-    \if\eq@parttotals\eqe@YES
-        \@actionsAtPageBreak{\global\let\@spacetobreak1}%
-            {\global\let\@spacetobreak0}%
-        \ifx\@spacetobreak0\relax
-            \bgroup\@tempdima=\pagetotal
-            \advance\@tempdima\eq@pointboxtotalheight
-            \ifdim\@tempdima>\pagegoal\aftergroup\newpage
-            \else\ifnum\arabic{eq@count}>0\relax
-                \removelastskip\vskip6pt\kern0pt
-                \if\@reportpoints\eqe@One\else\@checkSpacing{0}\fi
-                    \textcolor{\endexamtotal@color}%
-                    {\eqeomarginbox{\arabic{eq@count}}{0}}\fi
-                \ifx\eqx@separationrule\eqe@YES
-                    \separationrule\eqe@adjForSepRule\fi
-            \fi\egroup
+  \ifx\eq@parttotals\eqe@YES
+    \@actionsAtPageBreak{\global\let\@spacetobreak\eqe@One}%
+      {\global\let\@spacetobreak\eqe@Zero}%
+    \ifx\@spacetobreak\eqe@One
+      \bgroup\@tempdima=\pagetotal
+      \advance\@tempdima\eq@pointboxtotalheight
+      \ifdim\@tempdima>\pagegoal\aftergroup\newpage
+      \else
+        \ifnum\arabic{eq@count}>\z@
+          \removelastskip\vskip6pt\kern0pt
+          \ifx\@reportpoints\eqe@One\else\@checkSpacing{0}\fi
+          \def\@emitPartTotalsBox{\textcolor{\endexamtotal@color}%
+            {\eqeomarginbox{\arabic{eq@count}}{0}}}%
+          \insertContent\@emitPartTotalsBox
         \fi
-    \else\ifx\eqx@separationrule\eqe@YES
-        \separationrule\eqe@adjForSepRule\fi
+        \ifx\eqx@separationrule\eqe@YES
+          \def\@emitSepRule{\separationrule\eqe@adjForSepRule}%
+          \insertContent\@emitSepRule
+        \fi
+      \fi\egroup
+    \else
+      \ifnum\arabic{eq@count}>\z@
+        \ifx\@reportpoints\eqe@One\else\@checkSpacing{0}\fi
+        \def\@emitPartTotalsBox{\textcolor{\endexamtotal@color}%
+          {\eqeomarginbox{\arabic{eq@count}}{0}}}%
+        \insertContent\@emitPartTotalsBox
+      \fi
+      \ifx\eqx@separationrule\eqe@YES
+        \def\@emitSepRule{\separationrule\eqe@adjForSepRule}%
+        \insertContent\@emitSepRule
+      \else
+        \eqe@adjForSepRule
+      \fi
     \fi
+  \else
+    \ifx\eqx@separationrule\eqe@YES
+      \def\@emitSepRule{\separationrule\bigskip}%
+      \insertContent\@emitSepRule\fi
+  \fi
+}
+\def\insertContent#1{%
+  \@ifundefined{NextAfter\currExamName}
+  {#1}
+  {\edef\x{%
+    \numFirstPageOfExam{\@nameuse{NextAfter\currExamName}}}%
+    \edef\y{\numLastPageOfExam{\currExamName}}%
+    \ifnum\x=\y\relax#1\fi
+  }%
 }
 \def\examenddef
 {%
@@ -4545,40 +4615,55 @@
 %    \end{macrocode}
 %    The beginning of the \env{exam} environment.
 %    \begin{macrocode}
+\let\currExamName\@empty
+\let\prevExamName\@empty
+\let\nextExamName\@empty
 \newenvironment{exam}[2][]
 {%
-  \ifDoNotRecordThisExam % dpsf02
+  \xdef\eqTWSave{\the\textwidth}%
+  \ifDoNotRecordThisExam
     \expandafter\bIFFalseWrtSolns\fi
-    \makeRoomForProb{\@fvsizeskip\textheight}{0}%
-    \let\isInExamEnv\eqe@YES
-    \stepcounter{eq@numparts}%
+  \makeRoomForProb{\@fvsizeskip\textheight}{0}%
+  \ifx\currExamName\@empty % chng
+    \xdef\currExamName{#2}\else
+    \xdef\prevExamName{\currExamName}%
+    \eqe@IWO\@auxout{\string\csarg\string
+      \gdef{NextAfter\prevExamName}{#2}}%
+    \xdef\currExamName{#2}%
+    \eqe@IWO\@auxout{\string\csarg\string
+      \gdef{PrevTo\currExamName}{\prevExamName}}%
+  \fi
+  \let\isInExamEnv\eqe@YES
+  \stepcounter{eq@numparts}%
 %    \end{macrocode}
 % If \texttt{\#2} is empty, use \cs{autoExamName}
 %    \begin{macrocode}
-    \def\eqexamargii{#2}\ifx\eqexamargii\@empty
-        \edef\eqexamargii{\autoExamName}\fi
-    \xdef\thisexamlabel{\eqexamargii}\xdef\curr@quiz{\eqexamargii}%
-    \def\eqexamargi{#1}\ifx\eqexamargi\@empty
-        \edef\eqexamargi{\eqexamargii}\fi
-    \expandafter\gdef\expandafter\thisUFexamlabel
-    \expandafter{\eqexamargi}%
-    \edef\eq@tmp{\the\partNames\string\\{\eqexamargii}}%
-    \global\partNames=\expandafter{\eq@tmp}%
-    \csarg\ifx{NumberOfParts}\relax\else
-\ifx\eqeWrtExamTitleToSolns\eqe@YES
-    \ifnum\nNumberOfP@rts=1\relax\else
-    \def\eqe@argi{#1}\ifx\eqe@argi\@empty
-        \eqe@writetoSolns{\eqexamargii}\eqe@writetoAux{\string
-            \csarg\string\gdef{userFriendly\eqexamargii}{\eqexamargii}}
+  \def\eqexamargii{#2}\ifx\eqexamargii\@empty
+      \edef\eqexamargii{\autoExamName}\fi
+  \xdef\thisexamlabel{\eqexamargii}\xdef\curr@quiz{\eqexamargii}%
+  \def\eqexamargi{#1}\ifx\eqexamargi\@empty
+      \edef\eqexamargi{\eqexamargii}\fi
+  \expandafter\gdef\expandafter\thisUFexamlabel
+  \expandafter{\eqexamargi}%
+  \edef\eq@tmp{\the\partNames\string\\{\eqexamargii}}%
+  \global\partNames=\expandafter{\eq@tmp}%
+  \csarg\ifx{NumberOfParts}\relax\else
+    \ifx\eqeWrtExamTitleToSolns\eqe@YES
+      \ifnum\nNumberOfP@rts=1\relax
+      \else
+        \def\eqe@argi{#1}%
+        \ifx\eqe@argi\@empty
+          \eqe@writetoSolns{\eqexamargii}\eqe@writetoAux{\string
+          \csarg\string\gdef{userFriendly\eqexamargii}{\eqexamargii}}
         \else
-        \eqe@writetoSolns{#1}\eqe@writetoAux{\string
-            \csarg\string\gdef{userFriendly#2}{#1}}
+          \eqe@writetoSolns{#1}\eqe@writetoAux{\string
+          \csarg\string\gdef{userFriendly#2}{#1}}%
         \fi
-    \fi\fi
-\fi
-    \exambegdef
-    \edef\temp@Exp{\noexpand\shortquiz\sqstar[\eqexamargii]}\temp@Exp
-%    \expandafter\shortquiz\sqstar[\eqexamargii]%
+      \fi
+    \fi
+  \fi
+  \exambegdef
+  \edef\temp@Exp{\noexpand\shortquiz\sqstar[\eqexamargii]}\temp@Exp
 }{%
     \examenddef
 %    \end{macrocode}
@@ -7108,6 +7193,183 @@
     \if@bypasseqexamheading\else
 \pagestyle{eqExamheadings}\fi\fi
 %    \end{macrocode}
+% \section{Insertion of figures into a problem or solution}
+% Over the years, there have been many requests for ``easy'' methods of inserting
+% images (or other content) into a problem. In this section, we provide some basic tools
+% for doing just that.
+%
+% There are two methods for inserting content (without disturbing the layout of the document):
+% (1) using a minipage; and (2) using a wrap-figure package, such as \pkg{picins} (recommended).
+%
+% The demo file for these features is \texttt{ins-fig.tex}
+% \changes{v5.1.10}{2020/03/14}{Added commands for inserting figures in a problem}
+%
+% \subsection{Enclose problem in a minipage}
+% The idea is to include the \env{problem} environment in a \env{minipage} with a width smaller than
+% \cs{linewidth}; then place the figure in another \env{minipage} next to the question. To use this
+% methods, precede the enclosing \env{minipage} with the command \cs{probInMinipage}; illustration follows.
+%\begin{verbatim}
+%\def\PROB{The problem ...}
+%\def\FIG{\includegraphics[width=4.5cm]{figura1}}
+%\probInMinipage
+%\begin{minipage}{\linewidth}
+%\begin{minipage}[t]{\textwidth-4.5cm-11pt}\kern0pt
+%\begin{problem}[10]\PROB
+%\begin{solution}[1in]
+%This is the solution to ``\PROB''
+%\end{solution}
+%\end{problem}
+%\end{minipage}
+%\begin{minipage}[t]{4.5cm}\kern0pt\FIG
+%\end{minipage}\end{minipage}
+%\end{verbatim}
+%The same technique is used for multi-part problems.
+%\begin{verbatim}
+%\probInMinipage
+%\begin{minipage}[t]{\linewidth-4.5cm-11pt}\kern0pt\parindent15pt
+%   \item \PROB
+%\begin{solution}[1in]
+%This is the solution to ``\PROB''
+%\end{solution}
+%\begin{workarea}{\sameVspace}
+%\end{minipage}\hfill
+%\begin{minipage}[t]{4.5cm}\kern0pt\FIG\end{minipage}
+%\end{verbatim}
+%\begin{macro}{\probInMinipage}
+%Place in front of a \env{minipage} environment that encloses side-by-side
+%content: the problem on the left and the figure on the right. The big problem
+%here is inserting the figure without disturbing the right margin totals.
+%The \cs{eqTWSave} is the saved value of the \cs{textwidth} in effect when
+%the \env{exam} environment is opened. The right totals box is placed in the right
+%margin based on this value.
+%    \begin{macrocode}
+\def\probInMinipage{%
+  \ifanswerkey
+    \ifkeepdeclaredvspacing
+      \global\let\w@sKeyOn\eqe@YES
+      \vspacewithkeyOff
+    \else
+      \global\let\w@sKeyOn\eqe@NO
+    \fi
+  \fi
+  \let\probInMinip@ge\eqTWSave\noindent}
+\let\probInMinip@ge\relax
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{environment}{vadjForSolnInBx}\hskip-\marginparsep\texttt{\darg{\ameta{width}}}
+%    When the \env{problem} environment environment
+%    is enclosed in a minipage, the space left for the solution is not correct when
+%    \cs{vspacewithkeyOn} is in effect.
+%
+%    This is companion environment to the \cs{probInMinipage} command whose intension is
+%    to get the spacing correct. It it placed after all \env{minipage}s
+%    are closed that enclosed the whole \env{problem}. The argument, \ameta{width}, is the same
+%    width of \env{minipage} that encloses the problem. The content of the environment should
+%    be the same content as the \env{solution} environment. \env{vadjForSolnInBx} calculates
+%    the total height of the typeset solution. It then calculates the difference between
+%    \cs{sameVspace}, which should hold the value of the optional argument of \env{solution},
+%    and the actual height of the solution. It then executes a \cs{vspace} for that amount calculated.
+%
+%    \begin{macrocode}
+\newenvironment{vadjForSolnInBx}[1]{%
+  \setlength\@tempdima{#1}%
+  \setbox\z@\vbox\bgroup\hsize\@tempdima
+}{%
+  \egroup
+  \ifanswerkey
+    \ifx\w@sKeyOn\eqe@YES
+      \global\vspacewithkeyOn\fi
+    \setlength{\@tempdima}{\ht\z@+\dp\z@}%
+    \setlength{\@tempdima}{\sameVspace-\@tempdima}%
+    \par\vspace{\@tempdima}\fi
+    \setbox\z@\box\voidb@x
+}
+%    \end{macrocode}
+%    \end{environment}
+%
+% \subsection{Insertions using a wrapping package}
+% A technique for wrapping text around the figure has been developed, and is an ugly hack.
+% The example below is typical: define \cs{insertFig} (for convenience). Prior to the
+% opening of \env{problem}, expand \verb~\bProbInsert{\insertFig}~.
+%    \begin{macro}{\bProbInsert}\hskip-\marginparsep\texttt{\darg{\ameta{fig}}}
+%    Use this command above the \env{problem} (or \env{problem*}) environment only. Prior to opening the \env{problem}
+%    use \cs{bProbInsert} with its argument. Place \DescribeMacro{\eProbInsert}\cs{eProbInsert} at the end of the statement of the
+%    question, as illustrated below. \cs{bProbInsert} puts the question into a group,
+%    \cs{eProbInsert} gets us out of the group.
+%\begin{verbatim}
+%\def\insertFig{\parpic[r]{\FIG}}
+%\bProbInsert{\insertFig}
+%\begin{problem}[10]\PROB
+%\PROB\space\PROB\eProbInsert
+%\begin{solution}[1in]
+%This is the solution: \PROB
+%\end{solution}
+%\end{problem}
+%\end{verbatim}
+%    \begin{macrocode}
+\def\bProbInsert#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \global\let\insE@rlyAtQues\@empty\else
+  \gdef\insE@rlyAtQues{\begingroup#1}\fi}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\bItemInsert}\hskip-\marginparsep\texttt{\darg{\ameta{fig}}\ameta{content}\cs{eProbInsert}}\\
+%    The \cs{bItemInsert} command is the \cs{item}-version of \cs{bProbInsert}. Place \cs{bItemInsert} with its argument
+%    just after the \cs{item}, as illustrated below. At the end of the question place \cs{eProbInsert}.
+%\begin{verbatim}
+%\begin{problem*}[5ea]
+%Solve each without error.
+%\begin{parts}
+%   \item \bItemInsert{\insertFig} \PROB
+%   \PROB\space\PROB\space\PROB\eProbInsert
+%\begin{solution}[1in]
+%This is the solution. \PROB
+%\end{solution}
+% ...
+%\end{parts}
+%\end{problem*}
+%\end{verbatim}
+%    \begin{macrocode}
+\def\bItemInsert#1{\begingroup#1\noindent\ignorespaces}
+\def\eProbInsert{\par\endgroup\@restorepar\par}
+%    \end{macrocode}
+%    \end{macro}
+% \section{Insertions in the solution section}
+% Its a bit trickier to include a wrapped graphic in the solution section. The primary
+% command for doing this is \DescribeMacro{\probInsertSoln}\cs{probInsertSoln}
+%\begin{verbatim}
+%\bProbInsert{\insertFig}
+%\probInsertSoln[\protect\vskip3pt]{\insertFig}
+%\begin{problem}[10]\begin{cq*}
+%\PROB\space\PROB
+%
+%\PROB\space\PROB\space\PROB\space\PROB\cqQS{}{\RESTOREPAR}
+%
+%\PROB\cqQS{\eProbInsert}{}
+%\end{cq*}
+%\begin{solution}[1in]
+%\ifcqSA\else\textit{Question}: \cqCopiedQues
+%\par\medskip\noindent\textit{Solution}:\space\fi
+%This is the solution: \PROB
+%\end{solution}
+%\end{problem}
+%\end{verbatim}
+%    \begin{macro}{\probInsertSoln}\hskip-\marginparsep\texttt{[\ameta{opt}]\darg{\ameta{\cs{cmd}}}}
+%    The command \ameta{\cs{cmd}} is a expands to the figure insertion; for example,
+%    \verb~\gdef\insertFig{\parpic[r]{\FIG}}~, the second argument would read \cs{insertFig}.
+%    The first argument was designed for vertical adjustment, as needed. In the sample file
+%    \texttt{ins-fig.tex}, we insert an extra 3pts, see the verbatim listing above.
+%    \begin{macrocode}
+\newcommand{\probInsertSoln}[2][]{\writeToSolnFile{#1%
+  \protect\def\protect
+  \priorexlabelheader{\protect#2\protect\noindent
+}}}
+%    \end{macrocode}
+%    Sometimes you need to insert \cs{RESTOREPAR} to make the paragraphs layout as they should.
+%    This is illustrated above.
+%    \begin{macrocode}
+\def\RESTOREPAR{\let\par\@@par}
+%    \end{macrocode}
+%    \end{macro}
 %    \begin{macrocode}
 %</package>
 %<*textbook>

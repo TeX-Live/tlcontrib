@@ -150,7 +150,7 @@ part of the\texorpdfstring{\\}{ }\texorpdfstring{\AcroTeX}{AcroTeX} eDucation Bu
 \keywords{LaTeX, hyperref, PDF, exercises, quizzes}
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
-\version{5.1.8, 2020/01/06}
+\version{5.1.10, 2020/03/14}
 \copyrightyears{2005-\the\year}
 
 \renewcommand{\exsectitletext}{Solutions to exams in this manual}
@@ -1727,7 +1727,7 @@ parameter is the value of the \texttt{label} key.
 
 I have a couple of crazy gizmos that you can use.
 
-\subsubsection{The \texttt{workarea} Environment}
+\subsubsection{The \texttt{workarea} Environment}\label{sss:workarea}
 
 For a mathematics test, we often pose
 a question that needs to be worked out. Vertical space is created
@@ -1784,7 +1784,7 @@ is not provided, and the \texttt{workarea} does nothing. If
 \texttt{solutionsafter} is specified, that space is replaced by
 the provided solution.
 
-\subsubsection{The  \texorpdfstring{\cs{placeAtxy}}{\textbackslash placeAtxy} Command}
+\subsubsection{The  \texorpdfstring{\cs{placeAtxy}}{\textbackslash placeAtxy} Command}\label{sss:placeatxy}
 
 The \cs{placeAtxy} command is another device that I've used to
 place a block of text or a graphic on top of the vertical space
@@ -1829,7 +1829,7 @@ combination with the \texttt{workarea} environment.
 % on the \hyperref[problem]{\texttt{problem} environment}, on
 % page~\hyperref[problem]{\pageref*{problem}}.
 
-\subsubsection{The \texttt{splitsolution} Environment}
+\subsubsection{The \texttt{splitsolution} Environment}\label{sss:splitsoln}
 
 I developed this environment to solve a problem with the
 \texttt{online} and \texttt{email} options.  The white space
@@ -5126,7 +5126,66 @@ in your \texttt{exam} environment.
 %\handpoint The demo file for this feature is named \texttt{markqs.tex}.
 
 \exAeBBlogPDF{p=1231} The demo file for this feature is named
-\texttt{\href{\urlAcroTeXBlog/?p=1231}{markqs.pdf}}
+\texttt{\href{\urlAcroTeXBlog/?p=1231}{markqs.pdf}} and is found on the {\AcroBlog}.
+
+\subsection{Methods for working figures into a problem}\label{s:insFigProbs}
+
+A figure is sometimes an integral part of a problem and is referred to in the
+statement of the problem. This section discusses methods of incorporating the
+figure into the problem.
+
+There are two placement locations for the figure: (1) in the work area or
+solution area depending on the state of the exam document, and (2) in the
+questions area. Traditionally, a figure is included as part of the work area;
+these methods are documented and illustrated in the earlier discussions on
+the \env{workarea} environment on page~\pageref{sss:workarea}, the
+\cs{placeAtxy} command on page~\pageref{sss:placeatxy}, and the
+\env{splitsolution} environment on page~\pageref{sss:splitsoln}. The primary
+focus, therefore, is on positioning the figure within the question itself.
+
+To insert a figure into the question, there are two methods: (1) enclose the
+problem in a \env{minipage}, enclose the figure in a \env{minipage}, and
+place them side-by-side; and~(2) use a wrapping package, such as \pkg{picins}, to
+insert and wrap the question text around the figure. We present commands in
+support of these two methods.
+
+\paragraph*{The \env{minipage} approach.}
+When a \env{problem} environment or an \cs{item} in a \env{problem*}
+environment is enclosed in a \env{minipage} to reduce the width of the
+problem to accommodate a figure, precede the outer \env{minipage} with
+the command \cs{probInMinipage} and follow the outer \env{minipage} with the
+environment \env{vadjustForSolnInBx}.
+%\begin{fullwidthEnv}[priorskip=0pt]
+\settowidth{\aebdimen}{\ttfamily\string\begin\darg{vadjForSolnInBx}\darg{\meta{width}}}%
+\def\1{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ marks a problem in a \env{minipage}}}}%
+\def\2{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ an environment that follows a problem ...}}}%
+\def\3{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ marked with \cs{probInMinipage}}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+!1\probInMinipage
+!2\begin{vadjForSolnInBx}{!meta(width)}
+!3!qquad!ameta(solution)
+\end{vadjForSolnInBx}
+\end{dCmd}
+
+\paragraph*{The wrap-the-figure method.} The next set of command supports wrapping
+the figure around the text of the question.
+
+\settowidth{\aebdimen}{\ttfamily\string\probInsertSoln\darg{\meta{content}}}%
+\def\2{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ for \env{problem} env}}}%
+\def\3{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ for \cs{item} of \env{problem*} environment}}}%
+\def\4{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ close group begun by two prior cmds}}}%
+\def\5{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ write figure to the solution page}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+!2\bProbInsert{!meta(content)}
+!3\bItemInsert{!meta(content)}
+!4\eProbInsert
+!5\probInsertSoln{!meta(content)}
+\end{dCmd}
+
+\exAeBBlogPDF{p=1419} The demo file that illustrates these commands and
+environment, named \texttt{\href{\urlAcroTeXBlog/?p=1419}{ins-fig.pdf}},
+is found on the {\AcroBlog}.
+
 
 \newpage
 \markright{References}

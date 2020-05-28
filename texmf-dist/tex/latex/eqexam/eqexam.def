@@ -7,7 +7,7 @@
 %% exerquiz.dtx  (with options: `eqexam')
 %% 
 \ProvidesFile{eqexam.def}
- [2020/01/01 v8.5.8 %
+ [2020/03/14 v8.5.10 %
  Exerquiz support file for eqexam (dps)]
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
@@ -257,6 +257,7 @@
         {\if\exerstar*\def\eq@next{\@exercise}\else
          \def\eq@next{\exercise@@}\fi\eq@next}%
 }{\eq@postexerciseHook\endexerhook\par
+    \global\let\insE@rlyAtQues\@empty
     \global\eq@exerciseheadingtrue\removelastskip\eq@exerskip}
 \def\exercise@[#1]{\edef\eq@arg{#1}%
     \if\eq@arg h\def\currhideopt{h}%
@@ -304,7 +305,8 @@
 \newcommand\exerSolnHeader[3]{%
     \prior@exerSolnHeaderHook
     \ifeqforpaper\else\webnewpage\fi\markright{#1}%\par\noindent%
-    #3%
+    \priorexlabelheader
+    #3\global\let\priorexlabelheader\relax
     \solnhspace
 }
 \let\solnItemMngt\relax
@@ -363,7 +365,8 @@
     \fi
     \eq@initializeContAnnot
     \ifeq@exerciseheading
-    \prior@questionsHook\marginparpriorhook\noindent\eqexheader@wrapper
+    \prior@questionsHook
+    \insE@rlyAtQues\marginparpriorhook\noindent\eqexheader@wrapper
     \afterlabelhskip\marginparafterhook\gEx@CommonCmd
     \eq@setPrbSolnAftrIndnt\ignorespaces\fi}
 \newif\ifterminexchanged \terminexchangedfalse % dps cq
@@ -374,6 +377,7 @@
 \def\makeExSolnsLocalOn{\makeExSlLocaltrue}
 \def\makeExSolnsLocalOff{\makeExSlLocalfalse}
 \let\eqMrkSoln\@gobble
+\let\priorexlabelheader\relax
 \def\eqExerSolnHeaderSngl{%
     \ifmakeExSlLocal\protect\begingroup^^J\fi
     \ifx\eqMrkCpyArg\@empty\else
@@ -677,7 +681,7 @@
     \endsolnexerhook\penalty0\relax}
 \let\eq@exerstarEnv\relax
 \newenvironment{exercise*}{\def\eq@exerstarEnv{*}\exercise}
-{\endexercise}
+{\global\let\insE@rlyAtQues\@empty\endexercise}
 \def\exerwparts@cols{0}
 \let\topofpartshook\relax
 \let\@listiiredefined\eq@NO
@@ -730,6 +734,7 @@
 \let\eqp@rtc@lcm@rk\relax
 \let\eq@insertContAnnot\relax
 \def\eq@item@common{\eq@insertContAnnot\eqp@rtc@lcm@rk
+    \global\let\probInMinip@ge\relax
     \def\currhideopt{x}\eq@hidesolutionfalse\eq@nolinkfalse
     \@ifnextchar[{\@ckhide}{\eq@item}}
 \newcommand{\partsitemsep}[1]{{%
@@ -762,6 +767,7 @@
     \eq@item@latex\eq@optArg\exlisttabheaderafterhook}
 \newif\ifwithinparts
 \let\ex@listtabheader@fterhook\@empty
+\let\probInMinip@ge\relax
 \newenvironment{exercise@parts@list}{%
     \settowidth{\eq@tmplength}{\parts@indent}%
     \edef\widthOfParts{\the\eq@tmplength}%
@@ -817,9 +823,11 @@
         {\eq@item@latex\ex@listtabheader@fterhook
             \exlisttabheaderafterhook}}%
     \def\eqthisenv{parts}\withinpartstrue
-    \def\item{\ifx\@currenvir\eqthisenv
+    \def\item{\ifx\probInMinip@ge\relax
+      \ifx\@currenvir\eqthisenv
         \def\eq@next{\eq@item@common}\else
         \def\eq@next{\eq@item}\fi
+      \else\def\eq@next{\eq@item@common}\fi
     \eq@next}%
 }}{\endlist\global\let\leadinitem\leadinitem@external
     \post@parts@hook\belowpartshook}
@@ -1055,9 +1063,8 @@
 \newcommand{\exerSolnInput}
 {%
   \@ifundefined{eqe@IWO}{}{\ifsolutionsAtEnd
-    \eqe@IWO\@auxout{\string\expandafter\string\gdef
-    \string\csname\space eqExamQuesLastPage\string\endcsname
-    {\arabic{page}}}\fi}\let\webnewpage\relax
+    \eqe@IWO\@auxout{\string\csarg\string\gdef
+    {eqExamQuesLastPage}{\arabic{page}}}\fi}\let\webnewpage\relax
   \ifsolutionsonly\else
     \bgroup\OKToWriteExamDatatrue
     \writeT@ExSolns{\string\endinput}\egroup
@@ -1086,6 +1093,7 @@
         \exerSolnInput
 }
 \newcommand{\prior@questionsHook}{}
+\let\insE@rlyAtQues\@empty
 \let\qMark@Hook\@empty
 \let\aebtitleQuiz\@empty
 \newcommand{\post@questionsHook}{}
@@ -1125,7 +1133,8 @@
     \toks@=\expandafter\expandafter\expandafter{#1}\expandafter
     \xdef\csname quesOpts\@quesctr\endcsname{\the\toks@}%
     \edef\tempexp{\noexpand\setkeys{props@ques}{\the\toks@}}\tempexp
-    \list{\qMark@Hook\prior@questionsHook\gdef\eqPTs{1}%
+    \list{\qMark@Hook\prior@questionsHook
+    \insE@rlyAtQues\gdef\eqPTs{1}%
     \global\let\eqQT\eq@na%
     {\@tempcnta=0 \let\@thispr@b\@empty
      \@whilenum\@tempcnta<\@eqquestiondepth\do{\advance\@tempcnta\@ne

@@ -1,5 +1,5 @@
 The eqexam Package 
-Dated: 2020-01-06
+Dated: 2020-03-14
 Author: D. P. Story
 
 eqExam is a LaTeX package for writing exams, tests, quizzes,
@@ -39,6 +39,11 @@ this package are as follows:
         authors. Documentation for this option is found in the doc/fortextbook
         folder. See also the series of blogs at
         http://www.acrotex.net/blog/?tag=fortextbook
+
+What's New (2020-03-14) Defined several commands and one environment to 
+support the insertion of a figure into a problem. Demo file that illustrates 
+these new commands and environment is found at 
+http://www.acrotex.net/blog/?p=1419 
 
 What's New (2020-01-06) Fixed a bug in eqexam, so that now comment.sty is 
 fully supported. For consistency, aeb-comment.sty is nothing more than 

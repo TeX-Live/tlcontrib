@@ -7,32 +7,32 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2100-nonfree
-depend revision/271
+depend revision/273
 
 name 00texlive.installation
 category TLCore
 revision 1
 shortdesc TeX Live configuration settings
-depend opt_paper:a4
-depend opt_path:0
 depend opt_adjustrepo:1
-depend opt_write18_restricted:1
-depend opt_frozen:0
-depend setting_available_architectures:amd64-freebsd amd64-netbsd armel-linux armhf-linux i386-cygwin i386-darwin i386-freebsd i386-linux i386-netbsd i386-solaris powerpc-darwin powerpc-linux sparc-solaris win32 x86_64-cygwin x86_64-darwin x86_64-darwinlegacy x86_64-linux x86_64-solaris
 depend opt_autobackup:1
 depend opt_backupdir:tlpkg/backups
 depend opt_create_formats:1
 depend opt_desktop_integration:1
 depend opt_file_assocs:1
+depend opt_frozen:0
 depend opt_generate_updmap:0
 depend opt_install_docfiles:1
 depend opt_install_srcfiles:1
 depend opt_location:__MASTER__
+depend opt_paper:a4
+depend opt_path:0
 depend opt_post_code:1
 depend opt_sys_bin:/usr/local/bin
 depend opt_sys_info:/usr/local/share/info
 depend opt_sys_man:/usr/local/share/man
 depend opt_w32_multi_user:1
+depend opt_write18_restricted:1
+depend setting_available_architectures:amd64-freebsd amd64-netbsd armel-linux armhf-linux i386-cygwin i386-darwin i386-freebsd i386-linux i386-netbsd i386-solaris powerpc-darwin powerpc-linux sparc-solaris win32 x86_64-cygwin x86_64-darwin x86_64-darwinlegacy x86_64-linux x86_64-solaris
 
 name acmtrans
 category Package
@@ -294,8 +294,8 @@ longdesc The package provides support files for the Adobe Caslon font
 longdesc family. The font's name, in the naming scheme specified in
 longdesc fontname, is pac. The package does not provide the (commercial)
 longdesc fonts themselves.
-execute addMap pac.map
 execute addMap pac-extra.map
+execute addMap pac.map
 docfiles size=218
  texmf-dist/doc/latex/adobecaslon/README details="Readme"
  texmf-dist/doc/latex/adobecaslon/adobecaslon.pdf details="Package documentation"
@@ -950,7 +950,7 @@ runfiles size=5
  texmf-dist/tex/latex/aebxmp/aebxmp.sty
 catalogue-contact-home http://www.math.uakron.edu/~dpstory/webeq.html
 catalogue-ctan /macros/latex/contrib/aeb_pro/aebxmp
-catalogue-license lppl1.2lppl1.2
+catalogue-license lppl1.2 lppl1.2
 catalogue-topics pdf-feat acrobat
 
 name annot-pro
@@ -1391,13 +1391,13 @@ depend acromemory
 depend acrosort
 depend acrotex
 depend adobecaslon
-depend aebenvelope
 depend aeb-minitoc
 depend aeb-mlink
 depend aeb-mobile
 depend aeb-pro
-depend aebslicing
 depend aeb-tilebg
+depend aebenvelope
+depend aebslicing
 depend aebxmp
 depend annot-pro
 depend artthreads
@@ -1412,9 +1412,9 @@ depend datepicker-pro
 depend digicap-pro
 depend dps
 depend ecards
+depend eq-save
 depend eq2db
 depend eqexam
-depend eq-save
 depend fc-arith
 depend fetchbibpes
 depend fitr
@@ -1436,8 +1436,8 @@ depend lettergothic
 depend literaturnaya
 depend lmacs
 depend lsabon
-depend lucidabr
 depend lucida-otf
+depend lucidabr
 depend lucold
 depend luxi
 depend mathstone
@@ -1863,12 +1863,12 @@ catalogue-version 2.0
 
 name eqexam
 category Package
-revision 259
+revision 273
 shortdesc A stand-alone exam package
 longdesc eqExam is a LaTeX package for writing exams, tests, quizzes,
 longdesc homework assignments, etc. It is a stand alone package, yet is
 longdesc tightly integrated with the AcroTeX eDucation Bundle (AeB).
-docfiles size=1187
+docfiles size=1216
  texmf-dist/doc/latex/eqexam/README.md details="Readme"
  texmf-dist/doc/latex/eqexam/eqecus.opt
  texmf-dist/doc/latex/eqexam/eqexam.pdf
@@ -1913,11 +1913,11 @@ docfiles size=1187
  texmf-dist/doc/latex/eqexam/fortextbook.zip
  texmf-dist/doc/latex/eqexam/fortextbook/fortextbook.pdf
  texmf-dist/doc/latex/eqexam/script/eqAttach.asp
-srcfiles size=100
+srcfiles size=103
  texmf-dist/source/latex/eqexam/eqexam.drv
  texmf-dist/source/latex/eqexam/eqexam.dtx
  texmf-dist/source/latex/eqexam/eqexam.ins
-runfiles size=69
+runfiles size=70
  texmf-dist/tex/latex/eqexam/aebrandom.def
  texmf-dist/tex/latex/eqexam/eqalone.def
  texmf-dist/tex/latex/eqexam/eqexam.def
@@ -3387,7 +3387,7 @@ runfiles size=2349
  texmf-dist/tex/latex/gandhi/TS1GandhiSerif-TOsF.fd
  texmf-dist/tex/latex/gandhi/gandhi.sty
 catalogue-ctan /fonts/gandhi
-catalogue-license noselllppl
+catalogue-license nosell lppl
 catalogue-topics font-serif font-sans font-otf font-type1 font-t1enc
 
 name garamond
@@ -3977,9 +3977,9 @@ name harftex
 category Package
 revision 235
 depend harftex.ARCH
-execute AddFormat name=harftex engine=harftex options="luatex.ini"   patterns=language.def,language.dat.lua
 execute AddFormat name=harflatex engine=harftex options="lualatex.ini"   patterns=language.dat,language.dat.lua
 execute AddFormat name=harflatex-dev engine=harftex options="lualatex.ini"   patterns=language.dat,language.dat.lua
+execute AddFormat name=harftex engine=harftex options="luatex.ini"   patterns=language.def,language.dat.lua
 docfiles size=9123
  texmf-dist/doc/generic/harftex/COPYING
  texmf-dist/doc/generic/harftex/README.md
@@ -4736,8 +4736,8 @@ longdesc themselves: the pfb files are not included in the package. To
 longdesc use Greek letters, you need to install the package Mathdesign.
 longdesc Three math versions (normal, semibold and bold) are provided
 longdesc for each font.
-execute addMap pst.map
 execute addMap ps8.map
+execute addMap pst.map
 docfiles size=24
  texmf-dist/doc/latex/mathstone/LEEME details="Readme" language="es"
  texmf-dist/doc/latex/mathstone/README details="Readme" language="en"

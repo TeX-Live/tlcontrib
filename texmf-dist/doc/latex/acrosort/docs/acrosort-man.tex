@@ -1,0 +1,360 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[%
+    web={centertitlepage,designv,forcolorpaper,latextoc,pro},
+    eforms,
+    uselayers,
+    aebxmp
+]{aeb_pro}
+%\usepackage{aeb_mlink}
+\usepackage{graphicx}
+%\usepackage{myriadpro}
+%\usepackage[usecmtt]{myriadpro}
+\usepackage[altbullet]{lucidbry}
+\usepackage{acrosort}
+\usepackage{fancyvrb}
+\usepackage{wrapfig}
+
+\let\pkg\textsf
+\let\app\textsf
+\let\env\texttt
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{\raisebox{#1}{\parbox{\marginparwidth}{\slshape\raggedleft\small#2}}}}
+\addtolength{\marginparwidth}{1in}
+
+
+%\usepackage{acaslonpro}
+%\usepackage{ajensonpro}
+%\usepackage{minionpro}
+%\usepackage{newsgothicstd}
+%\usepackage{lucidbry}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \textsf{acrosort} Package},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Documentation for AcroSort},
+    talksite={\url{www.acrotex.net}},
+    version={1.6.1}, 
+    versionLabel={Version},
+    copyrightyears={2006-\the\year},
+    prepared={2020/06/17},
+    preparedLabel={Distribution Dated:},
+    keywords={Adobe Acrobat, JavaScript, LaTeX, JavaScript, bubble sort, tiling},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+\nocopyright
+\usepackage{acroman}
+%\usepackage[active]{srcltx}
+
+
+\def\nhfootnote#1{\begin{NoHyper}\footnote{#1}\end{NoHyper}}
+
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{1.5em}{2.5em}}
+\makeatother
+
+
+\def\scalefactor{.75}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\def\AcroTeX{Acro\negthinspace\TeX}
+
+\begin{embedding}
+\isPackage
+\asEmbedTiles{choo}{20}{../examples/choo/choo}
+\isPackage
+\asEmbedTiles{emoji}{16}{graphics/myemoji}
+\end{embedding}
+
+\customFinishJS{if(sortName=="emoji") toggleSetThisLayer("retire", true);}
+
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The acrosort Package";
+var manualfilename="Manual_BG_Print_acrosort.pdf";
+var manualtemplate="Manual_BG_Green.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+
+%\definePath\bgPath{"C:/Users/Public/Documents/ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\begin{docassembly}
+%\addWatermarkFromFile({
+%    bOnTop:false,
+%    cDIPath:\bgPath
+%});
+%\executeSave();
+%\end{docassembly}
+
+
+%\previewOn\pmpvOn
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}
+
+% \ulCornerHere sets the upper left corner of where the image is to be placed.
+% \reserveSpaceByFile leaves space for the image.
+\begin{wrapfigure}{l}{2in}\vskip-\baselineskip
+\insertTiles{choo}{2in}{4}{5}
+
+
+\smallskip
+
+%
+% Simple controls, there meaning is obvious. You can changes their appearance
+% by using the option argument. See \textsf{eForms} documentation for details
+% on how to change the appearance.
+%
+
+\centering\StartSort{choo}{}{11bp}\quad\ClearSort{choo}{}{11bp}%\quad\StopSort{}{11bp}
+\vskip-\baselineskip
+\end{wrapfigure}%
+\pkg{acrosort} is a novelty {\LaTeX} package for importing a
+series of tiled images of a picture. The tiled images are randomly
+arranged, then resorted before the user's eyes using a bubble sort. We shall refer to the figure to the left
+as a \FmtMP{tiled bubble sort}\textit{tiled bubble sort}.
+
+This new version of \pkg{acrosort}, dated 2020/06/02 or later,
+supports all common workflows: \app{pdflatex}, \app{lualatex}, \app{xelatex},
+and \app{dvips\,->\,distiller}.
+
+The \pkg{graphicx}, \pkg{eforms}, and \pkg{icon-appr} packages are
+automatically input by \textsf{acrosort}. When the workflow
+\app{dvips\,->\,distiller} is used, the package \pkg{aeb\_pro} is required.
+For the first time, \FmtMP{multiple tiled bubble\\sorts supported}multiple tiled bubble sorts can appear in the same
+document,
+though only one can be sorted at a time.
+
+\paragraph*{Demo files.} There are two sample files for this distribution: \texttt{as1.tex} (only one tile bubble sort),
+and \texttt{as2.tex} (two tiled bubble sorts). These are found in the \texttt{examples} folder.
+
+
+\section{The Method}
+
+The creation of the \emph{tiled bubble sort} has two easy steps. \verb~:-{)~
+\begin{enumerate}
+  \item Embed your graphics using the \env{embedding} environment of \pkg{icon-appr} and the special
+  command \cs{asEmbedTiles}.
+\bVerb\takeMeasure{\string\asEmbedTiles[\ameta{ext}]\darg{\ameta{name}}\darg{\ameta{num-tiles}}\darg{\ameta{path}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!color(gray)\begin{embedding}
+\isPackage
+\asEmbedTiles[!ameta(ext)]{!ameta(name)}{!ameta(num-tiles)}{!ameta(path)}
+!color(gray)\end{embedding}
+\end{dCmd}
+\eVerb
+The \cs{asEmbedTiles} is defined by \pkg{acrosort}. The parameters are:
+\ameta{name} is a unique name used by \cs{insertTiles} to refer this tile
+embedding; \ameta{num-tiles} is the number of tiles; \ameta{path} is the
+path to the graphics file,\footnote{a relative or absolute path, relative
+preferred} the graphics file is referenced by its \emph{base name}.
+Usually, PDF files are used for graphics.
+
+\cs{isPackage} is optional and must appear prior to the \cs{asEmbedTiles}
+command to which it refers. \cs{isPackage} means the tiled graphic files
+are ``packaged'' in a single PDF, named
+\texttt{\ameta{base name}\_package.pdf}.
+
+The optional argument \ameta{ext} is ignored when \cs{isPackage} is
+present; otherwise, an extension of \ameta{ext} is affixed to the graphics
+file. If \ameta{ext} is not specified, then an extension of \texttt{pdf}
+(\texttt{.pdf}) is assumed.
+
+\textbf{Base name:} Suppose the base name is \texttt{myPicure}, then
+\ameta{path} might be \texttt{graphics/\allowbreak myPicture}. If
+\cs{isPackage} is expanded prior to \cs{asEmbedTiles}, \pkg{acrosort} looks
+for \texttt{myPicture\_package.pdf} in the \texttt{graphics} folder. If
+\cs{isPackage} does not appear, then \pkg{acrosort} looks for the sequence
+of the tiled graphic files \texttt{myPicture\_01}, \texttt{myPicture\_02},
+\dots \texttt{myPicture\_\ameta{num-tiles}}, numbers less than 10 are
+prefixed with a zero (0). In this case, the graphic file extension is taken
+to be the one specified by \ameta{ext}, or as \texttt{.pdf}, otherwise.
+
+\cs{asEmbedTiles} puts the base graphic file in a box and measures its dimensions;
+the format for the base graphic must be in a format that \cs{includegraphics} supports, for
+whatever PDF creator you are using. In particular, when using straight {\LaTeX},  the base document
+show have an EPS version. Note that in each of the graphics folders (\texttt{choo} and \texttt{emoji})
+both PDF and EPS versions of the base graphic are provided.
+
+\goodbreak
+
+\item In the body of the document, place the \cs{insertTiles} command:
+\bVerb\takeMeasure{\string\insertTiles\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{n-rows}}\darg{\ameta{n-cols}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\insertTiles{!ameta(name)}{!ameta(width)}{!ameta(n-rows)}{!ameta(n-cols)}
+\end{dCmd}
+\eVerb
+where \ameta{name} is the name of an embedding (\cs{asEmbedTiles});
+\ameta{width} is the total width of the picture; \ameta{n-row} is the
+number of rows; \ameta{n-cols} is the number of columns.
+\end{enumerate}
+For the tiled bubble sort figure of this document, the following was used.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+...
+\begin{embedding}
+\isPackage
+\asEmbedTiles{choo}{20}{../examples/choo/choo}
+\end{embedding}
+...
+\begin{document}
+...
+\insertTiles{choo}{2in}{4}{5}
+...
+\end{document}
+\end{Verbatim}
+It's just that simple !
+
+\section{Controlling the bubble sort}
+
+Below are three basic commands for controlling a tile bubble sort by the name
+of \ameta{name}.\normalbaselines
+\bVerb\takeMeasure{\string\StartSort[\ameta{KV-pairs}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\StartSort[!ameta(KV-pairs)]{!ameta(name)}{!ameta(wd)}{!ameta(ht)}
+\StopSort[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\ClearSort[!ameta(KV-pairs)]{!ameta(name)}{!ameta(wd)}{!ameta(ht)}
+\end{dCmd}
+\eVerb
+Use \ameta{KV-pairs} to change the appearance of the fields, where
+\ameta{KV-pairs} are \pkg{eforms} field key-value pairs. The \ameta{name} argument
+(\cs{StartSort} and \cs{ClearSort}) is the  name of the graphics to be controlled.
+(\ameta{name} must match up with the \ameta{name} argument of \cs{asEmbedTiles} and
+\cs{insertTiles}.) The \ameta{wd} and \ameta{ht} are the width and height of the push button fields.
+If a caption is provided, set \ameta{wd} to \texttt{\darg{}} and \pkg{eforms} will automatically
+calculate the width based on the value of the \cs{CA} key.
+
+\newtopic\noindent
+There are several other commands of interest, these are,
+\begin{description}
+\item[\cs{customStartJS\darg{\ameta{script}}}] (Field level) Inserts
+    \ameta{script} just prior to the start of the sort (\cs{StartSort}). The default
+    is \cs{customStartJS\darg{}}.
+\item[\cs{customFinishJS\darg{\ameta{script}}}] (Document level) Inserts
+    \ameta{script} just after the finish of the sort. The default is
+    \cs{customFinishJS\darg{}}.
+\item[\cs{appendStartSortJS\darg{\ameta{script}}}] (Field level) Inserts
+    \ameta{script} following the underlying package JavaScript of
+    \cs{StartSort}. The default is \cs{appendStartSortJS\darg{}}.
+\item[\cs{appendStopSortJS\darg{\ameta{script}}}] (Field level) Inserts
+    \ameta{script} following the JavaScript of \cs{StopSort}. The default
+    is \cs{appendStopSortJS\darg{}}.
+\item[\cs{appendClearSortJS\darg{\ameta{script}}}] (Field level) Inserts
+    \ameta{script} following the underlying package JavaScript of
+    \cs{ClearSort}. The default is \cs{appendClearSortJS\darg{}}.
+\end{description}
+Some simple examples; assume there is a text field by the name of
+\texttt{"message"}:
+\begin{Verbatim}[xleftmargin=\parindent]
+\renewcommand{\customStartJS}{%
+    var f=this.getField("message");
+    f.value="Begin sorting choo";
+}
+\renewcommand{\customFinishJS}{%
+  var f=this.getField("message");
+  f.value="Finished sorting choo";
+}
+\end{Verbatim}
+
+\paragraph*{Placement.} It should be noted that the above commands marked as
+``Field level'' may be placed in the body of the document, prior to the
+commands they effect. The other command (\cs{customFinishJS}), which is marked as
+``Document level,'' needs to be placed in the preamble to have any effect.
+
+\newtopic\noindent The sample file \texttt{as2.tex} provides examples of these various commands.
+
+
+\section{Creation of tiles}
+
+Use the package \pkg{tile-graphic}\FmtMP{\pkg{tile-graphic} pkg} to tile a
+graphics file. In the \texttt{examples} folder there are two demo files, \texttt{as1.tex}
+and \texttt{as2.tex}, that use the graphics in the \texttt{emoji} and \texttt{choo} folders.
+These two folders contain files \texttt{tg-emoji.tex} and \texttt{tg-choo.tex} that were used to produce
+the tiled graphics. The one in the \texttt{emoji}
+folder is reproduced
+below.\FmtMP[-3\baselineskip]{\texttt{pdfcreator=\mbox{\hskip20pt}\\pdflatex\string|\\lualatex\string|\\xelatex\string|\\distiller}}
+\begin{Verbatim}[fontsize=\small]
+\documentclass{article}
+\usepackage[!wrttofiles,packagefiles,pdfcreator=pdflatex]{tile-graphic}
+\setTileParams{4}{4}{emoji}
+\begin{document}
+\tileTheGraphic
+\end{document}
+\end{Verbatim}
+Refer to the documentation of \pkg{tile-graphic} for more information. Currently, the options
+are \opt{!wrttofiles} and \opt{packagefiles}, these produce \texttt{emoji\_package.pdf}. If you are using
+\app{xelatex}\FmtMP{for \app{xelatex} users}, you'll need the ``non-packaged'' files. Produce them by changing the options
+to
+\opt{wrttofiles} and \opt{!packagefiles} and compile, the files \texttt{emoji\_01.pdf},
+\texttt{emoji\_02.pdf}, \dots, \texttt{emoji\_12.pdf} should be created. It's just that simple!
+
+
+\section{Applications} %\previewOn\pmpvOn
+
+I've used this package to create birthday, wedding, and anniversary cards for
+friends. You can use it for whatever novel idea your mind can conjure up!
+Enjoy!
+\begin{center}\fboxsep1bp\fboxrule2bp\appendClearSortJS{toggleSetThisLayer("retire", false);}
+\leavevmode\llap{\StartSort{emoji}{}{11bp}\olBdry\ClearSort{emoji}{}{11bp}}\quad\fbox{\insertTiles{emoji}{2in}{4}{4}}\quad\leavevmode
+\xBld[print=true]{retire}\rlap{\parbox{1.5in}{Now, I simply must get back to my retirement, \dps}\eBld}
+
+\end{center}
+
+%\newtopic\noindent
+%Now, I simply must get back to my retirement, \dps
+\end{document}

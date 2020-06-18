@@ -2,8 +2,8 @@
 % \iffalse
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% acrosort package,                2011-12-22          %%
-%% Copyright (C) 2006--2011  D. P. Story                %%
+%% acrosort package,                                    %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%   storyd@nwfsc.edu                                   %%
 %%                                                      %%
@@ -16,267 +16,399 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{acrosort}
-%<package> [2011/12/22 v1.5 AcroSort (dps)]
+%<package> [2020/06/17 v1.6.1 AcroSort (dps)]
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[dviwindo,colorlinks,hyperindex]{hyperref}
-\pdfstringdefDisableCommands{\let\\\textbackslash}%
-\EnableCrossrefs \CodelineIndex
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\usepackage{fancyvrb}
+%\def\texorpdfstring#1#2{#1}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{web}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{web}{aebdocfmt.def cannot be found}}
+\EnableCrossrefs \CodelineIndex \RecordChanges
 \begin{document}
-  \GetFileInfo{acromemory.sty}
-  \title{The \texttt{AcroSort} Package\texorpdfstring{\\}{: }
-  A member of the AeB Pro family}
+\bgroup\ttfamily
+\gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\ltag{<}\def\rtag{>}
+\def\EXCL{!}
+\let\app\textsf\let\pkg\textsf
+  \GetFileInfo{acrosort.sty}
+  \title{The \textsf{acrosort} Package}
   \author{D. P. Story\\
-    Email: \texttt{storyd@nwfsc.edu}}
+    Email: \texttt{dpstory@acrotex.net}}
   \date{processed \today}
   \maketitle
   \tableofcontents
   \let\Email\texttt
   \DocInput{acrosort.dtx}
-  \PrintIndex
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o acrosort.ind acrosort.idx} on the command line and recompile
+    \texttt{acrosort.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o acrosort.gls acrosort.glo} on the command line and recompile
+    \texttt{acrosort.dtx}.}
 \end{document}
 %</driver>
 % \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%    \DoNotIndex{\DPSIndxList,\g@addto@macro,\divide,\box,\setbox,\x,\y,\z}
+%
+% \section{Introduction}
+% \pkg{acrosort} is a novelty {\LaTeX} package for embedding a series of tiled
+% images of a picture. The tiled images are randomly arranged, then resorted
+% before the user's eyes using a bubble sort.
+%
+% This new version of \pkg{acrosort}, dated 2020/06/02 or later, supports all
+% common workflows: \app{pdflatex}, \app{lualatex}, \app{xelatex}, and
+% \app{dvips\,\texttt{->}\,distiller}.
+%
+% The \pkg{graphicx}, \pkg{eforms}, and \pkg{icon-appr} packages are
+% automatically input by \textsf{acrosort}. When the workflow
+% \app{dvips\,\texttt{->}\,distiller} is used, the package \pkg{aeb\_pro} is required.
+%
+% For the first time, \emph{multiple tiled bubble sorts} can appear in the same document,
+% though only one can be sorted at a time.
+% \changes{v1.6}{2020/06/02}{Rewrite whole package to support \string\app{pdflatex},
+% \string\app{lualatex}, and \string\app{xelatex} workflows.}
+% \changes{v1.6.1}{2020/06/17}{Minor changes to conform to CTAN requirements.}
 % \section{Main Code}
-% When setting up your AcroSort document, you need to provide this package with
-% certain information, as listed below.
-%    \begin{macro}{\theTotalTiles}
-%    \begin{macro}{\theNumRows}
-%    \begin{macro}{\theNumCols}
-%    \begin{macro}{\theImportPath}
-%    \begin{macro}{\theIconExt}
-%    \begin{macro}{\theTeXImageWidth}
-%    \begin{macro}{\isPackage}
-%\begin{itemize}
-%   \item \cs{theTotalTiles}: The total number of tiles in the game board. For example,
-%   \verb!\theTotalTiles{20}!. This parameter is required.
-%   \item \cs{theNumRows}: The number of rows in the game board. For example,
-%   \verb!\theNumRows{5}!. This parameter is required.
-%   \item \cs{theNumCols}: The number of columns in the game board. For example,
-%   \verb!\theNumCols{4}!. This parameter is required.
-%   \item \cs{theImportPath}: The import path to the basename of the image. The path
-%   should use the path specification as defined in the PDF Ref, and the file name should
-%   have no extension. For example, \verb!\theImportPath{myFig/myimages}!. Required.
-%   \item \cs{theIconExt}: The extension of the image file(s), Required if different
-%   from \texttt{pdf}.
-%   \item \cs{theTeXImageWidth}: The scaled width of the rectangular game board. The
-%   game board will be rescaled so that its width is equal to the value specified
-%   by the argument of this command, e.g., \verb!\theTeXImageWidth{2in}!.
-%   \item \cs{isPackage} executed in the preamble signals that the icon files are
-%   packaged.
-%\end{itemize}
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
 % \paragraph*{Required Packages.}
 %    \begin{macrocode}
-\RequirePackage[execJS]{eforms}
+\@ifpackageloaded{eforms}{\let\execjs=y}
+  {\RequirePackage[execJS]{eforms}}
+\ifxetex\makeXasPDOff\fi
+%    \end{macrocode}
+% (2020/06/02) We require the \pkg{icon-appr} package.
+%    \begin{macrocode}
+\RequirePackage{icon-appr}
+\RequirePackage{multido}
 \RequirePackage{graphicx}
 %    \end{macrocode}
-%    \begin{macrocode}
-\def\theTotalTiles#1{\def\nTotalTiles{#1}}
-\let\nTotalTiles\@empty
-%    \end{macrocode}
-% For \cs{theNumRows} and \cs{theNumCols} we try to calculate the total
-% number of tiles, \cs{nTotalTiles}. We must wait until both the row and
-% column command have been expanded.
-%    \begin{macrocode}
-\def\theNumRows#1{%
-    \def\nRows{#1}%
-    \ifx\nCols\@empty\else
-        \ifx\nTotalTiles\@empty
-        {\count0=#1\relax\multiply\count0by\nCols
-            \xdef\nTotalTiles{\the\count0}}%
-        \fi
-    \fi
-    }
-\let\nRows\@empty
-\def\theNumCols#1{%
-    \def\nCols{#1}%
-    \ifx\nRows\@empty\else
-        \ifx\nTotalTiles\@empty
-        {\count0=#1\relax\multiply\count0by\nRows
-            \xdef\nTotalTiles{\the\count0}}%
-        \fi
-    \fi
-}
-\let\nCols\@empty
-\def\theImportPath#1{\def\importpath{#1}}
-\def\theIconExt#1{\def\iconsExt{#1}}
-\def\iconsExt{pdf}
-\def\theTeXImageWidth#1{\def\texImageWidth{#1}%
-    {\dimen0=\texImageWidth \xdef\imageWidth{\strip@pt\dimen0 }}%
-}
-\def\isPackage{\def\bIsPackage{true}}
-\def\bIsPackage{false}
-%    \end{macrocode}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \begin{macro}{\ulCornerHere}
-%    \begin{macro}{\reserveSpaceByDimension}
-%    \begin{macro}{\reserveSpaceByFile}
-% This group of buttons appear together. \cs{ulCornerHere} is used to
-% set the upper left corner of the image. One of the two commands
-% \cs{reserveSpaceByDimension} or \cs{reserveSpaceByFile} immediately follow
-% the `corner' commands.
-%    \begin{macrocode}
-\def\ulCornerHere{\makebox[0pt][l]%
-    {\pushButton[\autoCenter{n}]{ulcorner}{0pt}{0pt}}}
-%    \end{macrocode}
-% The two arguments are $\texttt{\#1} = \mbox{width}$ and $\texttt{\#2} = \mbox{height}$.
-%    \begin{macrocode}
-\def\reserveSpaceByDimension#1#2{%
-    \hbox{\ifpreview\setlength\fboxrule{0.4pt}\setlength\fboxsep{0pt}%
-    \@tempdima=#1\advance\@tempdima by-\fboxrule
-    \@tempdimb=#2\advance\@tempdimb by-\fboxrule
-    \fbox{\parbox[t][\@tempdimb][t]{\@tempdima}{\kern0pt\hfill\vfill}}%
-    \else\parbox[t][#2][t]{#1}{\kern0pt\hfill\vfill}\fi}%
-}
-\newcommand{\reserveSpaceByFile}[1][\importpath]%
-    {{\setbox0=\hbox{\includegraphics[draft,width=\texImageWidth]{#1}}%
-    \reserveSpaceByDimension{\wd0}{\ht0}}}
-%    \end{macrocode}
-%    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \begin{macro}{\StartSort}
-%    \begin{macro}{\ClearSort}
-%    \begin{macro}{\StopSort}
+%    \section{Some simple controls}
 % Some buttons to control the starting, stopping and clearing of the image. You can
 % change the appearance of these buttons by using the optional parameter, see the
-% \textsf{eForms} documentation.
+% \pkg{eforms} documentation.
+%    \begin{macro}{\StartSort}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Starts the sort for the pictures having the associated \ameta{name}.
 %    \begin{macrocode}
-\newcommand{\StartSort}[1][]{{\small\pushButton[\CA{Press Me}#1
-    \A{\JS{%
-    ok2Continue = true;\r
-    mixupDPS();\r
-    showDPS();\r
-    sortoutDPS();
-    }}]{StartButton}{}{12bp}}%
-}
-\newcommand{\ClearSort}[1][]%
-    {\small{\pushButton[\CA{Clear}#1\A{\JS{%
-        clearDPS();\sortCustomStartJS}}%
-    ]{StartButton}{}{12bp}}%
-}
-\newcommand{\StopSort}[1][]%
-    {\small{\pushButton[\CA{Stop}#1\A{\JS{ok2Continue = false;}}%
-    ]{StartButton}{}{12bp}}%
+\newcommand{\StartSort}[4][]
+  {\pushButton[\CA{Press Me}#1\A{\JS{\sortCustomStartJS;\r
+   startSortAS("#2");
+   \@ppendStartSortJS}}]{btStartSort}{#3}{#4}%
 }
 %    \end{macrocode}
 %    \end{macro}
-%    \end{macro}
-%    \end{macro}
-%    \begin{macro}{\bDebug}
-% Debugging command. Get back more info when you assemble the document.
+%    \begin{macro}{\ClearSort}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Clears the sort for the pictures having the associated \ameta{name}, it does this simply
+%    by making all pictures hidden.
 %    \begin{macrocode}
-\def\bDebug{\def\memDebug{true}}
-\def\memDebug{false}
+\newcommand{\ClearSort}[4][]%
+  {\pushButton[\CA{Clear}#1\A{\JS{%
+    var f=this.getField("btn#2pic");\r
+    if(f!=null)f.display=display.hidden;\r
+    asOk2Continue = false;
+    \@ppendClearSortJS
+  }}]{btnClearSort}{#3}{#4}%
+}
 %    \end{macrocode}
 %    \end{macro}
-% \section{Document JavaScript for \textsf{AcroSort}}
-% Most of the work of this package is done with document JavaScript, and here
-% it is.
-%\par\medskip\noindent
-%\StopEventually{JavaScript listing suppressed,
-% comment out \cs{OnlyDescription} at the beginning of this file to see
-% the JavaScript.}
+%    \begin{macro}{\StopSort}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Starts the sort for the pictures having the associated \ameta{name}.
+%    \begin{macrocode}
+\newcommand{\StopSort}[3][]
+    {\pushButton[\CA{Stop}#1\A{\JS{%
+      asOk2Continue = false;
+      \@ppendStopSortJS
+    }}]{btnStopSort}{#2}{#3}%
+}
+%    \end{macrocode}
+%    \begin{macro}{\customStartJS}\hskip-\marginparsep\texttt{\darg{\ameta{script}}}
+%    Inserts \ameta{script} into the beginning of the \cs{StartSort} command.
 %    \begin{macrocode}
 \newcommand{\customStartJS}[1]{\def\sortCustomStartJS{#1}}
-\let\sortCustomStartJS\@empty
-\newcommand{\customFinishJS}[1]{\def\sortCustomFinishJS{#1}}
+\let\sortCustomStartJS\@gobbletwo
+%    \end{macrocode}
+%    \end{macro}
+%    \leavevmode\DescribeMacro\appendStartSortJS\hskip-\marginparsep\texttt{\darg{\ameta{script}}}
+%    Appends \ameta{script} to the \cs{StartSort} control.
+%    \begin{macrocode}
+\def\appendStartSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendStartSortJS\@empty\else
+  \def\@ppendStartSortJS{\r #1}\fi}
+\let\@ppendStartSortJS\@empty
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\appendClearSortJS\hskip-\marginparsep\texttt{\darg{\ameta{script}}}
+%    Appends \ameta{script} to the \cs{ClearSort} control.
+%    \begin{macrocode}
+\def\appendClearSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendClearSortJS\@empty\else
+  \def\@ppendClearSortJS{\r #1}\fi}
+\let\@ppendClearSortJS\@empty
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\appendStopSortJS\hskip-\marginparsep\texttt{\darg{\ameta{script}}}
+%    Appends \ameta{script} to the \cs{StopSort} control.
+%    \begin{macrocode}
+\def\appendStopSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendStopSortJS\@empty\else
+  \def\@ppendStopSortJS{\r #1}\fi}
+\let\@ppendStopSortJS\@empty
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+%    \end{macrocode}
+%\leavevmode\DescribeMacro\asIconPic\hskip-\marginparsep\texttt
+%    {[\ameta{opts}]\darg{\ameta{fieldname}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    There is allowance for displaying additional button images. The
+%    \begin{macrocode}
+\newcommand{\asIconPic}[4][]{% \I{\csOf{name}} required
+  \pushButton[\Ff{\FfReadOnly}\BG{}\S{S}#1\TP{1}\F{\FHidden}
+    \PA{.5 1}]{#2}{#3}{#4}}
+%    \end{macrocode}
+% \section{Embedding the tiles}
+%   The first step is to embed the tiles using the \env{embedding} environment of \pkg{icon-appr}.
+%    \begin{macrocode}
+%    \end{macrocode}
+%   \leavevmode
+%   \DescribeMacro\asEmbedTiles\hskip-\marginparsep\texttt{[\ameta{ext}]\darg{\ameta{name}}\darg{\ameta{n-pics}}\darg{\ameta{path}}}
+%   We take a graphic and explode it into rows and columns, \ameta{n-pics} is the total number
+%   of tiled pictures. We assume the tiles are created row-wise, possible by the \pkg{tile-graphic} package. We assume also a naming convention
+%   for the tiles if \texttt{mypic} is the basename of the picture or graphic, then the tiles are
+%   named \texttt{mypic\_01}, \texttt{mypic\_02}, \texttt{mypic\_03}, \dots. It is assumed a single digit
+%   index has a leading 0. Use the command \DescribeMacro\isPackage
+%   \cs{isPackage} prior to \cs{asEmbedTiles}.
+%   \changes{v1.5}{2020/05/30}{Embed graphics and support for packaged graphics}
+%    \begin{macrocode}
+\newcount\as@nCnt
+\newif\if@isPackaged\@isPackagedfalse
+\def\isPackage{\@isPackagedtrue}
+\let\asIconObjs\@gobble
+\newcommand{\asEmbedTiles}[4][]{\begingroup
+  \gdef\asNumSideShowPics{#3}%
+  \csarg\gdef{asGraphicPath#2}{#4}%
+  \def\@Ext{#1}\ifx\@Ext\@empty\def\@Ext{.pdf}\else\def\@Ext{.#1}\fi
+  \@tempcnta\z@
+  \let\@embedList\@empty
+% \let\DPSIndxList\@gobble
+  \edef\z{\noexpand\g@addto@macro\noexpand
+    \asIconObjs{,"#2":\asNumSideShowPics}}\z
+  \@whilenum \@tempcnta < \asNumSideShowPics \do{%
+    \as@nCnt\@tempcnta\advance\as@nCnt\@ne
+    \ifnum\as@nCnt<10\relax\edef\x{0\the\as@nCnt}\else
+      \edef\x{\the\as@nCnt}\fi
+%   \edef\z{\noexpand\g@addto@macro\noexpand\DPSIndxList{,"\x"}}\z
+    \ifxetex\if@isPackaged
+      \PackageWarning{acrosort}
+      {There is no support for embedding packaged\MessageBreak
+      PDFs with xelatex. Ignoring the \string\isPackage\MessageBreak
+      command}%
+      \@isPackagedfalse
+    \fi\fi
+    \if@isPackaged
+      \ifpdf
+        \edef\y{\noexpand
+          \embedIcon[name=#2pic\x,%
+          hyopts={page=\x}]{#4_package.pdf}}%
+      \else
+        \edef\y{\noexpand
+          \embedIcon[name=#2pic\x,placement=btn#2pic.\x,%
+          page=\x-1]{#4_package.pdf}}%
+      \fi
+    \else
+      \edef\y{\noexpand
+        \embedIcon[name=#2pic\x,placement=btn#2pic.\x]{#4_\x\@Ext}}%
+    \fi
+    \expandafter\g@addto@macro\expandafter\@embedList\expandafter{\y}%
+    \@tempcnta\as@nCnt
+  }% do
+  \toks@=\expandafter{\@embedList}\the\toks@
+  \endgroup
+  \global\@isPackagedfalse
+}
+%    \end{macrocode}
+% \section{Inserting the tiles to be sorted} The next step is to insert
+% the tiles into the body of the document, and sort them.\vskip6pt\noindent
+%   \DescribeMacro\insertTiles\hskip-\marginparsep
+%   \texttt{\darg{\ameta{width}}\darg{\ameta{rows}}\darg{\ameta{cols}}}
+% Command for placing the tiles of a picture. We assume that the pictures are numbered
+% consecutively across rows.
+% \begin{quote}
+% \begin{description}
+% \item[\ameta{name}]  The name of the graphic (a JavaScript identifier)
+% \item[\ameta{width}] The width of the image, the height is scaled proportionally
+% \item[\ameta{rows}]  The number of rows
+% \item[\ameta{cols}]  The number of columns
+% \end{description}
+% \end{quote}
+%      \begin{macrocode}
+\newcommand\insertTiles[4]{\begingroup
+  \setbox\z@\hbox{%
+    \includegraphics[draft,width=#2]{\@nameuse{asGraphicPath#1}}}%
+  \edef\asGrphWd{\the\wd\z@}%
+  \@tempdima\wd\z@
+  \divide\@tempdima #4\relax
+  \edef\asTileWd{\the\@tempdima}%
+  \setlength\@tempdima{\ht\z@+\dp\z@}%
+  \setbox\z@\box\voidb@x
+  \edef\asTtlGrphHt{\the\@tempdima}%
+  \@tempdima\asTtlGrphHt\relax
+  \divide\@tempdima #3\relax
+  \edef\asTileHt{\the\@tempdima}%
+  \begin{minipage}{#2}%
+    \offinterlineskip\@tempcnta\z@
+    \multido{\iR=1+1}{#3}{\hbox{%
+      \multido{\iC=1+1}{#4}{%
+        \global\advance\@tempcnta\@ne
+        \ifnum\@tempcnta<10\relax
+          \edef\x{0\the\@tempcnta}\else
+          \edef\x{\the\@tempcnta}\fi
+        \edef\iconPresets{\noexpand\I{\noexpand\csOf{#1pic\x}}}%
+        \asIconPic[\BC{}\FB{true}\presets{\iconPresets}%
+          \presets{\astile@KVs}]{btn#1pic.\x}{\asTileWd}{\asTileHt}%
+      }% inner multido
+    }}% hbox, outer multido
+  \end{minipage}%
+  \endgroup
+}
+%    \end{macrocode}
+% \leavevmode\DescribeMacro\astileKVs\hskip-\marginparsep\texttt{\ameta{KV-pairs}}
+% A way to pass \pkg{eform} key-values to the optional
+% argument of the underlying push button.
+%    \begin{macrocode}
+\def\astileKVs#1{\def\astile@KVs{#1}}
+\astileKVs{}
+%    \end{macrocode}
+%
+% \section{Document JavaScript for \textsf{acrosort}}
+% Most of the work of this package is done with document JavaScript, and here
+% it is.
+%    \begin{macro}{\customFinishJS}\hskip-\marginparsep\texttt{\darg{\ameta{script}}}
+%    Inserts \ameta{script} at the end of the bubble sort.
+%    \begin{macrocode}
+\newcommand{\customFinishJS}[1]{\gdef\sortCustomFinishJS{#1}}
 \def\sortCustomFinishJS{;}
-\begin{insDLJS}[randomDPS]{sort}{JS for bubble sort}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+\begin{insDLJS}{asSort}{AcroSort: Bubble Sort}
 // Global Data:
-var randomDPS = new Array(\nTotalTiles+1);
-var ldps = randomDPS.length;
+var btnbase="";     // btn<name>pic.01, btn<name>pic.02, etc
+var iconbase="";    // <name>pic01, <name>pic02, etc.
+var iconObjs={\asIconObjs};
+var sortName="";
+var randomAS = new Array();
 var timeout = 10;
 var shutdown;
-var debug = \memDebug;
-var ok2Continue = true;
-for (i=1; i<=\nTotalTiles; i++) randomDPS[i]=i;
-
-// Clear DPS:
-try {this.addIcon("nullIcon", this.createIcon("", 0, 0));} catch(e) {}
-
-function clearDPS()
-{
-    for ( var i=1; i<=\nTotalTiles; i++ )
-    {
-        var oIcon = this.getIcon("nullIcon");
-        var f = this.getField("button."+i);
-        f.buttonSetIcon(oIcon);
-    }
+var asOk2Continue = false;
+function initRandomDPS(name) {
+  var nTotalTiles = iconObjs[name];
+  for (i=1; i<=nTotalTiles; i++) randomAS[i]=i;
+  return nTotalTiles;
 }
-
-// Mixup DPS:
-function mixupDPS()
+%    \end{macrocode}
+%    \leavevmode\IndexJS{startSortAS}\hskip-\marginparsep\texttt{(\ameta{name})} is the function
+%    that starts the sorting.
+%    \begin{macrocode}
+function startSortAS(name) {
+  if (!asOk2Continue) {
+    sortName=name;
+    randomAS = new Array();
+    var f=this.getField("btn"+name+"pic");
+    if(f!=null)f.display=display.visible;
+    asOk2Continue = true;
+    mixupAS();
+    showAS();
+    sortoutAS();
+  }
+}
+function mixupAS()
 {
     var i, rand, temp;
-    for (i=1; i<= \nTotalTiles; i++)
+    var nTotalTiles=initRandomDPS(sortName);
+    var ldps = randomAS.length;
+    for (i=1; i<= nTotalTiles; i++)
     {
         var rand = Math.random();
         rand *= ldps*ldps;
         rand = Math.ceil(rand);
         rand = rand \% ldps;
         if (rand == 0 ) rand = 1;
-        temp = randomDPS[i];
-        randomDPS[i]=randomDPS[rand];
-        randomDPS[rand]=temp;
+        temp = randomAS[i];
+        randomAS[i]=randomAS[rand];
+        randomAS[rand]=temp;
     }
 }
-
-// Show DPS:
-function showDPS()
+function showAS()
 {
-    \sortCustomStartJS
-    for ( var i=1; i<=\nTotalTiles; i++ )
+    var I,J;
+    var nTotalTiles = iconObjs[sortName];
+    btnbase="btn"+sortName+"pic.";
+    iconbase=sortName+"pic";
+    for ( var i=1; i<=nTotalTiles; i++ )
     {
-        var oIcon = this.getIcon("pic."+randomDPS[i]);
-        var f = this.getField("button."+i);
+        I=((i<10)?"0":"")+i;
+        J=((randomAS[i]<10)?"0":"")+randomAS[i];
+        var oIcon = this.getIcon(iconbase+J);
+        var f = this.getField(btnbase+I);
         f.buttonSetIcon(oIcon);
     }
 }
-
-// Sortout DPS:
-function sortoutDPS()
+function sortoutAS()
 {
-    outerLoop(randomDPS.length-1);
+    outerLoop(randomAS.length-1);
 }
 function outerLoop(i)
 {
-     if ( ok2Continue && (i >= 0) ) shutdown = app.setTimeOut("app.clearTimeOut(shutdown); innerLoop("+i+",1);", timeout);
+     if ( asOk2Continue && (i >= 0) )
+        shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+",1);", timeout);
      else {
-        \sortCustomFinishJS
+      asOk2Continue=false;
+     \sortCustomFinishJS
      }
 }
 function innerLoop(i,j)
 {
+    var I, J;
     if ( j <= i )
     {
-       if (randomDPS[j-1] > randomDPS[j])
+       if (randomAS[j-1] > randomAS[j])
        {
-            var temp = randomDPS[j-1];
-            randomDPS[j-1] = randomDPS[j];
-            randomDPS[j] = temp;
-            var oIcon = this.getIcon("pic."+randomDPS[j-1]);
-            var f = this.getField("button."+(j-1));
+            var temp = randomAS[j-1];
+            randomAS[j-1] = randomAS[j];
+            randomAS[j] = temp;
+            J=((randomAS[j-1]<10)?"0":"")+randomAS[j-1];
+            I=((j-1 < 10)?"0":"")+(j-1);
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
             f.buttonSetIcon(oIcon);
-            var oIcon = this.getIcon("pic."+randomDPS[j]);
-            var f = this.getField("button."+j);
+            J=((randomAS[j]<10)?"0":"")+randomAS[j];
+            I=((j < 10)?"0":"")+j;
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
             f.buttonSetIcon(oIcon);
         }
         j++
-        if ( ok2Continue ) shutdown = app.setTimeOut("app.clearTimeOut(shutdown); innerLoop("+i+","+j+");", timeout);
-        else {
-            \sortCustomFinishJS
-        }
+        if ( asOk2Continue ) %
+shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+","+j+");", timeout);
     }
     else
     {
@@ -285,93 +417,6 @@ function innerLoop(i,j)
     }
 }
 \end{insDLJS}
-
-\begin{execJS}{acrosortjs}
-var index, ip="\importpath";
-var re=/_package$/;
-var isPackage=\bIsPackage;
-if (debug) console.println("isPackage: " + isPackage);
-if (debug) console.println("nTotalTiles = " + \nTotalTiles)
-if (isPackage) {
-    ip = ip+"_package";
-    for ( var i = 1; i <= \nTotalTiles; i++)
-    {
-        try { aebTrustedFunctions(this, aebImportIcon, {cName: "pic."+i,
-        nPage: (i-1), cDIPath: ip+".\iconsExt"}, this);
-        } catch(e) {console.println("exception: " + e.toSource())}
-
-    }
-} else {
-    for ( var i = 1; i <= \nTotalTiles; i++)
-    {
-        index = ( i < 10 ) ? "0"+i : ""+i;
-        if (debug) console.println(ip+"_"+index+".\iconsExt")
-        try { aebTrustedFunctions(this, aebImportIcon, {cName: "pic."+i, cDIPath: ip+"_"+index+".\iconsExt"}, this);
-        } catch(e) {console.println("exception: " + e.toSource())}
-    }
-}
-// Now lay out the icon fields.
-var f = this.getField("ulcorner");
-var nPage = f.page;
-var ulCorner = f.rect;
-this.removeField("ulcorner");
-
-ip = ip.replace(re,"");
-ip=ip+".pdf";
-var doc = aebTrustedFunctions( this, aebAppOpenDoc, { cPath: ip, oDoc: this, bHidden: true });
-var aRect = doc.getPageBox({cBox:"Crop"})
-doc.closeDoc(true);
-
-if (debug) console.println("aRect: " + aRect.toSource());
-
-var nRows = \nRows;
-var nCols = \nCols;
-
-
-var width = aRect[2]-aRect[0];
-var height = aRect[1]-aRect[3];
-
-var scaleFactor = \imageWidth/width;
-
-if (debug) console.println("scaleFactor = " + scaleFactor);
-
-var scaledWidth = width*scaleFactor;
-var scaledHeight = height*scaleFactor;
-
-if (debug) console.println("scaledWidth = " + scaledWidth);
-if (debug) console.println("scaledHeight = " + scaledHeight);
-
-var mWidth = scaledWidth/nCols
-var mHeight = scaledHeight/nRows
-
-if (debug) console.println("mWidth = " + mWidth);
-if (debug) console.println("mHeight = " + mHeight);
-
-var nCnt = 0;
-
-for ( var i=0; i<nRows; i++) {
-    for ( var j=0; j<nCols; j++ ) {
-        nCnt++;
-        try {
-        var g = this.addField({
-            cName: "button."+nCnt,
-            cFieldType: "button",
-            nPageNum: nPage,
-            oCoords: [ ulCorner[0]+j*mWidth, ulCorner[1]-i*mHeight, ulCorner[0]+(j+1)*mWidth, ulCorner[1]-(i+1)*mHeight ]
-        });
-        } catch(e) { console.println( e.toSource()); }
-        try {
-        g.highlight=highlight.p
-        g.buttonPosition = position.iconOnly;
-        g.lineWidth = 0;
-        g.readonly = true;
-        } catch(e) { console.println("set properties: " + e.toSource()) }
-        var oIcon = this.getIcon("pic."+nCnt);
-        g.buttonSetIcon(oIcon,1);
-    }
-}
-// aebTrustedFunctions(this, aebSaveAs, "Save")
-\end{execJS}
 %</package>
 %    \end{macrocode}
 %  \Finale

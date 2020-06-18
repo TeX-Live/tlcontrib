@@ -8,8 +8,8 @@
 %% 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% acrosort package,                2011-12-22          %%
-%% Copyright (C) 2006--2011  D. P. Story                %%
+%% acrosort package,                                    %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%   storyd@nwfsc.edu                                   %%
 %%                                                      %%
@@ -21,159 +21,224 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{acrosort}
- [2011/12/22 v1.5 AcroSort (dps)]
-\RequirePackage[execJS]{eforms}
+ [2020/06/17 v1.6.1 AcroSort (dps)]
+\@ifpackageloaded{eforms}{\let\execjs=y}
+  {\RequirePackage[execJS]{eforms}}
+\ifxetex\makeXasPDOff\fi
+\RequirePackage{icon-appr}
+\RequirePackage{multido}
 \RequirePackage{graphicx}
-\def\theTotalTiles#1{\def\nTotalTiles{#1}}
-\let\nTotalTiles\@empty
-\def\theNumRows#1{%
-    \def\nRows{#1}%
-    \ifx\nCols\@empty\else
-        \ifx\nTotalTiles\@empty
-        {\count0=#1\relax\multiply\count0by\nCols
-            \xdef\nTotalTiles{\the\count0}}%
-        \fi
-    \fi
-    }
-\let\nRows\@empty
-\def\theNumCols#1{%
-    \def\nCols{#1}%
-    \ifx\nRows\@empty\else
-        \ifx\nTotalTiles\@empty
-        {\count0=#1\relax\multiply\count0by\nRows
-            \xdef\nTotalTiles{\the\count0}}%
-        \fi
-    \fi
+\newcommand{\StartSort}[4][]
+  {\pushButton[\CA{Press Me}#1\A{\JS{\sortCustomStartJS;\r
+   startSortAS("#2");
+   \@ppendStartSortJS}}]{btStartSort}{#3}{#4}%
 }
-\let\nCols\@empty
-\def\theImportPath#1{\def\importpath{#1}}
-\def\theIconExt#1{\def\iconsExt{#1}}
-\def\iconsExt{pdf}
-\def\theTeXImageWidth#1{\def\texImageWidth{#1}%
-    {\dimen0=\texImageWidth \xdef\imageWidth{\strip@pt\dimen0 }}%
+\newcommand{\ClearSort}[4][]%
+  {\pushButton[\CA{Clear}#1\A{\JS{%
+    var f=this.getField("btn#2pic");\r
+    if(f!=null)f.display=display.hidden;\r
+    asOk2Continue = false;
+    \@ppendClearSortJS
+  }}]{btnClearSort}{#3}{#4}%
 }
-\def\isPackage{\def\bIsPackage{true}}
-\def\bIsPackage{false}
-\def\ulCornerHere{\makebox[0pt][l]%
-    {\pushButton[\autoCenter{n}]{ulcorner}{0pt}{0pt}}}
-\def\reserveSpaceByDimension#1#2{%
-    \hbox{\ifpreview\setlength\fboxrule{0.4pt}\setlength\fboxsep{0pt}%
-    \@tempdima=#1\advance\@tempdima by-\fboxrule
-    \@tempdimb=#2\advance\@tempdimb by-\fboxrule
-    \fbox{\parbox[t][\@tempdimb][t]{\@tempdima}{\kern0pt\hfill\vfill}}%
-    \else\parbox[t][#2][t]{#1}{\kern0pt\hfill\vfill}\fi}%
+\newcommand{\StopSort}[3][]
+    {\pushButton[\CA{Stop}#1\A{\JS{%
+      asOk2Continue = false;
+      \@ppendStopSortJS
+    }}]{btnStopSort}{#2}{#3}%
 }
-\newcommand{\reserveSpaceByFile}[1][\importpath]%
-    {{\setbox0=\hbox{\includegraphics[draft,width=\texImageWidth]{#1}}%
-    \reserveSpaceByDimension{\wd0}{\ht0}}}
-\newcommand{\StartSort}[1][]{{\small\pushButton[\CA{Press Me}#1
-    \A{\JS{%
-    ok2Continue = true;\r
-    mixupDPS();\r
-    showDPS();\r
-    sortoutDPS();
-    }}]{StartButton}{}{12bp}}%
-}
-\newcommand{\ClearSort}[1][]%
-    {\small{\pushButton[\CA{Clear}#1\A{\JS{%
-        clearDPS();\sortCustomStartJS}}%
-    ]{StartButton}{}{12bp}}%
-}
-\newcommand{\StopSort}[1][]%
-    {\small{\pushButton[\CA{Stop}#1\A{\JS{ok2Continue = false;}}%
-    ]{StartButton}{}{12bp}}%
-}
-\def\bDebug{\def\memDebug{true}}
-\def\memDebug{false}
 \newcommand{\customStartJS}[1]{\def\sortCustomStartJS{#1}}
-\let\sortCustomStartJS\@empty
-\newcommand{\customFinishJS}[1]{\def\sortCustomFinishJS{#1}}
+\let\sortCustomStartJS\@gobbletwo
+\def\appendStartSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendStartSortJS\@empty\else
+  \def\@ppendStartSortJS{\r #1}\fi}
+\let\@ppendStartSortJS\@empty
+\def\appendClearSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendClearSortJS\@empty\else
+  \def\@ppendClearSortJS{\r #1}\fi}
+\let\@ppendClearSortJS\@empty
+\def\appendStopSortJS#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\@ppendStopSortJS\@empty\else
+  \def\@ppendStopSortJS{\r #1}\fi}
+\let\@ppendStopSortJS\@empty
+\newcommand{\asIconPic}[4][]{% \I{\csOf{name}} required
+  \pushButton[\Ff{\FfReadOnly}\BG{}\S{S}#1\TP{1}\F{\FHidden}
+    \PA{.5 1}]{#2}{#3}{#4}}
+\newcount\as@nCnt
+\newif\if@isPackaged\@isPackagedfalse
+\def\isPackage{\@isPackagedtrue}
+\let\asIconObjs\@gobble
+\newcommand{\asEmbedTiles}[4][]{\begingroup
+  \gdef\asNumSideShowPics{#3}%
+  \csarg\gdef{asGraphicPath#2}{#4}%
+  \def\@Ext{#1}\ifx\@Ext\@empty\def\@Ext{.pdf}\else\def\@Ext{.#1}\fi
+  \@tempcnta\z@
+  \let\@embedList\@empty
+  \edef\z{\noexpand\g@addto@macro\noexpand
+    \asIconObjs{,"#2":\asNumSideShowPics}}\z
+  \@whilenum \@tempcnta < \asNumSideShowPics \do{%
+    \as@nCnt\@tempcnta\advance\as@nCnt\@ne
+    \ifnum\as@nCnt<10\relax\edef\x{0\the\as@nCnt}\else
+      \edef\x{\the\as@nCnt}\fi
+    \ifxetex\if@isPackaged
+      \PackageWarning{acrosort}
+      {There is no support for embedding packaged\MessageBreak
+      PDFs with xelatex. Ignoring the \string\isPackage\MessageBreak
+      command}%
+      \@isPackagedfalse
+    \fi\fi
+    \if@isPackaged
+      \ifpdf
+        \edef\y{\noexpand
+          \embedIcon[name=#2pic\x,%
+          hyopts={page=\x}]{#4_package.pdf}}%
+      \else
+        \edef\y{\noexpand
+          \embedIcon[name=#2pic\x,placement=btn#2pic.\x,%
+          page=\x-1]{#4_package.pdf}}%
+      \fi
+    \else
+      \edef\y{\noexpand
+        \embedIcon[name=#2pic\x,placement=btn#2pic.\x]{#4_\x\@Ext}}%
+    \fi
+    \expandafter\g@addto@macro\expandafter\@embedList\expandafter{\y}%
+    \@tempcnta\as@nCnt
+  }% do
+  \toks@=\expandafter{\@embedList}\the\toks@
+  \endgroup
+  \global\@isPackagedfalse
+}
+\newcommand\insertTiles[4]{\begingroup
+  \setbox\z@\hbox{%
+    \includegraphics[draft,width=#2]{\@nameuse{asGraphicPath#1}}}%
+  \edef\asGrphWd{\the\wd\z@}%
+  \@tempdima\wd\z@
+  \divide\@tempdima #4\relax
+  \edef\asTileWd{\the\@tempdima}%
+  \setlength\@tempdima{\ht\z@+\dp\z@}%
+  \setbox\z@\box\voidb@x
+  \edef\asTtlGrphHt{\the\@tempdima}%
+  \@tempdima\asTtlGrphHt\relax
+  \divide\@tempdima #3\relax
+  \edef\asTileHt{\the\@tempdima}%
+  \begin{minipage}{#2}%
+    \offinterlineskip\@tempcnta\z@
+    \multido{\iR=1+1}{#3}{\hbox{%
+      \multido{\iC=1+1}{#4}{%
+        \global\advance\@tempcnta\@ne
+        \ifnum\@tempcnta<10\relax
+          \edef\x{0\the\@tempcnta}\else
+          \edef\x{\the\@tempcnta}\fi
+        \edef\iconPresets{\noexpand\I{\noexpand\csOf{#1pic\x}}}%
+        \asIconPic[\BC{}\FB{true}\presets{\iconPresets}%
+          \presets{\astile@KVs}]{btn#1pic.\x}{\asTileWd}{\asTileHt}%
+      }% inner multido
+    }}% hbox, outer multido
+  \end{minipage}%
+  \endgroup
+}
+\def\astileKVs#1{\def\astile@KVs{#1}}
+\astileKVs{}
+\newcommand{\customFinishJS}[1]{\gdef\sortCustomFinishJS{#1}}
 \def\sortCustomFinishJS{;}
-\begin{insDLJS}[randomDPS]{sort}{JS for bubble sort}
+\begin{insDLJS}{asSort}{AcroSort: Bubble Sort}
 // Global Data:
-var randomDPS = new Array(\nTotalTiles+1);
-var ldps = randomDPS.length;
+var btnbase="";     // btn<name>pic.01, btn<name>pic.02, etc
+var iconbase="";    // <name>pic01, <name>pic02, etc.
+var iconObjs={\asIconObjs};
+var sortName="";
+var randomAS = new Array();
 var timeout = 10;
 var shutdown;
-var debug = \memDebug;
-var ok2Continue = true;
-for (i=1; i<=\nTotalTiles; i++) randomDPS[i]=i;
-
-// Clear DPS:
-try {this.addIcon("nullIcon", this.createIcon("", 0, 0));} catch(e) {}
-
-function clearDPS()
-{
-    for ( var i=1; i<=\nTotalTiles; i++ )
-    {
-        var oIcon = this.getIcon("nullIcon");
-        var f = this.getField("button."+i);
-        f.buttonSetIcon(oIcon);
-    }
+var asOk2Continue = false;
+function initRandomDPS(name) {
+  var nTotalTiles = iconObjs[name];
+  for (i=1; i<=nTotalTiles; i++) randomAS[i]=i;
+  return nTotalTiles;
 }
-
-// Mixup DPS:
-function mixupDPS()
+function startSortAS(name) {
+  if (!asOk2Continue) {
+    sortName=name;
+    randomAS = new Array();
+    var f=this.getField("btn"+name+"pic");
+    if(f!=null)f.display=display.visible;
+    asOk2Continue = true;
+    mixupAS();
+    showAS();
+    sortoutAS();
+  }
+}
+function mixupAS()
 {
     var i, rand, temp;
-    for (i=1; i<= \nTotalTiles; i++)
+    var nTotalTiles=initRandomDPS(sortName);
+    var ldps = randomAS.length;
+    for (i=1; i<= nTotalTiles; i++)
     {
         var rand = Math.random();
         rand *= ldps*ldps;
         rand = Math.ceil(rand);
         rand = rand \% ldps;
         if (rand == 0 ) rand = 1;
-        temp = randomDPS[i];
-        randomDPS[i]=randomDPS[rand];
-        randomDPS[rand]=temp;
+        temp = randomAS[i];
+        randomAS[i]=randomAS[rand];
+        randomAS[rand]=temp;
     }
 }
-
-// Show DPS:
-function showDPS()
+function showAS()
 {
-    \sortCustomStartJS
-    for ( var i=1; i<=\nTotalTiles; i++ )
+    var I,J;
+    var nTotalTiles = iconObjs[sortName];
+    btnbase="btn"+sortName+"pic.";
+    iconbase=sortName+"pic";
+    for ( var i=1; i<=nTotalTiles; i++ )
     {
-        var oIcon = this.getIcon("pic."+randomDPS[i]);
-        var f = this.getField("button."+i);
+        I=((i<10)?"0":"")+i;
+        J=((randomAS[i]<10)?"0":"")+randomAS[i];
+        var oIcon = this.getIcon(iconbase+J);
+        var f = this.getField(btnbase+I);
         f.buttonSetIcon(oIcon);
     }
 }
-
-// Sortout DPS:
-function sortoutDPS()
+function sortoutAS()
 {
-    outerLoop(randomDPS.length-1);
+    outerLoop(randomAS.length-1);
 }
 function outerLoop(i)
 {
-     if ( ok2Continue && (i >= 0) ) shutdown = app.setTimeOut("app.clearTimeOut(shutdown); innerLoop("+i+",1);", timeout);
+     if ( asOk2Continue && (i >= 0) )
+        shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+",1);", timeout);
      else {
-        \sortCustomFinishJS
+      asOk2Continue=false;
+     \sortCustomFinishJS
      }
 }
 function innerLoop(i,j)
 {
+    var I, J;
     if ( j <= i )
     {
-       if (randomDPS[j-1] > randomDPS[j])
+       if (randomAS[j-1] > randomAS[j])
        {
-            var temp = randomDPS[j-1];
-            randomDPS[j-1] = randomDPS[j];
-            randomDPS[j] = temp;
-            var oIcon = this.getIcon("pic."+randomDPS[j-1]);
-            var f = this.getField("button."+(j-1));
+            var temp = randomAS[j-1];
+            randomAS[j-1] = randomAS[j];
+            randomAS[j] = temp;
+            J=((randomAS[j-1]<10)?"0":"")+randomAS[j-1];
+            I=((j-1 < 10)?"0":"")+(j-1);
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
             f.buttonSetIcon(oIcon);
-            var oIcon = this.getIcon("pic."+randomDPS[j]);
-            var f = this.getField("button."+j);
+            J=((randomAS[j]<10)?"0":"")+randomAS[j];
+            I=((j < 10)?"0":"")+j;
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
             f.buttonSetIcon(oIcon);
         }
         j++
-        if ( ok2Continue ) shutdown = app.setTimeOut("app.clearTimeOut(shutdown); innerLoop("+i+","+j+");", timeout);
-        else {
-            \sortCustomFinishJS
-        }
+        if ( asOk2Continue ) %
+shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+","+j+");", timeout);
     }
     else
     {
@@ -182,92 +247,6 @@ function innerLoop(i,j)
     }
 }
 \end{insDLJS}
-
-\begin{execJS}{acrosortjs}
-var index, ip="\importpath";
-var re=/_package$/;
-var isPackage=\bIsPackage;
-if (debug) console.println("isPackage: " + isPackage);
-if (debug) console.println("nTotalTiles = " + \nTotalTiles)
-if (isPackage) {
-    ip = ip+"_package";
-    for ( var i = 1; i <= \nTotalTiles; i++)
-    {
-        try { aebTrustedFunctions(this, aebImportIcon, {cName: "pic."+i,
-        nPage: (i-1), cDIPath: ip+".\iconsExt"}, this);
-        } catch(e) {console.println("exception: " + e.toSource())}
-
-    }
-} else {
-    for ( var i = 1; i <= \nTotalTiles; i++)
-    {
-        index = ( i < 10 ) ? "0"+i : ""+i;
-        if (debug) console.println(ip+"_"+index+".\iconsExt")
-        try { aebTrustedFunctions(this, aebImportIcon, {cName: "pic."+i, cDIPath: ip+"_"+index+".\iconsExt"}, this);
-        } catch(e) {console.println("exception: " + e.toSource())}
-    }
-}
-// Now lay out the icon fields.
-var f = this.getField("ulcorner");
-var nPage = f.page;
-var ulCorner = f.rect;
-this.removeField("ulcorner");
-
-ip = ip.replace(re,"");
-ip=ip+".pdf";
-var doc = aebTrustedFunctions( this, aebAppOpenDoc, { cPath: ip, oDoc: this, bHidden: true });
-var aRect = doc.getPageBox({cBox:"Crop"})
-doc.closeDoc(true);
-
-if (debug) console.println("aRect: " + aRect.toSource());
-
-var nRows = \nRows;
-var nCols = \nCols;
-
-var width = aRect[2]-aRect[0];
-var height = aRect[1]-aRect[3];
-
-var scaleFactor = \imageWidth/width;
-
-if (debug) console.println("scaleFactor = " + scaleFactor);
-
-var scaledWidth = width*scaleFactor;
-var scaledHeight = height*scaleFactor;
-
-if (debug) console.println("scaledWidth = " + scaledWidth);
-if (debug) console.println("scaledHeight = " + scaledHeight);
-
-var mWidth = scaledWidth/nCols
-var mHeight = scaledHeight/nRows
-
-if (debug) console.println("mWidth = " + mWidth);
-if (debug) console.println("mHeight = " + mHeight);
-
-var nCnt = 0;
-
-for ( var i=0; i<nRows; i++) {
-    for ( var j=0; j<nCols; j++ ) {
-        nCnt++;
-        try {
-        var g = this.addField({
-            cName: "button."+nCnt,
-            cFieldType: "button",
-            nPageNum: nPage,
-            oCoords: [ ulCorner[0]+j*mWidth, ulCorner[1]-i*mHeight, ulCorner[0]+(j+1)*mWidth, ulCorner[1]-(i+1)*mHeight ]
-        });
-        } catch(e) { console.println( e.toSource()); }
-        try {
-        g.highlight=highlight.p
-        g.buttonPosition = position.iconOnly;
-        g.lineWidth = 0;
-        g.readonly = true;
-        } catch(e) { console.println("set properties: " + e.toSource()) }
-        var oIcon = this.getIcon("pic."+nCnt);
-        g.buttonSetIcon(oIcon,1);
-    }
-}
-// aebTrustedFunctions(this, aebSaveAs, "Save")
-\end{execJS}
 \endinput
 %%
 %% End of file `acrosort.sty'.

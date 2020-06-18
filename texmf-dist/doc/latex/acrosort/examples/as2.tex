@@ -1,0 +1,87 @@
+%
+% dpstory@acrotex.net
+%
+\documentclass{article}
+% aeb_pro  not required for pdflatex, lualatex, or xelatex
+% If you don't have acrobat, no harm done. For the
+% dvips -> distiller workflow, aeb_pro is required.
+\usepackage[%
+    web={designiii},
+    eforms,useacrobat
+]{aeb_pro}
+% for non-pdfmark workflow, and if you don't want to install aeb_pro,
+% the alternative is to use the following two packages instead.
+%\usepackage[designiii]{web}
+%\usepackage{eforms}
+\usepackage{acrosort}
+
+\university{Acro\negthinspace\TeX.Net}
+\title{The AcroSort Package}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\subject{Test file for the AcroSort Package}
+\keywords{Adobe Acrobat, JavaScript, LaTeX, JavaScript, sort, tiling}
+
+%\previewOn\pmpvOn
+
+\begin{embedding}
+\isPackage
+\asEmbedTiles{emj}{16}{emoji/myemoji}
+\isPackage
+\asEmbedTiles{choo}{20}{choo/choo}
+\end{embedding}
+
+\parskip6pt
+\parindent0pt
+\thispagestyle{empty}
+
+% sortName is the name of the active tiled sort. At the end of a sort
+% if it is the choo sort, we start the emj sort.
+\customFinishJS{%
+  if(sortName=="choo") {
+    var f=this.getField("message");
+    f.value=("Starting the emj sort from the choo sort");
+    startSortAS("emj");
+  }
+}
+
+\begin{document}
+
+The new \textsf{acrosort} allows for multiple tiled bubble sorts.
+
+% These apply to both tiled bubble sorts
+\appendClearSortJS{this.resetForm("message");}
+\appendStopSortJS{this.resetForm("message");}
+
+\begin{minipage}[t]{.5\linewidth-5pt}\kern0pt
+\begin{center}\fboxsep1bp\fboxrule2bp
+\fbox{\makebox[0pt][l]{\makebox[\linewidth][c]{The choo tiled sort}}%
+  \insertTiles{choo}{\linewidth}{4}{5}}%
+\end{center}
+
+% the \customStartJS and \appendStartSortJS apply only to choo, since they are in a group (minipage)
+\smallskip\customStartJS{var f=this.getField("message"); f.value=("Starting the choo sort");}
+% if Ctrl key is not down, we fool the \customFinishJS by renaming sortName, that way, simply
+% pressing the Press Me button does not activate the emj sort on finish.
+\appendStartSortJS{sortName=(event.modifier)?"choo":"";}
+\centering\StartSort[\TU{Click to sort the train, press Ctrl-Click to sort both}]{choo}{}{12bp}\quad\StopSort{}{12bp}\quad\ClearSort{choo}{}{12bp}\par\medskip
+\end{minipage}\hfill
+%
+\begin{minipage}[t]{.5\linewidth-5pt}\kern0pt
+\begin{center}\fboxsep1bp\fboxrule2bp
+\fbox{\makebox[0pt][l]{\makebox[.5\linewidth]{The emj tiled sort}}%
+  \insertTiles{emj}{.5\linewidth}{4}{4}}
+\end{center}
+
+% the \customStartJS and \appendStartSortJS apply only to emj, since they are in a group (minipage)
+\smallskip\customStartJS{var f=this.getField("message"); f.value=("Starting the emj sort");}
+\centering\StartSort{emj}{}{12bp}\quad\StopSort{}{12bp}\quad\ClearSort{emj}{}{12bp}
+\end{minipage}
+\vfill
+
+This demo file works when viewed in \textsf{Acrobat}, \textsf{Adobe Reader}, or \textsf{PDFX-Change Editor}.
+
+\vfill
+\textField{message}{\linewidth}{11bp}
+
+\end{document}

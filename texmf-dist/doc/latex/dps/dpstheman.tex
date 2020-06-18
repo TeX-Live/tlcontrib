@@ -1,0 +1,1823 @@
+\documentclass{article}
+\usepackage[%
+  web={designv,forcolorpaper,latextoc,extended},
+  eforms={execJS}
+]{aeb_pro}
+%\usepackage[designv,nodirectory,forcolorpaper,latextoc]{web}
+%\usepackage[execJS]{eforms}
+\usepackage{graphicx}
+\reversemarginpar
+
+%\usepackage{myriadpro}
+\usepackage[altbullet]{lucidbry}
+\usepackage{aeb_mlink}
+\usepackage{acroman}
+
+\usepackage[active]{srcltx}
+
+\def\darg#1{\texttt{\{#1\}}}
+\let\key\texttt
+
+%\setlength{\marginparsep}{0pt}
+\addtolength{\marginparwidth}{15pt}
+
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+
+%\margins{.25in}{.25in}{24pt}{.25in} % left,right,top, bottom
+%\screensize{6.5in}{5in} % height, width
+
+\university{\AcroTeX.Net}
+\title{dps Package\texorpdfstring{\\[1em]}{: }Das Puzzle Spiel}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\subject{Documentation of the dps package}
+\keywords{Adobe Acrobat, games, matching}
+
+\versionLabel{Dated:}
+\version{2020/06/03}
+\copyrightyears{2006-\the\year}
+\nocopyright
+\prepared{2020/06/03} %2020/06/03 v1.7
+\revisionLabel{Distribution Dated:}
+
+\DesignTitlePageTrailer
+{%
+    ul=Copyright \copyright\ \webcopyrightyears,
+    ur=\thewebemail,
+    lr=\url{http://www.acrotex.net},
+    raise=-25pt
+}
+
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\let\tops\texorpdfstring
+\makeatletter
+\let\web@copyright=\@gobble
+\def\changelinkcolorto#1{\def\@linkcolor{#1}}
+\newdimen\totaltextwidth
+\totaltextwidth=\fullscreenwidth
+\advance\totaltextwidth\oddsidemargin
+\renewcommand{\@oddhead}{\hspace{-\oddsidemargin}%
+    \hbox to\totaltextwidth{\normalfont\footnotesize
+    \web@headerhook\web@lhead\hfil\web@chead\hfil
+    \web@rightheader}\hss}%
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\def\AcroTeX{Acro\negthinspace\TeX}
+%\newenvironment{sverbatim}
+%{\par\footnotesize\verbatim}{\endverbatim}
+
+%\newcommand\redpoint{\par\removelastskip
+%\vskip\medskipamount
+%\noindent
+%  \makebox[0pt][r]{\large\color{red}$\blacktriangleright$\enspace}}
+%\newcommand\handpoint{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+%\vskip\medskipamount\noindent
+%  \makebox[\parindent][l]{\large\color{blue}\ding{042}}}
+%\newcommand\newtopic{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+%\vskip\medskipamount\noindent}
+%\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\makeatletter
+\newcommand{\linkSave}[2][]{\def\argi{#1}\ifx\argi\@empty\def\argi{#2}\fi
+    \setLinkText[\Border{0 0 0}\A{\JS{this.exportDataObject({cName: "\argi", nLaunch: 0})}}]
+    {\textcolor{webgreen}{#2}}}
+\makeatother
+
+\def\FmtMP#1{\marginpar{\slshape\raggedleft\small#1}}
+
+\optionalPageMatter{%
+\par\minimumskip\vspace{\stretch{1}}
+    \noindent\begin{minipage}{\linewidth}
+    \begin{center}
+    \fcolorbox{blue}{webyellow}{%
+    \begin{minipage}{.67\linewidth}\parskip3pt
+    \textcolor{red}{Abstract: }\textcolor{blue}{Das Puzzle Spiel} is a {\LaTeX} package for
+    creating a puzzle, a message actually, and a series of
+    questions and answers. The document consumer matches the
+    questions with the answers. With each match, another letter
+    appears in the puzzle. Upon completion of all questions, the
+    message hidden in the puzzle is revealed. The game has an application
+    as a classroom learning device.
+    \end{minipage}}%
+%    \par\bigskip
+%    \fcolorbox{blue}{webyellow}{%
+%    \begin{minipage}{.67\linewidth}\parskip3pt \tightsettings
+%    \textcolor{red}{Distribution: } Click on the link below, and
+%    save \texttt{dps.txt} to your hard drive.\footnote{If the link does not work for you,
+%    save \texttt{dps.txt} using the Adobe Reader user interface.}
+%    \begin{itemize}
+%    \item[] \texttt{\linkSave{dps.txt}}
+%    \end{itemize}
+%    Rename \texttt{dps.txt} to \texttt{dps.zip}. Unzip
+%    \texttt{dps.zip} somewhere in your {\LaTeX} search path. Unzipping
+%    will create a folder named \texttt{dps}. If using a {\TeX} system
+%    requires it, refresh your file name database.
+%
+%    Brief descriptions of
+%    these files are given on
+%    \hyperref[distribution]{page~\pageref*{distribution}}.
+%\par\smallskip
+%    \end{minipage}}
+    \end{center}
+    \end{minipage}
+}
+
+\makeatletter
+\renewcommand{\section}{%
+   \renewcommand{\@seccntformat}[1]{\csname the##1\endcsname.\enspace}%
+   \@startsection{section}{1}{-62.5pt}%
+   {-3ex\@plus -1ex \@minus-.2ex}%
+   {1ex\@plus .2ex}% 6pt
+   {\noindent\normalfont\large\bfseries\color{blue}}}%
+\renewcommand\subsection{%
+   \renewcommand{\@seccntformat}[1]{\csname the##1\endcsname.\enspace}%
+   \@startsection{subsection}{2}{-42.5pt}%
+   {-2.5ex\@plus -1ex \@minus -.2ex}%
+   {1ex \@plus .2ex}%
+   {\noindent\normalfont\normalsize\bfseries\color{blue}}}
+\makeatother
+
+%\parindent0pt
+%\parskip\medskipamount
+
+%
+% Attach the document target.pdf to this document
+%
+%\begin{execJS}{execjs}
+%console.println("Importing data object");
+%var myPath = /.*\//i.exec(this.path);
+%var thisPath = this.path.replace(/\.pdf$/, ".tex");
+%aebTrustedFunctions(this, aebImportDataObject, {cName:"dps.txt", cDIPath: myPath+"dps.txt" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"dps.dtx", cDIPath: myPath+"dps.dtx" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"dps.ins", cDIPath: myPath+"dps.ins" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"dps_demo.tex", cDIPath: myPath+"dps_demo.tex" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"pmg_d1.tex", cDIPath: myPath+"pmg_d1.tex" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"pmg_d1_p.tex", cDIPath: myPath+"pmg_d1_p.tex" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"pmg_d2.tex", cDIPath: myPath+"pmg_d2.tex" })
+%%aebTrustedFunctions(this, aebImportDataObject, {cName:"pmg_d3.tex", cDIPath: myPath+"pmg_d3.tex" })
+%\end{execJS}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The DPS Package";
+var manualfilename="Manual_BG_Print_dps.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+
+\begingroup
+
+\linewidth=\fullscreenwidth\relax
+%\advance\linewidth\oddsidemargin
+%\setlength{\oddsidemargin}{0pt}
+\maketitle
+
+\endgroup
+
+\changelinkcolorto{black}
+
+\tableofcontents
+
+\changelinkcolorto{webgreen}
+
+
+\section{Introduction}
+
+The work on this package was inspired by one of my son's worksheets
+in pre-algebra. The worksheet consisted of a series of simple
+algebraic expressions the student was to simplify. The simplified
+form was listed somewhere in the answers column.  The answer had a
+letter associated with it which the student then placed in a puzzle.
+Upon completion of the worksheet, the puzzle (message) is completely
+filled in; if the message makes sense, the student can determine
+that he/she did the worksheet correctly.
+
+I set out to duplicate this worksheet for electronic media, but
+also to have an option for paper as well.
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.45\linewidth]{graphics/normal}}\hfil
+\fbox{\includegraphics[width=.45\linewidth]{graphics/normal-partial}}
+\caption{\texttt{dps\_demo.pdf}: Initial layout (left) and partially worked (right)}
+\end{figure}
+\section{Requirements}
+
+The following packages are required for \textsf{dps} beyond that of
+the standard {\LaTeX} distribution:
+\begin{itemize}
+    \item \pkg{AeB}:\footnote{\url{https://ctan.org/pkg/acrotex}} The
+        \pkg{web} and \pkg{eforms} components of the
+        Acro\negthinspace\TeX{} eDucation Bundle are used.
+    \item
+        \texttt{\href{https://ctan.org/pkg/random}{random.tex}}:\footnote{\url{https://ctan.org/pkg/random}}
+        A \TeX/\LaTeX{} macro file to generate random numbers, the package
+        was written by Donald Arseneau.
+    \item If the \opt{usebtnappr} option is taken, the \pkg{icon-appr}
+        package, dated 2020/06/05 or later, is
+        required.\footnote{\url{https://ctan.org/pkg/icon-appr}}
+\end{itemize}
+The package should work for users of \app{dvips\,->\,distiller}, \app{pdflatex},
+\app{lualatex}, and \app{xelatex}. A document author who owns the
+\app{Acrobat} application and plans to use either the \opt{usebtnappr} or
+\opt{uselayers} option should have the \pkg{aeb\_pro} package (completely) installed.
+
+
+\section{Comments on the demo files}\label{distribution}
+
+The distribution comes with the following demonstration files.
+
+\begin{itemize}
+    \item \texttt{examples/basic/dps\_demo.tex}\FmtMP{\texttt{basic} folder}: A demo file that you can use to
+        try the package with different options. Build the source file for
+        screen or for paper. Two column format for questions, and half the
+        answers on the left, and half on the right.
+
+        This demo file has more answers than questions.
+
+    \item \texttt{examples/basic/dps\_d1.tex}\\ The original file constructing during
+    the development of this package. This puzzle has the famous
+    u-umlaut. Can be compiled with the
+    \opt{forpaper}/\allowbreak\opt{forcolorpaper} option of web. The layout
+    is designated as ``design 1'' (d1): questions in center in two column format
+    and answer on the left and right.
+
+    This demo file illustrates the special name of \texttt{cr}, as well as \texttt{space} and \texttt{punc}.
+
+    \item \texttt{examples/basic/dps\_d1\_p.tex}\\Same as \texttt{dps\_d1.tex}, but set up
+        as a paper document (using the \opt{forcolorpaper} option). The font size is
+        enlarged to make it easier for filling the puzzle out using a
+        pencil.
+
+    \item \texttt{examples/basic/dps\_d2.tex}\\ Same puzzle/questions as
+        \texttt{dps\_d1.tex}, but uses the layout designated as
+        ``design~2'' (d2): Questions and answer in column format on left
+        and right, puzzle in the center. This leaves a lot of white space
+        in the middle, perhaps for a graphic. This example also manually
+        inserts the answer key command \cs{AnswerKey}, which manifests
+        itself when the \opt{showletters} option is taken.
+
+    \item \texttt{examples/basic/dps\_d3.tex}\\ Same puzzle/questions as
+        \texttt{dps\_d1.tex}, but uses the layout designated as
+        ``design~3'' (d3): Puzzle and questions vertically aligned
+        (questions in two column format), answer in single column. This
+        file uses many of the formatting commands mentioned in the
+        documentation.
+    \item \texttt{examples/basic/dps\_signin.tex}\\ Demonstrates how to require
+    the player to enter his/her name, useful when puzzle is to be handed
+    in for extra credit.
+    \item \texttt{examples/basic/dps\_demo.tex}\\ Indicates how to change the appearance
+    of some of the form elements of the puzzle.
+    \item \texttt{examples/basic/stat\_match1.tex}\\
+      An example of a puzzle with extended length questions. Demo can be
+      used as a paper assignment or a digital assignment.
+    \item\texttt{examples/basic/stat\_match1-print.tex}\\
+      A layout with long questions designed for paper.
+\end{itemize}
+There are several ``advanced examples'' that demonstrate two methods
+of posing \emph{extended length questions}; these two methods correspond to the two
+options \opt{usebtnappr} and \opt{uselayers}.
+%use the full power of
+%\app{Adobe Acrobat} and its \app{Adobe Distiller} companion. The four
+%examples are found in the \texttt{examples/aeb\_pro} folder. They are compiled
+%with a \app{dvips \texttt{->} distiller} workflow.
+\begin{itemize}
+\item \texttt{examples/advanced/usebtnappr/basic/stat\_match1.tex}\FmtMP{\texttt{usebtnappr} folder}\\
+    Uses the \opt{usebtnappr} to create icon pushbutton appearances of the
+    extended length questions. This example works for all common workflows:
+    \app{pdflatex}, \app{lualatex}, \app{xelatex}, and
+    \app{dvips\,->\,distiller}.
+
+\item \texttt{examples/advanced/usebtnappr/sideshow/first\_date.tex}\\
+    A file developed from by cyber buddy, who I've never met,
+    to offer advice for going on a date \textsl{mit eine
+    Fr\"{a}lein}. This example works for all common workflows:
+    \app{pdflatex}, \app{lualatex}, \app{xelatex}, and
+    \app{dvips\,->\,distiller}. Uses a graphical sideshow.
+
+\item \texttt{examples/advanced/uselayers/basic/stat\_math1-tb.tex}\FmtMP{\texttt{uselayers} folder}\\
+    Uses the \opt{uselayers} option and the \pkg{textpos} package.
+
+    An extra credit assignment given to my statistics class in 2006. The
+    questions are placed in separate layers and appear when a question
+    checkbox is selected; this allows for more wordy questions without
+    taking up a lot of space in the question part of the puzzle.
+
+\item \texttt{examples/advanced/uselayers/basic/stat\_math1-ep.tex}\\
+    Same as puzzle as \texttt{stat\_math1-tb.tex} but uses the
+    \pkg{eso-pic} package.
+
+\item \texttt{examples/advanced/uselayers/basic/stat\_math1\_g.tex}\\ Same as a
+    \texttt{stat\_math1-tb.tex}, but more graphical. If memory serves, this
+    version was developed my good cyber friend J\"{u}rgen.
+
+\item \texttt{examples/advanced/uselayers/sideshow/first\_data.tex}\\ A file developed
+    from by cyber buddy, who I've never met, to offer advice for going on a
+    date \textsl{mit eine Fr\"{a}lein}. Uses a graphical sideshow.
+
+\item \texttt{examples/advanced/uselayers/sideshow/first\_data\_g.tex}\\
+    More graphical version of \texttt{first\_data.tex}, but with different
+    design and graphical sideshow.
+\end{itemize}
+
+\section{Package Options}\label{packopts}
+
+Here we list the options of package \textsf{dps}.
+
+\begin{description}
+\item[\normalfont{\opt{nonrandomized}}:] The default behavior is to
+    randomize the questions and to randomize the answers. With this
+    option, the questions and answer are listed in the order that they
+    appear in the \env{Composing} environment. This makes it easy for
+    the document author to quickly solve the puzzle and to see if the
+    check marks and letters appear as they should.
+
+\item[\normalfont{\opt{!nonrandomized}}:] (Convenience option) Cancels the effects of
+    \opt{nonrandomized}; in this case, the answers are randomized (the
+    default).
+
+\item[\normalfont{\opt{viewmode}}:] Useful when using a dvi previewer or a
+    PDF previewer. Here you can see the placement of the puzzle (with the
+    letters to the puzzle filled in) and the boxes were the checkboxes go.
+    Useful in the designing the layout of your game phase.
+
+%\end{description}
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.67\linewidth]{graphics/view-mode}}
+\caption{Compiled with \opt{viewmode} option}
+\end{figure}
+%\begin{description}
+
+\item[\normalfont{\opt{!viewmode}}:] (Convenience option) Cancels the effects of
+\opt{viewmode}, this same as not specifying \opt{viewmode}.
+
+\item[\normalfont{\opt{showletters}}:] Sets up a visual relation
+    between the questions, the answers and the puzzle elements.  Useful
+    in design phase, can be used with \texttt{viewmode}. Refer to \hyperref[fig:shwltrs]{Figure~\ref*{fig:shwltrs}}.
+
+    When \opt{showletters}, the command \cs{AnswerKey} is populated with
+    the answer key to the puzzle. \cs{AnswerKey}\FmtMP{\cs{AnswerKey}} is automatically inserted
+    into the running footer when the \opt{showanswerkey} option is taken;
+    otherwise, it can be manually inserted into the document by expanding
+    \cs{AnswerKey} in a location somewhere \emph{after} the building of the
+    puzzle, the questions and the answers.
+
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.67\linewidth]{graphics/show-letters}}
+\caption{Compiled with \opt{showletters} option}\label{fig:shwltrs}
+\end{figure}
+
+\item[\normalfont{\opt{!showletters}}:] (Convenience option) Cancels the effects of
+\opt{showletters}; in this case, the letters are not shown (the default).
+
+\item[\normalfont{\opt{showanswerkey}}:] Shows the answer key in the
+    footer of the document. If the \textsf{graphicx} package is loaded,
+    the answer key is rotated $180^\circ$. This option is meant to be
+    used when the \texttt{forpaper} option is taken in the \textsf{web}
+    package. Refer to \hyperref[fig:ansky]{Figure~\ref*{fig:ansky}}.
+
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.67\linewidth]{graphics/answer-key}}
+\caption{Compiled with \opt{showanswerkey} option}\label{fig:ansky}
+\end{figure}
+
+
+    The positioning of the running footer may be adjust using the
+    convenience command
+    \cs{setdpsfootskip\darg{\ameta{skip}}}\FmtMP{\cs{setdpsfootskip}}.
+    When there is  no paper option for \pkg{web} (neither \opt{forpaper} or
+    \opt{forcolorpaper}), \ameta{skip} is the distance up from the bottom
+    edge of the screen page. The default is
+    \cs{setdpsfootskip\darg{.25in}}. When there is a paper option, this
+    command does nothing; location of the running footer is determined by
+    the {\LaTeX} \cs{footskip} register.
+
+\item[\normalfont{\opt{!showanswerkey}}:] (Convenience option) Turns off
+    the \opt{showanswerkey} option.
+
+\item[\normalfont{\opt{savedata}}:]\label{item:savedata} Saves three pieces of information to
+    the local hard drive : (1) the seed value used by the \texttt{random}
+    package to randomize the questions and answers; (2) the value of the
+    last number generated; and (3) the answer key. This information is
+    saved to the file \cs{jobname\_data.sav}.
+    \begin{itemize}
+    \item The seed value can be used to reproduce the exact
+        randomization at a later time. Open the file
+        \cs{jobname\_data.sav} in your editor, it might look like this:
+\begin{Verbatim}[fontsize=\small]
+\randomi=482053344 % Initial seed:
+\dpsLastSeed{271256117}
+% Answer Key: 1--e; 2--s; 3--i; 4--u; 5--l; 6--d; 7--a; 8--z; 9--p;
+\end{Verbatim}
+    Copy the number indicated as the \textsf{Initial seed} and paste it
+    into the argument \cs{useRandomSeed\darg{482053344}}. Place this
+    command in the preamble, below the \verb!\usepackage{dps}! line.
+    This should reproduce the same randomization.
+
+    \item The second line is use when the \cs{useLastSeed} command
+        appears in the preamble. This is the last number generated by the
+        current compile.
+
+    \item The third line in the above verbatim listing is the answer key,
+        for the randomization initiated by the seed on the first line.
+        You can copy and paste this second line into the {\TeX/\LaTeX}
+        document and publish the solution in a separate document, at a
+        later time. This is useful when publishing for paper.
+    \end{itemize}
+\item[\normalfont{!\opt{savedata}}:] (Convenience option) Turns
+    off the \opt{savedata} option.
+
+
+\item[\normalfont\opt{usebtnappr}] Use this option to provide support for
+    longer questions without taking up anymore space on the digital page.
+    The option uses icon appearances of a push button.
+    Refer to Section~\ref{s:usebtnappr}.
+
+
+\item[\normalfont\opt{uselayers}] Use this option to provide support for
+    longer questions without taking up anymore space on the digital page.
+    The option places the long question in separate layers (OCGs). Refer to
+    Section~\ref{s:uselayers}.
+
+%\item[\normalfont\opt{wrtcontent}] An option that is only effective with the
+%\opt{usebtnappr} option. Refer to Section~\ref{s:usebtnappr} for more information.
+%\item[\normalfont\opt{!wrtcontent}] (Convenience option) Turns off the
+%\opt{usebtnappr} option.
+
+\item[\normalfont{\opt{lang=english|german|custom}}:] Currently, there
+    are only two language options. The value of \opt{custom} allows you to
+    create your own language strings.
+
+    To use the \texttt{lang=custom}
+    option, you must create the file \texttt{dps\_str\_cus.def}. Do this by
+    taking the file \texttt{dps\_str\_us.def} (or \texttt{dps\_str\_de.def},
+    if you prefer), copying the file and changing its name to
+    \texttt{dps\_str\_cus.def}. Open \texttt{dps\_str\_cus.def} in your
+    favorite editor and change the text strings to a language of your
+    choice, or change the strings that tickle your funny bone more than the
+    ones provided.\footnote{Or tickle your funny bone \emph{less}, if you
+    are a crusty one.} To represent accented characters, use the octal
+    encoding defined in \texttt{pd1enc.def}, as distributed with
+    the \pkg{hyperref} bundle. The u-umlaut, for example, should appear
+    in the file as \verb!\string\374! and not as \verb!\"{u}!.
+
+    \textbf{\textcolor{red}{Change notification:}} If you have already written
+    your own \texttt{dps\_str\_cus.def} for an earlier version of \pkg{dps};
+    there is a change your should attend to: In the definition of
+    \cs{regretPleased} change \texttt{(\,nMissed\,>\,n\,)} to read \texttt{(\,nMissed\,>\,nPassing\,)}.
+
+\newtopic\noindent\makebox[0pt][r]{\large\color{red}$\blacktriangleright$\enspace}\ignorespaces
+For your convenience, the \Nameref{appendix} contains a
+listing of the octal codes for accented letters.
+Here is an important option of \textsf{web} package.
+
+\item[\normalfont{\opt{forpaper/forcolorpaper}}:] These are options
+of the \textsf{web} package, not the \textsf{dps} package. Then this
+option is taken, the puzzle created is meant for paper publication.
+No \app{Acrobat} forms will be created, the \texttt{showletters} option of
+\textsf{dps} is automatically taken. If you originally designed the
+game for the screen, you may have to rework the sizing and design of
+the game to fit everything into the constraint of a piece of paper.
+Landscape is an option to think about, depending on your design and
+the number of questions and answers.
+\end{description}
+
+
+\section{Designing your Puzzle}
+
+There are several test files that you can use as basis of
+constructing your own puzzle.\footnote{My apologies, this game is
+more properly described as a matching game with message, but my
+friend insisted that I call it a puzzle so that the package could be
+named Das Puzzle Spiel, or dps, which are my initials. \dps} The
+files themselves illustrate adequately the structure of the puzzle,
+but a few remarks are in order.
+
+\subsection{\texorpdfstring{\protect\cs{DeclarePuzzle}}{\textbackslash DeclarePuzzle}}\label{s:DP}
+
+The first step is to have a message, either funny, serious, or
+whatever. For the purpose of illustration, suppose your message is
+``Hello, J\"{u}rgen!'' This message has all the elements that need
+to be discussed, letters, punctuation, spaces, capitalized letters,
+and accented letters.
+
+\newtopic\noindent{\normalfont\cs{DeclarePuzzle\darg{\ameta{puzzle-args}}}:} The
+\ameta{puzzle-args} consists of a series of \textit{paired parameters}:\setlength{\leftmargini}{\parindent}
+\begin{quote}\ttfamily
+   \string\nPuzzleCols\{\ameta{nCols}\}\quad\% \textsf{optional}\\
+   \string\DeclarePuzzle\{\%\\
+     \null\qquad\darg{\ameta{letter\SUB1}}\darg{\ameta{name\SUB1}}\\
+     \null\qquad\darg{\ameta{letter\SUB2}}\darg{\ameta{name\SUB2}}\\
+     \null\qquad\dots\\
+     \null\qquad\dots\\
+     \null\qquad\darg{\ameta{letter\SUB{n}}}\darg{\ameta{name\SUB{n}}}\\
+   \}
+\end{quote}
+\cs{nPuzzleCols\darg{\ameta{nCols}}} is a convenience command for setting
+the number of columns in the puzzle; \ameta{nCols} is passed to
+\cs{insertPuzzle\darg{\ameta{nCols}}}, which appears in the body of the document.
+
+\newtopic\textbf{Parameter description for \cs{DeclarePuzzle}.}
+ The argument \ameta{letter} represents a letter in the puzzle;
+ \ameta{letter} plays two roles: (1) it is used to typeset the letters into
+ the document when certain options, such as \opt{viewmode}, are used; (2) it
+ is used as the default value of a text fields that is created (when the
+ puzzle is built to be interactive). This creates a problem for special
+ characters, such as \"{u}; it is a typeset letter, and is \verb~\string\374~
+ when placed into a text field (\cs{341}) is the (octal) PDFDocEncoding of
+ u-umlaut. The way around this conundrum is to use \cs{texorpdfstring}: use
+ \ameta{letter} to be,
+ \begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!()}]
+ \texorpdfstring{\protect\"{u}}{\ifxetex! !"(u)\else\string\374\fi}
+ \end{Verbatim}
+ Notice the use of \cs{protect} to protect this moving argument. Also
+ included above is a special case for \app{xelatex}, which does not support
+ the octal notation; in this case, using the capabilities of your editor,
+ simply type in an u-umlaut. The above complex expression is normally not
+ needed. Here, we try to provide guidance for all PDF creators. If you stick
+ to one, the \cs{ifxetex} conditional is not needed.
+
+ The second argument pair is \ameta{name}, this is a unique name that is used
+ in the construction of the underlying text field name: the field name
+ becomes \texttt{puzzle.\ameta{name}}. As a result, \ameta{name} needs to be
+ a JavaScript identifier (or, basically consist of letters and numbers). In
+ the case of special characters such as our umlaut problem, we can assign a
+ name like so:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!()},
+  codes={\def\OR{\llap{\rlap{\textsf{or}}\kern15pt}}}]
+\texorpdfstring{\protect\"{u}}{\ifxetex! !"(u)\else\string\374\fi}{uml}
+!OR
+\tops{\protect\"{u}}{\ifxetex! !"(u)\else\string\374\fi}{uml}
+\end{Verbatim}
+where \cs{tops}\FmtMP{\cs{tops}} is an alias for \cs{texorpdfstring}. This
+argument pair is seen several times in the demonstration files. There are
+three special names, these are \texttt{space}, \texttt{punc}, and
+\texttt{cr}; as a argument pair, these should appear as follows:
+\verb!{}{space}!\FmtMP{\texttt{space}}, \verb~{,}{punc}~\FmtMP{\texttt{punc}}, and
+\verb~{}{cr}~\FmtMP{\texttt{cr}}, respectively. Spaces and punctuation are not normally part of
+the puzzle to be discovered by answering questions, though they could be.
+The special name \texttt{cr} terminates a row.
+
+%The argument consists of a series of \textit{paired parameters}, the first of
+%each pair is a letter in the puzzle, a punctuation or a space; and the second
+%in the pair is a name, which is used as a field name for the underlying form
+%fields.
+
+\newtopic\indent
+In the design of the puzzle there are three sets of form fields to
+manage: checkboxes for the questions, checkboxes for the answers,
+and text fields for the puzzle. The checkboxes and puzzle letter are
+all tied together by a common base field name, which is the second
+parameter in the parameter pairs.
+
+\newtopic\indent
+In our puzzle, ``Hello, J\"{u}rgen!'', we place the \cs{DeclarePuzzle}
+in the preamble, as shown in \hyperref[fig:HJ]{Figure~\ref*{fig:HJ}}.
+For letters, the second parameter in the pair can simply be the same, as in
+\verb!{H}{H}! and \verb!{e}{e}!.
+
+\begin{figure}[htb]\centering
+\begin{minipage}{3in}
+\begin{Verbatim}[fontsize=\small,commandchars={*()}]
+\DeclarePuzzle{%
+   {H}{H}
+   {e}{e}
+   {l}{l}
+   {l}{l}
+   {o}{o}
+   {,}{punc}
+   {}{space}
+   {J}{J}
+   {\tops{*textbf(\protect)\"{u}}%
+     {\ifxetex*space*"(u)\else*textbf(\string)\374}\fi}{uml}
+   {r}{r}
+   {g}{g}
+   {e}{e}
+   {n}{n}
+   {!}{punc}
+}
+\end{Verbatim}
+\end{minipage}
+\caption{The ``Hello, J\"{u}rgen'' Puzzle}\label{fig:HJ}
+\end{figure}
+
+%For punctuation, the first argument is the punctuation mark, the
+%second is a special name \texttt{punc}; consequently, you see in the
+%above \verb!{,}{punc}! and \verb!{,}{punc}!. Punctuation is not part
+%of the puzzle (though it could be), the macro that ultimately processes
+%this list of paired parameters looks for the name \texttt{punc}, and
+%handles it appropriately.
+
+%The space character also has a special second parameter
+%\texttt{space}. The space will have a place in the puzzle, but has
+%no question/answer corresponding to it.
+
+%Finally, there are the special latin-1 letters.  In the puzzle above, I have
+%an u-umlaut.  The problem is that this umlaut appears in two contexts, a
+%{\TeX} and PDF context; the u-umlaut will appear as typeset content by {\TeX}
+%and will appear as a value of an Acrobat form field. The representation is
+%different in each context. In this case, use the \textsf{hyperref} command
+%\cs{texorpdfstring} (use can use a special alias command \cs{tops} as well).
+%\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+%{\texorpdfstring{\"{u}}{\string\374}}{uml}
+%{\tops{\"{u}}{\string\374}}{uml}
+%\end{Verbatim}
+%The first argument of the u-umlaut is
+%\verb!\texorpdfstring{\"{u}}{\string\374}! (or
+%\verb!\tops{\"{u}}{\string\374}!). When typeset, the first argument of the
+%command \cs{texorpdfstring} (when the option \opt{viewmode} is active, for
+%example) is used and in the PDF context, the second argument is used.
+
+\begin{quote}
+\textbf{\textcolor{red}{Rule:}} As a general rule, and this rule will be
+repeated later, there should be one question for each distinct second
+argument (\ameta{name}). There should be \emph{no question} corresponding to the
+names \texttt{space}, \texttt{punc}, and \texttt{cr}.
+\end{quote}
+In the example of \hyperref[fig:HJ]{Figure~\ref*{fig:HJ}}, letters like \texttt{e} and \texttt{l} appear
+more than once in the puzzle. Note that the second argument of each
+of these two \texttt{e}'s is the same.  There should be only one for
+this \texttt{e}, and when the question associated with \texttt{e} is
+correctly answered, both \texttt{e}'s in the puzzle will appear. (If
+you want a question for each \texttt{e}, then you need to name the
+fields differently, \verb!{e}{e1}! and \verb!{e}{e2}!, for example.)
+
+\subsection{Begin composing the questions and answers}\label{composing}
+
+We create questions and answers for the puzzle within the \env{Composing}
+environment. Questions are posed within the \env{cQ} environment and answers
+are written within the \env{cA} environment.
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\DeclarePuzzle{!ameta(puzzle-args)}
+\begin{Composing}
+\begin{cQ}{!ameta(name)}
+!qquad!ameta(!sffamily(some question))
+\end{cQ}
+\begin{cA}[!ameta(alt-letter)]{!ameta(name)}
+!qquad!ameta(!sffamily(some answer))
+\end{cA}
+...
+\end{Composing}
+\end{Verbatim}
+\begin{description}
+\item[\normalfont\env{Composing}:] You compose the questions and
+    answers within the \env{Composing} environment. At the top of
+    the environment, certain counters are initialized. All the work
+    is done at the end of the environment: The number of questions
+    and answers are known, at which point, the order of the
+    questions and answers are randomized.
+
+    The \env{Composing} environment follows \cs{DeclarePuzzle}.
+
+\item[\normalfont\env{cQ} and \env{cA}:] Within the
+    \texttt{Composing} environment, you compose your questions and
+    answers within the \env{cQ} and \env{cA} environments,
+    respectively.  Each question must be followed by its answer.
+    You can have more answers than questions, but these answers
+    \emph{must} be listed last.
+%    (The answers will be randomized anyway.)
+\end{description}
+Each of these environments has one required argument, and \env{cA} has one
+optional argument. The required argument, \ameta{name}, is the field name to
+which this answer corresponds. (The second argument of the paired arguments
+of \cs{DeclarePuzzle}.)
+
+This optional argument, \ameta{alt-letter}, of the \texttt{cA} environment is
+only relevant when the document is compiled with the \texttt{showletters}
+option. The value of the argument is a letter to appear in the answers column
+(and in the answer key). Normally, one of the first entries in the
+\cs{DeclarePuzzle} command is used. Cases where you would want to include
+this optional argument are,
+\begin{quote}
+\begin{enumerate}
+\item[(1)] when giving an answer that does not correspond to a question.
+    For example, in \texttt{dps\_demo.tex}, there are several answers that
+    are distractions
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{cA}[w]{fake1}
+$14x+10$
+\end{cA}
+\end{Verbatim}
+In the puzzle this answer appears in the list of answers but does not correspond
+to any question. The letter associated with this answer is `w'.
+
+\item[(2)] the letter is capitalized, suggesting a proper name or the
+beginning of a sentence, use the optional argument to list the letter in
+lower case. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{cA}[h]{H}
+$-2x-2$
+\end{cA}
+\end{Verbatim}
+\end{enumerate}
+\end{quote}
+
+\paragraph*{Easily set up the \env{Composing} environment.} Once you
+decide on your puzzle (this is easy), you need to set up the corresponding
+environments \env{Composing}, \env{cQ}, and \env{cA}.
+\begin{quote}
+\textbf{\textcolor{red}{Rule:}} As a general rule, and this rule will be
+repeated later, there should be one question for each distinct second
+argument, that is, for each distinct \ameta{name}, with the exception of
+the names \texttt{space}, \texttt{punc}, and \texttt{cr}.
+\end{quote}
+Because of human errors, sometimes we have questions/\allowbreak answer pairs
+that correspond to a duplicate field name---perhaps this letter occurs
+multiple times. No, no, that violates the red rule above. After having made
+this same error several times myself, I decided to let {\TeX} do the work for
+me.
+
+\newtopic\noindent Just after the end of the
+    argument of \cs{DeclarePuzzle}, prior to authoring the questions and
+    answers, place the \cs{writeComposingEnv}:
+\begin{Verbatim}
+\writeComposingEnv
+\end{Verbatim}
+Remember, \cs{DeclarePuzzle} is in the preamble and the beginning of document
+has not been encountered; the command writes an outline for the
+puzzle---based on the arguments of \cs{DeclarePuzzle}---to the file
+\cs{jobname\_comp.def} and ends the document. Once this file is created, copy
+and paste its contents into your source file. It should look like this:
+\begin{verbatim}
+\begin{Composing}
+
+\begin{cQ}{M}
+\end{cQ}
+\begin{cA}{M}
+\end{cA}
+
+\begin{cQ}{a}
+\end{cQ}
+\begin{cA}{a}
+\end{cA}
+...
+\end{Composing}
+\end{verbatim}
+The correct number of environments should be there, with the correct
+argument inserted for each environment. Cool! Now, just compose your
+questions and answers.
+
+After \cs{jobname\_comp.def} is created and copied into the puzzle document,
+\emph{delete the} command \cs{writeComposingEnv}. This command is not part of
+the puzzle, but a helper command. As an option, rather than pasting the
+contents into your document following the \cs{DeclarePuzzle}, you can fill in
+your questions and answers to your puzzle within the \cs{jobname\_comp.def},
+input the file \cs{jobname\_comp.def} with \verb!\input{\jobname_comp.def}!.
+\textcolor{red}{\textbf{Warning:}} If you leave your questions and answers in
+the auxiliary file \cs{jobname\_comp.def} you may overwrite them by
+un-commenting \cs{writeComposingEnv} and compiling your puzzle document.
+
+\newtopic\noindent Another rule:
+\begin{quote}
+\textbf{\textcolor{red}{Rule:}} You must have one correct answer per
+    question. Each answer is unique in the list of all answers (no two
+    answers can be the same). You can have more answers than questions
+    (distractions---answers ``close''  in appearance to the correct
+    answer). Each of the distractions must have a unique \ameta{name}.
+\end{quote}
+
+\section{Placing the Content}
+
+The content consists of five parts, plus whatever you wish to include
+in the document:
+\begin{enumerate}
+
+\item The title and instructions.
+
+\item The puzzle
+
+\item The questions
+
+\item The answers
+
+\item The message field
+
+\end{enumerate}
+Each of these is discussed the the sections that follow.
+
+
+\subsection{The title and instructions}
+
+The title and instructions are your bailiwick, see package demo files
+for suggestions.
+
+\subsection{The puzzle}
+
+\begin{description}
+\item[\normalfont{\cs{insertPuzzle\darg{empty|\ameta{nCols}}}}:] The
+    puzzle, which consists of the first of the paired arguments declared in
+    the \cs{DeclarePuzzle} command, is laid out in a tabular format. The
+    one required argument of \cs{insertPuzzle} is either the empty argument
+    (\darg{}) or \ameta{nCols}, the number of columns per row to be used.
+
+    If you say \cs{insertPuzzle\darg{}}, then
+    \cs{nPuzzleCols\darg{\ameta{nCols}}} is expected to appear in the
+    preamble. If the argument of \cs{insertPuzzle} is empty and
+    \cs{nPuzzleCols} does not appear in the preamble, a warning is issued
+    and \ameta{nCols} is set to 10.
+
+    In the demo files, \cs{insertPuzzle} is enclosed in a \texttt{minipage}
+    environment (and in a \cs{fbox} as well). By placing \cs{insertPuzzle} in
+    this way, you can control the width of the table, and it may help fit it with
+    the other components of the game.
+
+\item[\normalfont{\cs{PuzzleAppearance}}:] Use this command to change
+    the appearance of the \app{Acrobat} text field that comprise the
+    interactive puzzle. The command takes one argument, this argument
+    consists of one or more commands from the \textsf{eForms} package
+    that change the appearance of a field. For example,
+\begin{Verbatim}[commandchars=!()]
+\PuzzleAppearance{\BC{1 0 0}}
+\PuzzleAppearance{\BC{red}}   %!textsf( if !pkg(xcolor) is loaded)
+\end{Verbatim}
+changes the boundary color to red. See the \pkg{eforms}
+documentation.
+
+\item[\normalfont{\cs{rowsep\darg{\ameta{skip}}}}:] By setting \cs{rowsep}, you can adjust
+    the vertical space between tabular rows. The commands takes one
+    argument, the amount of vertical skip, for example,
+\begin{Verbatim}
+\rowsep{2ex}
+\end{Verbatim}
+\item[\normalfont{\cs{wdPuzzleFields\darg{\ameta{length}}}}] Sets the width of a puzzle field
+  to \ameta{length}. The default is 1.6em
+\item[\normalfont{\cs{htPuzzleFields\darg{\ameta{length}}}}] Sets the height of the puzzle field
+to \ameta{length}. The default is 11bp.
+\end{description}
+
+\subsection{The questions}
+
+\begin{description}
+\item[\normalfont{\cs{displayRandomizedQuestions}}:] The questions are
+    inserted by this command. This command must be placed in an
+    \texttt{enumerate} environment. This will number the questions,
+    so when, for example, the \texttt{showletters}, discussed later,
+    is taken, there is a visual mapping between the questions, the
+    answers and the puzzle.
+
+If the number of questions is not great, you can list the questions
+in a single column; however, in the examples that I have done, I've
+determined that a two column format (using the \texttt{multicol}
+package) seems to me to be the best layout for the questions.
+
+\item[\normalfont{\cs{QuesAppearance}}:] Use this command to change the
+    appearance of the \app{Acrobat} checkboxes  for the questions that
+    appear in the label margin. The command takes one argument, this
+    argument consists of one or more commands from the
+    \textsf{eForms} package that change the appearance of a field.
+    For example,
+\begin{Verbatim}[commandchars=!()]
+\QuesAppearance{\BC{gray}} %!textsf( assumes xcolor pkg or just !cs(BC{.5 .5 .5}))
+\end{Verbatim}
+changes the boundary color to a gray color. See the \pkg{eforms} documentation.
+
+\item[\normalfont{\cs{widestFmtdQNum\darg{\ameta{str}}}}] Sets the width of the checkbox
+for the questions. The argument \ameta{str} is a string whose width determines the width
+of the checkboxes. The default is \cs{widestFmtdQNum\darg{00.}}. If the numbers are typeset
+in bold, then \cs{widestFmtdQNum\darg{\string\textbf\darg{00.}}} is a little wider to
+account for the bold font.
+\item[\normalfont{\cs{htOfQ\darg{\ameta{length}}}}] Sets the height of the checkbox for the question.
+The default is \cs{htOfQ\darg{13bp}}.
+\end{description}
+
+\subsection{The answers}
+
+\begin{description}
+\item[\normalfont{\cs{displayRandomizedAnswers}}:] As with the
+    questions, the answer are displayed in by a similar command. Again,
+    this command should be in a list environment, preferably the
+    \texttt{itemize}. The list label is suppressed by placing
+    \cs{item[]} before each answer.  When the \texttt{showletters}
+    option is taken, the letter this answer corresponds to will be the
+    label.
+
+One of the design layouts in the demo files has the questions in a
+two column format in the center with two columns of answers, half
+the answers to the left of the questions, and the other half to the
+right.  The two commands
+\begin{Verbatim}
+\displayRandomizedAnswersLeftPanel
+\displayRandomizedAnswersRightPanel
+\end{Verbatim}
+are used for that purpose.\footnote{{\TeX} doesn't know his left
+from his right, so you can actually place the left panel listing on
+the right. {\TeX} will not object!} As with
+\cs{displayRandomizedAnswers}, each of these commands should be in
+an \texttt{itemize} environment.
+
+\item[\normalfont{\cs{AnsAppearance}}:] Use this command to change the
+    appearance of the \app{Acrobat} checkboxes for the answers that appear in
+    the label margin. The command takes one argument, this argument
+    consists of one or more commands from the \textsf{eForms} package
+    that change the appearance of a field. For example,
+\begin{Verbatim}[commandchars=!()]
+\AnsAppearance{\BC{gray}} %!textsf( assumes xcolor pkg, or !cs(BC{.5 .5 .5}))
+\end{Verbatim}
+changes the boundary color to a gray color. See the \textsf{eforms} documentation.
+
+\item[\normalfont{\cs{ltrFmtA\darg{\ameta{\string\cmd\darg{\#1}}}}}] Formats the letters in
+the list of answers when the option \opt{showletters} is active. In the argument, \texttt{\#1}
+references the current letter to be typeset. For example, \verb~\ltrFmtA{\textbf{\textcolor{blue}{#1}}}~
+typesets the letters in bold and blue.
+
+\item[\normalfont{\cs{widestFmtdALtr\darg{\ameta{str}}}}] Sets the width of the checkbox
+for the answers. The argument \ameta{str} is a string whose width determines the width
+of the checkboxes. The default is \cs{widestFmtdALtr\darg{w}}.
+
+\item[\normalfont{\cs{htOfA\darg{\ameta{length}}}}] Sets the height of the checkbox for the answer.
+The default is \cs{htOfA\darg{13bp}}.
+\end{description}
+
+\subsection{The message field}
+
+\begin{description}
+\item[\normalfont{\cs{placeMessageField[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}}:]
+    This \app{Acrobat} text field is used to write messages to the user.  If
+    the user tries to choose an answer before selecting an answer, s/he
+    gets the message
+\[
+    \texttt{"You must choose a question to answer before you answer!"}
+\]
+For the interactive version of this game\footnote{Does that mean
+there is also a non-interactive version of this game, sir? Yes, yes
+there is. \dps}, there is a language option for \pkg{dps} to
+change the messages from English, the default, to German, for
+example.
+
+The parameters are \ameta{wd} (the width of the text field),
+\ameta{ht} (the height of the text field and \ameta{opt} (the
+optional argument for changing the appearance of the field, as
+described in the documentation of the \pkg{eforms} package.
+\end{description}
+The message field is automatically removed when the document is
+compiled in the \opt{forpaper} option of the \pkg{web}
+package.
+
+\subsection{Auxiliary files}
+
+Developing a puzzle file creates a number of auxiliary files, in addition to
+the usual ones of a typical {\LaTeX} file. The \pkg{dps} package creates a
+large number of CUT files and a few SAV files. If you create a sideshow (page~\pageref{s:sdshw}),
+additional PDF files are created as well. As a general rule, do not delete these files
+until you are finished building your puzzle and you have verified that is working correctly.
+
+\section{Commands for controlling randomization}
+
+When randomizing is to be used (that is, the option \opt{!nonrandomized} is in effect, or
+the \opt{nonrandomized} option is not specified), there are several commands to
+control the initial seed of the random number generator.
+\begin{Verbatim}[commandchars=!()]
+\useRandomSeed{!ameta(seed)}  %!textsf( eg, )\useRandomSeed{187968637}
+\inputRandomSeed
+\useLastSeed
+\end{Verbatim}
+All commands are placed in the preamble. Only one of the three should appear during any compile.
+\begin{description}
+\item[\normalfont\cs{useRandomSeed\darg{\ameta{seed}}}]\hskip-\labelsep\relax\space initializes the
+    random number generator to \ameta{seed}.
+\item[\normalfont\cs{inputRandomSeed}]\hskip-\labelsep\relax\space inputs
+    the seed value saved by the \opt{savedata} option; as a result, the
+    same randomization sequence is obtained each time the file is
+    compiled.\footnote{This assumes that randomized items are neither added
+    or deleted.} In effect, this command freezes the randomization sequence
+    as long as the file \cs{jobname\_data.sav} has not been deleted. To
+    continue to use this random sequence after \cs{jobname\_data.sav} is
+    deleted, save the value of the initial seed first, as described in the
+    description of the \opt{savedata} option on
+    \hyperref[item:savedata]{page~\pageref*{item:savedata}}.
+
+\item[\normalfont\cs{useLastSeed}]\hskip-\labelsep\relax\space initializes
+    the random number generator with the last random number generated in
+    the \emph{previous} compile. In this way, you get a new randomization
+    each time you compile the file.
+\end{description}
+The last two commands assume \cs{jobname\_data.sav} exists; otherwise they take an initial seed based on
+the current date and time.
+
+\section{Printing and clearing the puzzle}
+
+The \pkg{dps} package provides the following two commands, which produce push buttons:
+\begin{Verbatim}[commandchars=!()]
+\printDPS[!ameta(form-options)]{!ameta(wd)}{!ameta(ht)} %!textsf( prints the document)
+\resetDPS[!ameta(form-options)]{!ameta(wd)}{!ameta(ht)} %!textsf( clears the document)
+\end{Verbatim}
+The \ameta{wd} and \ameta{ht} are the width and height of the push button;
+the optional argument \ameta{form-options} are key-value pairs to change the
+appearance of the buttons. Familiarity with the \pkg{eforms} package is
+needed.
+
+The \pkg{dps} provides the command \cs{dpsResetHook} to add JavaScript lines to the
+action of \cs{resetDPS}. The command takes one argument to pass the JavaScript lines
+to \cs{resetDPS}; for example, \verb|\dpsResetHook{dpsHideFld("btnEmoji");}|\FmtMP{\cs{dpsHideFld}} appears
+in several of the example file. This hides the \texttt{btnEmoji} image.
+
+\section{Methods of handling long questions}
+
+All the basic examples (those in the folder \texttt{examples/basic}) feature
+\emph{short questions} that conveniently fit into the space provided.\footnote{With the one exception
+of \texttt{stat\_match1-print.tex} in the \texttt{basic} folder.} More
+complex questions require longer questions.  The problem, then, is to
+develop a method of posing long questions, without disturbing the puzzle design,
+for an \textit{interactive puzzle}.
+
+In this section, we detail two methods of posing long questions, while saving
+space on a one page puzzle document; these are (1) place the long questions
+into an appearance of an push button (yes, you can do that); and (2) place
+the long questions into a layer (optional content group, OCG). All {\LaTeX}
+workflows are supported by method (1), while method~(2) requires the
+\app{dvips\,->\,distiller} workflow.
+
+Both methods are designed for an interactive puzzle\FmtMP{interactive puzzles}, not a paper puzzle.
+
+\subsection{The \tops{\protect\opt{usebtnappr}}{usebtnappr} option}\label{s:usebtnappr}
+
+\textbf{Demo file.} The demonstration file for this subsection is \texttt{stat\_match1.tex},
+found in the \texttt{examples/advanced/icon-appr} folder.
+
+\newtopic\noindent This solution requires two files: (1) the puzzle file; and the (2) icon file.
+
+\subsubsection{The puzzle file}
+
+Within the puzzle file, the \opt{usebtnappr} option is specified. The
+\cs{usepackage} command for \pkg{dps} below specifies the minimal options:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\usepackage[%
+  !textbf(usebtnappr),
+  nonrandomized,
+  savedata
+]{dps}
+\end{Verbatim}
+%More on the \opt{wrtcontent} option in the section titled \mlNameref{ss:workflow}.
+
+\paragraph*{In the preamble.} We place two environments;
+\env{embedding}, to embed the icons; and \env{setContent}, to pose the
+long questions.
+
+\subparagraph*{Embedding the icons.} The \opt{usebtnappr} brings in the
+\FmtMP{\pkg{icon-appr} package}\pkg{icon-appr} package,\footnote{\url{https://ctan.org/pkg/icon-appr}} which defines the
+\env{embedding} environment and the \cs{embedIcon} command. The \pkg{dps}
+package defines \cs{dpsEmbedIcons}. This command embeds all the dynamically
+created PDF graphics that comprise the long questions. \cs{dpsEmbedIcons} is
+followed by other optional \cs{embedIcon} commands.
+\begin{Verbatim}[commandchars=!()]
+\begin{embedding}
+\dpsEmbedIcons
+!ameta(other-embeds)
+\end{embedding}
+\end{Verbatim}
+Below is the example from the demo file.
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{embedding}
+\dpsEmbedIcons
+\embedIcon[name=Emoji,placement=btnEmoji]{MyEmoji.pdf}
+\end{embedding}
+\end{Verbatim}
+The second line is the optional one; here, we explicitly embed, using the
+syntax of \pkg{icon-appr}, an additional graphic for use by the puzzle.
+
+\subparagraph*{Special note for \app{xelatex} users.} The \env{embedding}
+environment is placed in the preamble but the indirect references (a PDF
+term) of the embedded graphics are not calculated until the first page is
+shipped out (a {\LaTeX} term); therefore, the \emph{puzzle should be on the second
+page} when the \emph{\pkg{textpos} package is used}\FmtMP{\pkg{textpos} pkg} to position the graphics. This
+issue does not arise when using the \pkg{eso-pic} package.
+
+\subparagraph*{Posing long questions.} Following the \env{embedding} environment comes the usual content for
+designing the puzzle: the \cs{DeclarePuzzle} data structure, followed by the
+\env{Composing} environment. It is within the \env{cQ} environment of the
+\env{Composing} environment that there is a change in content.
+
+The\FmtMP{posing long question} \opt{usebtnappr} option
+defines the \env{setContent} environment, which is placed in the \env{cQ}
+environment.
+\begin{Verbatim}[commandchars=!()]
+\begin{cQ}{!ameta(name)}
+  !ameta(question-prompt)
+\begin{setContent}{!ameta(name)}
+  !ameta(long-question)
+\end{setContent}
+\end{cQ}
+\end{Verbatim}
+The \ameta{name} argument of \env{setContent} is same as the argument of the
+enclosing \env{cQ} environment. \env{setContent} is a verbatim write
+environment; \cs{begin\darg{setContent}} can follow the end of the
+\emph{question-prompt} (one or more words that suggest what the question is
+about), but the \cs{end\darg{setContent}} must be in the left-most margin, as
+shown above. We illustrate first with an example taken from the demo file:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\begin{Composing}
+\begin{cQ}{R}
+Branches of Statistics!textbf(\begin{setContent}{R})
+The two branches of statistics are descriptive and
+\underbar{\hspace{.5in}}.
+!textbf(\end{setContent})
+\end{cQ}
+\begin{cA}[r]{R}
+inferential
+\end{cA}
+...
+\end{Composing}
+\end{Verbatim}
+A long question is not required, in the demo file most have long questions and
+some do not.
+
+The \env{setContent} environment writes its content verbatim to a CUT file
+(named \cs{jobname-sc(\ameta{num}).cut}). For example, the CUT file for the
+first question of the demo file reads,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\textbf{Problem 1}\newline
+The two branches of statistics
+are descriptive and \underbar{\hspace{.5in}}.
+\end{Verbatim}
+The first line seen above can be modified using the following two commands.
+\begin{Verbatim}
+\newcommand{\quesNumTxt}[1]{\protect\textbf{Problem #1}}
+\newcommand{\quesNumTxTPost}{\protect\newline}
+\end{Verbatim}
+These may be redefined.
+
+\paragraph*{On the puzzle page.} Aside from the layout of the puzzle, questions,
+and answers commands, above all these, place the following commands:
+\begin{Verbatim}[commandchars=!()]
+\placeQuesIcon{!ameta(placement-cmds)}
+\placeOtherIcon{!ameta(placement-cmds)}
+\end{Verbatim}
+The nature of the \ameta{placement-cmds} depends on the ``placement'' package used. The demo files
+use either the \FmtMP{\pkg{eso-pic}, \pkg{textpos} packages}\pkg{eso-pic} or
+\pkg{textpos} package. The \ameta{placement-cmds} place the text field
+\cs{dpsQuesIcon\darg{\#1}\darg{\ameta{wd}\darg{\ameta{ht}}}}.
+The following is taken from the demo file, it uses the \pkg{eso-pic} package.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={@~^}]
+\placeQuesIcon{\AddToShipoutPictureFG*{\AtTextCenter{\put(-72,0)
+  {@textbf~\dpsQuesIcon{#1}{2.25in}{9\baselineskip}^}}}}
+\end{Verbatim}
+If other icons were embedded in the \env{embedding} environment, those icons can be placed
+using the \cs{placeOtherIcon} command.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={@~^}]
+\placeOtherIcon{\AddToShipoutPictureFG*{\AtTextCenter{\put(-72,0)
+  {@textbf~\dpsOtherIcon[\I{\csOf{Emoji}}]{btnEmoji}{2.25in}{9\baselineskip}^}}}}
+\end{Verbatim}
+
+\subsubsection{The icons file}\label{ss:iconfile}
+
+The \opt{usebtnappr} option requires the use of a second file, named
+\texttt{icons.tex}.\footnote{The name of the file is hard-wired into the
+package and cannot be changed at this time.} The \texttt{icons.tex} file in
+the \texttt{examples/advanced/icon-appr}. The icons file (\texttt{icons.tex})
+is a very short file and is placed in the same folder as the puzzle file.
+\begin{Verbatim}[commandchars={*@^}]
+\documentclass{article}
+\usepackage[!useacrobat]{icon-doc}
+\margins{3pt}{3pt}{3pt}{3pt}        %*textsf@ left,right,top,bottom (web command)^
+\screensize{9\baselineskip}{2.25in} %*textsf@ height,width (web command)^
+\begin{document}
+\small
+\createRequiredIcons{12}{stat_match1}
+\end{document}
+\end{Verbatim}
+The icons file is placed in the came folder as the puzzle file. The \pkg{dps}
+distribution has the \FmtMP{\pkg{icon-doc} package}\pkg{icon-doc} package, a
+short package designed for the icons file. The package has two options
+\opt{useacrobat} and \opt{!useacrobat}, the default is \opt{!useacrobat}.
+Document authors who use \app{pdflatex}, \app{lualatex}, or
+\app{dvips\,->\,distiller} need not bother with this option; the option is
+designed for \app{xelatex} users.
+
+Use the \cs{margins} command to adjust the boundary margins of icons file.
+Use the \cs{screensize} to adjust the height of the icons file and the width
+of the icons file. The dimensions shown above are the ones used by the demo
+file.
+
+The \cs{createRequiredIcons\darg{\ameta{num-ques}}\darg{\ameta{puzzle-file}}}
+command has two arguments: \ameta{num-ques} is the number of questions in the
+puzzle file; \ameta{puzzle-file} is the base name of the puzzle file.
+The command has two behaviors:
+\begin{enumerate}
+  \item \textbf{For \app{xelatex} authors that do not have \app{Acrobat}.}
+      When the icon file is compiled, the result is \ameta{num-ques} PDFs,
+      each PDF contains a \emph{single} long question. Since the author
+      does not have \app{Acrobat}, the icons file is compiled with the
+      \opt{!useacrobat} option. This case requires the
+      \FmtMP{\pkg{shellesc} pkg}\pkg{shellesc} package and that your
+      {\LaTeX} editor be setup to use the \texttt{shell-escape} switch of your editor.
+      Refer to Figure~\ref{fig:shesc} to see how to do this for the \app{WinEdt} editor.
+      Other editors/\TeX{} systems may support the \texttt{shell-escape} switch.
+\begin{figure}[htb]\centering
+  \includegraphics[width=.67\linewidth]{graphics/shell-escape}
+  \caption{Setting \texttt{shell-escape} on \app{WinEdt}}\label{fig:shesc}
+\end{figure}
+  \item \textbf{For all other cases of workflow.} When the icons file is
+      compiled, the result is a \emph{single} PDF (\texttt{icons.pdf}) with a page
+      for each long question in the puzzle file, in an order determined by
+      the randomization option (\opt{!nonrandomized} or
+      \opt{nonrandomized}).
+
+      For a \app{xelatex} author who has \app{Acrobat}, the
+      \opt{useacrobat} needs to be used.
+\end{enumerate}
+
+\paragraph*{Additional comments for \app{xelatex} authors.}\label{para:addCmts} In the case the author
+does not own \app{Acrobat}, when the icons file is compiled, each of the
+files \cs{jobname-sc(\ameta{num}).cut} is \emph{wrapped in a document
+template}, compiled, and saved as \texttt{icon-\ameta{num}.pdf}.
+The document wrapper is determined by the contents of the
+\FmtMP{\env{icondoc} env}\env{icondoc} environment. The default declaration
+of \env{icon-body} is,
+\begin{Verbatim}[commandchars=!()]
+\begin{icondoc}
+\documentclass{article}
+\usepackage{web}
+\margins{3pt}{3pt}{3pt}{3pt}
+\screensize{9\baselineskip}{2.25in}
+\begin{document}
+\small
+\dpsInputContent    %!textsf( required, defined in icon-doc)
+\end{document}
+\end{icondoc}
+\end{Verbatim}
+Notice that this markup is similar to the source file for \texttt{icons.tex};
+they differ in two respects, however: (1) the \pkg{icon-doc} package is not
+used; and (2) in the body, we use \cs{dpsInputContent} rather than
+\cs{createRequiredIcons}. If you use multiple workflows, the layout of the
+icons file and the declarations of the \env{icondoc} environment should be
+the same. Changes to the \env{icondoc} environment are made in the icons file. For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={*@^}]
+%*textsf@ icons.tex^
+%*textsf@ modify a design parameters^
+\documentclass{article}
+\usepackage[!useacrobat]{icon-doc}
+\margins{4pt}{4pt}{4pt}{4pt}       %*textsf@ left,right,top,bottom (web command)^
+\screensize{10\baselineskip}{3in}  %*textsf@ height,width (web command)^
+%*textsf@ change *env@icondoc^ to reflect changes above^
+*textbf@\begin{icondoc}^
+\documentclass{article}
+\usepackage{web}
+\margins{4pt}{4pt}{4pt}{4pt}
+\screensize{10\baselineskip}{3in}
+\begin{document}
+\small
+\dpsInputContent    %*textsf@ required, defined in icon-doc^
+\end{document}
+*textbf@\end{icondoc}^
+\begin{document}
+\small
+\createRequiredIcons{12}{stat_match1}
+\end{document}
+\end{Verbatim}
+\textbf{Why is \app{xelatex} so special (such a problem)?} The basic problem when dealing
+with \app{xelatex} is that it does not obey the \key{page} key of \cs{includegrapics}. When a graphic is embedded
+in a document we say,
+\begin{quote}
+    \cs{embedIcon[name=Q\string\n,hyopts=\darg{page=\string\n}]\darg{icons.pdf}}
+\end{quote}
+where, \cs{n} is question number; in this case, \cs{n} is also the page
+number where the question is located in \texttt{icons.pdf}. Since, the
+\key{key} is not obeyed, we cannot bundle all the questions in a single PDF
+and pull out the page we want; no, the questions must be their own PDF, the
+embedding command is then,
+\begin{quote}
+    \cs{embedIcon[name=Q\string\n]\darg{icons-\string\n.pdf}}
+\end{quote}
+where \cs{n} is the question number.
+
+\newtopic Hey, we're almost done with this option!
+
+\subsubsection{The workflow to build the puzzle file}\label{ss:workflow}
+
+Let's summarize the workflow to build a puzzle file that uses icon appearances
+to display the long questions. We assume you have jumped through all the hoops of the previous section,
+your puzzle file and icons file are ready to go.
+\begin{enumerate}
+    \item Compile the puzzle file, using the compiler of your choice. If
+        you require a randomized listing of the questions and answers,
+        either compile with \opt{!nonrandomized}, or the \opt{nonrandomize}
+        option commented out or deleted. If you are randomizing, compile
+        with the command \cs{inputRandomSeed} in the preamble to input that
+        same initial seed back in when your later compile the puzzle file
+        in step~3.\footnote{Or, you can open the SAV file and copy and
+        paste the initial seed into the argument of \cs{useRandomSeed}.}
+    \item Compile the icons file, using your favorite compiler. If you are
+        a \app{xelatex} user, the option \opt{useacrobat} and
+        \opt{!useacrobat} as appropriate. (Refer to \textbf{\mlnameref{para:addCmts}}
+        on page~\pageref{para:addCmts} for more details.)
+    \item Return to the puzzle file. Compile the puzzle file again to
+        obtain the final version.
+
+    \item Bring your PDF into \app{Adobe Reader DC} (or \app{Adobe Acrobat DC} if you
+        have it) and save the file. After saving, test the puzzle to be sure
+        the icons are displayed with the long questions. If it does not work,
+        repeat steps~1--3 more carefully.
+\end{enumerate}
+To familiarize yourself to the procedure, build the demo file
+\texttt{stat\_match1.tex} using your favorite PDF creator. Try it with
+several PDF creators, just for fun. The process is straight forward once
+everything is properly set up.
+
+\subsection{The \tops{\protect\opt{uselayers}}{uselayers} option}\label{s:uselayers}
+
+\textbf{Demo files.} There are several example files in the
+\texttt{examples/advanced/ocgs} folder, but in this discussion, we'll
+reference, once again, \texttt{stat\_match1} found in the \texttt{ex1}
+folder. There are two versions of this file \texttt{stat\_match1-ep.tex} and
+\texttt{stat\_match1-tb.tex}. The latter uses the \pkg{textpos} package, the
+latter uses the \pkg{eso-pic} package. For variety, we'll reference the
+\pkg{textpos} version.
+
+\newtopic\noindent
+The \opt{uselayers} option is actually a simpler approach (no icon file
+needed), but there has more restrictions on the workflow. This option
+requires \FmtMP{\pkg{aeb\_pro} pkg} the \pkg{aeb\_pro} package (with
+correctly installed JS files \texttt{aeb.js} and \texttt{aeb\_pro.js}) and
+requires a \FmtMP{\app{Acrobat} required}\app{dvips->distiller} PDF creator workflow.
+
+\subsubsection{The puzzle file}
+
+A minimal specification for the \pkg{aeb\_pro} and \pkg{dps} packages is
+listed below:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\usepackage[%
+  web={extended,tight},
+  eforms,
+  !textbf(uselayers)
+]{aeb_pro}
+\usepackage[!textbf(uselayers),
+  nonrandomized,
+  savedata
+]{dps}
+\end{Verbatim}
+
+\paragraph*{Posing long questions.} The \cs{DeclarePuzzle} is as described in
+\hyperref[s:DP]{Section~\ref*{s:DP}}. As in the case of \hyperref[s:usebtnappr]{Section~\ref*{s:usebtnappr}},
+the \env{setContent} environment is used to pose long questions.
+\begin{Verbatim}[commandchars=!()]
+\begin{cQ}{!ameta(name)}
+  !ameta(question-prompt)
+\begin{setContent}{!ameta(name)}
+  !ameta(long-question)
+\end{setContent}
+\end{cQ}
+\end{Verbatim}
+The definition of \env{setContent} differs from that of \env{setContent} for
+the \opt{usebtnappr} option. A long question is not required.
+
+The \env{setContent} environment writes its content verbatim to a CUT file
+(named \cs{jobname-sc(\ameta{name}-\ameta{num}).cut}). For example, the CUT file for the
+first question of the demo file reads,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\textbf{Problem 1}\newline
+The two branches of statistics
+are descriptive and \underbar{\hspace{.5in}}.
+\end{Verbatim}
+The first line, which is not part of the \env{setContent} content, seen above
+can be modified using the following two commands.
+\begin{Verbatim}
+\newcommand{\quesNumTxt}[1]{\protect\textbf{Problem #1}}
+\newcommand{\quesNumTxTPost}{\protect\newline}
+\end{Verbatim}
+These may be redefined.
+
+\begin{comment}
+\fmtOCGQues{%
+  \parbox[t][9\baselineskip][t]{2.25in}{\kern0pt\small\hfuzz11pt
+  \psshadowbox[framesep=0pt]{\fcolorbox{red}{cornsilk}{%
+  \parbox{\linewidth}{\dpsQuesLayer{#1}\vskip3pt}}}}%
+}
+% These declaration go on the page where they are to appear
+\placeQuesLayer{%
+  \begin{textblock*}{2.25in}[0,0](2.5in+.725in,3in) %(.33\paperwidth,.42\paperheight)\hfuzz11pt
+  \insertQuesLayer{#1}
+  \end{textblock*}%
+}
+
+\placeOtherLayer{%
+  \begin{textblock*}{2.25in}[0,0](2.5in+.725in,3in)\centering
+  \xBld{owclogo}\parbox{2.25in}{\includegraphics[width=2.25in]{owc_self}}\eBld
+  \end{textblock*}%
+}
+\end{comment}
+
+\paragraph*{In the body of the puzzle page.} The following three commands are placed
+on the same page as the puzzle is to appear. They precede the layout of the puzzle, questions,
+and answers.
+\begin{Verbatim}[commandchars=!()]
+\fmtOCGQues{!ameta(formatting-comm)}
+\placeQuesLayer{!ameta(placement-cmds)}
+\placeOtherLayer{!ameta(placement-cmds)}
+\end{Verbatim}
+The argument of \FmtMP{\cs{fmtOCGQues}}\cs{fmtOCGQues} is a convenient way of designing how your long question
+appears on the page. Within the argument, use \cs{dpsQuesLayer{\#1}} to symbolically reference
+the question. For example, from the demo file,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\fmtOCGQues{%
+  \parbox[t][9\baselineskip][t]{2.25in}{\kern0pt\small\hfuzz11pt
+  \psshadowbox[framesep=0pt]{\fcolorbox{red}{cornsilk}{%
+  \parbox{\linewidth}{!textbf(\dpsQuesLayer{#1})\vskip3pt}}}}
+}
+\end{Verbatim}
+Here, we've used \cs{psshadowbox} from \pkg{pstricks-add},
+
+The nature of the \ameta{placement-cmds} depends on the ``placement'' package used. The demo files
+use either the \FmtMP{\pkg{eso-pic}, \pkg{textpos} packages}\pkg{eso-pic} or
+\pkg{textpos} package. The \ameta{placement-cmds} argument places the question
+\cs{insertQuesLayer\darg{\#1}}.
+
+For the command \FmtMP{\cs{placeQuesLayer}}\cs{placeQuesLayer} places the question layer,
+symbolically represented by \cs{insertQuesLayer\darg{\#1}}. For example, from the demo file,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\placeQuesLayer{%
+  \begin{textblock*}{2.25in}[0,0](2.5in+.725in,3in)
+  !textbf(\insertQuesLayer{#1})
+  \end{textblock*}%
+}
+\end{Verbatim}
+\cs{insertQuesLayer} sets the layer and inputs the formatted content.
+
+Use \FmtMP{\hfuzz4pt\cs{placeOtherLayer}}\cs{placeOtherLayer} to place other
+non-question content in a layer. For example, from the demo file,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\placeOtherLayer{%
+  \begin{textblock*}{2.25in}[0,0](2.5in+.725in,3in)\centering
+  \xBld{owclogo}\parbox{2.25in}
+    {\includegraphics[width=2.25in]{owc_self}}\eBld
+  \end{textblock*}%
+}
+\end{Verbatim}
+Here, you must use the \pkg{aeb\_pro} commands to create a named layer, using
+the \cs{xBld}/\allowbreak\cs{eBld} command pair. The argument of \cs{xBld} is the name
+of the layer. Within the \cs{xBld}/\cs{eBld} pair, we create our content of a
+graphic.
+
+\subsection{Developing an end of game event}
+
+There are commands and JavaScript hooks to enable a knowledgable author to
+create a special end-of-game event. For example, the graphic placed by
+\cs{placeOtherIcon} or \cs{placeOtherLayer}, becomes visible when the player
+finishes the puzzle. All the demo files in the \texttt{advanced} folder have
+end of game events. The \pkg{dps} provides the command \cs{dpsFinishedEvent}
+to add JavaScript lines to the action to the end of game event. The command
+takes one argument to pass the JavaScript lines to the end of game event; for
+example, \verb|\dpsFinishedEvent{dpsShowFld("btnEmoji");}|\allowbreak
+\FmtMP{\leavevmode\llap{\cs{dpsFinishedEvent}}} appears in several of the
+example file. This shows the \texttt{btnEmoji} image when the player has
+finished the puzzle.
+
+\section{Creating a sideshow}\label{s:sdshw}
+
+Some of the advanced examples use a sideshow; as the player progresses through
+the puzzle, with each success, a new piece of a graphic is revealed. A partially worked puzzle
+is shown in \hyperref[fig:sideshow]{Figure~\ref*{fig:sideshow}}.
+
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.67\linewidth]{graphics/sideshow}}
+\caption{Puzzle with sideshow, shown on left}\label{fig:sideshow}
+\end{figure}
+
+There are two commands, placed in the preamble, that control the behavior of
+the sideshow.
+\begin{Verbatim}
+\randomizePicMappings
+\sortPicMappings
+\end{Verbatim}
+The order the sideshow pictures appears can be in their natural order, or in
+a randomized order. To randomize the order, insert \cs{randomizePicMappings}
+in the preamble; otherwise, the pictures appear in their natural order.
+
+Second command, \cs{sortPicMappings} implies \cs{randomizePicMappings}, but
+with a twist. The pictures are placed in random positions as they appear; at
+the end of the puzzle, a bubble sort is applied, and the pictures are sorted
+to their natural order. Cool.
+
+In all cases, pressing the \textsf{Clear} button creates a new randomization
+of the sideshow.
+
+
+\paragraph*{Tiled graphics.}\label{para:tiledgraphics} A sideshow appears in pieces, called \emph{tiles}, that appear
+one at a time as the  puzzle is solved, see
+\hyperref[fig:sideshow]{Figure~\ref*{fig:sideshow}}. The graphic to be used
+must have been broken down into a series of \emph{tiled sub-graphics}. These
+tiles must be created in a certain way and labeled in a specific manner. Use
+the \FmtMP{\pkg{tile-graphic} pkg}\pkg{tile-graphic} package to tile the
+graphic into either individual PDF tiled sub-graphics or as a single package
+of tiled graphics.\footnote{\url{https://ctan.org/pkg/tile-graphic}}
+
+\subparagraph*{The base name of the graphic.}\label{subpara:basename} The \pkg{tile-graphic} has a naming convention
+that this package respects:
+\begin{itemize}
+  \item When the tiled graphics are individual files, they are named, for
+      example, \texttt{mypic\_01}, \texttt{mypic\_02}, \texttt{mypic\_03},
+      \dots. The base name of this example is \texttt{mypic}. The graphical
+      file format of the tiles is any format the PDF creator supports for
+      graphical inclusion. It is usually most convenient for the tiled
+      files to be PDF files.
+  \item When the tiled graphics are packaged,\footnote{\app{xelatex} does not support packaged files,
+  the tiles should be individual PDFs, as describe previously.} the \pkg{tile-graphic}
+      package names the package file, for example,
+      \texttt{mypic\_package.pdf}. When packaged, the graphical file format
+      for the tiles are always PDFs. The base name of this example is \texttt{mypic}.
+\end{itemize}
+
+
+\newtopic
+Additional details of how to create a sideshow are dependent on whether the
+option \opt{usebtnappr} or \opt{uselayers} is taken.
+
+\subsection{Sideshow with the \tops{\protect\opt{usebtnappr}}{usebtnappr} option}
+
+\textbf{Demo file.} The demo file for this feature is \texttt{first\_date.tex} found
+in the folder \texttt{examples/advanced/usebtnappr/sideshow}.
+
+\newtopic\noindent First we embed the pictures of the sideshow in the \env{embedding}
+environment.
+\begin{Verbatim}[commandchars=!()]
+\begin{embedding}
+\dpsEmbedIcons
+!ameta(other-embedding commands)
+!textbf(\sideshowPackaged!quad)%!sffamily( optional)
+!bfseries\dpsEmbedSideShow[!ameta(ext)]{!ameta(n-pics)}{!ameta(path)}
+\end{embedding}
+\end{Verbatim}
+There are two ways to present the sideshow pictures, as described in the
+paragraph \textbf{\nameref{para:tiledgraphics}} above, to the
+\cs{dpsEmbedSideShow} command: (1) as individual tiled graphics; or (2) as a
+packaged graphic, the pages of which are the tiled graphics. The form of how
+the picture is presented is signaled to the \cs{dpsEmbedSideShow} command by
+the command \cs{sideshowPackage}, as indicated above. The first argument is
+\ameta{ext}, the file extension of the graphic, this usually not needed; when
+there is no \ameta{ext} specified, the extension is assumed to be
+\texttt{pdf}. The second argument is \ameta{n-pics}, the number of tile
+sub-graphics in the sideshow. The third argument, \ameta{path}, is the path
+to the sideshow graphic. At the end of the \ameta{path} is the base name of
+the graphic, as described in \textbf{\nameref{subpara:basename}} on
+page~\pageref*{subpara:basename}; for example, \texttt{graphics/mypic}
+indicates the tile files are in the \texttt{graphics} sub-folder, with base
+name of \texttt{mypic}.
+
+\newtopic After embedding the sideshow graphics, insert them into the puzzle board
+using,
+\begin{Verbatim}[commandchars=!()]
+\insertSideshow{!ameta(nRows)}{!ameta(nCols)}{!ameta(width)}{!ameta(height)}
+\end{Verbatim}
+where, \ameta{nRows} is the number of rows of the tiled graphic;
+\ameta{nCols} is the number of columns of the tiled graphic; \ameta{width} is
+the width of the tile; and \ameta{height} is the height of the tile. These
+latter two are adjusted so the tile fits into the space allotted and the
+aspect ratio is preserved.
+
+\newtopic\noindent
+\textbf{\textcolor{red}{Remark.}} When compiling a puzzle with the
+\opt{usebtnappr} option, the puzzle file compiles in two ``modes,'' depending
+on the state of the switch \cs{ifwrtContent}. Each time the document is
+compiled, the package looks for the file \texttt{icons-pglst.sav}, if it
+exists, the switch \cs{ifwrtContent} is set false; otherwise, it is set to
+true. The file \texttt{icons-pglst.sav} is created by \texttt{icons.tex}, the
+existence of \texttt{icons-pglst.sav} means \texttt{icons.tex} has been
+built. Once the puzzle file knows the \texttt{icons.tex} is built, the
+switch \cs{ifwrtContent} is set to false, and its behavior is changed
+slightly. If something goes wrong, delete \texttt{icons-pglst.sav}, and rebuild
+the puzzle file first, the icons file next, then finally the puzzle file again.
+
+\subsection{Sideshow with the \tops{\protect\opt{uselayers}}{uselayers} option}
+
+\textbf{Demo file.} The two TEX files in the \texttt{examples/advanced/uselayers/sideshow} folder.
+
+\newtopic\noindent
+When the \opt{uselayers} option is specified, only EPS files are supported.
+\begin{Verbatim}[commandchars=!()]
+\insertSideshow{!ameta(nRows)}{!ameta(nCols)}[!ameta(hy-opts)]{!ameta(path)}
+\end{Verbatim}
+
+% layers
+%\insertSideshow{3}{2}[hiresbb,width=.5\linewidth]{flowers1/DSC_0453}
+
+\section{Some small degree of security}
+
+If a puzzle is create for a class of students to take for credit; then some
+security is appropriate. Typically, you post the puzzle with a print button
+(see \cs{printDPS} above. After the student completes the puzzle, he/she
+prints the results and hands it in for some credit. The \pkg{dps} package also
+provides \cs{clearOnCloseOrSave}:
+\begin{Verbatim}
+\clearOnCloseOrSave
+\end{Verbatim}
+Place this command in the preamble.  Now, when the puzzle is built, a student
+tries to close or save the puzzle, the puzzle is cleared before closing or
+saving. The only record is the printed version.\footnote{Perhaps this is a
+mere nuisance, the student can make many copies of the printed puzzle, and
+hand it around to others in the class. Nothing is foolproof.}
+
+%\section{Advanced hooks}
+%There are several built-in hooks that can be exploited to author special effects.
+
+% The two commands \afterQhookA and \OnFocusQhookAA are hooks onto
+% the \dpsQ command of the dps package. This allows us to post process
+% the user's choice of a questions, and allows us to execute JS on focus.
+% We use these two to call to JS function to support these additional
+
+% \afterQhookA
+% \OnFocusQhookAA
+
+% afterCorrectChoiceHook()
+% dpsFinishedHook()
+
+\section{Let's have some Fun}
+
+In order to make answering the questions ``fun,'' and in addition to
+the puzzle (or message), I implemented a point system. Each time the
+user checks an incorrect answer, that is recorded as a miss. After
+completion of the game, the JavaScript determines if the user has
+passed the test. To make it more interesting, a penalty point system
+is also used: If the user incorrectly answer the same questions
+multiple times (guessing!), penalty points are given.
+
+\newtopic\noindent
+The document author can set the various parameters of this aspect of the game.
+\begin{description}
+\item[\normalfont{\cs{threshold\darg{\ameta{n}}}}:] The number, \ameta{n}, of
+    times a person is allowed to miss the same question before being
+    ``awarded'' penalty points.  The command \cs{threshold} with its one
+    argument defines the command \cs{dsthreshold} which expands to the
+    argument, \texttt{n}, of \cs{threshold}. Set \cs{threshold} in the
+    preamble, and use \cs{dsthreshold} as part of the instructions or
+    description of the game. The default: \verb!\threshold{3}!.
+
+\item[\normalfont{\cs{penaltypoints\darg{\ameta{n}}}}:] The number, \ameta{n},
+of penalty points to be added into the final score. Penalty points
+are ``awarded'' for missing the same question more than the number
+specified by the argument of \cs{threshold}. The command
+\cs{penaltypoints} with its one argument defines the command
+\cs{dspenaltypoints} which expands to the argument, \texttt{n}, of
+\cs{penaltypoints}. Set \cs{penaltypoints} in the preamble, and use
+\cs{dspenaltypoints} as part of the instructions or description of
+the game. Default: \verb!\penaltypoints{3}!.
+
+\item[\normalfont{\cs{passing\darg{\ameta{n}}}}:] The maximum number,
+\ameta{n}, of questions the user needs to miss and still pass the
+test. Passing or not does not depend on the number of penalty
+points. The command \cs{passing} with its one argument defines the
+command \cs{dspassing} which expands to the argument, \ameta{n}, of
+\cs{passing}. Set \cs{passing} in the preamble, and use
+\cs{dspassing} as part of the instructions or description of the
+game. The default is \verb!\passing{4}!.
+
+The number of incorrect answers and the total penalty points are
+combined. Based on the combined score, a final evaluation of the
+user's knowledge on the subject is displayed.
+\end{description}
+
+\section{Checking for validity}
+
+When creating the game, human error can sneak in. The most critical
+part is the \cs{Declare\-Puzzle} command and getting the names of your
+fields set up the way you want. Letters with the same field name
+(the second parameter of the pair) will only need one question, they
+will all ``light up'' when the question is answered.
+
+As explained earlier, after you've decided on your puzzle and the
+field names, you can then create your \texttt{Composing} environment
+using the \cs{writeComposingEnv} helper command. Review the
+discussion in \Nameref{composing}.
+
+To help you lay out your design, use the \texttt{viewmode} option,
+possibly along with the \texttt{showletter} option. This gives you a
+nice preview and you can see where everything is located. You may
+have to adjust the parameter for \cs{insertPuzzle} to fit the puzzle
+into the allotted space. If enclosing puzzle, questions and answer
+in frames, there may have to be some adjustment of the depth of the
+controlling \texttt{minipage} environments, and so on, etc., etc.,
+etc., and, of course, etc.
+
+Assuming you have successfully posed questions and answers, and
+designed a layout for your puzzle, the questions, and the answers, you are
+ready to test it. Using the \texttt{nonrandomized} option is nice
+for checking your puzzle; the questions and answers are listed in
+the same order.
+
+If you have customized the text using the \texttt{lang=custom}
+option, you need to check that your text displays correctly; this is
+especially important if your new text contains accented characters,
+such as our old friend \"{u}. To test your customized string, open
+your puzzle document in \app{Acrobat} (\app{Reader} will not do here) and
+execute these JavaScript lines in the console:\footnote{To execute
+from the console, open the console window by pressing
+\texttt{Ctrl+J}, paste in the code, highlight all the lines and
+press the \texttt{Enter} key on the keyboard, or \texttt{Ctrl+Enter}
+on the keypad.}
+\begin{verbatim}
+this.resetForm()
+nMissed = 0;
+nPenaltyPoints = 0;
+nPassing = 4;
+checkForFinished();
+\end{verbatim}
+By changing the variables \texttt{nMissed}, \texttt{nPenaltyPoints}
+and \texttt{nPassing}, and executing, you get the different messages
+appearing in the message text field.
+
+\section{Using the \textsf{web} Package}
+
+The web package has a many features that can be utilized as a part
+of your overall puzzle design.
+
+The package has a powerful template management system for inserting
+background graphics into a document, and a system for painting the
+background a color other than the default white.
+
+Use the \cs{margins} and \cs{screensize} commands to set the
+dimensions of your puzzle game page:
+\begin{Verbatim}[commandchars=!()]
+\margins{!ameta(left)}{!ameta(right)}{!ameta(top)}{!ameta(bottom)}
+\screensize{!ameta(height)}{!ameta(width)}
+\end{Verbatim}
+Enter the title and author's name, as well as other metadata:
+\begin{Verbatim}[commandchars=!()]
+\title{!ameta(doc-title)}
+\author{!ameta(doc-author)}
+\end{Verbatim}
+See the documentation, \texttt{aeb\_man.pdf}, of the \href{http://www.ctan.org/pkg/acrotex}{\textsf{AeB} distribution}
+for details.
+
+\section{Thanks}
+
+My thanks to J\"{u}rgen Gilg, of u-umlaut fame, for his help and
+kind suggestions during the development of this game.
+
+That's all for now. Hope you enjoy \textsl{Das Puzzle Spiel} and
+find it a useful learning tool.
+
+\newtopic\noindent
+Now, I simply must get back to my retirement. \dps
+
+\newpage
+
+\section{Appendix}\label{appendix}
+
+The following is a subset of the PDFDocEncoding character set for PDF, these are
+useful for creating your custom localization file \texttt{dps\_str\_cust.def}, as discussed
+in \mlNameref{packopts}.
+
+\subsection{German Umlaut (dieresis)}
+Here a little tabular how to substitute the German Umlaut
+(dieresis) in PD1.\\[6pt]
+%
+\begin{tabular}{cl|cl|cl}
+\"{A}&\verb!\string\304!&\"{O}&\verb!\string\326!&\"{U}&\verb!\string\334!\\
+\"{a}&\verb!\string\344!&\"{o}&\verb!\string\366!&\"{u}&\verb!\string\374!\\
+{\ss}&\verb!\string\337!
+\end{tabular}
+
+\subsection{Accents}
+Here a little tabular how to substitute accents in PD1.\\[6pt]
+%
+\begin{tabular}{cl|cl|cl}
+\`{A}&\verb!\string\300!&\`{E}&\verb!\string\310!&\`{I}&\verb!\string\314!\\
+\`{a}&\verb!\string\340!&\`{e}&\verb!\string\350!&\`{\i}&\verb!\string\354!\\
+\'{A}&\verb!\string\301!&\'{E}&\verb!\string\311!&\'{I}&\verb!\string\315!\\
+\'{a}&\verb!\string\341!&\'{e}&\verb!\string\351!&\'{\i}&\verb!\string\355!\\
+\^{A}&\verb!\string\302!&\^{E}&\verb!\string\312!&\^{I}&\verb!\string\316!\\
+\^{a}&\verb!\string\342!&\^{e}&\verb!\string\352!&\^{\i}&\verb!\string\356!\\
+\`{O}&\verb!\string\322!&\`{U}&\verb!\string\331!&\"e&\verb!\string\353!\\
+\`{o}&\verb!\string\362!&\`{u}&\verb!\string\371!&\c{C}&\verb!\string\307!\\
+\'{O}&\verb!\string\323!&\'{U}&\verb!\string\332!&\c{c}&\verb!\string\347!\\
+\'{o}&\verb!\string\363!&\'{u}&\verb!\string\372!\\
+\^{O}&\verb!\string\324!&\^{U}&\verb!\string\333!\\
+\^{o}&\verb!\string\364!&\^{u}&\verb!\string\373!
+\end{tabular}
+\end{document}

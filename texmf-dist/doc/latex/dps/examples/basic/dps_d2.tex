@@ -1,0 +1,231 @@
+\documentclass{article}
+%\usepackage[forcolorpaper]{web}
+\usepackage{web} % dvips->ps2pdf|distiller, pdftex, lualatex, xelatex
+\usepackage{eforms}
+\usepackage[nonrandomized,showletters,savedata]{dps}
+
+\previewOn \pmpvOn
+%\useRandomSeed{number}
+\inputRandomSeed
+%\useLastSeed
+
+\rowsep{2.5ex}
+
+\margins{.5in}{.5in}{.5in}{.5in} % left,right,top, bottom
+\screensize{8in+4\baselineskip}{8.5in} % height, width
+
+\title{DPS -- Das Puzzle Spiel}
+\author{D. P. Story}
+
+\ifeqforpaper
+\setlength{\oddsidemargin}{-.5in}\fi
+
+\parindent0pt
+\parskip6pt
+
+\DeclarePuzzle
+{%
+    {H}{H}
+    {e}{e}
+    {l}{l}
+    {l}{l}
+    {o}{o}
+%    {,}{punc}
+    {J}{J}
+    {\tops{\protect\"{u}}{\ifxetex ü\else\string\374\fi}}{uml} % ü
+    {r}{r}
+    {g}{g}
+    {e}{e}
+    {n}{n}
+    {,}{punc}
+%    {}{space}
+    {h}{h}
+    {o}{o}
+    {w}{w}
+    {}{space}
+    {a}{a}
+    {r}{r}
+    {e}{e}
+    {}{space}
+    {y}{y}
+    {o}{o}
+    {u}{u}
+%    {}{space}
+    {t}{t}
+    {o}{o}
+    {d}{d}
+    {a}{a}
+    {y}{y}
+    {?}{punc}
+}
+
+\begin{Composing}
+
+\begin{cQ}{H}
+$ -5x - 2 + 3x $
+\end{cQ}
+\begin{cA}[h]{H}
+$-2x-2$
+\end{cA}
+
+\begin{cQ}{e}
+$ 2x + 5x $
+\end{cQ}
+\begin{cA}{e}
+$7x$
+\end{cA}
+
+\begin{cQ}{l}
+$ 6x - 3x + 1 $
+\end{cQ}
+\begin{cA}{l}
+$3x+1$
+\end{cA}
+
+\begin{cQ}{o}
+$ 5 -5x + 2x -2 $
+\end{cQ}
+\begin{cA}{o}
+$-3x+3$
+\end{cA}
+
+\begin{cQ}{J}
+$ 4( x + 2 ) - 2 $
+\end{cQ}
+\begin{cA}[j]{J}
+$4x+6$
+\end{cA}
+
+\begin{cQ}{uml}
+$ -3x + 2(5-2x) $
+\end{cQ}
+\begin{cA}{uml}
+$-7x+10$
+\end{cA}
+
+\begin{cQ}{r}
+$ -2 ( 3x + (-4) ) + 4 $
+\end{cQ}
+\begin{cA}{r}
+$-6x+12$
+\end{cA}
+
+\begin{cQ}{g}
+$ 5 ( x - (-2) ) $
+\end{cQ}
+\begin{cA}{g}
+$5x+10$
+\end{cA}
+
+\begin{cQ}{n}
+$ 6x - 5 (x - 2) $
+\end{cQ}
+\begin{cA}{n}
+$x+10$
+\end{cA}
+
+\begin{cQ}{h}
+$ 2 - 3(4x - 2) $
+\end{cQ}
+\begin{cA}{h}
+$-12x+8$
+\end{cA}
+
+\begin{cQ}{w}
+$ 6x - 3 + x + 5 $
+\end{cQ}
+\begin{cA}{w}
+$7x+2$
+\end{cA}
+
+\begin{cQ}{a}
+$ 5( -2x + 4 ) + 3x - 2 $
+\end{cQ}
+\begin{cA}{a}
+   $-7x+18$
+\end{cA}
+
+\begin{cQ}{y}
+$ 3(x-3) -  2(x+2) $
+\end{cQ}
+\begin{cA}{y}
+$x-13$
+\end{cA}
+
+\begin{cQ}{u}
+$ -2(3-x) - 4(1-3x) $
+\end{cQ}
+\begin{cA}{u}
+$14x-10$
+\end{cA}
+
+\begin{cQ}{t}
+$ x (5 +2) -3x $
+\end{cQ}
+\begin{cA}{t}
+$4x$
+\end{cA}
+
+\begin{cQ}{d}
+$ 1 -2 ( 2x -4x) + 2x $
+\end{cQ}
+\begin{cA}{d}
+$ 6x + 1$
+\end{cA}
+
+\end{Composing}
+
+\begin{document}
+\begin{center}\bfseries\Large\color{blue}
+    \webtitle\\[1ex]\webauthor
+\end{center}
+
+\ifeqforpaper
+    \textcolor{red}{\textbf{Instructions:}} Solve each of the
+    numbered problems in the center panel, and find the answer in either
+    the left or right panel.  Fill in the space(s) in the puzzle
+    corresponding to the question number with the letter associated with
+    the answer.
+\else
+    \textcolor{red}{\textbf{Instructions:}} Select a question from the
+    center panel by clicking its checkbox. Solve the problem and find
+    the answer listed in either the left or right panel.  No guessing!
+    A maximum of $\dsthreshold$ tries on any problem before you get
+    $\dspenaltypoints$ penalty points !  Passing is to complete the puzzle with only
+    $\dspassing$ incorrect answers.
+\fi
+
+% widths for the left (ans) and right (ques) columns
+\def\answidth{1.2in}
+\def\queswidth{1.8in}
+
+\fbox{\begin{minipage}[t][5in][t]{\answidth-2\fboxsep-2\fboxrule}\raggedright
+\makebox[\linewidth]{\textbf{Answers}}
+\begin{itemize}
+\displayRandomizedAnswers
+\end{itemize}
+\par\smallskip
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][1in+12pt][t]{\linewidth-\answidth-\queswidth-2\fboxsep-2\fboxrule}\centering
+\textbf{The Puzzle}\par\medskip
+\insertPuzzle{11}
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][5in][t]{\queswidth-2\fboxsep-2\fboxrule}
+\makebox[\linewidth]{\centering\textbf{Questions}}
+\begin{enumerate}
+\displayRandomizedQuestions
+\end{enumerate}
+\par\smallskip
+\end{minipage}}%
+
+\nointerlineskip\vspace{-\parskip} % makes it flush with the puzzle above
+\placeMessageField{\linewidth}{50pt}
+
+Print this page: \printDPS{}{11bp}\ifeqforpaper\else\cgBdry[1ex]
+Try again: \resetDPS{}{11bp}\fi
+
+The answer key: \AnswerKey
+
+\end{document}

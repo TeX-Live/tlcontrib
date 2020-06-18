@@ -1,0 +1,236 @@
+\documentclass{article}
+\usepackage[%
+  web={extended},
+  eforms,
+  uselayers
+]{aeb_pro}
+\usepackage[uselayers,
+  lang=custom,
+  nonrandomized,
+  !showletters,
+  !showanswerkey,
+  savedata]{dps}
+\usepackage{graphicx}
+\usepackage{pstricks-add}
+\usepackage[absolute]{textpos} 
+
+%\previewOn\pmpvOn
+%\useRandomSeed{number}
+\inputRandomSeed
+%\useLastSeed
+
+\randomizePicMappings
+
+\margins{.5in}{.5in}{.5in}{.5in} % left,right,top, bottom
+\screensize{9.5in}{8.5in} % height, width
+
+\DeclareDocInfo
+{
+    title=A Rookie's Big Night Out,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=A Rookie's Big Night Out,
+    keywords={matching, layers, game},
+    talksite=http://www.acrotex.net,
+    copyrightyears=2006-\the\year,
+}
+\talkdateLabel{Version}
+\version{1.0}\nocopyright
+
+\ifeqforpaper
+\setlength{\oddsidemargin}{-.5in}\fi
+
+\everyTextField{\textFont{TiRo}}
+
+\def\centerQHead#1{\makebox[\linewidth][c]{#1}}
+\renewcommand{\quesNumTxt}[1]{\protect\centerQHead{\protect\textbf{Question #1}}}
+\renewcommand{\quesNumTxTPost}{\protect\vspace{3pt}}
+
+\rheader{}
+
+\parindent0pt
+\parskip6pt
+
+\DeclarePuzzle
+{%
+    {F}{F}
+    {l}{l}
+    {o}{o}
+    {w}{w}
+    {e}{e}
+    {r}{r}
+    {s}{s}
+}
+
+%\writeComposingEnv
+
+\begin{Composing}
+
+\begin{cQ}{F}
+Clothes\begin{setContent}{F}
+You wear your \underbar{\hspace*{\ublength}} clothes when you pick her up.
+\end{setContent}
+\end{cQ}
+\begin{cA}{F}
+best
+\end{cA}
+
+\begin{cQ}{l}
+Shoes\begin{setContent}{l}
+You should \underbar{\hspace*{\ublength}} your shoes before you put them on, and before
+you pick her up.
+\end{setContent}
+\end{cQ}
+\begin{cA}{l}
+shine
+\end{cA}
+
+\begin{cQ}{o}
+Hair\begin{setContent}{o}
+Part your hair in the
+\underbar{\hspace*{\ublength}} of your head before you leave
+your flat to pick her up.
+\end{setContent}
+\end{cQ}
+\begin{cA}{o}
+middle
+\end{cA}
+
+\begin{cQ}{w}
+Socks\begin{setContent}{w}
+Your socks should have no \underbar{\hspace*{\ublength}} in them.
+\end{setContent}
+\end{cQ}
+\begin{cA}{w}
+holes
+\end{cA}
+
+\begin{cQ}{e}
+Shirt\begin{setContent}{e}
+\raggedright Your shirt should be clean and \underbar{\hspace*{\ublength}} the day before you
+pick her up.
+\end{setContent}
+\end{cQ}
+\begin{cA}{e}
+pressed (ironed)
+\end{cA}
+
+\begin{cQ}{r}
+Sideburns\begin{setContent}{r}
+Your sideburns should be \underbar{\hspace*{\ublength}} below your waist.
+\end{setContent}
+\end{cQ}
+\begin{cA}{r}
+trimmed
+\end{cA}
+
+\begin{cQ}{s}
+Hand\begin{setContent}{s}
+When you arrive at her doorstep, you should have \underbar{\hspace*{\ublength}} in
+your left hand.
+\end{setContent}
+\end{cQ}
+\begin{cA}{s}
+flowers
+\end{cA}
+
+%---------- distractions ----------
+
+\begin{cA}{fake1}
+worst
+\end{cA}
+
+\begin{cA}{fake2}
+scuffed
+\end{cA}
+
+\begin{cA}{fake3}
+in the back
+\end{cA}
+
+\begin{cA}{fake4}
+sand
+\end{cA}
+
+\begin{cA}{fake5}
+wrinkled
+\end{cA}
+
+\begin{cA}{fake6}
+long and hairy
+\end{cA}
+
+\begin{cA}{fake7}
+sauerkraut
+\end{cA}
+
+
+\end{Composing}
+
+\begin{document}
+
+\fmtOCGQues{%
+  \parbox[t][9\baselineskip][t]{2.25in}{\kern0pt\small\hfuzz11pt
+  \psshadowbox[framesep=0pt]{\fcolorbox{red}{cornsilk}{%
+  \parbox{\linewidth}{\dpsQuesLayer{#1}\vskip3pt}}}}%
+}
+
+% these are placed on the page where they are to appear
+\placeQuesLayer{%
+  \begin{textblock*}{2.25in}[0,0](2.5in+.725in,4in) %(.33\paperwidth,.42\paperheight)\hfuzz11pt
+  \insertQuesLayer{#1}
+  \end{textblock*}%
+}
+
+
+\def\answidth{1.7in}
+\def\queswidth{2in}
+\def\commondepth{6in+2\baselineskip}
+
+\ifeqforpaper\vspace*{-1in}\fi
+{\bfseries\noindent
+\makebox[\textwidth]{\rlap{\webauthor}\hfill\textcolor{blue}{\webtitle}\hfill\llap{Acro\negthinspace\TeX.Net}}}
+
+\textcolor{red}{\textbf{Instructions:}} Select a question from
+the left panel by clicking its checkbox. Select your answer from
+the right panel.  No guessing! A maximum of $\dsthreshold$ tries
+on any problem before you get $\dspenaltypoints$ penalty points!
+Passing is to complete the puzzle with only $\dspassing$
+incorrect answers.
+
+\def\answidth{1.7in}
+\def\queswidth{2in}
+\def\ublength{.5in}
+
+\fbox{\begin{minipage}[t][\commondepth][t]{\queswidth-2\fboxsep-2\fboxrule}\raggedright
+\makebox[\linewidth]{\centering\textbf{Questions}}
+\begin{enumerate}
+\displayRandomizedQuestions
+\end{enumerate}
+\par\bigskip
+\insertSideshow{3}{2}[hiresbb,width=.5\linewidth]{flowers1/DSC_0453}
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][\commondepth][t]{\linewidth-\answidth-\queswidth-2\fboxsep-2\fboxrule}
+When you have a date with a young lady, rookie, what do you take with you?\par\smallskip
+\begin{center}
+\parbox{2.6in}{\insertPuzzle{7}}
+\end{center}
+\makebox[0pt][s]{\hspace*{-\fboxsep}\rule{\linewidth+2\fboxsep}{.4pt}\hss}
+\vfill
+\placeMessageField{\linewidth}{10\baselineskip}
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][\commondepth][t]{\answidth-2\fboxsep-2\fboxrule}\raggedright
+\makebox[\linewidth]{\textbf{Answers}}
+\begin{itemize}
+\displayRandomizedAnswers
+\end{itemize}
+\par\smallskip
+\end{minipage}}
+
+Print this page: \printDPS{}{11bp}\cgBdry[1ex]
+Try again: \resetDPS{}{11bp}
+
+\end{document}

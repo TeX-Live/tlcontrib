@@ -1,0 +1,135 @@
+%%
+%% This is file `usebtnappr.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% dps.dtx  (with options: `copyright,btnadv')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\quesNumTxt}[1]{\protect\textbf{Problem #1}}
+\newcommand{\quesNumTxTPost}{\protect\newline}
+\newenvironment{setContent}[1]{%
+  \immediate\write\@auxout{\string\csarg
+    \string\xdef{ltrpg#1}{\theenumi}}%
+  \ifwrtContent
+    \def\CommentCutFile{\jobname-sc(\theenumi).cut}%
+    \immediate\openout\CommentStream=\CommentCutFile
+    \begingroup
+    \set@display@protect
+    \let\verbatim@out\CommentStream
+    \dps@IWVO{\quesNumTxt{\theenumi}\quesNumTxTPost}%
+    \set@typeset@protect
+    \expandafter\verbatimwrite
+  \else
+    \edef\x{\noexpand\pl@ceQues{\theenumi}}\x\expandafter
+    \comment
+  \fi
+}{\ifwrtContent\expandafter
+    \endverbatimwrite
+    \endgroup
+    \immediate\closeout\CommentStream
+  \else
+    \expandafter\endcomment
+  \fi
+}
+\def\ltrToNum#1{\@nameuse{ltrpg#1}}
+\def\pglstWarningMsg{\PackageWarningNoLine{dps}
+  {The file icons-pglst.sav not found.\MessageBreak
+   Icons may not appear. Build the\MessageBreak icons.tex file}}
+\ifwerandomize\else\let\pglstWarningMsg\@empty\fi
+\def\dpsEmbedIcons{%
+\InputIfFileExists{icons-pglst.sav}{\wrtContentfalse}
+  {\pglstWarningMsg\def\pagelist{}}%
+  \edef\TFOR{\noexpand\@tfor\noexpand\n:=\pagelist}%
+  \ifxetex
+    \TFOR\do{\embedIcon[name=Q\n]{icons-\n.pdf}}%
+  \else\ifpdf
+    \TFOR\do{\embedIcon[name=Q\n,hyopts={page=\n}]{icons.pdf}}%
+  \else % pdfmark
+    \TFOR\do{\embedIcon[name=Q\n,placement=btnQ.\n,%
+      page={\n-1}]{icons.pdf}}%
+  \fi\fi
+}
+\newcommand{\dpsQuesIcon}[4][]{%
+  \pushButton[\Ff{\FfReadOnly}\BG{}\S{S}#1\TP{1}\F{\FHidden}
+    \I{\csOf{Q#2}}\PA{.5 1}]{btnQ.#2}{#3}{#4}}
+\newcommand{\dpsOtherIcon}[4][]{% \I{\csOf{name}} required
+  \pushButton[\Ff{\FfReadOnly}\BG{}\S{S}#1\TP{1}\F{\FHidden}
+    \PA{.5 1}]{#2}{#3}{#4}}
+\long\def\placeQuesIcon#1{\@ifundefined{textblock}
+  {\let\dps@mode\relax}{\let\dps@mode\par}%
+  \def\pl@ceQues##1{\dps@mode #1}}
+\long\def\placeOtherIcon#1{#1}
+\def\afterQhookA#1{%
+  if(!event.target.isBoxChecked(0))dpsHideQFields();\r
+  else\pdfSP if(PlayerSignIn())dpsShowQues("\ltrToNum{#1}");}
+\def\OnFocusQhookAA#1{dpsHidePreviousQues("\ltrToNum{#1}")}
+\newcommand{\dpsEmbedSideShow}[3][]{\begingroup
+  \gdef\dpsNumSideShowPics{#2}%
+  \def\@Ext{#1}\ifx\@Ext\@empty\def\@Ext{.pdf}\else\def\@Ext{.#1}\fi
+  \@tempcnta\z@
+  \let\@embedList\@empty
+  \let\DPSIndxList\@gobble
+  \@whilenum \@tempcnta < \dpsNumSideShowPics \do{%
+    \ds@nCnt\@tempcnta \advance\ds@nCnt\@ne
+    \ifnum\ds@nCnt<10 \edef\x{0\the\ds@nCnt}\else
+      \edef\x{\the\ds@nCnt}\fi
+    \edef\z{\noexpand\g@addto@macro\noexpand\DPSIndxList{,"\x"}}\z
+    \ifxetex\if@isPackaged
+      \PackageWarning{dps}
+      {There is no support for embedding packaged\MessageBreak
+      PDFs with xelatex. Ignoring the \string\isPackaged\MessageBreak
+      command}%
+      \@isPackagedfalse
+    \fi\fi
+    \if@isPackaged
+      \ifpdf
+        \edef\y{\noexpand
+          \embedIcon[name=pic\x,%
+          hyopts={page=\x}]{#3_package.pdf}}%
+      \else
+        \edef\y{\noexpand
+          \embedIcon[name=pic\x,placement=btnpic.\x,%
+          page=\x-1]{#3_package.pdf}}%
+      \fi
+    \else
+      \edef\y{\noexpand
+        \embedIcon[name=pic\x,placement=btnpic.\x]{#3_\x\@Ext}}%
+    \fi
+    \expandafter\g@addto@macro\expandafter\@embedList\expandafter{\y}%
+    \@tempcnta\ds@nCnt
+  }% do
+  \toks@=\expandafter{\@embedList}\the\toks@
+  \endgroup
+}
+\def\tileKVs#1{\def\tile@KVs{#1}}
+\tileKVs{}
+\newcommand\insertSideshow[4]{\begingroup
+  \offinterlineskip\@tempcnta\z@
+  \multido{\iR=1+1}{#1}{\hbox{%
+    \multido{\iC=1+1}{#2}{%
+      \global\advance\@tempcnta\@ne
+      \ifnum\@tempcnta<10\relax
+        \edef\x{0\the\@tempcnta}\else
+        \edef\x{0\the\@tempcnta}\fi
+      \edef\iconPresets{\noexpand\I{\noexpand\csOf{pic\x}}}%
+      \dpsOtherIcon[\BC{}\FB{true}\presets{\iconPresets}
+        \presets{\tile@KVs}]{btnpic.\x}{#3}{#4}%
+    }% inner multido
+  }}% hbox, outer multido
+  \endgroup
+}
+\endinput
+%%
+%% End of file `usebtnappr.def'.

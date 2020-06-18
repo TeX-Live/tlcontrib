@@ -7,10 +7,9 @@
 %% dps.dtx  (with options: `copyright,english')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% dps.sty package,             2006-10-06              %%
-%% Copyright (C) 2006  D. P. Story                      %%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
-%%   storyd@owc.edu                                     %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -20,28 +19,33 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\chooseQ{"You must choose a question to answer before you answer!"}
 \def\triedTooMuch{"You have tried this problem too many times,
-    I'm adding "
-    + \dspenaltypoints
-    + " points, and resetting the penalty counter. Bad boy/girl!"}
+  I'm adding "
+  + \dspenaltypoints
+  + " points, and resetting the penalty counter. Bad boy/girl!"}
 \def\congratFinished{"Congratulations! You finished the puzzle"
-        +((nMissed==0) ? " without missing a single problem, amazing!"
-        : ", but you missed " + nMissed + " questions in the process!")}
-\def\regretPleased{(( nMissed > n )
-        ? "I regret to report that you did not pass the test because
-            you missed too many questions."
-        : "I am pleased to report that you passed the test!")}
+  +((nMissed==0) ? " without missing a single problem, amazing!"
+  : ", but you missed " + nMissed + " questions in the process!")}
+\def\regretPleased{(( nMissed > nPassing )
+  ? "I regret to report that you did not pass the test because
+      you missed too many questions."
+  : "I am pleased to report that you passed the test!")}
 \def\reportPenaltyPoints{"The number of penalty points is "
-    + nPenaltyPoints +"."}
-\def\finalPenaltyScore{"Final penalty score is " + nTotalPenaltyPoints + ". "}
+  + nPenaltyPoints +"."}
+\def\finalPenaltyScore{"Final penalty score is "
+  + nTotalPenaltyPoints + ". "}
 \def\aPenaltyScale{[-1,0], [0,4], [4, 10], [10,25], [25,5000]}
 \def\aPenaltyMsgs
 {%
-    "Perfect!",
-    "Very nice performance!",
-    "This is not looking good. Perhaps a review is in order!",
-    "Are you trying? No one could do so badly, you only need a seventh grade education!",
-    "You're hopeless!"
+  "Perfect!",
+  "Very nice performance!",
+  "This is not looking good. Perhaps a review is in order!",
+  "Are you trying? No one could do so badly, you only need a
+    seventh grade education!",
+  "You're hopeless!"
 }
+\dlJSStr[noquotes]{\signInMsg}{%
+  You must enter your name in the field at the top of
+  the page to get credit for this assignment.}
 \endinput
 %%
 %% End of file `dps_str_us.def'.

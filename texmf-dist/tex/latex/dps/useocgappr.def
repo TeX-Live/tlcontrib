@@ -1,0 +1,75 @@
+%%
+%% This is file `useocgappr.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% dps.dtx  (with options: `copyright,ocgadv')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\@ifpackageloaded{textpos}{\let\dps@mode\par}{\let\dps@mode\relax}
+\def\afterQhookA#1{%
+  if(!event.target.isBoxChecked(0))dpsHideLayer("#1");\r
+  else\pdfSP if(PlayerSignIn())dpsShowLayer("#1");}
+\def\OnFocusQhookAA#1{dpsHidePreviousLayer("#1")}
+\def\dps@getOCGName#1-#2\@nil{\def\dps@OcgName{#1}}
+\def\fmtOCGQues#1{\def\fmtOCGQues@i##1{#1}}
+\def\dpsQuesLayer#1{\input{\jobname-sc(#1).cut}}
+\long\def\placeQuesLayer#1{\@ifundefined{textblock}
+  {\let\dps@mode\relax}{\let\dps@mode\par}%
+  \def\pl@ceQuesL@yer##1{\dps@mode #1}}
+\long\def\placeOtherLayer#1{#1}
+\def\insertQuesLayer#1{\dps@getOCGName#1\@nil
+  \edef\x{\noexpand\xBld{\dps@OcgName}}\x
+  \fmtOCGQues@i{#1}\eBld}
+\newcommand{\quesNumTxt}[1]{\protect\textbf{Problem #1}}
+\newcommand{\quesNumTxTPost}{\protect\newline}
+\newenvironment{setContent}[1]{%
+     \gdef\scArg{#1}% save the argument for the end env
+  \def\CommentCutFile{\jobname-sc(#1-\theenumi).cut}%
+  \immediate\openout\CommentStream=\CommentCutFile
+  \begingroup
+  \set@display@protect
+  \let\verbatim@out\CommentStream
+  \dps@IWVO{\quesNumTxt{\theenumi}\quesNumTxTPost}%
+  \set@typeset@protect
+  \verbatimwrite
+}{%
+  \endverbatimwrite
+  \endgroup
+  \immediate\closeout\CommentStream
+  \edef\x{\noexpand\pl@ceQuesL@yer{\scArg-\theenumi}}\x
+}
+\newcommand{\insertSideshow}[3][]{\begingroup
+  \def\@Ext{#1}\ifx\@Ext\@empty\else\def\@Ext{.#1}\fi
+  \def\@nrows{#2}\def\@ncols{#3}\insertSideshow@i
+}
+\newcommand\insertSideshow@i[2][]{\offinterlineskip
+  \@tempcnta\z@
+  \let\DPSIndxList\@gobble
+  \multido{\iR=1+1}{\@nrows}{\hbox{%
+    \multido{\iC=1+1}{\@ncols}{%
+      \global\advance\@tempcnta\@ne
+      \ifnum\@tempcnta<10\relax
+        \edef\x{0\the\@tempcnta}\else\edef\x{\the\@tempcnta}\fi
+        \edef\z{\noexpand\g@addto@macro\noexpand\DPSIndxList{,"\x"}}\z
+        \xBld{pic\x}\includegraphics[#1]{#2_\x\@Ext}\eBld
+    }% inner multido
+  }}%  hbox, outer multido
+  \immediate\write\@auxout{\string\gdef\string
+    \DPSIndxList{\DPSIndxList}}%
+  \endgroup
+}
+\endinput
+%%
+%% End of file `useocgappr.def'.

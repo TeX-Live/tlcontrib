@@ -1,0 +1,200 @@
+\documentclass{article}
+\usepackage{web}  % dvips-> distiller, pdftex, lualatex, xelatex
+\usepackage{eforms}
+\usepackage[!viewmode,nonrandomized,showletters,showanswerkey,savedata]{dps}
+
+%\usepackage{graphicx}
+
+%\previewOn \pmpvOn
+%\useRandomSeed{number}
+\inputRandomSeed
+%\useLastSeed
+
+% Uncomment these three lines to modify the appearance of the text fields and check boxes.
+\PuzzleAppearance{\BC{red}\textSize{0}} % assumes xcolor loaded
+\QuesAppearance{\BC{gray}}
+\AnsAppearance{\BC{gray}}
+
+\ifeqforpaper
+\setlength{\oddsidemargin}{-.5in}\fi
+
+\margins{.5in}{.5in}{24pt}{.5in} % left,right,top, bottom
+\screensize{6.5in}{6.5in} % height, width
+
+\title{DPS -- Das Puzzle Spiel}
+\author{D. P. Story}
+
+% (Optional) Try to prevent the student from saving the game (for some other student)
+% we clear the game board if either student closes or save the document.
+%\clearOnCloseOrSave
+
+
+
+\rheader{}
+
+\parindent0pt
+\parskip6pt
+
+\DeclarePuzzle
+{%
+    {D}{D}
+    {a}{a}
+    {s}{s}
+    {}{space}
+    {p}{p}
+    {u}{u}
+    {z}{z}
+    {z}{z}
+    {l}{l}
+    {e}{e}
+    {}{space}
+    {s}{s}
+    {p}{p}
+    {i}{i}
+    {e}{e}
+    {l}{l}
+    {!}{punc}
+}
+
+\begin{Composing}
+
+\begin{cQ}{D}
+$ 3(x-3) -  2(x+2) $
+\end{cQ}
+\begin{cA}[d]{D} %
+$x-13$
+\end{cA}
+
+\begin{cQ}{a}
+$ 2x + 5x $
+\end{cQ}
+\begin{cA}{a}
+$7x$
+\end{cA}
+
+\begin{cQ}{s}
+$ 6x - 3x + 1 $
+\end{cQ}
+\begin{cA}{s}
+$3x+1$
+\end{cA}
+
+\begin{cQ}{p}
+$ 5 -5x + 2x -2 $
+\end{cQ}
+\begin{cA}{p}
+$-3x+3$
+\end{cA}
+
+\begin{cQ}{u}
+$ 4( x + 2 ) - 2 $
+\end{cQ}
+\begin{cA}{u}
+$4x+6$
+\end{cA}
+
+\begin{cQ}{z}
+$ -3x + 2(5-2x) $
+\end{cQ}
+\begin{cA}{z}
+$-7x+10$
+\end{cA}
+
+\begin{cQ}{l}
+$ -2 ( 3x + (-4) ) + 4 $
+\end{cQ}
+\begin{cA}{l}
+$-6x+12$
+\end{cA}
+
+\begin{cQ}{e}
+$ 5 ( x - (-2) ) $
+\end{cQ}
+\begin{cA}{e}
+$5x+10$
+\end{cA}
+
+\begin{cQ}{i}
+$ 6x - 5 (x - 2) $
+\end{cQ}
+\begin{cA}{i}
+$x+10$
+\end{cA}
+
+%--- Begin distractions
+%--- we give each of this distractions its own letter, these letters should not
+%----be part of the puzzle. Distraction do not have an association question.
+
+\begin{cA}[w]{fake1}
+$14x+10$
+\end{cA}
+
+\begin{cA}[\"{o}]{fake2}
+$5x-1$
+\end{cA}
+
+\begin{cA}[m]{fake3}
+$3x+3$
+\end{cA}
+
+\end{Composing}
+
+
+\begin{document}
+
+\begin{center}\bfseries\Large\color{blue}
+    \webtitle\\[1ex]\webauthor
+\end{center}
+
+\ifeqforpaper
+    \textcolor{red}{\textbf{Instructions:}} Solve each of the
+    numbered problems in the center panel, and find the answer in
+    either the left or right panel.  Fill in the space(s) in the
+    puzzle corresponding to the question number with the letter
+    associated with the answer.
+\else
+    \textcolor{red}{\textbf{Instructions:}} Select a question from
+    the center panel by clicking its checkbox. Solve the problem and
+    find the answer listed in either the left or right panel.  No
+    guessing! A maximum of $\dsthreshold$ tries on any problem
+    before you get $\dspenaltypoints$ penalty points !  Passing is
+    to complete the puzzle with only $\dspassing$ incorrect answers.
+    \textcolor{red}{\textbf{Warning:}} Saving or closing the document
+    clears the puzzle.
+\fi
+
+\def\commondepth{2in}
+
+\fbox{\begin{minipage}{\linewidth-2\fboxsep-2\fboxrule}\centering
+\insertPuzzle{10}
+\end{minipage}}
+\fbox{\begin{minipage}[t][\commondepth][t]{.2\linewidth-2\fboxsep-2\fboxrule}\raggedright
+Find the correct answer
+\begin{enumerate}
+\displayRandomizedAnswersLeftPanel
+\end{enumerate}
+\par\smallskip
+\end{minipage}}%
+\fbox{\begin{minipage}[t][\commondepth][t]{.6\linewidth-2\fboxsep-2\fboxrule}
+Simplify each of the expressions below, and find the answer in the column of answers.
+\begin{multicols}{2}
+\begin{enumerate}
+\displayRandomizedQuestions
+\end{enumerate}
+\end{multicols}
+\par\smallskip
+\end{minipage}}%
+\fbox{\begin{minipage}[t][\commondepth][t]{.2\linewidth-2\fboxsep-2\fboxrule}\raggedright
+Find the correct answer
+\begin{enumerate}
+\displayRandomizedAnswersRightPanel
+\end{enumerate}
+\par\smallskip
+\end{minipage}}
+
+\placeMessageField{\linewidth}{50pt}
+
+Print this page: \printDPS{}{11bp}\ifeqforpaper\else\cgBdry[1ex]
+Try again: \resetDPS{}{11bp}\fi
+
+\end{document}

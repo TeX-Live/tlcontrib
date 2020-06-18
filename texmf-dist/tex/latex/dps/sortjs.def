@@ -1,0 +1,113 @@
+%%
+%% This is file `sortjs.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% dps.dtx  (with options: `copyright,sortjs')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{insDLJS}{dpssort}{DPS: Bubble Sort}
+// Global Data:
+var hasBeenRandomized=false;
+var btnbase="btnpic."; // btnpic.01, btnpic.02, etc
+var iconbase="pic";    // pic01, pic02, etc.
+var nTotalTiles=\dpsNumSideShowPics;
+var randomDPS = new Array(nTotalTiles+1);
+var ldps = randomDPS.length;
+var timeout = 10;
+var shutdown;
+var debug = false; // memDebug;
+var ok2Continue = true;
+for (i=1; i<=nTotalTiles; i++) randomDPS[i]=i;
+// Mixup DPS:
+function mixupDPS()
+{
+    var i, rand, temp;
+    for (i=1; i<= nTotalTiles; i++)
+    {
+        var rand = Math.random();
+        rand *= ldps*ldps;
+        rand = Math.ceil(rand);
+        rand = rand \% ldps;
+        if (rand == 0 ) rand = 1;
+        temp = randomDPS[i];
+        randomDPS[i]=randomDPS[rand];
+        randomDPS[rand]=temp;
+    }
+}
+
+// Show DPS:
+function showDPS()
+{
+    var I,J;
+    for ( var i=1; i<=nTotalTiles; i++ )
+    {
+        I=((i<10)?"0":"")+i;
+        J=((randomDPS[i]<10)?"0":"")+randomDPS[i];
+        var oIcon = this.getIcon(iconbase+J);
+        var f = this.getField(btnbase+I);
+        f.buttonSetIcon(oIcon);
+    }
+}
+// Sortout DPS:
+function sortoutDPS()
+{
+    outerLoop(randomDPS.length-1);
+}
+function outerLoop(i)
+{
+     if ( ok2Continue && (i >= 0) ) %
+shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+",1);", timeout);
+     else {
+     }
+}
+function innerLoop(i,j)
+{
+    var I, J;
+    if ( j <= i )
+    {
+       if (randomDPS[j-1] > randomDPS[j])
+       {
+            var temp = randomDPS[j-1];
+            randomDPS[j-1] = randomDPS[j];
+            randomDPS[j] = temp;
+            J=((randomDPS[j-1]<10)?"0":"")+randomDPS[j-1];
+            I=((j-1 < 10)?"0":"")+(j-1);
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
+            f.buttonSetIcon(oIcon);
+            J=((randomDPS[j]<10)?"0":"")+randomDPS[j];
+            I=((j < 10)?"0":"")+j;
+            var oIcon = this.getIcon(iconbase+J);
+            var f = this.getField(btnbase+I);
+            f.buttonSetIcon(oIcon);
+        }
+        j++
+        if ( ok2Continue ) %
+shutdown = app.setTimeOut("app.clearTimeOut(shutdown); %
+innerLoop("+i+","+j+");", timeout);
+        else {
+        }
+    }
+    else
+    {
+        i--;
+        outerLoop(i);
+    }
+}
+\end{insDLJS}
+\endinput
+%%
+%% End of file `sortjs.def'.

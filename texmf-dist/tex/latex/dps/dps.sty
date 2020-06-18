@@ -7,10 +7,9 @@
 %% dps.dtx  (with options: `copyright,package')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% dps.sty package,             2006-10-06              %%
-%% Copyright (C) 2006  D. P. Story                      %%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
-%%   storyd@owc.edu                                     %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -20,64 +19,146 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{dps}
- [2006/10/31 v1.0 Das Puzzle Spiel (dps)]
+ [2020/06/03 v1.7 Das Puzzle Spiel (dps)]
 \RequirePackage{xkeyval}
 \DeclareOptionX{nonrandomized}{\werandomizefalse}
+\DeclareOptionX{!nonrandomized}{\werandomizetrue}
 \DeclareOptionX{viewmode}{\viewModetrue\previewtrue}
+\DeclareOptionX{!viewmode}{\viewModefalse\previewfalse}
 \DeclareOptionX{showletters}{\showletterstrue}
+\DeclareOptionX{!showletters}{\showlettersfalse}
 \DeclareOptionX{showanswerlabels}
 {%
     \ifeqforpaper\else\def\dpsAitemOptArg{}\fi
 }
+\DeclareOptionX{!showanswerlabels}{%
+  \def\dpsAitemOptArg{[]}}
 \def\dpsAitemOptArg{[]}
-\DeclareOptionX{showanswerkey}{\showsolutiontrue}
+\DeclareOptionX{showanswerkey}{\showsolutiontrue
+  \ExecuteOptionsX{showletters}}
+\DeclareOptionX{!showanswerkey}{\showsolutionfalse}
+\DeclareOptionX{usebtnappr}{\usebtnapprtrue
+  \ifuseocgappr
+    \PackageWarningNoLine{dps}
+      {Options usebtnappr and uselayers both used.\MessageBreak
+    Will use the uselayers option}%
+    \usebtnapprfalse
+    \let\dpsInputBtnAppr\relax
+  \else
+    \def\dpsInputBtnAppr{\InputIfFileExists{usebtnappr.def}{}{}}%
+  \fi}
+\let\dpsInputBtnAppr\relax
+\DeclareOptionX{uselayers}{\useocgapprtrue
+  \ifusebtnappr
+    \PackageWarningNoLine{dps}
+      {Options usebtnappr and uselayers both used.\MessageBreak
+      Will use the usebtnappr option}%
+      \useocgapprfalse
+      \let\dpsInputOcgAppr\relax
+  \else
+    \def\dpsInputOcgAppr{\InputIfFileExists{useocgappr.def}{}{}}%
+  \fi}
+\let\dpsInputOcgAppr\relax
 \DeclareOptionX{savedata}{\savepuzzledatatrue}
+\DeclareOptionX{!savedata}{\savepuzzledatafalse}
 \newif\ifwerandomize \werandomizetrue
 \newif\ifviewMode \viewModefalse
 \newif\ifshowletters\showlettersfalse
 \newif\ifshowsolution\showsolutionfalse
 \newif\ifsavepuzzledata\savepuzzledatafalse
+\newif\ifusebtnappr \usebtnapprfalse
+\newif\ifuseocgappr \useocgapprfalse
+\newif\ifwrtContent\wrtContenttrue
 \ifeqforpaper\showletterstrue\fi
 \define@choicekey*+{dps.sty}{lang}[\val\nr]{english,german,custom}
 {%
-    \ifcase\nr\relax
-        \def\dps@lang@type{\input{dps_str_us.def}}
-    \or
-        \def\dps@lang@type{\input{dps_str_de.def}}
-    \or
-        \def\dps@lang@type{\input{dps_str_cus.def}}
-    \else
-        \def\dps@lang@type{\input{dps_str_us.def}}
-    \fi
+  \ifcase\nr\relax
+    \def\dps@lang@type{\input{dps_str_us.def}}\or
+    \def\dps@lang@type{\input{dps_str_de.def}}\or
+    \def\dps@lang@type{\input{dps_str_cus.def}}\else
+    \def\dps@lang@type{\input{dps_str_us.def}}\fi
 }{\PackageWarning{dps}{Bad choice for lang, permissible values
 are english, german and custom. Try again}}
 \def\dps@lang@type{\input{dps_str_us.def}}
 \AtEndOfPackage{\dps@lang@type}
 \ProcessOptionsX
+\edef\dps@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\_=\the\catcode`\_\relax
+}
+\@makeother\"\@makeother\,\@makeother\_
+\RequirePackage{web}
+\RequirePackage{eforms}
+\ifxetex\makeXasPDOff\fi
+\RequirePackage{graphicx}
 \RequirePackage{verbatim}
 \RequirePackage{calc}
 \RequirePackage{multicol}
+\RequirePackage{multido}
+\hypersetup{pdfencoding=pdfdoc}
+\ifusebtnappr
+  \def\x{\AtEndOfPackage{\dpsInputBtnAppr}}%
+  \expandafter\x\fi
+\ifuseocgappr
+  \def\x{\AtEndOfPackage{\dpsInputOcgAppr}}%
+\expandafter\x\fi
+\ifusebtnappr
+  \def\dps@RP{\RequirePackage{icon-appr}[2020/06/05]}
+  \expandafter\dps@RP
+\fi
+\def\dps@ckForpglst{\IfFileExists{icons-pglst.sav}
+  {\global\wrtContentfalse}{}
+  \ifusebtnappr
+    \ifwrtContent
+      \global\savepuzzledatatrue
+    \else
+      \global\savepuzzledatafalse
+    \fi
+  \fi
+}
+\ifusebtnappr
+\def\dps@emitEOP{\AtEndOfPackage{\dps@ckForpglst}}
+\expandafter\dps@emitEOP\fi
 \@ifundefined{nextrandom}{\input{random.tex}}{}
-\def\nextrandom{\begingroup
- \ifnum\randomi<\@ne % then initialize with time
-    \global\randomi\time
-    \global\multiply\randomi388 \global\advance\randomi\year
-    \global\multiply\randomi31 \global\advance\randomi\day
-    \global\multiply\randomi97 \global\advance\randomi\month
-    \message{Randomizer initialized to \the\randomi.}%
-    \nextrandom \nextrandom \nextrandom
-    \xdef\ds@saveRandomSeed{\the\randomi}%
- \fi
- \count@ii\randomi
- \divide\count@ii 127773 % modulus = multiplier * 127773 + 2836
- \count@\count@ii
- \multiply\count@ii 127773
- \global\advance\randomi-\count@ii % random mod 127773
- \global\multiply\randomi 16807
- \multiply\count@ 2836
- \global\advance\randomi-\count@
- \ifnum\randomi<\z@ \global\advance\randomi 2147483647\relax\fi
- \endgroup
+\def\dps@nextrandom{%
+  \def\nextrandom{\begingroup
+   \ifnum\randomi<\@ne % then initialize with time
+      \global\randomi\time
+      \global\multiply\randomi388 \global\advance\randomi\year
+      \global\multiply\randomi31 \global\advance\randomi\day
+      \global\multiply\randomi97 \global\advance\randomi\month
+      \message{Randomizer initialized to \the\randomi.}%
+      \nextrandom \nextrandom \nextrandom
+      \xdef\ds@saveRandomSeed{\the\randomi}%
+   \fi
+   \count@ii\randomi
+   \divide\count@ii 127773 % modulus = multiplier * 127773 + 2836
+   \count@\count@ii
+   \multiply\count@ii 127773
+   \global\advance\randomi-\count@ii % random mod 127773
+   \global\multiply\randomi 16807
+   \multiply\count@ 2836
+   \global\advance\randomi-\count@
+   \ifnum\randomi<\z@ \global\advance\randomi 2147483647\relax\fi
+   \endgroup
+  }
+}
+\newif\ifnextrandomredefd\nextrandomredefdfalse
+\def\redefnextrandomAsNeeded{\ifnextrandomredefd\else
+  \global\let\nextrandom\dps@nextrandom
+  \global\nextrandomredefdtrue\fi}
+\def\useRandomSeed#1{\randomi=#1
+  \def\ds@saveRandomSeed{#1}}
+\def\inputRandomSeed{\ifwerandomize
+  \InputIfFileExists{\jobname_data.sav}{}{}%
+  \edef\ds@saveRandomSeed{\the\randomi}\fi}
+\def\dpsLastSeed#1{\def\dps@LastSeed{#1}}
+\def\useLastSeed{\ifwerandomize
+  \InputIfFileExists{\jobname_data.sav}{}{}%
+  \@ifundefined{dps@LastSeed}{}
+    {\randomi=\dps@LastSeed\relax}%
+  \edef\ds@saveRandomSeed{\the\randomi}\fi
 }
 \newif\ifforquestions \forquestionstrue
 \newcount\ds@nCnt
@@ -97,111 +178,242 @@ are english, german and custom. Try again}}
 \newtoks\ds@QuesAppearancetoks \ds@QuesAppearancetoks={}
 \newtoks\ds@AnsAppearancetoks \ds@AnsAppearancetoks={}
 \newwrite \ds@question@write
-\ifsavepuzzledata
-\newwrite \ds@savedata
-\immediate\openout \ds@savedata \jobname_data.sav
-\fi
 \setlength{\multicolsep}{\topsep}
+\def\csarg#1#2{\expandafter#1\csname #2\endcsname}
+\let\dps@One=1 \let\dps@Zero=0
+\def\DeclarePuzzle#1{%
+  \gdef\puzzleParameters{#1}%
+  \let\DPSNamesList\@gobble
+  \dps@getNames#1\relax\relax
+}
+\def\dps@getNames{\begingroup\dps@getNames@i}
+\def\dps@getNames@i#1#2{%
+  \ifx#2\relax\let\getNextN@me\endgroup
+  \else\let\getNextN@me\dps@getNames@i
+    \def\@rgii{#2}\ifx\@rgii\ds@myspace\else
+    \ifx\@rgii\ds@punc\else
+    \ifx\@rgii\ds@cr\else
+      \@ifundefined{ds@name@#2}{\g@addto@macro\DPSNamesList{,"#2"}%
+        \csarg\let{ds@name@#2}\@empty}{}%
+    \fi\fi\fi
+  \fi
+  \getNextN@me
+}
+\def\nPuzzleCols#1{\def\nCols{#1}}
+\let\nCols\@empty
 \def\PuzzleAppearance#1{\ds@PuzzleAppearancetoks={#1}}
+\def\wdPuzzleFields#1{\bgroup\setlength\@tempdima{#1}%
+  \xdef\wd@fPF{\the\@tempdima}\egroup}
+\def\wd@fPF{1.6em}
+\def\htPuzzleFields#1{\bgroup\setlength\@tempdima{#1}%
+  \xdef\ht@fPF{\the\@tempdima}\egroup}
+\def\ht@fPF{11bp}
+\def\dps@strut{\rule{0pt}{\ht@fPF}}
 \ifeqforpaper
-    \ifviewMode
-        \def\makeTextField#1#2{\def\argii{#2}\ifx\argii
-            \ds@myspace\let\ds@ul\relax\else\let\ds@ul\underbar\fi
-            \ifshowletters\raisebox{-8pt}{%
-            \makebox[0pt][l]{\makebox[16bp][c]{%
-            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
-            \ds@ul{\makebox[16bp][c]{\Hy@pdfstringfalse#1}}}
-    \else
-        \def\makeTextField#1#2{\def\argii{#2}\ifx\argii\ds@myspace
-            \let\ds@ul\relax\else\let\ds@ul\underbar\fi
-            \ifshowletters\raisebox{-8pt}{%
-            \makebox[0pt][l]{\makebox[16bp][c]{%
-            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
-            \ds@ul{\makebox[16bp][c]{\hfil}}}
-    \fi
+  \ifviewMode
+    \def\ds@makeTextField#1#2{\def\argii{#2}\ifx\argii
+      \ds@myspace\let\ds@ul\relax\else\let\ds@ul\underbar\fi
+      \ifshowletters\raisebox{-10pt}{%
+      \makebox[0pt][l]{\makebox[\wd@fPF][c]{\footnotesize
+      \ds@getProbNumber{#1}{#2}}}}\fi
+      \ds@ul{\makebox[\wd@fPF][c]{\dps@strut
+        \Hy@pdfstringfalse#1}}}
+  \else
+    \def\ds@makeTextField#1#2{\def\argii{#2}\ifx\argii\ds@myspace
+      \let\ds@ul\relax\else\let\ds@ul\underbar\fi
+      \ifshowletters\raisebox{-10pt}{%
+      \makebox[0pt][l]{\makebox[\wd@fPF][c]{\footnotesize
+      \ds@getProbNumber{#1}{#2}}}}\fi
+      \ds@ul{\makebox[\wd@fPF][c]{\dps@strut\hfil}}}
+  \fi
 \else
-    \ifviewMode
-        \def\makeTextField#1#2{\ifshowletters\raisebox{-8pt}{%
-            \makebox[0pt][l]{\makebox[16bp][c]{%
-            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
-            \underbar{\makebox[16bp][c]{\Hy@pdfstringfalse#1}}}
-    \else
-        \def\makeTextField#1#2{\ifshowletters
-            \raisebox{-8pt}{\makebox[0pt][l]{\makebox[16bp][c]{%
-            \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
-            \edef\textfieldTmp{\noexpand\textField[\noexpand\Q{1}%
-            \noexpand\S{U}\noexpand\Ff\noexpand\FfReadOnly
-            \the\ds@PuzzleAppearancetoks\noexpand\DV{#1}]%
-            {puzzle.#2}{16bp}{11bp}}\Hy@pdfstringtrue\textfieldTmp}
-    \fi
+  \ifviewMode
+    \def\ds@makeTextField#1#2{\ifshowletters\raisebox{-10pt}{%
+      \makebox[0pt][l]{\makebox[\wd@fPF][c]{%
+      \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+      \underbar{\makebox[\wd@fPF][c]{\dps@strut
+        \Hy@pdfstringfalse#1}}}
+  \else
+    \def\ds@makeTextField#1#2{\ifshowletters
+      \raisebox{-10pt}{\makebox[0pt][l]{\makebox[\wd@fPF][c]{%
+      \footnotesize\ds@getProbNumber{#1}{#2}}}}\fi
+      \edef\textfieldTmp{\noexpand\textField[\noexpand\Q{1}%
+      \noexpand\S{U}\noexpand\Ff\noexpand\FfReadOnly
+      \the\ds@PuzzleAppearancetoks\noexpand\DV{#1}]%
+      {puzzle.#2}{\wd@fPF}{\ht@fPF}}\Hy@pdfstringtrue\textfieldTmp}
+  \fi
 \fi
-\def\DeclarePuzzle#1{\gdef\puzzleParameters{#1}}
-\def\insertPuzzle#1{\gdef\nCols{#1}%
-    \ifviewMode\Hy@pdfstringfalse\else\Hy@pdfstringtrue\fi
-    \expandafter\aeb@Puzzle\expandafter{\puzzleParameters}}%
-\def\rowsep#1{\gdef\@rowsep{[#1]}}\rowsep{\rowsep@default}
-\def\rowsep@default{1ex}
+\def\dps@emitAK{0}
+\def\dps@AddToEmitAK#1{\bgroup
+  \@tempcnta=\dps@emitAK\relax
+  \advance\@tempcnta by#1\relax
+  \xdef\dps@emitAK{\the\@tempcnta}\egroup
+}
+\def\dps@ckEmitAK{\ifnum\dps@emitAK>\thr@@\expandafter
+  \ifshowletters\expandafter\ds@buildAnswerKey\fi\fi}
+\def\insertPuzzle#1{\begingroup\def\@rgi{#1}%
+  \ifx\@rgi\@empty
+    \ifx\nCols\@empty
+      \PackageWarning{dps}{\string\insertPuzzle\space
+      needs an argument, use\MessageBreak
+      either \string\insertPuzzle{<nCols>} or\MessageBreak
+      declare \string\nPuzzleCols{<nCols>} in preamble.\MessageBreak
+      Setting <nCols> to 10 for now}\gdef\nCols{10}%
+    \fi
+  \else
+    \xdef\nCols{#1}%
+  \fi
+  \ifviewMode\Hy@pdfstringfalse\else\Hy@pdfstringtrue\fi
+  \let\tops\texorpdfstring\expandafter\dps@Puzzle
+  \expandafter{\puzzleParameters}\endgroup
+  \dps@AddToEmitAK{1}\dps@ckEmitAK
+}
+\def\rowsep#1{\gdef\@rowsep{[#1]}\gdef\@rowskip{#1}}
+\rowsep{\rowsep@default}
+\def\rowsep@default{2ex}
 \def\eq@tabSep{&}\def\ds@punc{punc}
-\def\aeb@Puzzle#1{\edef\eq@tabEnd{\noexpand\\\@rowsep}%
-    \aeb@@Puzzle#1\relax\relax}%
-\def\aeb@@Puzzle{\begin{tabular*}{\linewidth}{*{\nCols}l}\@aebPuzzlei}%
-\def\@aebPuzzlei#1#2{\ifx#1\relax\gdef\nextPuzzleChar{\@aebPuzzleDone}%
-    \else\gdef\nextPuzzleChar{\@aebPuzzleii{#1}{#2}}\fi\nextPuzzleChar}%
-\def\@aebPuzzleii#1#2{\makeTextField{#1}{#2}\@takeaPeek}
-\def\@takeaPeek#1#2{\def\argii{#2}\ifx\argii\ds@punc
-    \def\@puzzNext{#1\@setSep@aebPuzzleii}%
-    \else\def\@puzzNext{\@setSep@aebPuzzleii{#1}{#2}}\fi\@puzzNext}
-\def\@setSep@aebPuzzleii{\global\advance\ds@nCntCols1\relax
-    \ifnum\ds@nCntCols=\nCols\expandafter\eq@tabEnd \global\ds@nCntCols=0
-    \else\expandafter\eq@tabSep\fi\@aebPuzzlei}%
-\def\@aebPuzzleDone{\end{tabular*}\ds@buildAnswerKey}%
+\def\dps@Puzzle#1{\edef\eq@tabEnd{\noexpand\\\@rowsep}%
+  \dps@@Puzzle#1\relax\relax}%
+\def\dps@@Puzzle{\begin{tabular}
+  {@{}*{\nCols}l@{}}\@dpsPuzzlei
+}
+\def\@dpsPuzzlei#1#2{\ifx#2\relax
+  \gdef\nextPuzzleChar{\@dpsPuzzleDone}\else
+  \gdef\nextPuzzleChar{\@dpsPuzzleii{#1}{#2}}\fi
+  \nextPuzzleChar
+}
+\def\@dpsPuzzleii#1#2{\def\argii{#2}%
+  \ifx\argii\ds@punc
+  % so something with punc
+    \def\@puzzNext{#1\@takeaPeek}%\@setSep@dpsPuzzleii}%
+  \else\ifx\argii\ds@cr
+  % do something with cr
+    \def\@puzzNext{\global\ds@nCntCols\z@
+    \eq@tabEnd\@dpsPuzzlei}%
+  \else
+  % ok to make a field
+    \def\@puzzNext{\ds@makeTextField{#1}{#2}\@takeaPeek}%
+  \fi\fi
+  \@puzzNext
+}
+\def\ds@cr{cr}
+\def\@takeaPeek#1#2{\def\argii{#2}%
+  \ifx\argii\ds@punc
+    \def\@puzzNext{#1\@takeaPeek}%
+  \else
+    \ifx\argii\ds@cr
+      \def\@puzzNext{\global\ds@nCntCols\z@
+        \eq@tabEnd\@dpsPuzzlei}%
+    \else
+      \def\@puzzNext{\@setSep@dpsPuzzleii{#1}{#2}}%
+    \fi
+  \fi
+  \@puzzNext
+}
+\def\@setSep@dpsPuzzleii{\global\advance\ds@nCntCols\@ne
+  \ifnum\ds@nCntCols=\nCols\relax
+    \expandafter\eq@tabEnd
+    \global\ds@nCntCols\z@\else
+    \expandafter\eq@tabSep\fi
+  \@dpsPuzzlei}
+\def\@dpsPuzzleDone{\end{tabular}\ifnum\ds@nCntCols=0\relax
+    \ifshowletters\vskip\@rowskip\relax
+    \else\vskip3pt\fi
+    \vskip-2\baselineskip
+  \fi\kern0pt}
+\def\AnswerKey{The answer key is not available.\PackageWarning{dps}
+  {The showletters option is required to generate\MessageBreak
+    an answer key,}}
 \def\ds@buildAnswerKey
 {%
-    {% local
-        \count0=0 \toks0={}%
-        \loop
-            \advance\count0by1
-            \xdef\AnswerKey{\the\toks0
-            \the\count0--\noexpand
-            \csname dps@probLetter\the\count0\noexpand\endcsname; }%
-            \toks0 = \expandafter{\AnswerKey}%
-        \ifnum\count0 < \ds@qNumber\repeat
-    }%
-    \ifshowsolution
-        \cfooter{\footnotesize\@ifundefined{rotatebox}{\AnswerKey}%
-        {\rotatebox{180}{\AnswerKey}}}%
-    \fi
-    \ifsavepuzzledata
-        \AtEndDocument{\ds@writePuzzleData}%
-    \fi
+  {% local
+    \Hy@pdfstringfalse
+    \let\tops\texorpdfstring
+    \let\protect\@unexpandable@protect
+    \count@\z@\toks@={}%
+    \loop
+      \advance\count@\@ne
+      \edef\y{\@nameuse{dps@probLetterii\the\count@}}%
+      \edef\x{\@nameuse{dps@probLetterKey\y}}%
+      \expandafter\ifx\x\relax\else
+        \csarg\xdef{dps@probLetter\the\count@}{\expandafter\noexpand
+          \csname dps@probLetterAlt\y\endcsname}\fi
+      \xdef\AnswerKey{\the\toks@
+      \the\count@--\@nameuse{dps@probLetter\the\count@}; }%
+      \toks@=\expandafter{\AnswerKey}%
+    \ifnum\count@ < \ds@qNumber\repeat
+  }%
+  \ifshowsolution
+    \cfooter{\let\tops\texorpdfstring
+    \footnotesize\@ifundefined{rotatebox}{\AnswerKey}%
+    {\rotatebox{180}{\AnswerKey}}}\fi
 }
-\def\ds@writePuzzleData{%
-    \let\verbatim@out\ds@savedata
-    \dps@IWVO{Initial seed: \string\randomi=\ds@saveRandomSeed}%
-    \dps@IWVO{Solution Key: \AnswerKey}%
+\def\ds@writePuzzleData{\ifsavepuzzledata
+  \newwrite \ds@savedata
+  \begingroup
+  \immediate\openout \ds@savedata \jobname_data.sav
+  \def\msgi{Initial seed}
+  \def\msgii{Answer key:}
+  \let\verbatim@out\ds@savedata
+  \uccode`c=`\%\uppercase{%
+    \ifwerandomize
+      \dps@IWVO{\string\randomi=\ds@saveRandomSeed\space
+        c \msgi}%
+      \dps@IWVO{\string\dpsLastSeed{\the\randomi}}\fi
+    \ifshowletters\let\tops\texorpdfstring
+      \set@display@protect
+      \dps@IWVO{c \msgii\space\AnswerKey}\fi
+  }
+  \immediate\closeout\ds@savedata
+  \endgroup
+\fi}
+\AtEndDocument{\ds@writePuzzleData}
+\def\setdpsfootskip#1{\bgroup
+  \setlength\@tempdima{#1}\ifeqforpaper\else
+  \xdef\web@footskip{\the\@tempdima}\fi
+  \egroup\InitLayout % a web command
 }
+\setdpsfootskip{.25in}
+\let\DPSIndxList\@empty
+\let\DPSNamesList\@empty
+\def\randomizePicMappings{\def\bRandPicMaps{true}}
+\def\bRandPicMaps{false}
+\ifusebtnappr
+  \def\sortPicMappings{%
+    \InputIfFileExists{sortjs.def}{}{}%
+    \OpenAction{\JS{try{if(!hasBeenRandomized)
+      {hasBeenRandomized=true;mixupDPS();showDPS();}
+      }catch(e){}}}%
+  }
+\else
+  \let\sortPicMappings\relax
+\fi
+\newif\if@isPackaged \@isPackagedfalse
+\def\sideshowPackaged{\@isPackagedtrue}
 \newenvironment{Composing}
 {\global\ds@qNumber=0 \global\ds@aNumber=0}
 {\aftergroup\ds@publishRandomLists}
 \newenvironment{cQ}[1]
 {%
-   \global\advance\ds@qNumber1
+   \global\advance\ds@qNumber\@ne
    \immediate\openout \ds@question@write \jobname_q\the\ds@qNumber.cut
-    \let\verbatim@out\ds@question@write
-    \dps@IWVO{\noexpand\dpsQ{#1}}%
-    \verbatimwrite}
-{%
+    \let\verbatim@out\ds@question@write\set@display@protect
+    \dps@IWVO{\protect\dpsQ{#1}}%
+    \set@typeset@protect
+    \verbatimwrite
+}{%
     \endverbatimwrite
     \immediate\closeout \ds@question@write
 }
 \newenvironment{cA}[2][]
 {%
-   \def\argi{#1}\global\advance\ds@aNumber1
+   \def\argi{#1}\global\advance\ds@aNumber\@ne
    \immediate\openout \ds@question@write \jobname_a\the\ds@aNumber.cut
     \let\verbatim@out\ds@question@write
-    \let\protect\noexpand
-    \dps@IWVO{\noexpand\dpsA\ifshowletters
-        \ifx\argi\@empty\else[#1]\fi\fi{#2}}%
+    \set@display@protect
+    \dps@IWVO{\protect\dpsA\ifshowletters
+      \ifx\argi\@empty\else[#1]\fi\fi{#2}}%
+    \set@typeset@protect
     \verbatimwrite}
 {%
     \endverbatimwrite
@@ -209,237 +421,343 @@ are english, german and custom. Try again}}
 }
 \def\QuesAppearance#1{\ds@QuesAppearancetoks={#1}}
 \def\AnsAppearance#1{\ds@AnsAppearancetoks={#1}}
-\let\afterQhookA\@gobble
+\def\afterQhookA#1{if(PlayerSignIn());}
 \let\OnFocusQhookAA\@gobble
+\def\widestFmtdQNum#1{\bgroup
+  \settowidth{\@tempdima}{#1}%
+  \ifxetex\advance\@tempdima2.5bp\else
+    \advance\@tempdima.5pt\fi
+  \xdef\Qwidth{\the\@tempdima}\egroup}
+\widestFmtdQNum{00.}
+\def\htOfQ#1{\setlength{\@tempdima}{#1}\ifxetex
+  \advance\@tempdima2bp\relax\fi\edef\Qht{\the\@tempdima}}
+\htOfQ{13bp}
 \newcommand{\dpsQ}[1]{\item\relax\ifeqforpaper\else
-    \edef\checkboxTmp{\noexpand\checkBox[\the\ds@QuesAppearancetoks
-    \noexpand\A{\noexpand\JS{activeQuestion = event.target.name;
-    clearRedCrosses(); \noexpand\afterQhookA{#1}}}%
-    \noexpand\AA{\noexpand\AAOnFocus{\noexpand\JS{%
-    this.resetForm(["ckbxQ"]); \noexpand\OnFocusQhookAA{#1}}}}]%
-    {ckbxQ.#1}{14bp}{11bp}{Yes}}\makebox[0pt][r]{\checkboxTmp\enspace}%
-    \fi\ignorespaces}
-\newcommand{\dpsA}[2][]{\expandafter\item\dpsAitemOptArg\relax
-    \ifeqforpaper\else
-        \edef\checkboxTmp{\noexpand\checkBox[\the\ds@AnsAppearancetoks
-        \noexpand\A{\noexpand\JS{processChoice("#2")}}]%
-        {ckbxA.#2}{14bp}{11bp}{Yes}}%
-        \makebox[0pt][r]{\checkboxTmp\enspace}%
-    \fi
-    \def\argi{#1}%
-        \ifshowletters
-            \ifx\argi\@empty
-                \let\getLetterNext\relax
-                \let\ds@foundLetter=0\def\ds@currFN{#2}%
-                \def\getLetterNext{\ds@typesetPuzzleLetter}%
-                \expandafter\getLetterNext
-            \else
-                \makebox[0pt][r]{\Hy@pdfstringfalse#1\enspace\kern4bp}%
-            \fi
-        \fi
-    \ignorespaces
+  \edef\checkboxTmp{\noexpand\checkBox[\the\ds@QuesAppearancetoks
+  \noexpand\textSize{0}\noexpand
+  \A{\noexpand\JS{activeQuestion = event.target.name;\noexpand
+  \r clearRedCrosses();\noexpand\r\noexpand\afterQhookA{#1}}}%
+  \noexpand\AA{\noexpand\AAOnFocus{\noexpand\JS{%
+  this.resetForm(["ckbxQ"]);\noexpand\r\noexpand
+  \OnFocusQhookAA{#1}}}}]{ckbxQ.#1}{\Qwidth}{\Qht}{Yes}}%
+  \makebox[0pt][r]{\strut
+    \smash{\checkboxTmp}\efKern{-.5pt}{-1.5pt}\enspace}\fi
+  \ignorespaces
 }
-\def\ds@typesetPuzzleLetter{%
-    \expandafter\typeset@PuzzleLetter\expandafter{\puzzleParameters}}
+\def\ltrFmtA#1{\def\@ltrFmtA##1{#1}}
+\ltrFmtA{#1}
+\def\widestFmtdALtr#1{\bgroup
+  \settowidth{\@tempdima}{#1}\ifxetex
+    \addtolength{\@tempdima}{2bp+8pt}\else
+    \addtolength{\@tempdima}{8pt}\fi
+  \xdef\Awidth{\the\@tempdima}\egroup}
+\widestFmtdALtr{w}
+\def\htOfA#1{\setlength{\@tempdima}{#1}\ifxetex
+  \advance\@tempdima2bp\relax\fi\edef\Aht{\the\@tempdima}}
+\htOfA{13bp}
+\newcommand{\dpsA}[2][]{\expandafter
+  \item\dpsAitemOptArg\relax
+  \ifeqforpaper\else
+    \edef\checkboxTmp{\noexpand
+      \checkBox[\the\ds@AnsAppearancetoks
+      \noexpand\textSize{0}\noexpand
+      \A{\noexpand\JS{processChoice("#2");}}]%
+      {ckbxA.#2}{\Awidth}{\Aht}{Yes}}%
+    \makebox[0pt][r]{\strut
+      \smash{\checkboxTmp}\enspace}%
+  \fi
+  \def\argi{#1}%
+  \bgroup % dps
+    \let\tops\texorpdfstring
+    \Hy@pdfstringfalse
+    \ifx\argi\@empty
+      \global\csarg\let{dps@probLetterKey#2}\relax
+    \else
+      \csarg\gdef{dps@probLetterKey#2}{#2}%
+      \csarg\gdef{dps@probLetterAlt#2}{#1}%
+    \fi
+  \egroup
+  \ifshowletters
+    \ifx\argi\@empty
+      \let\getLetterNext\relax
+      \let\ds@foundLetter\dps@Zero\def\ds@currFN{#2}%
+      \def\getLetterNext{\ds@typesetPuzzleLetter}%
+      \expandafter\getLetterNext
+    \else
+      \makebox[0pt][r]{\let\tops\texorpdfstring
+        \Hy@pdfstringfalse\@ltrFmtA{#1}\enspace\kern4bp}%
+    \fi
+  \fi
+  \ignorespaces
+}
+\def\ds@typesetPuzzleLetter{\expandafter
+  \typeset@PuzzleLetter\expandafter{\puzzleParameters}}
 \def\typeset@PuzzleLetter#1{\typeset@@PuzzleLetter#1\relax\relax}%
 \def\typeset@@PuzzleLetter#1#2{%
-    \ifx#1\relax
-        \gdef\nextPuzzleLetter{\relax}%
-    \else
-        \gdef\nextPuzzleLetter{\typeset@PuzzleLetteri{#1}{#2}}%
-    \fi
-    \nextPuzzleLetter
+  \ifx#1\relax
+    \gdef\nextPuzzleLetter{\relax}\else
+    \gdef\nextPuzzleLetter{\typeset@PuzzleLetteri{#1}{#2}}\fi
+  \nextPuzzleLetter
 }
 \def\typeset@PuzzleLetteri#1#2{\def\argii{#2}\ifx\argii\ds@currFN
-    \if\ds@foundLetter0\makebox[0pt][r]{%
-        \Hy@pdfstringfalse#1\enspace\kern4bp}\let\ds@foundLetter=1\fi
-        \expandafter\typeset@@PuzzleLetter
-        \else\expandafter\typeset@@PuzzleLetter\fi}
+  \ifx\ds@foundLetter\dps@Zero
+    \makebox[0pt][r]{\let\tops\texorpdfstring
+    \Hy@pdfstringfalse\@ltrFmtA{#1}\enspace\kern4bp}%
+    \let\ds@foundLetter\dps@One\fi
+    \expandafter\typeset@@PuzzleLetter
+  \else
+    \expandafter\typeset@@PuzzleLetter
+  \fi
+}
 \def\ds@publishRandomLists{%
-    \ds@randomizeQuestionList{\the\ds@qNumber}%
-    \ds@randomizeAnswerList{\the\ds@aNumber}%
+  \ds@randomizeQuestionList{\the\ds@qNumber}%
+  \ds@randomizeAnswerList{\the\ds@aNumber}%
 }
 \def\ds@myspace{space}
 \def\ds@getProbNumber#1#2{%
-    \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
-    \ifx\ds@currentArgii\ds@myspace\def\ds@probNumNext{\relax}\else
-        \def\ds@probNumNext{%
-            \@ifundefined{dps@probNum#2}{\global\advance\ds@probCnt1
-                \ds@@getProbNumber{\the\ds@probCnt}%
-            }{\csname dps@probNum#2\endcsname}%
-    }%
-    \fi
-    \ds@probNumNext
+  \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
+  \ifx\ds@currentArgii\ds@myspace\def\ds@probNumNext{\relax}\else
+    \def\ds@probNumNext{%
+      \@ifundefined{dps@probNum#2}{\global\advance\ds@probCnt\@ne
+        \ds@@getProbNumber{\the\ds@probCnt}}
+        {\csname dps@probNum#2\endcsname}%
+  }%
+  \fi
+  \ds@probNumNext
 }
 \def\ds@@getProbNumber#1{%
-    {\count0=0 \let\\=\ds@getNthOne\the\ds@qlistOut}%
-    \csname dps@probNum\ds@currentArgii\endcsname
+  {\count@\z@ \let\\=\ds@getNthOne\the\ds@qlistOut}%
+  \csname dps@probNum\ds@currentArgii\endcsname
 }
-\def\ds@getNthOne#1{\advance\count0by1
-    \ifnum\ds@probCnt=#1
-        \expandafter
-            \xdef\csname dps@probNum\ds@currentArgii\endcsname
-                {\the\count0 }%
-        \expandafter
-            \xdef\csname dps@probLetter\the\count0\endcsname
-                {\expandafter\noexpand\ds@currentArgi}%
-    \fi
+\def\ds@getNthOne#1{\advance\count@\@ne
+  \ifnum\ds@probCnt=#1\relax
+    \csarg\xdef{dps@probNum\ds@currentArgii}{\the\count@}%
+    \toks@=\expandafter{\ds@currentArgi}% dps
+    \csarg\xdef{dps@probLetter\the\count@}{\the\toks@}% dps
+    \csarg\xdef{dps@probLetterii\the\count@}%
+      {\ds@currentArgii}%
+  \fi
 }
 \def\writeComposingEnv{%
-    \newwrite \ds@composing@write
-    \immediate\openout \ds@composing@write \jobname_comp.def
-    \let\verbatim@out\ds@composing@write
-    \dps@IWVO{\string\begin{Composing}}%
-    \dps@IWVO{}%
-    \expandafter\write@ComposingEnv\expandafter{\puzzleParameters}%
+  \newwrite \ds@composing@write
+  \immediate\openout \ds@composing@write \jobname_comp.def
+  \let\verbatim@out\ds@composing@write
+  \dps@IWVO{\string\begin{Composing}}%
+  \dps@IWVO{}%
+  \expandafter\write@ComposingEnv\expandafter{\puzzleParameters}%
 }
 \def\write@ComposingEnv#1{\write@@ComposingEnv#1\relax\relax}%
+\newcommand{\ComposingEnvMsg}{\begin{quote}An outline of your
+  \texttt{Composing}environment is written to
+  \texttt{\jobname\_comp.def}, based on data in the
+  argument of your \texttt{\string\DeclarePuzzle} command. Copy and
+  paste the contents of this file into your puzzle document following
+  \texttt{\string\DeclarePuzzle} then fill in your questions and
+  answers. Good luck.\end{quote}}
 \def\write@@ComposingEnv#1#2{\ifx#1\relax
-    \gdef\nextPuzzlePair{%
-    \dps@IWVO{\string\end{Composing}}%
-    \immediate\closeout \ds@composing@write}%
-    \else\gdef\nextPuzzlePair{\write@@@ComposingEnv{#1}{#2}}\fi
-    \nextPuzzlePair}%
+  \gdef\nextPuzzlePair{%
+  \dps@IWVO{\string\end{Composing}}%
+  \immediate\closeout \ds@composing@write}%
+  \begin{document}
+  \ComposingEnvMsg
+  \end{document}
+  \else\gdef\nextPuzzlePair{\write@@@ComposingEnv{#1}{#2}}\fi
+  \nextPuzzlePair}%
 \def\write@@@ComposingEnv#1#2{%
-    \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
-    \ifx\ds@currentArgii\ds@myspace
-        \def\ds@probNumNext{\write@@ComposingEnv}%
-    \else
-        \ifx\ds@currentArgii\ds@punc
-            \def\ds@probNumNext{\write@@ComposingEnv}\else
-            \def\ds@probNumNext{%
-                \@ifundefined{dps@compQ#2}{% write to file
-                \expandafter\gdef\csname dps@compQ#2\endcsname{found}%
-                \dps@IWVO{\string\begin{cQ}{\noexpand#1}}%
-                \dps@IWVO{\string\end{cQ}}%
-                \dps@IWVO{\string\begin{cA}{\noexpand#1}}%
-                \dps@IWVO{\string\end{cA}}%
-                \dps@IWVO{}%
-                }{}%
-                \write@@ComposingEnv
-            }%
-    \fi\fi
-    \ds@probNumNext
+  \gdef\ds@currentArgi{#1}\gdef\ds@currentArgii{#2}%
+  \ifx\ds@currentArgii\ds@myspace
+    \def\ds@probNumNext{\write@@ComposingEnv}%
+  \else
+    \ifx\ds@currentArgii\ds@punc
+      \def\ds@probNumNext{\write@@ComposingEnv}\else
+      \def\ds@probNumNext{%
+        \@ifundefined{dps@compQ#2}{% write to file
+        \expandafter\gdef\csname dps@compQ#2\endcsname{found}%
+        \dps@IWVO{\string\begin{cQ}{\noexpand#1}}%
+        \dps@IWVO{\string\end{cQ}}%
+        \dps@IWVO{\string\begin{cA}{\noexpand#1}}%
+        \dps@IWVO{\string\end{cA}}%
+        \dps@IWVO{}%
+        }{}%
+        \write@@ComposingEnv
+      }%
+    \fi
+  \fi
+  \ds@probNumNext
 }
 \def\verbatimwrite{\@bsphack
-    \let\do\@makeother\dospecials
-    \catcode`\^^M\active \catcode`\^^I=12
-    \def\verbatim@processline{%
-        \immediate\write\verbatim@out
-        {\the\verbatim@line}}%
-    \verbatim@start}
+  \let\do\@makeother\dospecials
+  \catcode`\^^M\active \catcode`\^^I=12
+  \def\verbatim@processline{%
+    \immediate\write\verbatim@out
+    {\the\verbatim@line}}%
+  \verbatim@start}
 \def\endverbatimwrite{\@esphack}
 \def\dps@IWVO{\immediate\write\verbatim@out}
 \def\ds@populateList#1{%
-    \ds@listIn = {}%
-    \ds@nCnt=0
-    \@whilenum \ds@nCnt < #1\do {%
-        \advance\ds@nCnt1
-        \edef\ds@listInHold{\the\ds@listIn\noexpand\\{\the\ds@nCnt}}%
-        \ds@listIn = \expandafter{\ds@listInHold}%
-    }%
+  \ds@listIn={}%
+  \ds@nCnt\z@
+  \@whilenum \ds@nCnt < #1\do {%
+    \advance\ds@nCnt\@ne
+    \edef\ds@listInHold{\the\ds@listIn\noexpand\\{\the\ds@nCnt}}%
+    \ds@listIn = \expandafter{\ds@listInHold}%
+  }%
 }
-\def\ds@processi#1{\advance\ds@nCnt1
-    \ifnum\ds@nCnt=\ds@getRanNum\edef\ds@listOutHold{\the\ds@listOut}%
-        \global\ds@listOut=\expandafter{\ds@listOutHold\\{#1}}%
-    \else
-        \edef\ds@listInHold{\the\ds@newListIn}%
-        \ds@tmpToks = \expandafter{\ds@listInHold\\{#1}}%
-        \ds@newListIn = \expandafter{\the\ds@tmpToks}%
-    \fi
+\def\ds@processi#1{\advance\ds@nCnt\@ne
+  \ifnum\ds@nCnt=\ds@getRanNum\edef\ds@listOutHold{\the\ds@listOut}%
+    \global\ds@listOut=\expandafter{\ds@listOutHold\\{#1}}%
+  \else
+    \edef\ds@listInHold{\the\ds@newListIn}%
+    \ds@tmpToks = \expandafter{\ds@listInHold\\{#1}}%
+    \ds@newListIn = \expandafter{\the\ds@tmpToks}%
+  \fi
 }
 \def\ds@processii#1{\input{\jobname_q#1.cut}}
 \def\ds@processiii#1{\input{\jobname_a#1.cut}}
-\def\ds@processL#1{\advance\count0by1 %\divide\ds@aNumber2
-    \ifnum\count0>\ds@aNumber\relax\else\input{\jobname_a#1.cut}\fi}
-\def\ds@processR#1{\advance\count0by1 %\divide\ds@aNumber2
-    \ifnum\count0>\ds@aNumber\relax\input{\jobname_a#1.cut}\fi}
-\def\displayRandomizedQuestions{\let\\=\ds@processii\the\ds@qlistOut}
-\def\displayRandomizedAnswers{\let\\=\ds@processiii\the\ds@alistOut}
-\def\displayRandomizedAnswersLeftPanel{{\let\\=\ds@processL\count0=0
-    \divide\ds@aNumber2 \the\ds@alistOut}}
-\def\displayRandomizedAnswersRightPanel{{\let\\=\ds@processR\count0=0
-    \divide\ds@aNumber2 \the\ds@alistOut}}
+\def\ds@processL#1{\advance\count@\@ne
+  \ifnum\count@>\ds@aNumber\relax\else\input{\jobname_a#1.cut}\fi}
+\def\ds@processR#1{\advance\count@\@ne
+  \ifnum\count@>\ds@aNumber\relax\input{\jobname_a#1.cut}\fi}
+\def\displayRandomizedQuestions{\let\\=\ds@processii\the\ds@qlistOut
+  \dps@AddToEmitAK{1}\dps@ckEmitAK}
+\def\displayRandomizedAnswers{\set@typeset@protect
+  \let\\=\ds@processiii\the\ds@alistOut
+  \dps@AddToEmitAK{2}\dps@ckEmitAK} % dps
+\def\displayRandomizedAnswersLeftPanel{{\set@typeset@protect
+  \let\\=\ds@processL\count@\z@
+  \divide\ds@aNumber\tw@ \xdef\lastOnLeft{\the\ds@aNumber}%
+  \the\ds@alistOut}%
+  \dps@AddToEmitAK{1}\dps@ckEmitAK}
+\def\displayRandomizedAnswersRightPanel{{\set@typeset@protect
+  \let\\=\ds@processR\count@\z@
+  \divide\ds@aNumber\tw@ \the\ds@alistOut}%
+  \dps@AddToEmitAK{1}\dps@ckEmitAK}
 \def\ds@randomizeQuestionList#1{%
-    \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
-    \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
-    \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
-    \global\forquestionstrue
-    \ifwerandomize
-        \expandafter\ds@randomizeList
-    \else
-        \global\ds@qlistOut=\expandafter{\the\ds@listIn}
-    \fi
+  \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
+  \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
+  \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
+  \global\forquestionstrue
+  \ifwerandomize
+    \expandafter\ds@randomizeList
+  \else
+    \global\ds@qlistOut=\expandafter{\the\ds@listIn}
+  \fi
 }
 \def\ds@randomizeAnswerList#1{%
-    \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
-    \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
-    \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
-    \global\forquestionsfalse
-    \ifwerandomize
-        \expandafter\ds@randomizeList
+  \global\ds@listIn={}\global\ds@newListIn={}\global\ds@listOut={}%
+  \global\ds@tmpToks={}%\global\ds@qlistOut={}\global\ds@alistOut={}%
+  \ds@nMax=#1\relax\ds@populateList{\the\ds@nMax}%
+  \global\forquestionsfalse
+  \ifwerandomize
+    \expandafter\ds@randomizeList
+  \else
+    \global\ds@alistOut=\expandafter{\the\ds@listIn}%
+  \fi
+}
+\def\ds@randomizeList{\redefnextrandomAsNeeded
+  \let\\=\ds@processi
+  \setrannum{\ds@getRanNum}{1}{\ds@nMax}%
+  \ds@nCnt\z@
+  \the\ds@listIn
+  \ds@loopTest
+}
+\def\ds@loopTest{\advance\ds@nMax\m@ne\relax
+  \ifnum\ds@nMax>\z@
+    \def\@next{%
+      \ds@listIn=\expandafter{\the\ds@newListIn}%
+      \ds@newListIn={}\ds@randomizeList}%
+  \else
+    \let\@next\relax
+    \ifforquestions
+      \global\ds@qlistOut=\expandafter{\the\ds@listOut}%
     \else
-        \global\ds@alistOut=\expandafter{\the\ds@listIn}%
+      \global\ds@alistOut=\expandafter{\the\ds@listOut}%
     \fi
+  \fi
+  \@next
 }
-\def\ds@randomizeList{%
-    \let\\=\ds@processi
-    \setrannum{\ds@getRanNum}{1}{\ds@nMax}%
-    \ds@nCnt=0\relax
-    \the\ds@listIn
-    \ds@loopTest
-}
-\def\ds@loopTest{\advance\ds@nMax-1\relax
-    \ifnum\ds@nMax>0\relax
-        \def\@next{%
-            \ds@listIn=\expandafter{\the\ds@newListIn}%
-            \ds@newListIn={}\ds@randomizeList}%
-    \else
-        \let\@next\relax
-        \ifforquestions
-            \global\ds@qlistOut=\expandafter{\the\ds@listOut}%
-        \else
-            \global\ds@alistOut=\expandafter{\the\ds@listOut}%
-        \fi
-    \fi
-    \@next
-}
-\newcommand{\placeMessageField}[3][]{%
-    \ifeqforpaper\else\textField[#1\Ff\FfMultiline]{report}{#2}{#3}\fi
-}
+\newcommand{\placeMessageField}[3][]{\ifeqforpaper\else
+  \textField[\Ff\FfReadOnly\BC{}#1
+  \Ff\FfMultiline]{report}{#2}{#3}\fi}
 \newcommand{\threshold}[1]{\def\dsthreshold{#1}}
 \threshold{3}
 \newcommand{\penaltypoints}[1]{\def\dspenaltypoints{#1}}
 \penaltypoints{3}
 \newcommand{\passing}[1]{\def\dspassing{#1}}
 \passing{4}
-\begin{insDLJS}[processChoice]{match}{JS Update of Matching Puzzle}
-var missesByQuestion = new Array();
+\newcommand{\printDPS}[3][]{%
+  \pushButton[\CA{Print}\A{\JS{%
+    var pp = this.getPrintParams();\r
+    pp.firstPage=1;\r
+    pp.lastPage=1;\r
+    pp.pageHandling = pp.constants.handling.shrink;\r
+    var fv = pp.constants.flagValues;\r
+    pp.flags |= (fv.suppressCenter | fv.suppressRotate);\r
+    this.print(pp);}}#1]{printDPS}{#2}{#3}%
+}
+\newcommand{\resetDPS}[3][]{%
+  \pushButton[\CA{Clear}\A{\JS{resetDPS();}}#1]{resetDPS}{#2}{#3}%
+}
+\def\dpsWCSWrnMsg{The file dps-wcs.def could not be found}
+\newcommand{\clearOnCloseOrSave}{\InputIfFileExists{dps-wcs.def}{}
+  {\PackageWarning{dps}{\dpsWCSWrnMsg}}}
+\def\lngthOfMsg{2000} % in milliseconds
+\def\dpsResetHook#1{\def\dpsresethook{#1}}
+\dpsResetHook{;}
+\def\dpsFinishedEvent#1{\def\dpsfinishedevent{#1}}
+\dpsFinishedEvent{;}
+\begin{insDLJS}{match}{DPS: JavaScript support Das Puzzle Spiel}
+var playerSignedIn = false;
+var missesByQuestion = new Object();
+var nPassing = \dspassing;
 var nMissed = 0;
 var nPenaltyPoints = 0;
 var activeQuestion = "";
-function processChoice(fieldname)
+var f=this.getField("ckbxQ");
+var g=f.getArray();
+var QBC=g[0].strokeColor;
+var pic = new Object();
+var _dpsTO; // time out variable
+var bRandPicMaps=\bRandPicMaps;
+function PlayerSignIn()
+{
+  if ( !playerSignedIn ) {
+    var f = this.getField("dpsSignInName");
+    if (f != null) {
+      var nameField = f.value;
+      if ( nameField.replace(/\s*/g,"") == "" ) {
+        app.alert("\signInMsg");
+        event.target.value="Off";
+      } else
+        playerSignedIn = true;
+    } else playerSignedIn = true;
+  }
+  return playerSignedIn;
+}
+function processChoice(name)
 {
     // Get the question field that corresponds to this question,
     // see if checked.
-    var f = this.getField("ckbxQ."+fieldname);
+    var f = this.getField("ckbxQ."+name);
     if ( (f != null) && (f.isBoxChecked(0)) ) { // right
         clearRedCrosses ();
-        this.resetForm(["puzzle."+fieldname]);
+        this.resetForm(["puzzle."+name]);
         event.target.textColor = ["RGB", 0, 0.6, 0];
         f.strokeColor = ["RGB", 0, 0.6, 0];
         f.readonly = true;
         event.target.readonly=true;
         try { afterCorrectChoiceHook() } catch(e) {};
-        checkForFinished(\dspassing);
+        checkForFinished();
     } else { // wrong
-        if ( activeQuestion != "" ) var h = this.getField(activeQuestion);
-        if ( (activeQuestion=="") || (h.readonly) ) { // active question already answered
+        if ( activeQuestion != "" )
+          var h = this.getField(activeQuestion);
+        if ( (activeQuestion=="") || (h.readonly) ) {
+            // active question already answered
             event.target.value = "Off";
             var g = this.getField("report");
             str = \chooseQ;
             g.value = str;
-            var to = app.setTimeOut("clearMessages()", 2000);
+            var to = app.setTimeOut("clearMessages()", \lngthOfMsg);
         } else {
             event.target.style = style.cr;
             event.target.textColor = color.red;
@@ -455,7 +773,7 @@ function processChoice(fieldname)
                 nPenaltyPoints += \dspenaltypoints;
                 missesByQuestion[activeQuestion] = 0;
                 clearRedCrosses ();
-                var to = app.setTimeOut("clearMessages()", 2000)
+                var to = app.setTimeOut("clearMessages()", \lngthOfMsg);
             }
         }
     }
@@ -474,13 +792,14 @@ function clearRedCrosses ()
         h[i].style = style.ch;
     }
  }
-function checkForFinished(n)
+function checkForFinished()
 {
     var f = this.getField("puzzle");
     var g = f.getArray();
     var anyEmpty = false;
     for ( var i=0; i < g.length; i++) {
-        if ( (g[i].name != "puzzle.space") && (g[i].value.replace(/\s/g,"") == "") ) {
+        if ( (g[i].name != "puzzle.space") && %
+(g[i].value.replace(/\s/g,"") == "") ) {
             anyEmpty = true;
             break;
         }
@@ -504,7 +823,171 @@ function finalRating(n) {
         if ( (n > aPenaltyScale[i][0]) && (n <= aPenaltyScale[i][1]) )
             return aPenaltyMsgs[i];
 }
+function resetDPS() {
+  this.delay=true;
+  this.resetForm();
+  var f=this.getField("puzzle");
+  var g=f.getArray();
+  for (var i=0; i<g.length; i++)g[i].value="";
+  var f=this.getField("ckbxQ");
+  f.strokeColor=QBC;
+  var g=f.getArray()
+  for (var i=0; i<g.length; i++)g[i].readonly=false;
+  var f=this.getField("ckbxA");
+  var g=f.getArray();
+  for (var i=0; i<g.length; i++)g[i].readonly=false;
+  this.dirty=false;
+  if(typeof(xBlds)!="undefined"){
+    for (var i=0; i<xBlds.length; i++) {
+      var bName=xBlds[i].name.substring(3);
+      toggleSetThisLayer(bName,false);
+    }
+  }
+  var f=this.getField("btnpic");
+  if(f!=null)f.display=display.hidden;
+  try {
+    \dpsresethook
+    if (typeof mixupDPS == "function") {
+      mixupDPS();
+      showDPS();
+    }
+  } catch(e){};
+  playerSignedIn = false;
+  missesByQuestion = new Object();
+  nMissed = 0;
+  nPenaltyPoints = 0;
+  activeQuestion = "";
+  aPicIndex=randomizePicList(aPicIndex,bRandPicMaps);
+  if(bRandPicMaps)assignNamesToIndexes();
+  this.delay=false;
+}
+/*
+    Create mapping from letters to pictures
+*/
+var aPicIndex=[\DPSIndxList];
+var aNamesList=[\DPSNamesList];
+var diff;
+var PIlength=aPicIndex.length;
+var NLlength=aNamesList.length;
+if ( (diff=NLlength-PIlength) > 0 )
+  for (var i=0; i<diff; i++)
+    aPicIndex.push(null);
+// now randomize aPicIndex, if requested
+aPicIndex=randomizePicList(aPicIndex,bRandPicMaps);
+// now make assignments
+assignNamesToIndexes();
+function assignNamesToIndexes() {
+  for(var i=0; i< NLlength; i++)
+    pic[aNamesList[i]]=aPicIndex[i];
+}
+function randomizePicList(array, bRandomize) {
+  if (bRandomize) shuffle(array);
+  return array;
+}
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
 \end{insDLJS}
+\ifusebtnappr
+\begin{insDLJS}{dpsbtnappr}{DPS: Icon appearance support}
+function dpsShowQues(n)
+{
+  if (PlayerSignIn()) {
+    dpsShowFld("btnQ."+n);
+  }
+}
+function dpsHideQFields() {
+    dpsHideFld("btnQ");
+}
+function dpsHideFinalField(name){
+  dpsHideFld(name);
+}
+function dpsHidePreviousQues()
+{
+  if ( activeQuestion != "" ) {
+    dpsHideQFields();
+  }
+}
+function dpsShowFld(name) {
+  var f=this.getField(name);
+  if (f!=null)f.display=display.visible;
+}
+function dpsHideFld(name) {
+  var f=this.getField(name);
+  if (f!=null)f.display=display.hidden;
+}
+function displayPic(name){
+  if (pic[name] != null )dpsShowFld("btnpic."+pic[name]);
+}
+function afterCorrectChoiceHook()
+{
+  var name = activeQuestion.replace(/ckbxQ\./,"");
+dpsHideQFields();
+displayPic.name=name;
+_dpsTO=app.setTimeOut("displayPic('"+name+"')",25);
+}
+function dpsFinishedHook()
+{
+    dpsHideQFields();
+    try {
+      \dpsfinishedevent
+      if(typeof sortoutDPS == "function") {
+        ok2Continue = true;
+        sortoutDPS();
+      }
+    }catch(e){}
+}
+\end{insDLJS}
+\fi
+\ifuseocgappr
+\begin{insDLJS}{dpslayer}{DPS: Layer Support}
+function dpsShowLayer(name)
+{
+    toggleSetThisLayer(name, true);
+}
+function dpsHidePreviousLayer()
+{
+    if ( activeQuestion != "" ) {
+        var activename=activeQuestion.substring(6)
+        dpsHideLayer(activename);
+    }
+}
+function dpsHideLayer(name)
+{
+    toggleSetThisLayer(name, false);
+}
+function afterCorrectChoiceHook()
+{
+    var name = activeQuestion.replace(/ckbxQ\./,"");
+    try {
+      if (pic[name] != null )
+      dpsShowLayer("pic"+pic[name]);
+    } catch(e) {};
+    dpsHideLayer(name);
+}
+function dpsFinishedHook()
+{
+    var name = activeQuestion.replace(/ckbxQ\./,"");
+    dpsHideLayer(name);
+    try {
+      \dpsfinishedevent
+    }catch(e){}
+}
+\end{insDLJS}
+\fi
+\dps@restoreCats
+\let\WriteBookmarks\relax
 \endinput
 %%
 %% End of file `dps.sty'.

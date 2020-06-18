@@ -1,0 +1,351 @@
+\documentclass{article}
+\usepackage[texcoord]{eso-pic}
+% aeb_pro  not required for pdflatex, lualatex, or xelatex
+% If you don't have acrobat, no harm done. For the
+% dvips -> distiller workflow, aeb_pro is required.
+\usepackage[web={extended},eforms,useacrobat]{aeb_pro}
+% for non-pdfmark workflow, the alternative is to use
+% the following two packages instead.
+%\usepackage[extended]{web}
+%\usepackage{eforms}
+\usepackage[usebtnappr,
+  nonrandomized,
+  !showletters,
+  !showanswerkey,
+  savedata,
+  lang=custom,
+]{dps}
+\usepackage{graphicx}
+
+%\previewOn \pmpvOn
+%\useRandomSeed{number}
+\inputRandomSeed
+%\useLastSeed
+
+\margins{.5in}{.5in}{.5in}{.5in} % left,right,top, bottom
+\screensize{8.5in}{8.5in}          % height, width
+
+\DeclareDocInfo
+{
+    title=Stat Matching Game,
+    author=D. P. Story,
+    university=NORTHWEST FLORIDA STATE COLLEGE\\Department of Mathematics,
+    email=storyd@nwfsc.edu,
+    subject=First extra credit assignment,
+    keywords={statistics, matching, game},
+    talksite=http://www.acrotex.net,
+    copyrightyears=2006-\the\year,
+}
+\talkdateLabel{Version}
+\version{1.0}\nocopyright
+
+\everyTextField{\textFont{TiRo}}
+
+\begin{embedding}
+\dpsEmbedIcons
+\embedIcon[name=Emoji,placement=btnEmoji]{MyEmoji.pdf}
+\end{embedding}
+
+% The dpsFinishedEvent() function fires when the puzzle is completed
+% (the last question is answered). Here, we display the btnEmoji
+%\begin{insDLJS}{dpsfinevent}{DPS: Btn appr finish event}
+%function dpsFinishedEvent() {
+%    dpsShowFld("btnEmoji");
+%}
+%\end{insDLJS}
+\dpsFinishedEvent{dpsShowFld("btnEmoji");}
+
+% since we are displaying btnEmoji, we need to hide it
+\dpsResetHook{%
+  dpsHideFld("btnEmoji");
+}
+
+
+% Try to prevent the student from saving the game (for some other student)
+% we clear the game board if either student closes or save the document.
+\clearOnCloseOrSave
+
+\optionalPageMatter
+{%
+    \par\minimumskip\vspace{\stretch{1}}
+    \begin{center}
+    \fcolorbox{blue}{white}{%
+    \begin{minipage}{.75\linewidth}\parskip3pt
+    \textbf{\textcolor{red}{Instructions: }}
+    On the next page of this document is a little matching game covering
+    some of the statistical concepts discussed in class.
+    \begin{itemize}
+        \item When you turn to the next page, type in your name in the name field
+        provided near the top of the page.
+        \item Follow the instructions on that page on how to answer the questions.
+        \item After you have correctly answered the last question correctly, a message
+        appears at the bottom of the page with an evaluation of your effort.
+        \item Print the completed page and turn it in to me at the next class meeting
+        for (extra) credit.
+    \end{itemize}
+    \textbf{\textcolor{red}{Warning:}} The puzzle board is cleared if this document
+    is closed or saved. Complete the puzzle in one sitting, then print the results.
+    \end{minipage}}
+    \end{center}
+}
+
+\rheader{}
+
+\parindent0pt
+\parskip6pt
+
+\DeclarePuzzle
+{%
+    {R}{R}
+    {o}{o}
+    {n}{n}
+    {a}{a}
+    {l}{l}
+    {d}{d}
+    {F}{F}
+    {i}{i}
+    {s}{s}
+    {h}{h}
+    {e}{e}
+    {r}{r}
+}
+
+
+%\writeComposingEnv
+
+\begin{Composing}
+
+\begin{cQ}{R}
+Branches of Statistics
+\begin{setContent}{R}
+The two branches of statistics
+are descriptive and \underbar{\hspace{.5in}}.
+\end{setContent}
+\end{cQ}
+\begin{cA}[r]{R}
+inferential
+\end{cA}
+
+\begin{cQ}{o}
+Definition\begin{setContent}{o}\raggedright
+\underbar{\hspace*{.5in}} is the
+science of collecting, organizing, analyzing and interpreting data
+in order to make decisions.
+\end{setContent}
+\end{cQ}
+\begin{cA}{o}
+statistics
+\end{cA}
+
+\begin{cQ}{n}
+A frequency distribution is an example of
+\underbar{\hspace*{.5in}}
+\end{cQ}
+\begin{cA}{n}
+data reduction
+\end{cA}
+
+\begin{cQ}{a}
+Find the median\begin{setContent}{a}
+Find the median of the following
+data:\\[1ex]
+\begin{tabular}{r|ll}
+2&2334&\kern6pt Key $2\,|\,4=24$\\
+2&57888\\
+3&344\\
+3&55666\\
+4&0023\\
+4&566
+\end{tabular}
+\end{setContent}
+\end{cQ}
+\begin{cA}{a}
+$34.5$
+\end{cA}
+
+\begin{cQ}{l}
+Compute mean and standard deviation\begin{setContent}{l}
+Given that $n=5$,
+$\sum x = 26$ $\sum x^2 = 154$, compute $\bar x$ and $s$.
+\end{setContent}
+\end{cQ}
+\begin{cA}{l}
+$5.2$ and $2.17$
+\end{cA}
+
+\begin{cQ}{d}
+Definition\begin{setContent}{d}
+A \underbar{\hspace{.5in}} is a sample
+in which every possible sample of the same size has the same chance
+of being selected.
+\end{setContent}
+\end{cQ}
+\begin{cA}{d}
+simple random sample
+\end{cA}
+
+\begin{cQ}{F}
+Measures of Position\begin{setContent}{F}
+The number
+\underbar{\hspace{.5in}} divides a data set in such a way that
+$75\%$ of the data is less than it and $25\%$ of the data is greater
+than it.
+\end{setContent}
+\end{cQ}
+\begin{cA}[f]{F}
+$Q_3$
+\end{cA}
+
+\begin{cQ}{i}
+Measure of Central Tendency\begin{setContent}{i} The
+\underbar{\hspace{.5in}} is the measure of central tendency
+that is sensitive to outliers in the data set.
+\end{setContent}
+\end{cQ}
+\begin{cA}{i}
+sample mean
+\end{cA}
+
+\begin{cQ}{s}
+$\mu$ refers to the \underbar{\hspace{.5in}}
+\end{cQ}
+\begin{cA}{s}
+population mean
+\end{cA}
+
+\begin{cQ}{h}
+Calculating the $z$-score\begin{setContent}{h}
+In a data set with sample
+mean of $4.5$ and sample standard deviation of $1.5$, the $z$-score
+of $x = 4$ is $ z = \underbar{\hspace{.5in}}$.
+\end{setContent}
+\end{cQ}
+\begin{cA}{h}
+$-0.33$
+\end{cA}
+
+\begin{cQ}{e}
+Interpreting the $z$-score\begin{setContent}{e}
+If a $z$-score of a data
+entry is negative, then that data entry is
+\underbar{\hspace{.5in}} than mean.
+\end{setContent}
+\end{cQ}
+\begin{cA}{e}
+less
+\end{cA}
+
+\begin{cQ}{r}
+The Empirical Rule\begin{setContent}{r}
+The mean value of land and building
+per acre from a sample of farms is $\$1200$ with a standard
+deviation of $\$350$. Assuming the distribution of the data set is
+bell shaped, approximately what percentage of the sample of farmers
+had value of land and building (per acre) between $\$1200$ and
+$\$1550$?
+\end{setContent}
+\end{cQ}
+\begin{cA}{r}
+$34$
+\end{cA}
+
+%-------------------
+
+\begin{cA}[b]{fake1}
+$5.2$ and $1.94$
+\end{cA}
+
+\begin{cA}[c]{fake2}
+sample
+\end{cA}
+
+\begin{cA}[d]{fake3}
+$0.33$
+\end{cA}
+
+\begin{cA}[g]{fake4}
+greater
+\end{cA}
+
+\begin{cA}[j]{fake5}
+median
+\end{cA}
+
+\begin{cA}[k]{fake6}
+mode
+\end{cA}
+
+\begin{cA}[m]{fake7}
+$Q_1$
+\end{cA}
+
+\begin{cA}[p]{fake8}
+variance
+\end{cA}
+
+\begin{cA}[t]{fake9}
+$35$
+\end{cA}
+
+\end{Composing}
+
+\begin{document}
+
+\maketitle
+
+% these are placed on the page where they are to appear
+\placeQuesIcon{\AddToShipoutPictureFG*{\AtTextCenter{\put(-72,0)
+  {\dpsQuesIcon{#1}{2.25in}{9\baselineskip}}}}}
+\placeOtherIcon{\AddToShipoutPictureFG*{\AtTextCenter{\put(-72,0)
+   {\dpsOtherIcon[\I{\csOf{Emoji}}]{btnEmoji}{2.25in}{9\baselineskip}}}}}
+
+
+\def\answidth{1.7in}
+\def\queswidth{2in}
+\def\commondepth{5.5in+6pt}
+
+{\bfseries\noindent
+\makebox[\textwidth]{\rlap{STA 2023}\hfill\textcolor{blue}{\webtitle}\hfill\llap{Statistics}}
+\makebox[\textwidth]{\rlap{\webauthor}\hfill\textcolor{blue}{Descriptive Statistics}\hfill\llap{Fall 2006}}}
+
+\underbar{\textbf{Name:} \textField[\BC{}]{dpsSignInName}{2in}{11bp}}
+
+\textcolor{red}{\textbf{Instructions:}} Select a question from the
+left panel by clicking its checkbox. Find the answer listed in
+either the right panel.  No guessing! A maximum of $\dsthreshold$
+tries on any problem before you get $\dspenaltypoints$ penalty
+points!  Passing is to complete the puzzle with only $\dspassing$
+incorrect answers.
+
+\fbox{\begin{minipage}[t][\commondepth][t]{\queswidth-2\fboxsep-2\fboxrule}\raggedright
+\makebox[\linewidth]{\centering\textbf{Questions}}
+\begin{enumerate}\itemsep3pt plus 1pt minus 1pt
+\displayRandomizedQuestions
+\end{enumerate}
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][\commondepth][t]{\linewidth-\answidth-\queswidth-2\fboxsep-2\fboxrule}
+Who is considered the founder of modern statistics? The answer is
+hidden in the puzzle below.\par\smallskip
+\begin{center}
+\parbox{2.2in}{\insertPuzzle{6}}
+\end{center}
+\makebox[0pt][s]{\hspace*{-\fboxsep}\rule{\linewidth+2\fboxsep}{.4pt}\hss}
+\vfill
+\placeMessageField{\linewidth}{10\baselineskip}%
+\end{minipage}}%
+%
+\fbox{\begin{minipage}[t][\commondepth][t]{\answidth-2\fboxsep-2\fboxrule}\raggedright
+\makebox[\linewidth]{\textbf{Answers}}
+\begin{itemize} \itemsep2pt plus 1pt minus 1pt
+\displayRandomizedAnswers
+\end{itemize}
+\par\smallskip
+\end{minipage}}%
+
+\textbf{\textcolor{red}{Important:}} Don't forget to print the puzzle page and to hand it in to me.
+
+Print this page: \printDPS{}{11bp}\cgBdry[1ex]
+Try again: \resetDPS{}{11bp}
+
+\end{document}

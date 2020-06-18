@@ -1,0 +1,142 @@
+%%
+%% This is file `icon-doc.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% dps.dtx  (with options: `copyright,icondoc')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% dps.sty package,                                     %%
+%% Copyright (C) 2006--2020  D. P. Story                %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{icon-doc}
+   [2020/04/21 v1.0 icon-doc:
+    Build Icon file and explode same (dps)]
+\newif\ifdpsuseacrobat \dpsuseacrobatfalse
+\DeclareOption{useacrobat}{\dpsuseacrobattrue}
+\DeclareOption{!useacrobat}{\dpsuseacrobatfalse}
+\DeclareOption{twice}{\dpscomptwicetrue}
+\newif\ifdpscomptwice \dpscomptwicefalse
+\ProcessOptions\relax
+\RequirePackage{ifxetex}
+\RequirePackage{shellesc}
+\RequirePackage{web}
+\RequirePackage{eforms}
+\execJSOn
+\pagestyle{empty}
+\parindent0pt \parskip0pt
+\newwrite \wrtPkg
+\newwrite\wrticonbody
+\def\IWB#1{\immediate\write\wrticonbody{#1}}
+\def\IWP#1{\immediate\write\wrtPkg{#1}}
+\def\verbatimwrite{\@bsphack
+    \let\do\@makeother\dospecials
+    \catcode`\^^M\active \catcode`\^^I=12
+    \def\verbatim@processline{%
+        \immediate\write\verbatim@out
+        {\the\verbatim@line}}%
+    \verbatim@start}
+\def\endverbatimwrite{\@esphack}
+\newenvironment{icondoc}
+{%
+   \immediate\openout \wrticonbody icons-template.tex
+    \let\verbatim@out\wrticonbody
+    \IWB{\string\RequirePackage{tmp}}%
+    \verbatimwrite
+}{%
+    \endverbatimwrite
+    \immediate\closeout \wrticonbody
+}
+\ifxetex\ifdpsuseacrobat\else
+\begin{icondoc}
+\documentclass{article}
+\usepackage{web}
+\margins{3pt}{3pt}{3pt}{3pt}
+\screensize{9\baselineskip}{2.25in}
+\parindent0pt
+\begin{document}
+\small
+\dpsInputContent    % required, defined in \@MultiQuesFiles
+\end{document}
+\end{icondoc}
+\fi\fi
+\let\pageList\@empty
+\def\addToPageList#1{\edef\x{{#1}}\expandafter
+  \g@addto@macro\expandafter
+  \pageList\expandafter{\x}}
+\def\@SnglQuesFile#1#2{%
+  \@tempcnta#1\relax\advance\@tempcnta\@ne
+  \edef\N{\the\@tempcnta}%
+  \@tempcnta\@ne\relax
+  \@whilenum\@tempcnta < \N \do{%
+    \begingroup
+      \InputIfFileExists{#2-sc(\the\@tempcnta).cut}
+        {\addToPageList{\the\@tempcnta}}{\null}\par
+    \endgroup
+    \newpage
+    \advance\@tempcnta\@ne
+  }%
+}
+\def\@MultiQuesFiles#1#2{%
+  \@tempcnta#1\relax\advance\@tempcnta\@ne
+  \edef\N{\the\@tempcnta}%
+  \@tempcnta\@ne\relax
+  \@whilenum\@tempcnta < \N \do{%
+    \IfFileExists{#2-sc(\the\@tempcnta).cut}
+      {\addToPageList{\the\@tempcnta}}{}
+    \immediate\openout\wrtPkg tmp.sty
+      \IWP{\string\def\string\dpsInputContent{\string
+        \InputIfFileExists{#2-sc(\the\@tempcnta).cut}%
+        {}{\string\null}}}%
+    \immediate\closeout\wrtPkg
+    \ShellEscape{xelatex icons-template.tex}%
+    \ifdpscomptwice\ShellEscape{xelatex icons-template.tex}\fi
+    \ShellEscape{copy icons-template.pdf icons-\the\@tempcnta.pdf}%
+    \advance\@tempcnta\@ne
+  }\null % content for the icons.tex file
+  \ShellEscape{del tmp.sty icons-template.*}%
+}
+\ifxetex
+  \ifdpsuseacrobat
+    \let\createRequiredIcons\@SnglQuesFile
+  \else
+    \let\createRequiredIcons\@MultiQuesFiles
+  \fi
+\else
+  \let\createRequiredIcons\@SnglQuesFile
+\fi
+\begin{defineJS}[\def\defineJSjsR{^^J}]{\execExplode}
+/* Extract pages to folder */
+// Regular expression used to acquire the base name of file
+try {
+for (var i = 0; i < this.numPages; i++)
+aebTrustedFunctions(this,aebExtractPages,{
+nStart: i,
+cPath: "icons-" + (i+1) +".pdf"
+});
+} catch (e) { console.println("Aborted: " + e); }
+\end{defineJS}
+\def\wrtPageList{\newwrite\pagelist
+  \immediate\openout \pagelist icons-pglst.sav
+  \immediate\write\pagelist{\string\def\string\pagelist{\pageList}}
+  \immediate\closeout\pagelist
+}
+\ifxetex\ifdpsuseacrobat
+\begin{execJS}{expl}
+\execExplode
+\end{execJS}
+\fi\fi
+\AtEndDocument{\wrtPageList}
+\let\WriteBookmarks\relax
+\endinput
+%%
+%% End of file `icon-doc.sty'.

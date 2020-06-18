@@ -47,7 +47,7 @@
     email={dpstory@acrotex.net},
     subject=Documentation for the icon-appr package,
     talksite={\url{www.acrotex.net}},
-    version={1.0, 2018/11/23},
+    version={1.2, 2020/06/05},
     Keywords={LaTeX, form field, icon appearances, AcroTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -174,7 +174,7 @@ above results. The above buttons are used in the demo files, these are found in 
 \end{itemize}
 The first one listed above is for the \app{pdflatex}, \app{lualatex}, and
 \app{xelatex} drivers (applications), the latter three are designed for users
-of \app{dvips} or \app{dvipsone}.
+of the \app{dvips\,->\,distiller} workflow.
 
 \newtopic\noindent
 The \pkg{eforms}\marginpar{\mpFmt\pkg{eforms} package
@@ -183,6 +183,72 @@ with icon appearances, this is because, as of this writing, the form fields
 produced by \pkg{hyperref} do not support the necessary markup to produce
 icon appearances.
 
+\subsection{What new: Version 1.2 (2020/06/05)}
+
+The basic functionality of this package is unchanged, as documented in
+subsequent sections. In this version, the \textbf{\textsf{AP}} entry is added
+to the \textbf{\textsf{Names}} dictionary of the PDF catalog. For this manual,
+the following code appears, new bits are highlighted in bold. The second line
+is the \textbf{\textsf{Names}} dictionary.
+\begin{Verbatim}[commandchars={!@^}]
+124 0 obj
+<<!textbf@/AP 117 0 R^/Dests 85 0 R/JavaScript 125 0 R>>
+endobj
+...
+117 0 obj
+!textbf@<</Names[(girl)151 0 R(mani)137 0 R(scot)162 0 0 R]>>^
+endobj
+\end{Verbatim}
+The \textbf{\textsf{AP}} entry
+references the indirect object \textbf{\textsf{Names}} dictionary consisting
+of the icon names and their indirect references. The tricky part is that
+the names in this \textbf{\textsf{Names}} array must be listed in alphabetical
+order. The \pkg{datatool} package is used for this purpose.\footnote{\url{https://ctan.org/pkg/datatool}}
+
+This means that the names of the icons imported in the \env{embedding}
+environment are known to \app{Acrobat/Adobe Reader}. It also allows the icons
+to be manipulated using JavaScript methods; for example, use the button below
+to cycle through all icons in this document.
+
+\begin{defineJS}{\cycleJS}
+if (typeof indexIcon == "undefined") var indexIcon=0;
+var oIconName=this.icons[indexIcon].name;
+var f=this.getField("iconContainer");
+var oIcon=this.getIcon(oIconName);
+f.buttonPosition=position.iconTextV;
+f.buttonSetIcon(oIcon);
+f.buttonSetCaption(oIconName);
+indexIcon = (indexIcon+1) \% (this.icons.length);
+\end{defineJS}
+
+% the display as before.
+\begin{defineJS}{\clearJS}
+f=this.getField("iconContainer")
+// save
+var sv=f.buttonPosition;
+var cptn=f.buttonGetCaption();
+// clear
+f.buttonPosition=position.textOnly;
+f.buttonSetCaption("");
+\end{defineJS}
+
+
+\begin{center} %\previewOn\pmpvOn
+\pushButton[\BG{}\autoCenter{n}
+  \TP{2}\I{}\S{S}]{iconContainer}{100bp}{100bp}\vcgBdry[6bp]
+\pushButton[\CA{Show me the icons!}\AAmouseup{\cycleJS}]{cycleBtn}{}{11bp}\olBdry
+\pushButton[\CA{Clr}\TU{Clear the display}\AAmouseup{\clearJS}]{clearBtn}{}{11bp}
+\end{center}
+
+\noindent
+The underlying JavaScript of the push button uses the \texttt{this.getIcon(\ameta{icon-name})} method.
+To use this method, the icons must be known, and now they are! All icons appearing in this document
+are EPS files, BION,\footnote{Believe it or not} yet we can still manipulate their images using JavaScript.
+\app{Adobe Reader} supports \texttt{\meta{Doc}.getIcon(\ameta{icon-name})}. \mlsetLink[\A{\JS{%
+console.clear();\r console.show();\r console.println("this.icons");}}]{Open the JavaScript console}, place
+your cursor on \textsf{this.icons}, and press \textsf{Ctrl+Enter}, \app{Acrobat/Reader} gives a readout of
+the icons known to this document. The above example is reproduced in \texttt{icon-appr-exmpl.tex} and
+\texttt{icon-appr-eps.tex}.
 
 \section{Methods for non-\textsf{pdfmark} drivers}\label{nPdfmark}
 
@@ -239,9 +305,9 @@ for a working example.
 
 \section{Methods for \textsf{pdfmark} drivers}
 
-For \psf{pdfmark} drivers (\app{dvips} and \app{dvipsone})\marginpar{\mpFmt\sffamily dvips\\ dvipsone}, there
+For the \psf{pdfmark} driver \app{dvips}\marginpar{\mpFmt\sffamily dvips}, there
 are two techniques that have been developed. These techniques were developed because
-EPS files are the only graphics files \app{dvips} (and \app{dvipsone}) work with.
+EPS files are the only graphics files \app{dvips} work with.
 \begin{itemize}
    \item \textbf{JavaScript approach:} Acrobat JavaScript has a method for
        embedding a number of graphics file formats as icons, which can then
@@ -318,7 +384,7 @@ rollover appearance.
 Note the variety of icon file formats used.
 
 In the body of the document, we create a push button. At the time
-the button is created, the icon files have not been imported and embedded,
+the button is created, the icon files have not been imported or embedded,
 but we indicate that this button uses icon appearances by passing
 \verb~\importIcons{y}~ as an optional argument, \emph{this is
 important}.\marginpar{\mpFmt Important!}

@@ -1,9 +1,10 @@
 \documentclass{article}
-
 \usepackage[designv,tight]{web}
 \usepackage{eforms}
 \usepackage{graphicxsp}[2018/11/20]
-\usepackage{icon-appr}\previewOff
+\usepackage{icon-appr}
+
+%\previewOn\pmpvOn
 
 \title{Creating icon appearances for button fields\texorpdfstring{\\[1ex]}{ }using EPS methods}
 \author{D. P. Story}
@@ -28,7 +29,7 @@
 
 \section{Introduction}
 
-For the \textsf{\textbf{pdfmark}}-type drivers (\textsf{dvips} and
+Forxx the \textsf{\textbf{pdfmark}}-type drivers (\textsf{dvips} and
 \textsf{dvipsone}), there are two ways to create an icon appearance: (1)
 JavaScript methods and (2) EPS methods. The JavaScript methods are
 demonstrated in \texttt{icons-appr-pb.tex}. A shortcoming of the JavaScript
@@ -80,5 +81,27 @@ however, the buttons have the correct appearances, but are not functional.
     ]{myRadBtn}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\hfill
 \pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}
 
+
+\section{Icons in this document}
+
+Use the button below to cycle through all icons in this document.
+
+% Note, compare this code and fields with that of icon-appr-exmpl.tex
+% in the latter file, we include a caption, where here, we do not
+% include a caption.
+\begin{defineJS}{\cycleJS}
+if (typeof indexIcon == "undefined") var indexIcon=0;
+var oIconName=this.icons[indexIcon].name;
+var f=this.getField("iconContainer");
+var oIcon=this.getIcon(oIconName);
+f.buttonSetIcon(oIcon);
+indexIcon = (indexIcon+1) \% (this.icons.length);
+\end{defineJS}
+
+\begin{center}
+\pushButton[\BG{}\autoCenter{n}
+  \TP{1}\I{}\S{S}]{iconContainer}{100bp}{100bp}\vcgBdry[6bp]
+\pushButton[\CA{Cycle}\AAmouseup{\cycleJS}]{cycleBtn}{}{11bp}
+\end{center}
 
 \end{document}

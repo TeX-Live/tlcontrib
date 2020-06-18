@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% icon-appr.sty package,                                %%
-%% Copyright (C) 2018  D. P. Story                       %%
+%% Copyright (C) 2018--2020                              %%
 %% dpstory@acrotex.net                                   %%
 %%                                                       %%
 %% This program can redistributed and/or modified under  %%
@@ -19,13 +19,40 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{icon-appr}
- [2018/11/23 v1.0 Provides icon appearances for button fields (dps)]
+ [2020/06/05 v1.2 Provides icon appearances for button fields (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
 \RequirePackage{eforms}[2018/11/10]
 \RequirePackage{graphicx}
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
+\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\ifpdfmarkup\else
+\def\ReqPkg{\RequirePackage{datatool}}\expandafter
+\ReqPkg\fi
+\newtoks\IA@IconsAlpha \IA@IconsAlpha={}
+\let\IA@Icons\@empty
+\let\IA@Icons@pdfmark\@empty
+\let\IA@Icons@pdfmark@Names\@gobble
+\newcommand{\sortitem}[2][\relax]{%
+  \DTLnewrow{list}% Create a new entry
+  \ifx#1\relax
+    \DTLnewdbentry{list}{sortlabel}{#2}%
+  \else
+    \DTLnewdbentry{list}{sortlabel}{#1}%
+  \fi%
+  \DTLnewdbentry{list}{description}{#2}%
+}
+\newenvironment{sortedlist}{%
+  \DTLifdbexists{list}{\DTLcleardb{list}}{\DTLnewdb{list}}%
+}{%
+  \DTLsort{sortlabel}{list}% Sort list
+  \DTLforeach*{list}{\theDesc=description}{\theDesc}%
+}
+\def\IA@sortitem#1{\sortitem[#1]{\IA@sortitemArgii{#1}}}
+\def\IA@sortitemArgii#1{\edef\z{\global
+  \IA@IconsAlpha={\the\IA@IconsAlpha (#1) \eq@relRef{\csOf{#1}}}}\z}
 \def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
 \def\heightOf#1{\@nameuse{#1heightOf}}
 \def\widthOf#1{\@nameuse{#1widthOf}}
@@ -33,8 +60,6 @@
 \newif\if@EmbedIconUsed \@EmbedIconUsedfalse
 \newif\if@EmbedEPSUsed \@EmbedEPSUsedfalse
 \@ifundefined{csOf}{\let\csOf\@nameuse}{}
-\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
 \let\IA@CreateImage@xsp\@empty
 \let\IA@EndEmbedding@aebpro\relax
 \define@key{IAKVfamily}{name}[]{\def\IAKVfamily@name{#1}}
@@ -49,6 +74,21 @@
   \@ifpackageloaded{graphicxsp}{\let\IA@embedEPS@save\embedEPS
     \let\embedEPS\IA@embedEPS}{\let\embedEPS\IA@embedEPS@null}%
 }{\global\@bEmbedfalse
+  \g@addto@macro\IA@Icons{\end{sortedlist}}
+  \ifpdfmarkup\else\expandafter\IA@Icons\fi
+  \ifluatex
+    \ifx\IA@Icons\@empty\else
+      \pdfextension names{/AP <</Names[\the\IA@IconsAlpha]>>}\fi
+  \else\ifpdf
+      \ifx\IA@Icons\@empty\else
+        \immediate\pdfnames{/AP <</Names[\the\IA@IconsAlpha]>>}\fi
+  \else\ifxetex
+      \ifx\IA@Icons\@empty\else
+        \immediate\@pdfm@mark{obj @iconnames %
+          << /Names [\the\IA@IconsAlpha] >> }%
+        \@pdfm@mark{put @names %
+          << /AP @iconnames >> }\fi
+  \fi\fi\fi
   \gdef\IA@EndEmbedding{\IA@EndEmbedding@aebpro
   \IA@CreateImage@xsp}\aftergroup\IA@EndEmbedding
 }
@@ -77,6 +117,7 @@
 \let\IA@embedEPS@null\IA@embedIcon@null
 \@ifundefined{aeb@image@cnt}{\def\aeb@image@cnt{0}}{}
 \ifluatex
+\protected\def\pdfnames{\pdfextension names }
 \newcommand{\IA@embedIcon}[2][]{\begingroup
   \setkeys*{IAKVfamily}{#1}%
   \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
@@ -86,7 +127,12 @@
   \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
   \immediate\saveboxresource\@tempboxa
   \x@namedef{\IAKVfamily@name}
-    {\the\lastsavedboxresourceindex}\endgroup}
+    {\the\lastsavedboxresourceindex}%
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else\ifpdf
 \newcommand{\IA@embedIcon}[2][]{\begingroup
   \setkeys*{IAKVfamily}{#1}%
@@ -96,8 +142,12 @@
   \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
   \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
   \immediate\pdfxform\@tempboxa
-  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}\endgroup
-}
+  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}%
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else\ifxetex
 \newcommand{\IA@embedIcon}[2][]{\begingroup
   \setkeys*{IAKVfamily}{#1}%
@@ -112,8 +162,12 @@
     height \the\ht\@tempboxa \space}%
   \@pdfm@mark{image width \the\wd\@tempboxa \space
     height \the\ht\@tempboxa \space (#2)}%
-  \@pdfm@mark{exobj}\endgroup
-}
+  \@pdfm@mark{exobj}%
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else
 \@ifpackageloaded{aeb_pro}{%
 \newcommand{\IA@embedIcon}[2][1]{\begingroup
@@ -121,7 +175,7 @@
 \def\IA@EndEmbedding@aebpro{\@bEmbedfalse\begingroup
   \IfFileExists{\jobname-exec.cut}{}
   {\immediate\openout\@auxout \jobname-exec.cut
-  \immediate\write1 {\string\begin{execJS}{IAexec}^^J%
+  \immediate\write\@auxout{\string\begin{execJS}{IAexec}^^J%
   \string\insertPreDocAssembly^^J%
   \string\end{execJS}}}%
   \InputIfFileExists{\jobname-exec.cut}{}{}%
@@ -145,17 +199,24 @@
   \toks@=\expandafter{\@tmpexp}%
   \edef\@tmpexp{\x\g@addto@macro\x
     \IA@CreateImage@xsp{\the\toks@}}\@tmpexp
+  \edef\y{\x\g@addto@macro\x
+    \IA@Icons@pdfmark@Names{,"\IAKVfamily@name"}}\y
+  \edef\y{\x\g@addto@macro\x
+    \IA@Icons@pdfmark{{\IAKVfamily@name}}}\y
   \endgroup
 }
 \def\IA@WarningMsgStr{%
-    A pdfmark driver used - dvips(one),\MessageBreak
+    A pdfmark driver used - dvips,\MessageBreak
     something's not right however:
     \if@EmbedIconUsed
-      \@ifpackageloaded{aeb_pro}{}{\MessageBreak Use of \string\embedIcon\space
-        requires the\MessageBreak aeb_pro package, or possibly use\MessageBreak
+      \@ifpackageloaded{aeb_pro}{}{\MessageBreak
+        Use of \string\embedIcon\space
+        requires the\MessageBreak aeb_pro package,
+        or possibly use\MessageBreak
         a non-pdfmark driver}\fi
   \if@EmbedEPSUsed
-    \@ifpackageloaded{graphicxsp}{}{\MessageBreak\string\embedEPS\space
+    \@ifpackageloaded{graphicxsp}{}{\MessageBreak
+      \string\embedEPS\space
       requires the graphicxsp package}\fi
   }
 \def\IA@WarningMsg{\PackageWarningNoLine{icon-appr}{\IA@WarningMsgStr}}
@@ -173,6 +234,25 @@
       not allowed\MessageBreak
       with \ifluatex lualatex\else\ifpdf pdflatex\else xetex\fi\fi}
     \fi}%
+\fi
+\ifpdfmarkup
+\def\IA@makeHiddenIconFlds{%\texttt{\IA@Icons@pdfmark}\previewOn
+  \edef\x{\noexpand\@tfor\noexpand\iName:=\IA@Icons@pdfmark}\x\do{%
+   \smash{\rlap{\pushButton[\BC{}\BG{}\F\FHidden\TP{1}\S{S}
+    \I{\csOf{\iName}}]{IAhidden.\iName}{0bp}{0bp}}}%
+  }%
+}
+\AtBeginDocument{\IA@makeHiddenIconFlds} % kaf
+\begin{insDLJS}{aicons}{icon-appr: Add icons to Catalog > Names > AP}
+var aIconNames= new Array(\IA@Icons@pdfmark@Names);
+for (i=0; i< aIconNames.length; i++) {
+  var f=this.getField("IAhidden."+aIconNames[i]);
+  if (f!=null) {
+    try{ this.addIcon(aIconNames[i],f.buttonGetIcon());
+    this.removeField("IAhidden."+aIconNames[i]); }catch(e){};
+  }
+}
+\end{insDLJS}
 \fi
 \endinput
 %%

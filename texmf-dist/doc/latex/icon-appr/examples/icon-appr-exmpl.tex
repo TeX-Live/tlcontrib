@@ -1,12 +1,18 @@
+% compile with pdflatex, lualatex, or xelatex
 \documentclass{article}
-\usepackage[designv]{web}
-\usepackage{icon-appr}\previewOff % change to \previewOn to see the positions of other form fields within your PDF viewer (such as SumatraPDF)
+%\usepackage[designv]{web}
+\usepackage[%
+    web={designi},
+    useacrobat
+]{aeb_pro}
+\usepackage{icon-appr}[2020/06/05]
 \usepackage{hologo}
 
-\usepackage[active]{srcltx}
+% uncomment next line to see the positions of other form fields within your PDF viewer (such as SumatraPDF)
+%\previewOn\pmpvOn 
 
-\title{Creating icon appearances for form buttons\texorpdfstring{\\}{}
-  using \textsf{pdflatex}, \textsf{lualatex}, and \textsf{xelatex}}
+\title{Creating icon appearances for form buttons using\texorpdfstring{\\}{}
+  \textsf{pdflatex}, \textsf{lualatex}, and \textsf{xelatex}}
 \author{D. P. Story}
 \university{Acro\TeX.Net}
 \email{dpstory@acrotex.net}
@@ -75,20 +81,55 @@ however.\vcgBdry[6pt]
 Checkbox:
 \checkBox[\BC{}\BG{}
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
-    \AP{\N{\On{Man}{\mani}\Off{\girl}} }
+    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
     ]{myCkBx}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
 
 Radio Button Fields: \radioButton[\BC{}\BG{}
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
-    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
-    ]{myRadBtn}{22bp}{22bp}{Man}\quad \radioButton[\BC{}\BG{}
+    \AP{\N{\On{Man1}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man1}\quad \radioButton[\BC{}\BG{}
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
-    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
-    ]{myRadBtn}{22bp}{22bp}{Man}\quad\radioButton[\BC{}\BG{}
+    \AP{\N{\On{Man2}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man2}\quad\radioButton[\BC{}\BG{}
     \V{Off}\DV{Off}\AS{Off}\H{N}\autoCenter{y}
-    \AP{\N{\On{Man}{\mani}\Off{\girl}}}
-    ]{myRadBtn}{22bp}{22bp}{Man}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
+    \AP{\N{\On{Man3}{\mani}\Off{\girl}}}
+    ]{myRadBtn}{22bp}{22bp}{Man3}\quad(Girl is `off', Man is `on')\vcgBdry[6pt]
 
 \pushButton[\CA{Reset}\A{\JS{this.resetForm();}}]{reset}{}{11bp}\vcgBdry[6pt]
 
-\end{document}
+\newpage
+
+\section{Icons in this document}
+
+Use the button below to cycle through all icons in this document.
+
+\begin{defineJS}{\cycleJS}
+if (typeof indexIcon == "undefined") var indexIcon=0;
+var oIconName=this.icons[indexIcon].name;
+var f=this.getField("iconContainer");
+var oIcon=this.getIcon(oIconName);
+f.buttonPosition=position.iconTextV;
+f.buttonSetIcon(oIcon);
+f.buttonSetCaption(oIconName);
+indexIcon = (indexIcon+1) \% (this.icons.length);
+\end{defineJS}
+% define a clear button feature, it clears the button iconContainer
+% so it no longer displays an icon; pressing the Cycle button resumes
+% the display as before.
+\begin{defineJS}{\clearJS}
+f=this.getField("iconContainer")
+// save
+var sv=f.buttonPosition;
+var cptn=f.buttonGetCaption();
+// clear
+f.buttonPosition=position.textOnly;
+f.buttonSetCaption("");
+\end{defineJS}
+
+\begin{center}
+\pushButton[\BG{}\TP{2}\S{S}]{iconContainer}{100bp}{100bp}\vcgBdry[6bp]
+\pushButton[\CA{Cycle}\AAmouseup{\cycleJS}]{cycleBtn}{}{11bp}\cgBdry[3bp]
+\pushButton[\CA{Clear}\AAmouseup{\clearJS}]{clearBtn}{}{11bp}
+\end{center}
+
+\end{document} 

@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% icon-appr.sty package,                                %%
-%% Copyright (C) 2018  D. P. Story                       %%
+%% Copyright (C) 2018--2020                              %%
 %% dpstory@acrotex.net                                   %%
 %%                                                       %%
 %% This program can redistributed and/or modified under  %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{icon-appr}
-%<package> [2018/11/23 v1.0 Provides icon appearances for button fields (dps)]
+%<package> [2020/06/05 v1.2 Provides icon appearances for button fields (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -71,6 +71,11 @@
 \RequirePackage{ifluatex}
 \RequirePackage{eforms}[2018/11/10]
 \RequirePackage{graphicx}
+\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
+\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\ifpdfmarkup\else
+\def\ReqPkg{\RequirePackage{datatool}}\expandafter
+\ReqPkg\fi
 %    \end{macrocode}
 %    \section{Introduction}
 %    The \cs{special}s and primitives of \app{pdflatex}, \app{lualatex}, and \app{xelatex} are used to provide support for inserting
@@ -81,6 +86,38 @@
 %    be the primary PDF viewer.\footnote{This means the newly created PDF must be opened with \app{Acrobat} and saved before
 %    the file is ready for general use.}
 %    \section{Utility commands}
+%    \subsection{Macros based on the \textsf{datatool} package}
+%    This version (2020/06/05 v1.2) of \pkg{icon-appr} attempts create the \textsf{\textbf{AP}}
+%    in the \textsf{\textbf{Names}} dictionary of the PDF catalog. A problem arose when I read from the PDF specification
+%    that the entries must be listed \emph{alphabetically}. After a quick search of the internet
+%    for {\LaTeX} packages that can alphabetize a list, came across a
+%    \href{https://tex.stackexchange.com/questions/121489/alphabetically-display-the-items-in-itemize}{tex.stackexchange.com} page,
+%    which solved the problem for me. In the lines below, the code from that page is modified to do the task I need it to do.
+%    \begin{macrocode}
+\newtoks\IA@IconsAlpha \IA@IconsAlpha={}
+\let\IA@Icons\@empty
+\let\IA@Icons@pdfmark\@empty
+\let\IA@Icons@pdfmark@Names\@gobble
+\newcommand{\sortitem}[2][\relax]{%
+  \DTLnewrow{list}% Create a new entry
+  \ifx#1\relax
+    \DTLnewdbentry{list}{sortlabel}{#2}%
+  \else
+    \DTLnewdbentry{list}{sortlabel}{#1}%
+  \fi%
+  \DTLnewdbentry{list}{description}{#2}%
+}
+\newenvironment{sortedlist}{%
+  \DTLifdbexists{list}{\DTLcleardb{list}}{\DTLnewdb{list}}%
+}{%
+  \DTLsort{sortlabel}{list}% Sort list
+  \DTLforeach*{list}{\theDesc=description}{\theDesc}%
+}
+\def\IA@sortitem#1{\sortitem[#1]{\IA@sortitemArgii{#1}}}
+\def\IA@sortitemArgii#1{\edef\z{\global
+  \IA@IconsAlpha={\the\IA@IconsAlpha (#1) \eq@relRef{\csOf{#1}}}}\z}
+%    \end{macrocode}
+%   \subsection{Other preliminaries}
 %    \begin{macrocode}
 \def\x@namedef#1{\expandafter\xdef\csname #1\endcsname}
 \def\heightOf#1{\@nameuse{#1heightOf}}
@@ -89,12 +126,10 @@
 \newif\if@EmbedIconUsed \@EmbedIconUsedfalse
 \newif\if@EmbedEPSUsed \@EmbedEPSUsedfalse
 %    \end{macrocode}
-%    \leavevmode\DescribeMacro\csOf\hskip-\marginparsep\darg{\cs{\ameta{name}}}
+%    \leavevmode\DescribeMacro\csOf\hskip-\marginparsep\darg{\ameta{name}}
 %      Use \cs{csOf} to expand a control name.
 %    \begin{macrocode}
 \@ifundefined{csOf}{\let\csOf\@nameuse}{}
-\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
 \let\IA@CreateImage@xsp\@empty
 \let\IA@EndEmbedding@aebpro\relax
 %    \end{macrocode}
@@ -118,6 +153,47 @@
   \@ifpackageloaded{graphicxsp}{\let\IA@embedEPS@save\embedEPS
     \let\embedEPS\IA@embedEPS}{\let\embedEPS\IA@embedEPS@null}%
 }{\global\@bEmbedfalse
+%    \end{macrocode}
+%     (2020/06/05) In this, the \cs{end\darg{embedding}} part of the environment,
+%     one or more \cs{embedIcon} commands have been inserted in the
+%     \cs{begin\darg{embedding}} part of the environment. A list \cs{IA@Icons} is
+%     built, beginning with \cs{begin\darg{sortedlist}}. Here, we close
+%     that environment. Then, if a \app{dvips\texttt{->}distiller} workflow \emph{is not being
+%     used}, we close the \env{sortedlist} environment, then expand \cs{IA@Icons},
+%     which should alphabetize the icon names, and leave results in the token
+%     register \cs{IA@IconsAlpha}, which we insert into the \textsf{\textbf{AP}} dictionary
+%     into the \textsf{\textbf{Names}} dictionary of the PDF catalog. The results looks
+%     like this (taken from one of my test files):
+%\begin{verbatim}
+%   <</AP<</Names[(girl)27 0 R(mani)36 0 R(scot)41 0 R]>> >>
+%\end{verbatim}
+%Note the entries of the \textsf{\textbf{Names}} dictionary of the
+%\textsf{\textbf{AP}} dictionary are listed in alphabetical order along with
+%their respective indirect reference.
+%    \begin{macrocode}
+  \g@addto@macro\IA@Icons{\end{sortedlist}}
+%    \end{macrocode}
+%     We expand \cs{IA@Icons} only if not a pdfmark workflow.
+%    \begin{macrocode}
+  \ifpdfmarkup\else\expandafter\IA@Icons\fi
+%    \end{macrocode}
+%     Write the \textbf{\sffamily AP} dictionary to the \textbf{\sffamily Names}
+%     dictionary for each driver.
+%    \changes{v1.1}{2020/06/04}{Entry in the icons array}
+%    \begin{macrocode}
+  \ifluatex
+    \ifx\IA@Icons\@empty\else
+      \pdfextension names{/AP <</Names[\the\IA@IconsAlpha]>>}\fi
+  \else\ifpdf
+      \ifx\IA@Icons\@empty\else
+        \immediate\pdfnames{/AP <</Names[\the\IA@IconsAlpha]>>}\fi
+  \else\ifxetex
+      \ifx\IA@Icons\@empty\else
+        \immediate\@pdfm@mark{obj @iconnames %
+          << /Names [\the\IA@IconsAlpha] >> }%
+        \@pdfm@mark{put @names %
+          << /AP @iconnames >> }\fi
+  \fi\fi\fi
   \gdef\IA@EndEmbedding{\IA@EndEmbedding@aebpro
   \IA@CreateImage@xsp}\aftergroup\IA@EndEmbedding
 }
@@ -149,7 +225,7 @@
 %\cs{eEmbedding} command pair. If yes, we fork off to any of five versions of \cs{embedIcon},
 %internally named \cs{IA@embedIcon}:
 % (1) one for \app{lualatex}; (2) one for \app{pdftex}; (3) one for \app{xelatex};
-% (4) one for \app{dvips}/\allowbreak\app{dvipsone} with \pkg{aeb\_pro}; and (5)
+% (4) one for \app{dvips} with \pkg{aeb\_pro}; and (5)
 % one for the otherwise case, it does nothing but does avoids stopping the tex engine.
 %    \begin{macrocode}
 \newcommand{\embedIcon}{\global\@EmbedIconUsedtrue
@@ -185,6 +261,7 @@
 %    \textbf{The \app{lualatex} driver.} The two \app{lualatex} commands \cs{saveboxresource} and
 %    \cs{lastsavedboxresourceindex} are used.
 %    \begin{macrocode}
+\protected\def\pdfnames{\pdfextension names }
 \newcommand{\IA@embedIcon}[2][]{\begingroup
   \setkeys*{IAKVfamily}{#1}%
   \ifx\IAKVfamily@name\@empty\IA@handle@name@empty{#2}\fi
@@ -194,7 +271,15 @@
   \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
   \immediate\saveboxresource\@tempboxa
   \x@namedef{\IAKVfamily@name}
-    {\the\lastsavedboxresourceindex}\endgroup}
+    {\the\lastsavedboxresourceindex}%
+%    \end{macrocode}
+%     (2020/06/05) Entry in the icons array
+%    \begin{macrocode}
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else\ifpdf
 %    \end{macrocode}
 %    \textbf{The \app{pdflatex} driver.} The \app{pdflatex} commands \cs{pdfxform} and
@@ -208,8 +293,15 @@
   \x@namedef{\IAKVfamily@name widthOf}{\the\wd\@tempboxa}%
   \x@namedef{\IAKVfamily@name heightOf}{\the\ht\@tempboxa}%
   \immediate\pdfxform\@tempboxa
-  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}\endgroup
-}
+  \x@namedef{\IAKVfamily@name}{\the\pdflastxform}%
+%    \end{macrocode}
+%     (2020/06/05) Entry in the icons array
+%    \begin{macrocode}
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else\ifxetex
 %    \end{macrocode}
 %    \textbf{The \app{xelatex} driver.} The \app{xelatex} \cs{special}s \texttt{bxobj},
@@ -230,8 +322,15 @@
     height \the\ht\@tempboxa \space}%
   \@pdfm@mark{image width \the\wd\@tempboxa \space
     height \the\ht\@tempboxa \space (#2)}%
-  \@pdfm@mark{exobj}\endgroup
-}
+  \@pdfm@mark{exobj}%
+%    \end{macrocode}
+%    (2020/06/05) Entry in the icons array
+%    \begin{macrocode}
+  \ifx\IA@Icons\@empty
+    \g@addto@macro\IA@Icons{\begin{sortedlist}}\fi
+  \protected@edef\x{\noexpand\g@addto@macro\noexpand
+    \IA@Icons{\protect\IA@sortitem{\IAKVfamily@name}}}\x
+\endgroup}
 \else
 %    \end{macrocode}
 %    If not any of the previously discussed drivers, it must a \textsf{\textbf{pdfmark}}-type driver.
@@ -253,7 +352,7 @@
 \def\IA@EndEmbedding@aebpro{\@bEmbedfalse\begingroup
   \IfFileExists{\jobname-exec.cut}{}
   {\immediate\openout\@auxout \jobname-exec.cut
-  \immediate\write1 {\string\begin{execJS}{IAexec}^^J%
+  \immediate\write\@auxout{\string\begin{execJS}{IAexec}^^J%
   \string\insertPreDocAssembly^^J%
   \string\end{execJS}}}%
   \InputIfFileExists{\jobname-exec.cut}{}{}%
@@ -277,7 +376,6 @@
   \begingroup\let\x\noexpand
   \setkeys*{IAKVfamily}{#1}%\XKV@rm has remaining keys
   \ifx\IAKVfamily@name\@empty\IA@handle@name@empty\fi
-%  \x@namedef{\IAKVfamily@name}{\IAKVfamily@name}%
   \edef\@tmpexp{\x
     \IA@embedEPS@save[\XKV@rm]{embed\IAKVfamily@name}{#2}}\@tmpexp
   \edef\@tmpexp{\x\begin{createImage}{\x
@@ -289,22 +387,34 @@
   \toks@=\expandafter{\@tmpexp}%
   \edef\@tmpexp{\x\g@addto@macro\x
     \IA@CreateImage@xsp{\the\toks@}}\@tmpexp
+%    \end{macrocode}
+%     Create a list (\cs{IA@Icons@pdfmark@Names}) a list of all the names,
+%     this is used to create an array of icon names (see the end of the file).
+%    Also created is a token list of the icon names, this is employed
+%    in the definition of \cs{IA@makeHiddenIconFlds} at the end of this file.
+%    \begin{macrocode}
+  \edef\y{\x\g@addto@macro\x
+    \IA@Icons@pdfmark@Names{,"\IAKVfamily@name"}}\y
+  \edef\y{\x\g@addto@macro\x
+    \IA@Icons@pdfmark{{\IAKVfamily@name}}}\y
   \endgroup
 }
 %    \end{macrocode}
 %    \end{macro}
+%    Some warning messages when things go wrong.
 %    \begin{macrocode}
 \def\IA@WarningMsgStr{%
-%  This package only supports pdflatex, lualatex,\MessageBreak
-%    xelatex, and dvips/dvipsone.\MessageBreak
-    A pdfmark driver used - dvips(one),\MessageBreak
+    A pdfmark driver used - dvips,\MessageBreak
     something's not right however:
     \if@EmbedIconUsed
-      \@ifpackageloaded{aeb_pro}{}{\MessageBreak Use of \string\embedIcon\space
-        requires the\MessageBreak aeb_pro package, or possibly use\MessageBreak
+      \@ifpackageloaded{aeb_pro}{}{\MessageBreak
+        Use of \string\embedIcon\space
+        requires the\MessageBreak aeb_pro package,
+        or possibly use\MessageBreak
         a non-pdfmark driver}\fi
   \if@EmbedEPSUsed
-    \@ifpackageloaded{graphicxsp}{}{\MessageBreak\string\embedEPS\space
+    \@ifpackageloaded{graphicxsp}{}{\MessageBreak
+      \string\embedEPS\space
       requires the graphicxsp package}\fi
   }
 \def\IA@WarningMsg{\PackageWarningNoLine{icon-appr}{\IA@WarningMsgStr}}
@@ -325,7 +435,42 @@
 \fi
 %    \end{macrocode}
 %    \end{macro}
+%    \leavevmode\DescribeMacro\IA@makeHiddenIconFlds
+%    There is a final case of the  workflow, when
+%    \cs{embedEPS} is used instead of \cs{embedIcon}. For \textbf{\textsf{pdfmark}},
+%    the user has \app{Acrobat}, I'm assuming, and is not using \app{ps2pdf} without
+%    \app{Acrobat}. Here, we create a series of hidden \cs{pushButtons} fields
+%    each referencing one of the EPS embedded with \cs{embedEPS}; the creation
+%    of these fields is encapsulated into the \cs{IA@makeHiddenIconFlds}.
 %    \begin{macrocode}
+\ifpdfmarkup
+\def\IA@makeHiddenIconFlds{%\texttt{\IA@Icons@pdfmark}\previewOn
+  \edef\x{\noexpand\@tfor\noexpand\iName:=\IA@Icons@pdfmark}\x\do{%
+   \smash{\rlap{\pushButton[\BC{}\BG{}\F\FHidden\TP{1}\S{S}
+    \I{\csOf{\iName}}]{IAhidden.\iName}{0bp}{0bp}}}%
+  }%
+}
+%    \end{macrocode}
+%    Insert \cs{IA@makdHiddenIconFlds} at the beginning of the document.
+%    \begin{macrocode}
+\AtBeginDocument{\IA@makeHiddenIconFlds} % kaf
+%    \end{macrocode}
+%    Finally, a document JavaScript is inserted into the document that
+%    gets each of the fields created by \cs{IA@makeHiddenIconFlds},
+%    and uses \texttt{\meta{Doc}.addIcon()} and \texttt{\meta{Field}.buttonGetIcon()}
+%    to ``register'' these icons. We then delete the fields after we are finished with them.
+%    \begin{macrocode}
+\begin{insDLJS}{aicons}{icon-appr: Add icons to Catalog > Names > AP}
+var aIconNames= new Array(\IA@Icons@pdfmark@Names);
+for (i=0; i< aIconNames.length; i++) {
+  var f=this.getField("IAhidden."+aIconNames[i]);
+  if (f!=null) {
+    try{ this.addIcon(aIconNames[i],f.buttonGetIcon());
+    this.removeField("IAhidden."+aIconNames[i]); }catch(e){};
+  }
+}
+\end{insDLJS}
+\fi
 %</package>
 %    \end{macrocode}
 %  \Finale

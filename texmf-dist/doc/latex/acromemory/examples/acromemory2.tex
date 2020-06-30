@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[web=designv,useacrobat]{aeb_pro}
+%\usepackage[designv]{web}
+\usepackage[includehelp]{acromemory}
+
+\title{AcroMemory\texorpdfstring{\\}{: }The Memory Game}
+\author{D. P. Story}
+\subject{Sample file}
+\keywords{Adobe Acrobat, LaTeX, PDF, Memory, Game}
+
+\email{dpstory@acrotex.net}
+\version{1.0}
+\copyrightyears{\the\year}
+
+\definecolor{bg}{rgb}{0.89,0.9,0.9}
+\optionalPageMatter{%
+    \par\minimumskip\vspace{\stretch{1}}
+    \begin{center}
+    \fcolorbox{blue}{bg}{%
+    \begin{minipage}{.67\linewidth}
+    \noindent\textcolor{red}{\textbf{Instructions:}}
+    Match the randomized images on the right, to the non-randomized
+    images on the left. Passing is having the patience to complete
+    the memory game.
+    \end{minipage}}
+    \end{center}
+}
+
+\begin{embedding}
+\isPackage
+\amEmbedTiles{duck}{20}{duckie/duckie}
+\end{embedding}
+
+\parskip6pt
+\parindent0pt
+\thispagestyle{empty}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\bfseries  \Large\color{blue} Feed the Duckie!\\[1ex]
+\large D. P. Story
+\end{center}
+
+\begin{center}
+
+\insertTilesL{duck}{2in}{4}{5}\qquad
+\insertTilesR{duck}{2in}{4}{5}
+
+\end{center}
+
+
+\bigskip
+\begin{center}
+
+\tryItAgain{}{11bp}
+
+\helpImage[\textSize{8}]{1in}\cgBdry[1em]
+\messageBox{2in}{25pt}\cgBdry[1em]
+\rolloverHelpButton{}{12pt}
+
+\end{center}
+
+\end{document}

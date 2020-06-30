@@ -1,0 +1,71 @@
+% This files needs to be compiled with lualatex or xelatex. In the case of
+% MiniPics-LilDino, a type1 font, xelatex works, but lualatex does not.
+\documentclass{article}
+\usepackage{multido}
+\usepackage{shellesc}
+
+\newcommand\amBaseName{myDinos}
+
+\pagestyle{empty}
+\parindent0pt
+
+\newcount\myCnt \myCnt=97
+\def\thiscolor{red}
+
+\begin{document}
+
+\newwrite \wrtfiles
+\long\def\IR#1{\immediate\write\wrtfiles{#1}}
+
+% Create \amBaseName_01.tex, \amBaseName_02.tex, etc
+\multido{\i=1+1}{10}{%
+\ifnum\i<10\relax\edef\x{0\i}\else\edef\x{\i}\fi
+\immediate\openout\wrtfiles \amBaseName_\x.tex
+\ifodd\i\string\relax
+  \gdef\thiscolor{red}\else
+  \gdef\thiscolor{blue}\fi
+\IR{%
+\string\documentclass{article}^^J%
+\string\usepackage{web}^^J%
+\string\usepackage{multido}^^J%
+\string\usepackage{fontspec}^^J%
+\string\usepackage{anyfontsize}^^J%
+\string\setmainfont[Mapping=tex-text]{MiniPics-LilDinos}^^J%
+\string\let\string\WriteBookmarks\string\relax^^J%
+\string\margins{0pt}{0pt}{0pt}{0pt}^^J%
+\string\screensize{2in}{2in}^^J%
+\string\pagestyle{empty}^^J%
+\string\parindent0pt^^J%
+\string\begin{document}^^J%
+  \string\fontsize{72}{72}\string\selectfont^^J%
+  \string\begin{minipage}[c][2in][c]{2in}^^J%
+  \string\begin{center}^^J%
+  \string\textcolor{\thiscolor}{\string\char\the\myCnt}^^J%
+  \string\end{center}^^J%
+  \string\end{minipage}^^J%
+\string\end{document}
+}
+    \immediate\closeout\wrtfiles
+    \global\advance\myCnt1\relax
+}
+
+% Now compile each of this TEX file using xelatex. Use
+% xelatex here because it successfully uses the MiniPics-LilDinos
+% font. For a different font, perhaps lualatex can be use.
+\multido{\i=1+1}{10}{%
+  \ifnum\i<10\relax\edef\x{0\i}\else\edef\x{\i}\fi
+  \ShellEscape{xelatex \amBaseName_\x.tex}
+}
+
+% Copy \amBaseName_01.pdf to \amBaseName.pdf, it will be use
+% to measure the size of a typical tile.
+\ShellEscape{copy \amBaseName_01.pdf \amBaseName.pdf}
+
+% Convert \amBaseName_01.pdf to \amBaseName.eps, it will be used
+% to measure the size of a typical tile for the dvips -> distiller workflow.
+\ShellEscape{pdftops -eps \amBaseName_01.pdf \amBaseName.eps}
+
+See separate files just created.
+
+\end{document}
+

@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage{web}
+\usepackage{multido}
+\usepackage{fontspec}
+\usepackage{anyfontsize}
+\setmainfont[Mapping=tex-text]{MiniPics-LilDinos}
+
+
+\margins{0pt}{0pt}{0pt}{0pt} % left,right,top, bottom
+\screensize{2in}{2in} % height, width
+
+\pagestyle{empty}
+\parindent0pt
+
+\newcount\myCnt \myCnt=97
+\def\thiscolor{red}
+
+\begin{document}
+
+\fontsize{72}{72}\selectfont
+
+\multido{\i=1+1}{10}{%
+    \begin{minipage}[c][2in][c]{2in}
+    \ifodd\i\gdef\thiscolor{red}\else\gdef\thiscolor{blue}\fi
+    \begin{center}
+    \textcolor{\thiscolor}{\char\the\myCnt}%
+    \end{center}
+    \end{minipage}
+    \global\advance\myCnt1\relax
+}
+\end{document}

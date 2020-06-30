@@ -1,0 +1,483 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,latextoc,pro},
+    eforms,
+%    linktoattachments,
+    aebxmp
+]{aeb_pro}
+\usepackage{pifont}
+\usepackage{graphicx}
+%\usepackage{aeb_mlink}
+%\usepackage{myriadpro}
+%\usepackage[usecmtt]{myriadpro}
+\usepackage[altbullet]{lucidbry}
+\usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\edef\amtIndent{\the\parindent}
+
+%\usepackage{myriadpro}
+%\usepackage{acaslonpro}
+%\usepackage{ajensonpro}
+%\usepackage{minionpro}
+%\usepackage{newsgothicstd}
+%\usepackage{lucidbry}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \textsf{acromemory} Package},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject=Documentation for the acromemory package,
+    talksite={\url{www.acrotex.net}},
+    version={2.0, 2020/06/23},
+    Keywords={LaTeX, form field, memory puzzles, AcroTeX},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) 2006--\the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\nhfootnote#1{\begin{NoHyper}\footnote{#1}\end{NoHyper}}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The acromemory Package";
+var manualfilename="Manual_BG_Print_acromemory.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+\begin{document}
+
+%\begingroup
+
+%\linewidth=\fullscreenwidth
+%\advance\linewidth\oddsidemargin
+%\setlength{\oddsidemargin}{0pt}
+\maketitle
+
+%\endgroup
+
+\changelinkcolorto{black}
+
+\tableofcontents
+
+\changelinkcolorto{webgreen}
+
+
+\section{Introduction}
+
+\pkg{AcroMemory} (\pkg{acromemory}) is a memory game in which you find the
+matching tiles. There are two versions---available as options of
+this package---for your enjoyment, \texttt{acromemory1} and
+\texttt{acromemory2} (the default). Only one option is allowed to be taken for any document,
+only one memory puzzle per document is supported. (In theory, you can have multiple instances of the same
+memory puzzle, but I don't really see a need for that.)
+\begin{itemize}
+   \item \texttt{acromemory1}: Here you have a single game board, a
+        rectangular region divided by rows and columns. The total number
+        of tiles \emph{must} be even, each tile \emph{must} have a matching twin.
+        The game begins with all the tiles hidden. The user clicks a
+        tile, then another. If the tiles do not match, they become
+        hidden again (you did remember the position of those tiles,
+        didn't you?); otherwise, they remain visible and are now
+        read-only. The game is complete when the user, with a lot of time
+        on his/her hands, matches all tiles. There is a running
+        tabulation kept on the number of tries.  There is also a button
+        which resets the game and randomizes the tiles.
+
+  \item \texttt{acromemory2}: For this game you have two identical
+        rectangular images subdivided into tiles (or slices), which
+        are arrayed in rows and columns. The tiles for one of the
+        two images is randomly re-arranged. The object of the
+        game is to find all the matching tiles by choosing a tile
+        from one image and a tile from the other image. As in the
+        first case, if the selected tiles do not match, they are
+        hidden after a short interval of time (you did remember the
+        position of those tiles, didn't you?); otherwise, they
+        remain visible and are now read-only. The game is over when
+        all tiles are matched; when this occurs, end-of-game special
+        effects occur that will dazzle the senses. There is an
+        option to view a small image to help you locate the matching
+        tiles on the non-randomized; useful if the image is complex.
+\end{itemize}
+\paragraph*{The demo files.} These are \texttt{acromemory1.tex} and
+\texttt{acromemory2.tex}. These files show how to lay out the
+various elements of this package.
+
+\paragraph*{Supported workflows.} This new version of \pkg{acromemory} is a complete
+re-write of the old version. All the common workflows are supported: \app{pdflatex},
+\app{lualatex}, \app{xelatex}, and \app{dvips -> distiller}.
+
+\section{Package Options}
+
+There are a few options of this package:
+\begin{itemize}
+    \item \texttt{acromemory1} and \texttt{acromemory2}: As described
+        earlier. The \texttt{acromemory2} option is the default.
+
+    \item \texttt{draft}: The \opt{draft} option is passed to the
+        \pkg{graphicx} package. Useful when setting up the layout of your
+        document and when composing the document. Works for \app{pdflatex}
+        and \app{lualatex} PDF creators.
+
+    \item \texttt{includehelp}: When building a file with the acromemory2
+        option, you can also include a help image, a small picture of the
+        game board to help the user to match the randomized tiles with the
+        ones on the non-randomized game board. Useful if the image is very
+        complex. The demo file \texttt{acromemory2.tex} contains the
+        necessary code for producing the help feature, the commands only
+        create the help feature if the \opt{includehelp} option is taken.
+\end{itemize}
+
+\section{Commands of the Package}
+
+We describe the commands of this package as well as methodology for creating
+tiled graphics for use by this package.
+
+\subsection{Commands for the \textsf{acromemory1} option}
+
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.5\linewidth]{graphics/am1}}
+\caption{Partially worked \textsf{acromemory1} puzzle}\label{fig:am1}
+\end{figure}
+
+\paragraph*{The preamble.}
+For the \opt{acromemory1} option, the preamble begins with some variation of
+the following:
+\bVerb\def\1{\llap{\ding{192}\enspace}}\def\2{\llap{\ding{193}\enspace}}
+\begin{minipage}[t]{.5\linewidth}
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+!normalfont!bfseries(Using the !pkg(web) package)
+\documentclass{article}
+!1\usepackage[%
+!1  web=designv,useacrobat
+!1]{aeb_pro}
+!2%\usepackage[designv]{web}
+\usepackage[acromemory1]{acromemory}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}[t]{.5\linewidth}
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+!normalfont!bfseries(Without using the !pkg(web) package)
+\documentclass{article}
+\usepackage[acromemory1]{acromemory}
+\end{Verbatim}
+\end{minipage}
+\eVerb The lines \ding{192} are optional, the advantage of using the
+\pkg{aeb\_pro} package is that it enables the example files to be compiled
+\emph{using all workflows}: \app{pdflatex}, \app{lualatex}, \app{xelatex},
+and \app{dvips\,->\,distiller}. The alternative is to use \ding{193}, that
+is, the \pkg{web} package with a design option, in this case \opt{designv}.
+On the right is the appropriate declarations without using \pkg{web}. All
+sample files use the \pkg{web} package.
+
+\subparagraph*{Embedding the tiles.} The next step is to embed the tiles
+using the \env{embedding} environment of the \pkg{icon-appr}
+package:\footnote{\url{https://ctan.org/pkg/icon-appr}}
+\begin{Verbatim}[fontsize=\small,xleftmargin=\amtIndent]
+\begin{embedding}
+%\isPackage
+\amEmbedTiles{dinos}{10}{dinos/mydinos}
+\end{embedding}
+\end{Verbatim}
+The \cs{isPackage} and \cs{amEmbedTiles} commands are used for embedding the
+tiles.
+\bVerb\takeMeasure{\string\amEmbedTiles\darg{\ameta{name}}\darg{\ameta{n-tiles}}\darg{\ameta{path}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\isPackage
+\amEmbedTiles{!ameta(name)}{!ameta(n-tiles)}{!ameta(path)}
+\end{dCmd}
+\eVerb were \ameta{name} is the name of the tile set; \ameta{n-tiles} is the
+number of \emph{distinct tiles}, and \ameta{path} is the path to the base name of
+the graphics. Note that for puzzles of type \opt{acromemory1}, the tiles are
+doubled to make a total of $2\times \texttt{\ameta{n-tiles}}$ tiles on the board.
+
+\subparagraph*{Comments on the tiled files required.} There are two ways the tiles
+are delivered:
+\begin{enumerate}
+  \item As a single package file, in which case the \pkg{acromemory} package
+      looks for the file \texttt{\ameta{path}\_package.pdf}. The tiles are
+      the pages of the package document. Signal to \pkg{acromemory} that the tiles
+      are packaged by including \cs{isPackage} prior to the \cs{embedTiles} command.
+      For example, from the \texttt{acromemory1.tex} demo file,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{embedding}
+\isPackage
+\amEmbedTiles{dinos}{10}{dinos/mydinos}
+\end{embedding}
+\end{Verbatim}
+    \pkg{acromemory} looks for the file \texttt{mydinos\_package.pdf} in the
+    \texttt{dinos} folder.
+
+    \textbf{Note.} This feature is only available for the \app{pdflatex}, \app{lualatex},
+    and \app{dvips\,->\,distiller} workflows.
+  \item If the files are not packaged, \pkg{acromemory} looks for the files
+    \texttt{\ameta{path}\_01.pdf}, \texttt{\ameta{path}\_02.pdf}, \dots, \texttt{\ameta{path}\_10.pdf}, \dots.
+    This method is available to all workflows, including \app{xelatex}.
+\end{enumerate}
+In addition to the tiles themselves, packaged or not, \pkg{acromemory} needs
+one or two more files. We illustrate using the dinos example. For the
+\app{dvips\,->\,distiller} workflow, \app{acromemory} looks for
+\texttt{mydinos.eps}; for all other workflows, it looks for
+\texttt{mydinos.pdf}. These files are used to measure the dimensions of a
+typical tile. The two basic files \texttt{mydinos.eps} and
+\texttt{mydinos.pdf} are just one of the tiles, perhaps it is just
+\texttt{mydinos\_01} as an EPS or PDF file.\footnote{If you never use the
+\app{dvips\,->\,distiller} workflow, EPS file is not needed.}
+
+
+\paragraph*{In the body of the document.}
+
+After the tiles have been embedded (in the preamble), we are ready to insert
+the tiles into the document with \cs{insertTiles}:
+\begin{Verbatim}[xleftmargin=\parindent]
+\insertTiles{dinos}{2in}{5}{4}
+\end{Verbatim}
+The syntax for \cs{insertTiles} is,
+\bVerb\takeMeasure{\string\insertTiles\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{n-rows}}\darg{\ameta{n-cols}}}%
+%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\insertTiles{!ameta(name)}{!ameta(width)}{!ameta(n-rows)}{!ameta(n-cols)}
+\end{dCmd}
+\eVerb where \ameta{name} matches the \ameta{name} to an earlier embedding;
+\ameta{width} is the width of your puzzle board; \ameta{n-rows} is the number
+of rows; and \ameta{n-cols} is the number of columns. Of course, $\texttt{\ameta{n-rows}}\times\texttt{\ameta{n-cols}}=2\times\texttt{\ameta{n-tiles}}$.
+
+\paragraph*{Other controls.} There a two other controls to mention.
+\bVerb\takeMeasure{\string\playItAgain[\ameta{eforms-opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}%
+%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\messageBox[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\playItAgain[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\end{dCmd}
+\eVerb \cs{messageBox} is a text field that displays various running scores; while
+\cs{playItAgain} is a push button for starting the matching game.
+
+\newtopic\noindent
+The results of all this effort are seen in \hyperref[fig:am1]{Figure~\ref*{fig:am1}},
+or by compiling, playing, and enjoying the file \texttt{acromemory1.tex}.
+
+
+\paragraph*{Creating the tiles.}
+This contents of these paragraphs can be skipped over on first reading. The
+sample file \texttt{acromemory1.tex} uses the `Mini Pics Lil Dinos' font set;
+you need not have the font set itself, the glyphs are contained in the
+mydinos support files.
+
+In this paragraph, we discuss the methodology for creating your own tile files.
+Two support files were developed to create the required files:
+\begin{itemize}
+  \item \texttt{myDinos\_package.tex} is used to create
+      \texttt{myDinos\_package.tex}, required for the \app{pdflatex},
+      \app{lualatex}, and \app{dvips\,->\,distiller} workflows. This file
+      should be studied to create your own package file with some other font
+      set.
+  \item \texttt{myDinos\_files.tex} is used to create the individual files,
+      \begin{quote}\texttt{myDinos\_01.pdf}, \texttt{myDinos\_02.pdf}, \dots,
+      \texttt{myDinos\_10.pdf}\end{quote} as well as the two additional files
+      \texttt{myDinos.pdf} and \texttt{myDinos.eps}. Again, this file should
+      be studied and modified to create these individual files for your own
+      font.
+\end{itemize}
+You need not use a font set to create the tile files, you can use a series of
+small graphics instead. We leave this as an exercise.
+
+\subsection{Commands for the \textsf{acromemory2} option}
+
+\begin{figure}[htb]\centering\fboxsep0pt
+\fbox{\includegraphics[width=.5\linewidth]{graphics/am2}}
+\caption{Partially worked \textsf{acromemory2} puzzle}\label{fig:am2}
+\end{figure}
+
+
+\noindent This option produces a two board matching game.
+\hyperref[fig:am2]{Figure~\ref*{fig:am2}} is a snapshot of the
+demo file \texttt{acromemory2.tex}.
+\paragraph*{Creating the required (tiled) graphics.} For this option you don't have to have a fancy font, any (interesting)
+picture will do. The first step is to decide how many rows and columns you
+want and then tile the image appropriately. To tile the graphic, use the
+\pkg{tile-graphic} package.\footnote{\url{https://ctan.org/pkg/tile-graphic}}
+In the \texttt{examples/duckie} folder, you will find \texttt{duckie-tg.tex},
+which was used to produce all the files needed to create the demo file
+\texttt{acromemory2.pdf}. Compile \texttt{duckie-tg.tex} using your preferred
+workflow to produce all required files.
+
+\newtopic\noindent
+Let's walk through the components of \texttt{acromemory2.tex}.
+
+\paragraph*{The preamble.}
+For the \opt{acromemory2} option, the preamble begins with some variation of
+the following:
+\bVerb\def\1{\llap{\ding{192}\enspace}}\def\2{\llap{\ding{193}\enspace}}
+\begin{minipage}[t]{.5\linewidth}
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+!normalfont!bfseries(Using the !pkg(web) package)
+\documentclass{article}
+!1\usepackage[%
+!1  web=designv,useacrobat
+!1]{aeb_pro}
+!2%\usepackage[designv]{web}
+\usepackage[includehelp]{acromemory}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}[t]{.5\linewidth}
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+!normalfont!bfseries(Without using the !pkg(web) package)
+\documentclass{article}
+\usepackage[includehelp]{acromemory}
+\end{Verbatim}
+\end{minipage}
+\eVerb The lines \ding{192} are optional, the advantage of using the
+\pkg{aeb\_pro} package is that it enables the example files to be compiled
+\emph{using all workflows}: \app{pdflatex}, \app{lualatex}, \app{xelatex},
+and \app{dvips\,->\,distiller}. The alternative is to use \ding{193}, that
+is, the \pkg{web} package with a design option, in this case \opt{designv}.
+On the right is the appropriate declarations without using \pkg{web}. All
+sample files use the \pkg{web} package. The use of the \opt{includehelp}
+option is optional.
+
+\subparagraph*{Embedding the tiles.} The next step is to embed the tiles
+using the \env{embedding} environment of the \pkg{icon-appr}
+package:\footnote{\url{https://ctan.org/pkg/icon-appr}}
+\begin{Verbatim}[fontsize=\small,xleftmargin=\amtIndent]
+\begin{embedding}
+%\isPackage
+\amEmbedTiles{duck}{20}{duckie/duckie}
+\end{embedding}
+\end{Verbatim}
+The \cs{isPackage} and \cs{amEmbedTiles} commands are used for embedding the
+tiles.
+\bVerb\takeMeasure{\string\amEmbedTiles\darg{\ameta{name}}\darg{\ameta{n-tiles}}\darg{\ameta{path}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\isPackage
+\amEmbedTiles{!ameta(name)}{!ameta(n-tiles)}{!ameta(path)}
+\end{dCmd}
+\eVerb were \ameta{name} is the name of the tile set; \ameta{n-tiles} is the
+number of \emph{tiles}, and \ameta{path} is the path to the base name of
+the graphics.
+
+In addition to the tiles themselves, packaged or not, \pkg{acromemory} needs
+one or two more files. We illustrate using the duckie example. For the
+\app{dvips\,->\,distiller} workflow, \app{acromemory} looks for
+\texttt{duckie.eps}; for all other workflows, it looks for
+\texttt{dickie.pdf}. These files are used to measure the dimensions of the
+image.\footnote{If you never use the \app{dvips\,->distiller} workflow,
+EPS file is not needed.}
+
+
+\paragraph*{In the body of the document.}
+
+After the tiles have been embedded (in the preamble), we are ready to insert
+the tiles into the document. Keep in mind, there are two puzzle boards:
+the left one which is the non-randomize tiled picture, and the one on the right
+which is the randomized tiled picture. The two commands \cs{insertTilesL} and \cs{insertTilesR}
+insert the left and right puzzle boards, respectively. For example,
+\begin{Verbatim}[xleftmargin=\parindent]
+\insertTilesL{duck}{2in}{4}{5}\qquad
+\insertTilesR{duck}{2in}{4}{5}
+\end{Verbatim}
+The syntax for \cs{insertTilesL} and \cs{insertTilesR} is,
+\bVerb\takeMeasure{\string\insertTilesL\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{n-rows}}\darg{\ameta{n-cols}}}%
+%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\insertTilesL{!ameta(name)}{!ameta(width)}{!ameta(n-rows)}{!ameta(n-cols)}
+\insertTilesR{!ameta(name)}{!ameta(width)}{!ameta(n-rows)}{!ameta(n-cols)}
+\end{dCmd}
+\eVerb where \ameta{name} matches the \ameta{name} to an earlier embedding;
+\ameta{width} is the width of your puzzle board; \ameta{n-rows} is the number
+of rows; and \ameta{n-cols} is the number of columns. Of course, $\texttt{\ameta{n-rows}}\times\texttt{\ameta{n-cols}}=\texttt{\ameta{n-tiles}}$.
+
+\paragraph*{Other controls.} There a two other controls to mention.
+\bVerb\takeMeasure{\string\rolloverHelpButton[\ameta{eforms-opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}%
+%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\tryItAgain[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\messageBox[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\helpImage[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\rolloverHelpButton[!ameta(eforms-opts)]{!ameta(wd)}{!ameta(ht)}
+\end{dCmd}
+\eVerb \cs{messageBox} is a text field that displays various running scores; while
+\cs{tryItAgain} is a push button for starting the matching game. The other two
+commands \cs{helpImage} and \cs{rolloverHelpButton} are used when the \opt{includehelp}
+option is taken. These two commands do nothing if \opt{includehelp} is not specified.
+
+\newtopic\noindent
+The results of all this effort are seen in \hyperref[fig:am2]{Figure~\ref*{fig:am2}},
+or by compiling, playing, and enjoying the file \texttt{acromemory2.tex}.
+
+
+\subsection{Commands common to both options}
+
+When the user begins to work on the puzzle(s) without first pressing the
+`\textsf{Play again}' or the `\textsf{Test your Memory}' button, an alert box
+with the one of the following messages appear, depending on whether
+\opt{acromemory1} or \opt{acromemory2} option is in force:
+\begin{Verbatim}
+\newcommand{\initFirstiMsg}{"Press the 'Play again'
+  button to initialize the puzzle"}
+\newcommand{\initFirstiiMsg}{"Press the 'Test Your Memory'
+  button to initialize the puzzle"}
+\end{Verbatim}
+`\textsf{Play again}' and `\textsf{Test your Memory}' are the default
+captions to  the \cs{playItAgain} and \cs{tryItAgain} controls. Should you change the
+caption of, for example, \cs{playItAgain}, you would then redefine \cs{initFirstiMsg}:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\playItAgain[\CA{Play!}]{}{12pt}
+\renewcommand{\initFirstiMsg}{"Press the 'Play!' button to
+  initialize the puzzle"}
+\end{Verbatim}
+Or, perhaps redefine the captions and messages for some other language.
+
+
+
+\section{Final comments}
+
+Use any of the demo files as a template to create your own memory
+game. Don't forget (use your memory?) that the \textsf{web} package
+has options to apply a background color or a graphic---this will
+jazz up your memory game.
+
+I do hope you find this game package fun, and that you will be
+creative in its use. Perhaps you can apply the techniques of this
+package to create your own game package, there are many
+possibilities.
+
+\newtopic Now, I simply must get back to my retirement! \dps
+
+
+
+\end{document}

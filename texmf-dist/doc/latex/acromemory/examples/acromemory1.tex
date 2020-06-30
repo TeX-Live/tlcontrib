@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[web=designv,useacrobat]{aeb_pro}
+%\usepackage[designv]{web}
+\usepackage[acromemory1]{acromemory}
+
+\title{AcroMemory\texorpdfstring{\\}{: }The Memory Game}
+\author{D. P. Story}
+\subject{Sample file}
+\keywords{Adobe Acrobat, LaTeX, PDF, Memory, Game}
+
+\email{dpstory@acrotex.net}
+\version{1.0}
+\copyrightyears{\the\year}
+
+\definecolor{bg}{rgb}{0.89,0.9,0.9}
+\optionalPageMatter{%
+    \par\minimumskip\vspace{\stretch{1}}
+    \begin{center}
+    \fcolorbox{blue}{bg}{%
+    \begin{minipage}{.67\linewidth}
+    \noindent\textcolor{red}{\textbf{Instructions:}}
+    Match images in the game board on the next page, the important thing
+    is to have fun.
+    \end{minipage}}
+    \end{center}
+}
+\begin{embedding}
+\isPackage
+\amEmbedTiles{dinos}{10}{dinos/mydinos}
+\end{embedding}
+
+\parskip6pt
+\parindent0pt
+\pagestyle{empty}
+
+\begin{document}
+
+\maketitle
+
+%\previewOn\pmpvOn
+
+\begin{center}
+  \bfseries  \Large\color{blue} AcroMemory\\[1ex]
+  \large D. P. Story\normalcolor
+
+  \insertTiles{dinos}{2in}{5}{4}
+
+  \messageBox{2in}{2\baselineskip}\vcgBdry[1ex]
+  \playItAgain{}{12bp}
+
+\end{center}
+
+\end{document}

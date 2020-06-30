@@ -24,6 +24,7 @@ $special{'datepicker-pro'} = '&MAKEdps';
 $special{'aeb-pro'}     = '&MAKEdps';
 $special{'annot-pro'}   = '&MAKEdps';
 $special{'acrotex'}     = '&MAKEdps';
+$special{'acromemory'}  = '&MAKEdps';
 $special{'aeb-mlink'}   = '&MAKEdps';
 $special{'aeb-minitoc'} = '&MAKEdps';
 $special{'graphicxsp'}  = '&MAKEdps';

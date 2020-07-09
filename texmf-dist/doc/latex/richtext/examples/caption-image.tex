@@ -1,0 +1,37 @@
+% Use any workflow to build this file
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[designv]{web}
+\usepackage{richtext}
+
+\newcommand\targetWd{3in}
+
+% \getDimFromGraphic is defined in web
+\getDimsFromGraphic[width=\targetWd]{graphics/dpsweb}{\dpswebW}{\dpswebH}
+
+% some presets to prevent user form messing with the rich text caption
+\def\noEditing{\Ff\FfDoNotSpellCheck\Ff\FfDoNotScroll
+\AAkeystroke{event.rc=false;}\AAformat{event.rc=false;}}
+
+\begin{document}
+
+\noindent
+Place a rich text field on top of a picture to overlay a rich text caption. Some JavaScript prevents
+any editing of the caption.
+
+\rtpara[size=8,valign=bottom,margbottom=12,margleft=12,margright=12]{farewell}{\bf{Thank you} for reviewing the
+\span{font=Courier}{richtext} package, I hope you will enjoy exploring
+it. Did I say '\span{url=www.acrotex.net,style=bold}{AcroTeX Rocks!}'?\spc\spc\spc\spc\spc\span{color=ff0000}{dps}}
+
+\begin{center}
+\makebox[\dpswebW]{\makebox[0pt][l]{\textField[\presets{\noEditing}\textSize{8}\BC{}\BG{}
+\Ff{\FfRichText}\Ff{\FfMultiline}\DS{\useDefaultDS}\RV{\useRV{farewell}}
+\autoCenter{n}\V{\useV{farewell}}]{rtFld1}{\dpswebW}{\dpswebH}}%
+\includegraphics[width=\targetWd]{graphics/dpsweb}}
+\end{center}
+
+\noindent
+Displays properly in \textsf{Acrobat}, \textsf{Adobe Reader DC}, and \textsf{PDF-XChange Editor}.
+
+\end{document}
+

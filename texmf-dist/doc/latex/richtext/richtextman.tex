@@ -7,11 +7,13 @@
 %    linktoattachments,
     aebxmp
 ]{aeb_pro}
+\usepackage{aeb_mlink}
 \usepackage{richtext}
 \usepackage{graphicx,array}
 %\usepackage{myriadpro}
 %\usepackage{calibri}
 \usepackage[altbullet]{lucidbry}
+\usepackage{pifont}
 
 %\previewtrue
 %\usepackage{makeidx}
@@ -22,6 +24,7 @@
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{5}
 \makeatletter
+%\def\rtEOL{\let\\\@empty}
 \renewcommand*{\theparagraph}{\texorpdfstring{\protect\P\protect\ }{\textparagraph}}
 \renewcommand{\paragraph}
     {\renewcommand{\@seccntformat}[1]{\theparagraph}%
@@ -30,8 +33,12 @@
 \def\chgCurrLblName#1{\def\@currentlabelname{#1}}
 \def\echgCurrLblName#1{\edef\@currentlabelname{#1}}
 \makeatother
+\let\tops\texorpdfstring
 
 \getDimsFromGraphic{graphics/dpsweb}{\dpswebW}{\dpswebH}
+
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{\raisebox{#1}{\parbox{\marginparwidth}{\slshape\raggedleft\small#2}}}}
+\addtolength{\marginparwidth}{1in}
 
 
 %\urlstyle{rm}
@@ -61,7 +68,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for the richtext package from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={v1.0c, 2016/10/03},
+    version={1.1.1, 2020/07/02},
     keywords={AcroTeX, rich text strings},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -192,8 +199,9 @@ drivers except \pkg{dvips}, and that is used by default.
 
 We begin by illustrating the result of the \pkg{richtext} package, consider the rich text field below.
 
-\rtpara[indent=first]{para1}{Now is the time for
-\span{style={bold,italic,strikeit},color=ff0000}{J\374rgen} and all
+\rtpara[indent=first]{para1}
+{Now is the time for \span{style={bold,italic,%
+strikeit},color=ff0000}{J\374rgen} and all
 good men to come to the aid of \it{their} \bf{country}. Now is the time for
 \span{style=italic}{all good} women to do the same.}
 \rtpara[indent=first]{para2}{With rich text, we can format the text within
@@ -244,14 +252,43 @@ the \uif{Link} attributes (URLs) are classified as \uif{Font}. The optional
 argument of \cs{rtpara} consists of usually \uif{Paragraph} attributes, most
 \uif{Font} attributes are also recognized.
 
+\newtopic\noindent\textbf{\textcolor{red}{Important!}} These comments are focused on the
+\app{dvips\,->\,distiller} workflow. The \app{dvips} application when
+converting from DVI to PS inserts line breaks in the Postscript file,
+according to rules known only to the developer. Breaking lines can cause problems with
+JavaScript code and rich text markup. The problems encountered do not occur in the other
+workflows (\app{pdflatex}, \app{lualatex}, and \app{xelatex}).
+\begin{description}
+    \item[\bfseries\color{red}Rule 1.] For the workflow \FmtMP{\app{dvips->distiller} workflow}\app{dvips\,->\,distiller}, spaces
+    in the third argument (\ameta{rich-text-paragraph}) are obeyed and are replaced
+    with the octal \cs{040} which is the (PDF) space character. Of particular importance,
+    the third argument of \cs{rtpara} must be flush against the left margin, otherwise
+    spurious spaces are introduced. See the verbatim listing below.
+%    \item[\bfseries\color{red}Rule 2.] Do not allow spaces between the arguments
+%    of \cs{rtpara}. To break a line, insert a comment character (\texttt{\%}), see
+%    line~\ding{182} below.
+    \item[\bfseries\color{red}Rule 2.]
+        Within\FmtMP{\app{dvips->distiller} workflow} the argument of
+        the \cs{span} command, \emph{do not use spaces}. To break a line within the
+        argument of \cs{span}, use the comment character (\texttt{\%}) to avoid spurious
+        spaces, see line~\ding{182} below. The \textit{value} of a key may require spaces, for example,
+        \cs{span\darg{font='Myriad Pro'}}. There should be no spaces between
+        key-value pairs, for example, don't type something like this: \verb*|\span{font = 'Myriad Pro'}|,
+        or do this: \verb~\span{style={bold, italic, strikeit}~.
+
+\end{description}
+
+\newtopic\noindent
 The definition of the first paragraph of the above rich text field reads as
-follows:
-\begin{Verbatim}[fontsize=\small]
-\rtpara[indent=first]{para1}{Now is the time for
-    \span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
-    and all good men to come to the aid of \it{their}
-    \bf{country}. Now is the time for \span{style=italic}
-    {all good} women to do the same.}
+follows:\def\1{\leavevmode\rlap{\hskip3.5in\normalfont\ding{182}}}\def\2{\leavevmode\rlap{\hskip3.5in\%\sffamily\space this is OK}}
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+!2\rtpara[indent=first]{para1}
+{Now is the time for
+!1\span{style={bold,italic,strikeit},%
+color=ff0000}{J\374rgen}
+and all good men to come to the aid of \it{their}
+\bf{country}. Now is the time for \span{style=italic}
+{all good} women to do the same.}
 \end{Verbatim}
 In this example, the optional argument for \cs{rtpara} was used to indent the
 paragraph. The rich text defined here is named \texttt{para1}. The third
@@ -274,25 +311,26 @@ described here, is only defined within the third argument
 \cs{span} is a {\TeX} primitive command, and we must not overwrite its
 definition.
 
-When you create a \emph{rich text string} there is a parallel development of a
-\emph{plain text string}, the string without its rich text markup, these two
-(rich and plain strings) are used to populate the values of the \psf{RV} and
-\psf{V} keys of a text field. When you define a rich text paragraph string
-under its own \ameta{name}, you can typeset it (to check the syntax) and its
-plain text counterpart using the \cs{useRV\darg{\ameta{name}}} and
-\cs{useV\darg{\ameta{name}}} commands. For example,
-\begin{quote}\raggedright\ttfamily\makeatletter\def\rt@SC{;\penalty0}%
+When you create a \emph{rich text string} there is a parallel development of
+a \emph{plain text string}, the string without its rich text markup, these
+two (rich and plain strings) are used to populate the values of the \psf{RV}
+and \psf{V} keys of a text field. When you define a rich text paragraph
+string under its own \ameta{name}, you can typeset it (to check the syntax)
+and its plain text counterpart using the methods of
+\hyperref[s:displayRVV]{Section~\ref*{s:displayRVV}}. For example,
+\begin{displayRtPara}{para1}
 \rtpara[indent=first]{para1}{Now is the time for
-\span{style={bold,italic,strikeit},color=ff0000}{J\string\374rgen} and all
+\span{style={bold,italic, strikeit},color=ff0000}{J\string\374rgen} and all
 good men to come to the aid of \it{their} \bf{country}. Now is the time for
 \span{style=italic}{all good} women to do the same.}
-\makeatother
-\hspace*{-\leftmargini}\textbf{\cs{useRV\darg{para1}:}}\ \useRV{para1}\\[\baselineskip]
-\hspace*{-\leftmargini}\textbf{\cs{useV\darg{para1}:}}\ \useV{para1}
-\end{quote}
-These commands may also be used to insert the strings into the \psf{RV} and
-\psf{V} keys, respectively; though the \pkg{richtext} package offers an
-alternative technique.
+\end{displayRtPara}
+\begin{flushleft}\textbf{\cs{useRV\darg{para1}:}}
+\texttt{\displayRV{para1}}\\[\baselineskip]
+\textbf{\cs{useV\darg{para1}:}} \texttt{\displayV{para1}}
+\end{flushleft}
+The commands \cs{useRV\darg{\ameta{name}}} and \cs{useV\darg{\ameta{name}}} may also be used to insert the strings
+into the \psf{RV} and \psf{V} keys, respectively; though the \pkg{richtext}
+package offers an alternative technique.
 
 \subsection{The \texorpdfstring{\uif{Font}}{Font} and
 \texorpdfstring{\uif{Link}}{Link} tabs}\label{s:FLtabs}
@@ -321,12 +359,12 @@ may appear as \ameta{Font-attrs} or \ameta{Para-Font-attrs}.
     contains white space, enclose it within single quotes (\texttt{'}).
 \begin{flushleft}\small %\previewtrue
 \verb|\rtpara[font={Arial,sans-serif}]{para1}{This is Arial or a|
-\hspace*{20pt}\verb|san-serif substitute.}|\\[3pt]
+\verb|san-serif substitute.}|\\[3pt]
 \rtpara[font={Arial,sans-serif}]{para1}{This is Arial or a san-serif substitute.}%
 \incFldCnt\textField[\Ff{\FfRichText}%\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3in}{16bp}\\[6pt]
 \verb|\rtpara{para2}{This is \span{font='Myriad Pro'}|
-\hspace*{20pt}\verb|{Myriad Pro} font.}|\\[3pt]
+\verb|{Myriad Pro} font.}|\\[3pt]
 \rtpara{para2}{This is \span{font='Myriad Pro'}{Myriad Pro} font.}
 \incFldCnt\textField[\Ff{\FfRichText}%\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para2}}\V{\useV{para2}}]{rtFld\the\fldCnt}{3in}{16bp}
@@ -451,8 +489,8 @@ commas.
 We can create a link within rich text by using the \texttt{url} key from within
 the first argument of the \cs{span} command. The syntax is \texttt{url=\ameta{URL}}.
 \begin{Verbatim}[fontsize=\small]
-\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},
-    font='Courier New'}{http://www.acrotex.net}}
+\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},%
+font='Courier New'}{http://www.acrotex.net}}
 \end{Verbatim}
 \begin{quote}
 \rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},font='Courier New'}{http://www.acrotex.net}}\par\smallskip
@@ -461,14 +499,13 @@ the first argument of the \cs{span} command. The syntax is \texttt{url=\ameta{UR
 \end{quote}
 It appears the \app{Acrobat/Reader} applications format a URL in underlined blue. We can override this however.
 \begin{Verbatim}[fontsize=\small]
-\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},
-    color=\htmlMagenta,ulstyle=none,font='Courier New'}
-    {http://www.acrotex.net}}
+\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},%
+color=\htmlMagenta,ulstyle=none,font='Courier New'}%
+{http://www.acrotex.net}}
 \end{Verbatim}
 \begin{quote}
-\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},
-    color=\htmlMagenta,ulstyle=none,font='Courier New'}
-    {http://www.acrotex.net}}
+\rtpara{para1}{Visit me at \span{url={http://www.acrotex.net},color=\htmlMagenta,ulstyle=none,font='Courier New'}%
+{http://www.acrotex.net}}
 \par\smallskip
 \incFldCnt\textField[\Ff{\FfRichText}%\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3.5in}{16bp}
@@ -477,14 +514,14 @@ Special characters are no problem, with the exception of wrapping a long URL
 around to a different line (usually needed for display purposes):
 \begin{Verbatim}[fontsize=\small]
 \rtpara{para1}{Visit me at
-    \span{url={http://www.math.uakron.edu/~dpstory/%
-    acrotex.html#technical}}{AcroTeX at The University
-    of Akron}}
+\span{url={http://www.math.uakron.edu/~dpstory/%
+acrotex.html#technical}}{AcroTeX at The University
+of Akron}}
 \end{Verbatim}
 \begin{quote}
 \rtpara{para1}{Visit me at \span{url={http://www.math.uakron.edu/%
-    ~dpstory/acrotex.html#technical}}
-    {AcroTeX at The University of Akron}}\par\smallskip
+~dpstory/acrotex.html#technical}}%
+{AcroTeX at The University of Akron}}\par\smallskip
 \incFldCnt\textField[\Ff{\FfRichText}\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3.5in}{16bp*2}
 \end{quote}
@@ -507,12 +544,14 @@ Both \cs{bf} and \cs{it} are local commands, undefined outside of the third argu
 of \cs{rtpara}. Do  not code \texttt{<b>\ameta{text}</b>} or \texttt{<i>\ameta{text}</i>}
 directly, rather, always use the {\LaTeX} commands \cs{bf} and \cs{it}. \cs{bf} and \cs{it} may be nested.
 \begin{Verbatim}[fontsize=\small]
-\rtpara{para1}{We \bf{boldly} say that \it{italic} is used for
-emphasis, but both \bf{\it{drive home the point}}.}
+\rtpara{para1}{We \bf{boldly} say that \it{italic} is used
+for emphasis, but both \span{color=\htmlBlue}%
+{\bf{\it{drive home the point}}}.}
 \end{Verbatim}
 \begin{quote}
-\rtpara{para1}{We \bf{boldly} say that \it{italic} is used for emphasis,
-but both \span{color=\htmlBlue}{\bf{\it{drive home the point}}}.}
+\rtpara{para1}{We \bf{boldly} say that \it{italic} is used
+for emphasis, but both \span{color=\htmlBlue}%
+{\bf{\it{drive home the point}}}.}
 \incFldCnt\textField[\Ff{\FfRichText}\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3.5in}{16bp*2}
 \end{quote}
@@ -558,18 +597,18 @@ the one on the right is \emph{Vertical Alignment}.
             key-values are obvious, we'll illustrate with examples.
 \begin{Verbatim}[fontsize=\small]
 \rtpara[halign=left]{para1}{This paragraph is left
-    aligned or flush left. Let's have a few more words
-    to wrap around.}
+aligned or flush left. Let's have a few more words
+to wrap around.}
 \rtpara[halign=center]{para2}{This paragraph is
-    centered. Let's have a few more words to wrap
-    around.}
+centered. Let's have a few more words to wrap
+around.}
 \rtpara[halign=right]{para3}{This paragraph is right
-    aligned or flush right. Let's have a few more words
-    to wrap around.}
+aligned or flush right. Let's have a few more words
+to wrap around.}
 \rtpara[halign=justify]{para4}{This paragraph is
-    justified. Space between words are stretched a
-    little to make this happen. It is adequate for
-    our purposes.}
+justified. Space between words are stretched a
+little to make this happen. It is adequate for
+our purposes.}
 \end{Verbatim}
 \begin{flushleft}
 \rtpara[halign=left]{para1}{This paragraph is left aligned or flush left. Let's have a few more words to wrap around.}
@@ -589,11 +628,11 @@ Horizontal alignment is applied to individual paragraph, unlike vertical alignme
                 we shall illustrate by example.
 \begin{Verbatim}[fontsize=\small]
 \rtpara[valign=top]{para1}{This paragraph is vertically
-    aligned at the top.}
+aligned at the top.}
 \rtpara[valign=middle]{para2}{This paragraph is
-    vertically aligned at the middle.}
+vertically aligned at the middle.}
 \rtpara[valign=bottom]{para3}{This paragraph is
-    vertically aligned at the bottom.}
+vertically aligned at the bottom.}
 \end{Verbatim}
 \begin{flushleft}
 \rtpara[valign=top]{para1}{This paragraph is vertically aligned at the top.}
@@ -628,14 +667,14 @@ The vertical alignment for the whole rich text field obeys the \texttt{valign} k
 \medskip
         Below is an example for both \texttt{margleft} and \texttt{margright}.
 \begin{Verbatim}[fontsize=\small]
-\rtpara[margleft=10,margright=40,halign=justify
-    ]{para1}{This is the first paragraph, it has
-    a left margin of 10pt and a right margin of
-    40pt.}
+\rtpara[margleft=10,margright=40,halign=justify]%
+{para1}{This is the first paragraph, it has
+a left margin of 10pt and a right margin of
+40pt.}
 \rtpara[halign=justify]{para2}{This is the second
-    paragraph. We demonstrate that the left and
-    margins can be applied separately to
-    paragraphs.}
+paragraph. We demonstrate that the left and
+margins can be applied separately to
+paragraphs.}
 \end{Verbatim}
 \begin{flushleft}
 \rtpara[font=10,margleft=10,margright=40,halign=justify]{para1}{This is the first
@@ -654,13 +693,13 @@ left and margins can be applied separately to paragraphs.}
     (the minus sign (\texttt{-}) is automatically applied. The default indent amount it \texttt{12pt}.\smallskip\kern0pt
 \begin{Verbatim}[fontsize=\small]
 \rtpara[indent=first]{para1}{This paragraph is
-    indented by the default amount of 12pt.}
+indented by the default amount of 12pt.}
 \rtpara[indent=first,indentby=24]{para2}{In this
-    second paragraph, we indent by 24pt, twice
-    as wide as the default.}
+second paragraph, we indent by 24pt, twice
+as wide as the default.}
 \rtpara[indent=hanging]{par3}{Here we have a third
-    paragraph, separated from the other two, with
-    the default hanging indentation.}
+paragraph, separated from the other two, with
+the default hanging indentation.}
 \end{Verbatim}
 \begin{flushleft}
 \rtpara[indent=first]{para1}{This paragraph is indented by the default amount of 12pt.}
@@ -681,9 +720,9 @@ the default hanging indentation.}\par\smallskip
             vertical space \emph{above} the paragraph.\medskip
 \begin{Verbatim}[fontsize=\small]
 \rtpara[margtop=12]{para1}{We put 12pt of extra
-    space above this paragraph.}
+space above this paragraph.}
 \rtpara[margtop=24]{para2}{Extra space above this
-    paragraph (24pt).}
+paragraph (24pt).}
 \end{Verbatim}
 \begin{flushleft}
 \rtpara[margtop=12]{para1}{We put 12pt of extra space above this paragraph.}
@@ -697,8 +736,8 @@ the default hanging indentation.}\par\smallskip
             vertical space below the paragraph.\par\medskip
 \begin{Verbatim}[fontsize=\small]
 \rtpara[valign=bottom,margbottom=12]{para1}{We put
-    \span{font=Courier,style=bold}{valign=bottom},
-    but bring the paragraph up 12pt from there.}
+\span{font=Courier,style=bold}{valign=bottom},
+but bring the paragraph up 12pt from there.}
 \end{Verbatim}
 \rtpara[valign=bottom,margbottom=12]{para1}{We put \span{font=Courier,style=bold}{valign=bottom}, but bring the
 paragraph up 12pt from there.}\par\medskip
@@ -728,18 +767,19 @@ linespacing=exact, lineheight=30. Do we get significant separation between sente
 The paragraph declarations for the above rich text field are,
 \begin{Verbatim}[fontsize=\small]
 \rtpara[linespacing=oneandhalf]{para1}{This
-    paragraph has line spacing of oneandhalf. We
-    will prattle on to get some wraparound to the
-    next line.}
+paragraph has line spacing of oneandhalf. We
+will prattle on to get some wraparound to the
+next line.}
 \rtpara[linespacing=double]{para2}{This paragraph
-    has double spacing. Once again, we'll ramble,
-    not prattle, on for several more words.}
+has double spacing. Once again, we'll ramble,
+not prattle, on for several more words.}
 \rtpara[linespacing=exact,lineheight=30]{para3}
-    {Let's see what we get here, with
-    linespacing=exact, lineheight=30. Do we
-    get significant separation between sentences?}
+{Let's see what we get here, with
+linespacing=exact, lineheight=30. Do we
+get significant separation between sentences?}
 \end{Verbatim}
-\medskip\noindent
+
+\newtopic\noindent
 The value of \texttt{lineheight}, which gives a `squeezing' effect between lines of the paragraph.
         \end{description}
     \end{description}
@@ -753,22 +793,22 @@ There are several other features that do not fit conveniently anywhere else, so 
 {Starting a new line using \cs{br}.}\chgCurrLblName{Starting a new line using \protect\cs{br}}\label{para:NewLine}
 The \cs{br} command expands to \texttt{<br />}. It should not be put within
 the second argument of the \cs{span} command. As was the case with \cs{bf},
-\cs{it}, \cs{sub}, and \cs{sup}, do not directly code in \texttt{<br />} for
+\cs{it}, \cs{sub}, and \cs{sup}, do not code in \texttt{<br />} directly, for
 you will fail.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \rtpara{para1}{Let's begin a sentence,\br then we'll
-    start a new line for no apparent reason.\br\br
-    Let's double down on the new lines shall we?}
+start a new line for no apparent reason.\br\br
+Let's double down on the new lines shall we?}
 \end{Verbatim}
 \begin{quote}
 \rtpara{para1}{Let's begin a sentence,\br then we'll
-    start a new line for no apparent reason.\br\br Let's
-    double down on the new lines shall we?}
+start a new line for no apparent reason.\br\br Let's
+double down on the new lines shall we?}
 \incFldCnt\textField[\Ff{\FfRichText}\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3.5in}{16bp*6}
 \end{quote}
 
-\paragraph[Adding spaces with \texorpdfstring{\cs{spc}}{\textbackslash{spc}}]{Adding
+\paragraph[Adding a space with \texorpdfstring{\cs{spc}}{\textbackslash{spc}}]{Adding
     spaces with \cs{spc}.}\chgCurrLblName{Adding
     spaces with \protect\cs{spc}}\label{para:addSPC}
     As with {\TeX} multiple spaces are ignored. To insert additional
@@ -792,8 +832,8 @@ within the optional argument of \cs{rtpara} or within the first argument of \cs{
 you can pass raw CSS2 markup.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \rtpara{para1}{We test the letter-spacing
-    attribute:\br\br\span{raw=letter-spacing:0.25em;}
-    {We test the letter-spacing attribute.}}
+attribute:\br\br\span{raw=letter-spacing:0.25em;}
+{We test the letter-spacing attribute.}}
 \end{Verbatim}
 \begin{quote}
 \rtpara{para1}{We test the letter-spacing attribute:\br\br\span{raw=letter-spacing:0.25em;}{We test the letter-spacing
@@ -802,7 +842,7 @@ attribute.}}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3.5in}{16bp*6}
 \end{quote}
 The syntax for a CSS2 attribute is `\texttt{\ameta{key}:\ameta{value};}', that is, keys and values are separated
-by a colon (\texttt{:}) and the value is terminated with a semi-colon (\texttt{;}).
+by a colon (\texttt{:}) and the value is terminated with a semi-colon~(\texttt{;}).
 
 It appears that tab stops work as well, these can be specified using the \texttt{raw} key as well. Refer to the
 XFA Specifications~\cite{webpage:XFASpec}.
@@ -822,29 +862,29 @@ command \cs{cs\darg{\ameta{text}}} to obtain a literal backslash (`\verb|\|'); f
 \verb|\cs{LaTeX}|, shown below, expands to `\texttt{\cs{LaTeX}}'.
 \begin{Verbatim}[fontsize=\small]
 \rtpara{para1}{We \"test\" \'special\' \bf{characters:}
-    \<\>\&\{ #\% in \cs{LaTeX} $x^2_4$ becomes
-    \it{x}\sup{2}\sub{4} \{\}}
+\<\>\&\{ #\% in \cs{LaTeX} $x^2_4$ becomes
+\it{x}\sup{2}\sub{4} \{\}}
 \end{Verbatim}
 The above \cs{rtpara} paragraph has two forms the \psf{RV} form and the \psf{V} form; these
 can be seen by using the \cs{useRV} and \cs{useV} commands.
 
-\begingroup\raggedright
-\makeatletter\def\rt@SC{;\penalty0}\makeatother
+\begin{displayRtPara}{para1}
 \rtpara{para1}{We \"test\" 'special' \bf{characters:} \<\>\&\{ #\% in
 \cs{LaTeX} $x^2_4$ becomes \it{x}\sup{2}\sub{4} \{\}}
-\begin{quote}
-\hspace*{-\leftmargini}\textbf{\cs{useRV\darg{para1}:}} \texttt{\useRV{para1}}
+\end{displayRtPara}
 
-\hspace*{-\leftmargini}\textbf{\cs{useV\darg{para1}:}} \texttt{\useV{para1}}
-\end{quote}
+
+\begin{flushleft}\textbf{\cs{useRV\darg{para1}:}} \texttt{\displayRV{para1}}\end{flushleft}
+
+\begin{flushleft}\textbf{\cs{useV\darg{para1}:}} \texttt{\displayV{para1}}\end{flushleft}
+%
 The resulting rich text form field is seen below:\\[3pt]
-\makeatletter\def\rt@SC{;}\makeatother
 \rtpara{para1}{We \"test\" \'special\' \bf{characters:} \<\>\&\{ #\% in
 \cs{LaTeX} $x^2_4$ becomes \it{x}\sup{2}\sub{4} \{\}}
 \incFldCnt\textField[\Ff{\FfRichText}\Ff{\FfMultiline}
 \DS{\useDefaultDS}\RV{\useRV{para1}}\V{\useV{para1}}]{rtFld\the\fldCnt}{3in}{16bp*4}
-\par\endgroup
-\medskip\noindent
+
+\newtopic\noindent
 That's pretty cool!
 
 \section{Rich text fields}
@@ -865,7 +905,7 @@ Remove \cs{Ff\darg{\cs{FfMultiline}}} if the field is only a single line. We
 discuss the \psf{DS} key (\cs{DS}) key first, followed by the keys \psf{RV}
 and \psf{V} (\cs{RV} and \cs{V}).
 
-\subsection{The \texorpdfstring{\protect\psf{DS}}{DS} key}
+\subsection{The \tops{\protect\psf{DS}}{DS} key}
 
 The value of the \psf{DS} key sets the formatting for the text field as a
 whole. Most importantly, use it to set the font, text size, and color.
@@ -893,18 +933,19 @@ why most all rich text fields in this document use Helvetica at \texttt{12pt}! U
 \setDefaultStyle{!ameta(name)}{!ameta(Font-Para-attrs)}
 \useDS{!ameta(name)}
 \end{dCmd}
+\eVerb
 Typically, the key-values associated with the \uif{Font} tab, Section~\ref{s:FLtabs}, may be used,
 some key-values are removed, such as \texttt{ul}, \texttt{raise}, and \texttt{url}. When you've defined
 a custom default style using \cs{setDefaultStyle}, insert \cs{useDS\darg{\ameta{name}}} as the value
 of the \psf{DS} key.\incFldCnt
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
 \rtpara{para1}{The font should be \'Myriad Pro\' at 10pt
-    and the default color of the field is webbrown, a color
-    defined in the web package.}
+and the default color of the field is webbrown, a color
+defined in the web package.}
 \setDefaultStyle{myStyle}{font='Myriad Pro',size=10,
-    color=!htmlWebBrown}
+color=!htmlWebBrown}
 \textField[\Ff{\FfRichText}\Ff{\FfMultiline}
-    \DS{!textbf(\useDS{myStyle})}\RV{\useRV{para1}}\V{\useV{para1}}
+  \DS{!textbf(\useDS{myStyle})}\RV{\useRV{para1}}\V{\useV{para1}}
 ]{rtFld!the!fldCnt}{3in}{16bp*3}
 \end{Verbatim}
 \begin{quote}
@@ -917,8 +958,8 @@ of the \psf{DS} key.\incFldCnt
 Note the use of \cs{useRV} and \cs{useV} in the \psf{RV} and \psf{V} fields.
 These are discussed in the next section.
 
-\subsection{The \texorpdfstring{\protect\psf{RV}}{RV} and
-\texorpdfstring{\protect\psf{V}}{V} keys}
+\subsection{The \tops{\protect\psf{RV}}{RV} and
+\tops{\protect\psf{V}}{V} keys}
 
 The techniques to handle multiple paragraph fields are more complex (but not discouragingly so),
 that topic will be taken up after the discussion of single paragraph fields.
@@ -930,12 +971,12 @@ data (both rich and plain) are inserted into the \cs{RV} and \cs{V} keys using \
 previous example, but with the emphasis on \cs{RV} and \cs{V}, and not on \cs{DS}.
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
 \rtpara{para1}{The font should be \'Myriad Pro\' at 10pt
-    and the default color of the field is webbrown, a
-    color defined in the web package.}
+and the default color of the field is webbrown, a
+color defined in the web package.}
 \setDefaultStyle{myStyle}{font='Myriad Pro',size=10,
-    color=!htmlWebBrown}
+color=!htmlWebBrown}
 \textField[\Ff{\FfRichText}\Ff{\FfMultiline}
-    \DS{\useDS{myStyle}}\RV{!textbf(\useRV{para1})}\V{!textbf(\useV{para1})}
+  \DS{\useDS{myStyle}}\RV{!textbf(\useRV{para1})}\V{!textbf(\useV{para1})}
 ]{rtFld!the!fldCnt}{3in}{16bp*3}
 \end{Verbatim}
 \begin{quote}
@@ -949,7 +990,6 @@ We declare our rich paragraph string using \cs{rtpara} and name it
 \texttt{para1}. We insert two data streams, one into the rich text key
 (\cs{RV\darg{useRV\darg{para}}}) and the other into the (plain) text key
 (\cs{V\darg{useV\darg{para}}}).
-
 
 \subsubsection{Multiple paragraph fields}
 
@@ -977,19 +1017,20 @@ Having composed how the strings are to be put together, we need to insert them i
 command. Insert \cs{useRVContent} as the value of the \psf{RV} key, and
 \cs{useVContent} as the value of the \psf{V} key.
 
+\newtopic\noindent
 We take as an example, the one from Section~\ref{s:CreateRTS}.\incFldCnt
 \begin{Verbatim}[fontsize=\small]
 \rtpara[indent=first]{para1}{Now is the time for
-    \span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
-    and all good men to come to the aid of \it{their}
-    \bf{country}. Now is the time for \span{style=italic}
-    {all good} women to do the same.}
+\span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
+and all good men to come to the aid of \it{their}
+\bf{country}. Now is the time for \span{style=italic}%
+{all good} women to do the same.}
 \rtpara[indent=first]{para2}{With rich text, we can format the
-    text within the text field. As a reader of this rich text
-    field, you can edit the contents of the box, feel free to
-    do so.}
+text within the text field. As a reader of this rich text
+field, you can edit the contents of the box, feel free to
+do so.}
 \rtpara[halign=right]{para3}{D. P. Story
-    \span{url=http://www.acrotex.net}{AcroTeX.Net}}
+\span{url=http://www.acrotex.net}{AcroTeX.Net}}
 \end{Verbatim}
 Now set the content with \cs{setRVVContent}, naming it \texttt{myContent}.
 \begin{Verbatim}[fontsize=\small]
@@ -999,9 +1040,9 @@ Having done all that, we create our rich text field:
 \begin{Verbatim}[fontsize=\small,commandchars=!()]
 \begin{center}
 \textField[\Ff{\FfRichText}\Ff{\FfMultiline}
-    \DS{\useDefaultDS}
-    !textbf(\RV{\useRVContent{myContent}})
-    !textbf(\V{\useVContent{myContent}})
+  \DS{\useDefaultDS}
+  !textbf(\RV{\useRVContent{myContent}})
+  !textbf(\V{\useVContent{myContent}})
 ]{rtFld!the!fldCnt}{4in}{10\baselineskip}
 \end{center}
 \end{Verbatim}
@@ -1027,6 +1068,8 @@ contents of the box, feel free to do so.}
 \RV{\useRVContent{myContent}}\V{\useVContent{myContent}}]{rtFld\the\fldCnt}{4in}{10\baselineskip}
 \end{center}
 
+\medskip
+\newtopic\noindent
 The argument of \cs{setRVVContent} is pretty robust. In making our declarations, we can type:
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \setRVVContent{myContent}
@@ -1041,19 +1084,98 @@ The argument of \cs{setRVVContent} is pretty robust. In making our declarations,
 Note that I've added a \texttt{skipline} so that are two blank lines after the second paragraph
 and before the third paragraph.
 
+
+
+\section{Displaying the values of the \tops{\protect\psf{RV} and \protect\psf{V}}{RV and V} keys}\label{s:displayRVV}
+
+For the purposes of inspection or discussion, you can \emph{typeset} the rich text values for both the
+\psf{RV} and \psf{V} keys using the following set of environments and commands.
+\bVerb\takeMeasure{\small\string\rtpara[\ameta{Para-Font-attrs}]\darg{\ameta{name}}\darg{\ameta{rich-text-paragraph}}}%
+\begin{dCmd}[fontsize=\small,commandchars=!()]{\bxSize}
+\begin{displayRtPara}{!ameta(name)}
+\rtpara[!ameta(Para-Font-attrs)]{!ameta(name)}{!ameta(rich-text-paragraph)}
+\end{displayRtPara}
+
+\begin{displayRtPara*}{!ameta(name)}
+\rtpara[!ameta(Para-Font-attrs)]{!ameta(name)}{!ameta(rich-text-paragraph)}
+\end{displayRtPara*}
+
+\displayRV{!ameta(name)}
+\displayV{!ameta(name)}
+\end{dCmd}
+\eVerb By placing an \cs{rtpara} command within the \env{displayRtPara} environment,
+you can then typeset a (cleaned-up) version of \psf{RV} and \psf{V} by
+expanding \cs{displayRV\ameta{name}} and/\allowbreak or
+\cs{displayRV\ameta{name}}. The \env{displayRtPara*} environments produces
+the `ugly' version of the entries, useful only with the
+\app{dvips\,->\,distiller} workflow.
+
+\paragraph*{Example.} If we say,
+\begin{Verbatim}[fontsize=\small]
+\begin{displayRtPara}{para1}
+\rtpara[indent=first]{para1}{Now is the time for
+\span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
+and all good men to come to the aid of \it{their}
+\bf{country}. Now is the time for \span{style=italic}%
+{all good} women to do the same.}
+\end{displayRtPara}
+\end{Verbatim}
+then type,
+\begin{Verbatim}[fontsize=\small]
+\begin{flushleft}\textbf{Rich text: }\ttfamily
+\displayRV{para1}\end{flushleft}
+\begin{flushleft}\textbf{Plain text: }\ttfamily
+\displayV{para1}\end{flushleft}
+\end{Verbatim}
+The following is typeset into the document:
+
+\begin{displayRtPara}{para1}
+\rtpara[indent=first]{para1}{Now is the time for
+\span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
+and all good men to come to the aid of \it{their}
+\bf{country}. Now is the time for \span{style=italic}%
+{all good} women to do the same.}
+\end{displayRtPara}
+
+\begin{flushleft}\textbf{Rich text: }\ttfamily\displayRV{para1}\end{flushleft}
+\begin{flushleft}\textbf{Plain text: }\ttfamily\displayV{para1}\end{flushleft}
+
+\newtopic %\noindent
+Now, if the same \cs{rtpara} is enclosed in a \env{displayRtPara} environment (not shown), we get the following:
+
+\begin{displayRtPara*}{para1}
+\rtpara[indent=first]{para1}{Now is the time for
+\span{style={bold,italic,strikeit},color=ff0000}{J\374rgen}
+and all good men to come to the aid of \it{their}
+\bf{country}. Now is the time for \span{style=italic}%
+{all good} women to do the same.}
+\end{displayRtPara*}
+
+\begin{flushleft}\textbf{Rich text: }\ttfamily\displayRV{para1}\end{flushleft}
+\begin{flushleft}\textbf{Plain text: }\ttfamily\displayV{para1}\end{flushleft}
+Yes, this document was created by a \app{dvips\,->\,distiller}
+workflow!\footnote{Actually, the \app{dvipsone\,->\,distiller} workflow.} As
+you can see, \cs{040} is inserted whenever there is a space. This is to keep
+\app{dvips} from breaking the Postscript at a point that will break the rich
+text CSS2 markup.
+
+For a non-Postscript workflow, typeset print outs from \env{displayRtPara} and
+\env{displayRtPara*} are the same, because only \app{dvips} needs special handling.
+
 \bigskip\noindent
-That's about it! Now, back to my retirement. \dps \space (See next page)
+That's about it! Now, back to my retirement. \dps %\space (See next page)
 
-\newpage
-
+%\newpage
+\newtopic\noindent
 Did I say that you can write captions to figures using rich text?
 
 \rtpara[valign=bottom,margbottom=12,margleft=12,margright=12]{farewell}{\bf{Thank you} for reviewing the
 \span{font=Courier}{richtext} package, I hope you will enjoy exploring
-it. Did I say that \span{url=www.acrotex.net,style=bold}{AcroTeX Rocks!}\spc\spc\spc\spc dps}
+it. Did I say '\span{url=www.acrotex.net,style=bold}{AcroTeX Rocks!}'?\spc\spc\spc\spc\spc dps}
 
 \begin{center}\incFldCnt
-\makebox[\dpswebW]{\makebox[0pt][l]{\textField[\BC{}\BG{}\autoCenter{n}\Ff{\FfRichText}\Ff{\FfMultiline}
+\makebox[\dpswebW]{\makebox[0pt][l]{\textField[\Ff\FfDoNotSpellCheck\Ff\FfDoNotScroll
+\AAkeystroke{event.rc=false;}\AAformat{event.rc=false;}\BC{}\BG{}\autoCenter{n}\Ff{\FfRichText}\Ff{\FfMultiline}
 \DS{\useDefaultDS}
 \RV{\useRV{farewell}}\V{\useV{farewell}}]{rtFld\the\fldCnt}{\dpswebW}{\dpswebH}}%
     \includegraphics{dpsweb}}
@@ -1071,7 +1193,7 @@ it. Did I say that \span{url=www.acrotex.net,style=bold}{AcroTeX Rocks!}\spc\spc
 \bibitem{webpage:XFASpec}\hypertarget{references}{}%
 Adobe XML Forms Architecture (XFA) Specification, Version 3.3, Adobe Systems, Inc.,
 Jan.\ 2012\backrefprint
-   \lngln\hfill{\small\url{partners.adobe.com/public/developer/xml/index_arch.html}}
+   \lngln\hfill{\small\mlurl{https://reference.pdfa.org/iso/32000/wp-content/uploads/2017/04/XFA-3_3.pdf}}
 
 \bibitem{webpage:CSS2}
 Cascading Style Sheets (CSS 2.2) Specification, Editors: Bert Bos \textsl{et al.},
@@ -1081,12 +1203,13 @@ World Wide Web Consortium (W3C), June 2011
 \bibitem{tech:AcroJS}
    JavaScript for Acrobat API Reference,
    Adobe Systems, Inc., May 2015
-   \lngln\hfill{\small\url{adobe.com/devnet/acrobat/documentation.html}}
-
+   \lngln\hfill{\small\url{https://www.adobe.com/devnet/acrobat/documentation.html}}%https://www.adobe.com/devnet/acrobat/documentation.html
+%https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/js_api_reference.pdf
 \bibitem{book:pdfspec}
     PDF Reference, Sixth Edition, Version 1.7, Adobe Systems, Inc., 2006
-    \lngln\hfill{\small\url{adobe.com/devnet/pdf/pdf_reference_archive.html}}
-
+    \lngln\hfill{\small\url{https://www.adobe.com/devnet/pdf/pdf_reference_archive.html}}
+%https://www.adobe.com/devnet/pdf/pdf_reference_archive.html
+%https://www.adobe.com/devnet/pdf/pdf_reference_archive.html
 
 \end{thebibliography}
 

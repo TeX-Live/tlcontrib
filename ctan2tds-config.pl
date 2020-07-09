@@ -33,6 +33,7 @@ $special{'eqexam'}      = '&MAKEdps';
 $special{'bargraph-js'} = '&MAKEdps';
 $special{'pmdb'}        = '&MAKEdps';
 $special{'thorshammer'} = '&MAKEdps';
+$special{'richtext'}    = '&MAKEdps';
 
 
 sub MAKEdps {

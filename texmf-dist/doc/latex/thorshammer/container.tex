@@ -1,0 +1,94 @@
+%%
+%% This is file `container.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% thorshammer.dtx  (with options: `container')
+%% 
+\documentclass{article}
+\usepackage[designi]{web}
+\usepackage{eforms}
+\hypersetup{pdfpagemode=UseAttachments}
+%% \previewOn\pmpvOn
+\parindent0pt \parskip6pt
+\begin{defineJS}{\pbContainer}
+var f=this.getField("qzName");
+if(typeof global.RcrdData=="undefined")
+  global.RcrdData=1;
+if(global.RcrdData) {
+  global.qzName=f.value;
+  if (global.qzName=="") {
+    f.value="qzData";
+    global.qzName="qzData.txt";
+  } else global.qzName=f.value+".txt";
+  var d=this.dataObjects;
+  if (d!=null) {
+    for(var i=0; i< d.length; i++)
+      this.removeDataObject(d[i].name);
+  }
+  this.createDataObject({
+    cName: global.qzName,
+    cValue: "First\\tSecond\\tPoints\\tTotal\\tGrade"
+  });
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+global.containerPath=_path.substring(0,pos+1);
+var f=this.getField("gradedPath");
+var v=f.value;
+var pos=v.indexOf(":");
+if(pos!=-1||v[0]=="/") global.gradedPath=v;
+else global.gradedPath=global.containerPath+v;
+aebTrustedFunctions(this,aebSaveAs);
+this.closeDoc(true);
+\end{defineJS}
+\begin{defineJS}{\clrContainer}
+this.resetForm(["qzName","gradedPath"]);
+try{
+  if (typeof global.qzName!="undefined")
+    delete global.qzName; global.qzName="";
+  if (typeof global.gradedPath!="undefined")
+    delete global.gradedPath; global.gradedPath="";
+  if (typeof global.appndSolns!="undefined")
+    delete global.appndSolns; global.appndSolns=true;
+  if (typeof global.RcrdDat!="undefined")
+    delete global.RcrdDat; global.RcrdDat=true;
+} catch(e){}
+\end{defineJS}
+\begin{document}
+This file contains the quiz data as an attachment. Before you
+start the batch action \textsf{Thor's way}, build and
+\emph{place this file in the class folder of the instructor}.
+\begin{center}
+\begin{tabular}{rl}
+\pushButton[\TU{Fill in the two fields then push this button
+before starting the batch sequence}\CA{Push}\AAmouseup{\pbContainer}
+]{pbContainer}{}{13bp}&%
+\parbox[c]{1.5in}{\textField[\TU{Enter base name of the file that
+stores quiz results}]{qzName}{1.5in}{13bp}\vcgBdry[3bp]
+\textField[\TU{The path to the folder that will hold the graded
+quizzes, it may be a relative or an absolute path}
+]{gradedPath}{1.5in}{13bp}}\cgBdry[\columnsep]%\makebox[0pt][l]
+{\pushButton[\CA{Clear}
+  \AAmouseup{\clrContainer}]{clear}{}{13bp}}\\[12pt]
+  \checkBox[\V{Yes}\DV{Yes}\AAmouseup{%
+    global.appndSolns=(event.target.isBoxChecked(0));
+}]{AppdSolns}{11bp}{11bp}{Yes}&%
+\rlap{Append solutions, if they exist}\\[6pt]
+\checkBox[\V{Yes}\DV{Yes}\AAmouseup{%
+  global.RcrdData=(event.target.isBoxChecked(0));
+}]{RecordData}{11bp}{11bp}{Yes}&%
+\rlap{Record class data}
+\end{tabular}
+\end{center}
+Fill in the base name of the file in the text field above. After
+you push the button, the file is saved, then start
+\textsf{Thor's way} action. After the batch sequence finishes,
+this file is opened again. Open the attachments panel and save
+the attached file. The file just saved is a tab delimited text
+file that can be opened in Microsoft Excel.
+\end{document}
+\endinput
+%%
+%% End of file `container.tex'.

@@ -1,0 +1,1100 @@
+%%
+%% This is file `thorshammer.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% thorshammer.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% thorshammer.sty package,                              %%
+%% Copyright (C) 2020  D. P. Story                       %%
+%%   dpstory@uakron.edu  dpstory@acrotex.net             %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thorshammer}
+ [2020/01/13 v1.5.7 Support commands for Thor's way]
+\RequirePackage{xkeyval}
+\edef\th@dquoteCat{\the\catcode`\"}
+\catcode`\"=12\relax
+\DeclareOptionX{nocfg}{\let\th@loadCFG\dl@NO}
+\let\th@loadCFG\dl@YES
+\newif\ifthtestmode\thtestmodefalse
+\DeclareOptionX{testmode}{\thtestmodetrue}
+\DeclareOptionX{!testmode}{\thtestmodefalse}
+\newif\ifthordinary \thordinaryfalse
+\DeclareOptionX{ordinary}{\thtestmodetrue\thordinarytrue}
+\newif\ifbasicmethods\basicmethodstrue
+\newif\ifuseclassOpt\useclassOptfalse
+\def\bUseClass{false}
+\DeclareOptionX{useclass}{\useclassOpttrue
+  \def\bUseClass{true}\basicmethodsfalse
+}
+\newif\ifth@allowfreeze \th@allowfreezetrue
+\DeclareOptionX{usebatch}{\th@allowfreezefalse
+  \ExecuteOptionsX{useclass}}
+\DeclareOptionX{batchdistr}{\ExecuteOptionsX{usebatch}%
+  \AtEndOfPackage{\distrToStudentsOff
+  \let\distrToStudentsOff\relax\let\distrToStudentsOff\relax}}
+\ProcessOptionsX
+\edef\thOrdQz{\ifthordinary true\else false\fi}
+\RequirePackage{insdljs}[2019/08/06]
+\ifx\usedAdbFuncs\dl@NO
+  \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}%
+    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}%
+    {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
+     Reinstall or refresh your file name database.}}}%
+     \let\usedAdbFuncs\dl@YES
+\else
+  \let\inputAltAdbFncs\relax
+\fi
+\inputAltAdbFncs
+\RequirePackage{exerquiz}[2019/08/13]
+\RequirePackage{eq-save}[2019/08/07]
+\let\execjs\dl@YES
+\@ifundefined{CommentStream}{\newwrite\CommentStream}{}
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\providecommand{\eqSP}{\string\040}
+\def\thPageOne{\setcounter{page}{1}}
+\def\setInitMag#1{\setkeys{thim}{mag=#1}}
+\define@choicekey+{thim}{mag}[\val\nr]%
+  {fitpage,actualsize,fitwidth,fitheight,%
+   fitvisible,inheritzoom}[fitpage]%
+  {\edef\th@initmag{\@nameuse{dl@\val}}}
+  {\PackageWarning{thorshammer}{%
+    Bad choice for initial magnification,\MessageBreak
+    permissible values are fitpage, actualsize,\MessageBreak
+    fitwidth, fitheight, fitvisible, and\MessageBreak
+    inheritzoom. Try again}}
+\def\th@initmag{\dl@fitpage}
+\addToDocOpen{\JS{%
+  var stmot=app.setTimeOut("this.calculate=false;",100);}}
+\addToDocOpen{\GoToD[\Page{1}\th@initmag]}
+\def\instrPathIsCHTTP{\def\thInstrFS{CHTTP}}
+\let\thInstrFS\@empty
+\newcommand\instrPath{\@ifstar
+  {\gdef\InstrPathFull{false}\instrPath@i}
+  {\gdef\InstrPathFull{true}\instrPath@i}}
+\def\instrPath@i#1{\gdef\InstrPath{"#1"}}
+\def\InstrPathFull{true}
+\def\InstrPath{this.path.replace(reRmFn,"")}
+\def\classPathIsCHTTP{\def\thClassFS{CHTTP}}
+\let\thClassFS\@empty
+\newcommand\classPath{\@ifstar
+  {\gdef\ClassPathFull{false}\classPath@i}
+  {\gdef\ClassPathFull{true}\classPath@i}}
+\def\classPath@i#1{\gdef\ClassPath{"#1"}}
+\def\ClassPath{this.path.replace(reRmFn,"")}
+\def\ClassPathFull{true}
+\def\thQzHeaderL#1{\def\th@QzHeaderLQ{\makebox[0pt][l]{#1}}}
+\def\th@QzHeaderL{\th@QzHeaderLQ}
+\thQzHeaderL{Thor's Class}
+\def\th@QzHeaderLS{\th@HeaderOffset\th@QzHeaderLQ}
+\def\thQzHeaderCQ#1{\def\th@QzHeaderCQ{\makebox[0pt][c]{#1}}}
+\thQzHeaderCQ{Quiz \thQuizName}
+\def\th@QzHeaderC{\th@QzHeaderCQ}
+\def\thQzHeaderCS#1{\def\th@QzHeaderCS{\makebox[0pt][c]{#1}}}
+\thQzHeaderCS{Solutions: \thQuizName}
+\def\thQzHeaderR#1{\def\t@hQzHeaderR{\makebox[0pt][r]{#1}}}
+\thQzHeaderR{\thepage}
+\@ifundefined{ps@webheadings}{%
+  \def\th@setHeaders{%
+  \renewcommand{\@oddhead}{\th@QzHeaderL\hfil\th@QzHeaderC\hfil
+  \t@hQzHeaderR}\renewcommand{\@evenhead}{\@oddhead}}%
+}{%
+  \def\th@setHeaders{%
+    \lheader{\th@QzHeaderL}%
+    \cheader{\th@QzHeaderC}%
+    \rheader{\t@hQzHeaderR}}%
+}
+\def\eq@normallheader{%
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLS}%
+    \def\th@QzHeaderC{\th@QzHeaderCS}%
+  }{%
+    \lheader{\th@QzHeaderLS}%
+    \cheader{\th@QzHeaderCS}%
+  }
+}
+\def\rhPgNumsOnly{\thQzHeaderL{}\thQzHeaderCQ{}\thQzHeaderCS{}}
+\AtBeginDocument{\th@setHeaders}
+\newif\ifthCoverPage \thCoverPagefalse
+\newcommand{\DeclareCoverPage}[1]{\thCoverPagetrue
+  \def\thIsCP{true}\def\thCvrPg{#1}}
+\def\thIsCP{false}\def\thCvrPg{0}
+\@onlypreamble\DeclareCoverPage
+\def\useNameToCustomize{\def\thUseNameToCustomize{true}}
+\def\thUseNameToCustomize{false}
+\def\enumQuizzes#1{\def\bUseClass{true}\basicmethodsfalse
+  \ClassEntriestrue\def\ClassPathFull{true}\def\InstrPathFull{true}%
+  \def\ClassPath{this.path.replace(reRmFn,"")}%
+  \def\InstrPath{this.path.replace(reRmFn,"")}%
+  \bgroup\@tempcnta#1\relax
+  \@whilenum\@tempcnta>\z@\do{\classMember{}{}{}%
+    \advance\@tempcnta\m@ne}\egroup
+  \def\thEnumQuizzes{#1}\def\bEnumQuizzes{true}}
+\def\thEnumQuizzes{0}\def\bEnumQuizzes{false}
+\newcommand{\distrQuizzes}{%
+  \ifuseclassOpt
+    \def\th@next{\PackageWarning{thorshammer}
+    {Use have specified the useclass option or higher\MessageBreak
+     yet you employ \string\distrQuizzes, these are\MessageBreak
+     incompatible. Assuming the specified package option}}%
+  \else
+    \let\th@next\th@distrQuizzes
+  \fi\th@next
+}
+\def\th@distrQuizzes{\def\bUseClass{true}\basicmethodsfalse
+  \ClassEntriestrue\bgroup\@makeother\_\th@distrQuizzes@i}
+\def\rmSTAR#1*\@nil{\def\@folder{#1}}
+\def\tstForSTAR#1*#2*\@nil{\def\@rgi{#1}\ifx\@rgi\@empty
+  \def\ISSTAR{*}\rmSTAR#2\@nil\else\let\ISSTAR\@empty\fi}%
+\def\th@distrQuizzes@i#1{\@tempcnta\z@
+  \@tfor\@folder:=#1\do{\advance\@tempcnta\@ne
+    \expandafter\tstForSTAR\@folder**\@nil
+    \edef\x{\noexpand\classMember{}{}\ISSTAR{\@folder}}\x
+  }\xdef\enumQuizzes{\the\@tempcnta}%
+  \gdef\bDistrQuizzes{true}\egroup
+}
+\def\bDistrQuizzes{false}
+\@ifundefined{executeSave}
+  {\def\executeSave(){%
+  console.println("automatically saving this file...");^^J%
+  var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+  {cPath:this.path,bCopy:false})}}{}
+\@ifundefined{docassembly}
+  {\newenvironment{docassembly}{%
+    \execJS[\mkClFlsSpcls]{docassembly}}{\endexecJS}}
+  {\renewenvironment{docassembly}{%
+    \execJS[\mkClFlsSpcls]{docassembly}}{\endexecJS}}
+\ifbasicmethods\let\th@namePresets\@empty\else
+\def\th@namePresets{\Ff\FfReadOnly\BC{}}\fi
+\newcommand\FirstName[3][]{\th@bMrkQz\textField[%
+  \presets{\th@namePresets}#1]{Name.first}{#2}{#3}}
+\newcommand\LastName[3][]{\textField[%
+  \presets{\th@namePresets}#1]{Name.last}{#2}{#3}}
+\def\th@bMrkQz{\@ifundefined{bMrkQz\currQuiz}
+  {\rlap{\textField[\Ff\FfReadOnly\BC{}\BG{}]{bMrkQz}{0pt}{0pt}}%
+   \@namedef{bMrkQz\currQuiz}{}}{}}
+\def\th@fullnamePresets{\Ff\FfReadOnly\BG{}\BC{}}
+\def\thfullnameFmt#1{\def\th@fullnameFmt##1##2{#1}}
+\thfullnameFmt{#1+" "+#2}
+\newcommand{\FullName}[3][]{\textField[%
+  \presets{\th@fullnamePresets}#1\AAcalculate{%
+  var fName=this.getField("Name.first").value;\r
+  var lName=this.getField("Name.last").value;\r
+  event.value=\th@fullnameFmt{fName}{lName};}]{FullName}{#2}{#3}}
+\def\pwdInstrFldTU#1{\def\pwdInstrFld@TU{#1}}
+\pwdInstrFldTU{Enter password to mark this quiz}
+\newcommand{\pwdInstrFld}[4][]{% opts, pwd, wd, ht
+  \@ifundefined{\currQuiz-nQs}{\def\nQs{0}}
+    {\edef\nQs{\@nameuse{\currQuiz-nQs}}}%
+  \textField[\cmd{\bParams{\currQuiz}{\nQs}{"#2"}\eParams}
+  \Ff\FfPassword\AAkeystroke{\pwdKeyJS}
+  \protect\AA\protect\Ff\TU{\pwdInstrFld@TU}#1%
+]{pwdtxt}{#3}{#4}}
+\def\markQzFldCA#1{\def\markQzFld@CA{#1}}
+\markQzFldCA{Mark It}
+\def\markQzFldTU#1{\def\markQzFld@TU{#1}}
+\markQzFldTU{Press to mark this quiz}
+\newcommand{\markQz}[3][]{%
+  \@ifundefined{\currQuiz-nQs}{\def\nQs{0}}%
+    {\edef\nQs{\@nameuse{\currQuiz-nQs}}}%
+  \makebox[0pt][l]{\textField[\BC{}\BG{}\H{S}\AAformat{%
+    var f=this.getField("MarkIt");\r
+    var g=this.getField("freezeQz");\r
+    if(typeof _thorshammer!="undefined" && _thorshammer){\r\t
+    if(f!=null)f.display=display.visible;\r\t
+} else{\r\t
+    if(f!=null)f.display=display.hidden;\r\t
+    if(g!=null)g.display=display.hidden;\r
+}}]{hideTxtFldMI}{0pt}{0pt}}%
+  \pushButton[\cmd{\bParams{\currQuiz}{\nQs}\eParams}\F\FHidden
+    \AAmouseup{\commonPassKey}\CA{\markQzFld@CA}
+    \TU{\markQzFld@TU}\protect\AA\protect\F#1%
+  ]{MarkIt}{#2}{#3}}
+\def\freezeQuizFldTU#1{\def\freezeQuizFld@TU{#1}}
+\freezeQuizFldTU{Make all fields readonly, cannot be undone}
+\def\freezeQuizFldCA#1{\def\freezeQuizFld@CA{#1}}
+\freezeQuizFldCA{Freeze Quiz}
+\newcommand\freezeQuiz[3][]{\pushButton[\cmd{\let\%\defjsLB}
+  \CA{\freezeQuizFld@CA}\F\FHidden
+  \TU{\freezeQuizFld@TU}\AAmouseup{freezeQuizMU()}
+  \protect\AA\protect\F
+  #1]{freezeQz}{}{11bp}}
+\def\instrSaveFldTU#1{\def\instrSaveFld@TU{#1}}
+\instrSaveFldTU{Save and close this file to the current folder}
+\def\instrSaveFldCA#1{\def\instrSaveFld@CA{#1}}
+\instrSaveFldCA{Save \string& Close}
+\newcommand\instrSave[3][]{\pushButton[%
+  \CA{\instrSaveFld@CA}\F\FHidden
+  \TU{\instrSaveFld@TU}\AAmouseup{%
+    var f=this.getField("studentenGrade");\r
+    var str=""+f.value;\r
+    str=str.replace(/\string\s/g,"");\r
+    if (str=="")\r\t
+      app.alert("You did not award the student a final mark."
+      +"\\n\\nAward the mark and then save.");\r
+    else {\r\t
+      aebTrustedFunctions(this,aebSaveAs);\r\t
+    this.closeDoc(true);\r
+  }}\protect\AA\protect\F
+  #1]{freezeQz}{}{11bp}}
+\AtEndOfPackage{\ifth@allowfreeze\let\freezeOrSave\freezeQuiz
+  \else\let\freezeOrSave\instrSave\fi}
+\newcommand{\studentReport}[3][]{%
+  \textField[\BC{}\BG{}\F\FHidden\Ff\FfReadOnly\protect\Ff#1%
+  ]{studentenReport}{#2}{#3}}
+\newcommand{\studentGrade}[3][]{\textField[\F\FHidden\protect\F
+  \BC{red}\BG{}\Q1\textSize{12}\textColor{blue}
+  \AAkeystroke{event.change=event.change.toUpperCase()}#1%
+  ]{studentenGrade}{#2}{#3}}
+\def\thQHFirstName#1{\def\th@QHFirstName{\textbf{#1}\space}}
+\thQHFirstName{First name:}
+\def\thQHLastName#1{\def\th@QHLastName{\textbf{#1}\space}}
+\thQHLastName{Last name:}
+\def\thQHPoints#1{\def\th@QHPoints{\textbf{#1}\space}}
+\thQHPoints{Points:}
+\def\thQHGrade#1{\def\th@QHGrade{\textbf{#1}\space}}
+\thQHGrade{Grade:}
+\newcommand{\thQuizHeader}{\let\Hy@EveryPageAnchor\relax
+  \@ifstar{\thPageOne\thQuizHeaderLayout}
+  {\newpage\thPageOne\thQuizHeaderLayout}%
+}
+\newcommand\thQuizHeaderLayout{\noindent
+  \th@QHFirstName\FirstName{1.5in}{13bp}\vcgBdry[3pt]
+  \th@QHLastName\LastName{1.5in}{13bp}\vcgBdry[6pt]
+  \begin{minipage}[t]{1.2in}\kern0pt
+    \makebox[0pt][r]{\raggedleft\markQz{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHPoints\studentReport{\widthof{000/000}}{11bp}\vcgBdry[6pt]
+    \makebox[0pt][r]{\raggedleft\freezeOrSave{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHGrade\studentGrade{14bp}{14bp}\vcgBdry[6pt]
+  \end{minipage}\hfill
+  \begin{minipage}[t]{\linewidth-1em-1.2in}\kern0pt
+  \begin{sumryTblAux}{\currQuiz}
+  \displaySumryTbl[ntables=1,showmarkup]{\currQuiz}
+  \end{sumryTblAux}
+  \end{minipage}}
+\def\completeMsgFldV#1{\def\completeMsgFld@V{#1}}
+\completeMsgFldV{Congratulations, you have completed the quiz,
+  before doing anything else, you need to save this document.}
+\newcommand{\completeMsgFld}[3][]{\textField[\F\FHidden\Ff\FfMultiline
+  \Ff\FfReadOnly\V{\completeMsgFld@V}
+  \DV{\completeMsgFld@V}]{postQzMsg}{#2}{#3}}
+\def\ShrtPtsFldFmt{\bgroup\obeyspaces\ShrtPtsFldFmt@i}
+\def\ShrtPtsFldFmt@i#1{\egroup\flJSStr[noquotes]{\ShrtPtsFld@Fmt}{#1}}
+\ShrtPtsFldFmt{"Short Pts: "+event.value}
+\newcommand{\ShrtPtsFld}[2][]{%
+  \PointsField[\AAformat{if(event.value!="")
+    event.value=\ShrtPtsFld@Fmt}\F\FHidden\protect\AA
+    \protect\F#1]{#2}}
+\def\LngPtsFldFmt{\bgroup\obeyspaces\LngPtsFldFmt@i}
+\def\LngPtsFldFmt@i#1{\egroup\flJSStr[noquotes]{\LngPtsFld@Fmt}{#1}}
+\LngPtsFldFmt{"Long Pts: "+event.value}
+\newcommand{\LngPtsFld}[2][]{%
+  \textField[\presets{\PointsFieldDefaults}\F\FHidden
+  \AAformat{if(event.value!="") event.value=\LngPtsFld@Fmt}
+  \AAcalculate{var f=this.getField("essayMrkUp");\r
+  if(f!=null)EFSimple_Calculate("SUM",%
+new Array("essayMrkUp.\currQuiz"));}
+  ]{EssayField.\currQuiz}{\PtFW}{\DefaultHeightOfWidget}}
+\def\TotalsFldFmt{\bgroup\obeyspaces\TotalsFldFmt@i}
+\def\TotalsFldFmt@i#1{\egroup\flJSStr[noquotes]{\TotalsFld@Fmt}{#1}}
+\TotalsFldFmt{"Total: "+event.value+"\space\eqOutOf\space"%
++NPointTotal}
+\newcommand{\TotalsFld}[2][]{%
+  \textField[\presets{\PointsFieldDefaults}\F\FHidden
+  \AAformat{try{event.value=(\TotalsFld@Fmt)}catch(e){}}
+  \AAcalculate{EFSimple_Calculate("SUM",%
+new Array("PointsField.\currQuiz","EssayField.\currQuiz"));\r
+    var\eqSP f=this.getField("studentenReport");\r
+    f.value=(1*event.value)+"\eqSP/\eqSP"+\theeqpointvalue;
+  }]{TotalsField.\currQuiz}{\PtFW}{\DefaultHeightOfWidget}}
+\newcommand{\thQuizTrailer}{\raisebox{\baselineskip-\fboxsep}%
+  {\makebox[0pt][l]{\parbox[t]{3in}{\kern0pt
+  \completeMsgFld{3in}{3\baselineskip}}}}%
+  \makebox[0pt][l]{\hspace{3in}\quad
+    \ifthtestmode\CorrButton{\currQuiz}\else
+    \stuSaveBtn{}{11bp}\fi}\parbox[t]{3in}
+    {\ShrtPtsFld{\currQuiz}\vcgBdry[6pt]
+    \LngPtsFld{\currQuiz}\vcgBdry[6pt]
+    \TotalsFld{\currQuiz}}}
+\def\essayQFldTU#1{\def\essayQFld@TU{#1}}
+\essayQFldTU{Assign points to extended responses}
+\def\EsW{33bp}\def\EsH{14bp}
+\def\essayQ#1{\let\qMark@HookSave\qMark@Hook
+  \def\qMark@Hook{\makebox[0pt][r]{\smash
+  {\raisebox{-7bp+\fboxsep}{\stepcounter{questionno}\textField[%
+    \cmd{\bParams{#1}\eParams}\F\FHidden\Q{1}
+    \AAkeystroke{\essayQKey}
+    \AAformat{if(event.value!="") event.value=event.value
+      +((event.value==1)?" \eqptLabel":" \eqptsLabel")}
+  \TU{\essayQFld@TU}
+  ]{essayMrkUp.\currQuiz.\thequestionno}{\EsW}{\EsH}%
+  \addtocounter{questionno}{-1}}}}\global
+  \let\qMark@Hook\qMark@HookSave}}
+\def\essayitem#1{\essayQ{#1}\item\PTs{#1}}
+\begin{defineJS}[\catcode`\@=0\relax]{\pwdKeyJS}
+if (event.willCommit) {
+  if (event.value==@p(3)) {
+    @commonPassKey
+  }
+}
+\end{defineJS}
+\begin{defineJS}[\catcode`\@=0\relax]{\commonPassKey}
+if(typeof aQuizzesInDoc=="undefined")
+  var aQuizzesInDoc=new Array();
+if (aQuizzesInDoc.indexOf("@oField"))
+  aQuizzesInDoc.push("@oField");
+if (typeof @oField=="undefined")
+  var @oField=new Object;
+restoreQuizData();
+this.calculate=true;
+var f=this.getField("postQzMsg");
+if (f!=null) f.display=display.hidden;
+var f=this.getField("pbStuSvCl");
+if (f!=null) f.display=display.hidden;
+var f=this.getField("ScoreField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("PointsField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("EssayField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("TotalsField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("essayMrkUp");
+if (f!=null) f.display=display.visible;
+correctQuiz("@p(1)",@p(2));
+var f=this.getField("qzreset");
+if (f!=null) f.display=display.visible;
+var f=this.getField("freezeQz");
+if (f!=null) f.display=display.visible;
+var f=this.getField("studentenReport");
+if (f!=null) f.display=display.visible;
+var f=this.getField("studentenGrade");
+if (f!=null) f.display=display.visible;
+if (typeof correctSumryTbl == "function")
+  correctSumryTbl("@p(1)",@p(2));
+\end{defineJS}
+\def\NoNumEnteredMsg#1{\flJSStr*[noquotes]{\cNoNumEnteredMsg}{#1}}
+\NoNumEnteredMsg{"You did not enter a number, %
+enter a nonnegative number only"}
+\def\TooMuchCreditMsg#1{\flJSStr*[noquotes]{\cTooMuchCredit}{#1}}
+\TooMuchCreditMsg{"You've assigned too much credit for this %
+problem, assigning the maximum instead"}
+\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\essayQKey}
+if (event.willCommit) {
+  var qpts=(1*event.value);
+  if (isNaN(qpts)) {
+    app.alert(@cNoNumEnteredMsg);
+    event.rc=false;
+  } else if (qpts<0) {
+    event.value=-1*event.value;
+    qpts=1*event.value;
+  }
+  if (event.rc) {
+    if (qpts > @p(1) ) {
+      app.alert(@cTooMuchCredit);
+      qpts=@p(1);
+    }
+    // update ProbDist array
+    ProbDist[@thequestionno]=qpts;
+    // see if table is present
+    if (typeof correctSumryTbl == "function") {
+      f=this.getField("%
+@dlcombine(@currQuiz)(SanityCheckPts).@thequestionno");
+      var thesePts= qpts + (( qpts == 1 )?%
+" @eqptLabel":" @eqptsLabel");
+      f.value=thesePts;
+      // add color
+      var cb=this.getField("%
+@dlcombine(@currQuiz)(SanityCheck).@thequestionno");
+      if (qpts==@p(1)) cb.strokeColor=@rghtColorJS;
+      else if (qpts>0) cb.strokeColor=@partialColorJS;
+      else cb.strokeColor=@wrngColorJS;
+    }
+    event.value=qpts;
+  }
+}
+\end{defineJS}
+\def\instrAutoSaveOn{\def\instrAutoSave{true}}
+\def\instrAutoSaveOff{\def\instrAutoSave{false}}
+\instrAutoSaveOn
+\def\instrAutoCloseOn{\def\instrAutoClose{true}}
+\instrAutoCloseOn
+\def\instrAutoCloseOff{\def\instrAutoClose{false}}
+\def\MarkWarningMsg#1{\dlJSStr*[noquotes]{\MarkWarning@Msg}{#1}}
+\MarkWarningMsg{"You did not award the student a final mark.\
+  \\n\\nAward the mark and then save."}
+\def\flattenOn{\def\bFlattenState{false}}
+\def\flattenOff{\def\bFlattenState{true}}
+\ifbasicmethods\flattenOff\else\flattenOn\fi
+\begin{insDLJS}{jsforthor}{thorshammer: Freeze/Save Doc}
+var sndSaveWarning=\SecondSave@Msg;
+var isthereCvrPg=\thIsCP;
+var cvrPgNum="\thCvrPg";
+function freezeQuizMU() {
+var f, fname;
+var bOK=true;
+var f=this.getField("studentenGrade");
+var str=""+f.value;
+str=str.replace(/\s/g,"");
+if (str=="") {
+  app.alert(\MarkWarning@Msg);
+  bOK=false;
+}
+var SolnSet=this.info.SolnSet;
+if (bOK&&SolnSet!=""){
+var SolnPath=this.info.SolnPath;
+// var SolnSet=this.info.SolnSet;
+var qzbasename=this.info.qzBaseName;
+  aebTrustedFunctions(this,aebInsertPages,{
+    nPage: (this.numPages-1),
+    cPath: SolnPath+"/"+qzbasename+"-"+SolnSet+".pdf"
+  })
+};
+if(\instrAutoSave&&bOK) {
+//  var cSave="\jobname";
+  var docFN=this.documentFileName;
+  docFN=docFN.substring(0,docFN.length-4);
+  var cSave=(\thUseNameToCustomize)?"\jobname":docFN;
+  if(\thUseNameToCustomize) {
+    var f=this.getField("Name.first");
+    if(f!=null)cSave+=("-"+f.value+"_");
+    f=this.getField("Name.last");
+    if(f!=null)cSave+=(f.value);
+    cSave+=("-g");
+  }
+  var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,{bSave:true,%
+cFilenameInit: cSave });
+  bOK=(typeof oRetn=="object");
+  if(bOK) {
+    for (var i=0; i<this.numFields; i++) {
+      fname=this.getNthFieldName(i);
+      f=this.getField(fname);
+      f.readonly=true;
+    }
+    var f=this.getField("MarkIt");
+    if (f!=null)f.display=display.hidden;
+    f=this.getField("freezeQz");
+    if (f!=null)f.display=display.hidden;
+    if(typeof _flattenThisDoc=="undefined")this.flattenPages();
+    oRecordOfQuizData=undefined;
+    this.info.SolnSet="";
+    var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+{cPath:oRetn.cPath,cFS:oRetn.cFS});
+  }
+}
+if(\instrAutoClose&&bOK) this.closeDoc(true);
+}
+\end{insDLJS}
+\begin{defineJS}[\catcode`\@=0\relax]{\freezeQuizMU}
+var f, fname;
+var bOK=true;
+if(@instrAutoSave) {
+  var cSave="@jobname";
+  var f=this.getField("Name.first");
+  if(f!=null)cSave+=("-"+f.value+"_");
+  f=this.getField("Name.last");
+  if(f!=null)cSave+=(f.value);
+  var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,{bSave:true,@%
+cFilenameInit: cSave });
+  bOK=(typeof oRetn=="object");
+  if(bOK) {
+    for (var i=0; i<this.numFields; i++) {
+      fname=this.getNthFieldName(i);
+      f=this.getField(fname);
+      f.readonly=true;
+    }
+    var f=this.getField("MarkIt");
+    if (f!=null)f.display=display.hidden;
+    f=this.getField("freezeQz");
+    if (f!=null)f.display=display.hidden;
+    this.flattenPages();
+    var retn=aebTrustedFunctions(this,aebDocSaveAs,@%
+{cFS:oRetn.cFS,cPath: oRetn.cPath });
+  }
+}
+if(@instrAutoClose&&bOK) this.closeDoc(true);
+\end{defineJS}
+\def\@@RespBoxEssayActions{%
+  \AA{\if\eqQuizType\isQZ
+    \AAKeystroke{%
+      if(event.willCommit){\jsR\jsT
+      RecordPointValue(\eqPTs,\thequestionno);\jsR\jsT
+      RecordProblemType("\eqQT",\thequestionno);\jsR
+      var stripResp=stripWhiteSpace(event.value);\jsR\jsT
+      if(stripResp=="")Responses[\thequestionno]=undefined;\jsR\jsT
+      else Responses[\thequestionno]="<essay>";\jsR\jsT
+      if ( typeof fieldPopTbl == "function" ) fieldPopTbl("\currQuiz");
+      }\jsR
+      if (!isQuizInitialized("\curr@quiz")) {\jsR\jsT
+          \eqObjAlert\space eqAppAlert(%
+              InitMsg("\bqlabelISO"),3);\jsR\jsT
+          event.rc = false;\jsR
+      }%
+    }%
+  \fi
+  }
+}
+\def\InitQzMsg#1{\flJSStr*[noquotes]{\InitQzMsg@Msg}{#1}}
+\InitQzMsg{"You cannot begin the quiz before entering
+  your first and last names in the fields provided.\n\n
+  Enter the name as you are known in the class; otherwise,
+  you will receive no credit for your work."}
+\def\IfbQzChkSnippet{%
+this.calculate=false;\jsR
+if(\thOrdQz) bOk=true\jsR
+else {\jsR\jsT
+  var f=this.getField("Name.first");\jsR\jsT
+  var str1=stripWhiteSpace(f.value);\jsR\jsT
+  var f=this.getField("Name.last");\jsR\jsT
+  var str2=stripWhiteSpace(f.value);\jsR\jsT
+  bOk=(str1!=""&&str2!="");\jsR
+}
+if(bOk)}
+\expandafter\def\expandafter\@initQuiz\expandafter
+  {\expandafter\IfbQzChkSnippet\expandafter{\@initQuiz}
+  else app.alert({cMsg:\InitQzMsg@Msg,cTitle:\ThorsAlert@Title});
+}
+\toks@=\expandafter{\postSubmitQuiz\t\t
+  oRecordOfQuizData["ProbDist.\oField"]=ProbDist;\r\t\t
+  oRecordOfQuizData["RightWrong.\oField"]=RightWrong;\r\t\t
+  var f=this.getField("postQzMsg");\r\t\t
+  if (f!=null) f.display=display.visible;\r\t\t
+  var f=this.getField("pbStuSvCl");\r\t\t
+  if (\stuAutoSave&&f!=null)f.display=display.visible;} %\r\t\t
+\edef\postSubmitQuiz{\the\toks@}
+\def\EndQzWarningMsg#1{\flJSStr*[noquotes]{\EndQzWarning@Msg}{#1}}
+\EndQzWarningMsg{"When you end the quiz, you cannot change
+any of your answers without starting the quiz over from the
+beginning.\n\n Press \\"Yes\\" to end the quiz."}
+\def\ThorsAlertTitle#1{\flJSStr*[noquotes]{\ThorsAlert@Title}{#1}}
+\ThorsAlertTitle{"Thor's Hammer"}
+\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\eq@EndQzBtnScript}
+if (!isQuizInitialized("*currQuiz"))
+  eqAppAlert(InitMsg("*bqlabelISO"),3);
+else {
+  var retn=app.alert({cMsg: *EndQzWarning@Msg,%
+cTitle: *ThorsAlert@Title, nIcon: 2, nType: 2});
+  if (retn==4) {
+    if (*minQuizResp(*thequestionno)&&_ModalNotOn){
+      *currQuiz.PtValues=(new %
+Array(*pointValuesArray));
+      ProbType=[*ptypeArray];
+*if@inclkey%
+      *currQuiz.CorrAns=(new %
+Array(*corrAnsArray));
+*fi%
+      DisplayQuizResults("*currQuiz",*theeqpointvalue,%
+*thequestionno);
+      var h=this.getField("ScoreData.*currQuiz");
+      h.value=Score+";"+NQuestions+";"%
++ptScore+";"+NPointTotal;
+      *postSubmitQuiz
+      resetQuiz("*currQuiz");
+    }
+  }
+}
+\end{defineJS}
+\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScript}}}
+\let\stuASOn\ef@YES
+\def\stuAutoSaveOn{\let\stuASOn\ef@YES
+  \def\stuAutoSaveScript{\t app.execMenuItem("SaveAs");\r}%
+  \def\stuAutoSave{true}}
+\def\stuAutoSaveOff{\let\stuASOn\ef@NO
+  \let\stuAutoSaveScript\@empty
+  \def\stuAutoSave{false}}
+\stuAutoSaveOn
+\def\stuAutoCloseOn{\def\stuAutoCloseScript{\t
+  if(!this.dirty)this.closeDoc(true);\r}%
+  \def\stuAutoClose{true}}
+\stuAutoCloseOn
+\def\stuAutoCloseOff{\let\stuAutoCloseScript\@empty
+  \def\stuAutoClose{false}}
+\def\stuSaveBtnCA#1{\def\stuSaveBtn@CA{#1}}
+\stuSaveBtnCA{Save}
+\def\stuSaveBtnTU#1{\def\stuSaveBtn@TU{#1}}
+\stuSaveBtnTU{Press to save and close the document}
+\def\SecondSaveMsg#1{\dlJSStr*[noquotes]{\SecondSave@Msg}{#1}}
+\SecondSaveMsg{"Alert! This document has not been saved, do not
+  exit before saving!"}
+\newif\ifUseStuSaveAsDialog\UseStuSaveAsDialogfalse
+\def\useStuSaveAsDialogOn{\UseStuSaveAsDialogtrue}
+\def\useStuSaveAsDialogOff{\UseStuSaveAsDialogfalse}
+\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\autoSaveStuJS}
+  var bOK=true;
+  global.bOkClose=true;
+  var _path=this.path;
+  var pos=_path.lastIndexOf("/");
+  var currentFolder=_path.substring(0,pos+1);
+  var docFN=this.documentFileName;
+  docFN=docFN.substring(0,docFN.length-4);
+  var cSave=(*thUseNameToCustomize)?"*jobname":docFN;
+  currentFolder=currentFolder+cSave+".pdf";
+  if (typeof aebTrustedFunctions=="undefined")
+    app.execMenuItem("SaveAs");
+  else {
+*ifUseStuSaveAsDialog%
+    var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,%
+{bSave:true,cFilenameInit: cSave });
+    bOK=(typeof oRetn=="object");
+*fi%
+    aebDocSaveAs.msg="";
+    aebDocSaveAs.action=%
+'global.bOkClose=false;app.alert("'+sndSaveWarning+'")';
+    if (bOK) var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+{cPath:*ifUseStuSaveAsDialog oRetn.cPath*else currentFolder*fi });
+    else app.alert(sndSaveWarning);
+  }
+  if(*stuAutoClose&&bOK&&global.bOkClose&&!this.dirty)
+    delete global.bOkClose;
+    this.closeDoc(true);
+\end{defineJS}
+\newcommand\stuSaveBtn[3][]{\pushButton[\F\FHidden
+  \CA{\stuSaveBtn@CA}\TU{\stuSaveBtn@TU}
+  \cmd{\ifx\stuASOn\ef@NO\let\@eqAAmouseup\@gobble\fi}
+  \AAmouseup{if(\stuAutoSave){\r
+    \autoSaveStuJS
+  }}\protect\AA\protect\F#1
+]{pbStuSvCl}{#2}{#3}}
+\let\DeclareQuizSAVE\DeclareQuiz
+\def\DeclareQuiz#1{\def\thQuizName{#1}\th@DeclareQuiz{#1}}
+\def\th@DeclareQuiz#1{\DeclareQuizSAVE{#1}%
+  \expandafter\gdef\expandafter
+  \eq@prior@endQuiz\expandafter{\eq@prior@endQuiz\wrtQzInfo}}
+\def\thQzName#1{\def\thqzname{#1}}
+\thQzName{\thQuizName}
+\def\wrtQzInfo{\eq@IWAuxOut{\string
+  \csarg\string\gdef{\currQuiz-nQs}{\thequestionno}^^J\string
+  \csarg\string\gdef{\currQuiz-nPts}{\theeqpointvalue}}}
+\renewcommand\eqQuizPointsMsg{ptScore}
+\renewcommand{\aeb@creditmarkup}{\bgroup
+  \edef\markupWidth{\EsW}\edef\markupHeight{\EsH}%
+  \textField[\Ff\FfReadOnly\BC{}\F\FHidden
+  \textColor{\pcMarkupColor}\textSize{\markupTextSize}\autoCenter{y}%
+  \DV{0 \eqptsLabel}\V{0 \eqptsLabel}]%
+  {qMark.\currQuiz.\thequestionno.\arabic{qMarkCnt}}%
+  {\markupWidth}{\markupHeight}\egroup}
+\def\eq@begintab{% second column left aligned
+    \begin{tabular}[t]{llc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
+    {\Large\strut}}%
+\let\st@scndclmnSAVE\st@scndclmn
+\def\st@scndclmn{\kern2bp\st@scndclmnSAVE}
+\def\stmarkupWidth{20bp} % normally 12bp
+\def\stmarkupHeight{9bp} % unchanged
+\def\stmarkupTextSize{8} % normally 0pt
+\def\stmarkupbox{\mbox} % normally {\makebox[0pt][l]}
+\def\st@thrdclmn#1{\setLink[\linktxtcolor{black}
+  \A{\JS{this.pageNum=(this.pageNum+#1-1)}}]{\sumrytbllinkHook{#1}}}
+\fancyQuizHeaders
+\setsolnspace{}
+\let\FncyHdrsFmtNoTitleQuiz\@empty
+\setlength{\eflength}{\widthof{\textbf{00.}\space}}
+\edef\th@leftShiftHdr{\the\eflength}
+\def\th@HeaderOffset{\hskip-\th@leftShiftHdr\relax}
+\def\doNotShirtSonsHdrs{\let\th@HeaderOffset\relax}
+\def\thQzSolnMrkr{\textField[\BC{}]{thsolns4.\currQuiz}{1bp}{1bp}}
+\def\quizSolnsHeadnToc{\section*
+  {\makebox[0pt][l]{\th@HeaderOffset
+    \thQzSolnMrkr\sqslsectitle}}%
+    \addcontentsline{toc}{section}{%
+    \@ifundefined{web@latextoc}{}{%
+    \ifx\web@latextoc\eq@YES\else
+    \protect\numberline{}\fi}\sqslsectitle}}
+\renewcommand\eq@sqslsectitle{Solutions to the Quiz}
+\newcommand\myFQHFmt{%
+  \string\bfseries\string\color{\fncyQHdrsColor}%
+  \ifx\aebTitleQuiz\@empty
+    \ifnum\@eqquestiondepth>0\relax
+        \FncyHdrsFmtNoTitleQuiz\fi\else
+        \aebTitleQuiz\protect\
+        \ifnum\@eqquestiondepth=0\else\\\relax
+        \FncyHdrsFmtQuestion\fi
+  \fi %\space
+  \ifcase\@eqquestiondepth
+    \ifx\aebTitleQuiz\@empty\FncyHdrsFmtNoTitleQuiz\fi
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+      (\alph{eqquestionnoii})\space
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+      (\alph{eqquestionnoii})%
+      (\roman{eqquestionnoiii})\space
+  \fi
+}
+\dclrFncyQzHdrsFmt{\myFQHFmt}
+\let\ReturnTo\@gobbletwo
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
+\providecommand{\inputWebCfg}{%
+  \let\bWebCustomize\relax
+  \let\eWebCustomize\endinput
+  \let\ExecuteOptions@SAVE\ExecuteOptions
+  \let\ExecuteOptions\@gobble
+  \makeatletter
+  \InputIfFileExists{web.cfg}{}{}\makeatother
+  \let\ExecuteOptions\ExecuteOptions@SAVE
+  \let\bWebCustomize\endinput
+  \let\eWebCustomize\relax
+}
+\def\classEntriesDef{["","","",false]}
+\newif\ifClassEntries\ClassEntriesfalse
+\let\classEntries\@gobble
+\def\classMember{\ClassEntriestrue\@ifstar
+  {\let\th@star\ef@YES\classMember@i}
+  {\let\th@star\ef@NO\classMember@i}}
+\newcommand\classMember@i[2]{%
+  \@ifstar{\let\th@exstar\ef@YES\classMember@ii{#1}{#2}}
+    {\let\th@exstar\ef@NO\classMember@ii{#1}{#2}}}
+\newcommand\classMember@ii[3]{%
+  \ifx\th@exstar\ef@YES\def\AbsPth{true}\else
+    \def\AbsPth{false}\fi
+  \ifx\th@star\ef@NO
+    \ifx\th@exstar\ef@YES
+      \g@addto@macro\classEntries{,["#1","#2","#3",true]}\else
+      \g@addto@macro\classEntries{,["#1","#2","#3",false]}\fi
+  \else
+    \g@addto@macro\classEntries{,["}%
+    \pdfstringdef\x{#1}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \g@addto@macro\classEntries{","}%
+    \pdfstringdef\x{#2}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \g@addto@macro\classEntries{","}%
+    \pdfstringdef\x{#3}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \ifx\th@exstar\ef@YES
+      \g@addto@macro\classEntries{",true]}\else
+      \g@addto@macro\classEntries{",false]}\fi
+  \fi}
+\def\autoCopyOn{\def\autoCopy{true}}
+\def\autoCopyOff{\def\autoCopy{false}}
+\autoCopyOn
+\newcommand{\cFS}[1]{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\cFSth\@empty\else\def\cFSth{CHTTP}\fi}
+\let\cFSth\@empty
+\def\distrToStudentsOn{\def\distrToStudents{true}}\distrToStudentsOn
+\def\distrToStudentsOff{\def\distrToStudents{false}}
+\def\distrToInstrOn{\def\distrToInstr{true}}\distrToInstrOn
+\def\distrToInstrOff{\def\distrToInstr{false}}
+\def\th@QzVer{0}
+\def\QzVer{1}
+\newcommand{\declareQuizBody}[1]{%
+  \bgroup\@tempcnta\th@QzVer\relax
+  \advance\@tempcnta\@ne
+  \edef\th@qbCnt{\the\@tempcnta}%
+  \csarg\xdef{#1-QzVer}{\th@qbCnt}\egroup
+  \csarg\def{#1}{\immediate\openout\CommentStream #1.cut
+    \let\verbatim@out\CommentStream
+    \immediate\write\verbatim@out{\string
+      \def\string\QzVer{\@nameuse{#1-QzVer}}}%
+    \verbatimwrite}%
+  \csarg\def{end#1}{\endverbatimwrite
+    \immediate\closeout\CommentStream}}
+\newcounter{th@qzCnt}
+\def\theth@qzCnt{\alph{th@qzCnt}}
+\newcommand{\InputQuizBody}[1]{\newpage %\thPageOne
+  \@ifundefined{thisQuizOrig}{\edef\thisQuizOrig{\thisQuiz}
+  \let\Hy@EveryPageAnchor\relax}{}\stepcounter{th@qzCnt}%
+  \edef\x{\thisQuizOrig\theth@qzCnt}\expandafter
+  \th@DeclareQuiz\expandafter{\x}%
+  \renewcommand\sqslsecrunhead{}%
+  \InputIfFileExists{#1.cut}{}{}
+  \immediate\closeout\quiz@solns %\th@QzHeaderLS
+  \let\eq@normallheader\relax
+  \newpage
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLS}%
+    \def\th@QzHeaderC{\th@QzHeaderCS}%
+  }{%
+    \lheader{\th@QzHeaderLS}%
+    \cheader{\th@QzHeaderCS}%
+  }
+  \includequizsolutions*\relax
+  \global\therearequizsolutionsfalse
+  \renewcommand\sqslsecrunhead{\eq@sqslsecrunhead}%
+  \eq@noformstrue
+  \immediate\openout \quiz@solns \jobname.qsl
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLQ}%
+    \def\th@QzHeaderC{\th@QzHeaderCQ}%
+  }{%
+    \lheader{\th@QzHeaderLQ}%
+    \cheader{\th@QzHeaderCQ}%
+  }%
+}
+\def\mkClFlsSpcls{\let\oct\eqbs\let\u\relax}
+\newenvironment{makeClassFiles}{%
+\execJS[\mkClFlsSpcls]{mcfthor}}{\endexecJS}
+\def\setClassArray{\ifClassEntries
+  \classEntries\else\classEntriesDef\fi}
+\def\setArrayLength{\ifbasicmethods0\else lst.length\fi}
+\def\setfilesuffix{\ifuseclassOpt"-"+fN+"_"+lN\else
+  \ifbasicmethods""\else"-"+(i+1)\fi\fi+".pdf"}
+\begin{defineJS}[\def\defineJSjsR{^^J}\let\u\relax
+  \catcode`\@=0\relax]{\sadQuizzes}
+if(@bFlattenState)
+  this.addScript({
+    cName: "thorshammer: Do not flatten",
+    cScript:"var _flattenThisDoc=false;"
+  });
+if (@autoCopy) {
+  var bUseClass=@bUseClass;
+  var reRmFn=new RegExp(this.documentFileName,"i");
+  var instrPath=@InstrPath;
+  var cLast=instrPath[instrPath.length-1];
+  if (cLast=="/")
+    instrPath=instrPath.substring(0,instrPath.length-1);
+  var classPath=@ClassPath;
+  cLast=classPath[classPath.length-1];
+  if (cLast=="/")
+    classPath=classPath.substring(0,classPath.length-1);
+  var thInstrFS="@thInstrFS";
+  var thClassFS="@thClassFS";
+  var isthereCvrPg=@thIsCP;
+  var cvrPgNum="@thCvrPg";
+  console.println("autocopy "+((@autoCopy)?"on":"off"));
+  var retn;
+  var solnSuffix="";
+  var oSolnSuffix=new Object;
+  var parentoDoc=this;
+  var workingFolder=this.path;
+  var pos=workingFolder.lastIndexOf("/");
+  workingFolder=workingFolder.substring(0,pos+1);
+  var _workingFolder="";
+  // console.println("working folder: " + workingFolder);
+  var willSaveScript='isAQuizUnfinishedAtSave();\r'
+      +'if (oRecordOfQuizData !=undefined) collectQuizData();';
+  var oHSD=this.getField("holdScoreData");
+  var Rect=oHSD.rect;
+  this.removeField("holdScoreData");
+  var hsdFmt='if(typeof oRecordOfQuizData=="undefined")\r\t\
+  oRecordOfQuizData=new Object;';
+  var restQD='@restoreQD';
+  if(isthereCvrPg) {// -------- extract cover pages ------------
+    var aCvrPgRng=cvrPgNum.split("-");
+    if (aCvrPgRng[0]=="") {
+      console.println("Start Range not specified, using 0 instead");
+      var bPg=0;
+    } else var bPg=aCvrPgRng[0];
+    var ePg=(aCvrPgRng.length>1)?aCvrPgRng[1]:aCvrPgRng[0];
+    var oDoc=aebTrustedFunctions(this,aebExtractPages,
+      {nStart: bPg, nEnd: ePg});
+    // save cover page(s) to the instructor folder
+    _workingFolder=(@InstrPathFull)?"":workingFolder;
+    aebDocSaveAs.msg="Cannot access the local folder "
+      + _workingFolder+instrPath+"/@jobname-cvrpg.pdf";
+    var retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+      {cFS:thInstrFS,cPath: _workingFolder+instrPath+"/@jobname-"
+      +"cvrpg.pdf",bCopy:false});
+    oDoc.dirty=false;
+    oDoc.closeDoc(true);
+    // delete cover page before continuing, will reinsert it later
+    this.deletePages({nStart: bPg, nEnd: ePg});
+    this.dirty=false;
+  }
+// ------- end cover page code --------------
+  var nQz=aQuizzesInDoc.length; // number of quizzes this doc
+  var bOkBasicSolns=false;
+  var f=this.getField("thsolns4");
+  if (f != null ) {
+    console.println("There are solutions");
+    bOkBasicSolns=true;
+    var g=f.getArray();
+    for (var i=0; i<g.length; i++) {
+      var solnSuffix=g[i].name; // eg solns4.q1a
+      var pos=solnSuffix.indexOf(".");
+      var qzName=solnSuffix.substring(pos+1);   // eg q1a
+      solnSuffix=solnSuffix.replace(/\./g,"-"); // eg solns4-q1a
+      // oSolnSuffix records whether a quiz has solution pages
+      oSolnSuffix[qzName]=solnSuffix;
+    }
+    // ------------- extraction--------------
+// console.println("aQuizzesInDoc: " + aQuizzesInDoc.toSource());
+// console.println("nQz="+nQz);
+    for (var i=0; i< nQz; i++) {
+      var f=this.getField("thsolns4");
+      var g=f.getArray();
+      var qzName=aQuizzesInDoc[i];
+      var bOk2Extract=(typeof oSolnSuffix[qzName]!="undefined");
+      if (bOk2Extract) {
+// console.println(g[0].name + ", begins on page "+g[0].page);
+        var bPg=g[0].page;
+// console.println("bPg= " + bPg);
+//      var f=this.getField("Name.first."+(i+1));
+        var f=this.getField("bMrkQz."+(i+1));
+        var ePg=(f==null)?(this.numPages-1):(f.page-1);
+// console.println("ePg= " + ePg);
+        var solnSuffix=g[0].name; // solns4.<qzName>
+        solnSuffix=solnSuffix.replace(/\./g,"-"); // solns4-<qzName>
+        var oDoc=aebTrustedFunctions(this,aebExtractPages,
+          {nStart: bPg, nEnd: ePg});
+        // save
+        _workingFolder=(@InstrPathFull)?"":workingFolder;
+        aebDocSaveAs.msg="Cannot access the local folder "
+          + _workingFolder+instrPath+"/@jobname-"+solnSuffix+".pdf";
+        var retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+          {cFS:thInstrFS,cPath: _workingFolder+instrPath+"/@jobname-"
+          +solnSuffix+".pdf",bCopy:false});
+        // close
+        oDoc.dirty=false;
+        oDoc.closeDoc(true);
+        // delete solution page before continuing
+        this.deletePages({
+          nStart: bPg,
+          nEnd: ePg});
+        this.dirty=false;
+      }
+    }
+  }
+// ------ begin creating custom quizzes for class members ------
+  var cnt=0;    // determines which quiz to generate
+  var lst=new Array(@setClassArray);
+  var l=(bUseClass)?@setArrayLength:1; // dps
+  for (var i=0; i < l; i++) {
+    var qzName=aQuizzesInDoc[cnt];
+// console.println("Working on " + qzName);
+    var fN=lst[i][0];
+    var lN=lst[i][1];
+    var folder=lst[i][2];
+    var isAbsPth=lst[i][3]; // dps
+    if (folder!="")folder+="/";
+    //  pre-populate with the student's name
+    this.getField("Name.first").value=fN;
+    this.getField("Name.last").value=lN;
+    // extract quiz
+//    var f=this.getField("Name.first."+cnt);
+    var f=this.getField("bMrkQz."+cnt);
+    var bPg=f.page;
+//    var f=this.getField("Name.first."+(cnt+1));
+    var f=this.getField("bMrkQz."+(cnt+1));
+    var ePg=(f==null)?(this.numPages-1):(f.page-1);
+    // ------------- extraction of quiz pages --------------
+    if(bUseClass)var oDoc=aebTrustedFunctions(this,aebExtractPages,
+      {nStart: bPg, nEnd: ePg});
+    else oDoc=this; // dps
+    // extracting preserves doc JS but not doc actions
+    oDoc.setAction({cTrigger: "WillSave", cScript: willSaveScript});
+    oDoc.addScript({
+      cName: "oRecordOfQuizData Obj Declaration", cScript: hsdFmt});
+    var oDocHSD=oDoc.addField({
+      cName: "holdScoreData",
+      cFieldType: "text",
+      nPageNum: 0,
+      oCoords: Rect
+    });
+    oDoc.setPageAction({
+      nPage: 0,
+      cTrigger: "Open",
+      cScript: restQD
+    });
+    oDoc.info.qzBaseName="@jobname";
+    if(isAbsPth) // dps
+      oDoc.info.StudentPath=folder;
+    else
+      oDoc.info.StudentPath=classPath+"/"+folder;
+    var bOkSolns=(typeof oSolnSuffix[qzName]!="undefined");
+    if(bOkSolns) oDoc.info.SolnSet=oSolnSuffix[qzName];
+    oDoc.info.SolnPath=_workingFolder+instrPath+"/";
+    if(isthereCvrPg) oDoc.info.CvrPg="cvrpg";
+    oDoc.info.cFS=thInstrFS;
+    // Insert cover page, if any.
+    if (isthereCvrPg) {
+      if (typeof bCVMsg == "undefined") {
+        console.println("Inserting cover page from "
+          + _workingFolder+instrPath+"/@jobname-cvrpg.pdf");
+        var bCVMsg=true;
+      }
+      if (cnt==0) var _cvrPath=_workingFolder+instrPath;
+      aebTrustedFunctions(oDoc,aebInsertPages,
+        {nPage: -1,
+        cPath: _cvrPath+"/@jobname-cvrpg.pdf"});
+    }
+    var filesuffix=@setfilesuffix;
+    // Now save this as a copy
+    if(bUseClass) {
+      _workingFolder=(@InstrPathFull)?"":workingFolder;
+      aebDocSaveAs.msg="Cannot access the local folder "
+        + _workingFolder+instrPath+"/@jobname-"+fN+"_"+lN+".pdf";
+      if(@distrToInstr) retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+        {cFS:thInstrFS,
+         cPath: _workingFolder+instrPath+"/@jobname"+filesuffix,
+         bCopy:true});
+      var _workingFolderC=(@ClassPathFull)?"":workingFolder;
+      if(isAbsPth)
+        var cPath=folder+"@jobname"+filesuffix;
+      else
+        var cPath=_workingFolderC+classPath+"/"+folder
+          +"@jobname"+filesuffix
+      aebDocSaveAs.msg="Cannot access the path "+ cPath;
+      if(@distrToStudents) retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+        {cFS:thClassFS,
+         cPath: cPath,
+         bCopy:true});
+      oDoc.dirty=false;
+      oDoc.closeDoc(true);
+    }
+    cnt=++cnt % nQz
+  }
+}
+this.resetForm(["Name"]);
+console.println("automatically saving this file...");
+var toSa=app.setTimeOut("aebTrustedFunctions(this,aebSaveAs);\
+app.clearTimeOut(toSa);",50);
+\end{defineJS}
+\let\sadMultQuizzes\sadQuizzes
+\let\rasSolns\sadQuizzes
+\def\InputClassData#1{\def\InputCl@ssData{#1}\mkClFlsSpcls
+  \InputIfFileExists{#1.cfg}
+    {\PackageInfo{thorshammer}{Inputting class file #1.cfg}}
+    {\PackageWarning{thorshammer}
+      {Cannot find the class file #1.cfg}}}
+\newcommand\InputFormattedClass[2][\classMember]{\ClassEntriestrue
+  \begingroup
+  \mkClFlsSpcls
+  \endlinechar=-1
+  \let\procThisLine\relax
+  \let\bClassData\relax
+  \let\re@dOK\dl@YES
+  \newread\fmtclass
+  \immediate\openin\fmtclass=#2.cfg
+  \loop
+    \read\fmtclass to \classmember
+    \ifeof\fmtclass\let\re@dOK\dl@NO
+    \else
+      \expandafter
+      \ifx\classmember\endinput\let\re@dOK\dl@NO
+      \else
+        \ifx\classmember\@empty %\let\procThisLine\relax
+        \else
+          \expandafter\procThisLine\classmember
+          \expandafter\ifx\classmember\bClassData
+          \def\procThisLine{#1}\fi
+        \fi
+      \fi
+    \fi
+    \ifx\re@dOK\dl@YES\repeat
+  \immediate\closein\fmtclass
+  \endgroup
+}
+\def\th@InputCFG{\InputIfFileExists{thorshammer.cfg}
+  {\PackageInfo{thorshammer}
+    {Inputting the configuration file}}
+  {\PackageInfo{thorshammer}
+    {No configuration file found}}}
+\ifx\th@loadCFG\dl@YES\expandafter\th@InputCFG\fi
+\catcode`\"=\th@dquoteCat
+\endinput
+%%
+%% End of file `thorshammer.sty'.

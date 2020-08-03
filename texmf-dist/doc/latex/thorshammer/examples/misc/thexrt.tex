@@ -1,0 +1,319 @@
+% spdef is part of aeb-mobile package
+% I'm using it as a convenience, so I can have a dual
+% setup between the web package and not loading the
+% web package
+\RequirePackage[use=forweb]{spdef} % try !use=forweb
+\documentclass{article}
+\usepackage{amstext}
+\ifforweb\usepackage[forcolorpaper]{web}\fi
+\expexe{\usepackage[usesumrytbls,allowrandomize\ifforweb\else,forcolorpaper\fi]{exerquiz}}
+\usepackage{ran_toks}
+\usepackage[usebatch]{thorshammer}
+
+\DeclareQuiz{q1}
+\thQzName{Grammatik 1}
+
+\title{Pr\"{u}fung: \thqzname}
+\author{Odon, Thor, Loki}
+\ifforweb
+  \subject{Testing Thor's way}
+  \keywords{LaTeX, acrotex, thorshammer}
+  \university{Thor University}
+  \email{thor@valhalla.gov}
+  \version{1700 Today}
+  \versionLabel{Due by}
+  \copyrightyears{1999-\the\year}
+  \nocopyright
+  \revisionLabel{}
+\fi
+% It is important to freeze the seed to that (1) you can reproduce the exact
+% same quiz at a later time; (2) allow content written to the AUX file to
+% come up to date. This is important when using summary tables.
+\useThisSeed{1344524586}
+
+\renewcommand\sqslsectitle{L\"{o}sungen: \thqzname\space(Ver~\QzVer)}
+
+%\thQzHeaderL{Thor's Class}
+\thQzHeaderCQ{Prüfung: \thqzname\space(Ver~\QzVer)}
+\thQzHeaderCS{L\"{o}sungen: \thqzname\space(Ver~\QzVer)}
+
+\ifforweb
+  \thQzHeaderR{Seite \thepage}
+\else
+  \thQzHeaderR{Herr Thor}
+\fi
+
+\thQzName{Grammatik 1}
+
+\setInitMag{fitwidth}
+\hypersetup{pdfpagemode=UseNone} % don't need to see bookmarks
+\hypersetup{pdfpagelayout=OneColumn}
+\reversemarginpar
+
+\showCreditMarkup
+
+%\previewOn\pmpvOn
+
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+\PTsHook{($\eqPTs^{\text{pts}}$)}
+
+\useMCCircles
+
+% An example of how to re-format how the
+% \Fullname field appears.
+\thfullnameFmt{#2+", "+#1}
+
+
+\makeatletter
+% An example of redefining \thQuizHeaderLayout, here
+% we make \Firstname and \Lastname field hidden and taking
+% up no space
+\renewcommand\thQuizHeaderLayout{\noindent
+  \smash{\rlap{\FirstName[\F\FHidden]{0bp}{0bp}}\rlap{\LastName[\F\FHidden]{0bp}{0bp}}}%
+  \begin{minipage}[t]{1.2in}\kern0pt
+    \makebox[0pt][r]{\raggedleft\markQz{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHPoints\studentReport{\widthof{000/000}}{11bp}\vcgBdry[6pt]
+    \makebox[0pt][r]{\raggedleft\freezeOrSave{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHGrade\studentGrade{14bp}{14bp}\vcgBdry[6pt]
+  \end{minipage}\hfill
+  \begin{minipage}[t]{\linewidth-1em-1.2in}\kern0pt
+  \begin{sumryTblAux}{\currQuiz}
+  \displaySumryTbl[ntables=1,showmarkup]{\currQuiz}
+  \end{sumryTblAux}
+  \end{minipage}}
+\makeatother
+
+% reset the paths for \instrPath and \classPath for your system
+\instrPath{/C/Users/dpstory/Desktop/Test Folder/target/_Thor}
+\classPath{/C/Users/dpstory/Desktop/Test Folder/target/myClass}
+\classMember{Peter}{Pan}{A/_Thor}
+\classMember{J\oct374rgen}{Gilg}{B/_Thor}
+\classMember{Thors}{Hammer}{C/_Thor}
+
+\autoCopyOn
+
+%\distrToInstrOff
+%\distrToStudentsOff
+
+\DeclareCoverPage{0}
+
+\begin{makeClassFiles}
+\sadQuizzes
+\end{makeClassFiles}
+
+\begin{document}
+
+\ifforweb
+  \makeinlinetitle
+\else
+  \maketitle
+\fi
+
+\thispagestyle{empty}
+%\thQzHeaderR{Herr Thor}
+
+\noindent
+Student Name: \FullName{1.5in}{11bp}
+
+\section*{Instructions}
+
+Solve each problem to the best of your ability. Do not look a
+little to the left or a little to the right -- Thor is watching
+!! You have a time limit of 2 minutes to complete the quiz.
+
+\paragraph*{The Procedure}
+\begin{enumerate}
+  \item The quiz begins on the next page
+  \item Go to the next page \verb!:-{)!
+  \item To begin the quiz, press the `\textsf{Begin}' button
+  \item Answer each of the questions
+  \item To end the quiz, press the `\textsf{End}' button. You
+      will be asked whether you really want to end the quiz. Press the
+      `\textsf{Yes}' button, or the `\textsf{No}' button to continue with the quiz
+  \item After ending the quiz, press the `\textsf{Save}' button; save the file
+    back to the original folder
+  \item Close \textsf{Adobe Reader}, and go have lunch.
+\end{enumerate}
+Good luck, no, I wish you \emph{good knowledge} !
+
+\newpage
+
+\declareQuizBody{qzbody1}
+\declareQuizBody{qzbody2}
+
+% The qzbody env encloses the entire body of the quiz
+\begin{qzbody1}
+\bRTVToks{\currQuiz}
+
+\thQuizHeader
+
+\noindent\textbf{Instructions:} (For the student) Press
+`\textsf{Begin}' to begin the quiz; after completing the quiz,
+press `\textsf{End}'. Use the `\textsf{Save}' button to save the
+document.
+
+\begin{quiz*}{\currQuiz}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\begin{rtVW}
+  \item\PTs{3} Which of these are true ?
+\begin{answers}{4}
+\Ans1 True & \Ans0 False
+\end{answers}
+\end{rtVW}
+
+\begin{rtVW}
+  \item \PTs{4} Select which of the following is true.
+\begin{answers}{4}
+\Ans1 True & \Ans0 False & \Ans0 Maybe & \Ans0 Sometimes
+\end{answers}
+\end{rtVW}
+
+\begin{rtVW}
+  \item\PTs{2} $9+8=\RespBoxMath{17}*{1}{.0001}{[0,1]}$
+\begin{solution}
+Everyone knows that $ 9 + 8 = 17$, why don't you ?
+\end{solution}
+\end{rtVW}
+
+\begin{rtVW}
+\essayQ{5} % num points assigned
+\item\PTs{5} Write a short history of Acro\negthinspace\TeX.\par
+\RespBoxEssay*{\linewidth}{1in}
+\begin{solution}
+Acro\negthinspace\TeX{} was created by D. P. Story and supported
+for many years by J\"{u}gen Gilg. Special inspiration was
+provided by K. F. Story, who suggested the name
+Acro\negthinspace\TeX.
+\end{solution}
+\end{rtVW}
+
+\begin{rtVW}
+\item\PTs{3} Which of the following are numbers?
+\begin{manswers}{6}
+\bChoices[random=true]
+  \Ans[-1]{0}d\eAns
+  \Ans[1]{1}17\eAns
+  \Ans[-1]{0}p\eAns
+  \Ans[1]{1}88\eAns
+  \Ans[-1]{0}s\eAns
+  \Ans[1]{1}105\eAns
+\eChoices
+\end{manswers}
+\end{rtVW}
+
+
+\begin{rtVW}
+\multipartquestion
+    \item\PTs{20} Answer each of the following multiple selection problems. Each correct answer
+    is worth $3$ points, and each incorrect answer is worth $-2$ points.
+    \begin{questions}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a President
+                     of the United States. (Select all correct choices.)
+
+        \begin{manswers}*{2}%
+            \bChoices[random=true]
+                \Ans[-2]{0} Henry Clay\eAns
+                \Ans[-2]{0} Ben Franklin\eAns
+                \Ans[3]{1}  Andrew Jackson\eAns
+                \Ans[3]{1}  Ronald Reagan\eAns
+                \Ans[-2]{0} George Meade\eAns
+                \Ans[3]{1}  Grover Cleveland\eAns
+                \Ans[-2]{0} John Jay\eAns
+                \Ans[-2]{0} Paul Revere\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a Chancellor of the
+            German Republic. (Select all correct choices.)
+        \begin{manswers}*{2}%
+            \bChoices[nCols=2,random=true]
+                \Ans[-2]{0} Gustav Heinemann\eAns
+                \Ans[-2]{0} Theodor Heu{\ss}\eAns
+                \Ans[3]{1}  Konrad Adenauer\eAns
+                \Ans[-2]{0} Richard von Weizs\"{a}cker\eAns
+                \Ans[3]{1}  Willy Brandt\eAns
+                \Ans[-2]{0} Heinrich L\"{u}bke\eAns
+                \Ans[-2]{0} Roman Herzog\eAns
+                \Ans[3]{1} Ludwig Erhard\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+      \item\PTs{2} If you select all choices in part~(a), you will
+          receive -1 points as a penalty for bad guessing. \textbf{Question:}
+          Determine the \emph{number of correct choices} in part~(a)?
+          \begin{answers}{4}
+          \bChoices[random=true]
+            \Ans0 1\eAns
+            \Ans0 2\eAns
+            \Ans1 3\eAns
+            \Ans0 4\eAns
+            \Ans0 5\eAns
+            \Ans0 6\eAns
+            \Ans0 7\eAns
+            \Ans0 8\eAns
+          \eChoices
+          \end{answers}
+    \end{questions}
+\end{rtVW}
+
+\eRTVToks
+
+% Ok, now display this questions in a random order.
+\displayListRandomly{\thisQuiz}
+
+\end{questions}
+\writeProListAux
+\end{quiz*}\quad\thQuizTrailer
+
+\end{qzbody1}
+
+\begin{qzbody2}
+
+\thQuizHeader
+
+\begin{quiz*}{\currQuiz}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\essayitem{3} Comment on the experience of taking a quiz the `Thorsten way.'.\par
+\RespBoxEssay*{\linewidth}{1in}
+
+\begin{solution}
+This was a very wonderful experience, I'm privileged to have been in this class with such a wonderful
+German teacher. As you can read, I am fluent in German now. Thank you Thor, wherever you are.
+
+A second paragraph should convince of my sincerity, remember me when you mark this quiz.
+\end{solution}
+
+\end{questions}
+\writeProListAux
+\end{quiz*}\quad\thQuizTrailer
+
+\end{qzbody2}
+
+% Now we input the qzbody back in two times, though it can be more than that. The quiz name
+% modified in each instance.
+%
+% Each instance of the quiz has a randomized order
+%
+\InputQuizBody{qzbody1}
+
+\InputQuizBody{qzbody2}
+
+\InputQuizBody{qzbody1}
+
+
+\end{document}

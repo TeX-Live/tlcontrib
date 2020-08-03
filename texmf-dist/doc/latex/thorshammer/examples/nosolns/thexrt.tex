@@ -1,0 +1,222 @@
+\documentclass{article}
+\usepackage{amstext}
+\usepackage{web}
+\usepackage[usesumrytbls,allowrandomize]{exerquiz}
+\usepackage{ran_toks}
+\usepackage[usebatch]{thorshammer}
+
+\DeclareQuiz{q1}
+
+% It is important to freeze the seed so that (1) you can reproduce the exact
+% same quiz at a later time; (2) allow content written to the AUX file to
+% come up to date. This is important when using summary tables.
+\useRandomSeed{1344524586} 
+
+\setInitMag{fitwidth}
+\hypersetup{pdfpagemode=UseNone} % don't need to see bookmarks
+\hypersetup{pdfpagelayout=OneColumn}
+\reversemarginpar
+
+\showCreditMarkup
+
+% \previewOn\pmpvOn
+
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+\PTsHook{($\eqPTs^{\text{pts}}$)}
+
+\useMCCircles
+
+% reset the paths for \instrPath and \classPath for your system
+\instrPath{/C/Users/dpstory/Desktop/Test Folder/target/_Thor}
+\classPath{/C/Users/dpstory/Desktop/Test Folder/target/myClass}
+\classMember{Peter}{Pan}{A/_Thor}
+\classMember{J\oct374rgen}{Gilg}{B/_Thor}
+\classMember{Thors}{Hammer}{C/_Thor}
+
+\autoCopyOn
+
+%\distrToInstrOff
+%\distrToStudentsOff
+
+\begin{makeClassFiles}
+\sadQuizzes
+\end{makeClassFiles}
+
+\begin{document}
+
+\noindent In this file, we attempt to \emph{duplicate} and
+\emph{extend} the work of \texttt{theexuc.tex} by developing a
+scheme to randomize choices and randomize the questions. To
+randomize the choices, we modify the preamble to include the
+option \texttt{allowrandomize} of \textsf{exerquiz}, to
+randomize the order of the questions, we include the
+\textsf{ran\_toks} package. The `quiz body' concept is used
+to introduced multiple equivalent quizzes.
+
+
+\newpage
+
+
+\declareQuizBody{qzbody1}
+\declareQuizBody{qzbody2}
+
+% The qzbody env encloses the entire body of the quiz
+\begin{qzbody1}
+
+\bRTVToks{\currQuiz}
+
+\thQuizHeader
+
+\noindent\textbf{Instructions:} (For the student) Press
+`\textsf{Begin}' to begin the quiz; after completing the quiz,
+press `\textsf{End}'. Use the `\textsf{Save}' button to save the
+document.
+
+\begin{quiz*}{\currQuiz}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\begin{rtVW}
+  \item\PTs{3} Which of these are true ?
+\begin{answers}{4}
+\Ans1 True & \Ans0 False
+\end{answers}
+\end{rtVW}
+
+\begin{rtVW}
+  \item \PTs{4} Select which of the following is true.
+\begin{answers}{4}
+\Ans1 True & \Ans0 False & \Ans0 Maybe & \Ans0 Sometimes
+\end{answers}
+\end{rtVW}
+
+\begin{rtVW}
+  \item\PTs{2} $9+8=\RespBoxMath{17}{1}{.0001}{[0,1]}$
+\end{rtVW}
+
+\begin{rtVW}
+\essayQ{5} % num points assigned
+\item\PTs{5} Write a short history of Acro\negthinspace\TeX.\par
+\RespBoxEssay{\linewidth}{1in}
+\end{rtVW}
+
+\begin{rtVW}
+\item\PTs{3} Which of the following are numbers?
+\begin{manswers}{6}
+\bChoices[random=true]
+  \Ans[-1]{0}d\eAns
+  \Ans[1]{1}17\eAns
+  \Ans[-1]{0}p\eAns
+  \Ans[1]{1}88\eAns
+  \Ans[-1]{0}s\eAns
+  \Ans[1]{1}105\eAns
+\eChoices
+\end{manswers}
+\end{rtVW}
+
+
+\begin{rtVW}
+\multipartquestion
+    \item\PTs{20} Answer each of the following multiple selection problems. Each correct answer
+    is worth $3$ points, and each incorrect answer is worth $-2$ points.
+    \begin{questions}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a President
+                     of the United States. (Select all correct choices.)
+
+        \begin{manswers}*{2}%
+            \bChoices[random=true]
+                \Ans[-2]{0} Henry Clay\eAns
+                \Ans[-2]{0} Ben Franklin\eAns
+                \Ans[3]{1}  Andrew Jackson\eAns
+                \Ans[3]{1}  Ronald Reagan\eAns
+                \Ans[-2]{0} George Meade\eAns
+                \Ans[3]{1}  Grover Cleveland\eAns
+                \Ans[-2]{0} John Jay\eAns
+                \Ans[-2]{0} Paul Revere\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a Chancellor of the
+            German Republic. (Select all correct choices.)
+        \begin{manswers}*{2}%
+            \bChoices[nCols=2,random=true]
+                \Ans[-2]{0} Gustav Heinemann\eAns
+                \Ans[-2]{0} Theodor Heu{\ss}\eAns
+                \Ans[3]{1}  Konrad Adenauer\eAns
+                \Ans[-2]{0} Richard von Weizs\"{a}cker\eAns
+                \Ans[3]{1}  Willy Brandt\eAns
+                \Ans[-2]{0} Heinrich L\"{u}bke\eAns
+                \Ans[-2]{0} Roman Herzog\eAns
+                \Ans[3]{1} Ludwig Erhard\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+      \item\PTs{2} If you select all choices in part~(a), you will
+          receive -1 points as a penalty for bad guessing. \textbf{Question:}
+          Determine the \emph{number of correct choices} in part~(a)?
+          \begin{answers}{4}
+          \bChoices[random=true]
+            \Ans0 1\eAns
+            \Ans0 2\eAns
+            \Ans1 3\eAns
+            \Ans0 4\eAns
+            \Ans0 5\eAns
+            \Ans0 6\eAns
+            \Ans0 7\eAns
+            \Ans0 8\eAns
+          \eChoices
+          \end{answers}
+    \end{questions}
+\end{rtVW}
+
+\eRTVToks
+
+% Ok, now display this questions in a random order.
+\displayListRandomly{\thisQuiz}
+
+\end{questions}
+\writeProListAux
+\end{quiz*}\quad\thQuizTrailer
+
+\end{qzbody1}
+
+\begin{qzbody2}
+
+\thQuizHeader
+
+\begin{quiz*}{\currQuiz}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+
+\essayQ{10} % num points assigned
+\item\PTs{10} Comment on the experience of taking a quiz the `Thorsten way.'\par
+\RespBoxEssay{\linewidth}{1in}
+
+\end{questions}
+\writeProListAux
+\end{quiz*}\quad\thQuizTrailer
+
+\end{qzbody2}
+
+% Now we input the qzbody back in two times, though it can be more than that. The quiz name
+% modified in each instance.
+%
+% Each instance of the quiz has a randomized order
+%
+\InputQuizBody{qzbody1}
+
+\InputQuizBody{qzbody1}
+
+\InputQuizBody{qzbody2}
+
+
+\end{document}

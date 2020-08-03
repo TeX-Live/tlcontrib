@@ -1,0 +1,2398 @@
+% \iffalse
+% makeindex -s gglo.ist -o thorshammer.gls thorshammer.glo
+% makeindex -s gind.ist -o thorshammer.ind thorshammer.idx
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% thorshammer.sty package,                              %%
+%% Copyright (C) 2020  D. P. Story                       %%
+%%   dpstory@uakron.edu  dpstory@acrotex.net             %%
+%%                                                       %%
+%% This program can redistributed and/or modified under  %%
+%% the terms of the LaTeX Project Public License         %%
+%% Distributed from CTAN archives in directory           %%
+%% macros/latex/base/lppl.txt; either version 1.2 of the %%
+%% License, or (at your option) any later version.       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesPackage{thorshammer}
+%<package> [2020/01/13 v1.5.7 Support commands for Thor's way]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
+\usepackage{calc}
+%\def\texorpdfstring#1#2{#1}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\gdef\brpr#1{\texttt{\char123\relax#1\char125\relax}}
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\let\tops\texorpdfstring
+\def\EXCL{!}
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\CMD#1{\textbackslash#1}
+\InputIfFileExists{aebdocfmt.def}{\PackageWarning{thorshammer}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{thorshammer}{aebdocfmt.def cannot be found}}
+\begin{document}
+\addtolength{\marginparwidth}{3pt}
+  \GetFileInfo{thorshammer.sty}
+  \title{The  \textsf{thorshammer} Package}
+  \author{D. P. Story\footnote{The author acknowledges Thorsten G. (a.k.a., Thor) who proposed this workflow and
+who contributed many ideas; J\"{u}rgen G. (a.k.a., Loki) also contributed many good ideas, enthusiasm,
+questions, bug detecting, and motivation. High regards and respect to both. D. P. Story (a.k.a., Odon).}\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\bgroup
+\value{secnumdepth}=3
+\value{tocdepth}=3
+  \tableofcontents
+\egroup
+  \DocInput{thorshammer.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here. Execute
+    \begin{quote}\texttt{makeindex -s gind.ist -o thorshammer.ind thorshammer.idx}\end{quote}
+    on the command line and recompile
+    \texttt{thorshammer.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here. Execute
+    \begin{quote}
+    \texttt{makeindex -s gglo.ist -o thorshammer.gls thorshammer.glo}
+    \end{quote}
+    on the command line and recompile \texttt{thorshammer.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%    \section{Introduction}
+%    Thorsten G.\ has asked me to assist him in creating a quiz system, based on Acro\negthinspace\TeX,
+%    to be delivered to his classes. His workflow for this assessment system is a follows:\footnote{As my occassional
+%    friend J\"{u}rgen says, this workflow is a real \emph{hammer}, so I titled this package `Thors(ten) hammer', or simply
+%    \pkg{thorshammer}.}
+%    \begin{enumerate}
+%       \item The \env{quiz} environment is used to pose the questions, which consist of MC, numerical fill-in
+%       the blank, and extended response questions.
+%       \item[] Though the \env{quiz} environment is used, the student does not get his/her score reported
+%       back immediately upon finishing the quiz.
+%       \item When the student finishes the exam, taken in AR, he/she presses
+%       the \textsf{End Quiz} control and saves the document as \texttt{\string\jobname-ID.pdf}, where \texttt{ID}
+%       is a student identification. I am informed the ID is the student name.
+%       \item At some point, the instructor's script moves the document to the instructors folder.
+%       \item The instructor opens the PDF and finishes marking the extended response questions and assigns a grade.
+%    \end{enumerate}
+%    This package supports the Thorsten's workflow by providing the necessary form elements and JavaScript
+%    to carry out his(her) plan. What happens to the quiz after that, I do not know.
+%
+%\changes{v1.4}{2019/08/11}{Begin major change to this package, leaving v1.3.8 as our best working
+% version prior to this update. }
+%
+%    \section{Preliminaries}
+%
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\edef\th@dquoteCat{\the\catcode`\"}
+\catcode`\"=12\relax
+%    \end{macrocode}
+% \subsection{Options for this package}
+%
+% \leavevmode\IndexOpt{nocfg} If this option is taken, \texttt{thorshammer.cfg} is not input.
+%    \begin{macrocode}
+\DeclareOptionX{nocfg}{\let\th@loadCFG\dl@NO}
+\let\th@loadCFG\dl@YES
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{testmode} If this option is taken, quizzes can be used in the normal way.
+%    \begin{macrocode}
+\newif\ifthtestmode\thtestmodefalse
+\DeclareOptionX{testmode}{\thtestmodetrue}
+\DeclareOptionX{!testmode}{\thtestmodefalse}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{ordinary} This is an experimental option to see if we can produce
+%    a regular quiz with selected features of a \pkg{thorshammer} workflow.
+%    \begin{macrocode}
+\newif\ifthordinary \thordinaryfalse
+\DeclareOptionX{ordinary}{\thtestmodetrue\thordinarytrue}
+%    \end{macrocode}
+% \leavevmode\IndexOpt{useclass}Use this option to bring in addition code to declare each member of
+% the class, to automatically build a quiz for each class member, to distribute these
+% quizzes to a designated folder of the instructor, and to distribute the quizzes the
+% respective class folder.
+%    \begin{macrocode}
+\newif\ifbasicmethods\basicmethodstrue
+\newif\ifuseclassOpt\useclassOptfalse
+\def\bUseClass{false}
+\DeclareOptionX{useclass}{\useclassOpttrue
+  \def\bUseClass{true}\basicmethodsfalse
+}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{usebatch}This option should be used with the \opt{useclass} option.
+%    When this option is taken, the no freeze quiz button is created. The batch sequence
+%    \textsf{Thor's way} does that, and the presence of the freeze button, the instructor
+%    may press it without thinking. We don't want that to happen.
+%    \begin{macrocode}
+\newif\ifth@allowfreeze \th@allowfreezetrue
+\DeclareOptionX{usebatch}{\th@allowfreezefalse
+  \ExecuteOptionsX{useclass}}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{batchdistr} This option declares the instructor's intention
+%    of using \app{Acrobat} to apply security using `\textsf{Thor distributes.sequ}' or  `\textsf{Thor protects and distributes.sequ}'
+%    to apply security and to distribute the files to the students's folders. This option simply
+%    expands \cs{distrToStudentsOff}, and redefines the two commands so the author can't use them. This option
+%    has no effect on writing quizzes to the instructor's folder.
+%    \begin{macrocode}
+\DeclareOptionX{batchdistr}{\ExecuteOptionsX{usebatch}%
+  \AtEndOfPackage{\distrToStudentsOff
+  \let\distrToStudentsOff\relax\let\distrToStudentsOff\relax}}
+%    \end{macrocode}
+%    Process the options
+%    \begin{macrocode}
+\ProcessOptionsX
+\edef\thOrdQz{\ifthordinary true\else false\fi}
+%    \end{macrocode}
+% \subsection{Required packages}
+%    \begin{macrocode}
+\RequirePackage{insdljs}[2019/08/06]
+%    \end{macrocode}
+% We use the \opt{usealtadobe} option of \pkg{insdljs}, but not directly. If \cs{inputAltAdbFncs}
+% is \cs{relax} than the functions have not already been input above \pkg{thorshammer}.
+% \changes{v1.3.5}{2019/08/06}{Use \string\cs{usedAdbFuncs} to detect \string\opt{usealtadobe} option}
+%    \begin{macrocode}
+\ifx\usedAdbFuncs\dl@NO
+  \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}%
+    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}%
+    {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
+     Reinstall or refresh your file name database.}}}%
+     \let\usedAdbFuncs\dl@YES
+\else
+  \let\inputAltAdbFncs\relax
+\fi
+\inputAltAdbFncs
+\RequirePackage{exerquiz}[2019/08/13]
+\RequirePackage{eq-save}[2019/08/07]
+\let\execjs\dl@YES
+\@ifundefined{CommentStream}{\newwrite\CommentStream}{}
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+\providecommand{\eqSP}{\string\040}
+\def\thPageOne{\setcounter{page}{1}}
+%    \end{macrocode}
+%    \section{Setting the initial view}
+%    We require the document to be opened on the first page, but the initial magnification
+%    is under the control of the document author.\medskip\par
+%    \noindent
+%    \DescribeMacro\setInitMag\nmpsep{\darg{fitpage\string|actualsize\string|fitwidth\string|fitheight\string|fitvisible\string|inheritzoom}}\\
+%    This command determines the initial magnification. There are a choice of six values for the argument; the default is \texttt{fitpage}
+%    \begin{macrocode}
+\def\setInitMag#1{\setkeys{thim}{mag=#1}}
+\define@choicekey+{thim}{mag}[\val\nr]%
+  {fitpage,actualsize,fitwidth,fitheight,%
+   fitvisible,inheritzoom}[fitpage]%
+  {\edef\th@initmag{\@nameuse{dl@\val}}}
+  {\PackageWarning{thorshammer}{%
+    Bad choice for initial magnification,\MessageBreak
+    permissible values are fitpage, actualsize,\MessageBreak
+    fitwidth, fitheight, fitvisible, and\MessageBreak
+    inheritzoom. Try again}}
+\def\th@initmag{\dl@fitpage}
+%    \end{macrocode}
+%    The \cs{addToDocOpen} is a command from \pkg{insdljs}. We turn off calculations as the student
+%    does not need to see the calculation icon each time s/he enters a response. When the instructor
+%    presses the \textsf{Mark It} button, calculations are turned on again. In the second line
+%    below, we set the initial view to page~1 and the magnification set by the \cs{setInitMag} command above.
+%    \begin{macrocode}
+\addToDocOpen{\JS{%
+  var stmot=app.setTimeOut("this.calculate=false;",100);}}
+\addToDocOpen{\GoToD[\Page{1}\th@initmag]}
+%    \end{macrocode}
+%     \section{Declaring instructor and class information}
+%
+%     \DescribeMacro\instrPath\nmpsep{*\darg{\ameta{path}}} The path to the
+%     instructor's folder. It is assumed that this \ameta{path} is an
+%     absolute path. If the star option is taken, then the path is relative
+%     to the current folder. The \DescribeMacro\instrPathIsCHTTP\cmd{\instrPathIsCHTTP}
+%     declaration is available if the path to the instructor is a WebDAV address. This
+%     info is passed on the a JavaScript method.
+%    \begin{macrocode}
+\def\instrPathIsCHTTP{\def\thInstrFS{CHTTP}}
+\let\thInstrFS\@empty
+\newcommand\instrPath{\@ifstar
+  {\gdef\InstrPathFull{false}\instrPath@i}
+  {\gdef\InstrPathFull{true}\instrPath@i}}
+\def\instrPath@i#1{\gdef\InstrPath{"#1"}}
+\def\InstrPathFull{true}
+%\let\InstrPath\@empty
+\def\InstrPath{this.path.replace(reRmFn,"")}
+%    \end{macrocode}
+%    \DescribeMacro\classPath\nmpsep{*\darg{\ameta{path}}} The path to the class folder.
+%    It is assumed that this \ameta{path} is an absolute path. If
+%    the star option is taken, then the path is relative to the current folder.
+%    The \DescribeMacro\classPathIsCHTTP\cmd{\instrPathIsCHTTP}
+%    declaration is available if the path to the class folders is a WebDAV address. This
+%    info is passed on the a JavaScript method.
+%    \begin{macrocode}
+\def\classPathIsCHTTP{\def\thClassFS{CHTTP}}
+\let\thClassFS\@empty
+\newcommand\classPath{\@ifstar
+  {\gdef\ClassPathFull{false}\classPath@i}
+  {\gdef\ClassPathFull{true}\classPath@i}}
+\def\classPath@i#1{\gdef\ClassPath{"#1"}}
+\def\ClassPath{this.path.replace(reRmFn,"")}
+\def\ClassPathFull{true}
+%    \end{macrocode}
+%
+%     \section{Running headers}
+%     The scheme used here assumes no other {\LaTeX} package has been used to take over the running
+%     headers (and footers). If that is the case, use the values of the commands below to design
+%     your own.
+%     \DescribeMacro\thQzHeaderL\nmpsep{\darg{\ameta{text}}} This is inserted into the left running header
+%     for the quiz pages.
+%    \begin{macrocode}
+\def\thQzHeaderL#1{\def\th@QzHeaderLQ{\makebox[0pt][l]{#1}}}
+\def\th@QzHeaderL{\th@QzHeaderLQ}
+\thQzHeaderL{Thor's Class}
+\def\th@QzHeaderLS{\th@HeaderOffset\th@QzHeaderLQ}
+%    \end{macrocode}
+%     \DescribeMacro\thQzHeaderCQ\nmpsep{\darg{\ameta{text}}} This is inserted into the center running header
+%     for the \emph{quiz} pages.
+%    \begin{macrocode}
+\def\thQzHeaderCQ#1{\def\th@QzHeaderCQ{\makebox[0pt][c]{#1}}}
+\thQzHeaderCQ{Quiz \thQuizName}
+\def\th@QzHeaderC{\th@QzHeaderCQ}
+%    \end{macrocode}
+%     \DescribeMacro\thQzHeaderCS\nmpsep{\darg{\ameta{text}}} This is inserted into the center running header
+%     for the \emph{solution} pages.
+%    \begin{macrocode}
+\def\thQzHeaderCS#1{\def\th@QzHeaderCS{\makebox[0pt][c]{#1}}}
+\thQzHeaderCS{Solutions: \thQuizName}
+%    \end{macrocode}
+%     \DescribeMacro\thQzHeaderR\nmpsep{\darg{\ameta{text}}} This is inserted into the right running header
+%     for the solution pages.
+%    \begin{macrocode}
+\def\thQzHeaderR#1{\def\t@hQzHeaderR{\makebox[0pt][r]{#1}}}
+\thQzHeaderR{\thepage}
+%    \end{macrocode}
+%    We apply the running headings, depending on whether \pkg{web} loaded by testing for the
+%    \texttt{webheadings} page style.
+%    \begin{macrocode}
+\@ifundefined{ps@webheadings}{%
+  \def\th@setHeaders{%
+  \renewcommand{\@oddhead}{\th@QzHeaderL\hfil\th@QzHeaderC\hfil
+  \t@hQzHeaderR}\renewcommand{\@evenhead}{\@oddhead}}%
+}{%
+  \def\th@setHeaders{%
+    \lheader{\th@QzHeaderL}%
+    \cheader{\th@QzHeaderC}%
+    \rheader{\t@hQzHeaderR}}%
+}
+%    \end{macrocode}
+%    Change the header for the solution section
+%    \begin{macrocode}
+\def\eq@normallheader{%
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLS}%
+    \def\th@QzHeaderC{\th@QzHeaderCS}%
+  }{%
+    \lheader{\th@QzHeaderLS}%
+    \cheader{\th@QzHeaderCS}%
+  }
+}
+%    \end{macrocode}
+%    \DescribeMacro\rhPgNumsOnly Originally, this package only exhibited page numbers
+%    in the running header, expanding \cs{rhPgNumsOnly} in the preamble restores that
+%    original experience.
+%    \begin{macrocode}
+\def\rhPgNumsOnly{\thQzHeaderL{}\thQzHeaderCQ{}\thQzHeaderCS{}}
+\AtBeginDocument{\th@setHeaders}
+%    \end{macrocode}
+%     \section{Declaring a cover page}
+%     \DescribeMacro\DeclareCoverPage\nmpsep{\darg{\ameta{pgNum}}}
+%     A cover page, if declared, is appended to the beginning of the quiz. The page
+%     specified by \ameta{pgNum} is the cover page. The cover page is a single page
+%     and must occur prior to any quiz. Valid in the \emph{preamble only}.
+%     \changes{v1.4.1}{2019/08/16}{Implement the concept of a cover page.}
+%    \begin{macrocode}
+\newif\ifthCoverPage \thCoverPagefalse
+\newcommand{\DeclareCoverPage}[1]{\thCoverPagetrue
+  \def\thIsCP{true}\def\thCvrPg{#1}}
+\def\thIsCP{false}\def\thCvrPg{0}
+\@onlypreamble\DeclareCoverPage
+%    \end{macrocode}
+%     \section{Basic methods}
+%
+%     Thor is tormenting me with the basic methods option. The basic methods option is
+%     no options other than perhaps \opt{nocfgs}. As a consequence, the student names are
+%     not pre-filled into the name fields. When multiple quizzes are produced, they are named
+%     differently, \cs{jobname-1.pdf}, \cs{jobname-2.pdf}, and so on. A lot of work has gone
+%     in to the basic methods so it works link the non-basic methods (option \opt{useclass} or higher).
+%     The commands \cs{instrPath} and \cs{classPath} are supported; to use the \cs{classMember}
+%     command, use \opt{useclass} or higher. In addition to \cs{instrPath} and \cs{classPath}, we
+%     define special basic method commands, as describe in the next section.
+%
+%     \subsection{Configuring the basic methods experience}
+%
+%     \DescribeMacro\useNameToCustomize\nmpsep{ \normalfont(Basic methods)}
+%     \cs{useNameToCustomize}
+% can be used to modify the file name of the quiz to include student name; the default is to
+% use the original quiz file name. This command is implemented through the \textsf{Freeze Quiz} button.
+% This command has no effect in the non-basic setting.
+% \changes{v1.3.6}{2019/08/07}{freezeQuizMU: Cannot freeze unless grade given and added suffix
+% \string\texttt{"-g"} to document name on saving.}
+%    \changes{v1.4.8}{2019/09/05}{Added \string\cs{useNameToCustomize}}
+%    \begin{macrocode}
+\def\useNameToCustomize{\def\thUseNameToCustomize{true}}
+\def\thUseNameToCustomize{false}
+%    \end{macrocode}
+%    \DescribeMacro\enumQuizzes\nmpsep{\darg{\ameta{num}}} (Basic methods) This file specifies that
+%    the quizzes should be replicated \ameta{num} times and named \cs{jobname-1},
+%    \cs{jobname-2}, ..., \cs{jobname-\ameta{num}}. The default is not to enumerate.
+%    \changes{v1.4.8}{2019/09/05}{Added \string\cs{enumQuizzes}}
+%    \begin{macrocode}
+\def\enumQuizzes#1{\def\bUseClass{true}\basicmethodsfalse
+  \ClassEntriestrue\def\ClassPathFull{true}\def\InstrPathFull{true}%
+  \def\ClassPath{this.path.replace(reRmFn,"")}%
+  \def\InstrPath{this.path.replace(reRmFn,"")}%
+  \bgroup\@tempcnta#1\relax
+  \@whilenum\@tempcnta>\z@\do{\classMember{}{}{}%
+    \advance\@tempcnta\m@ne}\egroup
+  \def\thEnumQuizzes{#1}\def\bEnumQuizzes{true}}
+\def\thEnumQuizzes{0}\def\bEnumQuizzes{false}
+%    \end{macrocode}
+%    \DescribeMacro\distrQuizzes\nmpsep{\darg{\darg{\ameta{folder\SUB1}}\darg{\ameta{folder\SUB2}}...\darg{\ameta{folder\SUB{n}}}}}
+%    (Basic methods) If \cs{distrQuizzes} is used, \cs{enumQuizzes} command is ignored. The quizzes are enumerated,
+%    as described above, but the number of quizzes created is the number of folders declared. The script
+%    |\sadQuizzes| also distributes the individual quizzes to the appropriate folder, on the path
+%    determined by the |\classPath| command.
+%    \changes{v1.4.8}{2019/09/05}{Added \string\cs{distrQuizzes}}
+%    \changes{v1.5.4}{2019/11/30}{Reworked \string\cs{distrQuizzes} to account for
+%    second star option of \string\cs{classMember}}
+%    \begin{macrocode}
+\newcommand{\distrQuizzes}{%
+  \ifuseclassOpt
+    \def\th@next{\PackageWarning{thorshammer}
+    {Use have specified the useclass option or higher\MessageBreak
+     yet you employ \string\distrQuizzes, these are\MessageBreak
+     incompatible. Assuming the specified package option}}%
+  \else
+    \let\th@next\th@distrQuizzes
+  \fi\th@next
+}
+\def\th@distrQuizzes{\def\bUseClass{true}\basicmethodsfalse
+  \ClassEntriestrue\bgroup\@makeother\_\th@distrQuizzes@i}
+\def\rmSTAR#1*\@nil{\def\@folder{#1}}
+%\def\tstForSTAR#1{\tstForSTAR@i#1**\@nil}
+\def\tstForSTAR#1*#2*\@nil{\def\@rgi{#1}\ifx\@rgi\@empty
+  \def\ISSTAR{*}\rmSTAR#2\@nil\else\let\ISSTAR\@empty\fi}%
+\def\th@distrQuizzes@i#1{\@tempcnta\z@
+  \@tfor\@folder:=#1\do{\advance\@tempcnta\@ne
+%    \end{macrocode}
+%   Determine if \cs{@folder} begin with \texttt*, remove it and return
+%   the path as \cs{@folder}
+%    \begin{macrocode}
+    \expandafter\tstForSTAR\@folder**\@nil
+    \edef\x{\noexpand\classMember{}{}\ISSTAR{\@folder}}\x
+  }\xdef\enumQuizzes{\the\@tempcnta}%
+  \gdef\bDistrQuizzes{true}\egroup
+}
+\def\bDistrQuizzes{false}
+%    \end{macrocode}
+%
+%     \paragraph*{Just auto-save the document - not recommended}
+%     The \cs{executeSave()} command previously figured in importantly,
+%     as this package developed, use of \cs{executeSave()} cannot be
+%     recommended. This command was implemented early in the development process
+%    \begin{macrocode}
+\@ifundefined{executeSave}
+  {\def\executeSave(){%
+  console.println("automatically saving this file...");^^J%
+  var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+  {cPath:this.path,bCopy:false})}}{}
+%    \end{macrocode}
+%    The \DescribeEnv{docassembly}\env{docassembly} environment was created early
+%    in development and was meant to be used with \cs{executSave()}. The environment
+%    definition was updated to be equivalent to the \env{makeClassFiles} environment.
+%    An environment by the same name, and the same functionality, is defined in \pkg{aeb\_pro}.
+%     \changes{v1.4.14}{2019/09/13}{Inserted \string\cs{mkClFlsSpcls} as optional
+%     argument of \string\env{docassembly}}
+%    \begin{macrocode}
+\@ifundefined{docassembly}
+  {\newenvironment{docassembly}{%
+    \execJS[\mkClFlsSpcls]{docassembly}}{\endexecJS}}
+  {\renewenvironment{docassembly}{%
+    \execJS[\mkClFlsSpcls]{docassembly}}{\endexecJS}}
+%    \end{macrocode}
+%
+%    \subsection{Post creation document assembly}
+%    The \DescribeMacro\rasSolns\cmd\sadQuizzes{} command is placed within the
+%    \env{docassembly} or \env{makeClassFiles} environment,
+%    \cs{sadQuizzes} in the body of the environment.
+%\begin{verbatim}
+%\begin{docassembly}
+%\sadQuizzes
+%\end{docassembly}
+%\begin{document}
+%\end{verbatim}
+%Originally, we defined a command \cs{rasSolns}, this command has been \cs{let} to
+%\cs{sadQuizzes}, which now performs its duties.
+%    \begin{macrocode}
+%    \end{macrocode}
+%
+%    \section{Form field commands}
+%
+%    We define two types of controls: (1) those placed outside the quiz; (2) those placed within the quiz.
+%
+%    \subsection{Controls above the \tops{\protect\env{quiz}}{quiz} environment}
+%
+%    \paragraph*{Commands that occur above the \tops{\protect\env{quiz}}{quiz} environment}\leavevmode\par\medskip\noindent
+%    The student needs to sign in with his/her first and last name. The commands
+%    \DescribeMacro\FirstName\cmd\FirstName{} and \DescribeMacro\LastName\cmd\LastName{} are
+%    defined for that purpose.
+%    \begin{macrocode}
+\ifbasicmethods\let\th@namePresets\@empty\else
+%    \end{macrocode}
+%    If the option \opt{useclass}, or higher, is taken, we make these fields read only and the
+%    JavaScript code of \cs{sadQuizzes} will fill name field in for the student.
+%    \begin{macrocode}
+\def\th@namePresets{\Ff\FfReadOnly\BC{}}\fi
+\newcommand\FirstName[3][]{\th@bMrkQz\textField[%
+  \presets{\th@namePresets}#1]{Name.first}{#2}{#3}}
+\newcommand\LastName[3][]{\textField[%
+  \presets{\th@namePresets}#1]{Name.last}{#2}{#3}}
+%    \end{macrocode}
+%    The \cs{sadQuizzes} command uses the name fields to identify on which page a quiz begins. This worries
+%    me a little if a document designer places more than one name field for a quiz. We attempt to make
+%    the first use of the name field per quiz. We define \cs{th@bMrkQz}. These fields are place exactly once
+%    for each quiz and is attached to the name fields.
+%    \changes{v1.4.7}{2019/08/27}{Added marker field attached to name field}
+%    \begin{macrocode}
+\def\th@bMrkQz{\@ifundefined{bMrkQz\currQuiz}
+  {\rlap{\textField[\Ff\FfReadOnly\BC{}\BG{}]{bMrkQz}{0pt}{0pt}}%
+   \@namedef{bMrkQz\currQuiz}{}}{}}
+%    \end{macrocode}
+%    \DescribeMacro{\FullName}\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} The first and
+%    last name fields are required; however, when \opt{useclass} or higher is used, they are automatically
+%    filled in. The \cs{FullName} field uses the calculate event to extract the first and last names
+%    and displays them together in one field. The format for the this name field can be changed
+%    through the declaration \DescribeMacro\thfullnameFmt\cmd{\thfullnameFmt}.
+%    \begin{macrocode}
+\def\th@fullnamePresets{\Ff\FfReadOnly\BG{}\BC{}}
+\def\thfullnameFmt#1{\def\th@fullnameFmt##1##2{#1}}
+\thfullnameFmt{#1+" "+#2}
+\newcommand{\FullName}[3][]{\textField[%
+  \presets{\th@fullnamePresets}#1\AAcalculate{%
+  var fName=this.getField("Name.first").value;\r
+  var lName=this.getField("Name.last").value;\r
+  event.value=\th@fullnameFmt{fName}{lName};}]{FullName}{#2}{#3}}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\pwdInstrFld\nmpsep{[\ameta{options}]\darg{\ameta{pwd}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    In this workflow, when the instructor opens a quiz file, he/she enters a password. On success, the
+%    non-extended response questions of the student's quiz is marked, and various hidden form elements are
+%    made visible.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\pwdInstrFldTU\nmpsep{\darg{\ameta{pdfstr}}}
+%    can be redefined to provide a tool tip
+%    for this field.
+%    \begin{macrocode}
+\def\pwdInstrFldTU#1{\def\pwdInstrFld@TU{#1}}
+\pwdInstrFldTU{Enter password to mark this quiz}
+%    \end{macrocode}
+%    The definition of \cmd\pwdInstrFld
+%    \begin{macrocode}
+\newcommand{\pwdInstrFld}[4][]{% opts, pwd, wd, ht
+  \@ifundefined{\currQuiz-nQs}{\def\nQs{0}}
+    {\edef\nQs{\@nameuse{\currQuiz-nQs}}}%
+  \textField[\cmd{\bParams{\currQuiz}{\nQs}{"#2"}\eParams}
+  \Ff\FfPassword\AAkeystroke{\pwdKeyJS}
+  \protect\AA\protect\Ff\TU{\pwdInstrFld@TU}#1%
+]{pwdtxt}{#3}{#4}}
+%    \end{macrocode}
+%    \DescribeMacro\markQz\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} Loki
+%    suggested another idea to have the password field hidden until the instructor opens the file.
+%    Well if you are doing that, why have a password field? Instead, a push button is provided.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\markQzFldCA\nmpsep{\ameta{jsstr}} The caption for this button
+%    \begin{macrocode}
+\def\markQzFldCA#1{\def\markQzFld@CA{#1}}
+\markQzFldCA{Mark It}
+%    \end{macrocode}
+%    \DescribeMacro\markQzFldTU\nmpsep{\ameta{jsstr}} The tool tip for this button
+%    \begin{macrocode}
+\def\markQzFldTU#1{\def\markQzFld@TU{#1}}
+\markQzFldTU{Press to mark this quiz}
+%    \end{macrocode}
+%    The code for \cmd\markQz. \textbf{Important!}\marginpar{\raggedleft\textbf{Important!}} For obvious
+%    reasons, we don't want the push button to be seen by the students. As a result, it is initially hidden.
+%    The key to having the push button visible when the instructor is the private JavaScript variable
+%    \texttt{\_thorshammer}\marginpar{\raggedleft\texttt{\_thorshammer}} (this can be changed). The following
+%    code is placed in the \texttt{config.js}\marginpar{\raggedleft\texttt{config.js}} file of the instructor's \app{Acrobat} installation:
+%    \begin{quote}\ttfamily
+%    var \_thorshammer=true;
+%    \end{quote}
+%    \app{Acrobat} reads this file only once when it's opened.
+%    When the instructor opens the student's quiz PDF in \app{Acrobat}\marginpar{\raggedleft\app{Acrobat}},
+%    some underlying JavaScript code tests whether the \texttt{\_thorshammer} variable is defined and is
+%    \texttt{true}. If these conditions are met, JavaScript makes the \cs{markQuizFld} and
+%    \cs{freezeQz} fields visible.
+%    \begin{macrocode}
+\newcommand{\markQz}[3][]{%
+  \@ifundefined{\currQuiz-nQs}{\def\nQs{0}}%
+    {\edef\nQs{\@nameuse{\currQuiz-nQs}}}%
+%    \end{macrocode}
+%    This text field is placed underneath the push button. It is the one that
+%    causes the \cs{markQz} field to be visible.
+%    \begin{macrocode}
+  \makebox[0pt][l]{\textField[\BC{}\BG{}\H{S}\AAformat{%
+    var f=this.getField("MarkIt");\r
+    var g=this.getField("freezeQz");\r
+    if(typeof _thorshammer!="undefined" && _thorshammer){\r\t
+    if(f!=null)f.display=display.visible;\r\t
+} else{\r\t
+    if(f!=null)f.display=display.hidden;\r\t
+    if(g!=null)g.display=display.hidden;\r
+}}]{hideTxtFldMI}{0pt}{0pt}}%
+%    \end{macrocode}
+%    The push button seen by the instructor to mark the quiz.
+%    \begin{macrocode}
+  \pushButton[\cmd{\bParams{\currQuiz}{\nQs}\eParams}\F\FHidden
+    \AAmouseup{\commonPassKey}\CA{\markQzFld@CA}
+    \TU{\markQzFld@TU}\protect\AA\protect\F#1%
+  ]{MarkIt}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\freezeQuiz\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    The \cs{freezeQuiz} makes all form fields readonly. After the instructor finishes marking
+%    the quiz, he/she presses the freeze quiz button before he moves it to the student's folder
+%    for review. This is done so the student cannot modify the quiz in any case and beg for more
+%    points. (They never beg for fewer points). The freeze quiz button makes itself hidden as well.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\freezeQuizFldTU\nmpsep{\darg{\ameta{pdfstr}}}
+%    can be redefined to provide a tool tip for this field.
+%    \begin{macrocode}
+\def\freezeQuizFldTU#1{\def\freezeQuizFld@TU{#1}}
+\freezeQuizFldTU{Make all fields readonly, cannot be undone}
+%    \end{macrocode}
+%     \DescribeMacro\freezeQuizFldCA\nmpsep{\darg{\ameta{pdfstr}}}
+%    can be redefined to provide a button caption for this field.
+%    \begin{macrocode}
+\def\freezeQuizFldCA#1{\def\freezeQuizFld@CA{#1}}
+\freezeQuizFldCA{Freeze Quiz}
+%    \end{macrocode}
+%    The definition of \cmd\freezeQuiz. If the \opt{usebatch} option is taken,
+%    we do not create the push button.
+%    \begin{macrocode}
+\newcommand\freezeQuiz[3][]{\pushButton[\cmd{\let\%\defjsLB}
+  \CA{\freezeQuizFld@CA}\F\FHidden
+  \TU{\freezeQuizFld@TU}\AAmouseup{freezeQuizMU()}
+  \protect\AA\protect\F
+  #1]{freezeQz}{}{11bp}}
+%    \end{macrocode}
+%    \DescribeMacro\instrSave\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A companion macro to \cs{freezeQuiz}. This macro is substituted for \cs{freezeQuiz}
+%    when the \opt{usebatch} option is taken. The \cs{instrSave} and \cs{freezeQuiz}
+%    should not appear in the same document; we give them the same field name
+%    so the JavaScript treats them them the same, in terms of making them hidden
+%    and visible. |\ifth@allowfreeze|
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\instrSaveFldTU\nmpsep{\darg{\ameta{pdfstr}}}
+%    can be redefined to provide a tool tip for this field.
+%    \begin{macrocode}
+\def\instrSaveFldTU#1{\def\instrSaveFld@TU{#1}}
+\instrSaveFldTU{Save and close this file to the current folder}
+%    \end{macrocode}
+%     \DescribeMacro\instrSaveFldCA\nmpsep{\darg{\ameta{pdfstr}}}
+%    can be redefined to provide a button caption for this field.
+%    \begin{macrocode}
+\def\instrSaveFldCA#1{\def\instrSaveFld@CA{#1}}
+\instrSaveFldCA{Save \string& Close}
+%    \end{macrocode}
+%    The definition of \cmd\instrSave. If the \opt{usebatch} option is taken,
+%    we do not create the push button.
+%    \begin{macrocode}
+\newcommand\instrSave[3][]{\pushButton[%
+  \CA{\instrSaveFld@CA}\F\FHidden
+  \TU{\instrSaveFld@TU}\AAmouseup{%
+    var f=this.getField("studentenGrade");\r
+    var str=""+f.value;\r
+    str=str.replace(/\string\s/g,"");\r
+    if (str=="")\r\t
+      app.alert("You did not award the student a final mark."
+      +"\\n\\nAward the mark and then save.");\r
+    else {\r\t
+      aebTrustedFunctions(this,aebSaveAs);\r\t
+    this.closeDoc(true);\r
+  }}\protect\AA\protect\F
+  #1]{freezeQz}{}{11bp}}
+%    \end{macrocode}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\freezeOrSave\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    is the recommended way of inserting \cs{freezeQuiz} or \cs{instrSave}. If \opt{usebatch}
+%    is taken, \c{freezeOrSave} expands to \cs{instrSave}; otherwise it expands to \cs{freezeQuiz}.
+%\changes{v1.2}{2019/07/16}{Added \string\cs{freezeOrSave}}
+%    \begin{macrocode}
+\AtEndOfPackage{\ifth@allowfreeze\let\freezeOrSave\freezeQuiz
+  \else\let\freezeOrSave\instrSave\fi}
+%    \end{macrocode}
+%    \DescribeMacro\studentReport\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} In Thor's
+%    way of things, a summary report is placed at the top of the document. This readonly field
+%    shows the number of points awarded and the total points.
+% \changes{v1.1.8}{2019/07/08}{make studentenReport initially hidden}
+%    \begin{macrocode}
+\newcommand{\studentReport}[3][]{%
+  \textField[\BC{}\BG{}\F\FHidden\Ff\FfReadOnly\protect\Ff#1%
+  ]{studentenReport}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\studentGrade\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Again, in Thor's way of things, a text field is available to assign grade. This field
+%    is initially hidden, but becomes visible when instructor signs in.
+%    \begin{macrocode}
+\newcommand{\studentGrade}[3][]{\textField[\F\FHidden\protect\F
+  \BC{red}\BG{}\Q1\textSize{12}\textColor{blue}
+  \AAkeystroke{event.change=event.change.toUpperCase()}#1%
+  ]{studentenGrade}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\thQHFirstName\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    The first name of the student
+%    \begin{macrocode}
+\def\thQHFirstName#1{\def\th@QHFirstName{\textbf{#1}\space}}
+\thQHFirstName{First name:}
+%    \end{macrocode}
+%    \DescribeMacro\thQHLastName\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    The last name of the student
+%    \begin{macrocode}
+\def\thQHLastName#1{\def\th@QHLastName{\textbf{#1}\space}}
+\thQHLastName{Last name:}
+%    \end{macrocode}
+%    \DescribeMacro\thQHPoints\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Number of points, displayed in the form `10 / 20'.
+%    \begin{macrocode}
+\def\thQHPoints#1{\def\th@QHPoints{\textbf{#1}\space}}
+\thQHPoints{Points:}
+%    \end{macrocode}
+%    \DescribeMacro\thQHGrade\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Some grade mark (A, B, C, etc., or 1, 2, 3, etc.)
+%    \begin{macrocode}
+\def\thQHGrade#1{\def\th@QHGrade{\textbf{#1}\space}}
+\thQHGrade{Grade:}
+%    \end{macrocode}
+%     \DescribeMacro\thQuizHeader\nmpsep{*}
+%     The above commands typically appear above the quiz and placed in some beautiful way.
+%     We bundle these commands into a single one, according to my own happiness, but you may
+%     seek happiness some other way by redefining \cs{thQuizHeaderLayout}.
+%     (The command \cs{thQuizHeader} just picks up on the \texttt*-option, then expands \cs{thQuizHeaderLayout}.)
+%     The command is placed beneath the \cs{DeclareQuiz} command and above the \env{quiz}
+%     environment. The command automatically emits a \cs{newpage}, unless the \texttt*-option is taken.\par\medskip\noindent
+%\begin{minipage}[t]{\widthof{\cs{DeclareQuiz\darg{\ameta{qz-name}}}}}
+%\begin{flushleft}
+%\textbf{Preferred Placement}\\[3pt]
+%\ttfamily
+%\cs{DeclareQuiz\darg{\ameta{qz-name}}}\\
+%...\\
+%\string\begin\darg{document}\\
+%...\\
+%\cs{thQuizHeader}\\
+%...\\
+%\ameta{\textsf{quiz-begins}}
+%\end{flushleft}
+%\end{minipage}\qquad
+%\begin{minipage}[t]{\widthof{\cs{DeclareQuiz\darg{\ameta{qz-name}}}}}
+%\begin{flushleft}
+%\textbf{Alternate Placement}\\[3pt]
+%\ttfamily
+%\string\begin\darg{document}\\
+%\cs{DeclareQuiz\darg{\ameta{qz-name}}}\\
+%\cs{thQuizHeader}\\
+%...\\
+%\ameta{\textsf{quiz-begins}}
+%\end{flushleft}
+%\changes{v1.4.3}{2019/08/22}{let \string\cs{Hy@EveryPageAnchor} to \string\cs{relax}}
+%\end{minipage}\medskip
+%    \begin{macrocode}
+\newcommand{\thQuizHeader}{\let\Hy@EveryPageAnchor\relax
+  \@ifstar{\thPageOne\thQuizHeaderLayout}
+  {\newpage\thPageOne\thQuizHeaderLayout}%
+}
+%    \end{macrocode}
+%     \DescribeMacro\thQuizHeaderLayout The body of this command contains the arraignment of
+%     the above defined commands. It is this command that may be redefined.
+%    \begin{macrocode}
+\newcommand\thQuizHeaderLayout{\noindent
+  \th@QHFirstName\FirstName{1.5in}{13bp}\vcgBdry[3pt]
+  \th@QHLastName\LastName{1.5in}{13bp}\vcgBdry[6pt]
+  \begin{minipage}[t]{1.2in}\kern0pt
+    \makebox[0pt][r]{\raggedleft\markQz{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHPoints\studentReport{\widthof{000/000}}{11bp}\vcgBdry[6pt]
+    \makebox[0pt][r]{\raggedleft\freezeOrSave{}{11bp}%
+    \hspace{\marginparsep}}%
+  \th@QHGrade\studentGrade{14bp}{14bp}\vcgBdry[6pt]
+  \end{minipage}\hfill
+  \begin{minipage}[t]{\linewidth-1em-1.2in}\kern0pt
+  \begin{sumryTblAux}{\currQuiz}
+  \displaySumryTbl[ntables=1,showmarkup]{\currQuiz}
+  \end{sumryTblAux}
+  \end{minipage}}
+%    \end{macrocode}
+% This assumes the English language and the \opt{usesumrytbls} option of \pkg{exerquiz}.
+%  \subsection{Commands that usually follow the quiz} %\leavevmode\par\medskip\noindent
+%    \DescribeMacro\completeMsgFldV\nmpsep{\darg{\ameta{pdfstr}}} is the message
+%    that is displayed in this multi-line text field.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\completeMsgFld\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    When the student completes the quiz, a  hidden text field appears and reminds
+%    the student to save the document.
+%    \begin{macrocode}
+\def\completeMsgFldV#1{\def\completeMsgFld@V{#1}}
+\completeMsgFldV{Congratulations, you have completed the quiz,
+  before doing anything else, you need to save this document.}
+%    \end{macrocode}
+%    The definition of \cmd\completeMsgFld
+%    \begin{macrocode}
+\newcommand{\completeMsgFld}[3][]{\textField[\F\FHidden\Ff\FfMultiline
+  \Ff\FfReadOnly\V{\completeMsgFld@V}
+  \DV{\completeMsgFld@V}]{postQzMsg}{#2}{#3}}
+%    \end{macrocode}
+%   \DescribeMacro\ShrtPtsFld\nmpsep{\darg{\ameta{options}}\darg{\ameta{quiz-name}}}
+%   This is \pkg{exerquiz}s \cs{PointsField}, but with special format script.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\ShrtPtsFldFmt\nmpsep{\darg{\ameta{js-str}}} is the formatting string
+%     used; \ameta{js-str} should incorporate the event property \texttt{event.value}
+%     in its definition. See default definition below.
+%     \changes{v1.4.17}{2019/10/03}{Rewrote \string\cs{ShrtPtsFldFmt} to produce pdf spaces}
+%    \begin{macrocode}
+\def\ShrtPtsFldFmt{\bgroup\obeyspaces\ShrtPtsFldFmt@i}
+\def\ShrtPtsFldFmt@i#1{\egroup\flJSStr[noquotes]{\ShrtPtsFld@Fmt}{#1}}
+\ShrtPtsFldFmt{"Short Pts: "+event.value}
+%    \end{macrocode}
+%    The definition of \cmd\ShrtPtsFld
+%    \begin{macrocode}
+\newcommand{\ShrtPtsFld}[2][]{%
+  \PointsField[\AAformat{if(event.value!="")
+    event.value=\ShrtPtsFld@Fmt}\F\FHidden\protect\AA
+    \protect\F#1]{#2}}
+%    \end{macrocode}
+%    \DescribeMacro\LngPtsFld\nmpsep{\darg{\ameta{options}}\darg{\ameta{quiz-name}}}
+%    This field will hold the total points for the essay or extended response
+%    questions. It is modeled after \cs{PointsField}, having the same defaults
+%    and width and height.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\LngPtsFldFmt\nmpsep{\darg{\ameta{js-str}}} is the formatting string
+%     used; \ameta{js-str} should incorporate the event property \texttt{event.value}
+%     in its definition. See default definition below.
+%     \changes{v1.4.17}{2019/10/03}{Rewrote \string\cs{LngPtsFldFmt} to produce pdf spaces}
+%    \begin{macrocode}
+\def\LngPtsFldFmt{\bgroup\obeyspaces\LngPtsFldFmt@i}
+\def\LngPtsFldFmt@i#1{\egroup\flJSStr[noquotes]{\LngPtsFld@Fmt}{#1}}
+\LngPtsFldFmt{"Long Pts: "+event.value}
+%    \end{macrocode}
+%    The definition of \cmd\LngPtsFld
+%    \changes{v1.1.3}{2019/07/03}{Make \string\cs{LngPtsFld} a calculation field}
+%    \changes{v1.4.10}{2019/09/11}{Fixed a bug in calculation when there are no
+%    essay questions}
+%    \begin{macrocode}
+\newcommand{\LngPtsFld}[2][]{%
+  \textField[\presets{\PointsFieldDefaults}\F\FHidden
+  \AAformat{if(event.value!="") event.value=\LngPtsFld@Fmt}
+  \AAcalculate{var f=this.getField("essayMrkUp");\r
+  if(f!=null)EFSimple_Calculate("SUM",%
+new Array("essayMrkUp.\currQuiz"));}
+  ]{EssayField.\currQuiz}{\PtFW}{\DefaultHeightOfWidget}}
+%    \end{macrocode}
+%   \DescribeMacro\TotalsFld\nmpsep{\darg{\ameta{options}}\darg{\ameta{quiz-name}}}
+%   This is modeled after \pkg{exerquiz}s \cs{PointsField}, but with special format script.
+%    \begin{macrocode}
+%    \end{macrocode}
+%     \DescribeMacro\TotalsFldFmt\nmpsep{\darg{\ameta{js-str}}} is the formatting string
+%     used; \ameta{js-str} should incorporate the event property \texttt{event.value}
+%     in its definition. See default definition below.
+%     \changes{v1.4.17}{2019/10/03}{Rewrote \string\cs{TotalsFldFmt} to produce pdf spaces}
+%    \begin{macrocode}
+\def\TotalsFldFmt{\bgroup\obeyspaces\TotalsFldFmt@i}
+\def\TotalsFldFmt@i#1{\egroup\flJSStr[noquotes]{\TotalsFld@Fmt}{#1}}
+\TotalsFldFmt{"Total: "+event.value+"\space\eqOutOf\space"%
++NPointTotal}
+%    \end{macrocode}
+%    The definition of \cmd\TotalsFld
+%    \changes{v1.1.2}{2019/07/02}{Added try/catch in \string\cs{AAformat} to avoid
+%    exceptions thrown in the case of distiller; added pdf space in the \string\cs{TotalsFld}
+%    JS to avoid unexpected wraps in the case of dvips/distiller worflow.}
+%    \begin{macrocode}
+\newcommand{\TotalsFld}[2][]{%
+  \textField[\presets{\PointsFieldDefaults}\F\FHidden
+  \AAformat{try{event.value=(\TotalsFld@Fmt)}catch(e){}}
+  \AAcalculate{EFSimple_Calculate("SUM",%
+new Array("PointsField.\currQuiz","EssayField.\currQuiz"));\r
+    var\eqSP f=this.getField("studentenReport");\r
+    f.value=(1*event.value)+"\eqSP/\eqSP"+\theeqpointvalue;
+  }]{TotalsField.\currQuiz}{\PtFW}{\DefaultHeightOfWidget}}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\thQuizTrailer
+%    The above commands can be arranged in some way following the quiz; one such arrangement
+%    is found in the command \cmd\thQuizTrailer.
+%    \begin{macrocode}
+\newcommand{\thQuizTrailer}{\raisebox{\baselineskip-\fboxsep}%
+  {\makebox[0pt][l]{\parbox[t]{3in}{\kern0pt
+  \completeMsgFld{3in}{3\baselineskip}}}}%
+  \makebox[0pt][l]{\hspace{3in}\quad
+    \ifthtestmode\CorrButton{\currQuiz}\else
+    \stuSaveBtn{}{11bp}\fi}\parbox[t]{3in}
+    {\ShrtPtsFld{\currQuiz}\vcgBdry[6pt]
+    \LngPtsFld{\currQuiz}\vcgBdry[6pt]
+    \TotalsFld{\currQuiz}}}
+%    \end{macrocode}
+%
+%    \subsection{Controls inside the \tops{\protect\env{quiz}}{quiz} environment}
+%
+%    \DescribeMacro{\essayQ}\nmpsep{\darg{\ameta{nPts}}}
+%    When we have an essay type question we need to mark it prior to the \cs{item}.
+%    In order to test whether the instructor has put in more credit than specified
+%    by the \cs{PTs} command, we need to pass the number of points for this question.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\essayQFldTU\nmpsep{\darg{\ameta{pdfstr}}} is the tool tip
+%    for this field.
+%    \begin{macrocode}
+\def\essayQFldTU#1{\def\essayQFld@TU{#1}}
+\essayQFldTU{Assign points to extended responses}
+%    \end{macrocode}
+%    We fix the width \DescribeMacro\EsW\cmd\EsW{} and the height \DescribeMacro\EsH\cmd\EsH{}
+%    of \cs{essayQ} using commands, these can be redefined.
+%    \begin{macrocode}
+\def\EsW{33bp}\def\EsH{14bp}
+%    \end{macrocode}
+%    Now for the definition of \cmd\essayQ
+%    \begin{macrocode}
+\def\essayQ#1{\let\qMark@HookSave\qMark@Hook
+  \def\qMark@Hook{\makebox[0pt][r]{\smash
+  {\raisebox{-7bp+\fboxsep}{\stepcounter{questionno}\textField[%
+    \cmd{\bParams{#1}\eParams}\F\FHidden\Q{1}
+    \AAkeystroke{\essayQKey}
+%    \AAonfocus{var essayPtsAssigned=(1*event.value);}
+    \AAformat{if(event.value!="") event.value=event.value
+      +((event.value==1)?" \eqptLabel":" \eqptsLabel")}
+  \TU{\essayQFld@TU}
+  ]{essayMrkUp.\currQuiz.\thequestionno}{\EsW}{\EsH}%
+  \addtocounter{questionno}{-1}}}}\global
+  \let\qMark@Hook\qMark@HookSave}}
+%    \end{macrocode}
+%  The way you pose an essay question is as follows:
+%\begin{verbatim}
+% \essayQ{5}
+% \item\PTs{5} The question ...\\[3pt]
+%              \RespBoxEssay{4in}{4\baselineskip}
+%\end{verbatim}
+%\leavevmode\DescribeMacro\essayitem\nmpsep{\darg{\ameta{num}}}
+% We simply this workflow a little, define \cs{essayitem}:
+%    \begin{macrocode}
+\def\essayitem#1{\essayQ{#1}\item\PTs{#1}}
+%    \end{macrocode}
+%Thus, we can now type,
+%\begin{verbatim}
+% \essayitem{5} The question ...\\[3pt]
+%               \RespBoxEssay{4in}{4\baselineskip}
+%\end{verbatim}
+%
+% \section{Field level JavaScript for form field commands}
+%
+% JS\DescribeMacro\pwdInstrFld{} Keystroke action for \cmd\pwdInstrFld. This script
+% uses three parameters passed to it through {\cmd\pwdInstrFld}: \texttt{@p(1)} is the quiz
+% name (\cmd\currQuiz); \texttt{@p(2)} is the number of questions; and \texttt{@p(3)} is
+% the password.
+%    \begin{macrocode}
+\begin{defineJS}[\catcode`\@=0\relax]{\pwdKeyJS}
+if (event.willCommit) {
+  if (event.value==@p(3)) {
+    @commonPassKey
+  }
+}
+\end{defineJS}
+\begin{defineJS}[\catcode`\@=0\relax]{\commonPassKey}
+%    \end{macrocode}
+%    Added code from \cs{qz@IDTxtField} to avoid the dreaded `q1 is undefined'
+%    JavaScript error message. This happends when the \textsf{Mark It} control
+%    and the \textsf{Begin Quiz} controls are on different pages. When \textsf{Mark It}
+%    is pressed, `q1' has not been defined yet, not until the next page.
+%    \changes{v1.4.7}{2019/08/27}{Added format code from \string\cs{qz@IDTxtField}}
+%    \begin{macrocode}
+if(typeof aQuizzesInDoc=="undefined")
+  var aQuizzesInDoc=new Array();
+if (aQuizzesInDoc.indexOf("@oField"))
+  aQuizzesInDoc.push("@oField");
+if (typeof @oField=="undefined")
+  var @oField=new Object;
+restoreQuizData();
+this.calculate=true;
+var f=this.getField("postQzMsg");
+if (f!=null) f.display=display.hidden;
+var f=this.getField("pbStuSvCl");
+if (f!=null) f.display=display.hidden;
+var f=this.getField("ScoreField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("PointsField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("EssayField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("TotalsField.@p(1)");
+if (f!=null) f.display=display.visible;
+var f=this.getField("essayMrkUp");
+if (f!=null) f.display=display.visible;
+correctQuiz("@p(1)",@p(2));
+var f=this.getField("qzreset");
+if (f!=null) f.display=display.visible;
+var f=this.getField("freezeQz");
+if (f!=null) f.display=display.visible;
+var f=this.getField("studentenReport");
+if (f!=null) f.display=display.visible;
+var f=this.getField("studentenGrade");
+if (f!=null) f.display=display.visible;
+if (typeof correctSumryTbl == "function")
+  correctSumryTbl("@p(1)",@p(2));
+\end{defineJS}
+%    \end{macrocode}
+% Keystroke JS\DescribeMacro\essayQKey{} action for \cmd\essayQ. The
+% \texttt{@p(1)} parameter is the weight of this essay question, it is passed to
+% this script by \cmd\essayQ.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\NoNumEnteredMsg\nmpsep{\darg{\ameta{jsstr}}} When you enter a non-number,
+%    and an alert box pops up with this as its message.
+%    \begin{macrocode}
+\def\NoNumEnteredMsg#1{\flJSStr*[noquotes]{\cNoNumEnteredMsg}{#1}}
+\NoNumEnteredMsg{"You did not enter a number, %
+enter a nonnegative number only"}
+%    \end{macrocode}
+%    \DescribeMacro\TooMuchCreditMsg\nmpsep{\darg{\ameta{jsstr}}} When you assign too
+%    much credit for the problem, an alert box appears containing this message.
+%    \begin{macrocode}
+\def\TooMuchCreditMsg#1{\flJSStr*[noquotes]{\cTooMuchCredit}{#1}}
+\TooMuchCreditMsg{"You've assigned too much credit for this %
+problem, assigning the maximum instead"}
+%    \end{macrocode}
+%    Now the definition of \cmd\essayQKey
+%    \changes{v1.1.1}{2019/06/30}{Corrected a bug in \string\cs{essayQKey} that caused
+%    a miscalculation.}
+%    \changes{v1.1.3}{2019/07/03}{Remove lines not needed since \string\cs{LngPtsFld} became
+%    a calculation field}
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\essayQKey}
+if (event.willCommit) {
+  var qpts=(1*event.value);
+  if (isNaN(qpts)) {
+    app.alert(@cNoNumEnteredMsg);
+    event.rc=false;
+  } else if (qpts<0) {
+    event.value=-1*event.value;
+    qpts=1*event.value;
+  }
+  if (event.rc) {
+    if (qpts > @p(1) ) {
+      app.alert(@cTooMuchCredit);
+      qpts=@p(1);
+    }
+    // update ProbDist array
+    ProbDist[@thequestionno]=qpts;
+    // see if table is present
+    if (typeof correctSumryTbl == "function") {
+      f=this.getField("%
+@dlcombine(@currQuiz)(SanityCheckPts).@thequestionno");
+      var thesePts= qpts + (( qpts == 1 )?%
+" @eqptLabel":" @eqptsLabel");
+      f.value=thesePts;
+      // add color
+      var cb=this.getField("%
+@dlcombine(@currQuiz)(SanityCheck).@thequestionno");
+      if (qpts==@p(1)) cb.strokeColor=@rghtColorJS;
+      else if (qpts>0) cb.strokeColor=@partialColorJS;
+      else cb.strokeColor=@wrngColorJS;
+    }
+    event.value=qpts;
+  }
+}
+\end{defineJS}
+%    \end{macrocode}
+%    \DescribeMacro\instrAutoSaveOn When the instructor presses the freeze quiz control, there is an option
+%    to automatically save the document or not. \cmd\instrAutoSaveOn{} saves the document; however, if
+%    \DescribeMacro\instrAutoSaveOff\cmd{\instrAutoSaveOff} is expanded in the preamble, no automatic
+%    save is performed. The default is \cmd\instrAutoSaveOn.
+%    \begin{macrocode}
+\def\instrAutoSaveOn{\def\instrAutoSave{true}}
+\def\instrAutoSaveOff{\def\instrAutoSave{false}}
+\instrAutoSaveOn
+%    \end{macrocode}
+%    \DescribeMacro\instrAutoCloseOn When the instructor presses the freeze quiz control, there is an option
+%    to silently close the document or not. \cmd\instrAutoCloseOn{} closes the document; however, if
+%    \DescribeMacro\instrAutoCloseOff\cmd{\instrAutoCloseOff} is expanded in the preamble, no automatic
+%    closing occurs. The default is \cmd{\instrAutoCloseOn}.
+%    \begin{macrocode}
+\def\instrAutoCloseOn{\def\instrAutoClose{true}}
+\instrAutoCloseOn
+\def\instrAutoCloseOff{\def\instrAutoClose{false}}
+%    \end{macrocode}
+% The mouse up\IndexJS{freezeQuizMU()}{} JavaScript for \texttt{freezeQuiz()}. It makes all form fields
+% \emph{in the entire document} readonly. \emph{Use only} after all markups are finished and document is ready
+% to be moved into the student's folder.
+%    \changes{v1.4.12}{2019/09/11}{Correction a problem with \string\cs{MarkWarningMsg}
+%    in the dvips/distiller workflow}
+%    \begin{macrocode}
+\def\MarkWarningMsg#1{\dlJSStr*[noquotes]{\MarkWarning@Msg}{#1}}
+\MarkWarningMsg{"You did not award the student a final mark.\
+  \\n\\nAward the mark and then save."}
+%    \end{macrocode}
+%    The \DescribeMacro\flattenOn\cs{flattenOn} turns on flattening, while
+%    \DescribeMacro\flattenOff\cs{flattenOff} turns flattening off. The reason
+%    you would turn flattening off is to use \textsf{Thor's way} for basic methods
+%    and for the \opt{useclass} option. The default is \cs{flattenOff} for basic methods
+%    and \cs{flattenOn} for \opt{usebatch}. Applies only when the \texttt{Freeze Quiz}
+%    button is present.
+%    \changes{v1.4.13}{2019/09/12}{Added \string\cs{flattenOn} and \string\cs{flattenOff}}
+%    \begin{macrocode}
+\def\flattenOn{\def\bFlattenState{false}}
+\def\flattenOff{\def\bFlattenState{true}}
+\ifbasicmethods\flattenOff\else\flattenOn\fi
+%    \end{macrocode}
+%    The definition of \texttt{freezeMU()}.
+%    \begin{macrocode}
+\begin{insDLJS}{jsforthor}{thorshammer: Freeze/Save Doc}
+var sndSaveWarning=\SecondSave@Msg;
+var isthereCvrPg=\thIsCP;
+var cvrPgNum="\thCvrPg";
+function freezeQuizMU() {
+var f, fname;
+var bOK=true;
+var f=this.getField("studentenGrade");
+var str=""+f.value;
+str=str.replace(/\s/g,"");
+if (str=="") {
+  app.alert(\MarkWarning@Msg);
+  bOK=false;
+}
+%    \end{macrocode}
+%    Determine if there are solution pages, and if so, re-insert them.
+%    \changes{v1.4.8}{2019/09/05}{Append solution pages if there is one}
+%    \begin{macrocode}
+var SolnSet=this.info.SolnSet;
+if (bOK&&SolnSet!=""){
+	var SolnPath=this.info.SolnPath;
+//	var SolnSet=this.info.SolnSet;
+	var qzbasename=this.info.qzBaseName;
+  aebTrustedFunctions(this,aebInsertPages,{
+    nPage: (this.numPages-1),
+    cPath: SolnPath+"/"+qzbasename+"-"+SolnSet+".pdf"
+  })
+};
+%    \end{macrocode}
+%    If \cs{thUseNameToCustomize} is true, we use the current file name; otherwise
+%    we use the original file name (\cs{jobname})
+%    \begin{macrocode}
+if(\instrAutoSave&&bOK) {
+//  var cSave="\jobname";
+  var docFN=this.documentFileName;
+  docFN=docFN.substring(0,docFN.length-4);
+  var cSave=(\thUseNameToCustomize)?"\jobname":docFN;
+%    \end{macrocode}
+%    If \cs{thUseNameToCustomize} is true, we append student and \texttt{"-g"}
+%    to signal that this file has been graded.
+%    \begin{macrocode}
+  if(\thUseNameToCustomize) {
+    var f=this.getField("Name.first");
+    if(f!=null)cSave+=("-"+f.value+"_");
+    f=this.getField("Name.last");
+    if(f!=null)cSave+=(f.value);
+    cSave+=("-g");
+  }
+  var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,{bSave:true,%
+cFilenameInit: cSave });
+  bOK=(typeof oRetn=="object");
+  if(bOK) {
+%    \end{macrocode}
+%    If the file name and path are chosen, we make all files readonly
+%    \begin{macrocode}
+    for (var i=0; i<this.numFields; i++) {
+      fname=this.getNthFieldName(i);
+      f=this.getField(fname);
+      f.readonly=true;
+    }
+%    \end{macrocode}
+%    After making all fields readonly, we hide the freeze quiz button itself.
+%    \begin{macrocode}
+    var f=this.getField("MarkIt");
+    if (f!=null)f.display=display.hidden;
+    f=this.getField("freezeQz");
+    if (f!=null)f.display=display.hidden;
+%    \end{macrocode}
+%    (2019/06/30) J\"{u}rgen suggested to flatten the document to add more security.
+%    \changes{v1.1}{2019/06/30}{Added flattening}
+%    \changes{v1.1.6}{2019/07/06}{Added save as requiring acrobat}
+%    \changes{v1.2.1}{2019/07/19}{Inserted test for \string\texttt{oRecordOfQuizData} before saving,
+%    this avoids the message that appears in the console that 'f is null'}
+%    \begin{macrocode}
+    if(typeof _flattenThisDoc=="undefined")this.flattenPages();
+%    \end{macrocode}
+%    Now we are ready to save the file
+%    \begin{macrocode}
+    oRecordOfQuizData=undefined;
+%    \end{macrocode}
+%    If instructor uses \textsf{Thor's way}, we don't want to reattach
+%    the solution page as it has already been reattached in this
+%    workflow.
+%    \begin{macrocode}
+    this.info.SolnSet="";
+    var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+{cPath:oRetn.cPath,cFS:oRetn.cFS});
+  }
+}
+if(\instrAutoClose&&bOK) this.closeDoc(true);
+}
+\end{insDLJS}
+\begin{defineJS}[\catcode`\@=0\relax]{\freezeQuizMU}
+var f, fname;
+var bOK=true;
+if(@instrAutoSave) {
+  var cSave="@jobname";
+  var f=this.getField("Name.first");
+  if(f!=null)cSave+=("-"+f.value+"_");
+  f=this.getField("Name.last");
+  if(f!=null)cSave+=(f.value);
+  var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,{bSave:true,@%
+cFilenameInit: cSave });
+  bOK=(typeof oRetn=="object");
+  if(bOK) {
+%    \end{macrocode}
+%    If the file name and path are chosen, we make all files readonly
+%    \begin{macrocode}
+    for (var i=0; i<this.numFields; i++) {
+      fname=this.getNthFieldName(i);
+      f=this.getField(fname);
+      f.readonly=true;
+    }
+%    \end{macrocode}
+%    After making all fields readonly, we hide the freeze quiz button itself.
+%    \begin{macrocode}
+    var f=this.getField("MarkIt");
+    if (f!=null)f.display=display.hidden;
+    f=this.getField("freezeQz");
+    if (f!=null)f.display=display.hidden;
+%    \end{macrocode}
+%    (2019/06/30) J\"{u}rgen suggested to flatten the document to add more security.
+%    \changes{v1.1}{2019/06/30}{Added flattening}
+%    \changes{v1.1.6}{2019/07/06}{Added save as requiring acrobat}
+%    \begin{macrocode}
+    this.flattenPages();
+%    \end{macrocode}
+%    Now we are ready to save the file
+%    \changes{v1.4.1}{2019/08/16}{Added cFS to aebDocSaveAs}
+%    \begin{macrocode}
+    var retn=aebTrustedFunctions(this,aebDocSaveAs,@%
+{cFS:oRetn.cFS,cPath: oRetn.cPath });
+  }
+}
+if(@instrAutoClose&&bOK) this.closeDoc(true);
+\end{defineJS}
+%    \end{macrocode}
+%    \section{Modifications and redefinitions of AeB}
+%    We modify various commands of \pkg{exerquiz} to conform the goals
+%    of the mighty Thor.
+%
+%    \subsection{Quiz components modified}
+%    We begin by modifying the \cs{RespBoxEssay} action.
+%    \begin{macrocode}
+\def\@@RespBoxEssayActions{%
+  \AA{\if\eqQuizType\isQZ
+    \AAKeystroke{%
+      if(event.willCommit){\jsR\jsT
+      RecordPointValue(\eqPTs,\thequestionno);\jsR\jsT
+      RecordProblemType("\eqQT",\thequestionno);\jsR
+%    \end{macrocode}
+%     The next three lines are inserted. After user has left the
+%     text field, we determine if he/she did anything. If \texttt{event.value},
+%     stripped of all white space, is empty, nothing was done and we mark
+%     the response as \texttt{undefined}; otherwise we mark it as
+%     \texttt{"<essay>"}. The fact that the \texttt{Responses} array
+%     is nonempty for this question will cause a check mark to appear
+%     in the summary table.
+%    \begin{macrocode}
+      var stripResp=stripWhiteSpace(event.value);\jsR\jsT
+      if(stripResp=="")Responses[\thequestionno]=undefined;\jsR\jsT
+      else Responses[\thequestionno]="<essay>";\jsR\jsT
+      if ( typeof fieldPopTbl == "function" ) fieldPopTbl("\currQuiz");
+      }\jsR
+      if (!isQuizInitialized("\curr@quiz")) {\jsR\jsT
+          \eqObjAlert\space eqAppAlert(%
+              InitMsg("\bqlabelISO"),3);\jsR\jsT
+          event.rc = false;\jsR
+      }%
+    }%
+  \fi
+  }
+}
+%    \end{macrocode}
+%    We redefine \cs{@initQuiz} from \pkg{exerquiz} to first test whether
+%    name fields have been entered.
+%    \changes{v1.1.6}{2019/07/06}{Check on name fields}
+%    \begin{macrocode}
+\def\InitQzMsg#1{\flJSStr*[noquotes]{\InitQzMsg@Msg}{#1}}
+\InitQzMsg{"You cannot begin the quiz before entering
+  your first and last names in the fields provided.\n\n
+  Enter the name as you are known in the class; otherwise,
+  you will receive no credit for your work."}
+\def\IfbQzChkSnippet{%
+this.calculate=false;\jsR
+if(\thOrdQz) bOk=true\jsR
+else {\jsR\jsT
+  var f=this.getField("Name.first");\jsR\jsT
+  var str1=stripWhiteSpace(f.value);\jsR\jsT
+  var f=this.getField("Name.last");\jsR\jsT
+  var str2=stripWhiteSpace(f.value);\jsR\jsT
+  bOk=(str1!=""&&str2!="");\jsR
+}
+if(bOk)}
+\expandafter\def\expandafter\@initQuiz\expandafter
+  {\expandafter\IfbQzChkSnippet\expandafter{\@initQuiz}
+  else app.alert({cMsg:\InitQzMsg@Msg,cTitle:\ThorsAlert@Title});
+}
+%    \end{macrocode}
+%    Modify \DescribeMacro\postSubmitQuiz\cmd\postSubmitQuiz.
+%    When the \textsf{End Quiz} control is pressed, we make visible the post
+%    quiz message, placed in the document by the \cmd\completeMsgFld{} command.
+%    \begin{macrocode}
+\toks@=\expandafter{\postSubmitQuiz\t\t
+  oRecordOfQuizData["ProbDist.\oField"]=ProbDist;\r\t\t
+  oRecordOfQuizData["RightWrong.\oField"]=RightWrong;\r\t\t
+  var f=this.getField("postQzMsg");\r\t\t
+  if (f!=null) f.display=display.visible;\r\t\t
+  var f=this.getField("pbStuSvCl");\r\t\t
+  if (\stuAutoSave&&f!=null)f.display=display.visible;} %\r\t\t
+\edef\postSubmitQuiz{\the\toks@}
+%    \end{macrocode}
+%    The action for the End Quiz button, we modify it to give the student a chance to reconsider
+%    his decision to end the quiz.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\EndQzWarningMsg\nmpsep{\darg{\ameta{jsstr}}} The message that appears
+%    on the alert box asking to student to verify ending the quiz.
+%    \changes{v1.1.6}{2019/07/06}{Added end quiz warning}
+%    \begin{macrocode}
+\def\EndQzWarningMsg#1{\flJSStr*[noquotes]{\EndQzWarning@Msg}{#1}}
+\EndQzWarningMsg{"When you end the quiz, you cannot change
+any of your answers without starting the quiz over from the
+beginning.\n\n Press \\"Yes\\" to end the quiz."}
+\def\ThorsAlertTitle#1{\flJSStr*[noquotes]{\ThorsAlert@Title}{#1}}
+\ThorsAlertTitle{"Thor's Hammer"}
+%    \end{macrocode}
+%    \DescribeMacro\eq@EndQzBtnScript The modified script for the end of the
+%    quiz button. We rework the script of \cs{eq@@EndQuizButtonActions}, taken from \pkg{exerquiz}.
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\eq@EndQzBtnScript}
+if (!isQuizInitialized("*currQuiz"))
+  eqAppAlert(InitMsg("*bqlabelISO"),3);
+else {
+  var retn=app.alert({cMsg: *EndQzWarning@Msg,%
+cTitle: *ThorsAlert@Title, nIcon: 2, nType: 2});
+  if (retn==4) {
+    if (*minQuizResp(*thequestionno)&&_ModalNotOn){
+      *currQuiz.PtValues=(new %
+Array(*pointValuesArray));
+      ProbType=[*ptypeArray];
+*if@inclkey%
+      *currQuiz.CorrAns=(new %
+Array(*corrAnsArray));
+*fi%
+      DisplayQuizResults("*currQuiz",*theeqpointvalue,%
+*thequestionno);
+      var h=this.getField("ScoreData.*currQuiz");
+      h.value=Score+";"+NQuestions+";"%
++ptScore+";"+NPointTotal;
+%      *eq@submitURL
+      *postSubmitQuiz
+      resetQuiz("*currQuiz");
+    }
+  }
+}
+\end{defineJS}
+%    \end{macrocode}
+%    Now, we redefine \cs{eq@@EndQuizButtonActions} of \pkg{exerquiz}.
+%    \begin{macrocode}
+\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScript}}}
+%    \end{macrocode}
+%    Add a \textsf{SaveAs} menu item to end of the quiz
+%    \changes{v1.1.4}{2019/07/04}{Add a SaveAs menu item to end of the quiz}
+%    \changes{v1.1.5}{2019/07/06}{If document is dirty, do not save}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\stuAutoSaveOn When expanded in the preamble, a save button will appear (\cmd\stuSaveBtn)
+%    when the \textsf{End Quiz} control is pressed. A dialog appears to save the file, the student can choose
+%    the file location and the file name at that time. When \DescribeMacro\stuAutoSaveOff\cmd\stuAutoSaveOff{}
+%    is in effect, the save button does not appear, and the student must press the save button the on
+%    \app{Adobe Reader} toolbar. The default is \cmd\stuAutoSaveOn.
+%    \begin{macrocode}
+\let\stuASOn\ef@YES
+\def\stuAutoSaveOn{\let\stuASOn\ef@YES
+  \def\stuAutoSaveScript{\t app.execMenuItem("SaveAs");\r}%
+  \def\stuAutoSave{true}}
+\def\stuAutoSaveOff{\let\stuASOn\ef@NO
+  \let\stuAutoSaveScript\@empty
+  \def\stuAutoSave{false}}
+\stuAutoSaveOn
+%    \end{macrocode}
+%    \DescribeMacro\stuAutoCloseOn This command is obeyed only if \cmd{\stuAutoSaveOn}
+%    is in effect. After the student presses the save button (\cmd\stuSaveBtn), the
+%    document is closed after the student save the document. Note that if the student
+%    cancels saving the document and if the document still needs saving, the document
+%    is not closed. The default is \cmd\stuAutoCloseOn.
+%    \begin{macrocode}
+\def\stuAutoCloseOn{\def\stuAutoCloseScript{\t
+  if(!this.dirty)this.closeDoc(true);\r}%
+  \def\stuAutoClose{true}}
+\stuAutoCloseOn
+\def\stuAutoCloseOff{\let\stuAutoCloseScript\@empty
+  \def\stuAutoClose{false}}
+%    \end{macrocode}
+%    \DescribeMacro\stuSaveBtnCA\nmpsep{\darg{\ameta{jsstr}}} The caption for this button
+%    \begin{macrocode}
+\def\stuSaveBtnCA#1{\def\stuSaveBtn@CA{#1}}
+\stuSaveBtnCA{Save}
+%    \end{macrocode}
+%    \DescribeMacro\stuSaveBtnTU\nmpsep{\darg{\ameta{jsstr}}} The tool tip for this button
+%    \begin{macrocode}
+\def\stuSaveBtnTU#1{\def\stuSaveBtn@TU{#1}}
+\stuSaveBtnTU{Press to save and close the document}
+%    \end{macrocode}
+%    \DescribeMacro\stuSaveBtn\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    This button is initially hidden and becomes visible within the student presses
+%    the \textsf{End Quiz} control; provided \cs{stuAutoSaveOn} is in effect. The button
+%    saves and optionally closes the document.
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro\autoSaveStuJS is a revised version of the JavaScript action
+%    for \cs{stuSaveBtn}. If the JavaScript method \texttt{aebTrustedFunctions} is undefined, we use the old code;
+%    otherwise, we use the new code.
+%    \changes{v1.5.5}{2019/12/08}{Use \string\texttt{aebTrustedFunctions} if present}
+%
+%    \medskip\noindent\DescribeMacro\SecondSaveMsg\nmpsep{\darg{\ameta{msg}}} is an alert dialog message stating
+%    the the document was not saved. This declaration mush occur on the preamble of in the CFG file, or is has no effect.
+%    \begin{macrocode}
+\def\SecondSaveMsg#1{\dlJSStr*[noquotes]{\SecondSave@Msg}{#1}}
+\SecondSaveMsg{"Alert! This document has not been saved, do not
+  exit before saving!"}
+%    \end{macrocode}
+%    When \texttt{aebTrustedFunctions} is defined for \app{AR}, we offer two methods for the student
+%    to save the document: (1) \DescribeMacro\useStuSaveAsDialogOff\cs{useStuSaveAsDialogOff} (the default)
+%    is the most seamless method, no save-as dialog is offered, the student asked to confirm the save; (2)
+%    \DescribeMacro\useStuSaveAsDialogOn\cs{useStuSaveAsDialogOn} offers the save-as dialog (but streamlined).
+%    These two commands must appear on the preamble or CFG file, or they have no effect.
+%    \begin{macrocode}
+\newif\ifUseStuSaveAsDialog\UseStuSaveAsDialogfalse
+\def\useStuSaveAsDialogOn{\UseStuSaveAsDialogtrue}
+\def\useStuSaveAsDialogOff{\UseStuSaveAsDialogfalse}
+\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\autoSaveStuJS}
+  var bOK=true;
+  global.bOkClose=true;
+  var _path=this.path;
+  var pos=_path.lastIndexOf("/");
+  var currentFolder=_path.substring(0,pos+1);
+  var docFN=this.documentFileName;
+  docFN=docFN.substring(0,docFN.length-4);
+  var cSave=(*thUseNameToCustomize)?"*jobname":docFN;
+  currentFolder=currentFolder+cSave+".pdf";
+  if (typeof aebTrustedFunctions=="undefined")
+    app.execMenuItem("SaveAs");
+  else {
+%    \end{macrocode}
+%    In this controlled environment of taking PDF quizzes at an institution,
+%    the AeB special function \texttt{aebTrustedFunctions} is defined,
+%    along with supporting functions.
+%    \begin{macrocode}
+*ifUseStuSaveAsDialog%
+    var oRetn=aebTrustedFunctions(this,aebBrowseForDoc,%
+{bSave:true,cFilenameInit: cSave });
+    bOK=(typeof oRetn=="object");
+*fi%
+%    \end{macrocode}
+%    If the user dismisses the browse-for-doc dialog, the return value (\texttt{oRetn}) is undefined;
+%    in this case, we do not save or close the document. The user must initiate the action
+%    again.
+%    \changes{v1.5.7}{2020/01/13}{Added delete global.bOkClose}
+%    \begin{macrocode}
+    aebDocSaveAs.msg="";
+    aebDocSaveAs.action=%
+'global.bOkClose=false;app.alert("'+sndSaveWarning+'")';
+    if (bOK) var retn=aebTrustedFunctions(this,aebDocSaveAs,%
+{cPath:*ifUseStuSaveAsDialog oRetn.cPath*else currentFolder*fi });
+    else app.alert(sndSaveWarning);
+  }
+  if(*stuAutoClose&&bOK&&global.bOkClose&&!this.dirty)
+    delete global.bOkClose;
+    this.closeDoc(true);
+\end{defineJS}
+%    \end{macrocode}
+%    We finally reach the definition of \cs{stuSaveBtn}
+%    \begin{macrocode}
+\newcommand\stuSaveBtn[3][]{\pushButton[\F\FHidden
+  \CA{\stuSaveBtn@CA}\TU{\stuSaveBtn@TU}
+%    \end{macrocode}
+%    Here, we leverage the new \cs{cmd} command to test if auto save is on, if not
+%    we gobble the \cs{AAmouseup} action.
+%    \begin{macrocode}
+  \cmd{\ifx\stuASOn\ef@NO\let\@eqAAmouseup\@gobble\fi}
+  \AAmouseup{if(\stuAutoSave){\r
+    \autoSaveStuJS
+%    \stuAutoSaveScript\stuAutoCloseScript
+  }}\protect\AA\protect\F#1
+]{pbStuSvCl}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\DeclareQuiz\nmpsep{\darg{\ameta{qz-name}}}
+%    We modify the \cs{DeclareQuiz} command of \pkg{exerquiz}, by appending
+%    some code that defines \cs{eq@prior@endQuiz} to write the number of questions
+%    and the number of points to the AUX file.
+%    This command \emph{must appear}\marginpar{\raggedleft Required in preamble or at top of file} at the top of the source file, just after
+%    \verb|\begin{document}| or in the \emph{preamble}, it defines \cs{currQuiz} for the rest of the document,
+%    and write to AUX file. When using multi-quizzes in one source file, this package redefines the \cs{currQuiz}; for example,
+%    if originally, you declared \cs{DeclareQuiz\darg{Quiz1}}, the first renditions uses the quiz name
+%    \texttt{Quiz1a}, the second \texttt{Quiz1b}, and so on. (Limit of 26 renditions). To preserve the original
+%    quiz name, we define \DescribeMacro\thQuizName\cs{thQuizName}, this command expands to \cs{Quiz1} within all
+%    renditions; consequently, can be used in the running head to consistently display the quiz name.
+%    \begin{macrocode}
+\let\DeclareQuizSAVE\DeclareQuiz
+\def\DeclareQuiz#1{\def\thQuizName{#1}\th@DeclareQuiz{#1}}
+\def\th@DeclareQuiz#1{\DeclareQuizSAVE{#1}%
+  \expandafter\gdef\expandafter
+  \eq@prior@endQuiz\expandafter{\eq@prior@endQuiz\wrtQzInfo}}
+%    \end{macrocode}
+%    \DescribeMacro\thQzName\nmpsep{\darg{\ameta{friendly-qz-name}}} This is the friendly (human readable)
+%    quiz name, suitable for use in the running header and elsewhere.
+%    \begin{macrocode}
+\def\thQzName#1{\def\thqzname{#1}}
+\thQzName{\thQuizName}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\wrtQzInfo{\eq@IWAuxOut{\string
+  \csarg\string\gdef{\currQuiz-nQs}{\thequestionno}^^J\string
+  \csarg\string\gdef{\currQuiz-nPts}{\theeqpointvalue}}}
+%    \end{macrocode}
+%    We modify \DescribeMacro\eqQuizPointsMsg\cmd\eqQuizPointsMsg{}, its default definition
+%    is the string \begin{quote}\ttfamily"\string\eqptScore\string\space"+ptScore+"
+%   \string\eqOutOf\string\space"+nPointTotal\end{quote}but for Thor's way, we simplify to \texttt{ptScore}.
+%    \begin{macrocode}
+\renewcommand\eqQuizPointsMsg{ptScore}
+%    \end{macrocode}
+%   \subsection{Modify margin points markup}
+%   Make the markup boxes in the margins larger.
+%    \begin{macrocode}
+\renewcommand{\aeb@creditmarkup}{\bgroup
+  \edef\markupWidth{\EsW}\edef\markupHeight{\EsH}%
+  \textField[\Ff\FfReadOnly\BC{}\F\FHidden
+  \textColor{\pcMarkupColor}\textSize{\markupTextSize}\autoCenter{y}%
+  \DV{0 \eqptsLabel}\V{0 \eqptsLabel}]%
+  {qMark.\currQuiz.\thequestionno.\arabic{qMarkCnt}}%
+  {\markupWidth}{\markupHeight}\egroup}
+%    \end{macrocode}
+%
+%   \subsection{Modifications to the summary table}
+%   We modify the summary table to make the markup points larger and
+%   left align the second column. Thor may come down on me with his mighty hammer, but
+%   I'll take the chance.
+%    \begin{macrocode}
+\def\eq@begintab{% second column left aligned
+    \begin{tabular}[t]{llc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
+    {\Large\strut}}%
+\let\st@scndclmnSAVE\st@scndclmn
+%    \end{macrocode}
+%    Offset the check boxes by 2bp to better align with the heading
+%    \begin{macrocode}
+\def\st@scndclmn{\kern2bp\st@scndclmnSAVE}
+%    \end{macrocode}
+%    Increase the width of the markup boxes (from 12bp to 20bp, and change to a fixed text size
+%    \begin{macrocode}
+\def\stmarkupWidth{20bp} % normally 12bp
+\def\stmarkupHeight{9bp} % unchanged
+\def\stmarkupTextSize{8} % normally 0pt
+%    \end{macrocode}
+%    Offset the check boxes by 2bp to better align with the heading
+%    \begin{macrocode}
+\def\stmarkupbox{\mbox} % normally {\makebox[0pt][l]}
+%\def\sumrytbllinkHook#1{\the\value{page}}
+\def\st@thrdclmn#1{\setLink[\linktxtcolor{black}
+  \A{\JS{this.pageNum=(this.pageNum+#1-1)}}]{\sumrytbllinkHook{#1}}}
+%    \end{macrocode}
+%
+%    \subsection{Boom! Thor's thunders: ``Thor needs solutions!''}
+%
+%    The package was complete, then it wasn't. \cs{RespBoxEssay} never supported
+%    solutions, so that needed to be fixed, now requiring \pkg{exerquiz} dated
+%    2019/08/13 or later.\par\medskip
+%
+%    The first issue addressed here is the labeling of the solutions to the quiz.
+%    We try a simple enumeration of the solutions. For that, the \cs{fancyQuizHeaders}
+%    is used from \pkg{exerquiz}.
+%    \begin{macrocode}
+\fancyQuizHeaders
+\setsolnspace{}
+\let\FncyHdrsFmtNoTitleQuiz\@empty
+%    \end{macrocode}
+%    The question numbers protrude into the left margin, to disguise this, wes
+%    shift the running header over a little
+%    \changes{v1.4.5}{2019/08/25}{Added command to remove shift for solns headers}
+%    \begin{macrocode}
+\setlength{\eflength}{\widthof{\textbf{00.}\space}}
+\edef\th@leftShiftHdr{\the\eflength}
+\def\th@HeaderOffset{\hskip-\th@leftShiftHdr\relax}
+\def\doNotShirtSonsHdrs{\let\th@HeaderOffset\relax}
+%    \end{macrocode}
+%    \DescribeMacro\thQzSolnMrkr\cmd{\thQzSolnMrkr} is a small text field that is inserted under the
+%    section title. This is used to identify on what page the solutions begin.
+%    Later used by \cs{sadQuizzes}.
+%    \begin{macrocode}
+\def\thQzSolnMrkr{\textField[\BC{}]{thsolns4.\currQuiz}{1bp}{1bp}}
+%    \end{macrocode}
+%    The quiz numbers will go in the left margin, so we'll shift
+%    the section title over a little to disguise this.
+%    \begin{macrocode}
+\def\quizSolnsHeadnToc{\section*
+  {\makebox[0pt][l]{\th@HeaderOffset
+    \thQzSolnMrkr\sqslsectitle}}%
+    \addcontentsline{toc}{section}{%
+    \@ifundefined{web@latextoc}{}{%
+    \ifx\web@latextoc\eq@YES\else
+    \protect\numberline{}\fi}\sqslsectitle}}
+\renewcommand\eq@sqslsectitle{Solutions to the Quiz}
+%    \end{macrocode}
+%     \DescribeMacro\myFQHFmt describes the numbering scheme
+%     for the solutions.
+%    \begin{macrocode}
+\newcommand\myFQHFmt{%
+  \string\bfseries\string\color{\fncyQHdrsColor}%
+  \ifx\aebTitleQuiz\@empty
+    \ifnum\@eqquestiondepth>0\relax
+        \FncyHdrsFmtNoTitleQuiz\fi\else
+        \aebTitleQuiz\protect\
+        \ifnum\@eqquestiondepth=0\else\\\relax
+        \FncyHdrsFmtQuestion\fi
+  \fi %\space
+  \ifcase\@eqquestiondepth
+    \ifx\aebTitleQuiz\@empty\FncyHdrsFmtNoTitleQuiz\fi
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+      (\alph{eqquestionnoii})\space
+    \or
+      \string\llap{\arabic{eqquestionnoi}.\space}%
+      (\alph{eqquestionnoii})%
+      (\roman{eqquestionnoiii})\space
+  \fi
+}
+\dclrFncyQzHdrsFmt{\myFQHFmt}
+%    \end{macrocode}
+%     No return symbol or link to the question.
+%    \begin{macrocode}
+\let\ReturnTo\@gobbletwo
+%    \end{macrocode}
+%
+%    \subsection{Modifications to the \texorpdfstring{\protect\pkg{web}}{web} package}
+%
+%    The TEX template file (\texttt{tex-template.tex}, generated by \texttt{thmclass.ps1})
+%    specifies the \pkg{web} package
+%    and uses many command particular to that package. Here, we create a special command
+%    to input customization commands that are specified in the \texttt{web.cfg} file. Place
+%    \DescribeMacro\inputWebCfg\cs{inputWebCfg} in the preamble to input the \texttt{web.cfg};
+%    any \cs{ExecuteOptions} commands are ignored. Customization commands are placed between
+%    the two marks \cs{bWebCustomize} and \cs{eWebCustomize}.
+%    \changes{v1.5.1}{2019/10/23}{Allow \string\texttt{web.cfg} to be imported in the preamble.}
+%
+%    \begin{macrocode}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
+\providecommand{\inputWebCfg}{%
+  \let\bWebCustomize\relax
+  \let\eWebCustomize\endinput
+  \let\ExecuteOptions@SAVE\ExecuteOptions
+  \let\ExecuteOptions\@gobble
+  \makeatletter
+  \InputIfFileExists{web.cfg}{}{}\makeatother
+  \let\ExecuteOptions\ExecuteOptions@SAVE
+  \let\bWebCustomize\endinput
+  \let\eWebCustomize\relax
+}
+%    \end{macrocode}
+%
+%    \section{The \texttt{useclass} option and above}
+%
+%    These options (\opt{useclass}, \opt{usebatch}, and \opt{batchdistr}) are designed for the mass production of the quizzes, one for each student
+%    in the class. The quiz is built and saved (for each student), saved to the instructor's
+%    designated folder, as declared by \cs{instrPath}, and to the student's personal folder
+%    as declared within the \cs{classMember} entry and \cs{classEntries} array.
+%
+%    \subsection{Declaring class members}\label{s:ICInfo}
+%    In conjunction with \cs{instrPath} and \cs{classPath},  use \cs{classMember} to declare
+%    the identity of each member of the class.
+%    \begin{macrocode}
+%    \end{macrocode}
+%   \DescribeMacro\classMember\nmpsep{*\darg{\ameta{first-name}}\darg{\ameta{last-name}}*\darg{\ameta{folder{\upshape\string|}path}}}
+%   Enter the first name, last name, and folder name of each student in the class. When the star
+%   form is used, \ameta{first-name} and \ameta{last-name} are first passed through
+%   \cs{pdfstringdef}. If the second star-open is specified between the second and third arguments, the third argument
+%   should be the absolute path to the (exceptional) student.\medskip
+%
+%   \noindent There are several ways of producing characters in the Latin-1 character set:
+%\begin{itemize}
+%  \item unicode method\DescribeMacro\u: |\classMember{J\u00FCrgen}{Loki}{B}|
+%
+%  \item using \cs{pdfstringdef}\DescribeMacro{\classMember*}, in this case use the star version of \cs{classMember}
+%    |\classMember*{J\"{u}rgen}{Loki}{B}|
+%
+%  \item octal method\DescribeMacro\oct: |\classMember{J\oct374rgen}{Loki}{B}|  or\\
+%       \phantom{octal method:} |\classMember{J\string\374rgen}{Loki}{B}|
+%\end{itemize}
+%    \begin{macrocode}
+\def\classEntriesDef{["","","",false]}
+\newif\ifClassEntries\ClassEntriesfalse
+\let\classEntries\@gobble
+\def\classMember{\ClassEntriestrue\@ifstar
+  {\let\th@star\ef@YES\classMember@i}
+  {\let\th@star\ef@NO\classMember@i}}
+\newcommand\classMember@i[2]{%
+  \@ifstar{\let\th@exstar\ef@YES\classMember@ii{#1}{#2}}
+    {\let\th@exstar\ef@NO\classMember@ii{#1}{#2}}}
+\newcommand\classMember@ii[3]{%
+  \ifx\th@exstar\ef@YES\def\AbsPth{true}\else
+    \def\AbsPth{false}\fi
+  \ifx\th@star\ef@NO
+    \ifx\th@exstar\ef@YES
+      \g@addto@macro\classEntries{,["#1","#2","#3",true]}\else
+      \g@addto@macro\classEntries{,["#1","#2","#3",false]}\fi
+  \else
+    \g@addto@macro\classEntries{,["}%
+    \pdfstringdef\x{#1}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \g@addto@macro\classEntries{","}%
+    \pdfstringdef\x{#2}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \g@addto@macro\classEntries{","}%
+    \pdfstringdef\x{#3}\expandafter
+    \g@addto@macro\expandafter\classEntries\expandafter{\x}%
+    \ifx\th@exstar\ef@YES
+      \g@addto@macro\classEntries{",true]}\else
+      \g@addto@macro\classEntries{",false]}\fi
+  \fi}
+%    \end{macrocode}
+%
+%    \subsection{Some process controls}
+%
+%    During document development, you don't want to copy the files each time you build and review the document.
+%    Set \DescribeMacro\autoCopyOff\cs{autoCopyOff} during quiz development, and declare
+%    \DescribeMacro\autoCopyOn\cs{autoCopyOn}. The default is \cs{autoCopyOn}.
+%    \begin{macrocode}
+\def\autoCopyOn{\def\autoCopy{true}}
+\def\autoCopyOff{\def\autoCopy{false}}
+\autoCopyOn
+%    \end{macrocode}
+% \DescribeMacro\cFS\nmpsep{\darg{empty\string|CHTTP}} (This command is obsolete, and should be removed. Its functionality
+% is accessed through the optional arguments of \cs{instrPath} and \cs{classPath}.)
+% The \texttt{Doc.saveAs()} method has a
+% \texttt{cFS} key for determining the file system, the value of the key is either empty
+% or the string \texttt{CHTTP}. We offer this option. This key is recognized for the \cs{classPath}, we
+% assume the \cs{instrPath} is in his local file system; however, it is easy to incorporate the \texttt{cFS}
+% key here as well.
+%    \begin{macrocode}
+\newcommand{\cFS}[1]{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\cFSth\@empty\else\def\cFSth{CHTTP}\fi}
+\let\cFSth\@empty
+%    \end{macrocode}
+%    \DescribeMacro\distrToStudentsOff
+%    Allow the instructor to turn off the distribution of the quizzes to the students'
+%    folders using \cs{distrToStudentsOff}, the default
+%    is \DescribeMacro\distrToStudentsOn\cs{distrToStudentsOn}.
+%    \begin{macrocode}
+\def\distrToStudentsOn{\def\distrToStudents{true}}\distrToStudentsOn
+\def\distrToStudentsOff{\def\distrToStudents{false}}
+%    \end{macrocode}
+%    \DescribeMacro\distrToInstrOff
+%    Allow the instructor to turn off the distribution of the quizzes to himself
+%    by using \cs{distrToInstrOff}, the default
+%    is \DescribeMacro\distrToStudentsOn\cs{distrToInstrOn}.
+%    \begin{macrocode}
+\def\distrToInstrOn{\def\distrToInstr{true}}\distrToInstrOn
+\def\distrToInstrOff{\def\distrToInstr{false}}
+%    \end{macrocode}
+%      (2019/08/26) Combined \cs{sadMultQuizzes} with \cs{sadQuizzes}
+%      \changes{v1.4.6}{2019/08/26}{Combined \string\cs{sadMultQuizzes} with
+%      \string\cs{sadQuizzes}}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \subsection{Working with multiple quizzes in one source}
+%    This section we develop some ideas of creating a single source file with multiple quizzes,
+%    these quizzes should be roughly equivalent. One such approach is to have a single quiz,
+%    and randomly permute the questions as well as randomly permute any MC or MS choice fields.
+%    \changes{v1.3}{2019/07/20}{Added multiple quizzes in one source}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \DescribeMacro\declareQuizBody\nmpsep{\darg{\ameta{name}}} This macro defines a
+%    verbatim environment with \ameta{name}. Such an environment cuts and saves its contents
+%    under the name of \texttt{\ameta{name}.cut}. It typically is designed to enclose
+%    the `body of a quiz,' the `quiz body' can then be input later using \cs{InputQuizBody}, define
+%    below. Associated with the declaration is a version number, \DescribeMacro\QzVer\cs{QzVer}, which
+%    may be used in the titles, refer to \texttt{thexrt.tex} in the \texttt{examples/misc} folder.
+%    \changes{v1.4.7}{2019/08/27}{Added version support for quiz bodies}
+%    \begin{macrocode}
+\def\th@QzVer{0}
+\def\QzVer{1}
+\newcommand{\declareQuizBody}[1]{%
+  \bgroup\@tempcnta\th@QzVer\relax
+  \advance\@tempcnta\@ne
+  \edef\th@qbCnt{\the\@tempcnta}%
+  \csarg\xdef{#1-QzVer}{\th@qbCnt}\egroup
+  \csarg\def{#1}{\immediate\openout\CommentStream #1.cut
+    \let\verbatim@out\CommentStream
+    \immediate\write\verbatim@out{\string
+      \def\string\QzVer{\@nameuse{#1-QzVer}}}%
+    \verbatimwrite}%
+  \csarg\def{end#1}{\endverbatimwrite
+    \immediate\closeout\CommentStream}}
+%    \end{macrocode}
+%    \DescribeMacro\InputQuizBody\nmpsep{\darg{\ameta{name}}}
+%    We input a `quiz body' that has been earlier CUT and saved
+%    under the name of \texttt{\ameta{name}.cut}.
+%    \changes{v1.4}{2019/08/11}{Changes to \string\cs{InputBodyQuiz}
+%    to support solution sets}
+%    \begin{macrocode}
+\newcounter{th@qzCnt}
+\def\theth@qzCnt{\alph{th@qzCnt}}
+\newcommand{\InputQuizBody}[1]{\newpage %\thPageOne
+  \@ifundefined{thisQuizOrig}{\edef\thisQuizOrig{\thisQuiz}
+  \let\Hy@EveryPageAnchor\relax}{}\stepcounter{th@qzCnt}%
+  \edef\x{\thisQuizOrig\theth@qzCnt}\expandafter
+  \th@DeclareQuiz\expandafter{\x}%
+  \renewcommand\sqslsecrunhead{}%
+  \InputIfFileExists{#1.cut}{}{}
+%    \end{macrocode}
+%    Before we include quiz solutions, we close the \cs{quiz@solns} stream.
+%    \begin{macrocode}
+  \immediate\closeout\quiz@solns %\th@QzHeaderLS
+  \let\eq@normallheader\relax
+  \newpage
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLS}%
+    \def\th@QzHeaderC{\th@QzHeaderCS}%
+  }{%
+    \lheader{\th@QzHeaderLS}%
+    \cheader{\th@QzHeaderCS}%
+  }
+  \includequizsolutions*\relax
+  \global\therearequizsolutionsfalse
+  \renewcommand\sqslsecrunhead{\eq@sqslsecrunhead}%
+  \eq@noformstrue
+%    \end{macrocode}
+%    Putting \cs{eq@noformtrue} assures us that the solution file will not be
+%    input a |\end{document}|. Next, we open a new quiz solution file stream
+%    so the another rendition to write solutions to a fresh file.
+%    \begin{macrocode}
+  \immediate\openout \quiz@solns \jobname.qsl
+  \@ifundefined{ps@webheadings}{%
+    \def\th@QzHeaderL{\th@QzHeaderLQ}%
+    \def\th@QzHeaderC{\th@QzHeaderCQ}%
+  }{%
+    \lheader{\th@QzHeaderLQ}%
+    \cheader{\th@QzHeaderCQ}%
+  }%
+}
+%    \end{macrocode}
+%   \subsection{Building quizzes with \tops{\protect\env}{}{makeClassFiles} \& \tops{\protect\cs}{\textbackslash}{sadQuizzes}}
+%   Central to this whole process is building customized quizzes. This done by the
+%   \cs{sadQuizzes} expanded within the \env{makeClassFiles} environment.\medskip
+%
+%    \noindent\DescribeEnv{makeClassFiles} is an \env{execJS} environment, the base name has been
+%    preset to be \texttt{mcfthor}. The contents of this environment is \cs{sadQuizzes}.
+%    Beginning the 2019/07/15 of \pkg{insdljs}, \env{execJS} has an option argument
+%    that is used to pass a command to the \texttt{.djs} file. We use this to make
+%    special definitions to support \DescribeMacro\oct\cs{oct} and \DescribeMacro\u\cs{u}.
+%    \changes{v1.1.9}{2019/07/15}{Added optional argument \string\cs{mkClFlsSpcls}}
+%
+%    \begin{macrocode}
+\def\mkClFlsSpcls{\let\oct\eqbs\let\u\relax}
+\newenvironment{makeClassFiles}{%
+\execJS[\mkClFlsSpcls]{mcfthor}}{\endexecJS}
+%    \end{macrocode}
+%   \DescribeMacro\sadQuizzes (save and distribute quizzes)
+%   is a script for the \env{makeClassFiles} environment.
+%   \changes{v1.4.6}{2019/08/26}{Renamed \string\cs{sadMultQuizzes} to
+%     \string\cs{sadQuizzes}, removed old \string\cs{sadQuizzes}.}
+%\begin{verbatim}
+%\begin{makeClassFiles}
+%\sadQuizzes
+%\end{makeClassFiles}
+%\begin{document}
+%...
+%\end{verbatim}
+%The above is placed just above |\begin{document}|. The script populates, for each entry in the
+%\cs{classEntries} array, the \texttt{Name.first} and \texttt{Name.last} fields with the student's
+%first and last name. It then saves a copy of the document to the instructor's folder under the name
+%\texttt{\string\jobname-\ameta{first-name}\_\ameta{last-name}}. It does the same thing for the
+%student's private folder. Finally, it clears the \texttt{Name} fields, and saves itself to the
+%source folder. The script may be redefined in the preamble of the document using the
+%\env{defineJS*} environment. The script also deals with solution and cover pages.
+%    \begin{macrocode}
+\def\setClassArray{\ifClassEntries
+  \classEntries\else\classEntriesDef\fi}
+\def\setArrayLength{\ifbasicmethods0\else lst.length\fi}
+\def\setfilesuffix{\ifuseclassOpt"-"+fN+"_"+lN\else
+  \ifbasicmethods""\else"-"+(i+1)\fi\fi+".pdf"}
+\begin{defineJS}[\def\defineJSjsR{^^J}\let\u\relax
+  \catcode`\@=0\relax]{\sadQuizzes}
+%    \end{macrocode}
+%   If \cs{autoCopyOff}, then this script does nothing
+%    \begin{macrocode}
+if(@bFlattenState)
+  this.addScript({
+    cName: "thorshammer: Do not flatten",
+    cScript:"var _flattenThisDoc=false;"
+  });
+if (@autoCopy) {
+%    \end{macrocode}
+%   \textbf{JavaScript variables common to building quizzes}
+%    \begin{macrocode}
+  var bUseClass=@bUseClass;
+  var reRmFn=new RegExp(this.documentFileName,"i");
+  var instrPath=@InstrPath;
+  var cLast=instrPath[instrPath.length-1];
+  if (cLast=="/")
+    instrPath=instrPath.substring(0,instrPath.length-1);
+  var classPath=@ClassPath;
+  cLast=classPath[classPath.length-1];
+  if (cLast=="/")
+    classPath=classPath.substring(0,classPath.length-1);
+  var thInstrFS="@thInstrFS";
+  var thClassFS="@thClassFS";
+  var isthereCvrPg=@thIsCP;
+  var cvrPgNum="@thCvrPg";
+  console.println("autocopy "+((@autoCopy)?"on":"off"));
+  var retn;
+  var solnSuffix="";
+  var oSolnSuffix=new Object;
+  var parentoDoc=this;
+  var workingFolder=this.path;
+  var pos=workingFolder.lastIndexOf("/");
+  workingFolder=workingFolder.substring(0,pos+1);
+  var _workingFolder="";
+  // console.println("working folder: " + workingFolder);
+  var willSaveScript='isAQuizUnfinishedAtSave();\r'
+      +'if (oRecordOfQuizData !=undefined) collectQuizData();';
+  var oHSD=this.getField("holdScoreData");
+  var Rect=oHSD.rect;
+  this.removeField("holdScoreData");
+  var hsdFmt='if(typeof oRecordOfQuizData=="undefined")\r\t\
+  oRecordOfQuizData=new Object;';
+  var restQD='@restoreQD';
+%    \end{macrocode}
+%    \textbf{Cover page or pages.} Determine if there are cover pages, if yes, extract it and save it
+%    to the instructor's folder.  Cover pages are declared in the preamble with
+%    the command \cs{DeclareCoverPage}, the argument of which is either a single number (usually 0)
+%    of a range of  zero-based page numbers.
+%    \begin{macrocode}
+  if(isthereCvrPg) {// -------- extract cover pages ------------
+    var aCvrPgRng=cvrPgNum.split("-");
+    if (aCvrPgRng[0]=="") {
+      console.println("Start Range not specified, using 0 instead");
+      var bPg=0;
+    } else var bPg=aCvrPgRng[0];
+    var ePg=(aCvrPgRng.length>1)?aCvrPgRng[1]:aCvrPgRng[0];
+    var oDoc=aebTrustedFunctions(this,aebExtractPages,
+      {nStart: bPg, nEnd: ePg});
+    // save cover page(s) to the instructor folder
+    _workingFolder=(@InstrPathFull)?"":workingFolder;
+    aebDocSaveAs.msg="Cannot access the local folder "
+      + _workingFolder+instrPath+"/@jobname-cvrpg.pdf";
+    var retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+      {cFS:thInstrFS,cPath: _workingFolder+instrPath+"/@jobname-"
+      +"cvrpg.pdf",bCopy:false});
+    oDoc.dirty=false;
+    oDoc.closeDoc(true);
+    // delete cover page before continuing, will reinsert it later
+    this.deletePages({nStart: bPg, nEnd: ePg});
+    this.dirty=false;
+  }
+// ------- end cover page code --------------
+  var nQz=aQuizzesInDoc.length; // number of quizzes this doc
+%    \end{macrocode}
+%    \textbf{Solution pages.} Before getting into generating the customized quizzes for the class, we must
+%    first see if there are any solutions in this document, if so, we separate
+%    the solution page(e) from the quiz.
+%    \begin{macrocode}
+  var bOkBasicSolns=false;
+  var f=this.getField("thsolns4");
+  if (f != null ) {
+    console.println("There are solutions");
+    bOkBasicSolns=true;
+%    \end{macrocode}
+%    Save the solution suffixes for later use
+%    \begin{macrocode}
+    var g=f.getArray();
+    for (var i=0; i<g.length; i++) {
+      var solnSuffix=g[i].name; // eg solns4.q1a
+      var pos=solnSuffix.indexOf(".");
+      var qzName=solnSuffix.substring(pos+1);   // eg q1a
+      solnSuffix=solnSuffix.replace(/\./g,"-"); // eg solns4-q1a
+      // oSolnSuffix records whether a quiz has solution pages
+      oSolnSuffix[qzName]=solnSuffix;
+    }
+%    \end{macrocode}
+% Extract the solution page save it, close it, delete the page from master document
+%    \begin{macrocode}
+    // ------------- extraction--------------
+// console.println("aQuizzesInDoc: " + aQuizzesInDoc.toSource());
+// console.println("nQz="+nQz);
+    for (var i=0; i< nQz; i++) {
+      var f=this.getField("thsolns4");
+      var g=f.getArray();
+      var qzName=aQuizzesInDoc[i];
+      var bOk2Extract=(typeof oSolnSuffix[qzName]!="undefined");
+      if (bOk2Extract) {
+// console.println(g[0].name + ", begins on page "+g[0].page);
+        var bPg=g[0].page;
+// console.println("bPg= " + bPg);
+//      var f=this.getField("Name.first."+(i+1));
+        var f=this.getField("bMrkQz."+(i+1));
+        var ePg=(f==null)?(this.numPages-1):(f.page-1);
+// console.println("ePg= " + ePg);
+        var solnSuffix=g[0].name; // solns4.<qzName>
+        solnSuffix=solnSuffix.replace(/\./g,"-"); // solns4-<qzName>
+        var oDoc=aebTrustedFunctions(this,aebExtractPages,
+          {nStart: bPg, nEnd: ePg});
+        // save
+        _workingFolder=(@InstrPathFull)?"":workingFolder;
+        aebDocSaveAs.msg="Cannot access the local folder "
+          + _workingFolder+instrPath+"/@jobname-"+solnSuffix+".pdf";
+        var retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+          {cFS:thInstrFS,cPath: _workingFolder+instrPath+"/@jobname-"
+          +solnSuffix+".pdf",bCopy:false});
+        // close
+        oDoc.dirty=false;
+        oDoc.closeDoc(true);
+        // delete solution page before continuing
+        this.deletePages({
+          nStart: bPg,
+          nEnd: ePg});
+        this.dirty=false;
+      }
+    }
+  }
+// ------ begin creating custom quizzes for class members ------
+  var cnt=0;    // determines which quiz to generate
+  var lst=new Array(@setClassArray);
+  var l=(bUseClass)?@setArrayLength:1; // dps
+  for (var i=0; i < l; i++) {
+    var qzName=aQuizzesInDoc[cnt];
+// console.println("Working on " + qzName);
+    var fN=lst[i][0];
+    var lN=lst[i][1];
+    var folder=lst[i][2];
+    var isAbsPth=lst[i][3]; // dps
+    if (folder!="")folder+="/";
+    //  pre-populate with the student's name
+    this.getField("Name.first").value=fN;
+    this.getField("Name.last").value=lN;
+    // extract quiz
+//    var f=this.getField("Name.first."+cnt);
+    var f=this.getField("bMrkQz."+cnt);
+    var bPg=f.page;
+//    var f=this.getField("Name.first."+(cnt+1));
+    var f=this.getField("bMrkQz."+(cnt+1));
+    var ePg=(f==null)?(this.numPages-1):(f.page-1);
+%    \end{macrocode}
+%    \textbf{Extraction:} We extract a quiz from the master document. Extracting
+%    causes some problems: the restore quiz data is lost, the WillSave event is
+%    lost, and the \texttt{holdScoreData} field is lost. We try to overcome this
+%    problems.
+%    \begin{macrocode}
+    // ------------- extraction of quiz pages --------------
+    if(bUseClass)var oDoc=aebTrustedFunctions(this,aebExtractPages,
+      {nStart: bPg, nEnd: ePg});
+    else oDoc=this; // dps
+%    \end{macrocode}
+%     Restore the \textsf{WillSave} event.
+%    \begin{macrocode}
+    // extracting preserves doc JS but not doc actions
+    oDoc.setAction({cTrigger: "WillSave", cScript: willSaveScript});
+%    \end{macrocode}
+%     We have had problems with \texttt{oRecordOfQuizData} is \texttt{undefined},
+%     to (finally) overcome this, we place some code at the document level.
+%    \begin{macrocode}
+    oDoc.addScript({
+      cName: "oRecordOfQuizData Obj Declaration", cScript: hsdFmt});
+%    \end{macrocode}
+%     The \texttt{holdScoreData} is on the first page of the document, this first
+%     page may not survive on the extracted pages, so we place this text field
+%     and the top of each of the first pages of the extracted quizzes.
+%    \begin{macrocode}
+    var oDocHSD=oDoc.addField({
+      cName: "holdScoreData",
+      cFieldType: "text",
+      nPageNum: 0,
+      oCoords: Rect
+    });
+%    \end{macrocode}
+%    Create a page open action to execute the restore quiz data
+%    \begin{macrocode}
+    oDoc.setPageAction({
+      nPage: 0,
+      cTrigger: "Open",
+      cScript: restQD
+    });
+%    \end{macrocode}
+%    We save custom info to each of the files being saved: \texttt{StudentPath}
+%    has the path to the students' folders and \texttt{cFS} is the file system.
+%    These two are used by `protect and distribute'.
+%    \begin{macrocode}
+    oDoc.info.qzBaseName="@jobname";
+    if(isAbsPth) // dps
+      oDoc.info.StudentPath=folder;
+    else
+      oDoc.info.StudentPath=classPath+"/"+folder;
+    var bOkSolns=(typeof oSolnSuffix[qzName]!="undefined");
+    if(bOkSolns) oDoc.info.SolnSet=oSolnSuffix[qzName];
+    oDoc.info.SolnPath=_workingFolder+instrPath+"/";
+    if(isthereCvrPg) oDoc.info.CvrPg="cvrpg";
+    oDoc.info.cFS=thInstrFS;
+%    \end{macrocode}
+%    \textbf{Insert cover page, if any}
+%    \changes{v1.4.2}{2019/08/22}{Insert cover page in \string\cs{sadQuizzes}}
+%    \changes{v1.4.17}{2019/10/03}{Saved path to cover page}
+%    \begin{macrocode}
+    // Insert cover page, if any.
+    if (isthereCvrPg) {
+      if (typeof bCVMsg == "undefined") {
+        console.println("Inserting cover page from "
+          + _workingFolder+instrPath+"/@jobname-cvrpg.pdf");
+        var bCVMsg=true;
+      }
+      if (cnt==0) var _cvrPath=_workingFolder+instrPath;
+      aebTrustedFunctions(oDoc,aebInsertPages,
+        {nPage: -1,
+    	   cPath: _cvrPath+"/@jobname-cvrpg.pdf"});
+    }
+    var filesuffix=@setfilesuffix;
+    // Now save this as a copy
+%    \end{macrocode}
+%    \textbf{Instructor's folder:} Save a copy to the instructor's folder
+%    \begin{macrocode}
+    if(bUseClass) {
+      _workingFolder=(@InstrPathFull)?"":workingFolder;
+      aebDocSaveAs.msg="Cannot access the local folder "
+        + _workingFolder+instrPath+"/@jobname-"+fN+"_"+lN+".pdf";
+      if(@distrToInstr) retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+        {cFS:thInstrFS,
+         cPath: _workingFolder+instrPath+"/@jobname"+filesuffix,
+         bCopy:true});
+%    \end{macrocode}
+%    \textbf{Student's folder:} Save a copy to the student's folder
+%    \changes{v1.4.17}{2019/10/03}{Defined \string\texttt{\_workingFolderC} to avoid
+%    redefinition of \string\texttt{\_workingFolder}}
+%    \begin{macrocode}
+      var _workingFolderC=(@ClassPathFull)?"":workingFolder;
+      if(isAbsPth)
+        var cPath=folder+"@jobname"+filesuffix;
+      else
+        var cPath=_workingFolderC+classPath+"/"+folder
+          +"@jobname"+filesuffix
+      aebDocSaveAs.msg="Cannot access the path "+ cPath;
+      if(@distrToStudents) retn=aebTrustedFunctions(oDoc,aebDocSaveAs,
+        {cFS:thClassFS,
+         cPath: cPath,
+         bCopy:true});
+      oDoc.dirty=false;
+      oDoc.closeDoc(true);
+    }
+    cnt=++cnt % nQz
+  }
+}
+this.resetForm(["Name"]);
+console.println("automatically saving this file...");
+%    \end{macrocode}
+% Remove the following line\\
+%|// this.oRecordOfQuizData=undefined;|
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \textbf{Save the source document:} Finally, save any changes
+%    that have occurred source document. Before saving, we make
+%    some adjustments in the case this is the basic method case.
+%    \begin{macrocode}
+var toSa=app.setTimeOut("aebTrustedFunctions(this,aebSaveAs);\
+app.clearTimeOut(toSa);",50);
+\end{defineJS}
+\let\sadMultQuizzes\sadQuizzes
+\let\rasSolns\sadQuizzes
+%    \end{macrocode}
+%    \begin{macrocode}
+%</package>
+%<*container>
+%    \end{macrocode}
+%    \section{Batch support files}
+%    These files are designed for a workflow wherein the \opt{usebatch}
+%    option is taken. This option, though largely symbolic, declares the instructor
+%    is going to use a batch sequence to process the students' quizzes, after they
+%    have taken the quiz and returned to the instructor.
+%    A custom batch file \texttt{Thor's way} was written for this purpose.
+%
+%   \paragraph*{\textsf{Thor's way}.}\hskip-\lastskip\space
+%   This batch sequence is run after the instructor has
+%   has a final look at each quiz (additional markup needed in the case of essay questions
+%   and assigning a final mark. the batch sequence performs a number of actions,
+%   for each quiz file selected, it acquires minimal quiz data (first name, last name,
+%   number of points awarded, total points, and final mark.
+%\changes{v1.2}{2019/07/16}{Added batch support files}
+%    \subsection{The container file for Thor's way}
+%    This file should be brought into \app{Acrobat}, its fields filled, and the button pushed. It sets
+%    global JavaScript variables \texttt{global.qzName} and \texttt{global.gradedPath}.
+%    \changes{v1.3.1}{2019/07/20}{container: Push now closes the container}
+%    \begin{macrocode}
+\documentclass{article}
+\usepackage[designi]{web}
+\usepackage{eforms}
+\hypersetup{pdfpagemode=UseAttachments}
+%% \previewOn\pmpvOn
+\parindent0pt \parskip6pt
+\begin{defineJS}{\pbContainer}
+var f=this.getField("qzName");
+if(typeof global.RcrdData=="undefined")
+  global.RcrdData=1;
+%    \end{macrocode}
+%    If the `\textsf{Record class data}' box is checked we create a new attachment to receive the data;
+%    otherwise, no new attachment file is created.
+%    \begin{macrocode}
+if(global.RcrdData) {
+  global.qzName=f.value;
+  if (global.qzName=="") {
+    f.value="qzData";
+    global.qzName="qzData.txt";
+  } else global.qzName=f.value+".txt";
+  var d=this.dataObjects;
+  if (d!=null) {
+    for(var i=0; i< d.length; i++)
+      this.removeDataObject(d[i].name);
+  }
+  this.createDataObject({
+    cName: global.qzName,
+    cValue: "First\\tSecond\\tPoints\\tTotal\\tGrade"
+  });
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+global.containerPath=_path.substring(0,pos+1);
+var f=this.getField("gradedPath");
+var v=f.value;
+var pos=v.indexOf(":");
+if(pos!=-1||v[0]=="/") global.gradedPath=v;
+else global.gradedPath=global.containerPath+v;
+aebTrustedFunctions(this,aebSaveAs);
+this.closeDoc(true);
+\end{defineJS}
+%    \end{macrocode}
+%   (2019/11/21) Put JS for Clear Btn in \env{defineJS} environment
+%   \changes{v1.5.2}{2019/11/21}{Put JS for Clear Btn in \string\env{defineJS}}
+%    \begin{macrocode}
+\begin{defineJS}{\clrContainer}
+this.resetForm(["qzName","gradedPath"]);
+try{
+%    \end{macrocode}
+%   (2019/11/21) Fixed a bug with exception thrown
+%   \changes{v1.5.2}{2019/11/21}{Fixed a bug with exception thrown}
+%    \begin{macrocode}
+  if (typeof global.qzName!="undefined")
+    delete global.qzName; global.qzName="";
+  if (typeof global.gradedPath!="undefined")
+    delete global.gradedPath; global.gradedPath="";
+  if (typeof global.appndSolns!="undefined")
+    delete global.appndSolns; global.appndSolns=true;
+  if (typeof global.RcrdDat!="undefined")
+    delete global.RcrdDat; global.RcrdDat=true;
+} catch(e){}
+\end{defineJS}
+\begin{document}
+This file contains the quiz data as an attachment. Before you
+start the batch action \textsf{Thor's way}, build and
+\emph{place this file in the class folder of the instructor}.
+\begin{center}
+\begin{tabular}{rl}
+\pushButton[\TU{Fill in the two fields then push this button
+before starting the batch sequence}\CA{Push}\AAmouseup{\pbContainer}
+]{pbContainer}{}{13bp}&%
+\parbox[c]{1.5in}{\textField[\TU{Enter base name of the file that
+stores quiz results}]{qzName}{1.5in}{13bp}\vcgBdry[3bp]
+\textField[\TU{The path to the folder that will hold the graded
+quizzes, it may be a relative or an absolute path}
+]{gradedPath}{1.5in}{13bp}}\cgBdry[\columnsep]%\makebox[0pt][l]
+{\pushButton[\CA{Clear}
+  \AAmouseup{\clrContainer}]{clear}{}{13bp}}\\[12pt]
+  \checkBox[\V{Yes}\DV{Yes}\AAmouseup{%
+    global.appndSolns=(event.target.isBoxChecked(0));
+}]{AppdSolns}{11bp}{11bp}{Yes}&%
+\rlap{Append solutions, if they exist}\\[6pt]
+\checkBox[\V{Yes}\DV{Yes}\AAmouseup{%
+  global.RcrdData=(event.target.isBoxChecked(0));
+}]{RecordData}{11bp}{11bp}{Yes}&%
+\rlap{Record class data}
+\end{tabular}
+\end{center}
+Fill in the base name of the file in the text field above. After
+you push the button, the file is saved, then start
+\textsf{Thor's way} action. After the batch sequence finishes,
+this file is opened again. Open the attachments panel and save
+the attached file. The file just saved is a tab delimited text
+file that can be opened in Microsoft Excel.
+\end{document}
+%</container>
+%<*bterminate>
+%    \end{macrocode}
+%    \subsection{The batch termination file}
+%    When running \pkg{Thor's way}, it is important that \texttt{terminate-batch.pdf} is the last
+%    file processed by the batch. The batch test each file initially, if the current file being process,
+%    the batch exits `gracefully', otherwise, the batch processes the current file. The role
+%    \texttt{terminate-batch.pdf} plays it that it is detected by the batch, it performs no actions.
+%    \begin{macrocode}
+\documentclass{article}
+\usepackage[designi]{web}
+\parindent0pt\parskip6pt
+\begin{document}
+\null\vfil
+\begin{center}
+\fbox{\begin{minipage}{.67\linewidth}
+This file is the last to be processed by \textsf{Thor's way},
+the batch action identifies it and gracefully terminates.
+\end{minipage}}
+\end{center}
+\vfil
+\end{document}
+%</bterminate>
+%    \end{macrocode}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%    \section{Configuration files}
+%    \subsection{Class configureation}
+%    It was suggested by Loki that we should be able to have a configuration file
+%    for the class. In the case an instructor has several classes, this is a great
+%    convenience.\medskip\par\noindent
+%    \DescribeMacro\InputClassData\nmpsep{\darg{\ameta{base-name}}} Input the class file
+%    with name \texttt{\ameta{base-name}.cfg}. The class configuration file (\texttt{\ameta{base-name}.cfg}) consists
+%    of a series of declarations of the form,
+%    \begin{quote}\ttfamily
+%       \string\instrPath\darg{\ameta{path}}\\
+%       \string\classPath\darg{\ameta{path}}\\
+%       \string\classMember*\darg{\ameta{first-name}}\darg{\ameta{last-name}}\darg{\ameta{folder}}\\
+%       ...
+%    \end{quote}
+%    where the \texttt* is optionally included.
+%    \begin{macrocode}
+\def\InputClassData#1{\def\InputCl@ssData{#1}\mkClFlsSpcls
+  \InputIfFileExists{#1.cfg}
+    {\PackageInfo{thorshammer}{Inputting class file #1.cfg}}
+    {\PackageWarning{thorshammer}
+      {Cannot find the class file #1.cfg}}}
+%    \end{macrocode}
+%    \DescribeMacro\InputFormattedClass\nmpsep{[\ameta{\cs{cmd}}]\darg{\ameta{base-name}}}
+%     We define a more general input method.
+%     The format for the class configuration file is as follows:
+%    \begin{quote}\ttfamily
+%       \string\instrPath\darg{\ameta{path}}\\
+%       \string\classPath\darg{\ameta{path}}\\
+%       \string\bClassData\\
+%       \ameta{entry1}\\
+%       \ameta{entry2}\\
+%       ...
+%    \end{quote}
+%    Prior to \cs{bClassData}, the entries are passed through, so you can, for example,
+%    set the \cs{instrPath} and \cs{classPath} here. After \cs{bClassData} comes a series
+%    of lines, one each student. Each line (\ameta{entry}) should be marked up so it can be parsed and information
+%    extracted; at the minimum, each line should contain \ameta{first-name}, \ameta{last-name},
+%    and \ameta{folder}, with possibly more. The default for \ameta{\cs{cmd}} is \cs{classMember}.
+%    For each line following \cs{bClassData}, \ameta{\cs{cmd}} is placed in front of each entry
+%    like so, \ameta{\cs{cmd}}\ameta{entry}.
+%
+%    The first optional argument is the command (\ameta{\cs{cmd}}) that parses each line.
+%    The end purpose of the command is to construct a data structure,
+%    \begin{quote}\ttfamily
+%     \string\classMember*\darg{\ameta{first-name}}\darg{\ameta{last-name}}\darg{\ameta{folder}}
+%     \end{quote}
+%     A simple example is the following (filename is \texttt{myclassroll.cfg}):
+%\begin{verbatim}
+%   \instrPath{myClass}
+%   \classPath{/z/Users/thor/myClass}
+%   \bClassData
+%   {Peter}{Pan}{A}
+%  *{J\"{u}rgen}{Loki}{B}
+%   {Thors}{Hammer}{C}
+%\end{verbatim}
+%We can then input this CFG file with \cs{InputFormattedClass\darg{myclassroll}}.
+% For each line after \cs{bClassData}, the default \ameta{\cs{cmd}} is placed in front;
+% for example, the first two lines of class data become |\classMember{Peter}{Pan}{A}|
+% and |\classMember*{J\"{u}rgen}{Loki}{B}|, and so on.
+%    \begin{macrocode}
+\newcommand\InputFormattedClass[2][\classMember]{\ClassEntriestrue
+  \begingroup
+  \mkClFlsSpcls
+  \endlinechar=-1
+  \let\procThisLine\relax
+  \let\bClassData\relax
+  \let\re@dOK\dl@YES
+  \newread\fmtclass
+  \immediate\openin\fmtclass=#2.cfg
+  \loop
+    \read\fmtclass to \classmember
+    \ifeof\fmtclass\let\re@dOK\dl@NO
+    \else
+      \expandafter
+      \ifx\classmember\endinput\let\re@dOK\dl@NO
+      \else
+        \ifx\classmember\@empty %\let\procThisLine\relax
+        \else
+          \expandafter\procThisLine\classmember
+          \expandafter\ifx\classmember\bClassData
+%    \end{macrocode}
+%     After we process the current line, if this line is \cs{bClassData},
+%     we switch over to \texttt{\#1} as the definition of
+%     \cs{procThisLine}.
+%    \begin{macrocode}
+          \def\procThisLine{#1}\fi
+        \fi
+      \fi
+    \fi
+    \ifx\re@dOK\dl@YES\repeat
+  \immediate\closein\fmtclass
+  \endgroup
+}
+%    \end{macrocode}
+%    \subsection{Load the configuration file}
+%    \changes{v1.3.7}{2019/08/11}{fixed typo in loading cfg}
+%    \begin{macrocode}
+\def\th@InputCFG{\InputIfFileExists{thorshammer.cfg}
+  {\PackageInfo{thorshammer}
+    {Inputting the configuration file}}
+  {\PackageInfo{thorshammer}
+    {No configuration file found}}}
+\ifx\th@loadCFG\dl@YES\expandafter\th@InputCFG\fi
+%    \end{macrocode}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    \begin{macrocode}
+\catcode`\"=\th@dquoteCat
+%</package>
+%    \end{macrocode}
+%\Finale

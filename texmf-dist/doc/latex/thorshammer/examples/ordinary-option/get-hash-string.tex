@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage[designi]{web}
+\usepackage{eforms}
+
+%\previewOn\pmpvOn
+
+\parindent0pt \parskip6pt
+
+\begin{document}
+
+\begin{defineJS}{\btnAct}
+var resp=app.response({
+  cQuestion: "Enter a PIN number",
+  cTitle: "Get Hash String"
+});
+var f=this.getField("txt");
+if (resp!=null) f.value=Collab.hashString(resp);
+\end{defineJS}
+
+Create a four digit (PIN) number and copy that number into the body of the
+definition of the \verb|\PIN| command, which is defined in the source file
+\texttt{quiz-pwd-to-correct-AR.tex}. This is to record and save the number.
+
+Push the button and enter the four digit number you just created into the
+response box. When you press the  \textsf{OK} button, the hash string of the
+number you entered appears in the text field. Copy and paste this value into
+the \texttt{quiz-pwd-to-correct-AR.tex} as the value of the
+\texttt{\_PinCode} JavaScript variable. Now you're ready to compile the file
+\texttt{quiz-pwd-to-correct-AR.tex}.
+
+\pushButton[\CA{Push}\AAmouseup{\btnAct}]{btn}{}{11bp}\olBdry
+\textField[\textSize{8}]{txt}{2in}{11bp}\olBdry
+\pushButton[\CA{Reset}\AAmouseup{this.resetForm();}]{reset}{}{11bp}
+
+\end{document}

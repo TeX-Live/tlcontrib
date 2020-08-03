@@ -1,0 +1,147 @@
+\RequirePackage[use=withdesign]{spdef} % try !use=withdesign (spdef is distributed with aeb-mobile)
+\documentclass{article}
+\usepackage{amstext}
+\expexe{\usepackage[\ifwithdesign{designi}\else{forcolorpaper}\fi]{web}}
+\usepackage[usesumrytbls]{exerquiz}
+\usepackage[!testmode]{thorshammer}
+
+\ifwithdesign
+% Some crazy calculations to get the left margin looking good
+\fontsize{9bp}{0}\selectfont
+  \addtoWebWidth{\widthof{Freeze Quiz}}
+  \resetmargins{\incby+\widthof{Freeze Quiz}}{}{}{}
+\normalsize
+\fi
+
+\DeclareQuiz{q1}
+
+\setInitMag{fitwidth}
+\hypersetup{pdfpagemode=UseNone} % don't need to see bookmarks
+\hypersetup{pdfpagelayout=OneColumn}
+\reversemarginpar
+
+\enumQuizzes{3}
+
+\showCreditMarkup
+
+%\previewOn\pmpvOn
+
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+\PTsHook{($\eqPTs^{\text{pts}}$)}
+
+\useMCCircles
+
+%\makePDasXOn
+%\makeXasPDOn
+
+\begin{docassembly}
+\sadQuizzes
+\end{docassembly}
+
+\begin{document}
+
+\thQuizHeader
+
+\noindent\textbf{Instructions:} Enter your first and last names
+in the fields provided. Press `\textsf{Begin}' to begin the
+quiz; after completing the quiz, press `\textsf{End}'. Use the
+`\textsf{Save}' button to save the document.
+
+\begin{quiz*}{\currQuiz}
+Solve each of these problems, passing is 100\%.
+\begin{questions}
+  \item\PTs{3} Which of these are true ?
+\begin{answers}{4}
+\Ans1 True & \Ans0 False
+\end{answers}
+
+  \item \PTs{4} Select which of the following is true.
+\begin{answers}{4}
+\Ans1 True & \Ans0 False & \Ans0 Maybe & \Ans0 Sometimes
+\end{answers}
+
+  \item\PTs{2} $9+8=\RespBoxMath{17}{1}{.0001}{[0,1]}$
+
+\essayQ{5} % num points assigned
+\item\PTs{5} Write a short history of Acro\negthinspace\TeX.\par
+\RespBoxEssay{\linewidth}{1in}
+
+\item\PTs{3} Which of the following are numbers?
+\begin{manswers}{6}
+\bChoices
+  \Ans[-1]{0}d\eAns
+  \Ans[1]{1}17\eAns
+  \Ans[-1]{0}p\eAns
+  \Ans[1]{1}88\eAns
+  \Ans[-1]{0}s\eAns
+  \Ans[1]{1}105\eAns
+\eChoices
+\end{manswers}
+
+\multipartquestion
+
+    \item\PTs{20} Answer each of the following multiple selection problems. Each correct answer
+    is worth $3$ points, and each incorrect answer is worth $-2$ points.
+    \begin{questions}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a President
+                     of the United States. (Select all correct choices.)
+
+        \begin{manswers}{2}%
+            \bChoices
+                \Ans[-2]{0} Henry Clay\eAns
+                \Ans[-2]{0} Ben Franklin\eAns
+                \Ans[3]{1}\label{aj} Andrew Jackson\eAns
+                \Ans[3]{1}\label{rr} Ronald Reagan\eAns
+                \Ans[-2]{0} George Meade\eAns
+                \Ans[3]{1}\label{gc} Grover Cleveland\eAns
+                \Ans[-2]{0} John Jay\eAns
+                \Ans[-2]{0} Paul Revere\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+        \item\PTs{9} Select which people who served as a Chancellor of the
+            German Republic. (Select all correct choices.)
+        \begin{manswers}{2}%
+            \bChoices[2]
+                \Ans[-2]{0} Gustav Heinemann\eAns
+                \Ans[-2]{0} Theodor Heu{\ss}\eAns
+                \Ans[3]{1} Konrad Adenauer\eAns
+                \Ans[-2]{0} Richard von Weizs\"{a}cker\eAns
+                \Ans[3]{1} Willy Brandt\eAns
+                \Ans[-2]{0} Heinrich L\"{u}bke\eAns
+                \Ans[-2]{0} Roman Herzog\eAns
+                \Ans[3]{1} Ludwig Erhard\eAns
+            \eChoices
+        \end{manswers}
+
+\rowsep{3pt}
+
+      \item\PTs{2} If you select all choices in part~(a), you will
+          receive $-1$ points as a penalty for bad guessing. \textbf{Question:}
+          Determine the \emph{number of correct choices} in part~(a)?
+          \begin{answers}{4}
+          \bChoices
+            \Ans0 1\eAns
+            \Ans0 2\eAns
+            \Ans1 3\eAns
+            \Ans0 4\eAns
+            \Ans0 5\eAns
+            \Ans0 6\eAns
+            \Ans0 7\eAns
+            \Ans0 8\eAns
+          \eChoices
+          \end{answers}
+    \end{questions}
+
+\end{questions}
+\writeProListAux
+\end{quiz*}\quad\thQuizTrailer
+
+\end{document}

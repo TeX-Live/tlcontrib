@@ -1,0 +1,970 @@
+\RequirePackage[use=publish]{spdef}
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[designi,forcolorpaper,latextoc,extended]{web}
+\usepackage{eforms}
+\usepackage{dirtree}
+\usepackage{fancyvrb}
+
+\usepackage{xbmks}
+\xbmksetup{colors={int=red},styles={intbf}}
+%\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\hypersetup{pdfpagemode=UseOutlines}
+
+
+\ifpublish % developer packages
+\def\useThese{\usepackage[altbullet]{lucidbry}
+\usepackage[active]{srcltx}}
+\expandafter\useThese\fi
+
+\newcommand\newtopic{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+\vskip\medskipamount}
+
+\tocPartTitle{\tops{\protect\makebox[0pt][r]{\thepart\hspace{1em}}}{\thepart\space}#1}
+\let\partSave\part
+\def\part#1{\par\addvspace{4ex}\bgroup\let\newpage\relax\partSave{#1}\egroup\addvspace{2ex}}
+
+\let\tops\texorpdfstring
+
+\DeclareDocInfo
+{
+    university={Acro\negthinspace\TeX.Net},
+%    title={The \textsf{thorshammer} package\tops{\\[1ex]}{: }%
+%      Documentation for \tops{\textsf}{}{thmclass.ps1}},
+    title={The \textsf{thorshammer} package\tops{\\[1ex]}{: }%
+      Documentation for the system scripts},
+    author={D. P. Story \& Thorsten Grothe},
+    email={dpstory@acrotex.net},
+    subject=Documentation for thmclass.ps1,
+    talksite={\url{www.acrotex.net}},
+    version={1.5.7, 2020/01/13},
+    Keywords={LaTeX, AcroTeX, Powershell, thorshammer},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+
+\useFullWidthForPaper
+
+\def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+\let\pkg\textsf
+\def\cs#1{\texttt{\char`\\#1}}
+\let\opt\textsf
+\let\app\textsf
+\let\uif\textsf
+\def\thescript{\texttt{thmclass.ps1}}
+\def\thebatch{\texttt{runps1.bat}}
+\def\dtt#1{\texttt{\$#1}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\darg#1{\texttt{\char123\relax#1\char125\relax}}
+\newenvironment{lquote}
+   {\list{}{}%
+    \item\relax}
+   {\endlist}
+
+\makeatletter
+%\setlength{\DT@offset}{(\linewidth-1.4in)/2}
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\def\chnglabelname#1{\edef\@currentlabelname{#1}}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\pdfbookmarkx[1]{Title Page}[action={\Named{FirstPage}}]{TitlePage}
+\pdfbookmarkx[1]{The thorshammer package}[action={\GoToR/F(thors-the-man.pdf)/D[0 /Fit]},color=blue,style={bf}]{thorhammer}
+\pdfbookmarkx[1]{Links to AcroTeX.Net}[action={/S/GoTo/D(undefined)},%
+  color=magenta,style={bf}]{acrotex}
+\belowpdfbookmarkx{http://www.acrotex.net}[action={\URI{http://www.acrotex.net}},%
+  color=magenta,style={bf}]{home}
+\belowpdfbookmarkx{http://blog.acrotex.net}[action={\URI{http://blog.acrotex.net}},%
+  color=magenta,style={bf}]{blog}
+
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}
+
+\textbf{\hyperref[PartI]{Part I}} describes how to execute {\thescript} and
+documents all the subordinate files and folders it generates.
+The \thescript\space file is a \app{Powershell} script file
+written, for the most part, \emph{by the great Thor himself} to
+meet the needs of his classes. It can be used ``as is'' or
+modified to conform it to your requirements. The script is
+designed to be used with the \pkg{thorshammer} package, but this
+is not a requirement.
+
+The file structure of Thor may not be for everyone, \textbf{\hyperref[PartII]{Part II}} describes a set
+of ``standalone'' scripts, which were derived from the scripts in \textbf{Part I}.
+
+\paragraph*{From the Acro\negthinspace\TeX{} Legal Department.}
+We offer no guarantees and accept no liabilities. Test the
+scripts extensively to be sure they are working for you. Modify the script
+as you will, but don't bother us with your changes, unless they are improvements. %\verb|:-{)|
+
+
+\paragraph*{Platforms.} The script has been tested on
+\textsf{Windows OS} and \app{Linux}. It is our understanding
+that \app{Powershell} can be installed and executed on
+\textsf{MacOS}, so this script \emph{may} have use on that
+platform as well.
+
+\part{Using the Thor system}\label{PartI}
+
+\noindent Thor has developed his own file structure for his class, this
+structure may be useful to your own classroom. Here, we describe the system
+that has been developed. Carefully read this part of the documentation to
+determine if Thor's scheme can work for you. \medskip
+
+\section{Deploying {\thescript} \textsl{et al}}
+
+Locate the three files \thescript, \thebatch, and \texttt{sample-vars.txt}
+from the \texttt{system-scripts} folder of the
+\pkg{thorshammer} distribution.
+
+\paragraph*{The first things first.} (1) \emph{Copy}
+\thescript, \thebatch, and \texttt{sample-vars.txt} to a
+working folder.  (2) Open the \app{Powershell} file \thescript{}
+in a text editor and edit the value of the variable appropriate to your platform
+\texttt{\$pathThorshammerWin} or \texttt{\$pathThorshammerLin},
+being sure the default path points to your \pkg{thorshammer}
+folder, and if not, modify the path to point to the folder
+of the \pkg{thorshammer} distribution on your computer.\footnote{The purpose of this is to
+grab the two support files \texttt{container.pdf} and
+\texttt{terminate-batch.pdf}. If your {\TeX} installation has
+installed these two files elsewhere, find them, and modify the
+path to point to the folder containing these two files.}
+
+\section{Executing \thescript}
+
+On \app{Windows}, the easiest way to execute \thescript\space is
+through the BAT file \thebatch.\footnote{The authors have little
+knowledge of how to do this on \app{Mac OS}. An interested user
+on \app{Mac OS} would need to advise us.} Running the script
+requires the input of eight (8) values for variables, these are
+listed below and described in the order they are expected to be
+input.
+
+\paragraph*{Eight basic variables}\label{para:eight}
+\begin{enumerate}
+  \item \dtt{class}: The name of the class, could be name as
+      listed in the college catalog (MAT101, STA221, HH21B,
+      A21A, WF23, \dots) or something more understandable (calc1,
+      alg1, euhist, \dots)\footnote{The value of this variable is used in the file name
+      of the TEX template file; consequently, this value should be kept short, yet meaningful.}
+
+  \item \dtt{number}: The quiz or exam number. The value of
+      this variable is not required to be a number.\footnotemark[\thefootnote]
+
+  \item \dtt{subject}: Field of study, such as Math, German,
+      History, and so on.\footnotemark[\thefootnote]
+
+  \item \dtt{theme}: The topic of this exam: factoring, grammar, 20thcentury, etc.\footnotemark[\thefootnote]
+
+
+  \item \dtt{instrName}: Instructor's name. The name should be
+      a single word that identifies the instructor (Thor,
+      Newton, Banach, and so on).\footnotemark[\thefootnote]
+
+
+  \item \dtt{date}: The date of the exam.
+
+
+  \item \dtt{time}: The length of the exam; this is, the time
+      the students have to work on the exam.
+
+  \item \dtt{classPath}: The full path to the folder that
+      contains the quizzes of the class.
+
+\end{enumerate}
+
+\begin{comment}
+\goodbreak
+\section{Execution modes: interactive and automatic}
+
+There are two execution modes: (1) interactive and (2)
+automatic.
+
+\subparagraph*{(1) Interactive:} If you execute \thebatch\space on the
+    \uif{Command Prompt}, you are offered three options:\footnote{Instructions are in German or English}\par\medskip
+    \begin{minipage}{\linewidth-\parindent}
+      \begin{enumerate}
+        \item[(1)] interactive query of individual variables (class,
+            teacher abbreviation, \dots)
+
+            Here, you are asked in enter the values for each of the
+            above listed eight variables.
+        \item[(2)] No query: test with default values
+
+            Used for testing purposes; automatically sets the values
+            of the eight variables.
+        \item[(q)] Exit the script
+      \end{enumerate}
+    \end{minipage}
+\subparagraph*{(2) Automatic:} For the automatic, the script gets
+    the values for the eight variables from a TXT file. It is
+    this option that is the main approach to building your file
+    structure, and is the topic of the rest of the discussion in
+    the documentation.
+\end{comment}
+
+\subsection{On running \thescript}\label{Focus}
+
+Now that you have read a brief description of the eight variables, rename the
+file \texttt{sample-vars.txt} in your working folder to something short yet
+appropriate to your work (perhaps rename it to just \texttt{class.txt}). In
+this document, we shall refer to the renamed TXT file as
+\texttt{\ameta{varlist}.txt}. Open \texttt{\ameta{varlist}.txt} in a text
+editor and modify the left column to values appropriate to your class. The
+contents of \ameta{varlist}\texttt{.txt} has the following form (shown with
+default values which need to be changed):
+\begin{Verbatim}[xleftmargin=\parindent]
+alg1              # class
+1                 # number
+maths             # subject
+factoring         # theme or topic
+THOR              # instrName
+01.01.2019        # date
+60 Min.           # time
+C:/temp           # classPath
+\end{Verbatim}
+Now execute \thebatch\space with arguments \texttt{thmclass} and
+\texttt{\ameta{varlist}.txt} from the \uif{Command Prompt}:\footnote{The \uif{Command Prompt} needs
+to be located in the folder that contains  \thescript, \thebatch, and \texttt{sample-vars.txt}}
+\begin{equation}
+  \fbox{\ttfamily runps1 thmclass \ameta{varlist}\texttt{.txt}}\label{dis:thmclass}
+\end{equation}
+\thescript\space reads the data contained in
+\ameta{varlist}\texttt{.txt}. Using a batch file is the easiest way of executing the
+\thescript\space with argument \texttt{\ameta{varlist}.txt}.
+
+\subsubsection{The results of running \tops{\thebatch}{runps1.bat}}
+
+Executing `\texttt{runps1 thmclass \ameta{varlist}.txt}', as
+just described (see display~(\ref{dis:thmclass})), creates a
+series of folders and files within the same folder in which
+{\thebatch}, {\thescript}, and \texttt{\ameta{varlist}.txt}
+reside.\medskip
+
+Suppose \texttt{\ameta{varlist}.txt} has the following symbolic
+values:
+\begin{quote}\ttfamily\obeyspaces\catcode`\#=12
+\ameta{class}     # class\\
+\ameta{number}    # number\\
+\ameta{subject}   # subject\\
+\ameta{theme}     # theme or topic\\
+\ameta{instrName} # instrName\\
+\ameta{date}      # date\\
+\ameta{time}      # time\\
+\ameta{classPath} # classPath
+\end{quote}
+
+
+\subsubsection{Structure displayed} Figure~\ref{fig:struct} represents the structure created by \thescript.
+
+\begin{figure}[htb]
+\bgroup
+\hfuzz120pt
+%\makeatletter
+%\hspace*{1.4in}
+\fboxsep0pt\let\BOX\relax
+\begin{center}\BOX{\begin{minipage}{3.5in}
+\dirtree{%
+.1 \ameta{working folder}.
+.2 {runps1.bat}.
+.2 {sample-vars.txt}\DTcomment{rename and edit\footnote{Generically referred to as \texttt{\ameta{varlist}.txt}}}.
+.2 {thmclass.ps1}.
+.2 \ameta{class}.
+.3 \ameta{instrName}.
+.4 backup.
+.4 anSUS (toStudents).
+.4 vonSUS (fromStudents).
+.4 {runps1.bat}.
+%.4 {classFolders.bat}.
+.4 {csvTOcfg.ps1}.
+.4 {classFolders.ps1}.
+%.4 {csvTOcfg.bat}.
+.4 {copyka.ps1}.
+.4 {delka.ps1}.
+.4 {moveka.ps1}.
+.4 {sample-list.csv}\DTcomment{rename and edit\footnote{Generically referred to as \texttt{\ameta{list}.csv}}}.
+.4 {container.pdf}.
+.4 {terminate-batch.pdf}.
+.3 {00-\ameta{class}.cfg}.
+.3 {genquiz.ps1}.
+.3 {runps1.bat}.
+.3 {tex-template.tex}.
+.3 {web.cfg}.
+}
+\end{minipage}}\hfill
+\end{center}
+\egroup
+\caption{Structure created by \thescript}\label{fig:struct}
+\end{figure}
+
+\subsubsection{Structure explained}
+
+We now attempt the Herculean task of explaining each of these.
+\begin{description}
+  \item[\normalfont\ameta{class}] (folder) The folder created by the \ameta{class} variable. This folder
+  contains all the working files and folders of the class you are teaching.
+  \item[\normalfont\ameta{instrName}] (folder) This is a short name for the instructor.  This folder contains
+  a number of other folders and files.
+  \begin{description}
+    \item[\normalfont\texttt{backup}] A folder that will contain the
+        instructor's copies of the quizzes generated. When
+        you open the file \texttt{00-\ameta{class}.cfg}, you
+        will find:
+        \verb|\instrPath*{|\ameta{instrName}\texttt{/backup}\verb|}|.
+    \item[\normalfont\texttt{anSUS} (\texttt{toStudents})] A folder to
+        drop the graded quizzes into. This folder name is
+        \texttt{anSUS} when the local language is German and
+        \texttt{toStudents} otherwise.
+    \item[\normalfont\texttt{vonSUS} (\texttt{fromStudents})] The
+        target destination of the script file
+        \texttt{copyka.ps1}. This folder name is
+        \texttt{vonSUS} when the local language is German
+        and \texttt{fromStudents} otherwise.
+
+%    \item[\texttt{classFolders.bat}] This batch file that
+%        takes the contents of its argument and creates the
+%        class folder structure within the \ameta{classPath}
+%        folder. See the section on \texttt{classFolders}
+%        below for more details.
+    \item[\normalfont\texttt{csvTocfg.ps1}] A \app{Powershell} script
+        that reads the contents of the configuration file \texttt{\ameta{list}.csv} and modifies
+        \texttt{00-\ameta{class}.cfg} by appending appropriate \cs{classMember}
+        statements.
+    \item[\normalfont\texttt{classFolders.ps1}] A \app{Powershell}
+        script file that creates class folders based on the
+        contents of the \texttt{00-\ameta{class}.cfg}
+        file.\footnote{The sysadmin may now allow creation
+        of folders on the system drive; this script may be
+        used for testing on the instructor's own drive.}
+    \item[\normalfont\texttt{copyka.ps1}] A \app{Powershell} script that
+        copies the completed student quizzes from their
+        student folders to the folder \texttt{vonSUS}
+        (\texttt{fromStudents}) where the instructor can
+        operate on them.
+%    \item [\texttt{csvTocfg.bat}] A batch file that takes
+%        the contents of its argument and modifies
+%        \texttt{00-\ameta{class}.cfg}, one level up. It
+%        appends the \cs{classMember} data lines.
+%  See the section on \texttt{classFolders} below for more
+%  details.
+    \item[\normalfont\texttt{delka.ps1}] A \app{Powershell} script
+        that deletes the student quizzes from their personal
+        student folders. (This is done after they are copied
+        using \texttt{copyka.ps1}.)
+    \item[\normalfont\texttt{moveka.ps1}] The \app{Powershell} script
+        that copies and deletes the student quizzes from
+        their personal student folders. \textbf{Not
+        recommended!} I prefer to copy them and verify that
+        they are all successfully copied before deleted them
+        from the personal student folders.
+    \item[\normalfont\texttt{sample-list.csv}] A comma (or semi-colon) delimited file. Each line
+    of the file consists of three entries and has two formulations:
+    \begin{quote}\ttfamily
+      \ameta{first},\ameta{last},\ameta{rel-path}\\[3pt]
+      \ameta{first},\ameta{last},*\ameta{full-path}
+    \end{quote}
+    In the first case, \ameta{rel-path} is the path, relative to the argument of the \cs{classPath},
+    to the student folder; in the second case, \ameta{full-path} is the full path to the student
+    folder.
+
+    You should rename this file and modify its contents to
+    reflect the class names and folder names of your class.
+
+    \item[\normalfont\texttt{container.pdf}] A PDF file used by
+        \textsf{Thor's way} action script. See the manual
+        for the \pkg{thorshammer} package for details.
+    \item[\normalfont\texttt{terminate-batch.pdf}] A PDF file used by
+        \textsf{Thor's way} action script. See the manual
+        for the \pkg{thorshammer} package for details.
+  \end{description}
+\end{description}
+At the top most level of this folder structure are four files.
+\begin{description}
+  \item[\normalfont\texttt{genquiz.ps1}]\label{item:genquiz} A \app{Powershell} script
+      that works in concert with \texttt{tex-template.tex}. When executed,
+      it reads the \ameta{varlist}\texttt{.txt} file (one level up), the
+      variable list file used to create the folders and files, it then
+      creates a TEX file named
+      \texttt{\ameta{number}-\ameta{class}-\ameta{subject}.tex}, which is a
+      copy of \texttt{tex-template.tex}, with certain tagged variables in
+      \texttt{tex-template.tex} replaced with their values based on
+      \ameta{varlist}\texttt{.txt}; for example, the tagged variable
+      \texttt{\#class} in \texttt{tex-template.tex} is replaced by the
+      value of the class variable declared in \ameta{varlist}\texttt{.txt}
+      (perhaps it is replaced by ``alg1'').
+
+      \textbf{Steps to change the default name.} You can
+      change the default name of the generated TEX file by
+      following these steps: (1) open \texttt{genquiz.ps1} in
+      your favorite text editor; (2) find the line,
+\begin{quote}\ttfamily\catcode`\$=12
+  $templateName="$number-$class-$subject.tex"
+\end{quote}
+and, finally, (3) change the assignment, perhaps to a function
+of one or more of the above above variables.
+
+  \item[\normalfont\texttt{tex-template.tex}] There are two renditions (or versions) for the TEX
+      template: (1) a German language version, and (2) an English language
+      version. The \app{Powershell} script \texttt{thmclass.ps1} detects
+      the language as set by your operating system and writes the proper
+      TEX template. The TEX template, which is \texttt{tex-template.tex}
+      by name, contains tagged variables {\def\AND{{\normalfont and
+      }}\catcode`\,=\active\def,{{\normalfont\string,
+      }\ignorespaces}\ttfamily\catcode`\#=12\relax #class,
+      #number,#subject,#theme,#instrName,#date, \AND #time}, which are
+      replaced by their counterparts {\def\AND{{\normalfont and
+      }}\catcode`\,=\active\def,{{\normalfont\string,
+      }\ignorespaces}\ttfamily\catcode`\$=12\relax $class,
+      $number,$subject,$theme,$instrName,$date, \AND $time}, as declared in
+      \ameta{varlist}\texttt{.txt}.
+
+      \textbf{German.} This \texttt{tex-template.tex} file is
+      Thor's visualization of what his quizzes should look
+      like. When \texttt{genquiz.ps1} is executed, it reads
+      this file and saves it again under a different name, as
+      discussed above.
+
+      \textbf{English.} This form of the TEX template is more
+      basic, without Thor's specialized features.
+
+      The contents of \texttt{tex-template.tex} can be
+      modified to suite your own understanding of what your
+      quiz should look like. Use the tagged variables as you
+      wish in your personal template file.
+
+  \item[\normalfont\texttt{00-\ameta{class}.cfg}] The configuration file
+      for building a quiz for the class. Initially, it has the
+      following form:
+\begin{Verbatim}[fontsize=\small,commandchars={^~@}]
+% Reset the paths for \instrPath and \classPath for your system
+% Use relative paths here for instructor according to dir, where tex file is located
+\classPath{^ameta~classPath@}
+\instrPath*{^ameta~instrName@/backup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Syntax:
+% \classMember{firstname}{lastname}{rel-path}
+% \classMember{firstname}{lastname}*{full-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{Verbatim}
+Running \texttt{csvTocfg.ps1} appends \cs{classMember} to the file. On running, it might now read,
+\begin{Verbatim}[fontsize=\small,commandchars={^~@}]
+% Reset the paths for \instrPath and \classPath for your system
+% Use relative paths here for instructor according to dir, where tex file is located
+\classPath{^ameta~classPath@}
+\instrPath*{^ameta~instrName@/backup}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Syntax:
+% \classMember{firstname}{lastname}{rel-path}
+% \classMember{firstname}{lastname}*{full-path}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\classMember{Muehle}{Waeter}{MW634B/^ameta~instrName@}
+\classMember{Anton}{Mueller}{AM256M/^ameta~instrName@}
+\classMember{Laura}{Voegt}{LM356B/^ameta~instrName}@
+\end{Verbatim}
+
+
+%  \item[\ameta{number}-\ameta{class}-\ameta{subject}-\ameta{theme}\texttt{.tex}]
+%      This is the TEX template file. This awkward, extremely
+%      long and painful file name is a result of German
+%      education. The file itself is a quiz template that uses
+%      the \pkg{web}, \pkg{exerquiz} packages, in addition to
+%      the \pkg{thorshammer} package. Bring this file into your
+%      favorite {\LaTeX} editor and modify as desired, or write
+%      your own from scratch. Of course, a change of name might
+%      be in order as well.
+
+\item[\normalfont\texttt{web.cfg}] The TEX template file uses the
+    \pkg{web} package, and as such, uses many
+    \pkg{web}-defined commands. These commands can be
+    redefined through the \texttt{web.cfg}. The file
+    \thescript{} creates its own \texttt{web.cfg}, for local
+    use. If you open this created file, its contents are,
+\begin{Verbatim}
+%
+% AeB Web Configuration file
+%
+\ExecuteOptions{dvips}
+\bWebCustomize
+% Insert redefinitions between these two marks
+\eWebCustomize
+\end{Verbatim}
+To illustrate the use of the \texttt{web.cfg}, modify the file to now read,
+\begin{Verbatim}
+%
+% AeB Web Configuration file
+%
+\ExecuteOptions{dvips}
+\bWebCustomize
+\author{Herr Dr. Thor}
+\university{AcroTeX.edu}
+\eWebCustomize
+\end{Verbatim}
+Above, we have declared \verb|\author{Herr Dr. Thor}| and
+\verb|\university{AcroTeX.edu}|. (The \cs{author} and \cs{university}
+commands are defined in the \pkg{web} package.) There are no restrictions, other
+redefinitions of commands defined by other packages are permitted. Freely
+use the special character `\texttt{@}' without having to type
+\cs{makeatletter}/\allowbreak\cs{makeatother} combination.
+
+      The \pkg{thorshammer} package defines a new command,
+      that will be picked by \pkg{web} itself; the command is
+      \cs{inputWebCfg}. This command has been embedded in the
+      preamble of the TEX template.
+\end{description}
+
+\paragraph*{Additional comments on the eight variables.} We
+document how the eight variables are used throughout the files generated by
+\thescript.
+\begin{description}
+  \item[\normalfont\ameta{class}] is used to construct a top-level folder
+      containing all the files generated by \thescript. This
+      variable is the base name of the CFG file
+      (\texttt{00-\ameta{class}.cfg}).
+      \texttt{00-\ameta{class}.cfg} is input by the template
+      file using the \cs{InputClassData} macro. It also
+      appears as the argument of the \cs{thQzHeaderL} and
+      \cs{title} commands in the template file.
+
+  \item[\normalfont\ameta{number}] This variable appears in the TEX template file as
+      the argument of the \cs{DeclareQuiz} and of the \cs{version} commands.
+
+  \item[\normalfont\ameta{subject}] This variable appears as an argument
+      of \cs{thQzHeaderCQ} and \cs{subject} in the TEX
+      template file.
+
+  \item[\normalfont\ameta{theme}] This variable appears as the argument of \cs{thQzName}.
+
+  \item[\normalfont\ameta{instrName}]  This variable appears in several
+      \uif{Powershell} script files: \app{copyka.ps1}, \app{moveka.ps1},
+      \app{delka.ps1}, \app{csvTOcfg.ps1}, and \app{classFolders.ps1}. In
+      the TEX template file, it appears as the argument of \cs{author}.
+      Within \texttt{00-\ameta{class}.cfg}, \ameta{instrName} appears as an
+      argument of \cs{instrPath}.
+
+  \item[\normalfont\ameta{date}] This variable is an argument of
+      \cs{copyrightyears} in the TEX template file.
+
+  \item[\normalfont\ameta{time}] This variable appears in the argument of \cs{keywords}
+
+  \item[\normalfont\ameta{classPath}] This variable is used in various
+      places: \app{copyka.ps1}, \app{moveka.ps1},
+      \app{delka.ps1}, and \app{classFolders.ps1}. It also
+      appears as the argument of \cs{classPath} within
+      \texttt{00-\ameta{class}.cfg}.
+
+\end{description}
+
+\section{Procedures after running \texttt{thmclass.ps1}}
+
+After the folders and files of
+\hyperref[fig:struct]{Figure~\ref*{fig:struct}} are created, go
+into the \ameta{class} folder, you will see \ameta{instrName} (a
+folder) and the two files \texttt{00-\ameta{class}.cfg} and
+\texttt{tex-template.tex}. Now, change directories by moving
+into the \ameta{instrName} folder. Now perform the following
+tasks.
+\begin{enumerate}
+  \item \textbf{Edit \texttt{sample-list.csv}.}\label{item:Editlist} Change the
+      name, if desired, of the file \texttt{sample-list.csv}
+      and open the renamed file in your text editor. For the
+      purpose of this documentation, we shall refer to the
+      renamed file \texttt{sample-list.csv} as
+      \texttt{\ameta{list}.csv}. The format of each line is
+      exemplified by the three sample lines provided. More
+      symbolically, each line consists of a comma (or
+      semi-colon) delimited list:
+\begin{quote}
+  \ameta{first},\ameta{last},\ameta{rel-path} or\\
+  \ameta{first};\ameta{last};\ameta{rel-path}
+\end{quote}
+One or more lines in this file may have an alternate syntax:
+\begin{quote}
+  \ameta{first},\ameta{last},*\ameta{full-path}
+\end{quote}
+where the first character of the third entry is an \texttt*,
+the rest of the entry is a full-path to the student's
+folder.\footnote{This is done when the student's does not lie
+in the path pointed to by the argument of \cs{classPath}.}
+
+To continue, enter the first and last names of each student in
+the class, followed by the relative path (relative to \cs{classPath})
+to that student's folder. The sample file reads,
+\begin{equation}
+\begin{minipage}{.5\linewidth}
+\begin{Verbatim}[commandchars=!()]
+M!"(u)hle;W!"(a)ter;MW634B
+Anton,M!"(u)ller,AM256M
+Laura,V!"(o)gt,LM356B
+\end{Verbatim}
+\end{minipage}\label{disp:list}
+\end{equation}
+These sample entries are to be deleted and replaced by the
+names and folders of the class members. If there are any
+student exception---one whose student folder is outside
+\cs{classPath}---, then a typical entry is has the following
+form,
+\begin{equation*}
+\begin{minipage}{.5\linewidth}
+\begin{Verbatim}[commandchars=!()]
+Laura,V!"(o)gt,*C:/Users/dpstory/Desktop/TestFolder/myOtherClass/LM356B
+\end{Verbatim}
+\end{minipage}
+\end{equation*}
+For the last entry, the third element begins with an \texttt*, which signals that
+what follows is full path to this student's folder.
+
+  \item \textbf{Run \texttt{csvTOcfg.ps1}:} Now, execute
+      \texttt{csvTocfg.ps1} using the general purpose batch
+      file \texttt{run1.bat} with a command line arguments of
+      \texttt{csvTocfg} and \ameta{list} (a CSV file); for example,
+      on the \app{Command Prompt}, type,
+\begin{equation}
+    \fbox{\ttfamily runps1 csvTocfg \ameta{list}}\label{dis:csvTocfg}
+\end{equation}
+
+%  \item \textbf{Run \texttt{csvTOcfg}.} Now, run the batch
+%      file \texttt{csvTOcfg.bat} with a command line argument
+%      of the CVS file; for example, on the \app{Command
+%      Prompt}, type.
+%\begin{quote}\ttfamily
+%    csvTocfg sample-list
+%\end{quote}
+and execute by pressing the \uif{Enter} key. \emph{Do not
+include the extension in the command line argument}. This will
+append the student information to the end of the
+\texttt{00-\ameta{class}.cfg} one level up. Each student has
+an entry in \texttt{00-\ameta{class}.cfg} of
+\cs{classMember\darg{\ameta{first}}\relax
+\darg{\ameta{last}}\darg{\ameta{folder-name}}}.
+\texttt{csvTocfg} also replaces all German umlauts with
+non-problematic characters like so: \"{u} \texttt{->} ue,
+\"{o} \texttt{->} oe, etc.
+
+  \item \textbf{Run \texttt{classFolders.ps1}:} The next step,
+      if needed, creates the personal student
+      folders.\footnote{The sysadmin may not allow creation of
+      folders on the system system drive; this script may be
+      used for testing on the instructor's own drive.} This
+      step may not be needed if the folders already exist. Run
+      the \texttt{runps1.bat} with a command line arguments of
+      \texttt{classFolders} and the CVS file; for example, on
+      the \app{Command Prompt}, type,
+\begin{equation}
+    \fbox{\ttfamily runps1 classFolders \ameta{list}}\label{dis:classFolders}
+\end{equation}
+and execute by pressing the \uif{Enter} key. \emph{Do not
+include the extension in the command line argument}.  If the
+folders already exist, the script does not destroy them and
+create them again. No harm done, I hope.
+\item \textbf{Run \texttt{genquiz.ps1}:} (Optional) If you
+    want to use the \texttt{tex-template.tex} file to create a
+    TEX file for your quiz, run \texttt{genquiz.ps1} with
+    the following \uif{Command prompt}:
+\begin{equation}
+    \fbox{\ttfamily runps1 genquiz}\label{dis:genquiz}
+\end{equation}
+Executing this line produces a TEX template file named
+`\texttt{\ameta{number}-\ameta{class}-\ameta{subject}.tex}'. The file
+\texttt{genquiz.ps1}, when executed, reads the
+\texttt{\ameta{varlist}.txt}, located one directory up, to get the current
+values of \ameta{number}, \ameta{class}, and \ameta{subject}.
+
+\end{enumerate}
+
+\paragraph*{Preliminaries are done! Have fun!} You are ready to
+compose your quiz/exam! Open the TEX template file and modify
+its contents to suite your needs, removing easy questions and
+adding difficult ones, or copy one of the demo files from the
+\texttt{examples} folder and modify it. For this part of the
+process you must be knowledgable of \pkg{exerquiz} and the
+documentation of the \pkg{thorshammer} package. The sample files
+of \pkg{thorshammer} will help to compose the quiz using the
+approach you want.
+
+
+\paragraph*{Repeat.} There is no need to run `\texttt{runps1 thmclass \ameta{varlist}.txt}'
+more than once a semester. As you work through the semester, you can copy an
+old quiz with a new file with a new name and modify for the new material
+studied or run \texttt{genquiz.ps1} to obtain a new clean template file:
+\[
+    \fbox{\ttfamily runps1 genquiz}
+\]
+The file \texttt{genquiz.ps1} reads the
+\texttt{\ameta{varlist}.txt} one level up; you might want to
+first edit this file and change the value of \ameta{number}.
+
+The contents of \texttt{00-\ameta{class}.cfg} remains unchanged; if students
+drop out of the course simply delete that student's line from
+\texttt{00-\ameta{class}.cfg} or if students add the course simply append a
+line to \texttt{00-\ameta{class}.cfg} using the template
+\cs{classMember\darg{\ameta{first}}\relax
+\darg{\ameta{last}}\darg{\ameta{folder-name}}}. Read the discussion on how to
+handle \nameref{para:exceptions} to these general rules.
+
+\section{Deploying the quizzes}
+
+The quizzes may be deployed to the student folders in two ways:
+\begin{enumerate}
+    \item When a quiz is compiled with the \opt{usebatch} option, the
+        \cs{sadQuizzes} command executes JavaScript lines when first opened
+        in \app{Acrobat}, which builds and distributes the quizzes to the
+        designated instructor folder and deploys individualized quizzes to
+        the correct student folder.
+    \item When the \opt{batchdistr} option is specified,
+        \cs{sadQuizzes} does its thing, but does not send the
+        quizzes to the individualized student folders. To
+        deploy them, either use the action sequence
+        \textsf{Thor protects and distributes} or just
+        \textsf{Thor distributes}. The end result of these two
+        is to deploy the quizzes to their designated student
+        folders.
+\end{enumerate}
+
+\section{Retrieving the quizzes}
+
+After the exam period is over the quizzes need to be retrieved
+from the student folders and placed in a folder where the
+instructor can grade them. The mechanics of doing this are
+explained next:
+\begin{itemize}
+  \item \texttt{copyka.ps1} copies the quizzes from their respective student folders
+    in the class folder declared by the \cs{classPath} command to the folder designated
+    by the \cs{instrPath}. These two declarations can be found in \texttt{00-\ameta{class}.cfg}.
+  \item \texttt{delka.ps1} delete the quizzes from their
+      respective student folders in the class folder declared
+      by the \cs{classPath} command.
+      \textcolor{red}{\textbf{Important:}} Do not run this
+      script until you've first run \texttt{copyka.ps1}
+      \emph{and} you've \emph{verified} all files have indeed been
+      transferred.
+  \item \texttt{moveka.ps1} copies and then deletes the
+      quizzes. \textbf{Not recommended}, use a \texttt{copyka.ps1} $\rightarrow$ verify
+      $\rightarrow$ \texttt{delka.ps1} workflow.
+\end{itemize}
+\paragraph*{\color{red}Danger Will Robinson!} These scripts dig
+down deep into the folder structure (pointed to by \cs{classPath}
+or any exception paths (refer to \nameref{para:exceptions}) looking for PDFs in the student's folder, in
+the subfolder named \ameta{instr}. If there are more than one
+PDF in this folder, the scripts will copy, delete, and move all
+PDFs found in the \ameta{instr} subfolder.
+
+\paragraph*{Running these scripts:}  In the \uif{Command Prompt} and with the cursor in the same folder
+as the scripts you are to execute, type,
+\begin{align*}
+    &\fbox{\ttfamily runps1 copyka}\\[1ex]
+    &\fbox{\ttfamily runps1 delka}\\[1ex]
+    &\fbox{\ttfamily runps1 moveka}
+\end{align*}
+\paragraph*{Exceptions:}\chnglabelname{Exceptions}\label{para:exceptions} In an ideal semester, each of the students
+takes the class for the first time and no additional information
+is needed by the above three scripts; however, for students who
+are taking the class again, their class folder may not be
+located on the \cs{classPath}. The three scripts make a
+provision for this. The above PS1 files look for a file named
+\texttt{altclasspaths.txt} in the current directory. The
+contents of this file is a list of \emph{alternate class paths}. For example, suppose
+we declare
+\begin{quote}
+\verb|\classPath{/C/Users/dpstory/Desktop/myClass}|
+\end{quote}
+but there are students whose class folder is located on the path
+\begin{quote}
+\verb|/C/Users/dpstory/Desktop/TestFolder/myOtherClass|
+\end{quote}
+To service these `exceptional' students, create a file named
+\texttt{altclasspaths.txt} and add the following line to that TXT file
+\begin{quote}
+\verb|/C/Users/dpstory/Desktop/TestFolder/myOtherClass|
+\end{quote}
+BTW, on \app{Windows}, you can use standard \app{Windows} notation (with forward slashes) as well:
+\begin{quote}
+\verb|C:/Users/dpstory/Desktop/TestFolder/myOtherClass|
+\end{quote}
+When any of the above three scripts is run, it will first perform its task for the main
+\cs{classPath}, then it will perform the same task for the paths listed in
+\texttt{altclasspaths.txt}.
+
+\section{Redeploying the quizzes}
+
+After the quizzes are marked and saved in a folder of the instructor's
+choice, you can (optionally) return the graded quizzes to the students. To do
+this, use the  \textsf{Thor distributes} action sequence.
+
+\section{How to execute a PS1 file without a BAT file} There are two methods.
+\begin{description}
+    \item [\normalfont Using the \texttt{\app{Powershell} App}:] From
+        \uif{File Explorer}, open a window and navigate to the
+        folder containing the PS1 file. Now select \uif{File}
+        \texttt{>} \uif{Open Windows Powershell} (or perhaps
+        the administrator version). In the \app{Powershell} command prompt, type
+\begin{quote}\ttfamily
+Powershell -ExecutionPolicy Bypass -Command .\cs{\ameta{basename}.ps1}
+\end{quote}
+The \texttt{-ExecutionPolicy Bypass} allows the script to run
+without security warnings.
+
+To run a PS1 file with argument,
+\begin{quote}\ttfamily
+Powershell -ExecutionPolicy Bypass -Command .\cs{thmclass.ps1} myVars.txt
+\end{quote}
+
+\item [\normalfont Using the \texttt{\app{Powershell} ISE App}:] This
+    application has a built-in editor. Start \app{Powershell}
+    ISE. Here you can load in your PS1 file by simply dragging
+    and dropping it into the window. Be sure the command
+    prompt is showing the folder where the script file is
+    located. Change directories using the \uif{cd} command, as
+    needed. For a PS1 file that does not  have an argument,
+    simple press on the \uif{Run Script} icon on the toolbar,
+    or choose the \uif{Run} menu item from the \uif{File}
+    menu.
+
+    To run a PS1 file with argument, type, for example,
+\begin{quote}\ttfamily
+Powershell -ExecutionPolicy Bypass -Command .\cs{thmclass.ps1} myVars.txt
+\end{quote}
+into the command prompt window and press the \uif{Enter} key to execute that line.
+\end{description}
+
+\part{Using a standalone system}\label{PartII}
+
+\noindent
+Using the Thor system of class structure (see \hyperref[fig:struct]{Figure~\ref*{fig:struct}}) may not be for
+everyone. For this reason, some standalone scripts are provided
+in the \texttt{standalone} folder of the \texttt{system-scripts}
+folder.
+
+\newtopic\noindent
+\textbf{Important:} The contents of the \texttt{standalone} folder should be
+copied to your working folder, the one that contains the source files for
+your quizzes you are developing.
+
+\newtopic\noindent
+Within the \texttt{system-scripts/standalone} folder, the following files are provided:\medskip
+\begin{description}
+\item[\normalfont\texttt{cpquizzes.ps1}] A renamed and modified version of \texttt{copyka.ps1}. To use this script,
+first open it in your editor and modify the following lines:
+\end{description}
+\begin{quote}\ttfamily
+\$baseName="\ameta{baseName}"\\
+\$classPath="\ameta{classPath}"\\
+\$destPath="\ameta{destPath}"
+\end{quote}
+\begin{itemize}
+\item[]
+The value of \texttt{\$baseName} is usually one word that
+represents the instructor (eg, THOR), but it does not have to be
+the instructor's name. \texttt{\$classPath} is the path to the
+class folders. The script searches \texttt{\$classPath} and
+copies all PDFs within \emph{any} subfolder with
+\texttt{\$baseName} as its name. It copies the PDFs to
+\texttt{\$destPath}. The quizzes all must be uniquely named
+because they are all copied to the same destination folder
+(\texttt{\$destPath}). Any older PDFs (perhaps from earlier
+quizzes, or actually any latent PDFs) are also copied, so you
+must set up your protocols appropriately. Execute this script
+from the \uif{Command Prompt}:
+\begin{flushleft}
+    \fbox{\ttfamily runps1 cpquizzes}
+\end{flushleft}
+\end{itemize}
+\begin{description}
+\item[\normalfont\texttt{rmquizzes.ps1}] After you've run \texttt{cpquizzes.ps1} and verified that all required
+files have been copied, you can safely delete (or remove) the quizzes from the student quiz folders.
+Open \texttt{rmquizzes.ps1} in your editor, and modify the values of this variables:
+\end{description}
+\begin{quote}\ttfamily
+\$baseName="\ameta{baseName}"\\
+\$classPath="\ameta{classPath}"
+\end{quote}
+\begin{itemize}
+\item[] The meanings of the variables \texttt{\$baseName} and \texttt{\$classPath} are the same as above in the
+description of \texttt{cpquizzes.ps1}. Run the script as follows:
+\begin{flushleft}
+    \fbox{\ttfamily runps1 rmquizzes}
+\end{flushleft}
+\item[] These first two scripts are basic and the class can be conducted using only \texttt{cpquizzes.ps1}
+and \texttt{rmquizzes.ps1}. The next two scripts can be considered optional.
+\end{itemize}
+\begin{description}
+\item[\normalfont\texttt{mkcfg.ps1}] This is a modified and renamed
+    version of \texttt{csvTOcfg.ps1}, refer to the description of \texttt{csvTOcfg.ps1}. Prior to using this
+    script, delete the file \texttt{00-web.cfg} in the current
+    folder (this file is created by \texttt{mkcfg.ps1}). Open
+    your editor and modify the values of the following
+    variables:
+\end{description}
+\begin{quote}\ttfamily
+\$classPath="\ameta{classPath}"\\
+\$instrPath="\ameta{instrPath}"
+\end{quote}
+\begin{itemize}
+\item[] The values of these variables correspond to \cs{classPath} and
+\cs{instrPath}, respectively. The script is executed from the
+\uif{Command Prompt} as follows:
+\begin{equation*}
+    \fbox{\ttfamily runps1 mkcfg \ameta{list}}
+\end{equation*}
+\item[] where the argument \ameta{list} is a list of class members and
+    folder locations data, as described in `Edit \texttt{sample-list.csv}'
+    on page~\pageref{item:Editlist}.
+
+The purpose of this script is to create the \texttt{00-web.cfg}
+file. Once created, move this file to the same file as your
+quizzes; input this file using \cs{InputClassData\darg{00-web}}. Examples of the use
+of \cs{InputClassData} are found in the \texttt{examples/cfgs} folder.
+As described earlier, the format of this file is,
+\begin{Verbatim}[commandchars=!()]
+\classPath{!ameta(classPath)}
+\instrPath{!ameta(instrPath)}
+\classMember{Muehle}{Waeter}{MW634B/_Thor}
+\classMember{Anton}{Mueller}{AM256M/_Thor}
+\classMember{Laura}{Voegt}{LM356B/_Thor}
+\end{Verbatim}
+\item[] Here, the sample class members of \texttt{sample-list.csv} are
+shown. For the \cs{classPath} and \cs{instrPath}, \emph{use only full
+paths}. Refer to `\textbf{Edit \texttt{sample-list.csv}}' on
+page~\pageref{item:Editlist} for more information.
+\end{itemize}
+\begin{description}
+\item[\normalfont\texttt{mkfolders.ps1}] This is a modified and renamed
+    version of \texttt{classFolders.ps1}. This script is used for testing
+    purposes; it can also be used to set up class folders provided you have
+    the necessary permissions. Run this script from the \uif{Command prompt}:
+\end{description}
+\begin{itemize}
+\item[] Open the file and edit the variable
+\begin{quote}\ttfamily
+\$classPath="\ameta{classPath}"
+\end{quote}
+where \ameta{classPath} is the full path to the root of the class folders. Run this script
+from the \uif{Command prompt}:
+\begin{equation*}
+    \fbox{\ttfamily runps1 mkfolders \ameta{list}}
+\end{equation*}
+where the argument \ameta{list} is a list of class members and
+    folder locations data, as described in `Edit \texttt{sample-list.csv}'
+    on page~\pageref{item:Editlist}.
+\end{itemize}
+%\end{description}
+
+\part{My retirement}
+
+Now, I simply must get back to it. \dps
+
+\end{document}

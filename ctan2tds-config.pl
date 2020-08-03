@@ -34,6 +34,7 @@ $special{'bargraph-js'} = '&MAKEdps';
 $special{'pmdb'}        = '&MAKEdps';
 $special{'thorshammer'} = '&MAKEdps';
 $special{'richtext'}    = '&MAKEdps';
+$special{'thorshammer'} = '&MAKEdps';
 
 
 sub MAKEdps {

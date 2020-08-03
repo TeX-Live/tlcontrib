@@ -38,6 +38,7 @@ $special{'thorshammer'} = '&MAKEdps';
 $special{'fitr'}        = '&MAKEdps';
 $special{'artthreads'}  = '&MAKEdps';
 $special{'popupmenu'}   = '&MAKEdps';
+$special{'ltx4yt'}      = '&MAKEdps';
 
 
 sub MAKEdps {

@@ -20,7 +20,7 @@
 \usepackage{acroman}
 
 %\def\amtIndent{15pt}
-\edef\amtIndent{\the\leftmargini}
+\edef\amtIndent{\the\parindent}
 
 \usepackage[active]{srcltx}
 
@@ -33,7 +33,7 @@
     subject={Wrapping links around to the next line},
     keywords={multi-line links, quad points, latex, pdf, aeb},
     talksite={\url{www.acrotex.net}},
-    version={2.3.5, 2020/01/06},
+    version={2.3.6, 2020/07/12},
     copyrightStatus={True},
     copyrightNotice={Copyright (C) 2006-\the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
@@ -179,12 +179,23 @@ does me little good.
 This package uses the \texttt{QuadPoints} entry of the link annotation
 dictionary to create a bounding region; consequently, this package
 requires\marginpar{\small\raggedright\flushright \app{Distiller} or
-\app{ps2pdf} required} \app{Acrobat Distiller} or the \app{ps2pdf.exe}
+\app{ps2pdf} required} \app{Acrobat Distiller} or the \app{ps2pdf}
 converter to create a PDF. The \texttt{QuadPoints} entry in the link
 annotation is a PDF 1.6 feature, so these multi-line links will work in
 \app{Adobe Reader} 7.0 or later. If viewed in a version of \app{Adobe Reader}
 previous to 7.0, the viewer will use the underlying bounding box, which is the
 smallest rectangle containing the link text.
+
+\newtopic\noindent
+Version 2.3.6 (dated 2020/07/12 or later) now allows an \pkg{aeb\_mlink}
+document to be compiled by \app{pdflatex}, \app{lualatex}, and \app{xelatex}
+without errors; however, all commands defined in the package do nothing other
+then to display their \ameta{text} with no links created. This makes it nice
+for the lovers of these drivers to compile the document with their favorite
+driver and view the PDF in their favorite PDF previewer, such as
+\app{SumatraPDF}. Later, the document author can switch over to a
+\app{latex\,->\,dvips\,->\ameta{\upshape{distiler\string|ps2pdf}}} workflow
+to acquire the multi-line link version.
 
 \section{Alternate package name: \texorpdfstring{\protect\pkg{aeb-mlink}}{aeb-mlink}}
 
@@ -244,17 +255,14 @@ of the Y\&Y {\TeX} System, no longer available, but is used by this author.} The
         comes last.
 \end{itemize}
 
-\paragraph*{Options of \pkg{aeb\_mlinks}.} The following are the options of this package.
+\paragraph*{Options of \pkg{aeb\_mlinks}.} These are,
 \begin{description}
   \item[\normalfont\texttt{dvips}] Use this option when the \textsf{dvips} application is used
   to create the Postscript file.
   \item[\normalfont\texttt{dvipsone}] Use this option when the \textsf{dvipsone} application is used
-  to create the Post\-script file. (Only a few people worldwide use this option.)
+  to create the Post\-script file. (Only a few people worldwide use this option, it could be as small as two.)
   \item[\normalfont\texttt{dblevel=\ameta{\upshape{0|1|2}}}] To obtain information on the multi-line links being
   created. Each value gives more information about what is going on. Used for development.
-  \item[\normalfont\texttt{urlOpts=\ameta{url-options}}] Use the key \opt{urlOpts} to pass options to the
-  \pkg{url} package; for example \opt{urlOpts=hyphens} enables URLs to be broken at hyphens. See the
-  \pkg{url} documentation for a list of options.
   \item[\normalfont\ameta{eforms-options}] Any options other than the ones listed above are passed to the
   \pkg{eforms} package.
 \end{description}
@@ -276,23 +284,24 @@ the other six.
 %constructed, it is best that the bounding rectangle is set on invisible, that
 %is, the line width of the boundary line is zero. The \opt{colorlinks} option
 %of \app{hyperref} should be taken.
+%\exSrc{mlink_tst}
 
-\exSrc{mlink_tst}The demo file is \texttt{mlink\_tst.tex}, it illustrates all
+The demo file is \texttt{mlink\_tst.tex}, it illustrates all
 the commands -- with the exception of \cs{mlurl} -- of this package. The
 demo file for \cs{mlurl} is a separate file and is mentioned in
 \hyperref[ss:mlrul]{Section~\ref*{ss:mlrul}}.
 
 \subsection{\cmdtitle{mlhypertext} (\cmdtitle{mlsetLink})} A general purpose multi-line link command.
 
-\bVerb[\aebdimen=8pt]\takeMeasure{\string\mlhypertext[\#1]\darg{\#2}}%
+\bVerb[\aebdimen=8pt]\takeMeasure{\string\mlhypertext[\ameta{opts}]\darg{\ameta{text}}}%
 \begin{minipage}{\bxSize}
-\begin{Verbatim}[frame=single,rulecolor=\color{webblue}]
-\mlhypertext[#1]{#2}
+\begin{Verbatim}[frame=single,rulecolor=\color{webblue},commandchars=!()]
+\mlhypertext[!ameta(opts)]{!ameta(text)}
 \end{Verbatim}
-\end{minipage}\quad\takeMeasure{\string\mlsetLink[\#1]\darg{\#2}}%
+\end{minipage}\quad\takeMeasure{\string\mlsetLink[\ameta{opts}]\darg{\ameta{text}}}%
 \begin{minipage}{\bxSize}
-\begin{Verbatim}[frame=single,rulecolor=\color{webblue}]
-\mlsetLink[#1]{#2}
+\begin{Verbatim}[frame=single,rulecolor=\color{webblue},commandchars=!()]
+\mlsetLink[!ameta(opts)]{!ameta(text)}
 \end{Verbatim}
 \end{minipage}
 \endgroup
@@ -329,11 +338,14 @@ used to create an alert box that appears when the link is clicked.
 
 \subsection{\cmdtitle{mlhyperlink}} A multi-line version of the \cs{hyperlink} command.
 
-\bVerb\takeMeasure{\string\mlhyperlink[\#1]\darg{\#2}\darg{\#3}}%
-\begin{dCmd}{\bxSize}
-\mlhyperlink[#1]{#2}{#3}
+\bVerb\takeMeasure{\string\mlhyperlink[\ameta{opts}]\darg{\ameta{named-dest}}\darg{\ameta{text}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlhyperlink[!ameta(opts)]{!ameta(named-dest)}{!ameta(text)}
 \end{dCmd}
 \endgroup
+
+%[\ameta{opts}]\darg{\ameta{named-dest}}\darg{\ameta{text}
+%[!ameta(opts)]{!ameta(text)}[\ameta{opts}]\darg{\ameta{text}}
 
 \PD The first parameter is optional, and is used to set the appearance, but \textit{not the actions} of the  link.
 The second parameter is a named destination, perhaps created by the \cs{hypertarget} command of
@@ -362,9 +374,9 @@ creating the named destination of \texttt{retire}.
 \subsection{\cmdtitle{mlhyperref}}\label{ss:mlhyperref}
 A multi-line version of the \cs{hyperref} command.
 
-\bVerb\takeMeasure{\string\mlhyperref[\#1]\darg{\#2}\darg{\#3}}%
-\begin{dCmd}{\bxSize}
-\mlhyperref[#1]{#2}{#3}
+\bVerb\takeMeasure{\string\mlhyperref[\ameta{opts}]\darg{\ameta{label}}\darg{\ameta{text}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlhyperref[!ameta(opts)]{!ameta(label)}{!ameta(text)}
 \end{dCmd}
 \endgroup
 \PD The first parameter is optional, and is used to set the
@@ -402,9 +414,9 @@ See \mlNameref{retirement}.
 
 \subsection{\cmdtitle{mlnameref}} A multi-line version of the \cs{nameref} command.
 
-\bVerb\takeMeasure{\string\mlnameref[\#1]\darg{\#2}}%
-\begin{dCmd}{\bxSize}
-\mlnameref[#1]{#2}
+\bVerb\takeMeasure{\string\mlnameref[\ameta{opts}]\darg{\ameta{label}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlnameref[!ameta(opts)]{!ameta(label)}
 \end{dCmd}
 \endgroup
 
@@ -431,9 +443,9 @@ The code for this link is seen below:
 \subsection{\cmdtitle{mlNameref}} A multi-line version of the
 \pkg{hyperref} command, \cs{Nameref}.
 
-\bVerb\takeMeasure{\string\mlNameref[\#1]\darg{\#2}}%
-\begin{dCmd}{\bxSize}
-\mlNameref[#1]{#2}
+\bVerb\takeMeasure{\string\mlNameref[\ameta{opts}]\darg{\ameta{label}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlNameref[!ameta(opts)]{!ameta(label)}
 \end{dCmd}
 \endgroup
 \PD The first parameter is optional, and is used to set the
@@ -457,15 +469,15 @@ the page, \mlNameref{retirement}. The code for the link is seen below:
 
 \subsection{\cmdtitle{mlhref}} A multi-line version of the
 \pkg{hyperref} command, \cs{href}.
-\bVerb\takeMeasure{\string\mlhref[\#1]\darg{\#2}\darg{\#3}}%
-\begin{dCmd}{\bxSize}
-\mlhref[#1]{#2}{#3}
+\bVerb\takeMeasure{\string\mlhref[\ameta{opts}]\darg{\ameta{url}}\darg{\ameta{text}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlhref[!ameta(opts)]{!ameta(url)}{!ameta(text)}
 \end{dCmd}
 \endgroup
 
 \PD The first parameter is optional, and is used to set the
     appearance, but \textit{not the actions} of the  link. The
-    second parameter is a URL, while the third parameter is the link text.
+    second parameter is an URL, while the third parameter is the link text.
 
 \CmdDescription This is the multi-line version of the
 \pkg{hyperref} command, \cs{href}. The default appearance is
@@ -488,13 +500,13 @@ defining a different action through the first parameter.
 The next link uses the \cs{mlhref} command with URL: \mlhref{%
 http://www.math.uakron.edu/~dpstory/acrotex.html#educational}
 {See the educational offerings of the {Acro\negthinspace{\TeX}} Web
-Site at the University of Akron}
+Site at the University of Akron}.
 \bVerb\takeMeasure{\{See the educational offerings of the \darg{Acro\string\negthinspace\darg{\string\TeX}} Web}%
 \begin{dCmd*}{\bxSize}
 \mlhref{%
 http://www.math.uakron.edu/~dpstory/acrotex.html#educational}
 {See the educational offerings of the {Acro\negthinspace{\TeX}} Web
-Site at the University of Akron}
+Site at the University of Akron}.
 \end{dCmd*}
 \eVerb
 Use the \cs{mlhref} command with mailto URL: My email address at Acro\negthinspace\TeX.Net,
@@ -525,9 +537,9 @@ application associated with the extension of the file provided.
 A multi-line version of the \cs{url} command of the \pkg{url} package.
 The \pkg{hyperref} modifies this command to make it into an unbreakable link (at least for those
 using \app{Distiller}).
-\bVerb\takeMeasure{\string\mlurl[\#1]\darg{\#2}}%
-\begin{dCmd}{\bxSize}
-\mlurl[#1]{#2}
+\bVerb\takeMeasure{\string\mlurl[\ameta{opts}]\darg{\ameta{url}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\mlurl[!ameta(opts)]{!ameta(url)}
 \end{dCmd}
 \endgroup
 
@@ -554,8 +566,9 @@ See the Internet reference
 \mlurl{http://www.w3schools.com/tags/ref_urlencode.asp} for a discussion of
 the \textbf{\caps{HTML URL Encoding Reference}}.
 
+% \exSrc{mlink_tst_url}
 
-\exSrc{mlink_tst_url}The demo file that illustrate all the commands to
+The demo file that illustrate all the commands to
 follow is \texttt{mlink\_tst\_url.tex}. Additional details and examples are found in this
 example file.
 
@@ -605,13 +618,13 @@ two styles of key-values:
             js={app.alert("AcroTeX rocks!")}}]{AcroTeX
             can be found at \texttt{www.acrotex.net}, as
             close as your nearest web browser.}
-\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!@^}]
 \mlsetLink[\ui{%
-    border=visible,
-    linestyle=underlined,
-    bordercolor={0 0.6 0},
-    linktxtcolor=webgreen,
-    js={app.alert("AcroTeX rocks!")}}]{AcroTeX...browser.}
+!quad@border=visible,^
+!quad@linestyle=underlined,^
+!quad@bordercolor={0 0.6 0},^
+!quad@linktxtcolor=webgreen,^
+!quad@js={app.alert("AcroTeX rocks!")}}]{AcroTeX...browser.}^
 \end{Verbatim}
     \item[] The \pkg{xkeyval} KVP system is described in the document
     \textsl{\mlhref{http://www.math.uakron.edu/~dpstory/acrotex/eformman.pdf}{Support for AcroForms and Links, and for Document JavaScript and Open Page Events}}.\footnote

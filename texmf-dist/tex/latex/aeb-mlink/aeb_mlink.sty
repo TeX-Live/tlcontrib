@@ -19,10 +19,42 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{aeb_mlink}
- [2020/01/06 v2.3.5 AeB MLink (dps)]
+ [2020/07/12 v2.3.6 AeB MLink (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
+\ifpdf
+  \let\ML@action\endinput
+\else
+  \ifxetex
+    \let\ML@action\endinput
+  \else
+    \let\ML@action\relax
+  \fi
+\fi
+\ifx\ML@action\endinput
+\RequirePackage{hyperref}
+\RequirePackage{eforms}[2018/08/16]
+\@ifundefined{mlhypertext}{\newcommand}{\renewcommand}%
+\mlhypertext[2][]{#2}
+\newcommand\mlhyperlink[3][]{#3}
+\newcommand\mlhyperref[3][]{#3}
+\newcommand\mlNameref[2][]{#2}
+\newcommand\mlnameref[2][]{#2}
+\newcommand\mlhref[3][]{#3}
+\newcommand\mlurl[2][]{\expandafter\Hurl\expandafter{#2}}
+\let\mlMarksOn\relax
+\let\mlMarksOff\relax
+\let\turnSyllbCntOn\relax
+\let\turnSyllbCntOff\relax
+\def\mlcs#1{\texttt{\@backslashchar#1}}
+\def\mlMaxNSylls{30}
+\PackageWarningNoLine{aeb_mlink}
+  {PDF creation requires Adobe Distiller.\MessageBreak
+  Workflow is latex > dvips > distiller; otherwise,\MessageBreak
+  this package does nothing}
+\fi
+\ML@action % \endinput or \relax
 \newif\if@ml@dvips \@ml@dvipstrue
 \def\mlcsarg#1#2{\expandafter#1\csname#2\endcsname}
 \DeclareOptionX{dvipsone}{\def\eq@drivernum{0}\@ml@dvipsfalse

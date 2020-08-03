@@ -14,11 +14,12 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{aeb_mlink}
-%<package> [2020/01/06 v2.3.5 AeB MLink (dps)]
+%<package> [2020/07/12 v2.3.6 AeB MLink (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
-\usepackage[colorlinks,hyperindex=false]{hyperref}
+\usepackage[colorlinks,hyperindex=false,pdfpagemode=UseNone]{hyperref}
+\let\bWebCustomize\endinput
 \usepackage{aeb_mlink}
 \pdfstringdefDisableCommands{\let\\\textbackslash}%
 \OnlyDescription  % comment out for implementation details
@@ -121,12 +122,64 @@
 %    \section{Package Requirements and Options}
 %    After having established the alternate of this package, we now work on the package itself.
 %    \changes{v2.3}{2018/04/26}{Added \string\pkg{aeb-mlink} as an alternate name for this package}
+%    \changes{v2.3.6}{2020/07/12}{Added some safeguards against using a driver other than dvips}
 %    \begin{macrocode}
 % Begin Package
 %<*package>
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
+%    \end{macrocode}
+%    (2020/07/12) We test for non-pdfmark drivers, if present, we make minimal
+%    package definitions, define all relevant commands to display their \ameta{text}
+%    argument. In this way, \app{pdflatex}, \app{lualatex}, and \app{xelatex} can be used
+%    to preview the document, perhaps viewing the results in \app{SumatraPDF}.
+%    \begin{macrocode}
+\ifpdf
+  \let\ML@action\endinput
+\else
+  \ifxetex
+    \let\ML@action\endinput
+  \else
+    \let\ML@action\relax
+  \fi
+\fi
+\ifx\ML@action\endinput
+%    \end{macrocode}
+%    \paragraph*{Begin the minimal version of the package.} Designed for when
+%    a non-pdfmark driver is used: \texttt{latex\,->\,dvips\,->\ameta{\upshape{distiller\string|ps2pdf}}}
+%    \begin{macrocode}
+\RequirePackage{hyperref}
+%\RequirePackage{refcount}
+\RequirePackage{eforms}[2018/08/16]
+%    \end{macrocode}
+%    Make all commands of this package to do nothing other
+%    then to reproduce their \ameta{text} argument.
+%    \begin{macrocode}
+\@ifundefined{mlhypertext}{\newcommand}{\renewcommand}%
+\mlhypertext[2][]{#2}
+\newcommand\mlhyperlink[3][]{#3}
+\newcommand\mlhyperref[3][]{#3}
+\newcommand\mlNameref[2][]{#2}
+\newcommand\mlnameref[2][]{#2}
+\newcommand\mlhref[3][]{#3}
+\newcommand\mlurl[2][]{\expandafter\Hurl\expandafter{#2}}
+\let\mlMarksOn\relax
+\let\mlMarksOff\relax
+\let\turnSyllbCntOn\relax
+\let\turnSyllbCntOff\relax
+\def\mlcs#1{\texttt{\@backslashchar#1}}
+\def\mlMaxNSylls{30}
+\PackageWarningNoLine{aeb_mlink}
+  {PDF creation requires Adobe Distiller.\MessageBreak
+  Workflow is latex > dvips > distiller; otherwise,\MessageBreak
+  this package does nothing}
+\fi
+\ML@action % \endinput or \relax
+%    \end{macrocode}
+%    \paragraph*{Begin the pdfmark version of the package}\leavevmode\\[6pt]
+% Set the driver for \texttt{dvips}
+%    \begin{macrocode}
 \newif\if@ml@dvips \@ml@dvipstrue
 \def\mlcsarg#1#2{\expandafter#1\csname#2\endcsname}
 %    \end{macrocode}
@@ -559,11 +612,12 @@ gMrk 0 0 put^^J%
 %    We finished searching for line breaks and are now going to work on combining
 %    contiguous quads. Contiguous quads are the ones between the offsets recorded
 %    in the \texttt{gMrk} array. Now, if there are now line breaks, the length
-%    of \texttt{gMrk} is one
+%    of \texttt{gMrk} is one.
 %
 %    \texttt{gAry} is a temporary array that holds all the quads \emph{corresponding to
 %    one line}. Each syllable generates an quad of length 8. Here, we assume any given
-%    line has at most \cs{mlMaxNSylls} syllables, (currently set to \mlMaxNSylls, but may be revised). The array \texttt{gAry} is declared
+%    line has at most \cs{mlMaxNSylls} syllables, (currently set to \cs{mlMaxNSylls},
+%    but may be revised). The array \texttt{gAry} is declared
 %    inside the next loop, so it is redeclared at each iteration of the loop. If \app{Distiller} of \app{ps2pdf}
 %    fails, it may be due to \cs{mlMaxNSylls} being too small for some of your sentences; in this case, redefine
 %    \cs{mlMaxNSylls} to a larger value.
@@ -741,7 +795,7 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 } def
 }}
 %    \end{macrocode}
-%     \leavevmode\DescribeMacro{\mlMarksOn}
+%     \DescribeMacro{\mlMarksOn}
 %     Added tracking marks. Turn them on with \cs{mlMarksOn} and off again
 %     with \DescribeMacro{\mlMarksOff}\cs{mlMarksOff}.
 %     \changes{v2.1.8}{2018/03/19}{Added tracking marks}
@@ -1515,6 +1569,10 @@ yMin 20 string cvs pf(]\string\n)pf^^J}%
 \let\eq@@mlhyph\@empty
 \def\ml@typset@syl#1{\raisebox{\ml@raiseamt}
   {\smash{\normalfont\normalcolor\tiny\strut\llap{\the#1}}}}
+%    \end{macrocode}
+%    \DescribeMacro\turnSyllbCntOn Turns on the counting of the syllables,
+%    while \DescribeMacro\turnSyllbCntOff\cmd{\turnSyllbCntOff} counting marks off.
+%    \begin{macrocode}
 \def\turnSyllbCntOn{\mlMarksOn\let\ml@typeset@@syl\ml@typset@syl}
 \def\turnSyllbCntOff{\let\ml@typeset@@syl\@gobble}
 \turnSyllbCntOff

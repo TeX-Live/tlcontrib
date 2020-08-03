@@ -1,28 +1,30 @@
 Package: aeb_mlink 
 Author: D. P. Story 
-Dated: 2020-01-06
+Dated: 2020-07-12
 
 The aeb_mlink package defines new link commands to create multi-line links. 
 The new commands are \mlhypertext, \mlhyperlink, \mlhyperref, \mlnameref, 
 \mlNameref, \mlhref, and \mlurl. 
 
-PDF Creators: Adobe Distiller or ps2pdf 
+PDF Creators: Adobe Distiller or ps2pdf.
 
-What's New (2020-01-06) This package reads web.cfg (web package, 
-if available). The web.cfg has changed format slightly, this 
-update now conforms to that format. Defined new option urlOpts to 
-pass options to the url package. 
+What's New (2020-07-12): An aeb_mlink document can now be compiled with 
+pdflatex, lualatex, or xelatex. In this case, no links are created and 
+only the link text is typeset. In this way, in theory, document authors 
+can use their favorite PDF creator and view the document in their favorite
+PDF previewer (SumatraPDF). To create multi-line links, compile with a
+dvips->(distiller|ps2pdf) workflow.
 
-What's New (2018/08/18): Created \turnSyllbCntOn (\turnSyllbCntOff) to turn
+What's New (2018-08-18): Created \turnSyllbCntOn (\turnSyllbCntOff) to turn
 on (resp., off) the viewing of syllable numbers. Reorganize core program to 
 accommodate the use of \mlhypertext command within the program code of 
 annot_pro. (This is to implement text markup annotations in that package.)
 
-What's New (2018/04/26): Included a 'dummy' package named aeb-mlink. The 
+What's New (2018-04-26): Included a 'dummy' package named aeb-mlink. The 
 aeb_mlink package is listed on CTAN as aeb-mlink, though there is no such 
 package by that name. Well, now there is. 
 
-What's New (2018/04/20): Previously, the links created by aeb_mlink consisted 
+What's New (2018-04-20): Previously, the links created by aeb_mlink consisted 
 of a series of rectangles around each of the syllables of the hypertext or 
 url; the little rectangles responded in unison when any one of them were 
 clicked. In this version, Postscript procedures are used to combine the 
@@ -35,7 +37,7 @@ a link apart, breaking it into two links. The second link is free to move to
 the next page. 
 
 This package requires the latest version of AeB, in particular, the eforms 
-package required is dated 2018/03/22 or later. See ctan.org/pkg/acrotex. 
+package required is dated 2018-03-22 or later. See ctan.org/pkg/acrotex. 
 
 In addition to the demo files distributed with the package, there are two new 
 demo files available from the AcroTeX Blog webiste: 

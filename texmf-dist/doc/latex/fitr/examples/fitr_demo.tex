@@ -1,20 +1,39 @@
 %
-% This file works for Adobe Distiller as the PDF creator, with drivers dvips or dvipsone.
-% It also works for pdftex (and luatex), dvipdfm, dvipdfmx, and xetex.
+% Works for all workflows.
+% If gonative is specified, dvips->ps2pdf works as well.
 %
 \documentclass[11pt]{article}
-\usepackage{amsmath}
-\usepackage[dvipsone,!preview,!viewMagWin]{fitr}
-\usepackage[js=restoreHookBlink,js=jmpHookBlink]{lmacs}
+\usepackage{amsmath}  % use only for the align environment
+\usepackage[forcolorpaper,extended]{web}
+\usepackage[blink,!preview,!viewMagWin]{fitr}
 \usepackage{graphicx}
 
-\hypersetup
+% Uncomment to use custom hooks, there are minimal functions already defined.
+% Uncomment to see these simple examples.
+%\usepackage[js=jmpHook,js=restoreHook]{lmacs}
+
+\DeclareDocInfo
 {%
-    pdftitle={Jumping to a Rectangular Region},
-    pdfauthor={D. P. Story},
-    pdfsubject={Demo file to test the FitR view destination of PDF},
-    pdfkeywords={LaTeX, PDF, Acrobat, JavaScript}
+    title={Jumping to a Rectangular Region},
+    author={D. P. Story},
+    university=My University,
+    talkdate={Dec.\ 17, \the\year},
+    subject={Demo file to test the FitR view destination of PDF},
+    keywords={LaTeX, PDF, Acrobat, JavaScript},
+    university={%
+            Acro\!\TeX.Net\\
+        NORTHWEST FLORIDA STATE COLLEGE\\
+           Department of Mathematics},
+    email={dpstory@acrotex.net},
+    version={1.0},
+    copyrightyears={2012}
 }
+\nocopyright
+\norevisionLabel
+
+\def\cs#1{\texttt{\char`\\#1}}
+
+\selectColors{linkColor=blue}
 
 \parindent0pt \parskip6pt \pagestyle{empty}
 
@@ -22,8 +41,7 @@
 % \renewcommand{\allowFXDefault}{false}
 
 \begin{document}
-
-\begin{center}\sffamily\bfseries\Large
+\begin{center}\sffamily\bfseries\Large\color{blue}
     Jumping to a Rectangular Region\\[1ex]\normalsize\normalcolor
     Dr. D. P. Story, \href{http://www.acrotex.net}{Acro\!\TeX.NeT}
 \end{center}
@@ -63,8 +81,8 @@ magnified region that needs to be inspected more closely. The links below
 are different from the ones above. After jumping to a magnified rectangle,
 restore the preview view by clicking on the rectangle.
 
-\def\RungePic{\includegraphics[width=\marginparwidth]{runge}}
-\def\KuttaPic{\includegraphics[width=\marginparwidth]{Kutta}}
+\def\RungePic{\includegraphics[width=\marginparwidth]{graphics/runge}}
+\def\KuttaPic{\includegraphics[width=\marginparwidth]{graphics/Kutta}}
 \def\jrOpts#1#2{link=#1,dest=#2}
 
 \textbf{\jdRect*[nodest,\jrOpts{jmp}{rungePic},adddestw=10,adddesth=10]{Carl Runge}}%
@@ -89,4 +107,45 @@ is also known for his work on airfoils.
 \begin{flushright}
 This work was  motivated by Mohsen M.
 \end{flushright}
+
+\newpage
+
+\noindent\textbf{FX and verbatim text.} The \cs{jsRect*} can ``scoop up'' verbatim text. We illustrate
+with several examples from the documentation.
+
+Using the \cs{verb} command: \jdRect*[adddestw=10bp,adddesth=10bp]{\verb!#$$%&$%^&$%^$!}
+
+% measure the width of the widest line in the verbatim listing below
+\newsavebox\fitrBox
+\begin{lrbox}{\fitrBox}
+\verb~\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%~%
+\end{lrbox}\edef\wdDisplay{\the\wd\fitrBox}
+
+\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}
+
+Jump to the \jdRect*[adddestw=10bp,adddesth=10bp]{\textsf{fitr} Package!} Click
+on the verbatim region below to view the listing up close.
+\restoreOverlayPresets
+\begin{flushleft}
+\jdRect*[adddestw=10bp,adddesth=10bp]
+{\begin{minipage}{\wdDisplay}
+\begin{verbatim}
+\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
+...
+Jump to the \jdRect*[adddestw=10bp,adddesth=10bp]%
+  {{\fitrpkg} Package!}
+\end{verbatim}
+\end{minipage}}
+\end{flushleft}
+\jdRect[width=\wdDisplay,height=4\baselineskip,lift=-\baselineskip,adddestw=10bp,adddesth=10bp]%
+Now using \cs{jdRect}.\parskip0pt
+%\previewOn\viewMagWinOn
+\begin{verbatim}
+\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
+...
+Jump to the \jdRect*[adddestw=10bp,adddesth=10bp]%
+  {{\fitrpkg} Package!}
+\end{verbatim}
+
+
 \end{document}

@@ -1,58 +1,65 @@
-% makeindex < aebpro_man.idx > aebpro_man.ind
 \documentclass{article}
 \usepackage[fleqn]{amsmath}
 \usepackage[
     web={centertitlepage,designv,forcolorpaper,
-         usesf,latextoc,pro}, %tight,
+         latextoc,pro}, %tight,
     eforms,aebxmp
 ]{aeb_pro}
-\usepackage{graphicx,array}
-\usepackage[dvipsone,!preview,!viewMagWin]{fitr}
-\usepackage[js=restoreHookBlink,js=jmpHookBlink]{lmacs}
-
 \usepackage[fortextbook,usecustomdesign,nomarginwrite]{eqexam}
+\usepackage{graphicx,array}
+\usepackage[blink,!preview,!viewMagWin]{fitr}
 
 %\usepackage{myriadpro}
 \usepackage[altbullet]{lucidbry}
 
-\renewcommand\allowFXDefault{false}
 
+\renewcommand\allowFXDefault{false}
 
 %\usepackage{makeidx}
 %\makeindex
 \usepackage{acroman}
+\usepackage[active]{srcltx}
+
+\let\tops\texorpdfstring
 
 \makeatletter
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{\raisebox{#1}{\parbox{\marginparwidth}{\slshape\raggedleft\small#2}}}}
+\addtolength{\marginparwidth}{1in}
 \def\eq@fititin#1{\noindent\unskip\nobreak\hfill\penalty50
     \hskip2em\hbox{}\nobreak\hfill#1}
 \def\fitit{\eq@fititin{\exrtnlabelformat}}
 \@mparswitchfalse\reversemarginpar
 \def\meta#1{$\langle\textit{\texttt{#1}}\rangle$}
-
+\let\maketitle\web@maketitle
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
 \makeatother
-%\usepackage[active]{srcltx}
+
 
 \urlstyle{rm}
 \def\fitrpkg{\textsf{f{i}tr}}
+\let\texorpdfstring\tops
 
 \DeclareDocInfo
 {
     university={\AcroTeX.Net},
-    title={\texorpdfstring{The}{The manual for the} f{i}tr Package\texorpdfstring{\\
+    title={\tops{The}{The manual for the} \tops{\textsf{f{i}tr}}{fitr} Package\tops{\\
         Defining and Jumping to\\a Rectangular Destination}{}},
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject=Documentation for the fitr package,
     talksite={\url{www.acrotex.net}},
-    version={1.0},
+    version={1.3.2, 2020/07/09},
     Keywords={LaTeX,PDF,fitr,JavaScript,Adobe Acrobat},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
     copyrightInfoURL={http://www.acrotex.net}
 }
 \DeclareInitView{windowoptions={showtitle}}
-
-
 \def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
    \kern-.6em \hbox{$\mathcal S$}}$}
 
@@ -63,24 +70,52 @@
 \sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
 \subsectionLayout{indent=-31.25pt,color=aeb}
 \subsubsectionLayout{indent=0pt,color=aeb}
-\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+\subsubDefaultDing{\tops{$\bullet$}{\textrm\textbullet}}
 
 %\pagestyle{empty}
-\parindent0pt
-\parskip\medskipamount
 
 
-\definePath\bgPath{"C:/Users/Public/Documents/%
-    ManualBGs/Manual_BG_Print_AeB.pdf"}
+%\definePath\bgPath{"C:/Users/Public/Documents/%
+%   ManualBGs/Manual_BG_Print_AeB.pdf"}
+\chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
-\addWatermarkFromFile({%
-    bOnTop: false,
-    cDIPath: \bgPath
-})
-\executeSave()
+var titleOfManual="The fitr Package";
+var manualfilename="Manual_BG_Print_fitr.pdf";
+var manualtemplate="Manual_BG_Green.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
 \end{docassembly}
 
 \begin{document}
+
+
 
 \maketitle
 
@@ -99,110 +134,162 @@ destination. The \textsl{PDF Reference} describes \textbf{FitR} as,
     and \textsl{top} entirely within the
     window both horizontally and vertically.
 \end{quote}
-The package supports the \textsf{dvips}, \textsf{dvipsone}, and
-\textsf{pdftex}, \textsf{luatex}, \textsf{dvipdfm}, \textsf{dvipdfmx}, and
-\textsf{xetex} applications, the first two assume that \textbf{Adobe
-Distiller} is the PDF creator.
+The package supports the \app{dvips}, \app{pdflatex}, \app{lualatex},
+\app{xelatex}, \textsf{dvipdfm}, and \textsf{dvipdfmx} applications.
 
-The only required packages are the \textsf{eforms} package (dated
-2012/06/20 or later), which is part of the \textbf{AeB Bundle}, and
-\textsf{collectbox} by Martin Scharrer, more on this package later, and
-the ubiquitous \textsf{xcolor}.\footnote{The \textsf{eforms} package
+The only required packages are the \pkg{eforms} package (dated
+2012/06/20 or later), which is part of the \pkg{AeB Bundle}, and
+\pkg{collectbox} by Martin Scharrer, more on this package later, and
+the ubiquitous \pkg{xcolor}.\footnote{The \textsf{eforms} package
 itself brings in other packages, including \textsf{hyperref} and
 \textsf{insdljs}.}
 
-The package was developed in response to a user of the AeB Bundle who was
-interested in developing documents for students with low vision; the idea
-is to magnify regions of the document so the student can read more
-comfortably. The demonstration files are \texttt{fitr\_demo.tex} which
-illustrates the package and some special methods for people with low
-vision, and \texttt{fitr\_minimal.tex}, which is the same demo file with
-any and extra package stripped out.
+\paragraph*{Motivation.} This package was developed in response to a user of the \pkg{AeB Bundle} who
+was interested in developing documents for students with \emph{low vision};
+the idea is to magnify regions of the document so the student can read more
+comfortably.
+
+\paragraph*{Demonstration files.} The demonstration files are \texttt{fitr\_demo.tex} which
+illustrates the package and some special methods for people with low vision,
+and \texttt{fitr\_minimal.tex}, which is the same demo file with any extra
+packages stripped out.
+
+\paragraph*{What's New for Version 1.3.2 (2020/07/09)} The package is extended to support
+the PDF creator \app{lualatex}. All common workflows are now automatically
+detected: \app{pdflatex}, \app{lualatex}, and \app{xelatex}. If  no driver is
+specified and none is automatically detected, \app{dvips} is automatically
+selected by default. The other drivers \app{dvipdfm} and \app{dvipdfmx} need
+to be explicitly specified as the driver (\ameta{driver}). The \ameta{driver}
+option is described in the next section. Also, there are several new options,
+one of which is \opt{gonative}; when this option is selected, no field or
+document JavaScript is used. For the \opt{gonative} option, the workflow
+\app{dvips\,->\,ps2pdf} is also supported because there is no document
+JavaScript required.
 
 \section{The Preamble and Package Options}
 
 The minimal preamble for this package is
-\begin{Verbatim}[xleftmargin=20pt,commandchars=!()]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[!meta(driver),!meta(options)]{fitr}
 \end{Verbatim}
-The \textsf{hyperref} package is brought in through the \textsf{eforms} package.
-Optionally, {\fitrpkg} can be used with other members of AeB (\textsf{web} and
-\textsf{exerquiz}, for example).
+Permissible names for \ameta{driver} are \opt{dvips}, \opt{pdftex},
+\opt{luatex}, \opt{xetex}, \textsf{dvipdfm}, and \textsf{dvipdfmx}. The
+\ameta{driver} option is only required for \app{dvipdfm} and \app{dvipdfmx},
+the others are either detected automatically, or is the default driver
+(\opt{dvips}). The drivers and options are discussed in more detail below.
 
-Another package requirement is \textsf{collectbox} by Martin Scharrer;
-quoting from the abstract of the documentation,
-\begin{quote}
-This package provides macros to collect and process an macro argument
-(i.e. something which looks like a macro argument) as horizontal box
-instead as a real macro argument. These ``arguments'' will be stored like
-when using \cs{savebox}, \cs{sbox} or the \texttt{lrbox} environment and
-allow verbatim or other special code. Instead of explicit braces also
-implicit braces in the form of \cs{bgroup} and \cs{egroup} are supported.\dots
-\end{quote}
+\paragraph*{Package requirements.} The \pkg{hyperref} package is brought in through the \pkg{eforms} package.
+Another package requirement is \textsf{collectbox} by Martin Scharrer.
 The \cs{collectbox} command is used to collect the second argument of
-\cs{jdRect}, see the discussion of \cs{jdRect} in Section~\ref*{jdRect}.
+\cs{jdRect}, see the discussion of \cs{jdRect} in \hyperref[jdRect]{Section~\ref*{jdRect}}.
 As a result, the second argument may contain verbatim text in it. Very cool.
 
-The package has ten options: six driver options and four viewing
-options.
-\begin{itemize}
-\item \textbf{Driver Options:} These are \texttt{dvips} (the default),
-    \texttt{dvipsone}, and \texttt{pdftex} (which includes the use of
-    lualatex), \texttt{dvipdfm}, \texttt{dvipdfmx}, and \texttt{xetex}. If you
-    specify one of the first two, it is assumed that you are using
-    \textbf{Adobe Distiller} as your PDF creator.
+\paragraph*{Package options.} The package has several options, broken down below by
+category: Driver, View, and Other options.
+\begin{description}
+\item[Driver Options:] The major driver options are
+    \opt{dvips}\FmtMP{\opt{dvips}} (the default),
+    \opt{pdftex}\FmtMP{\opt{pdftex}}, \opt{luatex}\FmtMP{\opt{luatex}}, and
+    \opt{xetex}\FmtMP{\opt{xetex}}. Lesser driver options are
+    \opt{dvipdfm}\FmtMP{\opt{dvipdfm}} and
+    \opt{dvipdfmx}\FmtMP{\opt{dvipdfmx}}, but there seems to be a bug in
+    the \cs{includegraphics} command as the bounding box is not correctly
+    re-scaled. If you specify \opt{dvips}, it is assumed that you are using
+    \app{Adobe Distiller} as your PDF creator.\footnote{Unless you are also
+    using the \opt{gonative} option, see the description of this option.}
 
-\item[] The \textsf{fitr} package checks whether the \textsf{web}
-    package is loaded, if so, its uses the driver used by
-    \textsf{web}; otherwise \textsf{fitr} auto-detects for
-    \textsf{pdftex} and \textsf{xetex}. If no driver is passed, and
-    neither \textsf{pdftex} nor \textsf{xetex} are detected, then
-    \textsf{dvips} is the default driver.
+    The \pkg{fitr} package checks whether the \pkg{web} package is loaded,
+    if so, the driver of \pkg{web} is used; otherwise \pkg{fitr}
+    auto-detects for \app{pdftex}, \app{luatex}, and \app{xetex}. If no
+    driver is passed, and neither \app{pdftex}, \app{luatex}, nor
+    \app{xetex} are detected, the default driver, \app{dvips}, is used.
 
-\item \textbf{Viewing Options:} When you specify \texttt{preview}, the
-bounding boxes of the buttons are shown in the dvi-previewer (or the PDF
-document); you can turn off this preview by specifying \texttt{!preview}
-(or removing \texttt{preview} entirely from the option list). The other
-option type is \texttt{viewMagWin}, when this option the viewing window, a
-rectangular region, becomes visible in the dvi-previewer (or in the PDF
-document); specifying \texttt{!viewMagWin} turns off this type of preview.
+\item[Viewing Options:] When you specify
+    \opt{preview}\FmtMP{\opt{preview}}, the bounding boxes of the buttons
+    are shown in the dvi-previewer (or the PDF viewer); you can turn off
+    this preview by specifying \opt{!preview} (or removing \opt{preview}
+    entirely from the option list). The other option type is
+    \opt{viewMagWin}\FmtMP{\opt{viewMagWin}}, when this option the viewing
+    window, a rectangular region, becomes visible in the dvi-previewer (or
+    in the PDF document); specifying \opt{!viewMagWin} turns off this type
+    of preview.
 
-\item[] The effects of the viewing options will be illustrated later in this
-document, see \autoref{previewEx} on page~\pageref*{previewEx}.
+    The effects of the viewing options will be illustrated later in this
+    document, see \autoref{previewEx} on page~\pageref*{previewEx}.
 
-\end{itemize}
+\item[Special Effects Options:] There are several options for bringing in
+    additional document JavaScript for special effects: (1)
+    \opt{blinkonjmp}\FmtMP{\opt{blinkonjmp}} blinks the border following the jump
+    to a focused destination; (2)
+    \opt{blinkonrestore}\FmtMP{\opt{blinkonrestore}} blinks the border following
+    the restore action; (3) \opt{blink}\FmtMP{\opt{blink}} is a convenience
+    option that combines the actions of \opt{blinkonjmp} and
+    \opt{blinkonrestore}. There are negative versions of these options as
+    well: \opt{!blinkonjmp}, \opt{!blinkonrestore}, and \opt{!blink}. The
+    default is to have no special effects, in effect \opt{!blink} is the
+    default. Refer to \hyperref[FX]{Section~\ref*{FX}} for more information
+    on special effects.
 
-\section{The one and only command}\label{jdRect}
+\item[Other Options:] The \opt{gonative}\FmtMP{\opt{gonative}} option does
+    not use any field or document JavaScript; as a result, the
+    \app{dvips\,->\,ps2pdf} is then supported as no document JavaScripts
+    are employed.
 
-The {\fitrpkg} has only one command, \cs{jdRect}, but there are two forms
-of usage. \cs{jdRect} optionally creates a push button or link, and
-optionally creates a viewing window. The term \emph{viewing window} refers
-to a rectangular region that is created by the \textbf{FitR} destination
-viewing specification, see \textbf{Table~8.2 Destination syntax} of the
-\textsl{PDF Reference}, version 1.7. A \emph{named destination} is created
-and is associated with the viewing window. When we jump to a viewing
-window, this window is magnified to the largest extent possible. For
-example, click on the either of the two displayed forms of the syntax for
-\cs{jdRect}; after jumping to the viewing window, click on the same
-display to return to the previous view.
+\end{description}
+
+\section{The \tops{\protect\cs{jdRect}}{\textbackslash{jdRect}} command}\label{jdRect}
+
+The {\fitrpkg} has only one command, \cs{jdRect}, which (optionally)
+\textbf{j}umps to and/\allowbreak or sets a \textbf{d}estination of a
+\textsf{Fit\textbf{Rect}}angle.\footnote{I had some problems
+naming this command.}
+There are two forms of usage. \cs{jdRect} optionally
+creates a push button or link, and optionally creates a viewing window. The
+term \emph{viewing window} refers to a rectangular region that is created by
+the \textbf{FitR} destination viewing specification, see \textbf{Table~8.2
+Destination syntax} of the \textsl{PDF Reference}, version 1.7. A \emph{named
+destination} is created and is associated with the viewing window. When we
+jump to a viewing window, this window is magnified to the largest extent
+possible. For example, click on the either of the two displayed forms of the
+syntax for \cs{jdRect}; after jumping to the viewing window, click on the
+same display to return to the previous view.
 
 %\previewtrue
-
+\newtopic\noindent
 There are two versions of \cs{jdRect}, the command itself, and a
 \texttt{*} version, \cs{jdRect*}. The syntax follows, along with the
 expected parameters.
-\begin{quote}
-    \jdRect*[adddestw=10bp,adddesth=10bp]{\cs{jdRect[\meta{key-values}]}}
-\end{quote}
+\bVerb %\previewOn\viewMagWinOn
+\takeMeasure{\string\jdRect[\ameta{key-values}]}%
+\setlength{\dimen0}{\bxSize}%
+\def\1{\rlap{\hspace*{\dimen0}\sffamily(Click on box to zoom in)}}
+\jdRect[width=\bxSize,height=1.5\baselineskip,lift=\baselineskip,adddestw=10bp,adddesth=10bp]\relax
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\jdRect[!ameta(key-values)]
+\end{dCmd}
+\eVerb
+%\begin{quote}
+%    \jdRect*[adddestw=10bp,adddesth=10bp]{\cs{jdRect[\meta{key-values}]}}
+%\end{quote}
 The above version is used to overlay a region with a button and view
 window. No content is specified, but is defined by specifying the
 \texttt{width} and \texttt{height}; it can be positioned using
 \texttt{shift} and \texttt{lift}.
 
+\newtopic\noindent
 There is a \texttt{*}-version as well:
-\begin{quote}
-    \jdRect*[adddestw=10bp,adddesth=10bp]{\cs{jdRect*[\meta{key-values}]}\verb!{!\meta{content}\verb!}!}
-\end{quote}
+\bVerb %\previewOn\viewMagWinOn
+\takeMeasure{\string\jdRect[\ameta{key-values}]\darg{\ameta{content}}}%
+\setlength{\dimen0}{\bxSize}%
+\def\1{\rlap{\hspace*{\dimen0}\sffamily(Click on box to zoom in)}}
+\jdRect[width=\bxSize,height=1.5\baselineskip,lift=\baselineskip,adddestw=10bp,adddesth=10bp]\relax
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\jdRect[!ameta(key-values)]{!ameta(content)}
+\end{dCmd}
+\eVerb
+%\begin{quote}
+%    \jdRect*[adddestw=10bp,adddesth=10bp]{\cs{jdRect*[\meta{key-values}]}\verb!{!\meta{content}\verb!}!}
+%\end{quote}
 The second parameter \meta{content} is required when the \texttt{*} is
 present. This version is meant to enclose \meta{content} within the button
 and view window. The \texttt{width} and \texttt{height} keys are ignored,
@@ -210,6 +297,7 @@ but \texttt{shift} and \texttt{lift} are obeyed (though you may
 \texttt{shift} or \texttt{lift} the button/view window away from the
 content).
 
+\paragraph*{Description of \ameta{key-values}.}
 Before illustrating the \cs{jdRect} command, we first discuss its
 key-value pairs.
 \begin{itemize}
@@ -234,7 +322,7 @@ key-value pairs.
     \autoref{displayEqEx} on page~\pageref*{displayEqEx}.
 
 \item \texttt{height=\meta{length}}: Similar comments here as was made
-    for the \texttt{width} key. This key is 0used to set the height of
+    for the \texttt{width} key. This key is used to set the height of
     the button/viewing window. The default is 0pt. It is required when
     \texttt{*} is not present. See \autoref{displayEqEx} on
     page~\pageref*{displayEqEx}.
@@ -250,13 +338,13 @@ key-value pairs.
 the same dimensions as the underlying button. The \texttt{adddestw}
 key-value pair is used to widen the viewing window; \texttt{adddestw=.2in}
 widens the window by \texttt{.2in} on the left and \texttt{.2in} on the
-right. See Figure~\ref*{bvw}, page~\pageref*{bvw}.
+right. See \hyperref[bvw]{Figure~\ref*{bvw}}, page~\pageref*{bvw}.
 
 \item \texttt{adddesth=\meta{length}}: Similar to \texttt{adddestw} but for height.
 The \texttt{adddesth}
 key-value pair is used to increase the height the viewing window; \texttt{adddesth=.2in}
 increases the height of the window by \texttt{.2in} on the top and \texttt{.2in} in the bottom.
-See Figure~\ref*{bvw}, page~\pageref*{bvw}.
+See \hyperref[bvw]{Figure~\ref*{bvw}} below.
 \begin{figure}[htb]
 \begin{center}\setlength\fboxsep{0pt}
    \fbox{\parbox[c][.9in]{2.4in}
@@ -272,13 +360,13 @@ See Figure~\ref*{bvw}, page~\pageref*{bvw}.
     window. Clicking the same region again restores the previous view.
 
 \item[] When \texttt{button} is \texttt{false}, the button is not created,
-but the viewing window is still created. You can then jump to the viewing
-window with a separate link or button. When \texttt{button=false}, use the
-\texttt{dest} key to assigned a numbed destination to viewing window.
-({\fitrpkg} automatically creates the definition names internally, they
-are used by the buttons. If no button is created, name the destination so
-your know its name and can reference it in link that jumps to that viewing
-area.)
+    but the viewing window is still created. You can then jump to the
+    viewing window with a separate link or button. When
+    \texttt{button=false}, use the \texttt{dest} key to assign a name
+    (\ameta{name}) to the viewing window. ({\fitrpkg} automatically creates
+    the destination names internally, they are used by the buttons. If no
+    button is created, name the destination so you know its name and can
+    reference it in link that jumps to that viewing area.)
 
 
 \item \texttt{link=jmp|restore} If \texttt{link} has a value, then
@@ -290,19 +378,20 @@ area.)
     \texttt{nodest} key as well; no viewing window will be created
     around the link, as it is unlikely you'll want to jump to a link.
 
-\def\RungePic{\kern0pt\includegraphics[width=\marginparwidth]{runge}}
+
+\def\RungePic{\kern0pt\includegraphics[width=1in]{runge}}
 \def\jrOpts#1#2{link=#1,dest=#2}
 
 \item[] For example click on the link
 \textbf{\jdRect*[nodest,\jrOpts{jmp}{rungePic},adddestw=10,adddesth=10]{Carl Runge}}%
-\marginpar{\jdRect*[\jrOpts{restore}{rungePic},adddestw=\marginparsep,
-adddesth=\marginparpush]{\parbox[t]{\marginparwidth}{\RungePic\\
+\marginpar{\raggedleft\jdRect*[\jrOpts{restore}{rungePic},adddestw=\marginparsep,
+adddesth=\marginparpush]{\parbox[t]{1in}{\RungePic\\
 \normalcolor\centering\footnotesize\textsf{Carl Runge}}}} and jump to
 the picture of Runge in the margin. Click on the picture of Runge and
 return to the previous view.
 
 The jump to the picture from the text ``Carl Runge'' is as follows:
-\begin{Verbatim}[xleftmargin=20pt]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \jdRect*[nodest,link=jmp,dest=rungePic,
 adddestw=10bp,adddesth=10bp]{Carl Runge}
 \end{Verbatim}
@@ -313,24 +402,24 @@ the destination of the jump link is the destination \texttt{rungePic}.
 \item[] The color of the link is determined by \cs{@linkcolor}, a \textsf{hyperref}
 command that holds a named color. This can be redefined at anytime,
 directly using
-\begin{Verbatim}[xleftmargin=20pt]
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \makeatletter
 \def\@linkcolor{blue}
 \makeatother
 \end{Verbatim}
 or, if you are using the \texttt{pro} option with the \textsf{web}
 package, you can say,
-\begin{Verbatim}[xleftmargin=20pt]
-\selectColors{linkColor=red}
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\selectColors{linkColor=blue}
 \end{Verbatim}
 When using the \textsf{web} package, the default is \texttt{webgreen}.
 
 \item[] The action to restore the previous view is as follows:
-\begin{Verbatim}[xleftmargin=20pt]
-\marginpar{\jdRect*[link=restore,dest=rungePic,
-    adddestw=\marginparsep,adddesth=\marginparpush
-    ]{\parbox[t]{\marginparwidth}{\RungePic\\
-    \normalcolor\centering\footnotesize\textsf{Carl Runge}}}}
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\marginpar{\raggedleft\jdRect*[link=restore,dest=rungePic,
+  adddestw=\marginparsep,adddesth=\marginparpush
+  ]{\parbox[t]{1in}{\RungePic\\
+  \normalcolor\centering\footnotesize\textsf{Carl Runge}}}}
 \end{Verbatim}
 The picture is placed in the margin using \cs{marginpar}; the command
 \cs{RungePic} is a convenience macro that uses \cs{includegraphics} in
@@ -353,37 +442,66 @@ destination the Carl Runge link jumps to.
     allows for special effects (FX) when a viewing window is jumped to
     and when the view is restored. The default value of
     \texttt{allowFX} is \texttt{true} allow special effects if there
-    is any defined. By saying \texttt{allowFX=false}, no special
+    are any defined. By saying \texttt{allowFX=false}, no special
     effects are used, even if some are defined.
 
 \item[] An example of special effects you say? Try clicking on the
     Pythagorean Theorem
     \jdRect*[allowFX,adddestw=10bp,adddesth=10bp]{$ a^2 + b^2 = c^2 $}
+The default is to allow special effects, the default is set by the command,
+\bVerb\takeMeasure{\string\renewcommand\darg{\string\allowFXDefault}\darg{true}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\renewcommand{\allowFXDefault}{true}
+\end{dCmd}
+\eVerb By declaring \verb~\renewcommand{\allowFXDefault}{false}~, the default
+is now set to no special effects.
 \end{itemize}
+
+\paragraph*{Passing KV-pairs to the push button of \cs{jdRect}.}\label{para:Presets} When \cs{jdRect}
+produces a push button, you can pass \pkg{eforms} key-value pairs (KV-pairs) to
+the underlying push button.
+\bVerb\takeMeasure{\string\newcommand\darg{\string\overlayPresets}\darg{\string\H\darg{I}\string\BG\darg{}\string\BC\darg{}\string\S\darg{S}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\newcommand{\overlayPresets}{\H{I}\BG{}\BC{}\S{S}}
+\restoreOverlayPresets
+\end{dCmd}
+\eVerb See the \textsf{eforms} manual for the meaning of these cryptic symbols.
+The initial value of \cs{overlayPresets} create transparent push
+buttons. In subsequent examples, we will redefine \cs{overlayPresets} to
+change the visibility of the overlay buttons. The command
+\cs{restoreOverlayPresets} returns any re-definition of \cs{overlayPresets}
+to its default definition, which is shown above.
 
 \section{Some Examples}
 
 \everymath{\displaystyle}
 
-In this section, several examples are presented that illustrate the
-options of \cs{jdRect}.
+In this section, several examples are presented that illustrate the options
+of the \cs{jdRect} command. The examples in this section are created with
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\renewcommand{\allowFXDefault}{false}
+\end{Verbatim}
+in force. There is one example
+where we set \opt{allowFX=true}. Additional discussion on special effects
+(FX) may be found in \hyperref[FX]{Section~\ref*{FX}}.
 
-\begin{example}\label{previewEx}\previewtrue\viewMagWintrue
+\begin{example}\label{previewEx}\previewOn\viewMagWinOn
 \textbf{Illustrate Preview Rectangles.} The \texttt{preview} and
 \texttt{viewMagWin} options just set Boolean switches. In this example, we
-manually gives these switches a value of \texttt{true}
+manually give these switches a value of \texttt{true}
 (\cs{previewtrue}\cs{viewMagWintrue}). Take a close look at the following
-function
-\jdRect*{$ f(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^x e^{-t^2/2}\,\text{d}t$},
-or the more general form
-\jdRect*[adddestw=20bp,adddesth=10bp]{$ f(x;\mu;\sigma) = \frac{1}{\sigma\sqrt{2\pi}}\int_{-\infty}^x e^{-\frac{(t-\mu)^2}{2\sigma^2}}\,\text{d}t$}
-The preview rectangles are shown: For the one on the left, the dimensions
-of the push button and the viewing rectangle are the same; for one on the
-right, the dimensions of the viewing window have been increased by
-using \texttt{adddestw=20bp,adddesth=10bp}. When you jump to each of these
-viewing windows, you the one on the left is magnified much more than the
-one on the right; the larger viewing window allows the user to see some of
-the surrounding text.\fitit
+function \jdRect*{$ f(x) = \frac{1}{\sqrt{2\pi}}\int_{-\infty}^x
+e^{-t^2/2}\,\text{d}t$}, or the more general form
+\jdRect*[adddestw=20bp,adddesth=10bp]{$ f(x;\mu;\sigma) =
+\frac{1}{\sigma\sqrt{2\pi}}\int_{-\infty}^x
+e^{-\frac{(t-\mu)^2}{2\sigma^2}}\,\text{d}t$} The preview rectangles are
+shown: For the one on the left, the dimensions of the push button and the
+viewing rectangle are the same; for one on the right, the dimensions of the
+viewing window have been increased by using
+\texttt{adddestw=20bp,adddesth=10bp}. When you jump to each of these viewing
+windows, the one on the left is magnified much more than the one on the
+right, but the larger viewing window allows the user to see some of the
+surrounding text.\fitit
 \end{example}
 
 \begin{example}\label{displayEqEx}
@@ -405,8 +523,8 @@ Find the system of equations satisfied by
 \jdRect*[adddestw=10,adddesth=10]{$r,s, a, b, c, w_1, w_2, w_3$}
 that will make the above algorithm a third order method.
 
-The verbatim listing of this set of aligned equations is
-\begin{Verbatim}[xleftmargin=20pt,numbers=left]
+The verbatim listing of this set of aligned equations is,
+\begin{Verbatim}[xleftmargin=\amtIndent,numbers=left]
 \begin{align*}
 \jdRect[height=1.3in,width=2.6in,lift=16pt,shift=-15pt,
     adddestw=10bp,adddesth=10bp]
@@ -417,17 +535,19 @@ K &= w_1 K_1+ w_2 K_2+ w_3 K_3\\
 y_{n+1} &= y_n+K
 \end{align*}
 \end{Verbatim}
-This is an example of \cs{jdRect} (the non-\texttt{*} version), so there
-is no second argument.  In this case, we create our button dimensions
-using \texttt{height=1.3in,width=2.6in}, line~(2). Note the positioning
-of the \cs{jdRect} command, the upper-left point of the display. We then
-use \texttt{lift=16pt,shift=-15pt} to move the button around to cover the
+This is an example of \cs{jdRect} (the non-\texttt{*} version), so there is
+no second argument.  In this case, we create our button dimensions using
+\texttt{height=1.3in,width=2.6in}, line~(2). Note the positioning of the
+\cs{jdRect} command, the upper-left point of the display. We then use
+\texttt{lift=16pt,shift=-15pt} to move the button around to cover the
 equations, line~(2); finally, we increase the dimensions of the viewing
-window in line~(3) with \texttt{adddestw=10bp,adddesth=10bp}. Now, how
-were the values of these keys determined? By trial and error, while the
+window in line~(3) with \texttt{adddestw=10bp,adddesth=10bp}. Now, how were
+the values of these keys determined? By trial and error, while the
 \texttt{preview} and \texttt{viewMagWin} options were in effect. Below are
 the same equations with \cs{previewtrue} and \cs{viewMagWintrue}, locally
-invoked:\previewtrue\viewMagWintrue
+invoked:\previewOn\viewMagWinOn\footnote{You can also use the commands
+\cs{previewOn}, \cs{previewOff}, \cs{viewMagWinOn}, and \cs{viewMagWinOff} as
+a convenient way of turning on or off these switches.}
 \begin{align*}
 \jdRect[height=1.3in,width=2.6in,lift=16pt,shift=-15pt,
     adddestw=10bp,adddesth=10bp]
@@ -448,33 +568,29 @@ modes.\fitit
 \end{example}
 
 \begin{example}\label{CustomAppr}
-\textbf{Customizing the appearance.} The properties of the underlying push button
-is to be visible, but does not print. The background and the border are
-transparent.  The default properties are passed to the push button using a
-presets command:
-\begin{Verbatim}[xleftmargin=20pt]
-\newcommand{\overlayPresets}{\H{I}\BG{}\BC{}\S{S}}
-\end{Verbatim}
-See the \textsf{eforms} manual for the meaning of these cryptic symbols.
-You can modify these settings locally, within a group, or globally. In
-this example, we change the border to red dashed line. We redefine
-\cs{overlayPresets} as follows:
-\begin{Verbatim}[numbers=left,xleftmargin=20pt]
+\textbf{Customizing the appearance.} The among the properties of the
+underlying push button is to be visible, but does not print. The background
+and the border are transparent. The default properties of the button overlay
+are passed to the push button using \cs{overlayPresets}, introduced earlier
+on \hyperref[para:Presets]{page~\pageref*{para:Presets}}. You can modify these
+settings locally, within a group, or globally. In this example, we change the
+border to red dashed line. We redefine \cs{overlayPresets} as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \renewcommand{\overlayPresets}{\H{I}\BG{}\BC{red}\S{D}}
 \end{Verbatim}
 \renewcommand{\overlayPresets}{\H{I}\BG{}\BC{red}\S{D}}%
-The changes are in line~(2), we say \verb!\BC{red}! (the \textsf{xcolor} package is
+In the re-definition, \verb!\BC{red}! is declared (the \textsf{xcolor} package is
 required here for named colors; otherwise, we would say \verb~\BC{1 0 0}~),
-and we've change \verb!\S{S}! to \verb~\S{D}~, which gives a dashed
+\verb!\S{S}! is changed to \verb~\S{D}~, which gives a dashed
 (\texttt{D}) border as opposed to a solid (\texttt{S}) border. Now to
 illustrate this. My name is \jdRect*{D. P. Story!}; lets increase the
 viewing window, shall we? My name is \jdRect*[adddestw=10bp,adddesth=10bp]{D. P.
 Story!}. Keep in mind that we are overlaying a push button; if you want
 the underlying text to have a color, you need to color it yourself:
-\jdRect*[adddestw=10bp,adddesth=10bp]{\textcolor{blue}{D. P. Story}!}
+\jdRect*[allowFX,adddestw=10bp,adddesth=10bp]{\textcolor{blue}{D. P. Story}!}
 This last button has code,
-\begin{Verbatim}[xleftmargin=20pt]
-\jdRect*[adddestw=10bp,adddesth=10bp]%
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\jdRect*[!textbf(allowFX),adddestw=10bp,adddesth=10bp]%
     {\textcolor{blue}{D. P. Story}!}
 \end{Verbatim}
 As the changes to the preset appearance are inside a group, after this
@@ -482,72 +598,124 @@ example (environment)) \cs{overlayPresets} will revert to its definition
 that was in effect outside the example.\fitit
 \end{example}
 
-\section{Special Effects}
+\section{Special Effects (FX)}\label{FX}
 
-For the standard set up, where there is a push button that overlays the
-content along with the viewing window is jumps to, there are two
-JavaScript ``hooks'' that can be exploited
-\begin{itemize}
-    \item \texttt{overlayJmpHook()} is an undefined JavaScript
-        function that is executed after the jump to the viewing
-        window. (It is enclosed in a \texttt{try/catch} construct that
-        catches the error thrown.) The document author can define
-        \texttt{overlayJmpHook()} to perform some action following the
-        jump. The distribution of {\fitrpkg} comes with one
-        definition, \texttt{jmpHookBlink.js}, which blinks the border
-        following the jump.
-    \item \texttt{overlayRestoreHook()} is an undefined JavaScript
-        function that is executed following the restored view action.
-        The document author needs to make a custom definition if
-        special effects are desired. The distribution of {\fitrpkg}
-        comes with one definition, \texttt{restoreHookBlink.js},
-        which blinks the border following the restore action.
-\end{itemize}
-The preamble of this document says,
-\begin{Verbatim}[xleftmargin=20pt]
-\usepackage[js=restoreHookBlink,js=jmpHookBlink]{lmacs}
-\end{Verbatim}
-The \textsf{lmacs} package is a new package I made available to CTAN, its
-a simple package that imports files with extensions of \texttt{.def}, \texttt{.cfg}, and
-\texttt{.js}. We import \texttt{restoreHookBlink.js} and
-\texttt{jmpHookBlink.js} using a key-value method, where the key is one of
-the supported extensions; thus \texttt{js=restoreHookBlink} will import
-the file texttt{restoreHookBlink.js} if it exists. By the way, another
-nice feature of \textsf{lmacs} is that you can prefix an exclamation point
-(!) to cancel out that import, for example, if we wanted to use \texttt{jmpHookBlink}
-but not \texttt{restoreHookBlink} we say
-\begin{Verbatim}[xleftmargin=20pt]
-\usepackage[!js=restoreHookBlink,js=jmpHookBlink]{lmacs}
-\end{Verbatim}
+\subsection{Built-in FX}
 
-\begin{example}\label{fx}\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
-\textbf{Special Effects.} Jump to the
-\jdRect*[allowFX,adddestw=10bp,adddesth=10bp]{{\fitrpkg} Package!}
+There are two built-in JavaScript functions \texttt{pbJmpHook()} and
+\texttt{pbRestoreHook()}; the first blinks the view window just after the
+focused jump, and the latter blinks the view window after the previous view
+is restored. These built-in functions are not available by default, they are
+brought into the document with the options \opt{blinkonjmp} and
+\opt{blinkonrestore}. The option \opt{blink} is equivalent to specifying both
+\opt{blinkonjmp} and \opt{blinkonrestore}. This document was compiled by inputting
+the \pkg{fitr} package as \verb~\usepackage[blink]{fitr}~.
 
-The verbatim listing is
-\begin{Verbatim}[xleftmargin=20pt,numbers=left]
-\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
-...
-Jump to the \jdRect*[allowFX,adddestw=10bp,adddesth=10bp]%
-    {{\fitrpkg} Package!}
+\subsubsection{FX examples}
+
+\begin{example}
+\textbf{FX and Verbatim.} Zoom in on verbatim text
+\jdRect*[allowFX,adddestw=10bp,adddesth=10bp]
+{\verb!#$$%&$%^&$%^$!} which can be handled by \cs{jdRect*} command. The listing is,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={~()}]
+\jdRect*[~textbf(allowFX),adddestw=10bp,adddesth=10bp]
+{\verb!#$$%&$%^&$%^$!} which can be handled by
+\verb!\jdRect*! command. The listing is,
 \end{Verbatim}
-We redefined the \cs{overlayPresets} command, choosing an initial border
-of blue. In line~(4), I've used \texttt{allowFX}, this key does not
-normally to appear in the option list, its default value is normally
-\texttt{true};  however, for this document, the following definition was
-made in the preamble
-\begin{Verbatim}[xleftmargin=20pt]
+Notice that \texttt{allowFX} is specified. This key does not normally
+appear in the option list, its default value is normally \texttt{true};
+however, for this document, the following definition was made in the preamble,
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \renewcommand\allowFXDefault{false}
 \end{Verbatim}
 This (re)definition of \cs{allowFXDefault} sets the default value of
-\texttt{allowFX} to \texttt{false}. This was done so the special effects
-JavaScript functions could be imported (using \texttt{lmacs}) but their
-effects would not be seen, by default. To see their effect, we have to
-explicitly put \texttt{allowFX} to \texttt{true}, which is what the single
-key does. (Or, you can say \texttt{allowFX=true}, but that is five more key
-presses.)\fitit
+\texttt{allowFX} to \texttt{false}. This is that earlier, the special effects
+would not be seen, by default. To see their effect, we have to explicitly put
+\texttt{allowFX} to \texttt{true}, which is what the single key does. (Or,
+you can say \texttt{allowFX=true}, but that is five more key presses.)\fitit
 \end{example}
 
+\begin{example}\label{fx}
+\textbf{FX.} Jump to the
+{\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
+\jdRect*[allowFX,adddestw=10bp,adddesth=10bp]{{\fitrpkg} Package!}} Click
+on the verbatim region below to view the listing up close.
+\bVerb\takeMeasure{Jump to the
+\string\jdRect*[\textbf{allowFX},adddestw=10bp,adddesth=10bp]\%}%
+\jdRect*[allowFX,adddestw=10bp,adddesth=10bp]
+{\noindent\begin{minipage}{\bxSize}
+\begin{Verbatim}[commandchars=!()]
+\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
+...
+Jump to the \jdRect*[!textbf(allowFX),adddestw=10bp,adddesth=10bp]%
+  {{\fitrpkg} Package!}
+\end{Verbatim}
+\end{minipage}}\eVerb
+We redefined the \cs{overlayPresets} command, choosing an initial border of
+blue, in this way, the document consumer sees that s/he can zoom in on the
+text.
+
+%\previewOn\viewMagWinOn
+\jdRect[allowFX,height=4\baselineskip,width=340pt,adddestw=10,adddesth=10,lift=-\baselineskip]%
+By the way, you can also zoom in on displayed verbatim text using \cs{jdRect} only.
+% lift=16pt,shift=-15pt,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\renewcommand{\overlayPresets}{\H{I}\BG{}\BC{blue}\S{D}}%
+...
+Jump to the \jdRect*[!textbf(allowFX),adddestw=10bp,adddesth=10bp]%
+  {{\fitrpkg} Package!}
+\end{Verbatim}
+This is done by explicitly enclosing the verbatim region as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\jdRect[!textbf(allowFX),height=4\baselineskip,width=340pt,
+  adddestw=10,adddesth=10,lift=-\baselineskip]%
+By the way, ...
+\end{Verbatim}
+and, in this instance, is placed at the beginning of the sentence.\fitit
+\end{example}
+
+
+\subsection{Custom FX}
+
+For the standard set up, where there is a push button that overlays the
+content along with the viewing window it jumps to, there are two JavaScript
+``hooks'' that can be exploited. These are document author defined.
+\begin{itemize}
+    \item \texttt{pbJmpHookCustom()} is an undefined JavaScript
+        function that is executed after the jump to the viewing
+        window. (It is enclosed in a \texttt{try/catch} construct that
+        catches the error thrown.) The document author can define
+        \texttt{pbJmpHookCustom()} to perform some action following the
+        jump.
+    \item \texttt{pbRestoreHookCustom()} is an undefined JavaScript
+        function that is executed following the restored view action.
+        The document author needs to make a custom definition if
+        special effects are desired.
+\end{itemize}
+The distribution comes with two skeleton custom JavaScript functions, defined
+in the files \texttt{jmpHook.js} and \texttt{restoreHook.js}. Study the two
+built-in functions, \texttt{pbJmpHook()} and \texttt{pbRestoreHook()}, which
+are part of this package, as a guide for writing your own special effects. To
+use your custom JavaScript functions, place
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\usepackage[js=jmpHook,js=restoreHook]{lmacs}
+\end{Verbatim}
+in the preamble of your document.\footnote{The alternative is to copy and
+paste the \env{indDLJS} environments directly into the preamble.} The
+\textsf{lmacs} package is a new package I made available to CTAN, it's a
+simple package that imports files with extensions of \texttt{.def},
+\texttt{.cfg}, and \texttt{.js}. We import \texttt{jmpHook.js} and
+\texttt{restoreHook.js} using a key-value method, where the key is one of the
+supported extensions; thus \texttt{js=jmpHook} will import the file
+\texttt{jmpHook.js} if it exists. By the way, another nice feature of
+\textsf{lmacs} is that you can prefix an exclamation point (!) to cancel out
+that import, for example, if we wanted to use \texttt{jmpHook} but not
+\texttt{restoreHook} specify,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\usepackage[js=jmpHook,!js=restoreHook]{lmacs}
+\end{Verbatim}
+
+\newtopic\noindent
 Now, I simply must get back to my retirement. \dps
 
 \end{document}

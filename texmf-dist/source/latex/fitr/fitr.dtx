@@ -1,8 +1,8 @@
 %\iffalse
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% fitr.sty package,                         2016-04-04 %%
-%% Copyright (C) 2012--2016  D. P. Story                %%
+%% fitr.sty package,                                    %%
+%% Copyright (C) 2012--2020  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,16 +14,24 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{fitr}
-%<package> [2016/04/09 v1.2e Support for FitR destinations (dps)]
+%<package> [2020/07/09 v1.3.2 Support for FitR destinations (dps)]
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[colorlinks,hyperindex]{hyperref}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
 \usepackage{fancyvrb,array,calc}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
-%\EnableCrossrefs \CodelineIndex
+\EnableCrossrefs
+\CodelineIndex
 \RecordChanges
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\def\EXCL{!}
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
 \bgroup\ttfamily
 \gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
 \def\ameta#1{\ensuremath{\langle\textsl{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
@@ -51,6 +59,9 @@
     \item\relax}
    {\endlist}
 \makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{fitr}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{fitr}{aebdocfmt.def cannot be found}}
 \begin{document}
 \def\CMD#1{\textbackslash#1}
   \GetFileInfo{fitr.sty}
@@ -61,23 +72,22 @@
   \maketitle
   \tableofcontents
   \let\Email\texttt
-  \renewenvironment{theglossary}{%
-    \let\efill\relax
-    \begin{itemize}}{\end{itemize}}
-   \value{GlossaryColumns}=1
   \DocInput{fitr.dtx}
-  \PrintIndex
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\PrintIndex}{\paragraph*{Index}
+    The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o fitr.ind fitr.idx} on the command line
+    and recompile \texttt{fitr.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of
+    changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o fitr.gls fitr.glo} on the command line
+    and recompile \texttt{fitr.dtx}.}
 \end{document}
 %</driver>
 % \fi
-% \MakeShortVerb{|}
-% \StopEventually{}
 %
-% \DoNotIndex{\def,\edef,\gdef,\xdef,\global,\long,\let}
-% \DoNotIndex{\expandafter,\string,\the,\ifx,\else,\fi}
-% \DoNotIndex{\csname,\endcsname,\relax,\begingroup,\endgroup}
-% \DoNotIndex{\DeclareTextCommand,\DeclareTextCompositeCommand}
-% \DoNotIndex{\space,\@empty,\special}
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{artthreads}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{fitr}{aebdonotindex.def cannot be found}}
 %
 %    \begin{macrocode}
 %<*package>
@@ -94,19 +104,25 @@
 %
 % When using a dvi-ps-pdf work flow (with Distiller as the PDF creator), the
 % package uses the \textbf{pdfmark} for the \textsf{FitR} view-type destination:
-%\begin{verbatim}
-%    [ /Dest/<name>/View [ /FitR left bottom right top ]/DEST pdfmark
-%\end{verbatim}
-% For the \texttt{pdftex} option, we use \cs{pdfdest} a primitive of
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+% [ /Dest/!ameta(name)/View [ /FitR left bottom right top ]/DEST pdfmark
+%\end{Verbatim}
+% For the \opt{pdftex} or \opt{luatex} option, we use \cs{pdfdest} a primitive of
 % that utility:
-%\begin{verbatim}
-%    \pdfdest name {<name>} fitr
-%       width  <width>
-%       height <height>
-%       depth  <depth>
-%\end{verbatim}
-% For the \texttt{dvipdfm}, \texttt{dvipdfmx}, and \texttt{xetex} options,
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\pdfdest name {!ameta(name)} fitr
+%   width  !ameta(wd)
+%   height !ameta(ht)
+%   depth  !ameta(dp)
+%\end{Verbatim}
+% For the \opt{dvipdfm}, \opt{dvipdfmx}, and \opt{xetex} options,
 % the problem of computing the \textsf{FitR} rectangle is a little trickier.
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!~^}]
+%\@pdfm@mark{dest (!ameta~name^) %
+%   [ @thispage /FitR @xpos @ypos @urx!ameta~name^ @ury!ameta~name^ ]}}}}%
+%\end{Verbatim}
+%where \texttt{@urx\ameta{name}} and \texttt{@ury\ameta{name}} are the calculated upper right $x$ and
+%$y$ coordinate of the bounding box.\par
 %\medskip\noindent
 %The \textsl{PDF Reference} describes \textsf{FitR} as,
 %\begin{quote}
@@ -119,109 +135,172 @@
 % to zoom in on a rectangular region.
 %
 % \section{Options and Required Packages}
+%   \changes{v1.3.2}{2020/07/09}{Bad upload for v1.3.1, corrected problem.}
 %    \begin{macrocode}
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 %    \end{macrocode}
-% \paragraph*{Driver options.} Three options, \DescribeMacro{dvips, dvipsone}\texttt{dvips} (the default)
-% and \texttt{dvipsone}, both of which require \textbf{Adobe Distiller}
-% as the PDF creator; the \DescribeMacro{pdftex}\texttt{pdftex} allows for the same functionality
-% for the \textsf{pdflatex} executable. We also support \DescribeMacro{dvipdfm,dvipdfmx,xetex}\texttt{dvipdfm}
+%   (2020/07/03) Added \pkg{ifluatex} package for later testing
+%   \changes{v1.3}{2020/07/03}{Added \string\pkg{ifluatex} package}
+%    \begin{macrocode}
+\RequirePackage{ifluatex}
+%    \end{macrocode}
+% \paragraph*{Driver options.} Three options, \IndexOpt{dvips}\IndexOpt{dvipsone}\app{dvips} (the default)
+% and \app{dvipsone}, both of which require \textbf{Adobe Distiller}
+% as the PDF creator; the \IndexOpt{pdftex}\app{pdflatex} and \IndexOpt{luatex}\app{luatex} allows for the same functionality
+% for the \textsf{pdflatex} executable. We also support \IndexOpt{dvipdfm}\IndexOpt{dvipdfmx}\IndexOpt{xetex}\texttt{dvipdfm}
 % and its extensions, \texttt{dvipdfmx} and \texttt{xetex}.
 %
-% \paragraph*{Preview options.} The \DescribeMacro{preview}\texttt{preview}
-% option is a carry over from \textsf{eforms}. When selected, all form fields are outlined; useful when
-% setting the location of fields in a dvi previewer. The other option is \texttt{viewMagWin}
-% \DescribeMacro{viewMagWin} will show the viewing windows surrounding the target. This is the rectangle
+% \paragraph*{Auto detection of drivers.} The drivers \app{pdflatex}, \app{lualatex}, and \app{xelatex} are automatically
+% detected, so there is no need to specify their respective options: \opt{pdftex}, \opt{luatex}, and \app{xetex}.
+%
+% \paragraph*{Preview options.} The \IndexOpt{preview}\texttt{preview}
+% option is a carry over from \pkg{eforms}. When selected, all form fields are outlined; useful when
+% setting the location of fields in a dvi previewer. The other option is \opt{viewMagWin}
+% \IndexOpt{viewMagWin} will show the viewing windows surrounding the target. This is the rectangle
 % that will be jumped to. Use this option to adjust the size of the window to your needs.
 % When either of the last two options has an exclamation point prior, that means to
 % turn off the switch. You can conveniently use \texttt{viewMagWin} to see the viewing window,
-% then change it to \DescribeMacro{!viewMagWin}\texttt{!viewMagWin} to remove the visible window. Cool.
-% Similarly, you can turn off \texttt{preview} using \DescribeMacro{!preview}\texttt{!preview}.
+% then change it to \IndexOpt[\protect\EXCL]{!viewMagWin}\opt{!viewMagWin} to remove the visible window. Cool.
+% Similarly, you can turn off \opt{preview} using \IndexOpt[\protect\EXCL]{!preview}\opt{!preview}.
 %    \begin{macrocode}
 %    \end{macrocode}
-% We create the \cs{ifpreview} and \cs{ifviewMagWin}, and declare the options.
+% We create \cs{ifpreview} and \cs{ifviewMagWin}, and declare the options.
 %    \begin{macrocode}
 \@ifundefined{ifpreview}{\newif\ifpreview \previewfalse}{}
 \@ifundefined{ifviewMagWin}{\newif\ifviewMagWin \viewMagWinfalse}{}
 \let\fitr@driver\@empty
+%    \end{macrocode}
+% The \opt{pdftex} option
+%    \begin{macrocode}
 \DeclareOptionX{pdftex}{\gdef\fitr@driver{pdftex}%
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@pdftex@driver{pdftex}
+%    \end{macrocode}
+% The \opt{luatex} option
+%    \begin{macrocode}
+\DeclareOptionX{luatex}{\gdef\fitr@driver{luatex}%
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
+\def\fitr@pdftex@driver{luatex}
 %    \end{macrocode}
 % Distiller based drivers.
 %    \begin{macrocode}
 \DeclareOptionX{dvips}{\gdef\fitr@driver{dvips}%
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@dvips@driver{dvips}
 \DeclareOptionX{dvipsone}{\gdef\fitr@driver{dvipsone}%
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@dvipsone@driver{dvipsone}
 %    \end{macrocode}
-% \textsf{dvipdfm} and its variants.
+% \app{dvipdfm} and its variants.
 %    \begin{macrocode}
 \newif \if@fitr@dvipdfm \@fitr@dvipdfmfalse
 \DeclareOptionX{dvipdfm}{\gdef\fitr@driver{dvipdfm}%
-    \@fitr@dvipdfmtrue
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \@fitr@dvipdfmtrue
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@dvipdfm@driver{dvipdfm}
 \DeclareOptionX{dvipdfmx}{\gdef\fitr@driver{dvipdfmx}%
-    \@fitr@dvipdfmtrue
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \@fitr@dvipdfmtrue
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@dvipdfmx@driver{dvipdfmx}
 \DeclareOptionX{xetex}{\gdef\fitr@driver{xetex}%
-    \@fitr@dvipdfmtrue
-    \PassOptionsToPackage{\fitr@driver}{hyperref}%
-    \PassOptionsToPackage{\fitr@driver}{eforms}%
-}
+  \@fitr@dvipdfmtrue
+  \PassOptionsToPackage{\fitr@driver}{hyperref}%
+  \PassOptionsToPackage{\fitr@driver}{eforms}}
 \def\fitr@xetex@driver{xetex}
 %    \end{macrocode}
+%     \leavevmode
+%     \IndexOpt{preview}^^A
+%     \IndexOpt[\protect\EXCL]{!preview}^^A
+%     \IndexOpt{viewMagWin}^^A
+%     \IndexOpt[\protect\EXCL]{!viewMagWin}^^A
+%     Various preview options.
 %    \begin{macrocode}
 \DeclareOptionX{preview}{\previewtrue}
 \DeclareOptionX{!preview}{\previewfalse}
 \DeclareOptionX{viewMagWin}{\viewMagWintrue}
 \DeclareOptionX{!viewMagWin}{\viewMagWinfalse}
 %    \end{macrocode}
+%    \leavevmode
+%    \DescribeMacro{\previewOn}^^A
+%    \DescribeMacro{\previewOff}^^A
+%    \DescribeMacro{\viewMagWinOn}^^A
+%    \DescribeMacro{\viewMagWinOff}^^A
+%    Some convenience macros to locally turn on or off \opt{preview} and
+%    \opt{viewMagWin}.
+%    \changes{v1.3.1}{2020/07/06}{Added commands to locally turn on the \string\opt{preview}
+%    and \string\opt{viewMagWin} options}
+%    \begin{macrocode}
+\providecommand{\previewOn}{\previewtrue}
+\providecommand{\previewOff}{\previewfalse}
+\providecommand{\viewMagWinOn}{\viewMagWintrue}
+\providecommand{\viewMagWinOff}{\viewMagWinfalse}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{gonative}^^A
+%    When the \opt{gonative} option is specified, field and document JavaScript
+%    \emph{are not used}, as a result, no special effects are implemented.
+%    This gives a basic document that can be compiled successfully
+%    with the \app{dvips\,\texttt{->}\,ps2pdf} workflow.
+%    \changes{v1.3.1}{2020/07/06}{Added \string\opt{gonative} option}
+%    \begin{macrocode}
+\newif\ifFRusedljs \FRusedljstrue
+\DeclareOptionX{gonative}{\FRusedljsfalse}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{blinkonjmp}^^A
+%    \IndexOpt[\protect\EXCL]{!blinkonjmp}^^A
+%    Target region blinks on jump
+%    \changes{v1.3.1}{2020/07/06}{Added \string\opt{blinkonjmp} and \string\opt{!blinkonjmp} options}
+%    \begin{macrocode}
+\newif\ifFRblinkonjmp \FRblinkonjmpfalse
+\DeclareOptionX{blinkonjmp}{\FRblinkonjmptrue}
+\DeclareOptionX{!blinkonjmp}{\FRblinkonjmpfalse}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{blinkonrestore}^^A
+%    \IndexOpt[\protect\EXCL]{!blinkonrestore}^^A
+%    Target region blinks on restore
+%    \changes{v1.3.1}{2020/07/06}{Added \string\opt{blinkonrestore} and \string\opt{!blinkonrestore} options}
+%    \begin{macrocode}
+\newif\ifFRblinkonrestore \FRblinkonrestorefalse
+\DeclareOptionX{blinkonrestore}{\FRblinkonrestoretrue}
+\DeclareOptionX{!blinkonrestore}{\FRblinkonrestorefalse}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{blink}^^A
+%    \IndexOpt[\protect\EXCL]{!blink}^^A
+%    A convenience option, \opt{blink} is equivalent to \opt{blinkonjmp} and \opt{blinkonrestore}.
+%    \changes{v1.3.1}{2020/07/06}{Added \string\opt{blink} and \string\opt{!blink} options}
+%    \begin{macrocode}
+\DeclareOptionX{blink}{\FRblinkonjmptrue\FRblinkonrestoretrue}
+\DeclareOptionX{!blink}{\FRblinkonjmpfalse\FRblinkonrestorefalse}
+%    \end{macrocode}
 % Before processing options, try for automatic driver detection.
 %    \begin{macrocode}
-\@ifpackageloaded{web}{%
-    \ExecuteOptionsX{\eq@driver@name}%
-}{%
-    \ifpdf\ExecuteOptionsX{pdftex}\else
-    \ifxetex\ExecuteOptionsX{xetex}\fi\fi
+\@ifpackageloaded{web}{\ExecuteOptionsX{\eq@driver@name}}{%
+  \ifluatex\ExecuteOptionsX{pdftex}\else
+  \ifpdf\ExecuteOptionsX{pdftex}\else
+  \ifxetex\ExecuteOptionsX{xetex}\else
+  \@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+      {\ExecuteOptionsX{dvipsone}}\fi\fi\fi
 }
 %    \end{macrocode}
-% Process the options
+% \paragraph*{Process the options}
 %    \begin{macrocode}
 \ProcessOptionsX
 %    \end{macrocode}
+% \paragraph*{Required packages}
 %    \begin{macrocode}
 \RequirePackage{xcolor}
-\ifx\fitr@driver\@empty
-    \def\fitr@driver{dvips}
-    \def\fitr@loadPkgs{%
-    \RequirePackage[dvips]{hyperref}
-    \RequirePackage[dvips]{eforms}}%
-\else
-    \def\fitr@loadPkgs{%
-    \RequirePackage{hyperref}
-    \RequirePackage{eforms}[2016/04/05]}
-\fi
-\fitr@loadPkgs
 %    \end{macrocode}
-% Minimal packages \textsf{calc} and \textsf{eforms} (which inputs \textsf{hyperref}).
+% Minimal packages \pkg{calc} and \pkg{eforms} (which inputs \pkg{hyperref}).
 %    \begin{macrocode}
+%\RequirePackage{hyperref}
+\RequirePackage{eforms}[2020/07/05]
 \RequirePackage{calc}
 %    \end{macrocode}
 % We also require \textsf{collectbox}, a cool way of collecting an argument which enables
@@ -234,38 +313,48 @@
 %    \begin{macrocode}
 \newcounter{magCnt}
 \newbox\fitr@bbox
-\newcount\fitr@height \newcount\fitr@width \newcount\fitr@depth
+\newcount\fitr@height
+\newcount\fitr@width
+\newcount\fitr@depth
 \newlength\fitr@length
 %    \end{macrocode}
-%    \begin{macro}{\get@fitr@dimen}
-%    \cs{get@fitr@dimen}\verb!{!\meta{content}\verb!}!:  this command encloses \meta{content}
+%   For \app{xelatex} we adjust field sizes to conform to the same sizes produced
+%   by \app{pdflatex} and \app{latex}. For \app{lualatex}, make a definition
+%   so it can be process just like \app{pdflatex}.
+%   \changes{v1.3}{2020/07/03}{Add a test for xetex and luatex}
+%    \begin{macrocode}
+\ifxetex\makeXasPDOff\fi
+\ifluatex\protected\def\pdfdest{\pdfextension dest }\fi
+%    \end{macrocode}
+%    \begin{macro}{\get@fitr@dimen}\nmpsep{\darg{\ameta{content}}}
+%    Tthis command encloses \ameta{content}
 %    in the box register \cmd{\fitr@bbox} (an \cs{hbox}) and transfers
 %    dimension info to the count registers \cmd{\fitr@height},
-%    \cmd{\fitr@width}, and \cmd{\fitr@depth},  To typeset \meta{content} you  must
+%    \cmd{\fitr@width}, and \cmd{\fitr@depth}.  To typeset \ameta{content},
 %    \cmd{\unhbox}\cmd{\fitr@bbox}.
 %    \begin{macrocode}
 \def\get@fitr@dimen#1{%
-    \setbox\fitr@bbox=\hbox{#1}%
-    \fitr@height=\ht\fitr@bbox
-        \xdef\fitr@height@l{\the\ht\fitr@bbox}%
-    \fitr@width=\wd\fitr@bbox
-        \xdef\fitr@width@l{\the\wd\fitr@bbox}%
-    \fitr@depth=\dp\fitr@bbox
-        \xdef\fitr@depth@l{\the\dp\fitr@bbox}%
-    \setlength\fitr@length{\ht\fitr@bbox+\dp\fitr@bbox}%
-    \edef\fitr@@height{\the\fitr@length}%
+  \setbox\fitr@bbox=\hbox{#1}%
+  \fitr@height=\ht\fitr@bbox
+    \xdef\fitr@height@l{\the\ht\fitr@bbox}%
+  \fitr@width=\wd\fitr@bbox
+    \xdef\fitr@width@l{\the\wd\fitr@bbox}%
+  \fitr@depth=\dp\fitr@bbox
+    \xdef\fitr@depth@l{\the\dp\fitr@bbox}%
+  \setlength\fitr@length{\ht\fitr@bbox+\dp\fitr@bbox}%
+  \edef\fitr@@height{\the\fitr@length}%
 }
 %    \end{macrocode}
 %    \end{macro}
-% The following commands are some PostScript for the \textsf{dvips} executable.
-%
-% \paragraph*{dvips.}
-% Uses \cmd{\fitr@bbox}; \texttt{\#1} is amount to widen box; \texttt{\#2} amount to heighten box.
+% \paragraph*{dvips.} The following commands are some PostScript for the \textsf{dvips} executable.
+%    \begin{macrocode}
+%    \end{macrocode}
+% \leavevmode\DescribeMacro\FitRbboxB\nmpsep{\darg{\ameta{amt-wd}}\darg{\ameta{amt-ht}}}
 %    \begin{macrocode}
 \def\fitr@urxury@fixup#1#2#3{}
 \ifx\fitr@driver\fitr@dvips@driver
 \headerps@out{/TeXtoPDF {65536 div DVImag mul} def % sp to pts
-/SPtoDvips{TeXtoPDF PDFToDvips} def} % dp to dots
+/SPtoDvips{TeXtoPDF PDFToDvips} def} % sp to dots
 \def\FitRbboxB#1#2{% Uses \fitr@bbox
   currentpoint 2 copy DvipsToPDF \the\fitr@depth\space TeXtoPDF add
   neg vsize add 72 sub #2\space sub exch          % y1
@@ -274,9 +363,10 @@
   TeXtoPDF add 72 add #1\space add exch           % x2
   DvipsToPDF \the\fitr@height \space TeXtoPDF sub
   neg vsize add 72 sub #2\space add}              % y2
-\else\ifx\fitr@driver\fitr@dvipsone@driver
+\else
+\ifx\fitr@driver\fitr@dvipsone@driver
 %    \end{macrocode}
-% \paragraph*{dvipsone.} Uses \cmd{\fitr@bbox}; \texttt{\#1} is amount to widen box; \texttt{\#2} amount to heighten box.
+% \paragraph*{dvipsone.} Definition of \cs{FitRbbox} for \app{dvipsone}.
 %    \begin{macrocode}
 \special{!/TeXtoPDF {65536 div mag 1000 div mul} def
 /PDFtoTeX {65536 mul mag 1000 div div} def}
@@ -288,9 +378,9 @@
    DvipsToPDF 72 add #1\space add exch         % x2
    \the\fitr@height\space sub DvipsToPDF neg
    PageHeight add 72 sub #2\space add}         % y2
-\else\ifx\fitr@driver\fitr@pdftex@driver
+\else\ifpdf
 %    \end{macrocode}
-% \paragraph*{pdftex.}
+% \paragraph*{pdftex.} Definition of \cs{FitRbbox} for \app{pdftex} and \app{luatex}.
 %  Uses \cmd{\fitr@bbox}; \texttt{\#1} is amount to widen box;
 % \texttt{\#2} amount to heighten box.
 %
@@ -300,117 +390,127 @@
 % \cs{fitr@pdftex@view@width\string|height\string|depth}.
 %    \begin{macrocode}
 \def\FitRbboxB#1#2{%
-    \fitr@length=#1bp
-    \fitr@length=2\fitr@length
-    \advance\fitr@length\wd\fitr@bbox
-    \edef\fitr@pdftex@view@width{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\ht\fitr@bbox
-    \edef\fitr@pdftex@view@height{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\dp\fitr@bbox
-    \edef\fitr@pdftex@view@depth{\the\fitr@length}%
+  \fitr@length=#1bp
+  \fitr@length=2\fitr@length
+  \advance\fitr@length\wd\fitr@bbox
+  \edef\fitr@pdftex@view@width{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\ht\fitr@bbox
+  \edef\fitr@pdftex@view@height{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\dp\fitr@bbox
+  \edef\fitr@pdftex@view@depth{\the\fitr@length}%
 }
 \else\if@fitr@dvipdfm
 %    \end{macrocode}
 % \paragraph*{dvipdfm/dvipdfmx/xetex.} The primitive \verb!\special{pdf: dest (name)...}! is used
-% along with the primitive variables \texttt{@xpos} and \texttt{@ypos}.
+% along with the primitive variables \texttt{@xpos} and \texttt{@ypos}. The third argument is \ameta{name}.
 %    \begin{macrocode}
 \def\FitRbboxB#1#2#3{%
-    \smash{\raisebox{-\fitr@depth@l-#2bp}%
-        {\makebox[0pt][l]{\hspace*{-#1bp}%
+  \smash{\raisebox{-\fitr@depth@l-#2bp}%
+    {\makebox[0pt][l]{\hspace*{-#1bp}%
 %    \end{macrocode}
 % The values of \texttt{@xpos} and \texttt{@ypos} correspond to the coordinates
 % of the lower left corner. The values of  \texttt{@urx\#3} and \texttt{@ury\#3}
 % are calculated in \cs{fitr@urxury@fixup} as the coordinates of the upper right
 % corner.
 %    \begin{macrocode}
-    \@pdfm@mark{dest (#3) %
-    [ @thispage /FitR @xpos @ypos @urx#3\space @ury#3\space ]}}}}%
-}
+  \@pdfm@mark{dest (#3) %
+    [ @thispage /FitR @xpos @ypos @urx#3\space @ury#3\space ]}}}}}
 %    \end{macrocode}
 % \cs{fitr@urxury@fixup} is placed just after \cs{fitr@bbox}.
 %    \begin{macrocode}
 \def\fitr@urxury@fixup#1#2#3{%
-    \smash{\raisebox{\fitr@height@l+#2bp}%
-    {\makebox[0pt][l]{\hspace*{#1bp}%
+  \smash{\raisebox{\fitr@height@l+#2bp}%
+  {\makebox[0pt][l]{\hspace*{#1bp}%
 %    \end{macrocode}
 % We raise up to the upper right corner of the content box and define
 % \texttt{@urx\#3} and \texttt{@ury\#3} as the current values of
 % \texttt{@xpos} and \texttt{@ypos},
 %    \begin{macrocode}
-    \@pdfm@mark{obj @urx#3\space @xpos}%
-    \@pdfm@mark{obj @ury#3\space @ypos}}}}%
+  \@pdfm@mark{obj @urx#3\space @xpos}%
+  \@pdfm@mark{obj @ury#3\space @ypos}}}}%
 }
 \fi\fi\fi\fi
 %    \end{macrocode}
-%     We use a short macro from \textsf{graphics} package.
-%     We do not require the \textsf{graphics} command
+%     We use a short macro from \pkg{graphics} package.
+%     We do not require the \pkg{graphics} command
 %     so we redefine it under a different name.
 %    \begin{macrocode}
 \def\fitr@defaultbp#1#2{%
   \afterassignment\fitr@def@bp\dimen@#2bp\relax{#1}{#2}}
 \def\fitr@def@bp#1\relax#2#3{%
-   \if!#1!%
-     \def#2{#3}%
-    \else
-      \dimen@.99626\dimen@
-      \edef#2{\strip@pt\dimen@}%
-    \fi}
+  \if!#1!%
+   \def#2{#3}%
+  \else
+    \dimen@.99626\dimen@
+    \edef#2{\strip@pt\dimen@}%
+  \fi}
 %    \end{macrocode}
 % The major command of this package is \cs{jdRect}. Its second required argument
 % has several key-value pairs that are recognized.
 % Options for the \cs{jdRect} command.
 %
-% \medskip\noindent\DescribeMacro{lift} is the amount of lift (performed by \cs{raisebox}. The vlue
+% \medskip\noindent\IndexKey{lift}^^A
+% is the amount of lift (performed by \cs{raisebox}. The value
 % can be a positive or negative length. Positive to translate upward, negative to translate downward.
 % The default is \texttt{0pt}.
 %    \begin{macrocode}
 \define@key{fitr}{lift}[0pt]{{\setlength\@tempdima{#1}%
-    \xdef\fitr@temp@length{\the\@tempdima}}%
-    \edef\fitr@@lift{\fitr@temp@length}}
+  \xdef\fitr@temp@length{\the\@tempdima}}%
+  \edef\fitr@@lift{\fitr@temp@length}}
 \def\fitr@@lift{0pt}
 %    \end{macrocode}
-% \DescribeMacro{shift} the amount of horizontal shift, positive to the right, negative to the left.
+% \leavevmode\IndexKey{shift}^^A
+% is the amount of horizontal shift, positive to the right, negative to the left.
 % The default is \texttt{0pt}
 %    \begin{macrocode}
 \define@key{fitr}{shift}[0pt]{{\setlength\@tempdima{#1}%
-    \xdef\fitr@temp@length{\the\@tempdima}}%
-    \edef\fitr@@shift{\fitr@temp@length}}
+  \xdef\fitr@temp@length{\the\@tempdima}}%
+  \edef\fitr@@shift{\fitr@temp@length}}
 \def\fitr@@shift{0pt}
 %    \end{macrocode}
-% \DescribeMacro{width}\DescribeMacro{height} are the dimensions of the bounding box
+% \leavevmode
+% \IndexKey{width}^^A
+% \IndexKey{height}^^A
+% are the dimensions of the bounding box
 % for the button/view rectangle. These dimensions are ignored when the first optional
 % parameter of \cmd{\jdRect} is nonempty.
 %    \begin{macrocode}
 \define@key{fitr}{width}[0pt]{{\setlength\@tempdima{#1}%
-    \xdef\fitr@temp@length{\the\@tempdima}}%
-    \edef\fitr@@width{\fitr@temp@length}}
+  \xdef\fitr@temp@length{\the\@tempdima}}%
+  \edef\fitr@@width{\fitr@temp@length}}
 \def\fitr@@width{0pt}
 \define@key{fitr}{height}[0pt]{{\setlength\@tempdima{#1}%
-    \xdef\fitr@temp@length{\the\@tempdima}}%
-    \edef\fitr@@height{\fitr@temp@length}}
+  \xdef\fitr@temp@length{\the\@tempdima}}%
+  \edef\fitr@@height{\fitr@temp@length}}
 \def\fitr@@height{0pt}
 %    \end{macrocode}
-% \DescribeMacro{ref} is the reference point. Values are \texttt{t} (the default),
+% \leavevmode\IndexKey{ref}^^A
+% is the reference point. Values are \texttt{t} (the default),
 % \texttt{c} center, and \texttt{b} bottom. When the optional first parameter of
 % \cmd{\jdRect} is nonempty, the default is \texttt{b}.
 %    \begin{macrocode}
 \define@choicekey+{fitr}{ref}[\val\nr]{t,c,b}[t]%
-    {\edef\fitr@@refPt{\val}}{}
+  {\edef\fitr@@refPt{\val}}{}
 \def\fitr@@refPt{t}
 %    \end{macrocode}
-% \DescribeMacro{adddestw}\DescribeMacro{adddesth} add additional length around
+% \leavevmode
+% \IndexKey{adddestw}^^A
+% \IndexKey{adddesth}^^A
+% add additional length around
 % the (internal) box. This larger rectangle is the view window.
 %    \begin{macrocode}
 \define@key{fitr}{adddestw}[0]{%
-    \fitr@defaultbp{\fitr@@adddestw}{#1}}
+  \fitr@defaultbp{\fitr@@adddestw}{#1}}
 \def\fitr@@adddestw{0}
 \define@key{fitr}{adddesth}[0]{%
-    \fitr@defaultbp{\fitr@@adddesth}{#1}}
+  \fitr@defaultbp{\fitr@@adddesth}{#1}}
 \def\fitr@@adddesth{0}
 %    \end{macrocode}
-% \DescribeMacro{button} is a Boolean. If \texttt{true} (the default), \cmd{\jdRect}
+% \leavevmode
+% \IndexKey{button}^^A
+% is a Boolean. If \texttt{true} (the default), \cmd{\jdRect}
 % creates a push button around the content. When the user pushes the button, the viewer
 % zooms in to the view window. Clicking again restores the previous view. When \texttt{button}
 % is \texttt{false}, the button is not created, but the viewing window is. You can then jump to the
@@ -419,7 +519,9 @@
 \define@boolkey{fitr}{button}[true]{}
 \KV@fitr@buttontrue
 %    \end{macrocode}
-% \DescribeMacro{link} is an key, which if taken, a link rather than a push button,
+% \leavevmode
+% \IndexKey{link}^^A
+% is an key, which if taken, a link rather than a push button,
 % is created. The \texttt{link} key takes one of two values: \texttt{jmp}, \texttt{restore}.
 % \begin{itemize}
 % \item When \texttt{link=jmp}, a link is created that jumps to the destination determined by
@@ -433,23 +535,34 @@
     {\edef\fitr@@link{\nr}}{}
 \let\fitr@@link\@empty
 %    \end{macrocode}
-% \DescribeMacro{nodest}\texttt{nodest} is a Boolean, which if \texttt{true},
+% \leavevmode
+% \IndexKey{nodest}^^A
+% is a Boolean, which if \texttt{true},
 % causes \cs{jdRect} not to generate a destination at the current link (or button).
 %    \begin{macrocode}
 \define@boolkey{fitr}{nodest}[true]{}
 \KV@fitr@nodestfalse
 %    \end{macrocode}
-% \DescribeMacro{dest} When \texttt{button=true} (the default), the name of the destination
+% \leavevmode
+% \IndexKey{dest}^^A
+% When \texttt{button=true} (the default), the name of the destination
 % is automatically generated, internally. When \texttt{button=false}, you need to specify
 % a destination to reference in a separate link or push button.
 %    \begin{macrocode}
 \define@key{fitr}{dest}[]{\def\fitr@@dest{#1}}
 \let\fitr@@dest\@empty
 %    \end{macrocode}
+% \leavevmode\IndexKey{allowFX}^^A
+% A Boolean switch (of sorts). The \texttt{fitr} package
+%    allows for special effects (FX) when a viewing window is jumped to
+%    and when the view is restored. The default value of
+%    \texttt{allowFX} is \texttt{true} allow special effects if there
+%    are any defined. By saying \texttt{allowFX=false}, no special
+%    effects are used, even if some are defined.
 %    \begin{macrocode}
 \define@choicekey+{fitr}{allowFX}[\val\nr]{true,false}[true]%
-    {\edef\fitr@allowFX{\val}}{}
-\def\allowFXDefault{true}
+  {\edef\fitr@allowFX{\val}}{}
+\newcommand{\allowFXDefault}{true}
 \let\fitr@allowFX\@empty
 %    \end{macrocode}
 % \paragraph{The main command.}
@@ -480,7 +593,7 @@
 %
 %\medskip\noindent Syntax for \cs{jdRect} has two forms:
 %\begin{quote}
-% \cs{jdRect[\meta{key-values}]}
+% \cs{jdRect[\ameta{KV-pairs}]}
 %\end{quote}
 % The above version is used to overlay a region with a button and view window.
 % No content is specified, but is defined by specifying the \texttt{width} and \texttt{height};
@@ -488,16 +601,16 @@
 %
 % There is a \texttt{*}-version as well:
 %\begin{quote}
-% \cs{jdRect*[\meta{key-values}]}\verb!{!\meta{content}\verb!}!
+% \cs{jdRect*[\ameta{KV-pairs}]\darg{\ameta{content}}}
 %\end{quote}
 % The second parameter \meta{content} is required when the \texttt{*} is present.
-% This version is meant to enclose \meta{content} within the button and view window.
+% This version is meant to enclose \ameta{content} within the button and view window.
 % \texttt{width} and \texttt{height} are ignored, but \texttt{shift} and \texttt{lift} are obeyed (though
 % you may \texttt{shift} or \texttt{lift} the button/view window away from the content).
 %    \begin{macrocode}
 \newcommand{\jdRect}{\begingroup
-    \@ifstar{\let\fitr@istar=1\set@rectjd}%
-        {\let\fitr@istar=0\set@rectjd}}
+  \@ifstar{\let\fitr@istar\ef@One\set@rectjd}%
+    {\let\fitr@istar\ef@Zero\set@rectjd}}
 %    \end{macrocode}
 % For links, we use the link color of \textsf{hyperref}. The definition of
 % \cmd{\ef@colorthislink} is in \textsf{eforms}.
@@ -512,214 +625,235 @@
 % We process the key-values before gathering the \cs{collectbox}
 % so we can insert the link color, if this is a link!
 %    \begin{macrocode}
-    \edef\temp@exp{\noexpand\setkeys{fitr}{#1}}\temp@exp
-    \ifx\fitr@@link\@empty\let\fitr@bcode\relax\fi
+  \edef\temp@exp{\noexpand\setkeys{fitr}{#1}}\temp@exp
+  \ifx\fitr@@link\@empty\let\fitr@bcode\relax\fi
 %    \end{macrocode}
 % If this is \cs{jdRect*}, we collect the second argument using
 % \cs{collectbox}, and move on to \cs{set@@rectjd}.
 %    \begin{macrocode}
-    \if\fitr@istar1%
-        \def\fitr@next{\collectbox[\fitr@bcode]{\set@@rectjd}}\else
+  \ifx\fitr@istar\ef@One
+    \def\fitr@next{\collectbox[\fitr@bcode]{\set@@rectjd}}\else
 %    \end{macrocode}
 % Otherwise, we just move on to \cs{set@@rectjd}.
 %    \begin{macrocode}
-    \def\fitr@next{\set@@rectjd}\fi\fitr@next
-}
+    \def\fitr@next{\set@@rectjd}\fi\fitr@next}
 %    \end{macrocode}
 % The third and final stage in the expansion of \cs{jdRect}
 %    \begin{macrocode}
 \def\set@@rectjd{%
-    \stepcounter{magCnt}\def\fitr@setBL{0pt}%
-    \ifx\fitr@@dest\@empty
-        \def\fitr@namedDest{fitrDestn\the\value{magCnt}}\else
-        \edef\fitr@namedDest{\fitr@@dest}\fi
-    \if\fitr@istar1\def\fitr@@refPt{b}\fi
+  \stepcounter{magCnt}\def\fitr@setBL{0pt}%
+  \ifx\fitr@@dest\@empty
+    \def\fitr@namedDest{fitrDestn\the\value{magCnt}}\else
+    \edef\fitr@namedDest{\fitr@@dest}\fi
+  \ifx\fitr@istar\ef@One\def\fitr@@refPt{b}\fi
 %    \end{macrocode}
 % If the user specifies the \texttt{link} option, we cancel the \texttt{button} option.
 %    \begin{macrocode}
-    \ifx\fitr@@link\@empty\else\KV@fitr@buttonfalse\fi
+  \ifx\fitr@@link\@empty\else\KV@fitr@buttonfalse\fi
 %    \end{macrocode}
 % If content is explicitly passed in the optional second parameter
 % we put it in a box and take its measurements. We'll insert the content
 % instead of an empty filled \cs{parbox}.
 %    \begin{macrocode}
-    \if\fitr@istar1%
-        \edef\fitr@@width{\the\wd\collectedbox}%
-        \edef\fitr@setBL{\the\dp\collectedbox}%
-        \setlength{\fitr@length}{\ht\collectedbox+\dp\collectedbox}%
-        \edef\fitr@@height{\the\fitr@length}%
-    \fi
+  \ifx\fitr@istar\ef@One
+    \edef\fitr@@width{\the\wd\collectedbox}%
+    \edef\fitr@setBL{\the\dp\collectedbox}%
+    \setlength{\fitr@length}{\ht\collectedbox+\dp\collectedbox}%
+    \edef\fitr@@height{\the\fitr@length}%
+  \fi
 %    \end{macrocode}
 % Now, we fit the content into \cs{fitr@bbox} using \cs{get@fitr@dimen}.
 %    \begin{macrocode}
-    \ifx\fitr@@link\@empty
-        \ifKV@fitr@button\let\fitr@FLB@ction\fitr@OverlayJmpBtn\else
+  \ifx\fitr@@link\@empty
+    \ifKV@fitr@button\let\fitr@FLB@ction\fitr@OverlayJmpBtn\else
 %    \end{macrocode}
 % \cs{Bbox} is defined in \textsf{eforms}.
 %    \begin{macrocode}
-        \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
-        {\let\fitr@FLB@ction\ef@Bbox}\fi
+    \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
+      {\let\fitr@FLB@ction\ef@Bbox}\fi
     \else\def\fitr@FLB@ction{\hfill\vfill\@gobbletwo}\fi
 %    \end{macrocode}
 % And overlay the button/link/box
 %    \begin{macrocode}
-    \get@fitr@dimen{%
-        \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
-        {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}%
-    }%
+  \get@fitr@dimen{%
+    \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
+    {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}}%
 %    \end{macrocode}
 % Now place the button/box according to the user's options.
 %    \begin{macrocode}
-    \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
-        \raisebox{\fitr@@lift-\fitr@setBL}{%
-        \ifKV@fitr@nodest\else\setFitRDest{\fitr@@adddestw}%
-            {\fitr@@adddesth}{\fitr@namedDest}\fi
-        \unhbox\fitr@bbox\ifKV@fitr@nodest\else\fitr@urxury@fixup
-        {\fitr@@adddestw}{\fitr@@adddesth}{\fitr@namedDest}\fi
-    }}}%
-    \setlength{\fboxsep}{0pt}%
+  \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
+    \raisebox{\fitr@@lift-\fitr@setBL}{%
+    \ifKV@fitr@nodest\else\setFitRDest{\fitr@@adddestw}%
+      {\fitr@@adddesth}{\fitr@namedDest}\fi
+    \unhbox\fitr@bbox\ifKV@fitr@nodest\else\fitr@urxury@fixup
+      {\fitr@@adddestw}{\fitr@@adddesth}{\fitr@namedDest}\fi
+  }}}%
+  \setlength{\fboxsep}{0pt}%
 %    \end{macrocode}
 % We attempt to represent the bounding box of the view window.
 % We display the bounding view window only if the \texttt{nodest}
 % option was not taken, and the \cs{ifviewMagWin} is true.
 %    \begin{macrocode}
-    \ifKV@fitr@nodest\else\ifviewMagWin
-        \fitr@length=\fitr@@adddestw bp
-        \fitr@length=2\fitr@length
-        \addtolength{\fitr@length}{\fitr@@width}%
-        \edef\fitr@@width{\the\fitr@length}%
-        \fitr@length=\fitr@@adddesth bp
-        \fitr@length=2\fitr@length
-        \addtolength{\fitr@length}{\fitr@@height}%
-        \edef\fitr@@height{\the\fitr@length}%
-        \setlength\fitr@length{-\fitr@@adddestw bp}%
-        \addtolength\fitr@length{\fitr@@shift}%
-        \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
-            \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
-            \if\fitr@@refPt b%
-              \addtolength\fitr@length{-\fitr@@adddesth bp}\else
-            \if\fitr@@refPt t%
-              \addtolength\fitr@length{\fitr@@adddesth bp}%
-            \fi\fi
-            \raisebox{\fitr@length}%
-            {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
-            {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
-        }%
-    \fi\fi
+  \ifKV@fitr@nodest\else\ifviewMagWin
+    \fitr@length=\fitr@@adddestw bp
+    \fitr@length=2\fitr@length
+    \addtolength{\fitr@length}{\fitr@@width}%
+    \edef\fitr@@width{\the\fitr@length}%
+    \fitr@length=\fitr@@adddesth bp
+    \fitr@length=2\fitr@length
+    \addtolength{\fitr@length}{\fitr@@height}%
+    \edef\fitr@@height{\the\fitr@length}%
+    \setlength\fitr@length{-\fitr@@adddestw bp}%
+    \addtolength\fitr@length{\fitr@@shift}%
+    \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
+      \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
+      \if\fitr@@refPt b%
+        \addtolength\fitr@length{-\fitr@@adddesth bp}\else
+      \if\fitr@@refPt t%
+        \addtolength\fitr@length{\fitr@@adddesth bp}%
+      \fi\fi
+      \raisebox{\fitr@length}%
+      {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
+      {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
+    }%
+  \fi\fi
 %    \end{macrocode}
 % If the user passes content through the optional first parameter, we
 % typeset it to the right of the material above (which did not change
 % the position of the current point.
 %    \begin{macrocode}
-    \if\fitr@@link0\let\fitr@FLB@ction\fitr@OverlayJmpLnk\else
-    \if\fitr@@link1\let\fitr@FLB@ction\fitr@OverlayRestoreLnk\else
-    \let\fitr@FLB@ction\relax\let\fitr@bcode\relax\fi\fi
-    \if\fitr@istar1\gdef\fitr@next{\fitr@FLB@ction{\BOXCONTENT}}\else
-    \let\fitr@next\relax\fi\fitr@next
-    \endgroup}
+  \if\fitr@@link\ef@Zero
+    \let\fitr@FLB@ction\fitr@OverlayJmpLnk\else
+  \if\fitr@@link\ef@One
+    \let\fitr@FLB@ction\fitr@OverlayRestoreLnk\else
+  \let\fitr@FLB@ction\relax\let\fitr@bcode\relax\fi\fi
+  \ifx\fitr@istar\ef@One
+    \gdef\fitr@next{\fitr@FLB@ction{\BOXCONTENT}}\else
+  \let\fitr@next\relax\fi\fitr@next
+  \endgroup}
 %    \end{macrocode}
 % The code for the \textbf{\textsf{FitR}} destination.
 %    \begin{macrocode}
 \def\setFitRDest#1#2#3{%
-    \if@fitr@dvipdfm
-        \FitRbboxB{#1}{#2}{#3}%
-    \else
-    \ifx\fitr@driver\fitr@pdftex@driver
-        \FitRbboxB{#1}{#2}%
+  \if@fitr@dvipdfm
+    \FitRbboxB{#1}{#2}{#3}%
+  \else
+    \ifpdf
+      \FitRbboxB{#1}{#2}%
 %    \end{macrocode}
 % We shift the rectangle \texttt{\#1bp} to the left without changing
 % the current point. Then use the \textsf{pdftex} primitive \cs{pdfdest}.
 %    \begin{macrocode}
-        \makebox[0pt][l]{\hspace*{-#1bp}%
-            \pdfdest name {#3} fitr
-            width  \fitr@pdftex@view@width\space
-            height \fitr@pdftex@view@height\space
-            depth  \fitr@pdftex@view@depth\space
-        }%
+      \makebox[0pt][l]{\hspace*{-#1bp}%
+        \pdfdest name {#3} fitr
+        width  \fitr@pdftex@view@width\space
+        height \fitr@pdftex@view@height\space
+        depth  \fitr@pdftex@view@depth\space
+      }%
 %    \end{macrocode}
 % The \textbf{PostScript} code for the \textbf{\textsf{FitR}} destination, for the
 % case of \texttt{dvips} and \texttt{dvipsone}.
 %    \begin{macrocode}
     \else\literalps@out{%
         [ /Dest/#3/View [ /FitR \FitRbboxB{#1}{#2} ]/DEST pdfmark}%
-    \fi\fi
+  \fi\fi
 }
 %    \end{macrocode}
 %     \paragraph*{Form fields.} The \textsf{eforms} package allows for what is
 %     called presets. We gather some useful options in one group, and pass them
 %     all together. \DescribeMacro{\overlayPresets}\cmd{\overlayPresets} sets
 %     some defaults for the push button that surrounding the content.
+%     The \DescribeMacro\restoreOverlayPresets\cmd{\restoreOverlayPresets} restores
+%     the default definition for \cs{overlayPresets}.
+%    \changes{v1.3.1}{2020/07/06}{Added \string\cs{restoreOverlayPresets}}
 %    \begin{macrocode}
 \newcommand{\overlayPresets}{\H{I}\BG{}\BC{}\S{S}}
+\newcommand{\restoreOverlayPresets}{%
+  \def\overlayPresets{\H{I}\BG{}\BC{}\S{S}}}
 %    \end{macrocode}
 %     The \cs{fitr@OverlayJmpBtn} is a \cs{pushButton} that is used internally.
-%     It calls document JavaScript \texttt{overlayJmpBtnAction()} for a mouse
+%     It calls document JavaScript \texttt{pbJmpBtnAction()} for a mouse
 %     up action.
 %    \begin{macrocode}
 \def\fitr@OverlayJmpBtn#1#2{%
-    \ifx\fitr@allowFX\@empty
-        \def\allowFXcode{bAllowFX=\allowFXDefault}\else
-        \def\allowFXcode{bAllowFX=\fitr@allowFX}\fi
-    \pushButton[\presets{\overlayPresets}\F{-\FPrint}\autoCenter{n}
-    \A{\JS{\allowFXcode;\r overlayJmpBtnAction(%
-event,"\fitr@namedDest","\fitr@namedDest");}}]{\fitr@namedDest}{#1}{#2}}
+  \ifx\fitr@allowFX\@empty
+    \def\allowFXcode{bAllowFX=\allowFXDefault}\else
+    \def\allowFXcode{bAllowFX=\fitr@allowFX}\fi
+  \pushButton[\presets{\overlayPresets}\F{-\FPrint}\autoCenter{n}
+  \A{\ifFRusedljs\JS{\allowFXcode;\r
+    pbJmpBtnAction(event,"\fitr@namedDest","\fitr@namedDest");}\else
+    \GoToD(\fitr@namedDest)\fi}]{\fitr@namedDest}{#1}{#2}}
 %    \end{macrocode}
 %    \begin{macrocode}
-
-\ifHy@colorlinks\def\overlayJmpLnkPresets{}\else
-    \def\overlayJmpLnkPresets{\Color{\@linkcolor}\W{1}}
+\ifHy@colorlinks\def\pbJmpLnkPresets{}\else
+  \def\pbJmpLnkPresets{\Color{\@linkcolor}\W{1}}
 \fi
-%\def\overlayJmpLnkPresets{\Color{\@linkcolor}\W{1}}\fi
 \def\fitr@OverlayJmpLnk#1{\setLink[%
-        \presets{\overlayJmpLnkPresets}
-        \A{\JS{overlayJmpLnkAction("\fitr@namedDest");}}]{#1}}
+  \presets{\pbJmpLnkPresets}
+  \A{\ifFRusedljs\JS{% dps
+    pbJmpLnkAction("\fitr@namedDest");}\else
+    \GoToD(\fitr@namedDest)\fi}]{#1}}
 \def\fitr@OverlayRestoreLnk#1{\setLink[%
-        \presets{\overlayJmpLnkPresets}
-        \A{\JS{overlayRestoreLnkAction("\fitr@namedDest");}}]{#1}}
+  \presets{\pbJmpLnkPresets}
+  \A{\ifFRusedljs\JS{% dps
+    pbRestoreLnkAction("\fitr@namedDest");}\else
+    \Named{GoBack}\fi}]{#1}}
 %    \end{macrocode}
 %
 % \section{Document JavaScript}
 % The document JavaScript for \textsf{fitr}.
 %    \begin{macrocode}
-\begin{insDLJS}[_fitrLoaded]{fitr}{JS for the fitr Package}
+\ifFRusedljs
+\begin{insDLJS*}[_fitrLoaded]{fitr}
+\begin{newsegment}{JS for the fitr Package}
 var _fitrLoaded=true;
 var restoreViewState;
 var savedRestore=false;
-var aSavedRestore=new Array();
+var oSavedRestore=new Object();
 var bAllowFX=true;
 %    \end{macrocode}
-% This is the function that the hidden overlayed button calls when the
+% \leavevmode\IndexOpt{pbJmpBtnAction}\nmpsep{(event,fname,dname)}
+% This is the function that the transparent overlay button calls when the
 % user clicks on it.
 %    \begin{macrocode}
-function overlayJmpBtnAction(event,fname,dname) {
+function pbJmpBtnAction(event,fname,dname) {
     if (event.shift) shiftRestoreView(fname,dname);
     else jumpToDest(fname,dname);
 }
+%    \end{macrocode}
+% \leavevmode\IndexOpt{shiftRestoreView}\nmpsep{(fname,dname)} The function to call
+% to restore a previously save view.
+%    \begin{macrocode}
 function shiftRestoreView(fname,dname) {
     var bRestore=restoreView(fname,dname);
 %    \end{macrocode}
-% \DescribeMacro{overlayRestoreHook} is a undefined function that the document
-% author can define to create additional code that s/he want executed following
-% the restore.
+% Try built-in store view special effects
 %    \begin{macrocode}
-    if (bAllowFX)
-        try { overlayRestoreHook(event,bRestore); } catch(e) {}
+    if (bAllowFX) try {pbRestoreHook(event,bRestore);}catch(e){}
+%    \end{macrocode}
+% \leavevmode
+% \IndexJS{pbRestoreHookCustom}\nmpsep{(fname,dname)}
+% A custom function to perform special effects on restore.
+%    \begin{macrocode}
+    if (bAllowFX) try {pbRestoreHookCustom(event,bRestore);}catch(e){}
 }
 %    \end{macrocode}
-% When the user clicks on the overlay button, \texttt{overlayJmpBtnAction()}
+% \leavevmode
+% \IndexJS{jumpToDest}\nmpsep{(fname,dname)}
+% When the user clicks on the overlay button, \texttt{pbJmpBtnAction()}
 % calls \texttt{jumpToDest}. The function stores the current state before
 % jumping.
 %    \begin{macrocode}
 function jumpToDest(fname,dname) {
-    if ( typeof aSavedRestore[fname]=="undefined")
-        aSavedRestore[fname]=[false,{}];
+    if ( typeof oSavedRestore[fname]=="undefined")
+        oSavedRestore[fname]=[false,{}];
     else {
 %    \end{macrocode}
-% If \texttt{aSavedRestore[fname][0]} is true, that means we have zoomed
+% If \texttt{oSavedRestore[fname][0]} is true, that means we have zoomed
 % into the expression, but have not zoomed out again. We'll go ahead and zoom out
 % by calling \texttt{shiftRestoreView()}, which does just that.
 %    \begin{macrocode}
-        if (aSavedRestore[fname][0]) {
+        if (oSavedRestore[fname][0]) {
             shiftRestoreView(fname,dname)
 %    \end{macrocode}
 % When restoring, we return from this call; we don't want to
@@ -728,43 +862,49 @@ function jumpToDest(fname,dname) {
             return;
         }
     }
-    if (!aSavedRestore[fname][0]){
-        aSavedRestore[fname][1]=this.viewState;
-        aSavedRestore[fname][0]=true;
+    if (!oSavedRestore[fname][0]){
+        oSavedRestore[fname][1]=this.viewState;
+        oSavedRestore[fname][0]=true;
     }
 %    \end{macrocode}
 % Jump to the named destination.
 %    \begin{macrocode}
     this.gotoNamedDest(dname);
 %    \end{macrocode}
-% \DescribeMacro{overlayJmpHook} is a undefined function that the document
-% author can define to create additional code that s/he want executed following
-% the jump.
+% Try the built-in zoom-in special effects.
 %    \begin{macrocode}
-    if (bAllowFX) try { overlayJmpHook(event); } catch(e) {}
+    if (bAllowFX) try { pbJmpHook(event); }catch(e){}
+%    \end{macrocode}
+% \leavevmode\IndexJS{pbJmpHookCustom}\nmpsep{(event)} is a custom function that
+% is executed as part of the zoom-in action.
+%    \begin{macrocode}
+    if (bAllowFX) try { pbJmpHookCustom(event); }catch(e){}
 }
 %    \end{macrocode}
-% When the user shift-clicks on the overlay button, \texttt{overlayJmpBtnAction()}
+% \leavevmode\IndexJS{restoreView}\nmpsep{(fname,dname)}
+% When the user shift-clicks on the overlay button, \texttt{pbJmpBtnAction()}
 % calls \texttt{restoreView}. This function restores the view before the user
 % magnified the view.
 %    \begin{macrocode}
 function restoreView(fname,dname) {
-    if ( typeof aSavedRestore[fname]=="undefined")
-        aSavedRestore[fname]=[false,{}];
-    if ( aSavedRestore[fname][0]){
-        this.viewState=aSavedRestore[fname][1];
-        aSavedRestore[fname][0]=false;
+    if ( typeof oSavedRestore[fname]=="undefined")
+        oSavedRestore[fname]=[false,{}];
+    if ( oSavedRestore[fname][0] ) {
+        this.viewState=oSavedRestore[fname][1];
+        oSavedRestore[fname][0]=false;
         return true;
     }
     else return false;
 }
 %    \end{macrocode}
-% \texttt{overlayJmpLnkAction()} is used when the \texttt{link=jmp} key-value pair is
-% specified. A link does not have a name, so we don't use an array of
+% \leavevmode\IndexJS{pbJmpLnkAction}\nmpsep{(\ameta{dname})}
+% is used when the \texttt{link=jmp} key-value pair is
+% specified. We jump to the named destination \ameta{dname}.
+% A link does not have a name, so we don't use an array of
 % stored view state as we do for push buttons. We use a single variable
 % for all links.
 %    \begin{macrocode}
-function overlayJmpLnkAction(dname) {
+function pbJmpLnkAction(dname) {
     if (!savedRestore){
         restoreViewState=this.viewState;
         savedRestore=true;
@@ -772,16 +912,89 @@ function overlayJmpLnkAction(dname) {
     this.gotoNamedDest(dname);
 }
 %    \end{macrocode}
-% \texttt{overlayRestoreLnkAction()} is used when the \texttt{link=restore} key-value pair is
+% \leavevmode\IndexJS{pbRestoreLnkAction}\nmpsep{(\ameta{dname})}
+% is used when the \texttt{link=restore} key-value pair is
 % specified. We restore the previously saved view state.
 %    \begin{macrocode}
-function overlayRestoreLnkAction(dname) {
+function pbRestoreLnkAction(dname) {
     if (savedRestore){
         this.viewState=restoreViewState;
         savedRestore=false;
     }
 }
-\end{insDLJS}
+\end{newsegment}
+\ifFRblinkonjmp
+%    \end{macrocode}
+% This script hooks into the DLJS of fitr to blink the field
+% border when the user clicks in it. Length of the blink
+% is 1250 milli-seconds.
+%    \begin{macrocode}
+\begin{newsegment}{Blink border after jump}
+%    \end{macrocode}
+% \leavevmode\IndexJS{pbJmpHook}\nmpsep{(event)}
+% blinks the border of an pb push button just after the jmp to
+% focus in on a rectangular region.
+%    \begin{macrocode}
+function pbJmpHook(event) {
+    toggleBC.field=event.target;
+    toggleBC.startColor=event.target.strokeColor;
+    toggleBC.altColor=%
+(color.equal(toggleBC.startColor,color.transparent))?%
+color.red:color.transparent;
+    oSIJ=app.setInterval("toggleBC();",250);
+    oTOJ=app.setTimeOut("app.clearInterval(oSIJ); resetBC();",1250);
+}
+if (typeof toggleBC != "function" ) {
+    function toggleBC() {
+        var oField=toggleBC.field;
+        oField.strokeColor=%
+(color.equal(oField.strokeColor,toggleBC.startColor))?%
+toggleBC.altColor:toggleBC.startColor;
+    }
+    function resetBC() {
+        toggleBC.field.strokeColor=toggleBC.startColor;
+    }
+}
+\end{newsegment}
+\fi % \ifFRblinkonjmp
+\ifFRblinkonrestore
+%    \end{macrocode}
+% This script hooks into the DLJS of fitr to blink the field
+% border when the user clicks in it. Length of the blink
+% is 1250 milli-seconds.
+%    \begin{macrocode}
+\begin{newsegment}{Blink border on restore}
+%    \end{macrocode}
+% \leavevmode\IndexJS{pbRestoreHook}\nmpsep{(event,bRestore)}
+% Supplies special effects on restore: \texttt{event} is the event object
+% that called this function; \texttt{bRestore} is a Boolean switch, it is
+% true when we are restoring, and false when we are not.
+%    \begin{macrocode}
+function pbRestoreHook(event,bRestore) {
+    if (!bRestore) return;
+    toggleBC.field=event.target;
+    toggleBC.startColor=event.target.strokeColor;
+    toggleBC.altColor=%
+(color.equal(toggleBC.startColor,color.transparent))?%
+color.red:color.transparent;
+    oSIR=app.setInterval("toggleBC();",250);
+    oTOR=app.setTimeOut("app.clearInterval(oSIR); resetBC();",1250);
+}
+if (typeof toggleBC != "function" ) {
+    function toggleBC() {
+        var oField=toggleBC.field;
+        oField.strokeColor=%
+(color.equal(oField.strokeColor,toggleBC.startColor))?%
+toggleBC.altColor:toggleBC.startColor;
+    }
+    function resetBC() {
+        toggleBC.field.strokeColor=toggleBC.startColor;
+    }
+}
+\end{newsegment}
+\fi % \ifFRblinkonrestore
+\end{insDLJS*}
+\fi % \ifFRusedljs
 %    \end{macrocode}
 %    \begin{macrocode}
 %</package>

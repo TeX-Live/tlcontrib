@@ -35,6 +35,7 @@ $special{'pmdb'}        = '&MAKEdps';
 $special{'thorshammer'} = '&MAKEdps';
 $special{'richtext'}    = '&MAKEdps';
 $special{'thorshammer'} = '&MAKEdps';
+$special{'fitr'}        = '&MAKEdps';
 
 
 sub MAKEdps {

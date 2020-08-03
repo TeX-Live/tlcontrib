@@ -1,0 +1,675 @@
+% makeindex < aebpro_man.idx > aebpro_man.ind
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,tight*,usetemplates,
+        forcolorpaper,latextoc,pro},%usesf,
+        eforms,aebxmp
+]{aeb_pro}
+%\usepackage{multicol}
+\usepackage{aeb_mlink}
+\usepackage[usepopup]{ltx4yt}
+\usepackage{array}
+\usepackage[altbullet]{lucidbry}
+
+\usepackage{makeidx}
+\makeindex
+\usepackage{acroman}
+
+\leftmargini\parindent
+
+
+\usepackage[active]{srcltx}
+
+\urlstyle{rm}
+\let\tops\texorpdfstring
+\let\pkg\textsf
+\let\app\textsf
+\let\opt\texttt
+\let\uif\textsf
+\let\env\texttt
+\def\meta#1{\textit{\texttt{#1}}}
+\def\ameta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\newdimen\aebdimen \aebdimen6pt %\partopsep  \advance\aebdimen\partopsep
+\newcommand\bVerb[1][]{\begingroup#1\vskip\aebdimen\parindent0pt}%
+\def\eVerb{\vskip\aebdimen\endgroup\noindent}
+\def\SUB#1{\ensuremath{{}_{\text{#1}}}}
+\def\darg#1{\texttt{\{#1\}}}
+\def\takeMeasure{\bgroup\obeyspaces\takeMeasurei}
+\def\takeMeasurei#1{\global\setbox\webtempboxi\hbox{\ttfamily#1}\egroup}
+\def\bxSize{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\let\amtIndent\leftmargini
+\makeatletter
+\def\setDisplayNumber#1#2{\kern0pt
+    \setlength\abovedisplayshortskip{0pt}%
+    \setlength\belowdisplayshortskip{0pt}%
+    \setlength\abovedisplayskip{0pt}%
+    \setlength\belowdisplayskip{0pt}%
+    \begin{equation}\label{#2}\end{equation}\kern0pt
+}
+\renewenvironment{quote}[1][]
+   {\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
+    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \item\relax}
+   {\endlist}
+\renewcommand*\descriptionlabel[1]{\hspace\labelsep
+    \normalfont #1}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{5}
+\renewcommand*{\theparagraph}{\texorpdfstring{\protect\P\protect\ }{\textparagraph}}
+\renewcommand{\paragraph}
+    {\renewcommand{\@seccntformat}[1]{\theparagraph}%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}} %\color{\aeb@subsubsectioncolor}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+\def\chgCurrLblName#1{\def\@currentlabelname{#1}}
+\def\echgCurrLblName#1{\edef\@currentlabelname{#1}}
+\makeatother
+
+\reversemarginpar
+\def\FmtMP#1{\marginpar{\slshape\raggedleft\small#1}}
+
+
+\newcommand{\YT}{\textsf{YouTube}}
+
+
+%\def\tutpath{doc/tutorial}
+%\def\tutpathi{tutorial}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \texorpdfstring{\textsf{ltx4yt} Package\\[1em]}{: }
+        Playing \texorpdfstring{\YT}{YouTube} Videos in the default browser},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Playing YouTube Videos in PDF},
+    talksite={\url{www.acrotex.net}},
+    version={0.7, 2020/07/30},
+    keywords={AcroTeX, PDF, YouTube, Browser},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-40pt,fontsize=large,color=aeb} %,afterskip=1sp}
+\subsectionLayout{indent=-20pt,color=aeb} %,afterskip=1sp}
+\subsubsectionLayout{indent=0pt,color=aeb} %,afterskip=1sp}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\newenvironment{eqComments}[1][\strut]{\smallskip\leftskip-\labelwidth
+\item[]\textbf{\textcolor{blue}{#1}}}{\par\smallskip}
+
+\begin{popupmenu}{YTSea}
+  \puIdTitle{J\"{u}rgen's favorite song*}{mLDF5MBMWHE}
+  \puIdTitle{\Esc"Sea Hunt\Esc" US TV series {(1958-61)} lead-in}{Lz0aMoWh8Q4}
+  \puIdTitle{Theme Song to Sea Hunt*}{2QxXk6X9GDo}
+  \puIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+\end{popupmenu}
+\ytUseMenus{YTSea}
+
+%\pagestyle{empty}
+%\parindent0pt\parskip\medskipamount
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The ltx4yt MANUAL";
+var manualfilename="Manual_BG_Print_ltx4yt.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}\label{s:intro}
+
+My beautiful package \pkg{yt4pdf} is gone, time has caught up with it: The
+Flash player is no longer in use, anywhere;\footnote{Adobe will formally
+abandon Flash Player in December 2020} \app{Google} discontinued its
+ActionScript 3.0 Player several years ago. It was \app{Acrobat} and
+\app{Google} technologies that were the foundation of the \pkg{yt4pdf}
+package.
+
+We turn over a new leaf by writing and publishing the \pkg{ltx4yt} package:
+{\LaTeX} for \YT. What \pkg{ltx4yt} does is to provide some tools for
+creating links, dropdown lists, popup menus for playing selected {\YT}
+videos in the default browser. Perfect for personal use and for academic,
+professional, or classroom presentations that refer to {\YT} content.
+
+% I believe that I was vaguely aware of the \href{http://code.google.com/apis/youtube/flash_api_reference.html}
+%{{\YT} ActionScript 3.0 Player},\footnote{The YouTube AcrionScript 2.0 Player API
+% has been deprecated as of January 27, 2015; however, it is still supported, for now.} but never pursued it because of my
+%general lack of interest in {\YT} (\url{www.youtube.com}). Recently, I
+%came across a very nice demo PDF that used the API, see
+%%\mlhref{http://www.uvsar.com/pdftube/}{PDF Tube - {\YT} API wrapper for PDF documents}.
+%``PDF Tube - {\YT} API wrapper for PDF documents'' (the page has
+%since been removed).
+%The SWF file and JavaScript are made freely available, so I
+%downloaded it, and was sufficiently impressed to port the example to
+%{\LaTeX} using various members of the {Acro\negthinspace\TeX} Fine Family of Software
+%\verb!:-{)!. The SWF file and JavaScript are due to the good folks at
+%\textbf{UVSAR} (\url{www.uvsar.com}). The \textbf{UVSAR}'s sample demo also appeared in the forums of
+%the \href{http://acrobatusers.com/forum/javascript/embed-youtube-video-pdf}{Acrobat User
+%Community}.
+
+%The \textsf{ltx4yt} package uses the \textsf{rmannot} to embed the \textsf{SWF}
+%file that plays the {\YT} videos.  There is a complete set of buttons
+%that come with the package to control the video: play, pause, stop
+%loading, rewind, load a video by its {\YT} video ID, and a button to
+%view a video on the {\YT} web site.\footnote{Some videos do not allow
+%embedded playback, and must be viewed on the {\YT} web site.}
+
+% http://acrobatusers.com/news/youtube-widget-acrobat
+
+\subsection{Sample files}
+
+The following are the sample files shipped with \textsf{ltx4yt}:
+\begin{itemize}
+    \item \texttt{ltx4yt-1.tex} demonstrates links created by \cs{ytvId}
+        and \cs{ytLink}. Such links created in a PDF are pretty much
+        functional for all PDF viewers, including the native PDF viewers of
+        all the modern browsers, and PDF viewers on other devices such as
+        \app{Android} and \app{iPhones}.
+
+    \item \texttt{ltx4yt-2.tex} demonstrates the PDF forms controls related
+        methods of selecting a video to watch. The command pair
+        \cs{ytComboList} and \cs{ytComboBtn} provide support for creating a
+        dropdown list (combo box) for selecting a video by title, the push
+        button takes the selection and passes it to {\YT} for display
+        in the default browser. The sample also includes a popup menu for
+        selecting video by title. Finally, there is a query field in enter
+        query text and to search {\YT} for all related titles.
+
+        This file (\texttt{ltx4yt-2.pdf}) performs as designed in
+        \app{Acrobat}, \app{Adobe Reader DC}, and \app{PDFX-Change Editor},
+        and \emph{will not} be functional in native PDF viewers of
+        browsers. \texttt{ltx4yt-2.pdf} will have no functionality in PDF
+        viewers on hand-held devices such as smart phones or tablets.
+\end{itemize}
+% Advanced examples \href{http://www.math.uakron.edu/~dpstory/aebblog.html}{AeB Blog site}.
+
+\section{Options, Requirements, and Workflows}
+
+\paragraph*{Options.} Currently, this package has two options: \opt{usepopup}\FmtMP{\opt{usepopup}
+option} and \opt{!usepopup}. When \opt{usepopup} is taken, additional
+commands are defined and supporting document Java\-Script is embedded in the
+PDF. See \hyperref[upu]{Section~\ref*{upu}} on page~\pageref*{upu} for details on using popups in the document. The
+\opt{!usepopup} is a convenience option that turns off the \opt{usepopup}
+option. The default is to not use popups in the document (\opt{!usepopup}).
+
+\paragraph*{Requirements.}
+This package requires the \pkg{eforms} package, which is part of \pkg{acrotex}.\footnote{\url{http://www.ctan/pkg/acrotex}}
+If the option \opt{usepopup}, the package \opt{popupmenu} is also input.\footnote{\url{http://www.ctan/pkg/popupmenu}}
+
+\paragraph*{Workflows.} This is a general {\LaTeX} package, any workflows can be used to build
+a \pkg{ltx4yt} document: \app{pdflatex}, \app{lualatex}, \app{xelatex}, or
+\app{dvips\,->\,distiller}.\footnote {\app{dvips\,->\,ps2pdf} can be used if
+only links are used to reference {\YT} videos and the \opt{!usepopup} option
+is in force (no document JavaScript).}
+
+\section{Basic Methods: Playing a {\YT} video using its Video ID}
+
+There are three methods of playing a {\YT} video based on its video ID:
+\begin{itemize}
+    \item \textbf{Using links}
+    \item \textbf{Using dropdown lists}
+    \item \textbf{Using a popup menu}
+\end{itemize}
+In each of the subsequent sections, we discuss each of these methods in turn.
+
+\subsection{Basic Methods: Links with \tops{\protect\cs}{\textbackslash}{ytvId}}
+
+\textbf{Demo files.} The techniques of this section are illustrated by the two files
+\texttt{examples/\allowbreak ltx4yt-1.tex} and \texttt{examples/web-pkg/ltx4yt-w1.tex}.
+
+\newtopic\noindent
+The underlying command that creates links is the \pkg{eforms} command \cs{setLink},
+this command is not seen, but is part of all link commands in this section.
+
+To create a link that references a {\YT} video from its video ID, use the \cs{ytvId} command.
+\bVerb\takeMeasure{\string\ytvId*[\ameta{KV-pairs}]\darg{\ameta{ytvID}}\darg{\ameta{text}}}%
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}% *[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytvId*[!ameta(KV-pairs)]{!ameta(ytvID)}{!ameta(text)}
+\ytvIdPresets{!ameta(KV-pairs)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:ytvId}
+\end{minipage}\end{minipage}\endgroup
+\PD Use the optional asterisk (\texttt*) when the referenced video
+\emph{cannot be embedded}; \emph{not specifying} the asterisk means the video
+\emph{can be embedded}. \textbf{Embedding is the best way of viewing a video.} The \ameta{KV-pairs} are key-value pairs recognized by the
+underlying \cs{setLinks} command. The \ameta{ytvID} is the {\YT} video ID of
+the video to be played in the default browser. Finally, \ameta{text} is the
+text around of which the link is constructed.
+
+\paragraph*{The \cs{ytvIdPresets} command}
+is a convenient way of setting the link options \emph{uniformly} for all
+links created by \cs{ytvId}. Individual \ameta{KV-pairs} passed though the
+optional argument of \cs{ytvId} will override the preset values. Its default
+definition is,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\ytvIdPresets{\linktxtcolor{webbrown}}
+\end{Verbatim}
+This sets the color of the link to a brown color, which is why the links of
+this document are brown.
+
+\paragraph*{An example.} There are two ``Kung-Fu Fighting'' videos of interest: \texttt{GZ9e3Dy7obA} and
+\texttt{jhUkGIsKvn0}; we set up likes for the first and twice for the second:
+\begin{quote}
+    \ytvId{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}\\
+    \verb~\ytvId{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}~\\[3pt]
+    \ytvId{jhUkGIsKvn0}{Kung-Fu Fighting (Carl Douglas)}\\
+    \verb~\ytvId{jhUkGIsKvn0}{Kung-Fu Fighting (Carl Douglas)}~\\[3pt]
+    \ytvId*{jhUkGIsKvn0}{Kung-Fu Fighting* (Carl Douglas)}\\
+    \verb~\ytvId*{jhUkGIsKvn0}{Kung-Fu Fighting* (Carl Douglas)}~
+\end{quote}
+The first link works fine, just the video and nothing else. The second one
+does not, the video poster is loaded, but when you play the video, the
+response is \textsf{Video unavailable}. The third link works fine now. The
+problem here is that the second video cannot be embedded; we have to use the
+\texttt*-option to create a different link, one that goes to the full {\YT}
+web site to see one or more advertisements before the video is allowed to be
+played, additionally, there are numerous extraneous content everywhere on the
+page. When a video \emph{can be embedded}, you get a very clean video
+experience, free of advertisements and extraneous content; \emph{this is the
+best case}. Try using the first link again to enjoy the experience.
+
+There is a multi-line version of \cs{ytvId},
+\bVerb\takeMeasure{\string\ytvIdML*[\ameta{KV-pairs}]\darg{\ameta{ytvID}}\darg{\ameta{text}}}%
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}% *[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytvIdML*[!ameta(KV-pairs)]{!ameta(ytvID)}{!ameta(text)}
+\ytvIdPresets{!ameta(KV-pairs)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:ytvIdML}
+\end{minipage}\end{minipage}\eVerb This form, which requires \pkg{aeb\_mlink} package and the
+\app{dvips\,->distiller}, creates true multi-line links. Here is an example:
+\ytvIdML{5y9-EVmreU4}{Lori's Corner: Episode \#1, I met her back in the year
+2000, though she probably does not remember.} The applications
+\app{pdflatex}, \app{lualatex}, and \app{xelatex} will break this link cross
+lines, but does so by creating two links. This link is a single link that
+inverts across both lines when clicked. \cs{ytvIdML} uses the same presets
+command \cs{ytIdPresets}.
+
+\subsubsection{How to get the {\YT} video ID}
+
+Go to the {\YT} web site and search for a video of interest. Once found, play, then pause
+the video. Go the browser's URL address bar and you'll see something like this:
+\begin{equation*}
+  \texttt{https://www.youtube.com/watch?v=$\underset{\text{ytvId}}{\underbrace{\texttt{dAgfnK528RA}}}$}
+\end{equation*}
+Copy the ytvId into the first argument of \cs{ytvId} and supply a title: %https://youtu.be/dAgfnK528RA
+\begin{quote}
+  \ytvId{dAgfnK528RA}{Math Antics - Order of Operations}\\
+  \verb~\ytvId{dAgfnK528RA}{Math Antics - Order of Operations}~
+\end{quote}
+Cool! You can also get the video ID by right clicking on the paused video and
+exploring the context menu presented.
+
+\subsubsection{Can the video be embedded?}
+
+I've done a little research on this question, the answer is that there is no
+way of knowing in advance. You need to test each link. In the case of video
+ID \texttt{dAgfnK528RA}, we found it, we created the link with \cs{ytvId},
+we tested it, and it worked! Had it not worked (the dreaded \textsf{Video
+unavailable} appears when you try to play the video), we simply use the
+\texttt*-option. It's just that simple.
+
+\subsection{Basic Methods: dropdown list}
+
+\textbf{Demo files.} The techniques of this section are illustrated by the two files
+\texttt{examples/\allowbreak ltx4yt-2.tex} and \texttt{examples/web-pkg/ltx4yt-w2.tex}.
+
+\newtopic\noindent A dropdown list, a combobox in Adobe's original terminology, is an Adobe form field
+that drops down to display a list of menu items. It takes up less page space,
+and may be a good choice rather than listing a number of links on the page.
+
+\paragraph*{To create a dropdown list}
+
+\begin{enumerate}
+\item
+\textbf{Create a play list.} At any point prior to the dropdown list, declare your play list:
+\bVerb\takeMeasure{\quad\string\ytIdTitle\darg{\ameta{title\SUB{n}}}\darg{\ameta{ytvId\SUB{n}}}}%
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\declarePlayList{!ameta(\plCmd)}{%
+!quad\ytIdTitle{!ameta(title!SUB1)}{!ameta(ytvId!SUB1)}
+!quad...
+!quad\ytIdTitle{!ameta(title!SUB(n))}{!ameta(ytvId!SUB(n))}
+}
+\end{Verbatim}
+\end{minipage}\eVerb If the video referenced by \ameta{ytvId} \emph{cannot be
+embedded}, then place an \FmtMP{use \texttt* in title}\texttt* in the
+\ameta{title} as a single to the underlying JavaScript that the video cannot
+be embedded.
+
+\item \textbf{Set the initial value and playlist} At any point prior to the dropdown list, set the require
+dropdown list information:
+\bVerb\takeMeasure{\string\ytPlayList\darg{\ameta{ytvId}}\darg{\ameta{\string\plCmd}}}%\plCmd
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytPlayList{!ameta(ytvId)}{!ameta(\plCmd)}
+\end{Verbatim}
+\end{minipage}\eVerb
+where \ameta{ytvId} is the video ID of the title initially displayed in the
+dropdown list, and \ameta{\string\plCmd} is a command defined earlier in a
+\cs{declarePlayList} command.
+
+\item \textbf{Place the dropdown list and accompanying \textsf{Play} button.}
+\bVerb\takeMeasure{\string\ytComboList[\ameta{KV-pairs}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}%\plCmd
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytComboList[!ameta(KV-pairs)]{!ameta(name)}{!ameta(wd)}{!ameta(ht)}
+\ytComboBtn[!ameta(KV-pairs)]{!ameta(name)}{!ameta(wd)}{!ameta(ht)}
+\end{Verbatim}
+\end{minipage}\eVerb where \ameta{name} is a text string of ASCII letters and numbers. The \ameta{name} is appended
+on to the field names of these two field; The pair \cs{ytComboList} and
+\cs{ytComboBtn} must be passed the same \ameta{name} value. The common
+\ameta{name} ties them together.
+\end{enumerate}
+Below is an abbreviated example, more extensive examples are found in the demo files sited at the beginning of this section.
+
+\declarePlayList{\playList}{% note: put parentheses within braces
+  \ytIdTitle{Kung-Fu Fighting {(Bruce Lee)}}{GZ9e3Dy7obA}
+  \ytIdTitle{Kung-Fu Fighting* {(Carl Douglas)}}{jhUkGIsKvn0}
+  \ytIdTitle{J\"{u}rgen's "favorite" song*}{mLDF5MBMWHE}
+  \ytIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+}
+\ytPlayList{GZ9e3Dy7obA}{\playList}
+
+\paragraph*{Example} A four-item dropdown list: \ytComboList{YT1}{144bp}{11bp}\olBdry\ytComboBtn{YT1}{33bp}{11bp}
+
+\newtopic\noindent The verbatim listing is,\bVerb
+\def\1{\llap{\rlap{\ding{182}}\hskip\amtIndent\relax}}\relax
+\def\2{\llap{\rlap{\ding{183}}\hskip\amtIndent\relax}}\relax
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\declarePlayList{\playList}{% note: put parentheses within braces
+!quad\ytIdTitle{Kung-Fu Fighting {(Bruce Lee)}}{GZ9e3Dy7obA}
+!quad\ytIdTitle{Kung-Fu Fighting* {(Carl Douglas)}}{jhUkGIsKvn0}
+!1!quad\ytIdTitle{J\"{u}rgen's "favorite" song*}{mLDF5MBMWHE}
+!2!quad\ytIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+}
+\ytPlayList{GZ9e3Dy7obA}{\playList}
+\paragraph*{Example} A two-item dropdown list:
+  \ytComboList{YT1}{144bp}{11bp}\olBdry\ytComboBtn{YT1}{33bp}{11bp}
+\end{Verbatim}
+\endgroup\noindent There are a several observations to make in this markup: line~\ding{182}
+uses standard {\LaTeX} markup to describe the u-umlaut, the double quote
+requires no special attention; line~\ding{183} the backslash can be expressed
+as \cs{cs\darg{\ameta{text}}}. Also note that two of the titles have an
+\texttt* in them, this signals that these videos cannot be embedded.
+
+\subsection{Basic Methods: popup menus}\label{upu}
+
+\textbf{Demo files.} The techniques of this section are illustrated by the two files
+\texttt{examples/\allowbreak ltx4yt-2.tex} and \texttt{examples/web-pkg/ltx4yt-w2.tex}.
+
+\newtopic\noindent A pop-up menu is a menu list that appears on top of the content of the page, it is generated
+by the JavaScript method \texttt{app.popUpMenuEx()}. The advantage of this
+method is that it take up no space on the page, it is displayed on top of the
+page and is dismissed when an item from the menu list is chosen.
+
+\goodbreak
+\newtopic\noindent\textbf{To create a pop-up menu}
+\begin{enumerate}
+    \item \textbf{Build a menu listing.} Use the \env{popupmenu} environment of
+        the \pkg{popumemnu} package to build/design your menu.
+\bVerb\takeMeasure{\string\begin\darg{submenu}\darg{title=\ameta{submenu-name\SUB{1}}}}%
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\begin{popupmenu}{!ameta(menu-name)}
+\puIdTitle{!ameta(title!SUB1)}{!ameta(ytvId!SUB1)}
+...
+\puIdTitle{!ameta(title!SUB(m))}{!ameta(ytvId!SUB(m))}
+\begin{submenu}{title=!ameta(submenu-name!SUB1)}
+!quad\puIdTitle{!ameta(title!SUB(m+1))}{!ameta(ytvId!SUB(m+1))}
+!quad..
+!quad\puIdTitle{!ameta(title!SUB(m+n))}{!ameta(ytvId!SUB(m+n))}
+\end{submenu}
+...
+\end{popupmenu}
+\end{Verbatim}
+\end{minipage}\eVerb
+You need not have a \env{submenu} structure, but \env{submenu}s are useful for organizing the links.
+The first argument of \cs{puIdTitle} is passed through \cs{pdfstringdef}, this enables you to use
+{\LaTeX} markups for accents, for example. If the second argument (\ameta{ytvId}) is empty, then
+that entry has no action associated with it, and can be used as a menu heading.
+
+\item \textbf{Create the menu data.} Following all \env{popupmenu}
+    environments, yet still in the preamble\FmtMP{preamble},  insert the
+    following command:
+\bVerb\takeMeasure{\string\ytUseMenus\darg{\ameta{menu-name\SUB{1}},...,\ameta{menu-name\SUB{k}}}}%
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytUseMenus{!ameta(menu-name!SUB1),...,!ameta(menu-name!SUB(k))}
+...
+!color(gray)\begin{document}
+\end{Verbatim}
+\end{minipage}\eVerb The argument of \cs{ytUseMenus} is a comma-delimited list
+of \ameta{menu-name}s declared as the first argument of \env{popupmenu}
+environments.
+
+\item \textbf{Place the \cs{ytPopupBtn} command.}
+\bVerb\takeMeasure{\string\ytPopupBtn[\ameta{KV-pairs}]\darg{\ameta{menu-name}\darg{\ameta{wd}}\darg{\ameta{ht}}}}%
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytPopupPresets{!ameta(KV-pairs)}
+\ytPopupBtn[!ameta(KV-pairs)]{!ameta(menu-name)}{!ameta(wd)}{!ameta(ht)}
+\end{Verbatim}
+\end{minipage}\eVerb Employ \cs{ytPopupPresets} as a way to pass \ameta{KV-pairs} to all
+\cs{ytPopupBtn} commands in the document. For an individual \cs{ytPopupBtn}
+command, its \ameta{KV-pairs} argument passes key-values to that
+\cs{ytPopupBtn}, these \ameta{KV-pairs} will override the ones of
+\cs{ytPopupPresets}. The second argument, \ameta{menu-name}, is name of the
+pop-up menu data you want to use. This menu data is created earlier in the
+preamble by the \env{popumenu} environment and referenced again in the argument
+of \cs{ytUseMenus}.
+\end{enumerate}
+
+\paragraph*{Example.} \ytPopupBtn[\CA{Sea Hunt}]{YTSea}{20bp}{5bp}
+Let's create a short pop-up menu, more extensive examples are found
+in \texttt{examples/\allowbreak ltx4yt-2.tex} and \texttt{examples/web-pkg/ltx4yt-w2.tex}.
+\bVerb\def\1{\llap{\rlap{\ding{182}}\hskip\amtIndent\relax}}\relax
+\def\2{\llap{\rlap{\ding{183}}\hskip\amtIndent\relax}}\relax
+\def\3{\llap{\rlap{\ding{184}}\hskip\amtIndent\relax}}\relax
+\def\4{\llap{\rlap{\ding{185}}\hskip\amtIndent\relax}}\relax
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\begin{popupmenu}{YTSea}
+!1!quad\puIdTitle{J\"{u}rgen's favorite song*}{mLDF5MBMWHE}
+!2!quad\puIdTitle{\Esc"Sea Hunt\Esc"
+!qquad~US TV series {(1958-61)} lead-in}{Lz0aMoWh8Q4}@
+!quad\puIdTitle{Theme Song to Sea Hunt*}{2QxXk6X9GDo}
+!3!quad\puIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+\end{popupmenu}
+!4\ytUseMenus{YTSea}
+...
+\begin{document}
+...
+...
+\paragraph*{Example.}
+\ytPopupBtn[\CA{Sea Hunt}]{YTSea}{20bp}{5bp} Let's ...
+\end{Verbatim}
+\eVerb The first argument of \cs{puIdTitle} is passed through
+\cs{pdfstringdef}, this enables you to use {\LaTeX} markup on accents, as in
+\ding{182}. In line \ding{183}, a special locally defined command \cs{Esc} is
+used to ``escape'' the double quotes so that we \verb~\"~ to appear in the
+document JavaScript, which is where the menu items appear within the PDF. In
+line~\ding{184} a special locally defined command \cs{cs} is used to create a
+backslash, in a manner similar to {\LaTeX} markup. Note the presence of the
+\FmtMP{\texttt{*} noted}\texttt{*} in the title of two of the menu items;
+this is used to signal to the underlying JavaScript that the title cannot be
+embedded. Finally, we the \env{popupmenu} environment, we declare, in line~\ding{185},
+that we are using the menu named \texttt{YTSea}.
+
+\newlength\ytlength
+
+\section{Advanced Methods: Playing video with \tops{\protect\cs}{\textbackslash}{ytLink}}
+
+The link earlier discussed is \cs{ytvId}, which takes as its first argument
+the video ID of the targeted video. It then constructs a URL one way or
+another, depending on the presence of the \texttt*-option. This method is
+pretty rigid, one size fits all, if you will. A more flexible method of
+constructing links is to use the \cs{ytLink} command.
+\bVerb\takeMeasure{\string\ytLink\darg{\string\embedId\darg{\ameta{ytvId}}\string\params\darg{\ameta{params}}\darg{\ameta{text}}}}%
+\setlength\ytlength{\bxSize}%
+\def\1{\rlap{\hskip\ytlength\relax\ding{182}}}%
+\def\2{\rlap{\hskip\ytlength\relax\ding{183}}}%
+\def\3{\rlap{\hskip\ytlength\relax\ding{184}}}%
+\def\4{\rlap{\hskip\ytlength\relax\ding{185}}}%
+\def\5{\rlap{\hskip\ytlength\relax\ding{186}}}%
+\def\6{\rlap{\hskip\ytlength\relax\llap{\sffamily(presets for \cs{ytvId})\hskip2\fboxsep\hskip2\fboxrule}}}%
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+!1\ytLink{\embedId{!ameta(ytvId)}\params{!ameta(params)}}{!ameta(text)}
+!2\ytLink{\watchId{!ameta(ytvId)}\params{!ameta(params)}}{!ameta(text)}
+!3\ytLink{\embed{!ameta(spec)}}{!ameta(text)}
+!4\ytLink{!ameta(spec)}{!ameta(text)}
+!5\ytLink{\channel{!ameta(name)}}{!ameta(text)}
+!5\ytLink{\user{!ameta(name)}}{!ameta(text)}
+!6\ytvIdPresets{!ameta(KV-pairs)}
+\end{Verbatim}
+\end{minipage}\eVerb Each of these has an optional first argument \ameta{KV-pairs} that is not shown above.
+Let's take a look at each of these in turn and illustrate with examples. Yes,
+{\YT} has a number of parameter is recognizes in its urls, see
+\href{https://developers.google.com/youtube/player_parameters#Parameters}{here}
+for a discussion.
+\begin{enumerate}
+  \item[\ding{182}] Use this form \emph{when you can embed} a video
+      \ameta{ytvId} with additional parameters. (this best type of video).
+      The \cs{params} argument \emph{must follow} the \cs{embedId}, its
+      arguments are any parameters you want to append to the URL. The use
+      of \cs{params} is optional; however, without \cs{params} you
+      should use \verb|\ytvId*{|\ameta{ytvID}\verb|}{|\ameta{text}\verb|}|.
+      For example, we auto play a video with modest branding:\\[3pt]
+     \ytLink{\embedId{5y9-EVmreU4}\params{autoplay=1&modestbranding=1}}{Lori's Corner: Episode \#1}\\\small
+     \verb!\ytLink{\embedId{5y9-EVmreU4}!\\
+     \null\qquad\verb!\params{autoplay=1&modestbranding=1}}{Lori's Corner: Episode \#1}!
+
+     The demo file \texttt{ltx4yt-1.tex} contains an example of this type
+     of link that sets up a small play list of three videos.
+
+  \item[\ding{183}]  Use this form \emph{when you \emph{cannot} embed} (or
+      you want to play the video on the main {\YT} site) \ameta{ytvId} with
+      additional parameters. The \cs{params} argument must follow the
+      \cs{watchId}, its argument are any parameters you want to append to
+      the URL. The use of \cs{params} is optional; however, without the
+      \cs{params} you may as well use
+      \verb|\ytvId*{|\ameta{ytvID}\verb|}{|\ameta{text}\verb|}|.
+    \\[3pt]
+    \ytLink{\watchId{5y9-EVmreU4}\params{autoplay=1}}{Lori's Corner: Episode \#1}\\
+    \verb!\ytLink{\watchId{5y9-EVmreU4}!\\
+    \null\qquad\verb!\params{autoplay=1}}{Lori's Corner: Episode \#1}!
+
+  \item[\ding{184}] A more general form that allows you to formulate general URLs. For example, we \emph{search}
+    for {\YT} videos on \app{Adobe Acrobat DC}:\\[3pt]
+    \ytLink{\embed{listType=search&list=Adobe Acrobat DC}}{Search for Adobe Acrobat DC}\\
+    \verb!\ytLink{\embed{listType=search&list=Adobe Acrobat DC}}!\\
+    \null\qquad\verb!{Search for Adobe Acrobat DC}!
+  \item[\ding{185}] The most general form, \ameta{spec} is simply appended, ie,
+  \texttt{https://www.youtube.com/\ameta{spec}}\\[3pt]
+  \ytLink{embed?listType=search&list=LaTeX typesetting}{Totally custom search link}\\
+  \verb|\ytLink{embed?listType=search&list=LaTeX typesetting}|\\
+  \null\qquad\verb|{Totally custom search link}|
+  \item[\ding{186}] There are a couple of URLs for displaying a channel on \YT, at least there are a couple
+  that I have discovered.
+  Use this form to see channel of a particular contributor to {\YT}. For example,\\[3pt]
+  \ytLink{\channel{rocketjump}}{The RocketJump Channel}\\
+  \verb|\ytLink{\channel{rocketjump}}{The RocketJump Channel}|\\[3pt]
+  \ytLink{\user{freddiew}}{Freddie Diew's Channel}\\
+  \verb|\ytLink{\user{freddiew}}{Freddie Diew's channel}|
+
+  To get the true \ameta{name} of a channel, go to {\YT} and search for that channel. For example,
+  search for \textsf{RocketJump}. On the resulting page, click on a RocketJump link and look at the
+  location bar in the browser to see the path, it may come up \texttt{c/rocketjump} or \texttt{user/freddiew}.
+\end{enumerate}
+
+\newtopic\noindent There is a multi-line version of \cs{ytLink}.
+\bVerb\takeMeasure{\string\ytLinkML*[\ameta{KV-pairs}]\darg{\ameta{spec}}\darg{\ameta{text}}}%
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}% *[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytLinkML*[!ameta(KV-pairs)]{!ameta(spec)}{!ameta(text)}
+\ytvIdPresets{!ameta(KV-pairs)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:ytLinkML}
+\end{minipage}\end{minipage}\eVerb This form, which requires \pkg{aeb\_mlink} package and the
+\app{dvips\,->distiller}, creates true multi-line links. \cs{ytLinkML} has the same variations
+of \cs{ytLink} (lines \ding{182}--\ding{186}) described earlier
+
+\section{Searching {\YT}} %\previewOn
+
+Want to interactively search {\YT} for your favorate video? Search using the commands \cs{ytInputQuery}
+and \cs{ytSearch}:
+\bVerb\takeMeasure{\string\ytInputQuery[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}}%
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\ytInputQuery[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\ytSearch[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\ytClearQuery[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\end{Verbatim}
+\end{minipage}
+\quad\ytInputQuery{1.5in}{11bp}\olBdry
+\ytSearch{}{11bp}\olBdry
+\ytClearQuery{}{11bp}
+\end{minipage}
+\eVerb \cs{ytInputQuery} is an input box to enter query text; \cs{ytSearch} is a push button that searchs
+{\YT} for the text entered into \cs{ytInputQuery}; and finally, \cs{ytClear} clears \cs{ytInputQuery}.
+
+
+\newtopic\noindent
+That's all for now, I simply must get back to my retirement. {\dps}
+
+\end{document}

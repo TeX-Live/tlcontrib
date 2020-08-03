@@ -1,0 +1,112 @@
+%%
+%% This is file `ytpu.def',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ltx4yt.dtx  (with options: `copyright,pujs')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ltx4yt.sty package,                                  %%
+%% Copyright (C) 2020                                   %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ytPopupAllMenuData{// ltx4yt: Begin popup menu data^^J}%
+\let\ytMenuNames\@gobble
+\newcommand{\ytUseMenus}[1]{\bgroup
+  \@for\yt@menu:=#1\do{%
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ytMenuNames{,"\yt@menu"}}\x
+    \edef\x{\expandafter\noexpand\@nameuse{\yt@menu}}%
+    \toks@=\expandafter{\x^^J}%
+    \expandafter\g@addto@macro\expandafter
+      \ytPopupAllMenuData\expandafter{\the\toks@}%
+  }\g@addto@macro\ytPopupAllMenuData
+    {// ltx4yt: End of popup menu data}%
+  \egroup
+}
+\@onlypreamble\ytUseMenus
+\newcommand{\puIdTitle}[2]{\Hy@unicodefalse\pdfstringdef\x@YT{#1}%
+  \edef\y@YT{\noexpand\item{title={\x@YT},%
+  return={[\noexpand\itemindex,'#2']}}}\y@YT}
+\def\ytpubtnCnt{0}
+\newcommand{\ytPopupBtn}[4][]{\bgroup
+  \@tempcnta\ytpubtnCnt\relax
+  \advance\@tempcnta\@ne
+  \xdef\ytpubtnCnt{\the\@tempcnta}%
+  \pushButton[\cmd{\pmpvCAOff}\CA{YT Menu}
+  \textColor{0 0 1}\W1\BC{}\textSize{0}
+    \H{N}\S{S}\presets{\yt@PopupPresets}#1
+    \AAmouseenter{ytPopupMenu("#2");} % dps
+    ]{ytPopup\ytpubtnCnt}{#3}{#4}\egroup
+}
+\newcommand{\ytPopupPresets}[1]{\def\yt@PopupPresets{#1}}
+\let\yt@PopupPresets\@empty
+\begin{insDLJS*}{yt}
+\begin{newsegment}{ltx4yt: %
+Popup Menu Data and JavaScript support functions}
+var YTdebug=false;
+var aYTLastChoice=new Array;
+var bYTLastChoice=false;
+\ytPopupAllMenuData
+var aChoice; // make local
+function ytProcessMenu(cMenu) { // aMenu->cMenu now a string
+  var aMenu=eval(cMenu);
+  var cChoice = app.popUpMenuEx.apply( app, aMenu );
+  ytProcessMenu.cChoice=cChoice;
+  if ( cChoice != null ) {
+    aChoice=eval(cChoice);
+    if (aChoice[1]=="") return null;
+    var thisChoice=aChoice[0];
+    eval(cMenu+thisChoice).bMarked=true;
+    if (!bYTLastChoice) {
+      eval(cMenu+aChoice[0]).bMarked=true;
+    } else {
+  var structLoc=eval(aYTLastChoice[1])[0]
+  eval(aYTLastChoice[0]+structLoc).bMarked=false; 
+      eval(cMenu+aChoice[0]).bMarked=true;
+    }
+    return aChoice;
+  } else return null;
+}
+function ytPopupMenu(cMenu) { // cMenu now a string
+  var aChoice=ytProcessMenu(cMenu);
+  var cChoice=ytProcessMenu.cChoice;
+  var aMenu=eval(cMenu);
+  if (aChoice!=null) {
+    var title=eval(cMenu+aChoice[0]).cName;
+    var i=title.indexOf("*");
+    var _hash=(i == -1)?"embed/"+aChoice[1]:"watch?v="+aChoice[1];
+    if (!bYTLastChoice) {
+      if(YTdebug) %
+console.println("launching url https://www.youtube.com/"+_hash);
+      else app.launchURL("https://www.youtube.com/"+_hash,false);
+      aYTLastChoice=[cMenu,cChoice];
+      bYTLastChoice=true;
+    } else {
+var cLastMenu=eval(aYTLastChoice[1])[0]
+      aYTLastChoice=[cMenu,cChoice];
+      if (cLastMenu!=aChoice[0]) {
+        if (YTdebug) %
+console.println("will launch url: https://www.youtube.com/"+_hash);
+        else app.launchURL("https://www.youtube.com/"+_hash,false);
+      } else {
+        if (YTdebug) console.println("will NOT launch url");
+        // choice is the same, uncheck this item
+        eval(cMenu+aChoice[0]).bMarked=false;
+        bYTLastChoice=false;
+      }
+    }
+  }
+}
+\end{newsegment}
+\end{insDLJS*}
+\endinput
+%%
+%% End of file `ytpu.def'.

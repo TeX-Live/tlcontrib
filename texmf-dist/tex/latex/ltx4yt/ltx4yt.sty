@@ -1,0 +1,172 @@
+%%
+%% This is file `ltx4yt.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% ltx4yt.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ltx4yt.sty package,                                  %%
+%% Copyright (C) 2020                                   %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{ltx4yt}
+ [2020/07/30 v0.7 ltx4yt: Play YouTube videos in the default browser (dps)]
+\RequirePackage{xkeyval}
+\DeclareOption{usepopup}{\def\lo@dpu{\InputIfFileExists{ytpu.def}
+  {\PackageInfo{ltx4yt}{Loading ytpu.def}}
+  {\PackageInfo{ltx4yt}{Can't find ytpu.def}}}}
+\DeclareOption{!usepopup}{}
+\let\lo@dpu\relax
+\AtEndOfPackage{\lo@dpu}
+\ProcessOptions
+\RequirePackage{xcolor}
+\RequirePackage{eforms}
+\ifx\lo@dpu\relax\else
+\def\YT@rpPU{\RequirePackage{popupmenu}[2020/07/26]}\expandafter
+\YT@rpPU\fi
+\newcommand{\ytvIdPresets}[1]{\def\yt@vIdPresets{#1}}
+\definecolor{webbrown}{rgb}{.6,0,0} % from the web package
+\ytvIdPresets{\linktxtcolor{webbrown}}
+\providecommand{\URI}[1]{/S/URI/URI(#1)}
+\def\ytNF{false}
+\def\ytURL{https://www.youtube.com}
+\newcommand{\ytvId}{\@ifstar{\def\yt@ask{*}\yt@@vId}
+  {\let\yt@ask\@empty\yt@@vId}}
+\newcommand{\yt@@vId}[3][]{%
+  \ifx\yt@ask\@empty
+    \def\yt@lnk@hash{embed/#2}\else
+    \def\yt@lnk@hash{watch?v=#2}\fi
+  \setLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+}
+\newcommand{\ytvIdML}{\@ifstar{\def\yt@ask{*}\yt@@vIdML}
+  {\let\yt@ask\@empty\yt@@vIdML}}
+\newcommand{\yt@@vIdML}[3][]{%
+  \ifx\yt@ask\@empty
+    \def\yt@lnk@hash{embed/#2}\else
+    \def\yt@lnk@hash{watch?v=#2}\fi
+  \mlsetLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+}
+\newif\ifytwatch \ytwatchfalse
+\def\yt@@parse{\let\ytspec\@empty\yt@parse}
+\def\yt@parse{\@ifnextchar\@nil{\@gobble}{\yt@parsei}}
+\def\yt@parsei{\@ifnextchar\watchId{% check for \watchId
+  \ytwatchtrue\yt@parse@watch}{\yt@parseii}}
+\def\yt@parse@watch\watchId#1{\g@addto@macro
+  \ytspec{\watchId{#1}}\yt@parse}
+\def\yt@parseii{\@ifnextchar\embedId{% check for \embedId
+  \yt@parse@embedId}{\yt@parseiii}}
+\def\yt@parse@embedId\embedId#1{\g@addto@macro
+  \ytspec{\embedId{#1}}\yt@parse}
+\def\yt@parseiii{\@ifnextchar\embed{% check for \embed
+  \yt@parse@embed}{\yt@parseiv}}
+\def\yt@parse@embed\embed#1{\g@addto@macro
+  \ytspec{\embed{#1}}\yt@parse}
+\def\yt@parseiv{\@ifnextchar\params{% check for \params
+  \yt@parse@params}{\yt@parsev}}
+\def\yt@parse@params\params#1{\ifytwatch
+  \g@addto@macro\ytspec{&#1}\else
+  \g@addto@macro\ytspec{?#1}\fi
+  \yt@parse}
+\def\yt@parsev#1\@nil{\g@addto@macro\ytspec{#1}}
+\newcommand{\ytLink}[3][]{\begingroup
+  \def\embedId##1{embed/##1}%
+  \def\params##1{##1}\def\embed##1{embed?##1}%
+  \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\user##1{user/##1}%
+  \yt@@parse#2\@nil % returns arg in \ytspec
+  \def\URLArg{\ytURL/\ytspec}%
+  \setLink[\presets{\yt@vIdPresets}#1\A{\URI{\URLArg}}
+  ]{#3}\endgroup
+}
+\newcommand{\ytLinkML}[3][]{\begingroup
+  \def\embedId##1{embed/##1}%
+  \def\params##1{##1}\def\embed##1{embed?##1}%
+  \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\user##1{user/##1}%
+  \yt@@parse#2\@nil % returns arg in \ytspec
+  \def\URLArg{\ytURL/\ytspec}%
+  \mlsetLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\URLArg}}
+  ]{#3}\endgroup
+}
+\newcommand{\ytComboList}[4][]{%
+  \comboBox[\Ff{\FfCommitOnSelChange}\DV{\yt@pl@def}\V{\yt@pl@def}
+    \presets{\yt@ComboListPresets}#1]{ytSelect#2}
+  {#3}{#4}{*\yt@pl@pl}% 2020/07/22 v0.4
+}
+\newcommand{\ytStrPLAY}{PLAY}
+\newcommand{\ytComboBtn}[4][]{%
+  \pushButton[\TU{Click to play}\CA{\ytStrPLAY}
+    \presets{\yt@ComboBtnPresets}#1
+    \A{\JS{var f=this.getField("ytSelect#2");\r
+    var ytID=f.value;\r
+    var i=f.currentValueIndices;\r
+    var ytFV=f.getItemAt(i,false);\r
+    var i=ytFV.indexOf("*");\r
+    if ( i == -1 )\r\t
+      app.launchURL("\ytURL/embed/"+ytID,\ytNF);\r
+    else\r\t
+      app.launchURL("\ytURL/watch?v="+ytID,\ytNF);
+  }}]{ytSelectBtn#2}{#3}{#4}%
+}
+\newcommand{\ytPlayList}{\begingroup\@makeother\_\@makeother\'
+    \ytPlayList@i}
+\def\ytPlayList@i#1#2{\gdef\yt@pl@def{#1}\xdef\yt@pl@pl{#2}\endgroup}
+\newcommand{\ytComboListPresets}[1]{\def\yt@ComboListPresets{#1}}
+\let\yt@ComboListPresets\@empty
+\newcommand{\ytComboBtnPresets}[1]{\def\yt@ComboBtnPresets{#1}}
+\let\yt@ComboBtnPresets\@empty
+\newcommand{\ytIdTitle}[2]{[(#2)(#1)]}
+\newcommand{\declarePlayList}[1]{\bgroup
+  \Hy@unicodefalse
+  \let\pl@yList\@empty
+  \ifpdfmarkup
+    \def\Esc{\eqbs}\else\def\Esc{}\fi
+  \def\cs##1{\eqbs\eqbs##1}\relax
+  \@makeother\_\@makeother\-
+  \yt@declarePlayList{#1}%
+}
+\def\yt@declarePlayList#1#2{%
+  \yt@declarePlayList@i#2\@nil\relax\relax
+  \toks@=\expandafter{\pl@yList}\relax
+  \xdef#1{\pl@yList}\egroup
+}
+\def\yt@declarePlayList@i{\@ifnextchar\@nil
+  {\expandafter\@gobbletwo\@gobble}
+  {\yt@declarePlayList@ii}%
+}
+\def\yt@declarePlayList@ii\ytIdTitle#1#2{%
+  \pdfstringdef\yt@PLTitle{#1}%
+  \edef\y{[(#2)(\yt@PLTitle)]}%
+  \expandafter\g@addto@macro\expandafter
+    \pl@yList\expandafter{\y}%
+  \yt@declarePlayList@i
+}
+\newcommand{\ytInputQuery}[3][]{%
+  \textField[\TU{Enter a query text string}#1]{ytSearchTxt}{#2}{#3}}
+\newcommand{\ytSearch}[3][]{%
+  \pushButton[\CA{Search}#1\AAmouseup{%
+    var f=this.getField("ytSearchTxt");\r
+    var v=f.value;\r
+    if ( v.replace(/\string\s/g,"") != "" )\r\t
+      app.launchURL("\ytURL/embed?listType=search&list="+v);}
+  ]{ytSearchBtn}{#2}{#3}}
+\newcommand{\ytClearQuery}[3][]{%
+  \pushButton[\CA{Clear}#1
+    \AAmouseup{this.resetForm("ytSearchTxt");}
+  ]{ytSearchClr}{#2}{#3}%
+}
+\endinput
+%%
+%% End of file `ltx4yt.sty'.

@@ -1,0 +1,651 @@
+%\iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ltx4yt.sty package,                                  %%
+%% Copyright (C) 2020                                   %%
+%%   dpstory@uakron.edu                                 %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+%<package>\ProvidesPackage{ltx4yt}
+%<package> [2020/07/30 v0.7 ltx4yt: Play YouTube videos in the default browser (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\hypersetup{pdfpagemode=useNone}
+\usepackage{fancyvrb}
+%\def\texorpdfstring#1#2{#1}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{ltx4yt}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{ltx4yt}{aebdocfmt.def cannot be found}}
+\EnableCrossrefs \CodelineIndex \RecordChanges
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewenvironment{quote}[1][]
+   {\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
+    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \item\relax}
+   {\endlist}
+\makeatother
+\bgroup\ttfamily
+\gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\tops\texorpdfstring
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\ltag{<}\def\rtag{>}
+\def\EXCL{!}
+\let\app\textsf\let\pkg\textsf
+\begin{document}
+  \GetFileInfo{ltx4yt.sty}
+  \title{The \textsf{ltx4yt} Package}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \let\Email\texttt
+  \DocInput{ltx4yt.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o ltx4yt.ind ltx4yt.idx} on the command line and recompile
+    \texttt{ltx4yt.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o ltx4yt.gls ltx4yt.glo} on the command line and recompile
+    \texttt{ltx4yt.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{ltx4yt}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{ltx4yt}{cannot find aebdonotindex.def}}
+%    \DoNotIndex{\g@addto@macro,\divide,\box,\setbox,\x,\y,\z}
+%
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+%
+% \section{Introduction}
+%
+% It is July 2020 and Adobe's support for Flash will vanish in December. Google stopped
+% supporting Flash several years ago, so the package \pkg{yt4pdf} is no longer functional
+% and will be withdrawn from CTAN. If we cannot play videos within PDF anymore, the next best
+% course is to develop some basic commands for playing YouTube videos in the default browser, preferably
+% without any annoying advertisements. This can be done for some videos, but for others it cannot be done.
+%
+%\changes{v0.1}{2020/07/17}{Begin new package \string\pkg{ltx4yt}}
+%\changes{v0.2}{2020/07/17}{Commands to pass arguments to urls}
+%\changes{v0.6}{2020/07/25}{Final version before first publication}
+%\changes{v0.7}{2020/07/30}{Corrected upload}
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{usepopup} When this option is taken, additional code to support
+%    the use of popup menus is input. We also support \IndexOpt[\protect\EXCL]{!usepopup}\opt{!popup},
+%    which is a convenience option for not using \opt{usepopup}.
+%    \begin{macrocode}
+\DeclareOption{usepopup}{\def\lo@dpu{\InputIfFileExists{ytpu.def}
+  {\PackageInfo{ltx4yt}{Loading ytpu.def}}
+  {\PackageInfo{ltx4yt}{Can't find ytpu.def}}}}
+\DeclareOption{!usepopup}{}
+\let\lo@dpu\relax
+\AtEndOfPackage{\lo@dpu}
+\ProcessOptions
+\RequirePackage{xcolor}
+\RequirePackage{eforms}
+%    \end{macrocode}
+%    If the \opt{usepopup} option is taken, we load the \pkg{popupmenu} package.
+%    \begin{macrocode}
+\ifx\lo@dpu\relax\else
+\def\YT@rpPU{\RequirePackage{popupmenu}[2020/07/26]}\expandafter
+\YT@rpPU\fi
+%    \end{macrocode}
+%
+% \section{Implementation}
+%
+% The JavaScript method \texttt{app.launchURL\darg{\ameta{URL}}} is used to open the default browser
+% on the page determined by \ameta{URL}. The links created use \cs{URI} (\texttt{/S/URI/URI}), this action type
+% allows links to be functional in all PDF viewers, even on hand held devices.
+%
+% We have three implementations of this plan: (1)~links (\cs{ytvId} and \cs{ytLink}) for all devices;
+% (2)~dropdown menus (combo boxes) (\cs{ytComboList} (uses JavaScript);
+% and (3)~pop-up menus using the \env{popupmenu} environment of the \pkg{popupmenu} package (uses JavaScript).
+% The methods that use JavaScript will not function in the near future on hand held devices.
+%
+% \subsection{Playing a YouTube video from its Video ID}
+%
+% In this section, we create several ways of calling for a YouTube video to play
+% in the default browser.
+%
+% \subsubsection{Using a Link}
+%    \begin{macro}{\ytvIdPresets}\nmpsep{\darg{\ameta{KV-pairs}}}
+% The options for the \cs{ytvId} link. The default is given below in the definition.
+% Initially, the preset is to produce \texttt{webbrown} colored links.
+%    \begin{macrocode}
+\newcommand{\ytvIdPresets}[1]{\def\yt@vIdPresets{#1}}
+\definecolor{webbrown}{rgb}{.6,0,0} % from the web package
+\ytvIdPresets{\linktxtcolor{webbrown}}
+%    \end{macrocode}
+%    \end{macro}
+%    Here is a convenience command. This definition has since been made
+%    in \pkg{insdljs}.
+%    \begin{macrocode}
+\providecommand{\URI}[1]{/S/URI/URI(#1)}
+%    \end{macrocode}
+%    Define \DescribeMacro\ytURL\cs{ytURL} to expand to the YouTube web site.
+%    \begin{macrocode}
+\def\ytNF{false}
+\def\ytURL{https://www.youtube.com}
+%    \end{macrocode}
+%    \begin{macro}{\ytvId}\nmpsep{*[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}}
+% The \cs{ytvId} is link which when pressed plays the video whose Video Id is \ameta{ytvID})
+% in the default browser.
+% \begin{quote}
+% \begin{itemize}
+%   \item[\texttt*] If the \texttt*-option is taken, you have determined that this
+%   video cannot be embedded (which is the ideal) and must be played normally on YouTube
+%   with all advertisements and other extraneous information.
+%   \item[{\ameta{opts}}:] link optional KV-pairs to modify the appearance of the link.
+%   \item[{\ameta{ytvID}}:] The video Id for the YouTube video to play
+%   \item[{\ameta{text}}:] The text that displays the link.
+%\end{itemize}
+%\end{quote}
+%    \begin{macrocode}
+\newcommand{\ytvId}{\@ifstar{\def\yt@ask{*}\yt@@vId}
+  {\let\yt@ask\@empty\yt@@vId}}
+\newcommand{\yt@@vId}[3][]{%
+  \ifx\yt@ask\@empty
+    \def\yt@lnk@hash{embed/#2}\else
+    \def\yt@lnk@hash{watch?v=#2}\fi
+  \setLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytvIdML}\nmpsep{*[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}}
+% The \cs{ytvId} is link which when pressed plays the video whose Video Id is \ameta{ytvID})
+% in the default browser. This is a multi-line link, it requires the \pkg{aeb\_mlink} package
+% and the \app{dvips\,\texttt{->}\,distiller} workflow.
+%    \begin{macrocode}
+\newcommand{\ytvIdML}{\@ifstar{\def\yt@ask{*}\yt@@vIdML}
+  {\let\yt@ask\@empty\yt@@vIdML}}
+\newcommand{\yt@@vIdML}[3][]{%
+  \ifx\yt@ask\@empty
+    \def\yt@lnk@hash{embed/#2}\else
+    \def\yt@lnk@hash{watch?v=#2}\fi
+  \mlsetLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytLink}\nmpsep{[\ameta{opts}]\darg{\ameta{spec}}\darg{\ameta{text}}}
+%    We create a custom link for youtube videos. The \ameta{spec} (specification) argument has several
+%    forms for maximum convenience and flexibility.
+%    \begin{itemize}
+%     \item |\ytLink{\embedId{|\ameta{ytvID}|}\params{|\ameta{parameters}|}}{|\ameta{text}|}|\\[3pt] This is the form
+%     for playing a video with \ameta{ytvID} that \emph{can be embedded} (this best type of video). The \cs{params}
+%     argument must follow the \cs{embedId}, its argument are any parameters you want to append to the URL.
+%     The use of \cs{params} is optional; however, without the \cs{params} you may as well use
+%     |\ytvId{|\ameta{ytvID}|}{|\ameta{text}|}|.
+%
+%     \item |\ytLink{\watchId{|\ameta{ytvID}|}\params{|\ameta{parameters}|}}{|\ameta{text}|}|\\[3pt] This is the form
+%     for playing a video with \ameta{ytvID} that \emph{cannot be embedded} (advertisements and other information
+%     appears). The \cs{params} argument must follow the \cs{watchId}, its argument are any parameters you want to append to the URL.
+%     The use of \cs{params} is optional; however, without the \cs{params} you may as well use
+%     |\ytvId*{|\ameta{ytvID}|}{|\ameta{text}|}|.
+%
+%     \item |\ytLink{\embed{|\ameta{spec}|}}{|\ameta{text}|}|\\[3pt]
+%     A form that does not specify a video ID. It is useful for more general actions, such as
+%     searches, for example,
+%     \begin{flushleft}
+%       |\ytLink{\embed{listType=search&list=Adobe Acrobat DC}}|\\
+%       \qquad|{Search for Adobe Acrobat DC}|
+%     \end{flushleft}
+%     This form does not have a \cs{params} optional argument as all the parameters are built into the
+%     argument of \cs{embed}.
+%
+%    \item |\ytLink{|\ameta{spec}|}{|\ameta{text}|}|\\[3pt] The most general form. The action of this
+%    link is |\URI{\ytURL/|\ameta{spec}|}|; for example,
+%     \begin{flushleft}
+%       |\ytLink{embed?listType=search&list=Adobe Acrobat DC}|\\
+%       \qquad|{Search for Adobe Acrobat DC}|
+%     \end{flushleft}
+%     Here you are free to build whatever URL you can imagine.
+%
+%    \item |\ytLink{\channel{|\ameta{name}|}}{|\ameta{text}|}|\\[3pt]
+%    Such a link displays the channel \ameta{name}. For example,
+%     \begin{flushleft}
+%       |\ytLink{\channel{rocketjump}}{The RocketJump Channel}|
+%     \end{flushleft}
+%     This link opens the YouTube channel named \texttt{rocketjump}.
+%    \end{itemize}
+%   \paragraph*{Passing Player Parameters.}
+%   As was illustrated above, the custom link \cs{ytLink} can pass various recognizable
+%   parameters to YouTube. After reviewing,
+%   \begin{flushleft}
+%   \url{https://developers.google.com/youtube/player_parameters#Parameters}
+%   \end{flushleft}
+%   the following parameters are recommended, some of them are illustrated in the
+%   sample document \texttt{ltx4yt-1.tex}:
+%   \begin{itemize}
+%     \item \texttt{autoplay=\ameta{\upshape{0\string|1}}} (default \texttt{0})
+%     \item \texttt{controls=\ameta{\upshape{0\string|1}}} (default \texttt{1})
+%     \item \texttt{fs=\ameta{\upshape{0\string|1}}} (default \texttt{1})
+%     \item \texttt{modestbranding=\ameta{\upshape{0\string|0}}}
+%     \item \texttt{playlist=\ameta{list}}
+%     \item \texttt{listType=search\&list=\ameta{query}}
+%   \end{itemize}
+%   The specialized needs of the document author is most easily accommodated through the use
+%   of the \cs{ytLink} command, for example,
+%   \begin{flushleft}\obeylines
+%     |\ytLink{\embedId{5y9-EVmreU4}\params{autoplay=1&modestbranding=1}}|
+%     \qquad|{Lori's Corner: Episode \#1}|
+%   \end{flushleft}
+%    \begin{macrocode}
+\newif\ifytwatch \ytwatchfalse
+%    \end{macrocode}
+%    \paragraph*{The \cs{ytLink} command.} Before getting to \cs{ytLink} an d\cs{ytLinkML},
+%    there is a long stream of commands to parse the \ameta{spec} argument of \cs{ytLink}.
+%    It goes through looking for \cs{watchId}, \cs{embedId}, \cs{embed}, and \cs{params}.
+%    As it progresses, it adds code to the macro \cs{ytspec}, which at the end of things
+%    will hold the fully formed \ameta{spec} for insertion into the URL.
+%    \begin{macrocode}
+\def\yt@@parse{\let\ytspec\@empty\yt@parse}
+\def\yt@parse{\@ifnextchar\@nil{\@gobble}{\yt@parsei}}
+\def\yt@parsei{\@ifnextchar\watchId{% check for \watchId
+  \ytwatchtrue\yt@parse@watch}{\yt@parseii}}
+\def\yt@parse@watch\watchId#1{\g@addto@macro
+  \ytspec{\watchId{#1}}\yt@parse}
+\def\yt@parseii{\@ifnextchar\embedId{% check for \embedId
+  \yt@parse@embedId}{\yt@parseiii}}
+\def\yt@parse@embedId\embedId#1{\g@addto@macro
+  \ytspec{\embedId{#1}}\yt@parse}
+\def\yt@parseiii{\@ifnextchar\embed{% check for \embed
+  \yt@parse@embed}{\yt@parseiv}}
+\def\yt@parse@embed\embed#1{\g@addto@macro
+  \ytspec{\embed{#1}}\yt@parse}
+\def\yt@parseiv{\@ifnextchar\params{% check for \params
+  \yt@parse@params}{\yt@parsev}}
+\def\yt@parse@params\params#1{\ifytwatch
+  \g@addto@macro\ytspec{&#1}\else
+  \g@addto@macro\ytspec{?#1}\fi
+  \yt@parse}
+%    \end{macrocode}
+%    If we get this far, \ameta{spec} is raw, has none
+%    of the helper commands. So we just insert the
+%    entire argument into \cs{ytspec}.
+%    \begin{macrocode}
+\def\yt@parsev#1\@nil{\g@addto@macro\ytspec{#1}}
+%    \end{macrocode}
+%    All preliminaries done, we define \cs{ytLink}
+%    \begin{macrocode}
+\newcommand{\ytLink}[3][]{\begingroup
+  \def\embedId##1{embed/##1}%
+  \def\params##1{##1}\def\embed##1{embed?##1}%
+  \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\user##1{user/##1}%
+  \yt@@parse#2\@nil % returns arg in \ytspec
+  \def\URLArg{\ytURL/\ytspec}%
+  \setLink[\presets{\yt@vIdPresets}#1\A{\URI{\URLArg}}
+  ]{#3}\endgroup
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytLinkML}\nmpsep{[\ameta{opts}]\darg{\ameta{spec}}\darg{\ameta{text}}}
+%    is the multi-line version of \cs{ytLink}. It requires a \app{dvips\,\texttt{->}\,distiller} workflow
+%    as well as the \pkg{aeb\_mlink} package.
+%    \begin{macrocode}
+\newcommand{\ytLinkML}[3][]{\begingroup
+  \def\embedId##1{embed/##1}%
+  \def\params##1{##1}\def\embed##1{embed?##1}%
+  \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\user##1{user/##1}%
+  \yt@@parse#2\@nil % returns arg in \ytspec
+  \def\URLArg{\ytURL/\ytspec}%
+  \mlsetLink[\presets{\yt@vIdPresets}#1
+    \A{\URI{\URLArg}}
+  ]{#3}\endgroup
+}
+%    \end{macrocode}
+%    \end{macro}
+% \subsubsection{Using a Combobox}
+%   All commands associate with a combo box play list.
+%    \begin{macro}{\ytComboList}\nmpsep{[\ameta{opts}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+% The \cs{ytComboList} command produces a combo box (dropdown menu) of video Ids and titles. The user selects a
+% video based on its title, then presses the PLAY button. The two commands
+% \cs{ytComboListPresets} and \cs{ytComboBtnPresets} are used to set the appearances
+% of the combo box and the PLAY button.
+%\begin{quote}
+%\begin{itemize}
+%   \item[\ameta{opts}:] eforms key-value pairs
+%   \item[\ameta{name}:] A unique name (ASCII letters and numbers)
+%   \item[\ameta{wd}:] The width of the combo box
+%   \item[\ameta{ht}:] The height of the combo box
+%\end{itemize}
+%\end{quote}
+% Now we have the code for \cs{ytComboList}
+%    \begin{macrocode}
+\newcommand{\ytComboList}[4][]{%
+  \comboBox[\Ff{\FfCommitOnSelChange}\DV{\yt@pl@def}\V{\yt@pl@def}
+    \presets{\yt@ComboListPresets}#1]{ytSelect#2}
+  {#3}{#4}{*\yt@pl@pl}% 2020/07/22 v0.4
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytComboBtn}\nmpsep{[\ameta{opts}]\darg{\ameta{name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+% A button to play the selection made in the combo box. The caption of the push button
+% is determined by the command \DescribeMacro\ytStrPLAY\cs{ytStrPlay}.
+% The parameters for \cs{ytComboBtn} are,
+% \begin{quote}
+%\begin{itemize}
+%   \item[\ameta{opts}:] The KV-pairs to pass to the underlying push button.
+%   \item[\ameta{name}:] A unique name (ASCII letters and numbers)
+%   \item[\ameta{wd}:] The width of the combo box
+%   \item[\ameta{ht}:] The height of the combo box
+%\end{itemize}
+%\end{quote}
+%    \begin{macrocode}
+\newcommand{\ytStrPLAY}{PLAY}
+\newcommand{\ytComboBtn}[4][]{%
+  \pushButton[\TU{Click to play}\CA{\ytStrPLAY}
+    \presets{\yt@ComboBtnPresets}#1
+    \A{\JS{var f=this.getField("ytSelect#2");\r
+    var ytID=f.value;\r
+    var i=f.currentValueIndices;\r
+    var ytFV=f.getItemAt(i,false);\r
+    var i=ytFV.indexOf("*");\r
+    if ( i == -1 )\r\t
+      app.launchURL("\ytURL/embed/"+ytID,\ytNF);\r
+    else\r\t
+      app.launchURL("\ytURL/watch?v="+ytID,\ytNF);
+  }}]{ytSelectBtn#2}{#3}{#4}%
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytPlayList}\nmpsep{\darg{\ameta{ytvID}}\darg{\ameta{\cs{cmd}}}}
+% This command is executed before \cs{ytComboList} to set the initial/default value (\ameta{ytvID}) of the
+% combo box and the play list (\ameta{\cs{cmd}}). Here \ameta{\cs{cmd}} is a command defined by the
+% \cs{declarePlayList} command. Use the \cs{ytPlayList} to pass the play list to the next combo box.
+%    \begin{macrocode}
+\newcommand{\ytPlayList}{\begingroup\@makeother\_\@makeother\'
+    \ytPlayList@i}
+\def\ytPlayList@i#1#2{\gdef\yt@pl@def{#1}\xdef\yt@pl@pl{#2}\endgroup}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytComboListPresets}\nmpsep{\darg{\ameta{opts}}} The KV-pairs
+%    for \cs{ytComboList}.
+%    \begin{macrocode}
+\newcommand{\ytComboListPresets}[1]{\def\yt@ComboListPresets{#1}}
+\let\yt@ComboListPresets\@empty
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytComboBtnPresets}\nmpsep{\darg{\ameta{opts}}} The KV-pairs
+%    for \cs{ytComboBtn}.
+%    \begin{macrocode}
+\newcommand{\ytComboBtnPresets}[1]{\def\yt@ComboBtnPresets{#1}}
+\let\yt@ComboBtnPresets\@empty
+%    \end{macrocode}
+%    \end{macro}
+%    \leavevmode\DescribeMacro{\ytIdTitle}\nmpsep{\darg{\ameta{text}}\darg{\ameta{VidID}}}
+%     A convenience command to lay out the playlist.
+%    \begin{macrocode}
+\newcommand{\ytIdTitle}[2]{[(#2)(#1)]}
+%    \end{macrocode}
+%    \begin{macro}{\declarePlayList}
+%    A video ID may contain characters {\LaTeX} considers special, so we sanitize these
+%    special characters before reading in the video ID. Near as I can determine, a video
+%    id consists of 11 characters comprising combinations of letters (A-Z,a-z) numbers
+%    (0-9) and special characters underscore and hyphen (\_ and -). We sanitize the last two.
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\declarePlayList{!ameta(\cmd)}{
+%   \ytIdTitle{!ameta(text)}{!ameta(VidID)}
+%   ...
+%   \ytIdTitle{!ameta(text)}{!ameta(VidID)}
+% }
+%\end{Verbatim}
+%The entries may also be in raw form `|[(\ameta{VidID})(\ameta{text})]|'. Note that the two arguments are
+%enclosed in parentheses, there is a problem with parsing if \ameta{text} itself contains
+%parentheses. Within \ameta{text} enclose matching parentheses in braces, for example,
+%\begin{flushleft}|\ytIdTitle{Kung-Fu Fighting {(Bruce Lee version)}}{GZ9e3Dy7obA}|\end{flushleft}
+%\paragraph*{The role of \texttt* in the title.} If an \texttt{*} appears in the title, this means
+%that the video cannot be embedded. Viewing the video will come with advertisements and other information
+%that YouTube generates.
+%\begin{flushleft}|\ytIdTitle{Kung-Fu Fighting* {(Original version)}}{jhUkGIsKvn0}|\end{flushleft}
+%\changes{v0.4}{2020/07/22}{Changed parsing of \string\cs{declarePlayList} to accomodate
+%\string\cs{pdfstringdef}}
+%    \begin{macrocode}
+\newcommand{\declarePlayList}[1]{\bgroup
+  \Hy@unicodefalse
+  \let\pl@yList\@empty
+  \ifpdfmarkup
+    \def\Esc{\eqbs}\else\def\Esc{}\fi
+  \def\cs##1{\eqbs\eqbs##1}\relax
+  \@makeother\_\@makeother\-
+  \yt@declarePlayList{#1}%
+}
+\def\yt@declarePlayList#1#2{%
+  \yt@declarePlayList@i#2\@nil\relax\relax
+  \toks@=\expandafter{\pl@yList}\relax
+  \xdef#1{\pl@yList}\egroup
+}
+\def\yt@declarePlayList@i{\@ifnextchar\@nil
+  {\expandafter\@gobbletwo\@gobble}
+  {\yt@declarePlayList@ii}%
+}
+\def\yt@declarePlayList@ii\ytIdTitle#1#2{%
+  \pdfstringdef\yt@PLTitle{#1}%
+  \edef\y{[(#2)(\yt@PLTitle)]}%
+  \expandafter\g@addto@macro\expandafter
+    \pl@yList\expandafter{\y}%
+  \yt@declarePlayList@i
+}
+%    \end{macrocode}
+%    \end{macro}
+%An example of use of \cs{declarePlayList}:
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\declarePlayList{\playListii}{%
+%  \ytIdTitle{Elfego Baca}{gRwa0MdeqVs}
+%  \ytIdTitle{Texas John Slaughter}{7yrk1BvtLE8}
+%  \ytIdTitle{Swamp Fox}{-SBPnw5riLM&NR}
+%  \ytIdTitle{Zorro Promo}{cKludhxEoJ0}
+%}
+%\end{Verbatim}
+%    \begin{macrocode}
+%</package>
+%<*pujs>
+%    \end{macrocode}
+% \subsubsection{Using a popup menu}
+%    These code lines (including the document JavaScript) are only included
+%    when the \opt{usepopup} option is taken.
+%    \begin{macro}{\ytUseMenus}\nmpsep{\darg{\ameta{menu-names}}}
+% A command used to list popupmenu data. It defines a command
+% \cs{ytPopupData} that is used in the JS support for popup menus. The argument
+% \ameta{menu-names} is a comma-delimited list of menu names defined by a \env{popupmenu} environment. The command
+% needs to be in the preamble.
+%    \begin{macrocode}
+\def\ytPopupAllMenuData{// ltx4yt: Begin popup menu data^^J}%
+\let\ytMenuNames\@gobble
+\newcommand{\ytUseMenus}[1]{\bgroup
+  \@for\yt@menu:=#1\do{%
+    \edef\x{\noexpand\g@addto@macro\noexpand
+      \ytMenuNames{,"\yt@menu"}}\x
+    \edef\x{\expandafter\noexpand\@nameuse{\yt@menu}}%
+    \toks@=\expandafter{\x^^J}%
+    \expandafter\g@addto@macro\expandafter
+      \ytPopupAllMenuData\expandafter{\the\toks@}%
+  }\g@addto@macro\ytPopupAllMenuData
+    {// ltx4yt: End of popup menu data}%
+  \egroup
+}
+\@onlypreamble\ytUseMenus
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\puIdTitle}
+% A convenience macro for entering popupmenu data for youtube videos.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,codes={\catcode`\%=9},commandchars={!()}]
+%\begin{popupmenu}{YTMenu}
+%  \puIdTitle{Select a YouTube Video}{} % A title has no yt Id
+%  \begin{submenu}{title=Music Videos}
+%     \puIdTitle{Kung-Fu Fighting (Bruce Lee version)}{GZ9e3Dy7obA}
+%     \puIdTitle{\string\"Sea Hunt\string\" TV serie}{MW-IZ67iADU}
+%     ...
+%   \end{submenu}
+%\end{popupmenu}
+%\end{Verbatim}
+% Note that we must protect the double quote.
+%    \begin{macrocode}
+%\newcommand{\puIdTitle}[2]{\item{title={#1},%
+%  return={[\itemindex,'#2']}}}
+\newcommand{\puIdTitle}[2]{\Hy@unicodefalse\pdfstringdef\x@YT{#1}%
+  \edef\y@YT{\noexpand\item{title={\x@YT},%
+  return={[\noexpand\itemindex,'#2']}}}\y@YT}
+%    \end{macrocode}
+%    \end{macro}
+%    Some convenience commands for setting up a push button to display the popupmenu
+%    on rollover.
+%    \begin{macrocode}
+\def\ytpubtnCnt{0}
+\newcommand{\ytPopupBtn}[4][]{\bgroup
+  \@tempcnta\ytpubtnCnt\relax
+  \advance\@tempcnta\@ne
+  \xdef\ytpubtnCnt{\the\@tempcnta}%
+  \pushButton[\cmd{\pmpvCAOff}\CA{YT Menu}
+  \textColor{0 0 1}\W1\BC{}\textSize{0}
+    \H{N}\S{S}\presets{\yt@PopupPresets}#1
+    \AAmouseenter{ytPopupMenu("#2");} % dps
+    ]{ytPopup\ytpubtnCnt}{#3}{#4}\egroup
+}
+\newcommand{\ytPopupPresets}[1]{\def\yt@PopupPresets{#1}}
+\let\yt@PopupPresets\@empty
+%    \end{macrocode}
+%    \begin{macrocode}
+%</pujs>
+%<*package>
+%    \end{macrocode}
+% \subsection{Search YouTube interactively}
+%    \begin{macro}{\ytInputQuery}\nmpsep{[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    Provides a text field to enter a query string.
+%    \begin{macrocode}
+\newcommand{\ytInputQuery}[3][]{%
+  \textField[\TU{Enter a query text string}#1]{ytSearchTxt}{#2}{#3}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytSearch}\nmpsep{[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A push button what will search YouTube based on the query string.
+%    \begin{macrocode}
+\newcommand{\ytSearch}[3][]{%
+  \pushButton[\CA{Search}#1\AAmouseup{%
+    var f=this.getField("ytSearchTxt");\r
+    var v=f.value;\r
+    if ( v.replace(/\string\s/g,"") != "" )\r\t
+      app.launchURL("\ytURL/embed?listType=search&list="+v);}
+  ]{ytSearchBtn}{#2}{#3}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\ytClearQuery}\nmpsep{[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A button to clear the query string.
+%    \begin{macrocode}
+\newcommand{\ytClearQuery}[3][]{%
+  \pushButton[\CA{Clear}#1
+    \AAmouseup{this.resetForm("ytSearchTxt");}
+  ]{ytSearchClr}{#2}{#3}%
+}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+%</package>
+%<*pujs>
+%    \end{macrocode}
+%\subsection{Document JavaScript}
+%    Some JavaScript to process the user's choice and to launch the browser
+%    to view the selected video.
+%    \changes{v0.5}{2020/07/24}{Manage multiple menus}
+%    \begin{macrocode}
+\begin{insDLJS*}{yt}
+\begin{newsegment}{ltx4yt: %
+Popup Menu Data and JavaScript support functions}
+var YTdebug=false;
+var aYTLastChoice=new Array;
+var bYTLastChoice=false;
+\ytPopupAllMenuData
+var aChoice; // make local
+function ytProcessMenu(cMenu) { // aMenu->cMenu now a string
+  var aMenu=eval(cMenu);
+  var cChoice = app.popUpMenuEx.apply( app, aMenu );
+  ytProcessMenu.cChoice=cChoice;
+  if ( cChoice != null ) {
+    aChoice=eval(cChoice);
+    if (aChoice[1]=="") return null;
+    var thisChoice=aChoice[0];
+    eval(cMenu+thisChoice).bMarked=true;
+    if (!bYTLastChoice) {
+      eval(cMenu+aChoice[0]).bMarked=true;
+    } else {
+		  var structLoc=eval(aYTLastChoice[1])[0]
+		  eval(aYTLastChoice[0]+structLoc).bMarked=false;	
+      eval(cMenu+aChoice[0]).bMarked=true;
+    }
+    return aChoice;
+  } else return null;
+}
+function ytPopupMenu(cMenu) { // cMenu now a string
+  var aChoice=ytProcessMenu(cMenu);
+  var cChoice=ytProcessMenu.cChoice;
+  var aMenu=eval(cMenu);
+  if (aChoice!=null) {
+    var title=eval(cMenu+aChoice[0]).cName;
+    var i=title.indexOf("*");
+    var _hash=(i == -1)?"embed/"+aChoice[1]:"watch?v="+aChoice[1];
+    if (!bYTLastChoice) {
+      if(YTdebug) %
+console.println("launching url https://www.youtube.com/"+_hash);
+      else app.launchURL("https://www.youtube.com/"+_hash,false);
+      aYTLastChoice=[cMenu,cChoice];
+      bYTLastChoice=true;
+    } else {
+		var cLastMenu=eval(aYTLastChoice[1])[0]
+      aYTLastChoice=[cMenu,cChoice];
+      if (cLastMenu!=aChoice[0]) {
+        if (YTdebug) %
+console.println("will launch url: https://www.youtube.com/"+_hash);
+        else app.launchURL("https://www.youtube.com/"+_hash,false);
+      } else {
+        if (YTdebug) console.println("will NOT launch url");
+        // choice is the same, uncheck this item
+        eval(cMenu+aChoice[0]).bMarked=false;
+        bYTLastChoice=false;
+      }
+    }
+  }
+}
+\end{newsegment}
+\end{insDLJS*}
+%    \end{macrocode}
+%    \begin{macrocode}
+%<*pujs>
+%<*package>
+%</package>
+%    \end{macrocode}
+%  \Finale
+\endinput
+
+https://developers.google.com/youtube/iframe_api_reference?csw=1

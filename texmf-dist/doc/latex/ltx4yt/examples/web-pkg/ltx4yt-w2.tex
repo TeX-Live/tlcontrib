@@ -1,0 +1,110 @@
+\documentclass{article}
+\usepackage[designv,extended]{web}
+\usepackage[usepopup]{ltx4yt}
+
+%\previewOn 
+
+\parindent0pt \parskip6pt
+
+
+\textBgColor{lightgray}
+
+\DeclareDocInfo
+{
+    title=The \texorpdfstring{\textsf{ltx4yt} Package\\[3pt]}{ltx4yt Package: }Playing YouTube in a Browser,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject={Live streamed video from YouTube.com},
+    keywords={You Tube, AeB, rmannot},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={\today}
+}
+\talkdateLabel{Published:}
+
+\parindent=0pt\parskip6pt
+\rheader{}
+
+\begin{popupmenu}{YTMenu}
+    \puIdTitle{Select a YouTube Video}{} % A title has no ytId
+    \begin{submenu}{title=Music Videos}
+        \puIdTitle{Kung-Fu Fighting (Bruce Lee)}{GZ9e3Dy7obA}
+        \puIdTitle{Kung-Fu Fighting* (Carl Douglas)}{jhUkGIsKvn0}
+        \puIdTitle{Ink Spots - If I didn't care}{rvwfLe6sLis}
+        \puIdTitle{Ink Spots* - My Prayer}{h7KJCns5v3g}
+    \end{submenu}
+    \begin{submenu}{title=Adobe Related Videos}
+        \puIdTitle{Open at Adobe}{eNzrn8-JFSE}
+        \puIdTitle{Lori's Corner Episode \#1}{5y9-EVmreU4}
+        \puIdTitle{Intro to PDF Portfolios}{T9Yzo_hlwP0}
+    \end{submenu}
+    \begin{submenu}{title=Action Videos}
+        \puIdTitle{Rocket Jump}{7XzdZ4KcI8Y}
+        \puIdTitle{AimBot}{NYGlWjIKoY4}
+        \puIdTitle{Flower Warfare}{031Dshcnso4}
+        \puIdTitle{Modern Warfare: Frozen Crossing Pt. 1}{rzQMGMuD1sU}
+        \puIdTitle{Modern Warfare: Frozen Crossing Pt. 2}{a08ViuvORRM}
+    \end{submenu}
+\end{popupmenu}
+
+\begin{popupmenu}{YTSea}
+  \puIdTitle{\Esc"Sea Hunt\Esc" US TV series {(1958-61)} lead-in}{Lz0aMoWh8Q4}
+  \puIdTitle{Theme Song to Sea Hunt*}{2QxXk6X9GDo}
+  \puIdTitle{J\"{u}rgen's favorite song*}{mLDF5MBMWHE}
+  \puIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+\end{popupmenu}
+
+
+% After defining all menus used with YouTube videos, declare them using \ytUseMenus
+\ytUseMenus{YTMenu,YTSea}
+
+\declarePlayList{\playList}{% note: put parentheses within braces
+    \ytIdTitle{Kung-Fu Fighting {(Bruce Lee)}}{GZ9e3Dy7obA}
+    \ytIdTitle{Kung-Fu Fighting* {(Carl Douglas)}}{jhUkGIsKvn0}
+    \ytIdTitle{RAF Sculthorpe {(Watch for my Mom at 6:22!)}}{K7H8QghVs9k}
+    \ytIdTitle{Rocket Jump}{7XzdZ4KcI8Y}
+    \ytIdTitle{Abdul And Cleopatra* - Jonathan Richman and the Modern Lovers}{mLDF5MBMWHE}
+%
+    \ytIdTitle{J\"{u}rgen's favorite song*}{mLDF5MBMWHE}
+    \ytIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
+    \ytIdTitle{"Sea Hunt" US TV series {(1958-61)} lead-in}{Lz0aMoWh8Q4}
+}
+
+\begin{document}
+
+
+
+%\maketitle
+
+\begin{center}\bfseries\Large\color{blue}LTX4YT -- Forms\end{center}
+
+In this second sample file, the combo box and popup menu are
+demonstrated. Both of these use JavaScript methods that will
+function perfectly on \textsf{Adobe Acrobat}, \textsf{Adobe
+Acrobat Reader DC}, and \textsf{PDFX-Change Editor}. None of the fields
+work within the native PDF viewer of modern browsers.
+
+\textbf{Demo of combo box of favorites.} By convention of this
+package, items with an ``\texttt{*}" in their title is a signal to
+the document consumer that that video cannot be
+embedded and must be played on the YouTube site with
+advertisements and such. \vspace{-\parskip}
+\begin{quote}
+\ytPlayList{\tops{Kung-Fu Fighting {(Bruce Lee version)}}{GZ9e3Dy7obA}}{\playList}
+\ytComboList{YT1}{190bp}{11bp}\olBdry
+  \ytComboBtn[\TU{Click to play}]{YT1}{33bp}{11bp}
+\end{quote}
+
+\ytPopupBtn{YTMenu}{20bp}{5bp}
+\textbf{Demo of a popup menu of favorites.}
+On this page, with your mouse cursor, roll over the push button labeled \textcolor{blue}{\textsf{YT Menu}}, and a popup
+menu appears. Choose a YouTube video based on title.
+
+\ytPopupBtn[\CA{Sea Hunt}]{YTSea}{20bp}{5bp} Yes, you can have multiple popup menus in the document.
+
+\textbf{Demo of an interactive search}\\[3pt]
+\ytInputQuery{1.5in}{11bp}\olBdry
+\ytSearch{}{11bp}\olBdry
+\ytClearQuery{}{11bp}
+
+\end{document}

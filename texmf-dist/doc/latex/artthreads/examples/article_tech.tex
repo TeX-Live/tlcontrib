@@ -1,26 +1,15 @@
 \documentclass{article}
 \usepackage[forcolorpaper]{web}
+% To compiles with latex > dvips > ps2pdf, use the option gonative, which gets
+% passed on to fitr. With gonative, no document JavaScript is created, which 
+% is not supported by a non-Acrobat PDF viewer.
 \usepackage[!viewMagWin,!preview]{artthreads}
 \usepackage{fancyvrb}
 \usepackage{multicol}
 
 \useFullWidthForPaper % from web
 \providecommand{\cs}[1]{\texttt{\char`\\#1}}
-
-% A selection of pushbutton actions for articles
-\def\toggleArticlePane{\pushButton[
-    \CA{Article}\A{\Named{ShowHideArticles}}]{TAPBtn}{}{11bp}}
-\def\toggleArticlePaneRead{\pushButton[
-    \CA{Article}\A{\Named{ShowHideArticles}
-    \Next{/S/Thread/D(\threadTitle)}}]{TAPRBtn}{}{11bp}}
-\def\showArticlePane{\pushButton[
-    \CA{Article}\A{\Named{ArticleThreads}}]{SAPBtn}{}{11bp}}
-\def\showArticlePaneRead{\pushButton[
-    \CA{Article}\A{\Named{ArticleThreads}
-    \Next{/S/Thread /D(\threadTitle)}}]{SAPRBtn}{}{11bp}}
-% Links may be used as well, here is only one such, this link below is hard-wired
-% modify as needed.
-%\setLink[\A{/S/Thread/D(Methodology)}]{Read Article}
+\let\pkg\textsf
 
 \setAddToBorder{addtow=4bp,addtoh=4bp}
 
@@ -32,14 +21,14 @@
 
 
 \noindent
-Below is a description of the \setLink[\linktxtcolor{red}\A{/S/Thread/D(Methodology)}]{methodology}
+Below is a description of the \setLink[\linktxtcolor{red}\A{\Thread{Methodology}}]{methodology}
 for developing article threads. You
 may compile this document using any of the usual drivers (options
 \texttt{dvips}, \texttt{pdftex}, \texttt{xetex}, \texttt{dvipdfm}, \texttt{dvipdfmx}).
 Play around with various combinations of \texttt{preview}, \texttt{!preview},
 \texttt{viewMagWin}, and \texttt{!viewMagWin}.
 
-\setThreadInfo{
+\setThreadInfo{%
     title=Methodology,
     author=D. P. Story,
     subject=Article thread test,
@@ -47,14 +36,14 @@ Play around with various combinations of \texttt{preview}, \texttt{!preview},
 }
 
 \begin{multicols}{2}
-\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=4in+2\baselineskip}\indent
+\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=4in+2\baselineskip}%
 There are two places to begin a thread: (1) at the very beginning of a paragraph;
 and (2) from within a paragraph. Method~(1) is preferred. We began this paragraph
 with
 \begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
 \noindent\bArticle{lift=\baselineskip,
     width=\linewidth,
-    height=4in+2\baselineskip}\indent
+    height=4in+2\baselineskip}%
 There are two places...
 \end{Verbatim}
 Place article threads after you've finished composing your document. While
@@ -105,5 +94,34 @@ text block.
 \noindent
 Adding text to the columns will change the positions of the article threads, for
 this reason, the threads need to be inserted after the document is finished.
+
+
+\setThreadInfo{%
+    title=\textbraceleft J\"{u}rgen's Thread\textbraceright,
+    author={D. P. Story, J\"{u}rgen},
+    subject=Discussion of the PDFDocEncloding Character Set,
+    keywords={AeB, PDF, LaTeX}
+}
+
+% Pass the title through \pdfstringdef, then pass directly as the argument of \Thread
+\pdfstringdef\JT{\textbraceleft J\"{u}rgen's Thread\textbraceright}
+% Here is a link with the thread title pass directly to the \Thread command.
+% \setLink[\linktxtcolor{red}\A{\Thread{\JT}}]{\textbraceleft{J\"{u}rgen's Thread}\textbraceright}
+\begin{center}
+\setLink[\cmd{\readArticle{\textbraceleft J\"{u}rgen's Thread\textbraceright}}\linktxtcolor{red}\A{\Thread{\threadTitle}}]{\textbraceleft{J\"{u}rgen's Thread}\textbraceright}\\[10bp]
+\begin{minipage}{5in}
+\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=12\baselineskip+6pt}%
+The \pkg{artthreads} package does support, through \pkg{hyperref}, the PDFDocEncloding Character Set. This thread offers
+a brief discussion of the topic. The \texttt{title} of this thread is
+\verb~\textbraceleft J\"{u}rgen's Thread\textbraceright~, which is properly understood to be
+``\textbraceleft J\"{u}rgen's Thread\textbraceright'' and appears correctly in the \setLink[\linktxtcolor{red}\A{\sArticlesPaneActn}]{\textsf{Articles}} pane.
+Use standard {\LaTeX} markup for accents, as in \verb~J\"{u}rgen~. Creating a link to such ``special titles''
+requires a little bit of trouble. When using the \cs{Thread} command to create an action to read an article thread,
+rather than passing the thread title directly as an argument, pass \verb~\A{\Thread{\threadTitle}}~ in the optional
+argument of a link, prior to that, insert \verb~\cmd{<thread-title>}}~ in the optional argument. See
+the link created for this article. You can also pass the thread title directly to \cs{Thread} but you must
+pass the title through \cs{pdfstringdef} first, the source of this file for details.
+\end{minipage}
+\end{center}
 
 \end{document}

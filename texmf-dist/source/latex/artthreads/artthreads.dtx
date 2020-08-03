@@ -1,8 +1,8 @@
 %\iffalse
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% artthreads.sty package,                   2016-04-09 %%
-%% Copyright (C) 2016  D. P. Story                      %%
+%% artthreads.sty package,                              %%
+%% Copyright (C) 2016 -- 2020                           %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,20 +14,29 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{artthreads}
-%<package> [2016/04/09 v1.1 Support for article threads (dps)]
+%<package> [2020/07/09 v1.3.1 Support for article threads (dps)]
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[colorlinks,hyperindex]{hyperref}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
 \usepackage{fancyvrb,array,calc}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
-%\EnableCrossrefs \CodelineIndex
+\EnableCrossrefs
+\CodelineIndex
 \RecordChanges
 \bgroup\ttfamily
 \gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\pkg\textsf
+\let\tops\texorpdfstring
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
 \def\ameta#1{\ensuremath{\langle\textsl{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \def\cs#1{\texttt{\bslash#1}}
+\def\EXCL{!}
 \DeclareRobustCommand{\tmspace}[3]{%
   \ifmmode\mskip#1#2\else\kern#1#3\fi\relax}
 \renewcommand{\,}{\tmspace+\thinmuskip{.1667em}}
@@ -47,10 +56,13 @@
 \renewenvironment{quote}[1][]
    {\def\@rgi{#1}\ifx\@rgi\@empty
     \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
-    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \list{}{\rghtm}%{\rightmargin\leftmargin}%
     \item\relax}
    {\endlist}
 \makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{artthreads}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{artthreads}{aebdocfmt.def cannot be found}}
 \begin{document}
 \def\CMD#1{\textbackslash#1}
   \GetFileInfo{artthreads.sty}
@@ -60,28 +72,27 @@
   \date{processed \today}
   \maketitle
   \tableofcontents
-  \let\Email\texttt
-  \renewenvironment{theglossary}{%
-    \let\efill\relax
-    \begin{itemize}}{\end{itemize}}
-   \value{GlossaryColumns}=1
   \DocInput{artthreads.dtx}
-  \PrintIndex
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\PrintIndex}{\paragraph*{Index}
+    The index goes here.\\Execute
+    \texttt{makeindex -s gind.ist -o artthreads.ind artthreads.idx} on the command line
+    and recompile \texttt{artthreads.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of
+    changes goes here.\\Execute
+    \texttt{makeindex -s gglo.ist -o artthreads.gls artthreads.glo} on the command line
+    and recompile \texttt{artthreads.dtx}.}
 \end{document}
 %</driver>
 % \fi
-% \MakeShortVerb{|}
-% \StopEventually{}
 %
-% \DoNotIndex{\def,\edef,\gdef,\xdef,\global,\long,\let}
-% \DoNotIndex{\expandafter,\string,\the,\ifx,\else,\fi}
-% \DoNotIndex{\csname,\endcsname,\relax,\begingroup,\endgroup}
-% \DoNotIndex{\DeclareTextCommand,\DeclareTextCompositeCommand}
-% \DoNotIndex{\space,\@empty,\special}
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{artthreads}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{artthreads}{aebdonotindex.def cannot be found}}
 %
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
+% \changes{v1.2}{2016/05/02}{Modified documentation to reflect new \string\textsf{DC} thread icons.}
 %
 % \section{Introduction}
 % This package is used to create \textit{article threads} around blocks of content. Generally,
@@ -96,80 +107,102 @@
 % \section{Options and Required Packages}
 %    \begin{macrocode}
 \RequirePackage{xkeyval}
-\RequirePackage{ifpdf}[2006/02/20]
-\RequirePackage{ifxetex}[2006/08/21]
-\@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
 %    \end{macrocode}
-% \paragraph*{Driver options.} Three options, \DescribeMacro{dvips,dvipsone}\texttt{dvips} (the default)
-% and \texttt{dvipsone}, both of which require \textbf{Adobe Distiller}
-% as the PDF creator; the \DescribeMacro{pdftex}\texttt{pdftex} allows for the same functionality
-% for the \textsf{pdflatex} executable. We also support \DescribeMacro{xetex,dvipdfm,dvipdfmx}\texttt{dvipdfm}
-% and its extensions.
+% \paragraph*{Driver options.} These options are  \opt{dvips} (the default),
+% \opt{pdftex}, \opt{luatex}, and \opt{xetex}
+% are automatically detected, other drivers supported are \opt{dvipdfm} and
+% \opt{dvipdfmx}.
 %
-% \paragraph*{Preview options.} The \DescribeMacro{preview}\texttt{preview}
+% \paragraph*{Preview options.} The \texttt{preview}
 % option is a carry over from \textsf{eforms}. When selected, all form fields are outlined; useful when
 % setting the location of fields in a dvi previewer. The other option is \texttt{viewMagWin}
-% \DescribeMacro{viewMagWin} will show the viewing windows surrounding the target. This is the rectangle
+% will show the viewing windows surrounding the target. This is the rectangle
 % that will be jumped to. Use this option to adjust the size of the window to your needs.
 % When either of the last two options has an exclamation point prior, that means to
 % turn off the switch. You can conveniently use \texttt{viewMagWin} to see the viewing window,
-% then change it to \DescribeMacro{!viewMagWin}\texttt{!viewMagWin} to remove the visible window. Cool.
-% Similarly, you can turn off \texttt{preview} using \DescribeMacro{!preview}\texttt{!preview}.
+% then change it to \texttt{!viewMagWin} to remove the visible window. Cool.
+% Similarly, you can turn off \texttt{preview} using \texttt{!preview}.
 %    \begin{macrocode}
 %    \end{macrocode}
-% All options are passed to the \textsf{fitr} package, which contains a lot of the code
+% \leavevmode\IndexOpt{pdftex}^^A
+% \IndexOpt{luatex}^^A
+% All options are passed to the \pkg{fitr} package, which contains a lot of the code
 % used in this package.
 %    \begin{macrocode}
 \DeclareOptionX{pdftex}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{luatex}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 %    \end{macrocode}
+% \leavevmode\IndexOpt{dvips}^^A
+% \IndexOpt{dvipsone}^^A
 % Distiller based drivers.
 %    \begin{macrocode}
 \DeclareOptionX{dvips}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 \DeclareOptionX{dvipsone}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 %    \end{macrocode}
-% \textsf{dvipdfm} and its variants.
+% \leavevmode\IndexOpt{xetex}^^A
+% \IndexOpt{dvipdfm}^^A
+% \IndexOpt{dvipdfmx}^^A
+% \opt{xetex} and its variants.
 %    \begin{macrocode}
 \DeclareOptionX{dvipdfm}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 \DeclareOptionX{dvipdfmx}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 \DeclareOptionX{xetex}{\PassOptionsToPackage{\CurrentOption}{fitr}}
 %    \end{macrocode}
+% \leavevmode\IndexOpt{preview}^^A
+% \IndexOpt[\protect\EXCL]{!preview}^^A
+% \IndexOpt{viewMagWin}^^A
+% \IndexOpt[\protect\EXCL]{!viewMagWin}^^A
+% Preview preferences
 %    \begin{macrocode}
-\DeclareOptionX{preview}{\PassOptionsToPackage{\CurrentOption}{fitr}}
-\DeclareOptionX{!preview}{\PassOptionsToPackage{\CurrentOption}{fitr}}
-\DeclareOptionX{viewMagWin}{\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{preview}
+  {\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{!preview}
+  {\PassOptionsToPackage{\CurrentOption}{fitr}}
+\DeclareOptionX{viewMagWin}
+  {\PassOptionsToPackage{\CurrentOption}{fitr}}
 \DeclareOptionX{!viewMagWin}
-    {\PassOptionsToPackage{\CurrentOption}{fitr}}
+  {\PassOptionsToPackage{\CurrentOption}{fitr}}
+%    \end{macrocode}
+%    Any other options are passed on to \pkg{fitr}. One useful
+%    option is \opt{gonative}, which creates no document JavaScript.
+%    Consequently, the \texttt{latex\,->\,dvips\,->\,ps2pdf} workflow
+%    is supported.
+%    \begin{macrocode}
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{fitr}}
 \ProcessOptionsX
 %    \end{macrocode}
 % \section{The Main Code}
 % We require the package \textsf{fitr}, as we use many commands from that package.
 % We pass all options to \textsf{fitr}.
+% \changes{v1.3.1}{2020/07/09}{Require \string\pkg{fitr} package, dated 2020/07/09}
 %    \begin{macrocode}
-\RequirePackage{fitr}[2016/04/04]
+\RequirePackage{fitr}[2020/07/09]
 %    \end{macrocode}
 % Some scratch counters, lengths, boxes.
 %    \begin{macrocode}
 \newif\ifnewarticle
-\newcounter{artthrdcnt}
+\newcounter{@rtBtnCnt}
 \def\CntArt{0}\def\CntArtInfo{0}
 \def\inc@CntMacro#1{{\@tempcnta#1\relax\advance\@tempcnta1\relax
     \xdef#1{\the\@tempcnta}}}
 \def\artM@rk{[\space}
 %    \end{macrocode}
-% \paragraph*{Key-values for \cs{setThreadInfo}} We set up
-% key-values\DescribeMacro{title}\DescribeMacro{author}\DescribeMacro{subject}^^A
-% \DescribeMacro{keywords} for the thread \textsf{Info} dictionary. Only the title
-% is required, that's why a default value of \texttt{thread-<num>} is otherwise provided.
+% \subsection{\tops{\protect\cs{setThreadInfo}}{\textbackslash{setThreadInfo}} and its KV-pairs}
+% We set up
+% key-values\IndexKey{title}\IndexKey{author}\IndexKey{subject}^^A
+% \IndexKey{keywords} for the thread \textsf{Info} dictionary. Only the title
+% is required, that's why a default value of \texttt{thread-\ameta{num}} is otherwise provided.
+% For \app{pdflatex} and \app{lualtex}, only \texttt{title} is supported.
 %    \begin{macrocode}
-\define@key{artthrd}{title}[]{\def\threadTitle{#1}}
-    \let\threadTitle\@empty
-\define@key{artthrd}{author}[]{\def\threadAuthor{#1}}
-    \let\threadAuthor\@empty
-\define@key{artthrd}{keywords}[]{\def\threadKeywords{#1}}
-    \let\threadKeywords\@empty
-\define@key{artthrd}{subject}[]{\def\threadSubject{#1}}
-    \let\threadSubject\@empty
+\define@key{artthrd}{title}[]{\Hy@unicodefalse
+  \pdfstringdef\threadTitle{#1}}
+  \let\threadTitle\@empty
+\define@key{artthrd}{author}[]{\pdfstringdef\threadAuthor{#1}}
+  \let\threadAuthor\@empty
+\define@key{artthrd}{keywords}[]{\pdfstringdef\threadKeywords{#1}}
+  \let\threadKeywords\@empty
+\define@key{artthrd}{subject}[]{\pdfstringdef\threadSubject{#1}}
+  \let\threadSubject\@empty
 %    \end{macrocode}
 % Use \DescribeMacro{\setThreadInfo}\cmd{\setThreadInfo} prior to the opening of a
 % new thread using \cs{cArticle}. Through its key-values, set the title, author,
@@ -179,16 +212,15 @@
     \let\threadTitle\@empty\let\threadAuthor\@empty
     \let\threadKeywords\@empty\let\threadSubject\@empty
     \setkeys{artthrd}{#1}\ifx\threadTitle\@empty
-        \def\threadTitle{thread-\CntArtInfo}\fi
-}
+        \def\threadTitle{thread-\CntArtInfo}\fi}
 \def\bArtErrMsg{When starting a new article thread
-    (\string\cArticle)\MessageBreak
+    (\string\bArticle)\MessageBreak
     first use \string\setThreadInfo\space to set the title,\MessageBreak
     author, subject, and keywords}
 %    \end{macrocode}
 % \paragraph*{Additional key-values for threads} In addition to the key-values provided
 % by \textsf{fitr}, we provide a few more. The two keys
-% \DescribeMacro{addtow}\texttt{addtow} and \DescribeMacro{addtoh}\texttt{addtoh}
+% \IndexKey{addtow}\texttt{addtow} and \IndexKey{addtoh}\texttt{addtoh}
 % adds to the reading border of the threads. These are set through the
 % command \DescribeMacro{\setAddToBorder}\cs{setAddToBorder}. For the most part,
 % choices for \texttt{addtow} (add to the width) and \texttt{addtoh} (add to the height)
@@ -202,20 +234,20 @@
 \def\artthrd@@addtoh{0}
 \newcommand{\setAddToBorder}[1]{\setkeys{@rtthrd}{#1}}
 %    \end{macrocode}
+% \subsection{The \tops{\protect\cs{bArticle} and \protect\cs{cArticle}}{\textbackslash{bArticle} and \textbackslash{cArticle}} commands}
 % The \DescribeMacro{\bArticle}\cmd{\bArticle} is used to start an article thread. The thread
 % may continue with \cs{cArticle}. Both commands have a required argument, consisting of
 % key-values defined by \textsf{fitr}.
 % The following is the syntax, with appropriate keys defined in \texttt{fitr}.
-% \begin{quote}\ttfamily
-% \string\cArticle\char123lift=\ameta{length},width=\ameta{length},height=\ameta{length}\char125
-% \end{quote}
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\cArticle{lift=!ameta(length),width=!ameta(length),height=!ameta(length)}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\bArticle}{\begingroup\inc@CntMacro\CntArt
     \ifnum\CntArt=\CntArtInfo\relax\else
     \PackageError{artthreads}{\bArtErrMsg}{See package documentation
     for \string\setThreadInfo}\fi
-    \newarticletrue\set@rectart
-}
+    \newarticletrue\set@rectart}
 %    \end{macrocode}
 % The only difference between \DescribeMacro{\cArticle}\cmd{\cArticle} and
 % \cmd{\bArticle} is the stepping of the counter \cmd{\CntArt}
@@ -225,163 +257,274 @@
 %    \end{macrocode}
 % \cmd{\set@rectart} continues \cs{bArticle}/\cs{cArticle}.
 %    \begin{macrocode}
-\newcommand{\set@rectart}[1]{\def\fitr@artrect@argi{#1}%
+\newcommand{\set@rectart}[1]{%\def\fitr@artrect@argi{#1}% dps
     \edef\temp@exp{\noexpand\setkeys{fitr}{#1}}\temp@exp
     \set@@rectart}
 %    \end{macrocode}
 % \cmd{\set@@rectart} is the main command for building the thread.
 %    \begin{macrocode}
 \def\set@@rectart{\def\fitr@setBL{0pt}%
-    \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
-        {\let\fitr@FLB@ction\ef@Bbox}%
-    \get@fitr@dimen{%
-        \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
-        {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}%
-    }%
-    \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
-        \raisebox{\fitr@@lift-\fitr@setBL}{%
+  \@ifundefined{ef@Bbox}{\let\fitr@FLB@ction\Bbox}%
+    {\let\fitr@FLB@ction\ef@Bbox}%
+  \get@fitr@dimen{%
+    \parbox[\fitr@@refPt][\fitr@@height]{\fitr@@width}%
+    {\kern0pt\fitr@FLB@ction{\fitr@@width}{\fitr@@height}\kern0pt}%
+  }%
+  \makebox[0pt][l]{\hspace*{\fitr@@shift}\smash{%
+    \raisebox{\fitr@@lift-\fitr@setBL}{%
 %    \end{macrocode}
 % Actually insert the thread code here by inserting \cs{setThre@d}.
 %    \begin{macrocode}
-        \setThre@d{\artthrd@@addtow}{\artthrd@@addtoh}%
-        \unhbox\fitr@bbox
-        \fitr@urxury@fixup{\artthrd@@addtow}{\artthrd@@addtoh}{}%
-    }}}\setlength{\fboxsep}{0pt}%
+      \setThre@d{\artthrd@@addtow}{\artthrd@@addtoh}%
+      \unhbox\fitr@bbox
+      \fitr@urxury@fixup{\artthrd@@addtow}{\artthrd@@addtoh}{}%
+  }}}\setlength{\fboxsep}{0pt}%
 %    \end{macrocode}
 % Now place an extended border around the viewing area
 %    \begin{macrocode}
-    \ifviewMagWin
-        \fitr@length=\artthrd@@addtow bp
-        \fitr@length=2\fitr@length
-        \addtolength{\fitr@length}{\fitr@@width}%
-        \edef\fitr@@width{\the\fitr@length}%
-        \fitr@length=\artthrd@@addtoh bp
-        \fitr@length=2\fitr@length
-        \addtolength{\fitr@length}{\fitr@@height}%
-        \edef\fitr@@height{\the\fitr@length}%
-        \setlength\fitr@length{-\artthrd@@addtow bp}%
-        \addtolength\fitr@length{\fitr@@shift}%
-        \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
-            \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
-            \if\fitr@@refPt b%
-              \addtolength\fitr@length{-\artthrd@@addtoh bp}\else
-            \if\fitr@@refPt t%
-              \addtolength\fitr@length{\artthrd@@addtoh bp}%
-            \fi\fi
-            \raisebox{\fitr@length}%
-            {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
-            {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
-        }%
-    \fi
+  \ifviewMagWin
+    \fitr@length=\artthrd@@addtow bp
+    \fitr@length=2\fitr@length
+    \addtolength{\fitr@length}{\fitr@@width}%
+    \edef\fitr@@width{\the\fitr@length}%
+    \fitr@length=\artthrd@@addtoh bp
+    \fitr@length=2\fitr@length
+    \addtolength{\fitr@length}{\fitr@@height}%
+    \edef\fitr@@height{\the\fitr@length}%
+    \setlength\fitr@length{-\artthrd@@addtow bp}%
+    \addtolength\fitr@length{\fitr@@shift}%
+    \makebox[0pt][l]{\hspace*{\fitr@length}\smash{%
+      \setlength\fitr@length{\fitr@@lift-\fitr@setBL}%
+      \if\fitr@@refPt b%
+        \addtolength\fitr@length{-\artthrd@@addtoh bp}\else
+      \if\fitr@@refPt t%
+        \addtolength\fitr@length{\artthrd@@addtoh bp}%
+      \fi\fi
+      \raisebox{\fitr@length}%
+      {\fbox{\parbox[\fitr@@refPt][\fitr@@height]%
+      {\fitr@@width}{\kern0pt\hfill\vfill\kern0pt}}}}%
+    }%
+  \fi
 \endgroup}
 %    \end{macrocode}
-% \paragraph*{Driver dependent macros} The \cs{ThrBbox} macros perform different tasks
-% depending on the driver.
+% \subsection{The driver dependent commands}
+% We begin with a required definition to enable \app{lualatex} to function correctly.
+%    \begin{macrocode}
+\ifluatex\protected\def\pdfthread{\pdfextension thread }\fi
+%    \end{macrocode}
+%    \DescribeMacro\AT@ThrBbox\nmpsep{\darg{\ameta{add-wd}\darg{\ameta{add-ht}}}} The definition
+%    of \cmd{\set@rtThrd} depends on the driver. The arguments are dimensionless numbers, representing
+%    Adobe points. The \cs{AT@ThrBbox} macros perform different tasks, one of which is to calculate the dimensions
+%    of the bounding box for the viewing rectangle. It is used in \cs{set@rtThrd}, defined below.
+% \changes{v1.3}{2020/07/03}{Add special definition for threads in the case of lualatex}
+% \changes{v1.3}{2020/07/03}{Added \string\cs{Thread}}
 %    \begin{macrocode}
 \if@fitr@dvipdfm
 %    \end{macrocode}
-%    For the \textsf{dvipdfm} and friends
+%    For the \app{xelatex} and friends
 %    \begin{macrocode}
-\def\ThrBbox#1#2{%
-    \fitr@length=#1bp
-    \fitr@length=2\fitr@length
-    \advance\fitr@length\wd\fitr@bbox
-    \edef\fitr@xetex@view@width{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\ht\fitr@bbox
-    \edef\fitr@xetex@view@height{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\dp\fitr@bbox
-    \edef\fitr@xetex@view@depth{\the\fitr@length}%
-}\else\ifx\fitr@driver\fitr@pdftex@driver
+\def\AT@ThrBbox#1#2{%
+  \fitr@length=#1bp
+  \fitr@length=2\fitr@length
+  \advance\fitr@length\wd\fitr@bbox
+  \edef\fitr@xetex@view@width{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\ht\fitr@bbox
+  \edef\fitr@xetex@view@height{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\dp\fitr@bbox
+  \edef\fitr@xetex@view@depth{\the\fitr@length}%
+}\else
+\ifpdf
 %    \end{macrocode}
-%    For the \textsf{pdftex} and friends
+%    For the \app{pdftex} and friends
+%    \changes{v1.3}{2020/07/03}{Use \string\cs{ifpdf}}
 %    \begin{macrocode}
-\def\ThrBbox#1#2{%
-    \fitr@length=#1bp
-    \fitr@length=2\fitr@length
-    \advance\fitr@length\wd\fitr@bbox
-    \edef\fitr@pdftex@view@width{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\ht\fitr@bbox
-    \edef\fitr@pdftex@view@height{\the\fitr@length}%
-    \fitr@length=#2bp
-    \advance\fitr@length\dp\fitr@bbox
-    \edef\fitr@pdftex@view@depth{\the\fitr@length}%
-}\else\ifx\fitr@driver\fitr@dvipsone@driver
+\def\AT@ThrBbox#1#2{%
+  \fitr@length=#1bp
+  \fitr@length=2\fitr@length
+  \advance\fitr@length\wd\fitr@bbox
+  \edef\fitr@pdftex@view@width{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\ht\fitr@bbox
+  \edef\fitr@pdftex@view@height{\the\fitr@length}%
+  \fitr@length=#2bp
+  \advance\fitr@length\dp\fitr@bbox
+  \edef\fitr@pdftex@view@depth{\the\fitr@length}%
+}\else
+\ifx\fitr@driver\fitr@dvipsone@driver
 %    \end{macrocode}
-%    For the \textsf{dvipsone} driver
+%    For the \app{dvipsone} driver
 %    \begin{macrocode}
-\def\ThrBbox#1#2{%
-   currentpoint 2 copy %
-   \the\fitr@depth\space add #2\space PDFtoTeX add      % y1
-   exch #1\space PDFtoTeX sub exch                      % x1
-   4 2 roll exch
-   \the\fitr@width\space add #1\space PDFtoTeX add exch % x2
-   \the\fitr@height\space sub #2\space PDFtoTeX sub}    % y2
-\else\ifx\fitr@driver\fitr@dvips@driver
+\def\AT@ThrBbox#1#2{%
+  currentpoint 2 copy %
+  \the\fitr@depth\space add #2\space PDFtoTeX add      % y1
+  exch #1\space PDFtoTeX sub exch                      % x1
+  4 2 roll exch
+  \the\fitr@width\space add #1\space PDFtoTeX add exch % x2
+  \the\fitr@height\space sub #2\space PDFtoTeX sub}    % y2
+\else
+\ifx\fitr@driver\fitr@dvips@driver
 %    \end{macrocode}
-%    For the \textsf{dvips} driver
+%    For the \app{dvips} driver
 %    \begin{macrocode}
-\def\ThrBbox#1#2{% Uses \fitr@bbox
-    currentpoint 2 copy %
-    \the\fitr@depth\space SPtoDvips add
-        #2\space BPToDvips add                  % y1
-    exch #1\space BPToDvips sub exch            % x1
-    4 2 roll exch
-    \the\fitr@width\space SPtoDvips add
-        #1\space BPToDvips add exch             % x2
-    \the\fitr@height \space SPtoDvips sub
-    #2\space BPToDvips sub}                     % y2
+\def\AT@ThrBbox#1#2{% Uses \fitr@bbox
+  currentpoint 2 copy %
+  \the\fitr@depth\space SPtoDvips add
+      #2\space BPToDvips add                  % y1
+  exch #1\space BPToDvips sub exch            % x1
+  4 2 roll exch
+  \the\fitr@width\space SPtoDvips add
+      #1\space BPToDvips add exch             % x2
+  \the\fitr@height \space SPtoDvips sub
+  #2\space BPToDvips sub}                     % y2
 \fi\fi\fi\fi
 %    \end{macrocode}
 % \paragraph*{Code to set the thread} The \cs{setThre@d} macros are driver dependent.
+% \medskip\par\noindent
+% \DescribeMacro\setThre@d\nmpsep{\darg{\ameta{add-wd}\darg{\ameta{add-ht}}}} This macro
+% strips out the dimensions of its arguments (10bp becomes 10) and passes these new arguments
+% to \cmd{\set@rtThrd}.
 %    \begin{macrocode}
 \def\setThre@d#1#2{%
-    \fitr@defaultbp{\aWd}{#1}\fitr@defaultbp{\aHt}{#2}%
-    \edef\tmp@exp{\noexpand\set@rtThrd{\aWd}{\aHt}}\tmp@exp
-}
+  \fitr@defaultbp{\aWd}{#1}\fitr@defaultbp{\aHt}{#2}%
+  \edef\tmp@exp{\noexpand\set@rtThrd{\aWd}{\aHt}}\tmp@exp}
 \if@fitr@dvipdfm
 %    \end{macrocode}
-%    For the \textsf{dvipdfm} and friends
+%    \DescribeMacro\set@rtThrd\nmpsep{\darg{\ameta{add-wd}\darg{\ameta{add-ht}}}} The definition
+%    of \cmd{\set@rtThrd} depends on the driver. The arguments are dimensionless numbers, representing
+%    Adobe points.\medskip\par\noindent
+%    For the \textsf{xelatex} and friends
 %    \begin{macrocode}
-\def\set@rtThrd#1#2{\ThrBbox{#1}{#2}%
-    \smash{\raisebox{-\fitr@xetex@view@height+#2bp}%
-        {\makebox[0pt][l]{\hspace*{-#1bp}%
-    \@pdfm@mark{thread @artthrd\CntArt\space
-    width \fitr@xetex@view@width\space
-    height \fitr@xetex@view@height\space
-    depth \fitr@xetex@view@depth\space
-    << /Title (\threadTitle)
-\ifnewarticle
-    /Author (\threadAuthor)
-    /Subject (\threadSubject)
-    /Keywords (\threadKeywords)
-\fi >>}}}}}\else\ifx\fitr@driver\fitr@pdftex@driver
+\def\set@rtThrd#1#2{\AT@ThrBbox{#1}{#2}%
+  \smash{\raisebox{-\fitr@xetex@view@height+#2bp}%
+      {\makebox[0pt][l]{\hspace*{-#1bp}%
+  \@pdfm@mark{thread @artthrd\CntArt\space
+  width \fitr@xetex@view@width\space
+  height \fitr@xetex@view@height\space
+  depth \fitr@xetex@view@depth\space
+  << /Title (\threadTitle)
+  \ifnewarticle
+  /Author (\threadAuthor)
+  /Subject (\threadSubject)
+  /Keywords (\threadKeywords)\fi >>}}}}}\else
+\ifpdf
 %    \end{macrocode}
-%    \textsf{pdftex} and friends
+%    For \app{pdftex} and friends
+%    \changes{v1.3}{2020/07/03}{Use \string\cs{ifpdf}}
 %    \begin{macrocode}
-\def\set@rtThrd#1#2{\ThrBbox{#1}{#2}%
-    \makebox[0pt][l]{\hspace*{-#1bp}%
-    \pdfthread
-        width  \fitr@pdftex@view@width\space
-        height \fitr@pdftex@view@height\space
-        depth  \fitr@pdftex@view@depth\space
-     name {\threadTitle}}}\else
+\def\set@rtThrd#1#2{\AT@ThrBbox{#1}{#2}%
+  \makebox[0pt][l]{\hspace*{-#1bp}%
+  \pdfthread
+    width  \fitr@pdftex@view@width\space
+    height \fitr@pdftex@view@height\space
+    depth  \fitr@pdftex@view@depth\space
+    name {\threadTitle}}}\else
 %    \end{macrocode}
-%    For drivers that use PostScript and the \textbf{pdfmark}.
-%    \changes{v1.1}{2016/04/09}{Removed the Page key and dependence on the refcount package}
+%    For drivers that use PostScript and the \textsf{\textbf{pdfmark}}.
+%    \changes{v1.1}{2016/04/09}{Removed the Page key and dependence on the
+%       \string\textsf{refcount} package}
 %    \begin{macrocode}
 \def\set@rtThrd#1#2{\literalps@out{\artM@rk
-    /Rect [\ThrBbox{\artthrd@@addtow}{\artthrd@@addtoh}]
-    /Title (\threadTitle)
-\ifnewarticle
+  /Rect [\AT@ThrBbox{\artthrd@@addtow}{\artthrd@@addtoh}]
+  /Title (\threadTitle)
+  \ifnewarticle
     /Author (\threadAuthor)
     /Subject (\threadSubject)
-    /Keywords (\threadKeywords)
-\fi
+    /Keywords (\threadKeywords)\fi
     /ARTICLE pdfmark}}
 \fi\fi
+%    \end{macrocode}
+% \subsection{Some navigation commands}
+%    \begin{macrocode}
+\let\threadTitle\@empty
+%    \end{macrocode}
+%    \DescribeMacro{\Thread}\nmpsep{\darg{\ameta{thread-title}}} The action to start
+%    read a thread whose title is \ameta{thread-title}. For example,
+%    |\setLink[\A{\Thread{Lipsum}}]{Read Lipsum}| \medskip
+%    \begin{macrocode}
+\providecommand{\Thread}[1]{/S/Thread/D(#1)}
+%    \end{macrocode}
+%    \DescribeMacro\shArticlesPaneActn\DescribeMacro\sArticlesPaneActn Actions for show/hid
+%    articles pane and to just show articles pane (The named action \texttt{ArticleThreads} is
+%    undocumented, don't remember show I got this name.) In addition to these two, we combine
+%    them with read thread actions: \DescribeMacro\shArticlesPaneReadActn\DescribeMacro\sArticlesPaneReadActn
+%    \begin{macrocode}
+\def\shArticlesPaneActn{\Named{ShowHideArticles}}
+\def\sArticlesPaneActn{\Named{ArticleThreads}}
+\def\shArticlesPaneReadActn{\shArticlesPaneActn
+  \Next{\Thread{\threadTitle}}}
+\def\sArticlesPaneReadActn{\sArticlesPaneActn
+  \Next{\Thread{\threadTitle}}}
+%    \end{macrocode}
+%    \DescribeMacro\readArticle\nmpsep{\darg{\ameta{thread-title}}} is a macro intended
+%    to be passed to a push button action through the \cs{cmd} key. For example,\medskip
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\showArticlePaneRead[!textbf(\cmd{\readArticle{more Lipsum}})]{}{11bp}
+%\end{Verbatim}
+%It should be used with \cs{toggleArticlePaneRead} and \cs{showArticlePaneRead} (push buttons). Alternatively,
+%these actions can be done through a link:
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9},commandchars={!()}]
+%\setLink[\cmd{\readArticle{Lipsum}}
+%\A{\shArticlesPaneReadActn}]{Lipsum}
+%\end{Verbatim}
+%    \begin{macrocode}
+\def\readArticle#1{\Hy@unicodefalse
+  \pdfstringdef\AT@x{#1}\edef\threadTitle{\AT@x}}
+\def\chkThreadName{%
+  \ifx\threadTitle\@empty
+    \global\let\isThrTtl\ef@NO
+    \def\readArtPresets{\cmd{\let\Next\@gobble}}\else
+    \global\let\isThrTtl\ef@YES
+    \let\readArtPresets\@empty
+  \fi
+}
+\def\readThreadMsg{\ifx\isThrTtl\ef@NO
+  \PackageWarning{artthreads}{No thread title specified to read}\fi}
+%    \end{macrocode}
+%    \DescribeMacro\toggleArticlePane\nmpsep{[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A push button whose action toggles the Articles pane open and closed.
+%    \begin{macrocode}
+\newcommand{\toggleArticlePane}[3][]{\stepcounter{@rtBtnCnt}%
+  \pushButton[\CA{Article}\TU{Toggle Articles Pane}#1
+  \A{\shArticlesPaneActn}
+]{TAPBtn\the@rtBtnCnt}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\toggleArticlePaneRead\nmpsep{[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A push button whose action us to toggle the Articles pane state (show/hide) and to begin reading the
+%    thread titled \cs{threadTitle}. If this command is placed after the \cs{setThreadInfo}
+%    command, then \cs{threadTitle} is the title set by the title key of \cs{setThreadInfo}.
+%    \begin{macrocode}
+\def\tooltipTogglePaneRead#1{\def\ttToggleP@neRead{#1}}
+\tooltipTogglePaneRead{Toggle Articles pane and read
+  the article \threadTitle}
+\newcommand{\toggleArticlePaneRead}[3][]{\begingroup
+  \stepcounter{@rtBtnCnt}\pushButton[\CA{Article}#1
+  \TU{\ttToggleP@neRead}\cmd{\chkThreadName}
+  \presets{\readArtPresets}\A{\shArticlesPaneReadActn}
+]{TAPRBtn\the@rtBtnCnt}{#2}{#3}\readThreadMsg\endgroup}
+%    \end{macrocode}
+%    \DescribeMacro\showArticlePane\nmpsep{[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}} A push button
+%    whose action is to show the Articles pane.
+%    \begin{macrocode}
+\newcommand{\showArticlePane}[3][]{\stepcounter{@rtBtnCnt}%
+  \pushButton[\CA{Article}\TU{Show Articles Pane}#1
+  \A{\sArticlesPaneActn}
+]{SAPBtn\the@rtBtnCnt}{#2}{#3}}
+%    \end{macrocode}
+%    \DescribeMacro\showArticlePaneRead\nmpsep{[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    A push button whose action is to show the Articles and to begin reading the
+%    thread titled \cs{threadTitle}. If this command is placed after the \cs{setThreadInfo}
+%    command, then \cs{threadTitle} is the title set by the title key of \cs{setThreadInfo}.
+%    \begin{macrocode}
+\def\tooltipShowPaneRead#1{\def\ttShowP@neRead{#1}}
+\tooltipShowPaneRead{Show Articles pane and read
+  the article \threadTitle}
+\newcommand{\showArticlePaneRead}[3][]{\begingroup
+  \stepcounter{@rtBtnCnt}\pushButton[\CA{Article}#1
+  \TU{\ttShowP@neRead}\cmd{\chkThreadName}
+  \presets{\readArtPresets}\A{\sArticlesPaneReadActn}
+]{SAPRBtn\the@rtBtnCnt}{#2}{#3}\readThreadMsg\endgroup}
 %    \end{macrocode}
 %    \begin{macrocode}
 %</package>

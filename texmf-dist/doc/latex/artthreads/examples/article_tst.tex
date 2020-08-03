@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[!viewMagWin,!preview]{artthreads}
+\usepackage{multicol,lipsum}
+\hypersetup{colorlinks}
+
+\setAddToBorder{addtow=10bp,addtoh=10bp}
+
+\begin{document}
+
+\noindent
+The two article threads: \setLink[\A{\Thread{Lipsum}}]{Read Lipsum}
+and \setLink[\A{\Thread{more Lipsum}}]{Read more Lipsum}.
+
+\setThreadInfo{title=Lipsum,author=D. P. Story,subject=Article thread test,keywords={AeB, PDF, LaTeX}}%
+
+\raggedcolumns
+\begin{multicols}{2}
+\noindent\makebox[0pt][r]{\showArticlePaneRead{}{11bp}\hspace{\marginparsep}}%
+\bArticle{lift=\baselineskip,width=\linewidth,height=\textheight-2\baselineskip}%
+\textsl{This is a series of paragraphs to fill the multi-columns of this document. It is imperative
+that we have a lot of text to fill these columns, but I fear that I don't know what to write.}
+
+\textsl{Well, here goes.} \lipsum[2]
+
+\textsl{That want well, more?} \lipsum[4]
+
+\textsl{Ok, I have the hang of it now.} \lipsum[6]
+
+\noindent\cArticle{lift=9\baselineskip,width=\linewidth,height=\textheight-2\baselineskip}\indent
+\textsl{Continuing now with} \lipsum[8]
+
+\textsl{I'm on a roll!} \lipsum[10]
+
+\end{multicols}
+
+\newpage
+
+\noindent\cArticle{lift=\baselineskip,width=\linewidth,height=1.5\baselineskip}%
+Same `article' but broken down into smaller pieces as an exercise.
+
+\setThreadInfo{title=more Lipsum,author=D. P. Story,subject=Article thread test,keywords={AeB, PDF, LaTeX}}%
+\begin{multicols}{2}\previewOn % locally turn on preview
+\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=3in+3\baselineskip}%
+\textsl{This is a series of paragraphs to fill the multi-columns of this document. It is imperative
+that we have a lot of text to fill these columns, but I fear that I don't know what to write.}
+
+\textsl{Well, here goes.} \lipsum[2]
+
+\noindent\cArticle{lift=\baselineskip,width=\linewidth,height=4in-1.5\baselineskip}\indent
+\textsl{That want well, more?} \lipsum[4]
+
+\textsl{Ok, I have the hang of it now.} \lipsum[6]
+
+\noindent\cArticle{lift=9\baselineskip,width=\linewidth,height=4in+2\baselineskip}\indent
+\textsl{Continuing now with,} \lipsum[8]
+
+\noindent\cArticle{lift=\baselineskip,width=\linewidth,height=3in-\baselineskip}\indent
+\textsl{I'm on a roll!} \lipsum[10]
+
+\end{multicols}
+
+\end{document}

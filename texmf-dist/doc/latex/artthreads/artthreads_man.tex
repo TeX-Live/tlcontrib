@@ -10,9 +10,11 @@
 %\usepackage{calibri}
 \usepackage[altbullet]{lucidbry}
 
-\usepackage[dvipsone,!viewMagWin,!preview]{artthreads}
+\usepackage[!viewMagWin,!preview]{artthreads}
 \usepackage{lipsum,multicol}
 \raggedcolumns
+
+%\previewOn\pmpvOn
 
 \makeatletter
 \renewenvironment{quote}[1][]
@@ -27,15 +29,16 @@
 %\usepackage{makeidx}
 %\makeindex
 \usepackage{acroman}
-
-
 \usepackage[active]{srcltx}
 
-\urlstyle{tt}
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{\raisebox{#1}{\parbox{\marginparwidth}{\slshape\raggedleft\small#2}}}}
+\addtolength{\marginparwidth}{1in}
 
-%\def\tutpath{doc/tutorial}
-%\def\tutpathi{tutorial}
-%\def\expath{../examples}
+\let\uif\textsf
+
+\leftmargini\amtIndent\relax
+
+\urlstyle{tt}
 
 \DeclareDocInfo
 {
@@ -46,7 +49,7 @@
     email={dpstory@acrotex.net},
     subject=Documentation for artthreads package,
     talksite={\url{www.acrotex.net}},
-    version={1.0},
+    version={1.3.1, 2020/07/09},
     Keywords={LaTeX, article threads, multi-column documents, AcroTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -63,30 +66,100 @@
 \subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
 
 \optionalPageMatter{%
+\setThreadInfo{title=Stop!,author=D. P. Story,
+    subject=Some early advice,keywords={AeB, PDF, LaTeX}}%
 \begin{center}
-\fcolorbox{blue}{webyellow}{
+\fcolorbox{blue}{webyellow}{%\previewOn
 \begin{minipage}{.67\linewidth}%
-\textbf{\textcolor{red}{Stop!}} Before you read this documentation, take a moment to change
-your preferences: On your menu system if \app{Adobe Acrobat/Reader}, select \textsf{Edit\,>\,\penalty0Preferences\,>\,\penalty0General}, and \emph{clear
+\bArticle{lift=\baselineskip-1pt,shift=-\fboxsep-\fboxrule,width=\linewidth+2\fboxsep+2\fboxrule,height=13\baselineskip+\fboxsep+6pt}%
+\textbf{\textcolor{red}{Stop!}} Before you read this documentation, take a
+moment to change your preferences: On your menu system of \app{Adobe
+Acrobat/Reader}, select
+\textsf{Edit\,>\,\penalty0Preferences\,>\,\penalty0General}, and \emph{clear
 the checkbox} for the item named \textsf{Make Hand tool select text \&
 images}, as listed under \textsf{Basic Tools} on that dialog box.
-(\textsf{Ctrl+K} or \textsf{Command+K} is the shortcut to the Preferences
-dialog box on \app{Windows} and \app{Mac OS}, respectively.) This makes reading an article thread
-much easier. Look for the hand icon with a down arrow on it.\hfill\dps
+(\textsf{Ctrl+K} or \textsf{Command+K} is the shortcut to the \textsf{Preferences}
+dialog box on \app{Windows} or \app{Mac OS}, respectively.) This makes
+reading an article thread much easier. Look for the hand icon with a down
+arrow on it.\medskip
+
+Article threads are an \app{Adobe Reader}/\app{Acrobat} feature. To my knowledge, they
+have not been implemented in any other PDF viewer. So, a PDF containing article threads
+must be viewed in \app{Adobe Reader} or \app{Acrobat}\hfill\dps
 \end{minipage}}
 \end{center}
 }
 
+\def\bART{\placeImage{Art-Start}{10bp}{10bp}}
+\def\cART{\placeImage{Art-Down}{10bp}{10bp}}
+\def\rART{\placeImage{Art-Up}{10bp}{10bp}}
+\def\eART{\placeImage{Art-End}{10bp}{10bp}}
+\def\bARTDC{\placeImage{Art-StartDC}{10bp}{10bp}}
+\def\cARTDC{\placeImage{Art-DownDC}{10bp}{10bp}}
+\def\rARTDC{\placeImage{Art-UpDC}{10bp}{10bp}}
+\def\eARTDC{\placeImage{Art-EndDC}{10bp}{10bp}}
 
+
+\declareMultiImages
+{%
+    {path=article_icons.pdf,page=0,placement={Art-Start}}
+    {path=article_icons.pdf,page=1,placement={Art-Down}}
+    {path=article_icons.pdf,page=2,placement={Art-Up}}
+    {path=article_icons.pdf,page=3,placement={Art-End}}
+% New DC icons
+    {path=article_icons.pdf,page=4,placement={Art-StartDC}}
+    {path=article_icons.pdf,page=5,placement={Art-DownDC}}
+    {path=article_icons.pdf,page=6,placement={Art-UpDC}}
+    {path=article_icons.pdf,page=7,placement={Art-EndDC}}
+}
+%\begin{docassembly}
+%\insertPreDocAssembly
+%\addWatermarkFromFile({
+%    bOnTop:false,
+%    cDIPath:"C:/Users/Public/Documents/ManualBGs/Manual_BG_Print_AeB.pdf"
+%});
+%\executeSave();
+%\end{docassembly}
+
+\chngDocObjectTo{\newDO}{doc}
 \begin{docassembly}
+\insertPreDocAssembly
+var titleOfManual="The artthreads Package";
+var manualfilename="Manual_BG_Print_artthreads.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
 \addWatermarkFromFile({
     bOnTop:false,
-    cDIPath:"C:/Users/Public/Documents/ManualBGs/Manual_BG_Print_AeB.pdf"
+    bOnPrint:false,
+    cDIPath:_path
 });
 \executeSave();
 \end{docassembly}
 
 \begin{document}
+
 
 \maketitle
 
@@ -96,9 +169,9 @@ much easier. Look for the hand icon with a down arrow on it.\hfill\dps
 
 \setAddToBorder{addtow=5bp,addtoh=0bp}
 
-\newcommand\showArtPanel[1][Article]{\pushButton[
-    \CA{#1}\A{\Named{ArticleThreads}
-    \Next{/S/Thread /D(\threadTitle)}}]{Btn}{}{11bp}}
+%\newcommand\showArtPanel[1][Article]{\pushButton[
+%    \CA{#1}\A{\Named{ArticleThreads}
+%    \Next{/S/Thread /D(\threadTitle)}}]{Btn}{}{11bp}}
 
 
 \section{Introduction}
@@ -107,8 +180,12 @@ much easier. Look for the hand icon with a down arrow on it.\hfill\dps
     subject=Introduction to article threads,keywords={AeB, PDF, LaTeX}}%
 
 
+%\makebox[0pt][r]{\showArtPanel[Intro]\relax\kern11bp}%
+%\showArticlePaneRead
+%\showArticlePaneRead[\CA{Intro}]{}{11bp}
+
 \begin{multicols}{2}
-\noindent\makebox[0pt][r]{\showArtPanel[Intro]\relax\kern11bp}%
+\noindent\makebox[0pt][r]{\pushButton[\CA{Intro}\A{\Thread{Introduction}}]{BtnIntro}{}{11bp}\kern11bp}%
 \bArticle{lift=\baselineskip,width=\linewidth,height=2.5in}%
 \noindent Through the commands of the \pkg{artthreads} package, you can
 create \textit{article threads}, a concept/feature of \app{Adobe
@@ -118,14 +195,14 @@ is in a multi-column format, or, perhaps, a single narrow column.
 
 When a document uses a multiple column format, it is often difficult, or at
 the very least inconvenient, to read it. When document page is fit into the viewing
-window, the text may be two small to read. This requires the reader, that's
+window, the text may be too small to read. This requires the reader, that's
 you, to adjust the magnification (zoom) level of the page to fit a column of
 text comfortably in the application window.\vadjust{\noindent
 \cArticle{lift=2\baselineskip,width=\linewidth,height=2.5in}}
 Once the column is fitted, additional navigation is needed to move the window
 view down one column, then up to the top of the next column. Think of trying
 to read a digital newspaper with many columns. Such navigation is tedious and
-distracts from reading the information begin presented.
+distracts from reading the information being presented.
 
 Set the article threads after the composition of the document is completed.
 The method of setting the threads is \emph{very visual} not automatic as in
@@ -138,13 +215,16 @@ the \pkg{threadcol} package of Scott Patkin.
 \setThreadInfo{title=Navigation,author=D. P. Story,
     subject=Navigation to article threads,keywords={AeB, PDF, LaTeX}}%
 
+%\makebox[0pt][r]{\showArtPanel[Navigate]\kern11bp}%
+%\showArticlePaneRead[\CA{Navigate}]{}{11bp}
+
 \begin{multicols}{2}
-\noindent\makebox[0pt][r]{\showArtPanel[Navigate]\kern11bp}%
+\noindent\makebox[0pt][r]{\pushButton[\CA{Navigate}\A{\Thread{Navigation}}]{BtnNavi}{}{11bp}\kern11bp}%
 \bArticle{lift=\baselineskip,width=\linewidth,height=4.2in}%
-\noindent Perhaps you noticed the `Intro' button on exhibit in this previous
-section or the `Navigate' button in this section as well. Clicking these
-buttons reveals the \textsf{Article} panel in the left-hand navigation pane.
-Listed there are all the articles created for this documentation.
+\noindent Perhaps you've noticed the `Intro' button on exhibit in this
+previous section or the `Navigate' button in this section as well. Clicking
+these buttons reveals the \mlsetLink[\linktxtcolor{red}\A{\shArticlesPaneActn}]{\kern0pt\sffamily Articles \normalfont panel} in the left-hand navigation
+pane. Listed there are all the articles created for this documentation.
 Right-clicking on any of the listed article names brings up a context menu;
 select \textsf{Read Article} to begin reading or choose \textsf{Properties}
 to see the thread info, which (may) include the title, author, subject, and
@@ -155,17 +235,18 @@ reading a thread: (1)~first open the \textsf{Article} pane
 (\textsf{View\,\penalty0>\penalty0\,\penalty0Show/Hide\,\penalty0>\,\penalty0Navigation
 Panes\,>\,Articles}), left-click an article title and select \textsf{Read
 Article}, or simple double-click an article title; or (2) place your mouse
-pointer over text, if it changes to a hand with an arrow on it, the text is
+pointer over text, if it changes to a hand with an arrow on it (\bART), the text is
 part of an article thread, simply click on it to begin.
 
 \paragraph*{Navigating a thread.} Once you have initiated \textsf{Read
 Article}, you can navigate through the article thread using any of the
 following methods\vadjust{\noindent
 \cArticle{lift=2\baselineskip,width=\linewidth,height=4.2in}}: (1)~click in
-an area when the mouse is a hand icon with an arrow on it to move forward
-(shift-click to move back); (2) press the \textsf{Enter} key to move forward
+an area when the mouse is a hand icon with an arrow on it (\cART) to move forward
+(shift-click to move back (\rART)); (2) press the \textsf{Enter} key to move forward
 (or shift+\textsf{Enter} to move back); or (3) the page down (or page up)
-keys will also move you around within the thread.
+keys will also move you around within the thread. At the end of the thread, you'll
+see this hand icon \eART.
 
 There may be problems in getting the hand icon with the arrow on it to
 appear, if this is the case, open the \textsf{Preferences} menu,
@@ -180,6 +261,10 @@ article threads and see how they work, the next thing to do is to see how
 they are created with the \pkg{artthreads} package.
 \end{multicols}
 
+It should be noted that in recent versions of \app{DC}, the thread icons are
+changed from \bART, \cART, \rART, and {\eART} to \bARTDC, \cARTDC,
+\rARTDC, and \eARTDC, respectively.
+
 \section{Creating article threads}
 
 We begin by including the \pkg{artthreads} package in your document.
@@ -188,7 +273,7 @@ We begin by including the \pkg{artthreads} package in your document.
 \end{Verbatim}
 The \pkg{artthreads} package brings in the \pkg{fitr} package
 (\url{http://ctan.org/pkg/fitr}), many commands from that package are used.
-In fact, the same set of package options are used.
+All options of \pkg{artthreads} are passed to \pkg{fitr}.
 
 \setThreadInfo{title=Package options,author=D. P. Story,
     subject=options of the artthreads package,keywords={AeB, PDF, LaTeX}}%
@@ -197,21 +282,22 @@ In fact, the same set of package options are used.
 \paragraph*{Package options.}
 The package has ten options: six driver options and four viewing
 options.
-\begin{multicols}{2}\previewtrue\viewMagWintrue
+\begin{multicols}{2}\previewOn\viewMagWinOn
 \setAddToBorder{addtow=10bp,addtoh=10bp}
 \begin{itemize}
 \item \bArticle{lift=\baselineskip,width=\linewidth,height=2.5in}%
-    \textbf{Driver Options:} These are \texttt{dvips} (the default),
-    \texttt{dvipsone}, and \texttt{pdftex} (which includes the use of
-    \textsf{lualatex}), \texttt{dvipdfm}, \texttt{dvipdfmx}, and
-    \texttt{xetex}. If you specify one of the first two, it is assumed that
-    you are using \textsf{Adobe Distiller} as your PDF creator.
+    \textbf{Driver Options:} The major driver options are \opt{dvips} (the
+    default), \opt{pdftex}, \opt{luatex}, and \opt{xetex}; there are two
+    minor driver options, these are \opt{dvipdfm} and \opt{dvipdfmx}. If
+    you specify \opt{dvips}, it is assumed the PDF creator is \app{Adobe
+    Distiller}.\footnote{You can use \app{dvips\,->\,ps2pdf} if there
+    are no document JavaScripts.}
 
-    The \textsf{fitr} package checks whether the \textsf{web} package is
-    loaded, if so, its uses the driver used by \textsf{web}; otherwise
-    \textsf{fitr} auto-detects for \textsf{pdftex} and \textsf{xetex}. If
-    no driver is passed, and neither \textsf{pdftex} nor \textsf{xetex} are
-    detected, then \textsf{dvips} is the default driver.
+    The \pkg{artthreads} package uses the driver of the \pkg{web} package,
+    if it is loaded; otherwise \pkg{artthreads} auto-detects for
+    \app{pdflatex}, \app{lualatex} and \app{xelatex}. If no driver is
+    passed and no driver is automatically detected, the \app{dvips} driver
+    is used.
 
 \setAddToBorder{addtow=0bp,addtoh=0bp}
 
@@ -221,7 +307,7 @@ options.
         dvi-previewer (or the PDF document); you can turn off this preview
         by specifying \texttt{!preview} (or removing \texttt{preview}
         entirely from the option list). The other option type is
-        \texttt{viewMagWin}, when this option the viewing window, a
+        \texttt{viewMagWin}. When this option is specified, the viewing window, a
         rectangular region, becomes visible in the dvi-previewer (or in the
         PDF document); specifying \texttt{!viewMagWin} turns off this type
         of preview.
@@ -229,21 +315,21 @@ options.
 %\item[] The effects of the viewing options will be illustrated later in this
 %document, see \autoref{previewEx} on page~\pageref*{previewEx}.
 \end{itemize}
-\end{multicols}
+\end{multicols}\noindent
 You'll notice the two rectangular regions around the left column. The inner
 one is made visible by the \texttt{preview} option (or locally by
-\cs{previewtrue}), you can see that it covers `precisely' the text of the
+\cs{previewOn}), you can see that it covers `precisely' the text of the
 item. The outer rectangle is exposed by the \texttt{viewMagWin} option (or
-locally by \cs{viewMagWintrue}). When you view the thread -- and you do not
+locally by \cs{viewMagWinOn}). When you view the thread -- and you do not
 define an `extra' border around the viewing area -- the inner rectangle is
-use. The text in this inner rectangle may not be entirely adequate for
+used. The text in this inner rectangle may not be entirely adequate for
 reading as it is very `tight' around the text. It is for this reason, we
 expand the viewing area by a specified amount. Compare the reading comfort of
-the left column verses the right column. (Try viewing the column thread with
+the left column versus the right column. (Try viewing the column thread with
 a narrow application window.)
 
-You may have also that the viewer returns to the same page view the page was
-in prior to reading the thread.
+You may have noticed that the viewer returns to the same page view the page
+was in prior to reading the thread.
 
 \paragraph*{The article info.} The specifications for an article thread require
 it to have a title, and to optionally have key-values for author, subject, and keywords.
@@ -256,9 +342,9 @@ it to have a title, and to optionally have key-values for author, subject, and k
 a generated value of \texttt{thread-\ameta{num}}. The \cs{setThreadInfo}
 command must appear prior to the opening the thread (see \cs{bArticle} below)
 to which it applies, if it does not, a {\LaTeX} error occurs. The drivers
-\opt{dvips}, \opt{dvipsone}, \opt{xetex} (\opt{dvipdfm}, \opt{dvipdfmx})
-support all four keys; however, \opt{pdftex} only supports the \texttt{title}
-key.
+\opt{dvips} and \opt{xetex} (\opt{dvipdfm}, \opt{dvipdfmx}) support all four
+keys; however, \opt{pdftex} and \opt{lualatex} only supports the
+\texttt{title} key.
 
 \paragraph*{The article thread commands.} There is one command
 (\cs{bArticle}) for beginning an article thread, and another (\cs{cArticle})
@@ -274,8 +360,7 @@ to continue that thread.
 \item \texttt{width=\ameta{length}}: The value of \opt{width} sets the
     width of the thread to \ameta{length}; \ameta{length} is usually, but
     not always, \cs{linewidth}. Dimension arithmetic is supported with the
-    value of \opt{width} (\texttt{width=\cs{linewidth}\,+\,3pt}, for
-    example).
+    value of \opt{width}; for example, \texttt{width=\cs{linewidth}\,+\,3pt}.
 
 \item \texttt{height=\ameta{length}}: The value of \opt{height} sets the
     height of the thread to \ameta{length}. As with the \opt{width} key,
@@ -308,16 +393,16 @@ sides of the rectangular boundary of the thread; \opt{addtoh} adds
 \ameta{length} to the top and bottom of the rectangular boundary of the
 thread. The default dimensions for these two keys are \texttt{0pt}.
 \begin{multicols}{2}\setThreadInfo{title=Illustrate \string\\setAddToBorder}%
-\noindent\setAddToBorder{addtow=10bp,addtoh=10bp}\previewtrue\viewMagWintrue
+\noindent\setAddToBorder{addtow=10bp,addtoh=10bp}\previewOn\viewMagWinOn
 {\small\verb|\setAddToBorder{addtow=10bp,|\\
-\null\qquad\verb|addtoh=10bp}|}\\\vadjust{\noindent\bArticle{lift=3\baselineskip,width=\linewidth,height=6\baselineskip}}
+\null\quad\verb|addtoh=10bp}|}\\\vadjust{\noindent\bArticle{lift=3\baselineskip,width=\linewidth,height=6\baselineskip}}%
 In this column we've set a \texttt{10bp} border around the thread. When you click
 on the reading area, the viewer should zoom to the width of the wider rectangle.
 \vfill
 \columnbreak
-\noindent\setAddToBorder{addtow=4bp,addtoh=4bp}\previewtrue\viewMagWintrue
+\noindent\setAddToBorder{addtow=4bp,addtoh=4bp}\previewOn\viewMagWinOn
 {\small\verb|\setAddToBorder{addtow=4bp,|\\
-\null\qquad\verb|addtoh=4bp}|}\\\vadjust{\noindent\cArticle{lift=3\baselineskip,width=\linewidth,height=6\baselineskip}}
+\null\quad\verb|addtoh=4bp}|}\\\vadjust{\noindent\cArticle{lift=3\baselineskip,width=\linewidth,height=6\baselineskip}}%
 In this column, we've set a \texttt{4bp} border. Again, when you click on the
 reading area, the viewer should zoom to the width of the wider rectangle.
 \end{multicols}
@@ -329,56 +414,74 @@ Postscript or PDF dimensions, depending on the driver.
 documentation, a description of the methodology, accompanied by examples. As
 pointed out early in this documentation, the method for applying the article
 threads is very visual. Compose your document content first, and then insert the
-document threads. Page~\arabic{page}
-\begin{center}\previewtrue\viewMagWintrue
+document threads.
+\begin{center}\previewOn\viewMagWinOn
 \begin{minipage}{.8\linewidth}\parindent=20pt\relax
-We illustrate the techniques in a single column of goodly width.
+We illustrate the techniques in a single column with a generous width.
 First we declare our add to border dimension and article info
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \setAddToBorder{addtow=4bp,addtoh=4bp}
 \setThreadInfo{title=Methodology,author=D. P. Story}
 \end{Verbatim}
 There are two places to begin a thread: (1) at the very beginning of a paragraph;
 and (2) from within a paragraph. Method~(1) is preferred. We begin the next paragraph
 with
-\begin{Verbatim}[fontsize=\small]
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
 \noindent\bArticle{lift=\baselineskip,
     width=\linewidth,height=1in+3\baselineskip}%
 Now we begin our deep thoughts...
 \end{Verbatim}
+\end{minipage}
+\end{center}
 \setAddToBorder{addtow=4bp,addtoh=4bp}
 \setThreadInfo{title=Methodology,author=D. P. Story}
-\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=1in+3\baselineskip}%
+
+\def\pi{\noindent\makebox[0pt][r]{\ding{182}\hskip\marginparsep}}
+\def\pii{\noindent\makebox[0pt][r]{\ding{183}\hskip\marginparsep}}
+\def\piii{\noindent\makebox[0pt][r]{\ding{184}\hskip\marginparsep}}
+
+\begin{center}\previewOn\viewMagWinOn
+\begin{minipage}{.8\linewidth}\parindent=\amtIndent\relax
+\newtopic\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=1in+3\baselineskip}%
+\pi\indent
 Now we begin our deep thoughts. During this development phase, the options
 \opt{preview} and \opt{viewMagWin} should be in effect. In a \EXT{DVI}
-viewer, we can see the bounding rectangles. We can see its too low, too long
+viewer, we can see the bounding rectangles. We can see it is too low, too long
 and so on. For users of \app{pdflatex}, \app{xelatex}, etc., view your
 documents in the \EXT{DVI} previewer first (or view them as a \EXT{PDF}).
 I've used \texttt{lift=\string\baselineskip} to raise up the thread rectangle
 by that mount to enclose the first line. The value of \opt{width} is usually
 \cs{linewidth}, but the value of \opt{height} may have to be adjusted, in this
 example, I've ``tweaked'' the \texttt{1in} by \texttt{3\string\baselineskip}.
+\end{minipage}
+\end{center}
 
-\newtopic Naturally, after you're satisfied, you then remove
+\begin{center}\previewOn\viewMagWinOn
+\begin{minipage}{.8\linewidth}\parindent=\amtIndent\relax
+\newtopic\pii Naturally, after you're satisfied, you then remove
 \opt{preview} and \opt{viewMagWin} or change them to
 \opt{!preview} and \opt{!viewMagWin}. Another possible location is from within
 a paragraph, here, we continue the previous thread using the \cs{cArticle} command
 in conjunction with the \cs{vadjust} {\TeX} primitive\vadjust{\noindent
 \cArticle{lift=5\baselineskip,width=\linewidth,height=2in+\baselineskip}}.
-Between the end of the word `primitive' and the period (.) ending the sentence, I've place
+Between the end of the word `primitive' and the period (.) ending the sentence, I've placed,
 \begin{Verbatim}[fontsize=\small]
 primitive\vadjust{\noindent\cArticle{lift=5\baselineskip,
     width=\linewidth,height=2in+\baselineskip}}. Between the
 \end{Verbatim}
-The value of \texttt{lift=5\string\baselineskip} we chosen because the
+We chose \texttt{lift=5\string\baselineskip} because the
 original positioning of the thread rectangle was too low by about five lines.
 The value of \texttt{height} was chosen to cover the paragraph once the
 complete paragraph was composed.
+\end{minipage}
+\end{center}
 
-\previewfalse\viewMagWinfalse
-We now declare \verb|\previewfalse\viewMagWinfalse|.
+\previewOff\viewMagWinOff
+\begin{center}
+\begin{minipage}{.8\linewidth}\parindent=20pt\relax
+We now declare \verb|\previewOff\viewMagWinOff|.
 
-\noindent\cArticle{lift=\baselineskip,width=\linewidth,height=.5in+3\baselineskip}\indent
+\noindent\piii\cArticle{lift=\baselineskip,width=\linewidth,height=.5in+3\baselineskip}\indent
 Of course, in this example, it was entirely unnecessary to insert the
 \cs{cArticle} mid-paragraph, it would have been better placed at the
 beginning of the paragraph. Placing \cs{cArticle} mid-paragraph is useful for
@@ -391,34 +494,44 @@ By the way, notice the use of \cs{noindent}, this is
 oftentimes needed to position the article thread in the left margin of the
 text block.
 
-\paragraph*{The demo file.} The demo file \texttt{article\_tech.tex}
+\paragraph*{Continuing a thread from one page to the next.} To continue
+reading across a page boundary, continue the thread on the previous page
+using \cs{cArticle}. For example, the most recent thread begins with
+paragraph~\ding{182} (\cs{bArticle}) and continues with paragraph~\ding{183}
+and~\ding{184} (\cs{cArticle}). Paragraphs~\ding{182} and~\ding{183} are on
+the previous page, while paragraph~\ding{184} is on this page. As you read
+this thread, paragraph~\ding{182} is presented first, followed by
+paragraph~\ding{183}, and finally, paragraph~\ding{185} on the subsequent
+page.
+
+\paragraph*{The demo files.} The demo file \texttt{article\_tech.tex}
 reproduces the discussion on methods, it is found in the \texttt{examples}
 folder.
-
 
 \setThreadInfo{title=Final Thread,{author=D. P. Story, Ph.D.}}
 
 \newtopic\noindent In this documentation, I've covered the content with many article threads; normally,
-for multi-column content, one thread per column is sufficient.
-\begin{multicols}{2} %\previewtrue
-\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=6.7in}\indent
+for multi-column content, one thread per column is sufficient. The thread for this article continues
+on to the next page, as this Lipsum text illustrates.
+\begin{multicols}{2} %\previewOn
+\noindent\bArticle{lift=\baselineskip,width=\linewidth,height=4.1in-\baselineskip}\relax
 \lipsum[2]
 
 \lipsum[4]
 
+\noindent\cArticle{lift=4\baselineskip,width=\linewidth,height=4.1in-\baselineskip}\indent
 \lipsum[6]
 
-\noindent\cArticle{lift=3\baselineskip,width=\linewidth,height=6.7in}\indent
 \lipsum[7]
 
+\noindent\cArticle{lift=11\baselineskip,width=\linewidth,height=6.25in+\baselineskip}\indent
 \lipsum[10]
 
 \lipsum[12]
 
-\noindent\cArticle{lift=10\baselineskip,width=\linewidth,height=4in-\baselineskip}\indent
+\noindent\cArticle{lift=2\baselineskip,width=\linewidth,height=6.25in+\baselineskip}\indent
 \lipsum[14]
 
-\noindent\cArticle{lift=8\baselineskip,width=\linewidth,height=4in-\baselineskip}\indent
 \lipsum[16]
 
 \end{multicols}
@@ -426,6 +539,124 @@ for multi-column content, one thread per column is sufficient.
 \paragraph*{The demo file.} The demo file for this package is \texttt{article\_tst.tex},
 available in the \texttt{examples} folder.
 
+\section{Other navigation commands}
+
+There are several commands for creating links or push button actions that
+open the \uif{Articles} pane and/or begin reading a specified article.
+
+\paragraph*{Manipulating the \uif{Articles} pane.} The following two commands represent
+actions that toggle the \uif{Articles} pane (\cs{shArticlesPaneActn}) or just open/show the \uif{Articles} pane (\cs{sArticlesPaneActn}).
+\bVerb\takeMeasure{\string\shArticlesPaneReadActn}%
+\setlength{\dimen0}{\bxSize}%
+\def\1{\rlap{\hskip\dimen0\relax\sffamily(Toggle Articles pane action)}}
+\def\2{\rlap{\hskip\dimen0\relax\sffamily(Show Articles pane action)}}
+\def\3{\rlap{\hskip\dimen0\relax\sffamily(Toggle Articles pane and read article action)}}
+\def\4{\rlap{\hskip\dimen0\relax\sffamily(Show Articles pane and read article action)}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\shArticlesPaneActn
+!2\sArticlesPaneActn
+!3\shArticlesPaneReadActn
+!4\sArticlesPaneReadActn
+\end{dCmd}
+\eVerb For example,
+\begin{quote}
+    \setLink[\A{\shArticlesPaneActn}]{Toggle \uif{Articles} pane}\\
+    \verb!\setLink[\A{\shArticlesPaneActn}]{Toggle \textsf{Articles} pane}!\\[3pt]
+    \setLink[\A{\sArticlesPaneActn}]{Show \uif{Articles} pane}\\
+    \verb!\setLink[\A{\sArticlesPaneActn}]{Show \textsf{Articles} pane}!
+\end{quote}
+These two actions can be used by push buttons as well.
+
+\paragraph*{Reading a thread.} To create an action to read a thread with a title of \ameta{thread-title},
+use \cs{Thread\darg{\ameta{thread-title}}}. For example,
+\begin{quote}
+    Read about the \setLink[\A{\Thread{Package options}}]{Package options}.\\
+    \verb~\setLink[\A{\Thread{Package options}}]{Package options}.~
+\end{quote}
+Again notice that the viewer returns you to the jumping off point after
+you've finished reading the thread. The \cs{Thread\darg{\ameta{thread-title}}}
+action can be part of a push button action as well.
+
+\paragraph*{Some push buttons.} \pkg{artthreads} has some push buttons with common actions,
+these are,
+\bVerb\takeMeasure{\string\toggleArticlePaneRead[\ameta{KV-pairs}]\darg{\ameta{wd}}\darg{\ameta{ht}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\toggleArticlePane[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\toggleArticlePaneRead[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\showArticlePane[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\showArticlePaneRead[!ameta(KV-pairs)]{!ameta(wd)}{!ameta(ht)}
+\end{dCmd}
+\eVerb The names of the commands describe the action they perform. However,
+the commands \cs{toggleArticlePaneRead} and \cs{showArticlePaneRead} require special comment.
+Each begins an article thread, but which article thread?
+\begin{quote}%\previewOn\pmpvOn
+    \showArticlePaneRead{}{11bp}\\[2bp]
+    \verb!\showArticlePaneRead{}{11bp}!
+\end{quote}
+Without any further qualifiers, this button begins reading the thread as
+determined by the value of the \texttt{title} key of the last
+\cs{setThreadInfo} command declared. So, the above push button should begin
+the thread titled ``\threadTitle''. However, to program the button to begin
+reading the thread titled \ameta{thread-title}, use the following syntax:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\showArticlePaneRead[!textbf(\cmd{\readArticle{!ameta(thread-title)}})]{}{11bp}
+\end{Verbatim}
+We illustrate by using \cs{showArticlePaneRead} to read the thread with title
+``Package options,'' and the same action in a link.
+\begin{quote} %\previewOn\pmpvOn
+    \showArticlePaneRead[\cmd{\readArticle{Package options}}]{}{11bp}\\[2bp]
+    \verb~\showArticlePaneRead[\cmd{\readArticle{Package options}}]{}{11bp}~\\[4bp]
+    \setLink[\cmd{\readArticle{Package options}}\A{\sArticlesPaneReadActn}]{Show \textsf{Articles} pane and read the Package options article}\\[2bp]
+    \verb~\setLink[\cmd{\readArticle{Package options}}~\\
+    \null\quad\verb~\A{\sArticlesPaneReadActn}]{Show \textsf{Articles} pane~\\
+    \null\quad\verb~and read the Package options article}~
+\end{quote}
+
+\subparagraph*{Tooltips for push buttons.} The tooltips for the commands
+\cs{toggleArticlePane} and \cs{showArticlePane} are \textsf{Toggle Articles
+Pane} and \textsf{Show Articles Pane}, respectively. These can be localized
+using the \cs{TU} key if \pkg{eforms}; for example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={|()}]
+\showArticlePane[|textbf(\TU{Umschalten der Artikel Schaltfl\"{a}che})]{}{11bp}
+\end{Verbatim}
+which may be German for \textsf{Toggle Articles Pane}.
+
+For the other two, \cs{toggleArticlePaneRead} and \cs{showArticlePaneRead}, two convenience
+commands are defined.
+\bVerb\takeMeasure{\string\tooltipTogglePaneRead\darg{\ameta{text}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\tooltipTogglePaneRead{!ameta(text)}
+\tooltipShowPaneRead{!ameta(text)}}
+\end{dCmd}
+\eVerb The values of \ameta{text} allows for the inclusion of the command
+\cs{threadTitle}, which expands to the current title of the thread article.
+The default definitions are,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\tooltipTogglePaneRead{Toggle Articles pane and
+  read the article \threadTitle}
+\tooltipShowPaneRead{Show Articles pane and
+  read the article \threadTitle}
+\end{Verbatim}
+If you roll over the button at the top of the this page, its tooltip will read \textsf{Show Articles pane and
+  read the article Package options}. The two commands may be declare with an appropriate language localization.
+
+\setThreadInfo{%
+    title=J\"{u}rgen's Thread,
+    author={D. P. Story, J\"{u}rgen},
+    subject=Discussion of the PDFDocEncloding Character Set,
+    keywords={AeB, PDF, LaTeX}
+}
+
+%\previewOn
+\noindent\bArticle{lift=-\medskipamount-4pt,width=\linewidth,height=5\baselineskip+6pt}%
+\paragraph*{Beyond Basic ASCII.} Begin by reading \setLink[\cmd{\readArticle{J\"{u}rgen's Thread}}\linktxtcolor{red}\A{\Thread{\threadTitle}}]{J\"{u}rgen's Thread}.
+The examples of this reference and, for the most part in the sample
+files, use Basic ASCII as the thread titles; however, the full PDFDocEncoding
+character set is also supported. The sample file \texttt{article\_tech.tex}
+provides a more complete discussion of this topic, as well as a more
+complicated example. Check out the
+\setLink[\linktxtcolor{red}\A{\sArticlesPaneActn}]{\textsf{Articles}} pane to
+see the title of this thread listed.
 
 \section{My retirement}
 

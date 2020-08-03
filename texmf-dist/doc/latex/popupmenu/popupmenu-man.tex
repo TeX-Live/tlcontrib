@@ -1,0 +1,685 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,tight*,usetemplates,
+        forcolorpaper,latextoc,pro},%usesf,
+        eforms,aebxmp
+]{aeb_pro}
+%\usepackage{multicol}
+%\usepackage{aeb_mlink}
+\usepackage[tracking]{popupmenu}
+\usepackage{array}
+\usepackage[altbullet]{lucidbry}
+
+%\previewOn
+
+\usepackage{makeidx}
+\makeindex
+\usepackage{acroman}
+
+\leftmargini\parindent
+
+
+\usepackage[active]{srcltx}
+
+\urlstyle{rm}
+\let\tops\texorpdfstring
+\let\pkg\textsf
+\let\app\textsf
+\let\opt\texttt
+\let\uif\textsf
+\let\env\texttt
+\def\meta#1{\textit{\texttt{#1}}}
+\def\ameta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\newdimen\aebdimen \aebdimen6pt %\partopsep  \advance\aebdimen\partopsep
+\newcommand\bVerb[1][]{\begingroup#1\vskip\aebdimen\parindent0pt}%
+\def\eVerb{\vskip\aebdimen\endgroup\noindent}
+\def\SUB#1{\ensuremath{{}_{\text{#1}}}}
+\def\darg#1{\texttt{\{#1\}}}
+\def\takeMeasure{\bgroup\obeyspaces\takeMeasurei}
+\def\takeMeasurei#1{\global\setbox\webtempboxi\hbox{\ttfamily#1}\egroup}
+\def\bxSize{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\let\amtIndent\leftmargini
+\makeatletter
+\def\setDisplayNumber#1#2{\kern0pt
+    \setlength\abovedisplayshortskip{0pt}%
+    \setlength\belowdisplayshortskip{0pt}%
+    \setlength\abovedisplayskip{0pt}%
+    \setlength\belowdisplayskip{0pt}%
+    \begin{equation}\label{#2}\end{equation}\kern0pt
+}
+\renewenvironment{quote}[1][]
+   {\def\@rgi{#1}\ifx\@rgi\@empty
+    \let\rghtm\@empty\else\def\rghtm{\rightmargin\leftmargin}\fi
+    \list{}{\rghtm} %{\rightmargin\leftmargin}%
+    \item\relax}
+   {\endlist}
+\renewcommand*\descriptionlabel[1]{\hspace\labelsep
+    \normalfont #1}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{5}
+\renewcommand*{\theparagraph}{\texorpdfstring{\protect\P\protect\ }{\textparagraph}}
+\renewcommand{\paragraph}
+    {\renewcommand{\@seccntformat}[1]{\theparagraph}%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}} %\color{\aeb@subsubsectioncolor}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+\def\chgCurrLblName#1{\def\@currentlabelname{#1}}
+\def\echgCurrLblName#1{\edef\@currentlabelname{#1}}
+\makeatother
+
+\reversemarginpar
+\def\FmtMP#1{\marginpar{\slshape\raggedleft\small#1}}
+
+
+\newcommand{\YT}{\textsf{YouTube}}
+
+
+%\def\tutpath{doc/tutorial}
+%\def\tutpathi{tutorial}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The manual for the \tops{\protect\pkg}{}{popupmenu} package},
+%    title={The \texorpdfstring{\textsf{popupmenu} Package\\[1em]}{: }
+%        Create popup-menus to perform actions},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Creating popup-menues},
+    talksite={\url{www.acrotex.net}},
+    version={1.2, 2020/07/26},
+    keywords={AcroTeX, PDF, popup-menus, JavaScript},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-40pt,fontsize=large,color=aeb} %,afterskip=1sp}
+\subsectionLayout{indent=-20pt,color=aeb} %,afterskip=1sp}
+\subsubsectionLayout{indent=0pt,color=aeb} %,afterskip=1sp}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\def\thispkg{\pkg{popupmenu}}
+
+\let\tops\texorpdfstring
+\newenvironment{eqComments}[1][\strut]{\smallskip\leftskip-\labelwidth
+\item[]\textbf{\textcolor{blue}{#1}}}{\par\smallskip}
+
+\begin{popupmenu}{Intro}
+  \item{title=title,return=Title: The manual for the popupmenu package}
+  \item{title=author,return=Author: D. P. Story}
+  \item{title=package name,return=Package: popupmenu}
+\end{popupmenu}
+
+\urlPath{\homeAtUA}{http://www.math.uakron.edu/~dpstory}
+\urlPath{\homeAeB}{http://www.acrotex.net}
+\urlPath{\blogAeB}{http://blog.acrotex.net}
+\urlPath{\urlCTAN}{https://www.ctan.org}
+\urlPath{\embedYT}{http://www.youtube.com/embed}
+\urlPath{\watchYT}{http://www.youtube.com/watch?v}
+\begin{popupmenu}{Various}
+    \item{title=Various AcroTeX Links,return=none}
+    \item{title=-}
+    \begin{submenu}{title=AeB at U of Akron}
+        \item{title=Home page,return=\homeAtUA/acrotex.html}
+        \item{title=Tutorials,return=\homeAtUA/acrotex.html\#educational}
+    \end{submenu}
+    \begin{submenu}{title=Commercial AcroTeX}
+        \item{title=AcroTeX main page,return=\homeAeB}
+        \item{title=AcroTeX blog,return=\blogAeB}
+    \end{submenu}
+    \begin{submenu}{title=AcroTeX on CTAN}
+        \item{title=Contributions: AcroTeX ,return=\urlCTAN/author/story}
+        \item{title=The popupmenu Package,return=\urlCTAN/pkg/popupmenu}
+    \end{submenu}
+    \begin{submenu}{title=YouTube Videos}
+        \begin{submenu}{title=Action Videos}
+            \item{title=Kung-Fu fighting (Bruce Lee version),return=\embedYT/GZ9e3Dy7obA}
+            \item{title=Rocket Jump,return=\embedYT/7XzdZ4KcI8Y}
+        \end{submenu}
+        \begin{submenu}{title=Miscellaneous}
+            \item{title=J\"{u}rgen's favorite song,return={\watchYT=mLDF5MBMWHE}}
+            \item{title=\Esc"Sea Hunt\Esc" US TV series (1958-61) lead-in,return=\embedYT/Lz0aMoWh8Q4}
+            \item{title=Learn \cs{LaTeX} in one video,return=\embedYT/VhmkLrOjLsw}
+        \end{submenu}
+    \end{submenu}
+\end{popupmenu}
+
+\puUseMenus{Intro,Various}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The popupmenu MANUAL";
+var manualfilename="Manual_BG_Print_popupmenu.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}\label{s:intro}
+
+Acrobat JavaScript has an interesting function, \texttt{app.popUpMenuEx()},
+that we exploit in this package. The function takes as its argument an array
+of structured menu items and displays these items as a pop-up menu. When an
+item is selected, a value is returned, which can then be acted upon in some
+way. Here is a simple example, pass your mouse pointer over the button:
+\pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{%
+  var cChoice = \popUpMenu(Intro);\r
+  if ( cChoice != null ) app.alert(cChoice); }]{intro}{}{11bp}\olBdry. This
+documentation describes the environments, commands, and JavaScript required
+to create such pop-up menus.
+
+\subsection{Sample files}
+
+The file \texttt{pu-exmpls.tex} is the only demo file; it incorporates the examples of this
+documentation, as well as few other bits and pieces.
+
+\subsection{Options, requirements, and workflows}
+
+\paragraph*{Options.} There are two options for this package
+\opt{tracking}\FmtMP{\opt{tracking}} and \opt{!tracking} (the default). The
+push button \pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{var cChoice =
+  \popUpMenu(Intro);\r if ( cChoice != null ) app.alert(cChoice);
+  }]{intro}{}{11bp} introduced earlier is an example of a menu system with
+  \emph{no tracking} (\opt{!tracking}). As you selected menu items appearance
+  of the item does not change. When the \opt{tracking} option is taken, the
+  menu keeps track of which menu item is selected by placing a check mark to
+  the left of the menu item; for example,
+  \pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{trackingPU=true;\r var
+  cChoice = \puProcessMenu(Intro);\r if ( cChoice != null )
+  app.alert(cChoice); }]{intro}{}{11bp}\olBdry, notice as you select items, a
+  check mark appears; select another item, the previous check mark is removed,
+  and the latest item selected is now checked. More on tracking in \hyperref[s:tracking]{Section~\ref*{s:tracking}}.
+
+\paragraph*{Requirements.}
+This package requires the \pkg{eforms} package, which is part of \pkg{acrotex}.\footnote{\url{http://www.ctan/pkg/acrotex}}
+
+\paragraph*{Workflows.} This is a general {\LaTeX} package, any workflows can be used to build
+a \thispkg{} document: \app{pdflatex}, \app{lualatex}, \app{xelatex}, or
+\app{dvips\,->\,\ameta{\upshape{distiller\,\string|\,ps2pdf}}}.\footnote{\pkg{popupmenu}
+uses document JavaScript when \cs{puUseMenus} is expanded in the preamble;
+\app{ps2pdf} does not support the creation of document JavaScript. If all
+menu structures are defined as field scripts, \app{ps2pdf} should work. See
+Section~\ref*{ps2pdf} for more information.}
+
+\section{The \tops{\protect\pkg}{}{popupmenu} environment}
+
+%\typeout{!! \Intro }
+
+To generate a pop-up menu using \texttt{app.popUpMenuEx()} you need to pass to it through its argument
+a menu-array. The most convenient way of creating this ``menu-array'' is with the \env{popupmenu} environment. Before
+discussing the full syntax of \env{popupmenu} we reproduce the \env{popupmenu} environment that produced the \textsf{Intro}
+button in first paragraph of this section:
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+\begin{popupmenu}{Intro}
+  \item{title=title,return=Title: The manual for the popupmenu package}
+  \item{title=author,return=Author: D. P. Story}
+  \item{title=package name,return=Package: popupmenu}
+\end{popupmenu}
+\end{Verbatim}
+This environment defines a JavaScript variable \texttt{Intro} and a {\LaTeX} command \cs{Intro}
+that expands to what you see below.
+\begin{Verbatim}[fontsize=\small,commandchars=!()]
+var Intro = [
+  {cName: "title", cReturn: "Title: The manual for the popupmenu package"},
+  {cName: "author", cReturn: "Author: D. P. Story"},
+  {cName: "package name", cReturn: "Package: popupmenu"}
+];
+\end{Verbatim}
+The above is a properly formed ``menu-array''.
+
+\newtopic\noindent
+The rollover push button was created with the following code:
+\begin{Verbatim}[fontsize=\small,commandchars={|~@}]
+\pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{%
+  var cChoice = \popUpMenu(Intro);\r
+  if ( cChoice != null ) app.alert(cChoice); }]{intro}{}{11bp}
+\end{Verbatim}
+The mouse-enter JavaScript is \texttt{var\:cChoice\:=\:\string\popUpMenu(Intro)}. The
+array name (\texttt{Intro}) is passed to the convenience command
+\cs{popUpMenU} to get the return value \texttt{cChoice}.\footnote{The name of the return variable is your choice,
+you can say \texttt{var retn=\cs{popUpMenu(Intro)}}, for example.} Finally, if
+nonempty, an alert dialog box is emitted with the return value displayed in
+it. BTY,\footnote{By the way} \cs{popUpMenu} expands to the JavaScript method
+\texttt{app.popUpMenuEx()}.
+
+\section{The \tops{\env}{}{popupmenu} environment}
+
+This general syntax for the \env{popupmenu} environment is,
+\bVerb\takeMeasure{\small\string\item\darg{title=\ameta{str},marked=\ameta{\upshape{true|false}},enabled=\ameta{\upshape{true|false}},return=\ameta{str}}}%
+\setlength\eflength{\bxSize}%
+\def\1{\rlap{\hskip\eflength\ding{182}}}
+\def\2{\rlap{\hskip\eflength\ding{183}}}
+\def\3{\rlap{\hskip\eflength\ding{184}}}
+\def\4{\rlap{\hskip\eflength\ding{185}}}
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}% *[\ameta{opts}]\darg{\ameta{ytvID}}\darg{\ameta{text}}
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red},fontsize=\small]
+!1\begin{popupmenu}{!ameta(name)}
+!2\item{title=!ameta(str),marked=!ameta(!upshape(true|false)),enabled=!ameta(!upshape(true|false)),return=!ameta(str)}
+!3\item{title=-}
+...
+!4\begin{submenu}{title=!ameta(str),marked=!ameta(!upshape(true|false))}
+\item{title=!ameta(str),marked=!ameta(!upshape(true|false)),enabled=!ameta(!upshape(true|false)),return=!ameta(str)}
+\item{title=-}
+...
+\end{submenu}
+...
+\end{popupmenu}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:puenv}
+\end{minipage}\end{minipage}\eVerb
+At the top-level \ding{182}, the \env{popupmenu} environment takes one
+argument. The \ameta{name} argument plays two roles: (1) it becomes the name
+of the JavaScript \emph{menu-array}; (2) it becomes a command name
+\cs{\ameta{name}} that expands to the JavaScript menu-array. For this reason,
+\ameta{name} must consist of ASCII letters only. The body of \env{popupmenu}
+consists of one or more \cs{item} commands (\ding{183} and \ding{184}). The
+body may contain zero or more \env{submenu} environments (\ding{185});
+\env{submenu} may then contain one or more \cs{item} commands. You can have
+sub-menus inside other sub-menus.
+
+Generally, some underlying JavaScript, such as when the \opt{tracing} option
+is in force, sets a menu item to \texttt{marked=true} or
+\texttt{marked=false}; so as a rule, it is not recommended to initially specify
+the \texttt{marked} key.
+
+\paragraph*{Discussion of \cs{item\darg{\ameta{KV-pairs}}}.} There are four key-value pairs.
+\begin{quote}
+\begin{description}
+  \item[\texttt{title=\ameta{str\upshape{\string|-}}}] (required) The
+      value of \texttt{title} (\ameta{str}) is the menu item title; a
+      value of `\texttt{-}' is reserved to signal that a separator line
+      should be drawn.
+  \item[\texttt{marked=\ameta{\upshape{true\string|false}}}] (optional)
+      If \texttt{true}, the menu item is marked with a check. The default
+      is \texttt{false} (not marked). Leave this key to JavaScript.
+  \item[\texttt{enabled=\ameta{\upshape{true\string|false}}}] (optional)
+      If \texttt{true} the item is to appear enabled; otherwise the menu
+      item is grayed out. The default is \texttt{true} (enabled).
+  \item[\texttt{return=\ameta{str}}] (optional) A string to be returned
+      when the menu item is selected. If \texttt{return} is not specified
+      or has no value, the value of the \texttt{title} key is returned.
+      There is a special return value; if \ameta{str} is the word
+      `\texttt{none}', the return value will be \texttt{null} (no
+      action). In this case, the value of the \texttt{title} key can be
+      used as a heading. (There is an example of the `\texttt{none}' value
+      in Section~\ref*{Exepu}.)
+\end{description}
+\end{quote}
+
+\paragraph*{Discussion of \env{submenu\darg{\ameta{KV-pairs}}}.} The argument of \env{submenu}
+takes only two key-value pairs: \texttt{title} and \texttt{marked}, see descriptions above.
+
+\paragraph*{Placement of the \env{popupmenu} environment.} The environment may appear in the
+preamble or in the body of the document.
+\begin{itemize}
+    \item\textbf{In the preamble.} When one or more \env{popupmenu}
+        environments are declared in the preamble, their corresponding
+        menu-array can be placed as document JavaScript. To place one or
+        more menu-arrays in the document JavaScript section of the PDF,
+        insert the \cs{puUseMenus} command following the last
+        \env{popupmenu} environment in the preamble.
+\bVerb\takeMeasure{\string\puUseMenus\darg{\ameta{menu-array-names}}}\par\noindent
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}%
+\begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
+\puUseMenus{!ameta(menu-array-names)}
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:puUseMenus}
+\end{minipage}\end{minipage}\eVerb
+where \ameta{menu-array-names} is a comma-delimited list of
+menu-array names; for example, \cs{puUseMenus\darg{myMenu,yourMenu}}.
+
+Tracing can only occur when (1) the \env{popupmenu} environment appears in
+the preamble; (2) and the \ameta{name} of the pop-up menu appears as one of
+the arguments of \cs{puUseMenus}; and (3) the command \cs{puProcessMenu} is
+used at the field level to open the pop-up, more on this in \hyperref[s:tracking]{Section~\ref*{s:tracking}}.
+
+\item\textbf{In the body of the document.} For \env{popupmenus}
+    environments declared in the body of the document, the corresponding
+    menu-arrays can still be used anywhere after the declaration. Refer to
+    \hyperref[s:notracking]{Section~\ref*{s:notracking}} for details.
+\end{itemize}
+
+\section{Executing a pop-up menu}\label{Exepu}
+
+Two commands used to open a pop-up menu, \cs{popUpMenu} and \cs{puProcessMenu}:
+\bVerb\takeMeasure{\string\puProcessMenu\darg{\ameta{name}}}%
+\setlength\eflength{\bxSize}\def\1{\sffamily\rlap{\hskip\eflength(for no-tracking menus)}}%
+\def\2{\sffamily\rlap{\hskip\eflength(for tracking menus)}}\par\noindent
+\begin{minipage}{\linewidth}
+\begin{minipage}{\bxSize}
+\xdef\panelWidth{\the\linewidth}%
+\begin{Verbatim}[frame=single,commandchars={!~@},rulecolor=\color{red}]
+!1\popUpMenu(!ameta~name@)
+!2\puProcessMenu(!ameta~name@)
+\end{Verbatim}
+\end{minipage}\hfill
+\begin{minipage}{\linewidth-\panelWidth}
+\setDisplayNumber\label{display:puCMDS}
+\end{minipage}\end{minipage}\eVerb where \ameta{name} is the name given to some
+\env{popupmenu} environment, refer to
+\hyperref[display:puenv]{display~(\ref*{display:puenv})}, defined earlier in
+the document. The first one is designed for no-tracking menus, the second is
+for tracking menus.
+
+\paragraph*{The \texttt{Various} menu.}\label{para:Various}
+In subsequent sections, we'll use the following pop-up menu, which is defined
+in the preamble of this document.
+\begin{Verbatim}[fontsize=\small,numbers=left]
+\urlPath{\homeAtUA}{http://www.math.uakron.edu/~dpstory}
+\urlPath{\homeAeB}{http://www.acrotex.net}
+\urlPath{\blogAeB}{http://blog.acrotex.net}
+\urlPath{\urlCTAN}{https://www.ctan.org}
+\urlPath{\embedYT}{http://www.youtube.com/embed}
+\urlPath{\watchYT}{http://www.youtube.com/watch?v}
+\begin{popupmenu}{Various}
+  \item{title=Various AcroTeX Links,return=none} % return value of 'none'
+  \item{title=-}
+  \begin{submenu}{title=AeB at U of Akron}
+    \item{title=Home page,return=\homeAtUA/acrotex.html}
+    \item{title=Tutorials,return=\homeAtUA/acrotex.html\#educational}
+  \end{submenu}
+  \begin{submenu}{title=Commercial AcroTeX}
+    \item{title=AcroTeX main page,return=\homeAeB}
+    \item{title=AcroTeX blog,return=\blogAeB}
+  \end{submenu}
+  \begin{submenu}{title=AcroTeX on CTAN}
+    \item{title=Contributions: AcroTeX,
+      return=\urlCTAN/author/story}
+    \item{title=The popupmenu Package,
+      return=\urlCTAN/pkg/popupmenu}
+  \end{submenu}
+  \begin{submenu}{title=YouTube Videos}
+    \begin{submenu}{title=Action Videos}
+      \item{title=Kung-Fu fighting (Bruce Lee version),
+        return=\embedYT/GZ9e3Dy7obA}
+      \item{title=Rocket Jump,return=\embedYT/7XzdZ4KcI8Y}
+    \end{submenu}
+    \begin{submenu}{title=Miscellaneous}
+      \item{title=J\"{u}rgen's favorite song,
+        return={\watchYT=mLDF5MBMWHE}}
+      \item{title=\Esc"Sea Hunt\Esc" US TV series (1958-61) lead-in,
+        return=\embedYT/Lz0aMoWh8Q4}
+      \item{title=Learn \cs{LaTeX} in one video,
+        return=\embedYT/VhmkLrOjLsw}
+    \end{submenu}
+  \end{submenu}
+\end{popupmenu}
+\end{Verbatim}
+\textbf{Notes:}
+\begin{itemize}
+\item In lines~(1)--(6), several URLs are declared using
+    \cs{urlPath}\FmtMP{\cs{urlPath}}, which is defined in \pkg{popupmenu}
+    package.
+\item Line~(8) The `\texttt{none}; return value is used.
+\item Line~(12) The fragment (\texttt{\#}) is escaped (\verb~\#~).
+\item Line~(31) The value of the \texttt{title} key is passed through the
+    \pkg{hyperref} command \cs{pdfstringdef}, consequently, you can use
+    standard {\LaTeX} markup for Latin-1 characters.
+\item Line~(32) The return value has an equal sign (\texttt{=}), the return value
+  is enclosed in braces to avoid a \pkg{xkeyval} parsing error.
+\item Line~(33) The double quote needs to be escaped (because ultimately,
+    the value will appear within double quotes. We use a special
+    \cs{Esc}\FmtMP{\cs{Esc}} command of \pkg{popupmenu}.
+\item Line~(35) To place a backslash(`\texttt\eqbs'), use the \cs{cs}\FmtMP{\cs{cs}} command.
+\end{itemize}
+
+\newtopic\noindent
+The \env{popupmenu} can be placed in the preamble or in the body of the document. Let's begin with the
+one declared in the body.
+
+\subsection{Declaring \tops{\protect\env}{}{popupmenu} in the body}\label{s:notracking}
+
+%\previewOn
+
+\begin{popupmenu}{LocalMenu}
+  \item {title=First Item}
+  \item {title=Second Item}
+\end{popupmenu}
+
+Here, in the body, we declare a (simple) menu: \pushButton[\CA{My Menu}\AAmouseenter{%
+\LocalMenu\r
+var cChoice = \popUpMenu(LocalMenu);\r
+if ( cChoice != null ) app.alert("You chose the \\""+cChoice+"\\"");
+}]{LocalMenuBtn}{}{11bp}\begingroup
+\def\1{\llap{\rlap{\ding{182}}\hskip\amtIndent\relax}}%
+\def\2{\llap{\rlap{\ding{183}}\hskip\amtIndent\relax}}%
+\def\3{\llap{\rlap{\ding{184}}\hskip\amtIndent\relax}}%
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={|~@}]
+|1\begin{popupmenu}{LocalMenu}
+  \item {title=First Item}
+  \item {title=Second Item}
+\end{popupmenu}
+\pushButton[\CA{My Menu}\AAmouseenter{%
+|2\LocalMenu\r   //|sffamily Expand the command version of the menu-array
+|3var cChoice = \popUpMenu(LocalMenu);\r  //|sffamily use \popUpMenu
+if ( cChoice != null )
+  app.alert("You chose the \\""+cChoice+"\\"");
+}]{LocalMenuBtn}{}{11bp}
+\end{Verbatim}
+\endgroup\noindent
+In line~\ding{182} we decare our simple menu. In line~\ding{183} we expand
+the command version of the \emph{menu-array}. (Refer to comment \ding{182} of
+\hyperref[display:puenv]{display~(\ref*{display:puenv})} on
+page~\pageref*{display:puenv}.) Finally, in line~\ding{184}, we execute
+\cs{popUpMenu(LocalMenu)} (See
+\hyperref[display:puCMDS]{display~(\ref*{display:puCMDS})} on
+page~\pageref*{display:puCMDS}, and the comments that follow). Using this
+technique, there is \emph{no tracking}; that is, the menu item chosen is not
+checked.
+
+The \env{popupmenu} can be declared in the preamble to obtain the same
+results, but still no tracking. To obtain tracking of the menu items, you
+must (1) declare \env{popupmenu} in the preamble; (2) include its name
+(\texttt{LocalMenu}) in the list of \ameta{menu-array-names} of the
+\cs{puUseMenus} command of
+\hyperref[display:puUseMenus]{display~(\ref*{display:puUseMenus})}; (3)
+delete line~\ding{183}; (4) replace \cs{popUpMenu} in line~\ding{184} with
+\cs{puProcessMenu}; and (5) the \opt{tracking} option must be specified.
+Details of setting up tracking are found in the
+\hyperref[{s:tracking}]{Section~\ref*{s:tracking}}.
+
+\subsection{Declaring \tops{\protect\env}{}{popupmenu} in the preamble}\label{s:tracking}
+
+A \env{popupmenu} environment can be declared anywhere \emph{before} its first use in
+field Java\-Script to actually display the menu to the user; however, to obtain
+tracking of the menu items chosen you must (1) specify
+\cs{usepackage[tracking]\darg{popupmenu}}, the \opt{tracking} option; (2)
+declare the menu (that is, the \env{popupmenu} environment) in the preamble; (3) list the menu name
+amongst the arguments of the \cs{puUseMenus} command; (4) use
+\cs{puProcessMenu} in lieu of \cs{popUpMenu} in the field JavaScript.
+
+\newtopic\noindent A bare-bones push button is as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={|~@}]
+\pushButton[|ameta~KV-pairs@\AAmouseenter{%
+  var cChoice = \puProcessMenu(|ameta~name@);\r
+  if ( cChoice != null ) |ameta~some-action@
+}}]{|ameta~btnName@}{|ameta~wd@}{|ameta~ht@}
+\end{Verbatim}
+
+
+\newtopic\noindent
+For example, make a selection: \pushButton[\CA{My Menu}\BC{}\W0\S{S}\H{N}\AAmouseenter{%
+var cChoice = \puProcessMenu(Various);\r
+if ( cChoice != null ) {\r\t
+  if (PUdebug)\r\t\t
+    app.alert("URL: \\""+cChoice+"\\"");\r\t
+  else app.launchURL(cChoice);\r
+}}]{mymenu}{}{11bp}\olBdry\,
+\pushButton[\TU{Toggle Debug}\BC{}\W0\S{S}\H{N}\CA{Action}\AAmouseup{if(PUdebug){\r\t
+  PUdebug=false;event.target.buttonSetCaption("Action");}\r
+  else {PUdebug=true;event.target.buttonSetCaption("Debug");}
+}]{DebugBtn}{.5in}{11bp}
+
+\newtopic\noindent The verbatim listing of the first push button follows:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={|~@}]
+\pushButton[\CA{My Menu}\BC{}\W0\S{S}\H{N}\AAmouseenter{%
+var cChoice = \puProcessMenu(Various);\r
+if ( cChoice != null ) {\r\t
+  if (PUdebug)\r\t\t
+    app.alert("URL: \\""+cChoice+"\\"");\r\t
+  else app.launchURL(cChoice);\r
+}}]{mymenu}{}{11bp}
+\end{Verbatim}
+This push button references the \texttt{Various} menu, tediously listed on
+page~\pageref*{para:Various}. The second button, labeled \textsf{Action},
+allows you to play around with the pop-up menu without going to the web
+sites. Click on it, and the caption now says \textsf{Debug}. Now, instead of
+going to the web site, an alert box appears announcing your choice. Good for
+testing things.
+
+\paragraph*{Multiple action types.} In all the examples of this document, as well as the demo files,
+all actions are the same, either the return is a URL and the action is
+\texttt{app.launchURL(URL)} or the return is text and results are reported in
+an alert box. You can have multiple action types, as is illustrated in the
+following local declaration.
+
+%\previewOff
+
+\newtopic\noindent Pick your choice:
+\begin{popupmenu}{puMulti}
+  \item {title=Item 1,return=0}
+  \item {title=Item 2,return=1}
+  \begin{submenu}{title=Other items}
+    \item{title=Item 3,return=2}
+  \end{submenu}
+\end{popupmenu}
+\begin{defineJS}[\makeesc|]{\puMultiActn}
+|puMulti
+var cChoice = |popUpMenu(puMulti);
+if ( cChoice != null ) {
+  switch (cChoice) {
+    case "0":
+      app.alert("You chose Item 1 from the menu");
+      break;
+    case "1":
+      app.launchURL("|homeAeB");
+      break;
+    default:
+      console.show()
+      console.println("Menu returned a value of \\""+cChoice+"\\"");
+      break;
+  }
+}
+\end{defineJS}
+\pushButton[\CA{Multi}\AAmouseenter{\puMultiActn}]{MultiBtn}{}{11bp}\olBdry.
+The verbatim list is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={*~@}]
+%*textsf~ Use the *texttt~defineJS@ environment to define the action@
+\begin{defineJS}[\makeesc|]{\puMultiActn}
+|puMulti
+var cChoice = |popUpMenu(puMulti);
+if ( cChoice != null ) {
+  switch (cChoice) {
+    case "0":
+      app.alert("You chose Item 1 from the menu");break;
+    case "1":
+      app.launchURL("|homeAeB");break;
+    default: console.show();
+      console.println("Menu returned a value of \\""+cChoice+"\\"");
+      break;
+  }
+}
+\end{defineJS}
+*goodbreak
+%*textsf~ Declare *texttt~popupmenu@ environment, return values are integers@
+\begin{popupmenu}{puMulti}
+  \item {title=Item 1,return=0}
+  \item {title=Item 2,return=1}
+  \begin{submenu}{title=Other items}
+    \item{title=Item 3,return=2}
+  \end{submenu}
+\end{popupmenu}
+%*textsf~ Now execute the pop-up menu as a mouse enter event@
+\pushButton[\CA{Multi}\AAmouseenter{\puMultiActn}]{MultiBtn}{}{11bp}
+\end{Verbatim}
+
+\section{Remarks on \tops{\protect\app}{}{ps2pdf}}\label{ps2pdf}
+
+To use the \app{dvips\,->\,ps2pdf} workflow, document JavaScript needs to be avoided.
+Do not use the \opt{tracking} option, do not use \cs{puUseMenus}, and use only the
+\cs{popUpMenu} command in field JavaScript. A simple outline of an document is found below,
+it is a working example.
+\begin{Verbatim}[fontsize=\small,commandchars={*~@}]
+\documentclass{article}
+\usepackage{popupmenu}
+\parindent0pt\parskip6pt
+\begin{document}
+%*textsf~ Declare in the body of the text, can use anywhere after this declaration@
+\begin{popupmenu}{LocalMenu}
+  \item {title=First Item}
+  \item {title=Second Item}
+\end{popupmenu}
+
+Pop-up menu using \verb|\pushButton| of \textsf{eforms}:
+\pushButton[\CA{My Menu}\AAmouseenter{\LocalMenu\r
+var cChoice = \popUpMenu(LocalMenu);\r
+if ( cChoice != null )\r\t
+  app.alert("You chose the \\""+cChoice+"\\" menu item");
+}]{LocalMenuBtn}{}{11bp}.
+
+Pop-up menu using \verb|\PushButton| of \textsf{hyperref}:
+\PushButton[name=hyperbutton1,onenter={\LocalMenu
+  var cChoice = \popUpMenu(LocalMenu);
+  if ( cChoice != null )
+    app.alert("You chose the \\""+cChoice+"\\" menu item");}
+]{My Menu}
+\end{document}
+\end{Verbatim}
+
+
+\paragraph*{Back to my retirement.} \dps
+
+
+\end{document}

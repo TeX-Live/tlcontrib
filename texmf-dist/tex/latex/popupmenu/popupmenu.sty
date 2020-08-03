@@ -7,10 +7,9 @@
 %% popupmenu.dtx  (with options: `copyright,package')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% popupmenu.sty package,           2009-10-15          %%
-%% Copyright (C) 2009  D. P. Story                      %%
+%% popupmenu.sty package,                               %%
+%% Copyright (C) 2009--2020                             %%
 %%   dpstory@acrotex.net                                %%
-%%   storyd@nwfsc.edu                                   %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
@@ -20,64 +19,192 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{popupmenu}
- [2010/09/18 v1.0 Provides support for popup menus (dps)]
+ [2020/07/26 v1.2 Provides support for popup menus (dps)]
 \RequirePackage{xkeyval}
-\define@key{menustruct}{title}[]{\def\menustruct@title{#1}}
+\newif\iftrackingPU \trackingPUfalse
+\DeclareOptionX{tracking}{\trackingPUtrue\def\puTracking{true}}
+\DeclareOptionX{!tracking}{\trackingPUfalse\def\puTracking{false}}
+\def\puTracking{false}
+\ProcessOptionsX\relax
+\edef\pu@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\'=\the\catcode`\'\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\'\@makeother\,\@makeother\!
+\RequirePackage{eforms}
+\def\title@dash{-}\def\puNone{none}
+\define@key{menustruct}{title}[]{\Hy@unicodefalse
+  \let\btitle@dash\ef@NO
+  \def\@rgi{#1}\ifx\@rgi\title@dash\let\btitle@dash\ef@YES\fi
+  \pdfstringdef\menustruct@title{#1}}
 \define@boolkey{menustruct}{marked}[true]{}
 \define@boolkey{menustruct}{enabled}[true]{}
-\define@key{menustruct}{return}[]{\def\menustruct@return{#1}}
+\define@key{menustruct}{return}[]{\def\menustruct@return{#1}\relax
+  \ifx\menustruct@return\puNone\def\menustruct@return{null}\fi}
 \let\pum@holdtoks\@empty
-\newcommand{\@AddToMenuToks}{\g@addto@macro\pum@holdtoks}
+\let\pum@holdtoksEx\@empty
+\def\@AddToMenuToks{\g@addto@macro\pum@holdtoks}
+\def\@AddToMenuToksEx{\g@addto@macro\pum@holdtoksEx}
 \newcount\pum@cnt
 \def\pum@updateindex{\global\advance\pum@cnt\@ne
    \edef\pum@rc{\pum@topindex[\the\pum@cnt]}\edef\itemindex{'\pum@rc'}}
-\def\pum@initIndexMenu#1{\global\pum@cnt=-1\relax\edef\pum@rc{#1}%
+\def\pum@initIndexMenu#1{\global\pum@cnt=\m@ne\edef\pum@rc{#1}%
    \edef\pum@topindex{\pum@rc}}
-\newenvironment{popupmenu}[1]{\pum@initIndexMenu{}%
-    \let\pum@holdtoks\@empty
-    \toks@={\pum@mytab}\@makeother\~
-    \gdef\msarg{#1}\@AddToMenuToks{\@gobble}%
-    \let\item\pum@item
-}{%
-    \expandafter\xdef\csname\msarg\endcsname{%
-        var \msarg\space = [ \pum@holdtoks^^J];}%
-}
+\newcount\submenuLevel \submenuLevel\z@
+\newenvironment{popupmenu}[1]{\pum@initIndexMenu{}\submenuLevel\z@
+  \ifpdfmarkup
+    \def\textbackslash{\eqbs}\relax
+    \def\Esc{\textbackslash}\relax
+    \def\csiv{\eqbs\eqbs}\relax
+    \def\cs##1{\csiv\csiv##1}\else
+    \def\Esc{\eqbs\eqbs}\def\cs{\Esc\Esc}\fi
+  \let\pum@holdtoks\@empty\let\pum@holdtoksEx\@empty
+  \toks@={\pum@mytab}\@temptokena={\pum@mytab}\@makeother\~%
+  \gdef\msarg{#1}\gdef\msargEx{#1Ex}\@AddToMenuToks{\@gobble}%
+  \@AddToMenuToksEx{\@gobble}\let\item\pum@item
+\ignorespaces}{%
+  \csarg\xdef{\msarg}{var \msarg\space = [ \pum@holdtoks^^J];}%
+  \iftrackingPU
+  \csarg\xdef{\msargEx}{var \msargEx\space = [ \pum@holdtoksEx^^J];}\fi
+\aftergroup\ignorespaces}
 \newcommand{\pum@item}[1]{\pum@updateindex
-    \edef\tmp@exp{\noexpand
-    \setkeys{menustruct}{title,marked=false,enabled,return,#1}}\tmp@exp
-    \edef\tmp@exp{,^^J\the\toks@
-        {cName: "\menustruct@title"%
-        \ifKV@menustruct@marked, bMarked: true\fi%
-     \ifKV@menustruct@enabled\else, bEnabled: false\fi%
-     \ifx\menustruct@return\@empty\else,
-     cReturn: "\menustruct@return"\fi}}%
-     \expandafter\@AddToMenuToks\expandafter{\tmp@exp}%
-}
+  \setkeys{menustruct}{title,marked=false,enabled,return,#1}\relax
+  \ifx\menustruct@title\@empty
+    \PackageWarning{popupmenu}
+    {A value of the key 'title' is required,\MessageBreak
+      putting in a place keeper title}%
+    \def\menustruct@title{This title is undefined}\fi
+  \edef\tmp@exp{,^^J\the\toks@
+    {cName: "\menustruct@title"%
+    \ifKV@menustruct@marked, bMarked: true\fi%
+    \ifKV@menustruct@enabled\else, bEnabled: false\fi%
+    \ifx\menustruct@return\@empty\else,%
+      cReturn: "\menustruct@return"\fi}}\expandafter
+  \@AddToMenuToks\expandafter{\tmp@exp}%
+  \edef\tmp@expEx{,^^J\the\@temptokena
+    {cName: "\menustruct@title"%
+    \ifKV@menustruct@marked, bMarked: true\fi%
+    \ifKV@menustruct@enabled\else, bEnabled: false\fi%
+    \ifx\btitle@dash\ef@NO
+    \ifx\menustruct@return\@empty,%
+      cReturn:"[\itemindex,'\menustruct@title']"%
+    \else,cReturn:"[\itemindex,'\menustruct@return']"\fi\fi}}%
+  \expandafter\@AddToMenuToksEx\expandafter{\tmp@expEx}%
+\ignorespaces}
 \begingroup
 \catcode`<=1 \catcode`\>=2 \@makeother\{ \@makeother\}
 \gdef\pum@lbrace<{>\gdef\pum@rbrace<}>
 \endgroup
 \def\pum@mytab{\space\space\space\space}
-\newenvironment{submenu}[1]{\pum@updateindex
-    \xdef\saved@pum@cnt{\the\pum@cnt}%
-    \pum@initIndexMenu{\pum@rc.oSubMenu}\edef\temp@toks{\the\toks@}%
-    \toks@=\expandafter{\temp@toks\pum@mytab}%
-    \setkeys{menustruct}{title,marked=false,enabled,return,#1}%
-    \edef\tmp@exp{,^^J\the\toks@
-        \noexpand\pum@lbrace cName: "\menustruct@title"%
-        \ifKV@menustruct@marked, bMarked: true\fi%
-        \ifKV@menustruct@enabled\else, bEnabled: false\fi,
-        oSubMenu:^^J\the\toks@[}%
-     \expandafter\@AddToMenuToks\expandafter{\tmp@exp\@gobble}%
-}{%
-    \edef\tmp@exp{^^J\the\toks@ ]\pum@rbrace}%
-    \expandafter\@AddToMenuToks\expandafter{\tmp@exp}%
-    \global\pum@cnt\saved@pum@cnt
-}
+\newenvironment{submenu}[1]{\pum@updateindex\advance\submenuLevel\@ne
+  \csarg\xdef{pum@cntLevel\the\submenuLevel}{\the\pum@cnt}%
+  \pum@initIndexMenu{\pum@rc.oSubMenu}\edef\temp@toks{\the\toks@}%
+  \def\temp@toksEx{\the\@temptokena}%
+  \toks@=\expandafter{\temp@toks\pum@mytab}%
+  \@temptokena=\expandafter{\temp@toksEx\pum@mytab}%
+  \setkeys{menustruct}{title,marked=false,enabled,return,#1}%
+  \edef\tmp@exp{,^^J\the\toks@
+    \noexpand\pum@lbrace cName: "\menustruct@title"%
+    \ifKV@menustruct@marked, bMarked: true\fi%
+    \ifKV@menustruct@enabled\else, bEnabled: false\fi,
+  oSubMenu:^^J\the\toks@[}%
+  \expandafter\@AddToMenuToks\expandafter{\tmp@exp\@gobble}%
+  \edef\tmp@expEx{,^^J\the\@temptokena
+    \noexpand\pum@lbrace cName: "\menustruct@title"%
+    \ifKV@menustruct@marked, bMarked: true\fi%
+    \ifKV@menustruct@enabled\else, bEnabled: false\fi,
+  oSubMenu:^^J\the\@temptokena[}%
+  \expandafter\@AddToMenuToksEx\expandafter{\tmp@expEx\@gobble}%
+\ignorespaces}{%
+  \edef\tmp@exp{^^J\the\toks@ ]\pum@rbrace}%
+  \edef\tmp@expEx{^^J\the\@temptokena ]\pum@rbrace}%
+  \expandafter\@AddToMenuToks\expandafter{\tmp@exp}%
+  \expandafter\@AddToMenuToksEx\expandafter{\tmp@expEx}%
+  \global\pum@cnt\@nameuse{pum@cntLevel\the\submenuLevel}%
+\aftergroup\ignorespaces}
 \def\popUpMenu(#1){app.popUpMenuEx.apply( app, #1 )}
+\def\puProcessMenu(#1){\iftrackingPU
+  puProcessMenu("#1")\else\popUpMenu(#1)\fi}
 \providecommand{\urlPath}[1]{\def\pum@urlName{#1}%
-    \hyper@normalise\pum@urlPath}
+  \hyper@normalise\pum@urlPath}
 \def\pum@urlPath#1{\expandafter\xdef\pum@urlName{#1}}
+\def\puUseTheseMenus{// No pop-up data defined^^J}
+\let\puMenuCmds\@empty
+\newcommand{\puUseMenus}[1]{\bgroup
+  \@for\pu@menu:=#1\do{\ifx\puMenuCmds\@empty
+    \def\puUseTheseMenus{// popupmenu: Begin popup menu data^^J}\fi
+    \expandafter\g@addto@macro\expandafter
+      \puMenuCmds\expandafter{%
+      \csname\pu@menu\endcsname^^J}\relax
+    \iftrackingPU
+      \expandafter\g@addto@macro\expandafter
+      \puMenuCmds\expandafter{%
+      \csname\pu@menu Ex\endcsname^^J}\relax
+    \fi
+    \edef\x{\expandafter\noexpand\@nameuse{\pu@menu}}%
+    \toks@=\expandafter{\x^^J}%
+    \expandafter\g@addto@macro\expandafter
+      \puUseTheseMenus\expandafter{\the\toks@}%
+    \iftrackingPU
+      \edef\x{\expandafter\noexpand\@nameuse{\pu@menu Ex}}%
+      \toks@=\expandafter{\x^^J}%
+      \expandafter\g@addto@macro\expandafter
+        \puUseTheseMenus\expandafter{\the\toks@}%
+    \fi
+  }\g@addto@macro\puUseTheseMenus
+    {// popupmenu: End of popup menu data}\egroup
+  \ifx\puUseTheseMenus\@empty
+  \def\puUseTheseMenus{// No pop-up data defined}\fi
+}
+\iftrackingPU
+\begin{insDLJS}{pujs}{Pop-up Menu Data}
+\puUseTheseMenus
+\end{insDLJS}
+\@onlypreamble\puUseMenus
+\begin{insDLJS*}{pumenu}
+\begin{newsegment}{popupmenu: Menu tracking support}
+var trackingPU=\puTracking;
+var PUdebug=false;
+var aPULastChoice=new Array;
+var bPULastChoice=false;
+var bIsMarked=false;
+function puProcessMenu(cMenu) { // aMenu->cMenu now a string
+  var cMenuEx=(trackingPU)?cMenu+"Ex":cMenu;
+  var aMenuEx=eval(cMenuEx);
+  var cChoice = app.popUpMenuEx.apply( app, aMenuEx );
+  if (trackingPU) {
+    if ( cChoice != null ) {
+      aChoice=eval(cChoice);
+      if (aChoice[1]==""||aChoice[1]=="null") return null;
+      var puRtn=aChoice[1];
+      var thisChoice=aChoice[0];
+//      eval(cMenuEx+thisChoice).bMarked=true;
+      if (!bPULastChoice) {
+        eval(cMenuEx+aChoice[0]).bMarked=true; 
+      } else {
+        var structLoc=aPULastChoice[1];
+        if(aPULastChoice[0]+structLoc==cMenuEx+aChoice[0]) {
+          bIsMarked = eval(cMenuEx+aChoice[0]).bMarked;
+          eval(cMenuEx+aChoice[0]).bMarked=!(bIsMarked);
+          bPULastChoice=false;
+          if (bIsMarked) var puRtn=null
+  } else {
+        eval(aPULastChoice[0]+structLoc).bMarked=false;
+        eval(cMenuEx+aChoice[0]).bMarked=true;
+  }
+    }
+      aPULastChoice=[cMenuEx,aChoice[0]];
+      bPULastChoice=true;
+      return puRtn;
+    } else return null;
+  } else return cChoice;
+}
+\end{newsegment}
+\end{insDLJS*}
+\fi
+\pu@restoreCats
 \endinput
 %%
 %% End of file `popupmenu.sty'.

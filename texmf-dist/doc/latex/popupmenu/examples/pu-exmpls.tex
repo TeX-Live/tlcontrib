@@ -1,0 +1,167 @@
+\documentclass{article}
+%\usepackage{xkeyval}
+\usepackage[designv]{web}
+\usepackage[tracking]{popupmenu}
+
+\title{The \texorpdfstring{\textsf}{}{popupmenu} Package Test File}
+\author{D. P. Story}
+\subject{Test file for the popupmenu Package}
+\keywords{LaTeX, popupmenu, Acrobat JavaScript, AcroTeX}
+
+\university{NORTHWEST FLORIDA STATE COLLEGE\\
+   Department of Mathematics}
+\email{dpstory@acrotex.net}
+\version{1.0}
+
+\norevisionLabel
+
+\begin{popupmenu}{Intro}
+  \item{title=title,return=Title: The manual for the popupmenu package}
+  \item{title=author,return=Author: D. P. Story}
+  \item{title=package name,return=Package: popupmenu}
+\end{popupmenu}
+
+\urlPath{\homeAtUA}{http://www.math.uakron.edu/~dpstory}
+\urlPath{\homeAeB}{http://www.acrotex.net}
+\urlPath{\blogAeB}{http://blog.acrotex.net}
+\urlPath{\urlCTAN}{https://www.ctan.org}
+\urlPath{\embedYT}{http://www.youtube.com/embed}
+\urlPath{\watchYT}{http://www.youtube.com/watch?v}
+\begin{popupmenu}{Various}
+    \item{title=Various AcroTeX Links,return=none}
+    \item{title=-}
+    \begin{submenu}{title=AeB at U of Akron}
+        \item{title=Home page,return=\homeAtUA/acrotex.html}
+        \item{title=Tutorials,return=\homeAtUA/acrotex.html\#educational}
+    \end{submenu}
+    \begin{submenu}{title=Commercial AcroTeX}
+        \item{title=AcroTeX main page,return=\homeAeB}
+        \item{title=AcroTeX blog,return=\blogAeB}
+    \end{submenu}
+    \begin{submenu}{title=AcroTeX on CTAN}
+        \item{title=Contributions: AcroTeX ,return=\urlCTAN/author/story}
+        \item{title=The popupmenu Package,return=\urlCTAN/pkg/popupmenu}
+    \end{submenu}
+    \begin{submenu}{title=YouTube Videos}
+        \begin{submenu}{title=Action Videos}
+            \item{title=Kung-Fu fighting (Bruce Lee version),return=\embedYT/GZ9e3Dy7obA}
+            \item{title=Rocket Jump,return=\embedYT/7XzdZ4KcI8Y}
+        \end{submenu}
+        \begin{submenu}{title=Miscellaneous}
+            \item{title=J\"{u}rgen's favorite song,return={\watchYT=mLDF5MBMWHE}}
+            \item{title=\Esc"Sea Hunt\Esc" US TV series (1958-61) lead-in,return=\embedYT/Lz0aMoWh8Q4}
+            \item{title=Learn \cs{LaTeX} in one video,return=\embedYT/VhmkLrOjLsw}
+        \end{submenu}
+    \end{submenu}
+\end{popupmenu}
+
+\puUseMenus{Intro,Various} % Can track these menus
+
+%\previewOn
+
+\def\cs#1{\texttt{\eqbs#1}}
+\def\pkg#1{\textsf{#1}}
+
+\parindent0pt\parskip6pt
+
+\begin{document}
+
+\maketitle
+
+\section{Examples of the documentation}
+
+Here is a simple example, pass your mouse pointer over the button:
+\pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{%
+  var cChoice = \popUpMenu(Intro);\r
+  if ( cChoice != null ) app.alert(cChoice); }]{intro}{}{11bp}, uses \cs{popUpMenu}, no tracking.
+
+Here is the same button \pushButton[\CA{Info}\BC{}\S{S}\H{N}\AAmouseenter{%
+  var cChoice = \puProcessMenu(Intro);\r
+  if ( cChoice != null ) app.alert(cChoice); }]{intro}{}{11bp}, but uses \cs{puProcessMenu}, will have tracking.
+
+For example, make a selection: \pushButton[\CA{My Menu}\AAmouseenter{%
+%var cChoice = \popUpMenu(myMenu);\r
+var cChoice = \puProcessMenu(Various);\r
+if ( cChoice != null ) {\r\t
+  if (PUdebug)\r\t\t
+    app.alert("You chose the \\""+cChoice+"\\" menu item");\r\t
+  else app.launchURL(cChoice);\r
+}}]{mymenu}{}{11bp}\olBdry
+\pushButton[\TU{Toggle Debug}\CA{Action}\AAmouseup{if(PUdebug){\r\t
+  PUdebug=false;event.target.buttonSetCaption("Action");}
+  else {PUdebug=true;event.target.buttonSetCaption("Debug");}
+}]{DebugBtn}{.5in}{11bp} (tracking)
+
+% Declare in the body of the text, can use anywhere after this declaration
+\begin{popupmenu}{LocalMenu}
+  \item {title=First Item}
+  \item {title=Second Item}
+\end{popupmenu}
+
+Here, in the body, we declare a (simple) menu: \pushButton[\CA{My Menu}\AAmouseenter{%
+\LocalMenu\r
+var cChoice = \popUpMenu(LocalMenu);\r
+if ( cChoice != null ) app.alert("You chose the \\""+cChoice+"\\" menu item");
+}]{LocalMenuBtn}{}{11bp}. This is a locally defined menu, \texttt{popumenu}
+declared in the body of the document. (Uses \cs{popUpMenu}, no tracking)
+
+Pick your choice:
+\begin{popupmenu}{puMulti}
+  \item {title=Item 1,return=0}
+  \item {title=Item 2,return=1}
+  \begin{submenu}{title=Other items}
+    \item{title=Item 3,return=2}
+  \end{submenu}
+\end{popupmenu}
+\begin{defineJS}[\makeesc|]{\puMultiActn}
+|puMulti
+var cChoice = |popUpMenu(puMulti);
+if ( cChoice != null ) {
+  switch (cChoice) {
+    case "0":
+      app.alert("You chose Item 1 from the menu");
+      break;
+    case "1":
+      app.launchURL("|homeAeB");
+      break;
+    default: console.show();
+      console.println("Menu returned a value of \\""+cChoice+"\\"");
+      break;
+  }
+}
+\end{defineJS}
+\pushButton[\CA{Multi}\AAmouseenter{\puMultiActn}]{MultiBtn}{}{11bp}\olBdry. Locally defined \texttt{popupmenu},
+no tracking.
+
+\section{Examples using push buttons of \texorpdfstring{\protect\textsf}{}{hyperref}}
+
+You can use the \cs{PushButton} command of \pkg{hyperref} to accomplish the same thing, but with less flair.
+\begin{itemize}
+  \item Mouse over event: \PushButton[name=hyperbutton1,onenter={%
+    var cChoice = \puProcessMenu(Various);
+    if ( cChoice != null )app.launchURL(cChoice);}]{Various URLs} (tracking)
+  \item Mouse up event: \PushButton[name=hyperbutton2,onclick={%
+    var cChoice = \puProcessMenu(Various);
+    if ( cChoice != null )app.launchURL(cChoice);}]{Various URLs} (tracking)
+\end{itemize}
+
+\section{Handling the `none' return value}
+
+The handling of a return value of `none' is automatic when \cs{puProcessMenu} is used. When
+\cs{popUpMenu} is employed, some special attention is needed. The topmost item of the
+menu \texttt{Various} has a return value of `none'.
+\begin{itemize}
+   \item With tracking: \pushButton[\CA{My Menu}\AAmouseenter{%
+      var cChoice = \puProcessMenu(Various);\r
+      if ( cChoice != null ) app.launchURL(cChoice);
+    }]{mymenu}{}{11bp}
+   \item Without tracking: \pushButton[\CA{My Menu}\AAmouseenter{%
+    % \popUpMenu returns the string "null", so we must test if "null" is the return value,
+    % if so, we make cChoice=null
+    var cChoice = \popUpMenu(Various);\r
+      if (cChoice=="null") cChoice=null;\r
+      if ( cChoice != null ) app.launchURL(cChoice);
+  }]{mymenu}{}{11bp}
+\end{itemize}
+
+\end{document}

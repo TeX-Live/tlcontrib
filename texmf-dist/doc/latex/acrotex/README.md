@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2020-01-01
+Dated: 2020-03-14
 
 AeB contains the following:
 
@@ -18,6 +18,8 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
+
+What's New (2020-03-14) Minor changes that support new features of eqexam.
 
 What's New (2020-01-01) Replace use of \count0 with new counter \eqtmpcnta, 
 in situation, the value of \count0 was leaking out giving incorrect page 

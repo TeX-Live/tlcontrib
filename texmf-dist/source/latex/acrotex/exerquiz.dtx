@@ -21,8 +21,8 @@
 %<eqexam>\ProvidesFile{eqexam.def}
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
-%<template>\ProvidesFile{template.`def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2020/01/01 v8.5.8 %
+%<template>\ProvidesFile{template.def}
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2020/03/14 v8.5.10 %
 %<package> Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver> Exerquiz documentation driver file (dps)]
 %<aebjs> Exerquiz document level JavaScript (dps)]
@@ -761,6 +761,8 @@
 % \changes{v6.4t}{2012/06/18}{Testing for pdflatex and xetex}
 % \changes{v8.1a}{2017/09/03}{Testing for luatex}
 %    \begin{macrocode}
+\let\bWebCustomize\endinput
+\let\eWebCustomize\relax
 \@ifpackageloaded{web}{%
     \ExecuteOptions{\eq@driver@name}%
 }{%
@@ -1923,6 +1925,7 @@
         {\if\exerstar*\def\eq@next{\@exercise}\else
          \def\eq@next{\exercise@@}\fi\eq@next}%
 }{\eq@postexerciseHook\endexerhook\par
+    \global\let\insE@rlyAtQues\@empty
     \global\eq@exerciseheadingtrue\removelastskip\eq@exerskip}
 %    \end{macrocode}
 % the exercise environment takes two sets of optional parameter,
@@ -1987,17 +1990,19 @@
 \newif\ifeq@exerciseheading \eq@exerciseheadingtrue
 %    \end{macrocode}
 % \changes{v6.7q}{2013/12/15}{Added this hook for use by \textsf{contsolns.dtx}}
+% \changes{v8.5.10}{2020/03/14}{Added \string\cs{priorexlabelheader} to support \string\pkg{eqexam}}
 %    \begin{macrocode}
 \let\prior@exerSolnHeaderHook\@empty
 \newcommand\exerSolnHeader[3]{%
     \prior@exerSolnHeaderHook
     \ifeqforpaper\else\webnewpage\fi\markright{#1}%\par\noindent%
+    \priorexlabelheader
 %</package|eqexam>
 %<*package>
-    \noindent\hypertarget{#2}{#3}\relax
+    \noindent\hypertarget{#2}{#3}\global\let\priorexlabelheader\relax
 %</package>
 %<*eqexam>
-    #3%
+    #3\global\let\priorexlabelheader\relax
 %</eqexam>
 %<*package|eqexam>
     \solnhspace
@@ -2129,7 +2134,8 @@
 %    \begin{macrocode}
     \eq@initializeContAnnot
     \ifeq@exerciseheading
-    \prior@questionsHook\marginparpriorhook\noindent\eqexheader@wrapper
+    \prior@questionsHook
+    \insE@rlyAtQues\marginparpriorhook\noindent\eqexheader@wrapper
     \afterlabelhskip\marginparafterhook\gEx@CommonCmd
     \eq@setPrbSolnAftrIndnt\ignorespaces\fi}
 %    \end{macrocode}
@@ -2163,6 +2169,7 @@
 \def\makeExSolnsLocalOn{\makeExSlLocaltrue}
 \def\makeExSolnsLocalOff{\makeExSlLocalfalse}
 \let\eqMrkSoln\@gobble
+\let\priorexlabelheader\relax
 \def\eqExerSolnHeaderSngl{%
     \ifmakeExSlLocal\protect\begingroup^^J\fi
     \ifx\eqMrkCpyArg\@empty\else
@@ -2739,7 +2746,7 @@
 %    \begin{macrocode}
 \let\eq@exerstarEnv\relax
 \newenvironment{exercise*}{\def\eq@exerstarEnv{*}\exercise}
-{\endexercise}
+{\global\let\insE@rlyAtQues\@empty\endexercise}
 %    \end{macrocode}
 %    \end{environment}
 %    \begin{environment}{parts}
@@ -2842,8 +2849,10 @@
 %    \end{macrocode}
 % (2012/02/04) Common code to the definition of \cs{item}
 % both list and tabular versions.
+% \changes{v8.5.10}{2020/03/14}{\string\cs{probInMinip@ge} set to \string\cs{relax}}
 %    \begin{macrocode}
 \def\eq@item@common{\eq@insertContAnnot\eqp@rtc@lcm@rk
+    \global\let\probInMinip@ge\relax
     \def\currhideopt{x}\eq@hidesolutionfalse\eq@nolinkfalse
     \@ifnextchar[{\@ckhide}{\eq@item}}
 %    \end{macrocode}
@@ -2893,6 +2902,7 @@
 %    \begin{macrocode}
 \newif\ifwithinparts
 \let\ex@listtabheader@fterhook\@empty
+\let\probInMinip@ge\relax
 %    \end{macrocode}
 % Begin the list version of the parts environment.
 %    \begin{macrocode}
@@ -2979,9 +2989,15 @@
         {\eq@item@latex\ex@listtabheader@fterhook
             \exlisttabheaderafterhook}}%
     \def\eqthisenv{parts}\withinpartstrue
-    \def\item{\ifx\@currenvir\eqthisenv
+%    \end{macrocode}
+%   If \cs{probInMinip@ge} has been redefined, continue to \cs{eq@item@common} to support \pkg{eqexam}.
+%   \changes{v8.5.10}{2020/03/14}{Change in logic for \string\cs{item} to support \string\pkg{eqexam}}
+%    \begin{macrocode}
+    \def\item{\ifx\probInMinip@ge\relax
+      \ifx\@currenvir\eqthisenv
         \def\eq@next{\eq@item@common}\else
         \def\eq@next{\eq@item}\fi
+      \else\def\eq@next{\eq@item@common}\fi
     \eq@next}%
 }}{\endlist\global\let\leadinitem\leadinitem@external
     \post@parts@hook\belowpartshook}
@@ -3522,9 +3538,8 @@
 \newcommand{\exerSolnInput}
 {%
   \@ifundefined{eqe@IWO}{}{\ifsolutionsAtEnd
-    \eqe@IWO\@auxout{\string\expandafter\string\gdef
-    \string\csname\space eqExamQuesLastPage\string\endcsname
-    {\arabic{page}}}\fi}\let\webnewpage\relax
+    \eqe@IWO\@auxout{\string\csarg\string\gdef
+    {eqExamQuesLastPage}{\arabic{page}}}\fi}\let\webnewpage\relax
   \ifsolutionsonly\else
 %    \end{macrocode}
 %   \changes{v8.2.6}{2018/12/03}{place \string\cs{endinput} at end of sol file}
@@ -3745,6 +3760,7 @@
 %    This is a redesigned \texttt{list} environment.
 %    \begin{macrocode}
 \newcommand{\prior@questionsHook}{}
+\let\insE@rlyAtQues\@empty
 \let\qMark@Hook\@empty
 \let\aebtitleQuiz\@empty
 \newcommand{\post@questionsHook}{}
@@ -3806,7 +3822,8 @@
     \toks@=\expandafter\expandafter\expandafter{#1}\expandafter
     \xdef\csname quesOpts\@quesctr\endcsname{\the\toks@}%
     \edef\tempexp{\noexpand\setkeys{props@ques}{\the\toks@}}\tempexp
-    \list{\qMark@Hook\prior@questionsHook\gdef\eqPTs{1}%
+    \list{\qMark@Hook\prior@questionsHook
+    \insE@rlyAtQues\gdef\eqPTs{1}%
     \global\let\eqQT\eq@na%
 %    \end{macrocode}
 % (06/06/10) We create a macro \cs{@currentQues} that holds the current
@@ -10298,7 +10315,7 @@ var ok2Continue = true;
 %
 % The arrays \texttt{RightWrong}, \texttt{ProbValue}, \texttt{ProbDist} and \texttt{ProbType} maintain quiz information
 % for a quiz. The following are typical values of these arrays. This is a quiz taken
-% from the manswer.tex demo file. Question 1 is a multiple selection question; Question 2
+% from the \texttt{manswer.tex} demo file. Question 1 is a multiple selection question; Question 2
 % is a multiple choice question; Question 3 is a math fill-in question; and Question 4
 % is a grouped question. (The \texttt{undefined} entries indicate an empty or a not used entry.)
 %\begin{verbatim}
@@ -11974,7 +11991,7 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
     for (var i=1; i < RightWrong.length; i++)
     {
         if ( (typeof RightWrong[i] == "object" ) %
-            && ( RightWrong[i][0] == "grp" ) ) {
+&& ( RightWrong[i][0] == "grp" ) ) {
             // grouped question
                 Score += GrpRight(RightWrong[i], i, qtfield);
                 var aWeights = ProbValue[i].slice(2);
@@ -11994,9 +12011,15 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
                     if (RightWrong[i][1] == 1)
                         ProbDist[i]=(typeof ProbValue[i]=="object") ?
                             1*ProbValue[i][1] : 1*ProbValue[i];
-                    else
+                    else {
                         ProbDist[i]=(typeof ProbValue[i] == "object") ?
                             1*ProbValue[i][1] : 0;
+%    \end{macrocode}
+%     If the user receives negative points, we change it to zero points.
+%    \changes{v8.5.9}{2020/02/21}{If the user receives negative points, we change it to zero points.}
+%    \begin{macrocode}
+                        if (!negPointsAllowed && !negPointsMarkupAllowed) if (ProbDist[i]<0) ProbDist[i]=0
+                    }
                     ptScore += (1*ProbDist[i]);
                 }
             } else {

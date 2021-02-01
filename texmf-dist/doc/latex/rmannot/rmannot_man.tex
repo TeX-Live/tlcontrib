@@ -1,0 +1,2109 @@
+%\listfiles
+%
+% http://www.adobe.com/devnet/acrobat/pdfs/PDF32000_2008.pdf
+%
+% makeindex < aebpro_man.idx > aebpro_man.ind
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[%
+    web={centertitlepage,designv,
+        forcolorpaper,latextoc,pro},%usesf,
+        aebxmp,eforms
+]{aeb_pro}
+\usepackage[dvipsone,showembeds]{graphicxsp}
+\usepackage{aeb_mlink}
+\usepackage{array,longtable}
+%\usepackage{myriadpro}
+\usepackage[altbullet]{lucidbry}
+\usepackage[use3D]{rmannot}
+
+\usepackage{makeidx}
+\makeindex
+\usepackage{acroman}
+
+\begin{comment}
+{\setlength{\fboxsep}{2\fboxsep}\fcolorbox{blue}{webyellow}{\parbox{\linewidth-2\fboxsep-2\fboxrule}{\bfseries
+\color{red}After December 2020, the JavaScript Bridge is no longer available. The methods of this section
+are no longer supported.}}}
+\end{comment}
+
+%\previewOn\pmpvOn
+\let\tops\texorpdfstring
+
+\usepackage[active]{srcltx}
+
+\setlongtables
+
+
+\urlstyle{rm}
+\let\pkg\textsf
+\let\key\texttt
+\let\app\textsf
+\let\env\texttt
+\def\psf#1{\textsf{\textbf{#1}}}
+\let\uif\textsf
+\let\opt\texttt
+
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+
+\addtolength{\marginparwidth}{1in}
+\edef\amtIndent{\the\parindent}
+\newdimen\aebdimen \aebdimen6pt %\partopsep \advance\aebdimen\partopsep
+\newcommand\bVerb[1][]{\begingroup#1\vskip\aebdimen\parindent0pt}%
+\def\eVerb{\vskip\aebdimen\endgroup\noindent}
+\def\takeMeasure{\bgroup\obeyspaces\takeMeasurei}
+\def\takeMeasurei#1{\global\setbox\webtempboxi\hbox{\ttfamily#1}\egroup}
+\def\bxSize{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+
+\reversemarginpar
+\newenvironment{aebQuote}
+   {\list{}{\leftmargin\amtIndent}%
+    \item\relax}{\endlist}
+\def\parboxValign{t}
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{%
+    \raisebox{.5\baselineskip+#1}{%
+    \expandafter\parbox\expandafter[\parboxValign]%
+        {\marginparwidth}{\kern0pt\aebbkFmtMp#2}}}}
+\def\aebbkFmtMp{\hfill\kern0pt\itshape\small
+    \color{blue}\raggedleft\hspace{0pt}}
+\newcommand{\BlogArticle}{\makebox[0pt][l]{\hspace{-1pt}\color{blue}\Pisymbol{webd}{254}%
+    }\raisebox{.5pt}{\color{red}\ding{045}}}
+
+\def\RMA{\textbf{RMA}}
+\def\RMAD{\textbf{RMA3D}}
+\def\FT#1{\textsf{#1}}
+
+%\def\tutpath{doc/tutorial}
+%\def\tutpathi{tutorial}
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={ The \texorpdfstring{\pkg{rmannot} Package\\[1em]}{rmannot Package: }
+        Rich Media Annotations\texorpdfstring{\\[1em]}{ }for Acrobat DC},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject={Documentation for AeB Pro from AcroTeX},
+    talksite={\url{www.acrotex.net}},
+    version={2.2, 2020/08/21},
+    keywords={Rich Media Annotations, SWF, FLV, MP3, AcroTeX, AcroFlex, LaTeX},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+\nocopyright
+\copyrightyears{2008-\the\year}
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\definePath{\urlAcroTeXBlog}{http://www.acrotex.net/blog}
+
+\def\anglemeta#1{$\langle\textit{\texttt{#1}}\rangle$}
+%\def\meta#1{\textit{\texttt{#1}}}
+\let\meta\anglemeta
+%\let\amtIndent\amtIndent
+\def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
+\def\nhnameref#1{\bNH\nameref{#1}\eNH}
+\def\nhNameref#1{\bNH\Nameref{#1}\eNH}
+\def\nhurl#1{\bNH\url{#1}\eNH}
+
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\renewcommand*\descriptionlabel[1]{\hspace\labelsep
+    \normalfont #1}
+\newcommand{\aebDescriptionlabel}[1]{%
+    \setlength\dimen@{\amtIndent+\labelsep}%
+    {\hspace*{\dimen@}#1}}
+\makeatother
+\newenvironment{aebDescript}
+  {\begin{list}{}{\setlength{\labelwidth}{0pt}%
+    \setlength{\leftmargin}{\leftmargin}%
+    \setlength{\leftmargin}{\leftmargin+\amtIndent}%
+    \setlength\itemindent{-\leftmargin}%
+    \let\makelabel\aebDescriptionlabel
+  }}{\end{list}}
+
+%\pagestyle{empty}
+%\parindent0pt\parskip\medskipamount
+
+\AcroVer{11}
+
+%\def\expath{./../examples/rma}
+\def\expath{./../examples/graphics}
+
+\definePath{\myRMFiles}{%
+    C:/Users/Public/Documents/My TeX Files/%
+    tex/latex/aeb/aebpro/rmannot/RMfiles}
+%\saveNamedPath{AcroAd}{\myRMFiles/Acro_Advertiser.swf}
+\saveNamedPath{knurl}{C:/Users/Public/Documents/%
+  My TeX Files/tex/latex/aeb/aebpro/rmannot/examples/rm3da/assets/knurl.swf}
+\saveNamedPath{oceanwaves}{\myRMFiles/ocean-waves.3gp}
+\saveNamedPath{horse1}{\myRMFiles/horse.mp4}
+\saveNamedPath{trek}{\myRMFiles/trek.mp3}
+\saveNamedPath{AcroLimerick}{\myRMFiles/AcroTeX_limerick.mp3}
+\makePoster[hiresbb]{AcroAd_poster}{\expath/AcroAd_poster}
+\makePoster[hiresbb]{aebmovie_poster}{\expath/aebmovie_poster}
+\makePoster{horse1_poster}{horse1_poster}
+\makePoster{ow-poster}{\expath/ow-poster}
+\makePoster{aebmusic_poster}{graphics/aebmusic_poster}
+%\makePoster[hiresbb]{aebmovie_poster}{aebmovie_poster_hd}
+
+\definePath{\myPath}{C:/Users/Public/Documents/%
+    My TeX Files/tex/latex/aeb/aebpro/rmannot/%
+    examples/rm3da}
+\saveNamedPath{myDice}{\myPath/3dmodels/dice.u3d}
+\saveNamedPath{AcroAd}{\myPath/assets/Acro_Advertiser.swf}
+\saveNamedPath{Don}{\myPath/assets/dpsweb.swf}
+\saveNamedPath{loadDon}{\myPath/js/scriptD.js}
+\saveNamedPath{turntable}{\myPath/js/turntable.js}
+
+\def\takeMeasure{\bgroup\obeyspaces\takeMeasurei}
+\def\takeMeasurei#1{\global\setbox\webtempboxi\hbox{\ttfamily#1}\egroup}
+
+%\optionalPageMatter
+%{%
+%    \makebox[\linewidth][c]{%
+%        \rmAnnot[poster=AcroAd_poster,enabled=pageopen]%
+%            {.5\linewidth}{.5\linewidth*\ratio{265bp}{612bp}}{AcroAd}}%
+%}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The rmAnnot MANUAL";
+var manualfilename="Manual_BG_Print_rmannot.pdf";
+var manualtemplate="Manual_BG_Green.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+\def\puncPt#1{#1}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}
+
+After December 2020, PDF content that uses \app{Flash Player} will no longer
+be supported by \app{Acrobat DC}/\app{Reader DC} (\app{AA}/\app{AR}), this includes all files of type \FT{FLV} and \FT{SWF}. As a result, Rich
+Media Annotations (\RMA) has changed, its ``richness'' is now ``plain-ness''; of particular
+importance, the JavaScript Bridge\FmtMP{JavaScript bridge dead} has collapsed, there is no control of the
+media using JavaScript. The good news is the \pkg{rmannot} package remains functional!
+Supported file types are,
+\begin{itemize}
+    \item \textbf{Video:} \FT{MOV}, \FT{MP4}, \FT{M4V}, \FT{3GP}, \FT{3G2}
+    \item \textbf{Audio:} \FT{MP3}
+    \item \textbf{3D:} \FT{U3D}, \FT{PRC}
+\end{itemize}
+This documentation describes the revised package.
+
+\paragraph*{Legacy documentation prior to the EOL of Flash player support.}
+Should you have a version of \app{Acrobat} prior to the EOL of Flash player,
+refer to the legacy documentation
+\href{rmannot_man-flash.pdf}{rmannot\_man-flash.pdf}.\footnote{Flash player
+is still supported by \app{Acrobat XI}/\allowbreak\app{Adobe Reader XI} or
+prior. Any version of \app{Acrobat DC}/\allowbreak\app{Adobe Reader DC},
+however, may not play Flash content, even though it is an older DC version
+because of any updates received.} None of the code of \pkg{rmannot} has been
+removed, so you can still incorporate FLV/SWF files into your document, but such
+media may not run on your computer; it pays to keep \app{AA/AR XI} or earlier.
+
+\newtopic\noindent
+Source material for the creation of this package is the document
+\textsl{Adobe Supplement to the ISO 32000}, June 2008. This document
+contains the PDF specification---the so called, BaseLevel~1.7,
+ExtensionLevel~3 specification---of the rich media annotation.
+
+\paragraph*{At the time of this writing.} Recent versions of \app{AA/AR DC} offer the option of
+using Flash content or of using the new multimedia methods. This option is
+found under \uif{Edit > Preferences}, select the category \uif{3D \&
+Multimedia Options} in the left panel, as shown in \hyperref[fig:3DMMOpts]{Figure~\ref*{fig:3DMMOpts}}.
+At the top of the right-hand panel observe the checkbox item \uif{Use Flash
+Player for playing 3D and multimedia content.} By clearing this checkbox, you
+can experience the new multimedia player. After December 2020, these options
+will probably be removed.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=.5\linewidth]{graphics/3DMM-prefs}
+  \caption{3D \& Multimedia Options}\label{fig:3DMMOpts}
+\end{figure}
+
+\exAeBBlogPDF{p=}\textbf{Examples.} In addition to the examples that ship
+with the \textsf{rmannot} package, there are numerous examples of
+\textsf{rmannot} on my
+\href{\urlAcroTeXBlog//?tag=rmannot-package}{{\AcroTeX} Blog} (having tag
+\textsl{rmannot-package}). There is also a whole series of articles on the
+\textbf{\href{\urlAcroTeXBlog/?cat=22}{Rich Media Annotation}} using
+\textbf{AeB Pro} and \textsf{rmannot}.\footnote{Articles that use \FT{FLV} or
+\FT{SWF} files, or uses the ``JavaScript bridge'' will not work in recent versions
+of \app{Acrobat DC} or \app{Acrobat Reader DC} after EOL of Flash player.}
+
+\section{Requirements}
+
+The requirements for your {\LaTeX} system are highlighted in this section.
+
+\subsection{{\LaTeX} Package Requirements}
+
+The following packages, in addition to the standard {\LaTeX}
+distribution, are required:
+\begin{enumerate}
+   \item AeB (\AcroTeX{} eDucation Bundle) The most recent version.
+      In particular the \texttt{eforms} package and its companion
+      package \texttt{insdljs}. The AeB Pro package is recommended. (All
+      the demo files use AeB Pro.) Get it at \href{http://ctan.org/pkg/acrotex}{ctan.org/pkg/acrotex}.
+  \item The \texttt{graphicxsp} Package. The latest version, I made
+      some slight modifications of this package for \pkg{rmannot}.
+      This package allows the embedding of poster graphics for use in
+      the appearances of the annotations when they are not activated.
+      Get it at \href{http://ctan.org/pkg/graphicxsp}{ctan.org/pkg/graphicxsp}.
+  \item (Recommended) Many of the demo files use \pkg{AeB Pro}
+      (\href{http://ctan.org/pkg/graphicxsp}{ctan.org/pkg/aeb-pro}) is a recommended
+      addition to your {\AcroTeX} collection.
+\end{enumerate}
+The installation instructions for \pkg{AeB} and \pkg{AeB Pro} must be read very closely
+as there are certain JavaScript files that must be copied to the correct
+location on your local hard drive.
+
+
+
+\subsection{PDF Creator Requirements}
+
+The \textsf{rmannot} package supports \app{Acrobat Distiller 9.0} (or later)
+as the PDF creator. The document author must have \app{Acrobat 9.0 Pro} (or later) and
+its companion application \app{Distiller}.\footnote{Current \app{Acrobat} is \app{Acrobat DC}} The document author typically uses
+\app{dvips} to produce a Postscript file, which is then distilled to obtain a
+PDF.
+
+If you are using \app{Acrobat DC} to build \pkg{rmannot} , it is necessary \emph{to clear the checkbox}
+\uif{Enable Protected Mode at startup}\FmtMP{Protected Mode}, this checkbox is found under the menu
+\uif{Edit > Preferences}. In the \uif{Preferences} dialog box, select
+\uif{Security (Enhanced)} category from the left panel; the targeted checkbox
+is at the top line on the right panel. Refer to \hyperref[fig:SP]{Figure~\ref*{fig:SP}} for a visual.
+
+\begin{figure}[htb]\fboxsep0pt\relax\centering
+  \fbox{\includegraphics[width=.5\linewidth]{graphics/SecurityPrefs}}
+  \caption{\tops{\protect\uif}{}{Security (Enhanced) Preferences}}\label{fig:SP}
+\end{figure}
+
+\subsection{Supported Media Formats}\label{s:MediaFmts}
+
+\definePath{\urlFmts}{https://helpx.adobe.com/acrobat/kb/supported-file-formats-acrobat-reader.html}
+
+
+\subsubsection{Supported video formats}
+
+The resource for video formats is
+\href{\urlFmts#main_Video_formats__Acrobat_DC_Pro_}{Supported file formats
+Acrobat and Reader}, see the sections \textbf{Video formats (Acrobat Pro
+DC)}, \textbf{Video formats (Acrobat X Pro)} and \textbf{Video formats
+(Acrobat~9 Pro and Pro Extended)}.  The \textsf{rmannot} package generally
+supports all formats listed there that have a `Yes' in the column labeled
+\textbf{Direct placement without transcoding}; in particular,
+\textsf{rmannot} supports \expandafter\st\expandafter{\FT{SWF}},
+\expandafter\st\expandafter{\FT{FLV}}, \FT{MOV}, \FT{MP4}, \FT{M4V},
+\FT{3GP}, \FT{3G2}, and \FT{MP3} files. Some of these are not supported by
+version~9. \st{For greatest compatibility, use {\FT{SWF}}, {\FT{FLV}} (or
+{\FT{F4V}}, Version~9.2 or later).}
+
+
+\subsubsection{Supported audio format}
+
+The resource for audio formats is
+\href{\urlFmts#main_Audio_formats__Acrobat_}{Supported file formats
+Acrobat and Reader}, see the section \textbf{Audio formats (Acrobat)}. For
+assured compatibility, use \FT{MP3} files for audio.
+
+\subsubsection{Supported 3D formats}
+
+The resource for audio formats is
+\href{\urlFmts#main_2D_and_3D_formats__Acrobat_9_Pro_Extended__Adobe_3D_Reviewer_}{Supported
+file formats Acrobat and Reader}, see the section \textbf{2D and 3D formats}.
+\app{Acrobat} and this package support filetypes \FT{U3D} and \FT{PRC}.
+
+
+
+%\section{Installation}
+
+\subsection{Comments on \tops{\protect\app}{}Distiller}
+
+\begin{comment}
+The installation is simple enough. Unzip \texttt{rmannot.zip} in a
+folder that is on your {\LaTeX} search path.  Refresh your filename
+database, if appropriate.
+
+I am perhaps the last one using YandY, but if there is anyone else,
+there is one other thing to do. The distribution comes with the
+default poster file for the \FT{MP3} file; the name of this file is
+\texttt{ramp3poster.eps} (found in the \texttt{graphics} subfolder).
+For YandY users, this file needs to be copied to a folder on the
+\texttt{PSPATH}. If you don't know what I'm talking about, follow
+the steps below.
+
+Open \textsf{dviwindo}, and go to \texttt{Preferences\;>\;Environment}
+and choose \texttt{PSPATH} from the drop down menu. Add the path
+\begin{Verbatim}[fontsize=\small]
+    C:\yandy\tex\latex\contrib\rmannot\graphics\\
+\end{Verbatim}
+at the end of your \texttt{PSPATH} string.\footnote{If your
+\textsf{YandY System} installation is elsewhere, enter that path.}
+It is important to have the double backslash at the end of the path.
+This tells the \textsf{YandY System} to search all subfolders for
+the graphics files. When you are finished, your \texttt{PSPATH}
+should look something like this:
+\begin{Verbatim}[fontsize=\small]
+    C:\yandy\ps;C:\yandy\tex\latex\contrib\rmannot\graphics\\
+\end{Verbatim}
+Be sure to separate these paths by a semicolon.
+\end{comment}
+
+\textbf{\textcolor{red}{Important:}} In recent versions of \app{Acrobat},
+security restrictions have been put in place to prevent
+\app{Distiller} from reading files (the Postscript \psf{file}
+operator does not work). Fortunately, \app{Distiller} has a switch that
+turns off this particular restriction. To successfully use this
+package, therefore, you need to run Distiller by using the
+\texttt{-F} command line switch. I personally use the \app{WinEdt}
+application as my text editor,\footnote{\app{WinEdt} home page:
+\url{www.winedt.com}} and use the \uif{GSView} button on the toolbar to pass the
+PS file to \app{Distiller} with the \texttt{-F} switch.
+toolbar. Edit \texttt{GSView.edt} to read,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\footnotesize]
+  Run(|%$('GSView'); %1 -F "%P\%N.ps"|,'%P',0,0,'%N.ps - GSview',1,1);
+\end{Verbatim}
+Note the use of the \texttt{-F} switch following \texttt{\%1}. The argument \texttt{\%1}
+is the path to the ``GSView'' application; this is redefined, as shown in Figure~\ref*{fig:EM}.
+
+\begin{figure}[htb]\centering
+\includegraphics[width=.75\linewidth]{graphics/exmodes}
+\caption{\uif{Options > Execution Modes > Ghostscript}}\label{fig:EM}
+\end{figure}
+
+If this package is used to create rich media annotations without the
+\texttt{-F} switch, you typically get the following error message in the
+Distiller log file
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+%%[ Error: undefinedfilename; OffendingCommand: file ]%%
+\end{Verbatim}
+This tells you that either you have not started Distiller with the
+\texttt{-F} command line switch, or Distiller can't find one of the
+files that the \psf{file} operator was trying to read.
+
+\subparagraph*{Mac OS Users.} The above comments on the \texttt{-F} command line
+switch are for \textsf{Windows~OS} users, \textsf{Mac~OS} users must choose the
+\texttt{AllowPSFileOps} user preference, this is located in the
+\texttt{plist}, possibly located at,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+/Users/[User]/Library/Preferences/com.adobe.distiller9.plist
+\end{Verbatim}
+You can use Spotlight, the search utility on Mac, to search for
+\texttt{com.adobe.distiller}. This finds the file
+\texttt{com.adobe.distiller9.plist}. Clicking on this find, Spotlight opens
+\texttt{com.adobe.distiller9.plist} in the \texttt{plist} editor, see
+\hyperref[plist]{Figure~\ref*{plist}}. If necessary, click on the arrow next
+to the Root to expand the choices, then click the up and down arrows at the
+far right in the \texttt{AllowPSFileOps} row to select \texttt{Yes} as the
+value.
+\begin{figure}[hbt]\setlength{\fboxsep}{0pt}\centering
+\fbox{\includegraphics[width=.75\linewidth]{graphics/plistEditor}}
+\caption{\tops{\protect\uif}{}{com.adobe.distiller9.plist}}\label{plist}
+\end{figure}
+
+\paragraph*{For \app{Acrobat DC} users.} Recent versions of \app{Acrobat Distiller DC} have a
+switch labeled \uif{Trust all files opened via Acrobat Distiller} under
+\uif{File > Preferences}, as shown in \hyperref[fig:TD]{Figure~\ref*{fig:TD}}
+on page~\pageref*{fig:TD}. When this checkbox is checked, there is no need
+for the \texttt{-F} switch.
+
+\begin{figure}[htb]\centering
+\includegraphics[width=.5\linewidth]{graphics/trust-distiller}
+\caption{\uif{\app{Acrobat Distiller}: File > Preferences}}\label{fig:TD}
+\end{figure}
+
+
+% \section{Options of this Package}
+
+
+\section{Setting the Paths and Posters}
+
+The paths to the supported media files are required to appear in the preamble, and any poster
+graphics are required to appear in the preamble as well.
+
+\subsection{Setting the Paths}
+
+There are two types of paths: System paths to resources needed by
+\app{Acrobat Distiller}, and media paths to the files used in the
+document.
+
+\paragraph*{System Paths.} This package uses \app{Acrobat Distiller~DC},
+which requires the document author to have \app{Acrobat~DC}.\footnote{In the
+post-\FT{FLV}/\FT{SWF} era, in theory versions of \app{Acrobat} built prior
+to the EOL of Flash player should work correctly for this package.} In the
+\app{Acrobat} program folder is a \texttt{Multimedia Skins} folder. \st{This
+folder contains the skins ({\FT{SWF}} files) used in providing playing
+controls to {\FT{FLV}} video files, and in the \texttt{Players} subfolder you
+will find \texttt{VideoPlayer.swf} and \texttt{AudioPlayer.swf}. The former
+plays {\FT{FLV}} files with an appropriate skin for user controls, the latter
+plays {\FT{MP3}} files.} The document author needs to set the path to these
+files, which are passed on to the distiller. This is easily done using the
+\Com{AcroVer} command.
+\takeMeasure{\string\AcroVer[win=\ameta{\upshape{32|64}}|mac]\{\meta{version}\}}%
+\begin{dCmd*}[commandchars=!()]{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\AcroVer[win=!ameta(!upshape(32|64))|mac]{!meta(version)}
+\end{dCmd*}
+{\noindent}Place the command in the preamble or in the \texttt{rmannot.cfg}
+configuration. The optional argument (\key{win} or \key{mac}) indicates the
+platform used to build the document; the \opt{win} option now takes one of
+two value, 32 or 64. This change is needed as Adobe rolls out its 64-bit
+versions of \app{Acrobat} and \app{Adobe Reader}. The required argument is
+the version of \app{Acrobat} you are using to build your {\RMA} document.
+When no optional argument is passed, \texttt{win} is assumed (\uif{Windows
+OS}). Possible values for \meta{version} are \texttt{DC}, a year
+(\texttt{2015} or later), or a version number, such as \texttt{9},
+\texttt{10}, or \texttt{11}.\footnote{A value of \texttt{Beta} is also
+recognized, for those in the Beta Program of \app{Acrobat}.}
+The default is \cs{AcroVer\darg{DC}}, which is equivalent to \cs{AcroVer[win=32]\darg{DC}}.
+
+The \textsf{rmannot} package, based on the information passed to it by
+\cs{AcroVer}, builds the appropriated path and passes this path to the
+\cs{pathToSkins} command as its argument. Should the path be proven to be
+incorrect, you can hunt down the correct path and directly enter it
+in the preamble, or in the \texttt{rmannot.cfg} configuration file. For
+version XI (version 11) of \app{Acrobat}, for example, the path is,
+\takeMeasure{\string\pathToSkins\{C:/Program Files (x86)/Adobe/\%}%
+\begin{dCmd*}{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\pathToSkins{C:/Program Files (x86)/Adobe/%
+    Acrobat 11.0/Acrobat/Multimedia Skins}
+\end{dCmd*}
+\noindent
+The path for the Mac OS may look like this,
+\takeMeasure{\string\pathToSkins\{/Applications/Adobe\string\ Acrobat\string\ 9\string\ Pro/Adobe\string\ Acrobat\string\ }%
+\begin{dCmd*}{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\pathToSkins{/Applications/Adobe\ Acrobat\ XI\ Pro/Adobe\ Acrobat\
+    Pro.app/Contents/Resources/Multimedia\ Skins}
+\end{dCmd*}
+\noindent
+These paths differ from platform to platform and \cs{AcroVer} tries to
+take all platforms and versions into consideration.
+
+%Note what the path is to the Multimedia Skins folder. The command
+%\cs{pathToSkins} also defines the path to the \texttt{Players} subfolder.
+
+%Future releases of \app{Acrobat} may change the name of the folders, so
+%a \Com{pathToPlayers} command is also provided; as with \cs{pathToSkins},
+%\cs{pathToPlayers} takes one argument, the path to the players.
+
+\handpoint The \pkg{rmannot} distribution comes with a
+\texttt{rmannot.cfg} file. In this file, you can place the \cs{AcroVer}
+command with its appropriate arguments for your platform and version of
+\app{Acrobat}. Remember, if you update your \app{Acrobat}, update
+also the \meta{version} argument of \cs{AcroVer}.
+
+\paragraph*{Document Media Paths.}
+Each media file must be declared in the preamble using the
+\Com{saveNamedPath} command.
+\takeMeasure{\string\saveNamedPath[\meta{mime\_type}]\{\meta{name}\}\{\meta{path}\}}
+\begin{dCmd}[commandchars=!()]{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\saveNamedPath[!meta(mime_type)]{!meta(name)}{!meta(path)}
+\end{dCmd}
+\noindent The optional argument \meta{mime\_type} is normally not needed.
+Only media with the extensions listed in
+\hyperref[s:MediaFmts]{Section~\ref*{s:MediaFmts}} are supported. The
+extension of the file name is isolated to determine the mime type.  The
+second parameter \meta{name} is a \emph{unique} name that will be used to
+reference this media file. Finally, \meta{path} is full and absolute path to
+the media file. The path includes the file name and extension. For
+example,\takeMeasure{\string\saveNamedPath\{summertime\}\{C:/myMedia/Summertime.mp3\}}
+\begin{dCmd*}{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\saveNamedPath{calliope}{C:/myMedia/calliope.mp4}
+\saveNamedPath{summertime}{C:/myMedia/summertime.mp3}
+\end{dCmd*}
+
+Once the paths are defined in this way, the media files are
+referenced using their given names. This has a couple of purposes.
+\begin{enumerate}
+    \item The names are used to determine if the media file has
+        already been embedded in the document. Though the media clip
+        may be used in several rich media annotations, the \pkg{rmannot}
+        attempts to embed a media file only once.
+    \item The command \cs{saveNamePath} uses
+        \cs{hyper@normalise}, of the \texttt{hyperref} package, to
+        ``sanitize'' special characters, so the path may contain
+        characters that normally have special meaning to {\LaTeX}.
+    \item Defining the path once leads to a consistent reference to
+        the file paths, and reduces the chance of typos.
+\end{enumerate}
+A brief example to illustrate the use of the names assigned by the
+\cs{saveNamedPath} follows:\takeMeasure{\string\rmAnnot\darg{1280bp}\darg{720bp}\darg{calliope}}
+\begin{dCmd*}{\bxSize}
+\rmAnnot{1280bp}{720bp}{calliope}
+\end{dCmd*}
+{\noindent}The above example would use the default poster image to give a
+visual of the annotation when it is not activated. The next section
+discusses how to define and implement your own poster image.
+
+\paragraph*{Defining a RM Path.}
+The rich media resources for your {\RMA} may reside on your local computer or
+on the Internet. As a way of reducing the amount of typing, you can use
+\Com{defineRMPath} to define common paths to your
+resources.\takeMeasure{\string\defineRMPath\darg{\meta{\cs{cmd}}}\darg{\meta{path}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\defineRMPath{!meta(\cmd)}{!meta(path)}
+\end{dCmd}
+{\noindent}The command uses \cs{hyper@normalise} (of \pkg{hyperref}) to
+``sanitize'' the path. The first argument \meta{\cs{cmd}} is the command to
+be created, and \meta{path} is the path to the media folder. After the
+definition, the command \meta{\cs{cmd}} expands to \meta{path}. For
+example,\takeMeasure{\string\saveNamedPath\darg{summertime}\darg{\string\myRMFiles/Summertime.mp3}}
+\begin{dCmd*}{\bxSize}
+\defineRMPath{\myRMFiles}{C:/myMedia}
+\saveNamedPath{calliope}{\myRMFiles/calliope.mp4}
+\saveNamedPath{summertime}{\myRMFiles/summertime.mp3}
+\end{dCmd*}
+{\noindent}We first define a path to our resources, then save those paths along with the file names.
+
+You can use \cs{defineRMPath} to define URLs as well:
+\bgroup\small\takeMeasure{\string\defineRMPath\{\string\myRMURLs\}\{http://www.example.com/\string~dpspeaker/videos\}}
+\begin{dCmd*}{\wd\webtempboxi+2\fboxsep+2\fboxrule}
+\defineRMPath{\myRMURLs}{http://www.example.com/~dpspeaker/videos}
+\end{dCmd*}
+\egroup\noindent
+Now, \cs{myRMURLs} points to your common video resources on the Internet.
+
+\subsection{Creating Posters}\label{createPosters}
+
+A \emph{poster} is an \FT{EPS} graphics file that covers the {\RMA} when the
+annotation is not activated. The \cs{rmAnnot} command has a \key{poster} key
+that is recognized as part of optional key-value pairs. The use of the
+\key{poster} key is optional, if you do not specify one, one will be
+generated for you. (More on the default poster appearance is presented
+below.) The poster image is visible when the rich media annotation is not
+activated.
+
+To create a poster for your rich media annotation, use a graphics application
+(\app{Adobe Illustrator}, \app{Adobe Photoshop}, etc.), and save as an
+\FT{EPS} file. You can also create a single page PDF from a TEX source file,
+as this package does. Move this file to your source file folder. Let's call
+this file \texttt{cool\_poster.eps}. In the preamble place the command,
+\takeMeasure{\string\makePoster\darg{myCP}\darg{cool\_poster}}
+\begin{dCmd*}{\bxSize}
+\makePoster{myCP}{cool_poster}
+\end{dCmd*}
+The first argument is a \emph{unique name} for the graphic, the
+second argument is the path name of the graphic (without the
+extension). The name is used as the value of the \key{poster}
+key.
+
+The command actually has an optional first argument. This argument
+is passed to the command \cs{includegraphics} (of the \pkg{graphicx}
+package). The general syntax of the command is,
+\takeMeasure{\string\makePoster[\meta{options}]\{\meta{name}\}\{\meta{path\_to\_EPS}\}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\makePoster[!meta(options)]{!meta(name)}{!meta(path_to_EPS)}
+\end{dCmd}
+The command uses the \pkg{graphicxsp} package to embed the file
+in the PDF document. The graphical image can then be used multiple
+times in many annotations.For example,
+\takeMeasure{\string\rmAnnot[poster=myCP]\darg{1280bp}\darg{720bp}\darg{calliope}}
+\begin{dCmd*}{\bxSize}
+\rmAnnot[poster=myCP]{1280bp}{720bp}{calliope}
+\end{dCmd*}
+\noindent See \Nameref{rmAnnot} for additional discussion of the \texttt{poster}
+key and \cs{rmAnnot}.
+
+The graphic itself should have the same \emph{aspect ratio} as the rich
+media annotation; this is important if the graphic contains text or
+images that would get otherwise distorted.
+
+\paragraph*{Default Poster Image.}\label{para:DPI} The \pkg{rmannot} package has
+default poster appearance. This poster appearance takes one of two
+forms. If the media file is \FT{MP3}, an image of the \app{AudioPlayer} control
+bar is used; otherwise it is dynamically generated (with the correct
+dimensions) using the following PostScript operators:
+\takeMeasure{\quad\string\rma@ps@txt@x\string\adj@measure\string\rma@ps@txt@y\string\adj@measure moveto}
+\begin{dCmd*}[commandchars=!(),codes={\let\1\quad}]{\bxSize}
+\defaultPoster
+{%
+!1\rma@ps@bg@setcolor
+!10 0 \this@width\space\this@height\space rectfill
+!1\rma@ps@txt@x\adj@measure\rma@ps@txt@y\adj@measure moveto
+!1\rma@ps@txt@setcolor/\rma@ps@font
+!1\rma@ps@relfontsize\rma@ps@fontsize selectfont
+!1\rma@ps@msg
+}
+\end{dCmd*}
+\noindent
+The commands \cs{this@width} and \cs{this@height} are the width and
+height of the annotation. The command \cs{adj@measure} converts a
+measurement to a proportion of the smaller of the two measurements
+\cs{this@width} and \cs{this@height}.
+%\footnote{The code presented
+%here is a simplified version of the actual code found in
+%\pkg{rmannot.dtx}. The definition of the default poster has a
+%number of macros that can be redefined to change the placement of
+%text, the color, size of the font, etc. See \texttt{rmannot.dtx}
+%for details.}
+
+Note that, in the above code, some text is generated in the lower left corner
+of the annotation, the text is \cs{rma@posternote}. This command is populated
+by the value of the \key{posternote} key of the optional argument of
+\cs{rmAnnot}. The default value of \texttt{posternote} is
+`\st{\textsf{AcroTeX Flash}}' \st{or} `\textsf{AcroTeX Video}' or
+`\textsf{AcroTeX MP3}', depending on the file type of the media. This can be
+changed through the \texttt{posternote} key.
+
+The default poster itself can be redefined by a document author who
+is schooled in Postscript things, perhaps if only to change colors,
+or font, or location of the poster note.
+
+\paragraph*{The \cs{setPosterProps} command.}\label{para:sPP}
+The parameters of the above display can be set with the \cs{setPosterProps} command.
+\begingroup
+\takeMeasure{\quad{textFont=\meta{font-name}}}\setlength{\eflength}{\bxSize+.5em}%
+\def\2{\rlap{\hskip\eflength\texttt{color=.7529 setgray}}}%
+\def\3{\rlap{\hskip\eflength\texttt{xPos=10}}}%
+\def\4{\rlap{\hskip\eflength\texttt{yPos=10}}}%
+\def\5{\rlap{\hskip\eflength\texttt{textColor=.4 setgray}}}%
+\def\6{\rlap{\hskip\eflength\texttt{relTextSize=10}}}%
+\def\7{\rlap{\hskip\eflength\texttt{textSize=10}}}%
+\def\8{\rlap{\hskip\eflength\texttt{textFont=Helvetica}}}%
+\def\9{\rlap{\hskip\eflength\sffamily\bfseries{Default settings}}}%
+\begin{dCmd*}[commandchars=!(),codes={\let\1\quad}]{\bxSize}
+\setPosterProps
+!9{%
+!2!1color=!meta(color),
+!3!1xPos=!meta(num),
+!4!1yPos=!meta(num),
+!5!1textColor=!meta(color),
+!6!1relTextSize=!meta(num),
+!7!1textSize=!meta(num),
+!8!1textFont=!meta(font-name)
+}
+\end{dCmd*}
+\endgroup\noindent
+The defaults are shown to the right of the display frame box. All values are either numbers or Postscipt code.
+\begin{aebQuote}
+  \begin{description}
+    \item [\key{color=\meta{color}}] The background color of the default
+        poster. The \meta{color} specification is a Postscript color
+        operator and its arguments.
+    \item [\key{xPos=\meta{num}}] The horizontal starting position (from
+        the lower-left corner) of the \key{posternote} text. This is a
+        relative value; \meta{num} is measured as percentage of the smaller
+        of the two dimensions of the annotation.
+    \item [\key{yPos=\meta{num}}] The vertical starting position (up from
+        the lower-left corner) of the \key{posternote} text. This is a
+        relative value; \meta{num} is measured as percentage of the smaller
+        of the two dimensions of the annotation.
+    \item [\key{textColor=\meta{color}}] The text color (of the poster
+        note)  of the default poster. The \meta{color} specification is a
+        Postscript color operator and its arguments.
+    \item [\key{relTextSize=\meta{num}}] The size of the text (of the
+        poster note); the value of \meta{num} is interpreted as a
+        percentage of the smaller of the two dimensions of the annot. (The
+        text size is resized when the annot is resized.)
+    \item [\key{textSize=\meta{num}}] The size of the text of the poster note.
+    \item [\key{textFont=\meta{font-name}}] The name of the Postscript font
+        to be use to display the poster note. The default is \texttt{Helvetica}.
+  \end{description}
+\end{aebQuote}
+
+\section{\texorpdfstring{\protect\cs}{\CMD}{rmAnnot} and its Options}\label{rmAnnot}
+
+The \cs{rmAnnot} command creates a rich media annotation (\RMA), an object
+first introduced in Version~9 of \app{Acrobat}/\allowbreak\app{Adobe Reader}
+(\app{AA}/\allowbreak\app{AR}), through which media files are played. Media
+files can be either embedded in the document or linked via a URL.
+
+%\app{Acrobat}/\app{Adobe Reader}
+%have a built-in Flash player that plays \textsf{SWF}, \textsf{FLV} and
+%\FT{MP3} files.
+
+Media files in other formats need to be converted to one of the supported
+formats, refer to \hyperref[s:MediaFmts]{Section~\ref*{s:MediaFmts}} for a
+list of supported media formats.
+
+%\footnote{The new \textbf{Acrobat 9 Pro Extended} can
+%convert media files to \textsf{FLV}, but embed the converted file in the PDF,
+%so we cannot really use that re-encoded file with our \pkg{rmannot}
+%package. Adobe Flash Video Encoder converts many movie formats to
+%\textsf{FLV} format, which can, in turn, be used in this package. Other
+%utilities may be available as shareware or commercialware.}
+
+\subsection{\texorpdfstring{\protect\cs{rmAnnot}}{\CMD{rmAnnot}} Command}
+
+The primary command of this package is \Com{rmAnnot}, which has four
+arguments, one optional and three required.
+\takeMeasure{\string\rmAnnot[\meta{options}]\darg{\meta{width}}\darg{\meta{height}}\darg{\meta{name}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\rmAnnot[!meta(options)]{!meta(width)}{!meta(height)}{!meta(name)}
+\end{dCmd}
+{\noindent}The command creates a {\RMA} based on the \meta{name} and
+conforming to the dimensions (\meta{width} and \meta{height}) and
+\meta{options} specified.
+
+\paragraph*{On the dimensions.} The \meta{width} and \meta{height} parameters are what they are,
+the width and height to be used in the rich media annotation. The aspect
+ratio should be the same as the aspect ratio of the media media. The
+annotation can be resized using the \key{width}, \key{height}, or \key{scale}
+keys, described below.
+
+\subparagraph*{Acquiring the dimensions.} The dimensions can (usually) be
+obtained from the properties of the media file, as displayed by the operating
+system. In \uif{File Explorer} of \app{Windows OS}, open the folder
+containing the media file in question, select the media file of interest,
+right-click on it and select \uif{Properties} from the dropdown menu. The
+media file properties dialog box appear, choose the \uif{Details} tab, as
+shown in \hyperref[fig:MFP]{Figure~\ref*{fig:MFP}}, you can obtain the
+dimensions of the media from the \uif{Frame width} and \uif{Frame height}
+entries.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=.5\linewidth]{graphics/media-file-props}
+  \caption{Media file Properties}\label{fig:MFP}
+\end{figure}
+
+
+\subparagraph*{Dimensions for \FT{MP3} Files.} A special legacy poster can be
+used. The dimensions of the legacy poster are \cs{cntrlbrWd} by
+\cs{cntrlbrHt}\FmtMP{\cs{cntrlbrWd}\\\relax\cs{cntrlbrHt}}. The legacy poster
+appears when the \key{poster} key is not specified. Refer to the named
+paragraph \textbf{\nameref{para:MP3DP}} on page~\pageref*{para:MP3DP} and to
+the subsection ``\nameref{ss:AddRrmsMP3}'' on  page~\pageref*{ss:AddRrmsMP3}
+for more information on \FT{MP3} files.
+
+\paragraph*{The other arguments.} The \meta{name} argument references a media file defined by the
+\cs{saveNamedPath} in the preamble. The \meta{options} are discussed in the
+subsection that follows.
+
+\subsubsection{\texorpdfstring{\protect\cs{rmAnnot}}{\CMD{rmAnnot}} Options}
+
+The \cs{rmAnnot} command has many key-value pairs that are passed to
+it through its first optional argument. Most of these key-value
+pairs correspond to options available through the user interface of
+\app{Acrobat}. Below is a listing of the key-values, and a brief
+description of each.
+
+\begin{description}
+    \item[\key{name=\meta{name}}] The value, \meta{name}, is the name of
+        the annotation. If none is supplied, a name of
+        \verb!aebRM\therm@Cnt! is used, where \texttt{rm@Cnt} is a {\LaTeX}
+        counter that is incremented each time \cs{rmAnnot} is expanded. The
+        value of the \key{name} key is used primarily for JavaScript
+        purposes. For example, the code
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!~@},fontsize=\small]
+var rma=this.getAnnotRichMedia({nPage:this.pageNum,cName:!meta~name@});
+\end{Verbatim}
+acquires the object for the {\RMA} on the current page with a name of \meta{name}.
+
+    \item[\texttt{enabled=\meta{value}}] The \texttt{enabled} key determines when the
+        annotation is activated, possible values are \key{onclick},
+        \key{pageopen}, and \key{pagevisible}.
+    \begin{description}\def\NH{\hspace*{-\labelsep}}
+        \item[\key{onclick}] The annotation is activated when the
+            user clicks on the annotation, or is activated through
+        JavaScript.
+        \item [\key{pageopen}] The annotation is activated when
+            the page containing the annotation is opened.
+        \item[\key{pagevisible}] The annotation is activated
+            when the page containing the annotation becomes visible.
+            (Useful for continuous page mode.)
+    \end{description}
+
+    The default is \key{onclick}.
+
+    \item[\key{deactivated=\meta{value}}] The \key{deactivated} key determines when the
+        annotation is deactivated, possible values are \key{onclick},
+        \key{pageclose}, and \key{pageinvisible}.
+    \begin{description}
+        \item [\key{onclick}] The annotation is deactivated by
+            user script or by right-clicking the annotation and choosing
+            \uif{Disable Content}.
+        \item [\key{pageclose}] The annotation is deactivated when
+            the page containing the annotation is closed.
+        \item [\key{pageinvisible}] The annotation is deactivated
+            when the page containing the annotation becomes invisible.
+            (Useful for continuous page mode.)
+    \end{description}
+    The default is \key{onclick}.
+
+    \item [\key{windowed=\meta{\upshape{true|false}}}] A Boolean, which if
+        \texttt{true}, the media is played in a floating window. The
+        default is \texttt{false}, the media is played in the annotation on
+        the page. For information on how to set the floating window
+        parameters, see \mlNameref{winparams}.
+    \item [\key{url}=\meta{\upshape{true|false}}] A Boolean, which if
+        \texttt{true}, the media is to be interpreted as an URL. The
+        default is \texttt{false}, the media is embedded from the local
+        hard drive within the PDF file.
+
+       To stream media, it is necessary to clear the checkbox \uif{Enable
+       Protected Mode at startup}, this checkbox is found under the menu
+       \uif{Edit > Preferences}. In the \uif{Preferences} dialog box,
+       select \uif{Security (Enhanced)} category from the left panel; the
+       targeted checkbox is the top line on the right panel. Refer to
+       \hyperref[fig:SP]{Figure~\ref*{fig:SP}} for a visual.
+
+       For end-users\FmtMP{End-users} viewing the streaming media from \app{Adobe Reader
+       DC}, the user also needs to clear the \uif{Enable Protected Mode at
+       startup} as well.
+
+    \item [\key{borderwidth=\meta{\upshape{none|thin|medium|thick}}}]
+        The\FmtMP{After Dec.~2020\\not obeyed } value of the
+        \key{borderwidth} key determines whether a border is drawn around
+        the annotation when it is activated. The default is \texttt{none}.
+    \item [\texttt{poster=\meta{name}}] The name of a poster graphic
+        created by \cs{makePoster}. See the section \Nameref{createPosters}
+        for additional details.
+    \item [\key{posternote=\meta{text}}] When the poster key is not given, the
+        default poster is generated. A short note of text appears in the
+        lower left-corner. The text for that note can be passed to the
+        default poster appearance through \texttt{posternote}. See
+        \mlNameref{createPosters} for additional details.
+    \item [\key{defaultposter=\meta{\upshape{true|false}}}] A
+        Boolean,\FmtMP{New: \key{defaultposter}\\{2020/08/21}}
+        which if true, replaces the default \FT{MP3} control bar with the
+        default poster image as described in the paragraph
+        \textbf{\mlnameref{para:DPI}} on page~\pageref*{para:DPI}. The
+        default is \texttt{true}. This key is obeyed only for \FT{MP3} files and
+        when the \key{poster} key \emph{is not} specified.
+    \item [\key{invisible=\meta{\upshape{true|false}}}] A Boolean
+        which\FmtMP{After Dec.~2020,\\this key is not useful}, if present,
+        \textsf{rmannot} creates a transparent poster for the \RMA. The
+        {\RMA} has not hidden property as form fields do, the best you can
+        do is to give the {\RMA} a transparent poster and place it in an
+        obscure corner of the page, or under a form field. Normally, if
+        \key{invisible} is specified, the video content is played in a
+        window (that is, the \key{windowed} option is specified)
+        and controlled by JavaScript methods.
+
+        \textbf{Note:} The \key{invisible} option requires that
+        you distill the document with a job options setting of
+        \texttt{Standard\_transparency}, distributed with the \textsf{graphicxsp}
+        package.
+\begin{comment}
+    \item [\st{{\key{transparentBG=\meta{\upshape{true|false}}}}}]\FmtMP{After Dec~2020,\\\FT{SWF} is not supported} \st{This option
+        is available for \textsf{SWF} files only. Quoting the \emph{Adobe
+        Supplement} document, ``A flag that indicates whether the page
+        content is displayed through the transparent areas of the rich
+        media content (where the alpha value is less than 1.0). If
+        \texttt{true}, the rich media artwork is composited over the page
+        content using an alpha channel. If false, the rich media artwork is
+        drawn over an opaque background prior to composition over the page
+        content.'' The default is \texttt{false}.}
+    \item [\st{{\key{passcontext=\meta{\upshape{true|false}}}}}]\FmtMP{After Dec~2020,\\\FT{SWF} is not supported}
+        \st{A Boolean, if \texttt{true}, passes
+        right-click context to Flash. Should be used only if there is a
+        way of deactivating the annotation, perhaps through JavaScript.
+        Recognized only for \textsf{SWF} files. The default is \texttt{false}.}
+
+        \st{\textsf{SWF} file developers can select this option to replace the
+        \textsf{Acrobat} context menu with the context menu of the
+        originating \textsf{SWF} file. When the user right-clicks the \textsf{SWF}
+        file, the available options are from the originating file.}
+\end{comment}
+    \item [\key{skin=\meta{value}}] For playing a video file,
+        \st{seven}two different skins are available for the user to control
+        the video, these are \texttt{all}\FmtMP{New: \key{all}
+        key\\{2020/08/21}}, \st{\texttt{skin1}, \texttt{skin2},
+        \texttt{skin3}, \texttt{skin4}, \texttt{skin5}, \texttt{skin6},
+        \texttt{skin7}}, and \texttt{none}. In the latter case, the media
+        is played when activated, but there is no user interface to control
+        the play. As for the description of each of the skins,
+    \begin{aebDescript}
+        \item [\texttt{all}] All Controls
+        \item [\st{\texttt{skin1}}] \st{All Controls}
+        \item [\st{\texttt{skin2}}] \st{Play, Stop, Forward, Rewind, Seek, Mute, and Volume}
+        \item [\st{\texttt{skin3}}] \st{Play}
+        \item [\st{\texttt{skin4}}] \st{Play and Mute}
+        \item [\st{\texttt{skin5}}] \st{Play, Seek, and Mute}
+        \item [\st{\texttt{skin6}}] \st{Play, Seek, and Stop}
+        \item [\st{\texttt{skin7}}] \st{Play, Stop, Seek, Mute, and Volume}R
+        \item [\texttt{none}] No Controls
+    \end{aebDescript}
+
+%    You can add other skins as well. If you have \textsf{Adobe Flash
+%    Professional CS5}, you have access to other skins. Place a new skin in
+%    the location Acrobat expect them to be in (as defined by
+%    \cs{PathToSkins}, then place a declaration like the following in the
+%    preamble of your document:
+%\begin{Verbatim}[xleftmargin=\amtIndent]
+%\saveNamedPath{skin8}{\PathToSkins/%
+%    MinimaUnderPlayBackSeekCounterVolMuteNoFull.swf}
+%\end{Verbatim}
+%(Here, I've wrapped the line around for display purposes.) Now, when you
+%use \cs{rmAnnot}, you can specify \texttt{skin=skin8} as a key-value in the optional
+%parameter list.
+
+\begin{comment}
+    \item [\st{{\texttt{skinAutoHide=\meta{\upshape{true|false}}}}}]\FmtMP{After Dec~2020,\\no supported}
+        \st{A Boolean, if \texttt{true}, the skin auto hides.
+        Only valid for video files.}
+    \item [\texttt{skinBGColor=\meta{color\_hex}}]\FmtMP{After Dec~2020,\\no supported}
+        The color of the skin.
+        The value is a color in hex format. The default is
+        \texttt{0x5F5F5F}.  Only valid for \textsf{FLV} files.
+
+    \item [\texttt{skinBGAlpha=\meta{num}}]\FmtMP{After Dec~2020,\\no
+        supported} The alpha level of the skin, a number between 0 and 1.
+        The default is 0.75. Only valid for \textsf{FLV} files.
+    \item [\texttt{volume=\meta{num}}] The initial volume level of the
+        video file, a number between 0 (muted) and 1 (max volume). The
+        default is 1.0. Only valid for \textsf{FLV} files.
+%    \item \texttt{speed}: Description quoted from the \textsl{Adobe
+%        Supplement} document. ``A positive number specifying the speed to be used
+%        when running the animation. A value greater than one shortens
+%        the time it takes to play the animation, or effectively speeds
+%        up the animation.'' The default is 1.
+%    \item\texttt{playcount}: Description quoted from the \textsl{Adobe
+%        Supplement} document. ``An integer specifying the play count for
+%        this animation style. A nonnegative integer represents the
+%        number of times the animation is played. A negative integer
+%        indicates that the animation is infinitely repeated.'' The
+%        default is -1.
+    \item [\texttt{cuepoints=\meta{list\_cuepoints}}] If the video is encoded with cue points, you
+    can associate a JavaScript action with each. The value of \texttt{cuepoints}
+    is a comma delimited list of cue points. See the paragraph
+    \Nameref{cuepoints} for more details.
+
+    \item [\texttt{resources=\meta{list}}] Use this key to list all files that are
+        required to run a \textsf{SWF} file.  The value of the resources
+        key is a \emph{comma-delimited} list of path names created by the
+        \cs{saveNamedPath} command. \emph{The files referenced within this
+        key are embedded in the PDF.} Files that are on the Internet---and
+        are played from the Internet---should not be listed here.
+
+    \item [\texttt{flashvars=\meta{vars}}] Flash developers can use the
+        \texttt{flashvars} key to add ActionScript variables for the
+        \textsf{SWF} file. See the discussion of
+        \textbf{\nhnameref{NameCmds}} in the paragraph below.
+\end{comment}
+\end{description}
+The next three keys resize the {\RMA} in the recommended way. Only \emph{one
+key} is recognized for any \cs{rmAnnot} command. They are examined in the
+order of \key{width}, \key{height}, and \key{scale}.
+\begin{description}
+
+    \item[\key{width}=\meta{length}] Resizes the {\RMA} to a width of
+        \meta{length}; the aspect ratio of the annot is preserved. For
+        example, the following
+\takeMeasure{\string\rmAnnot[width=.5\string\linewidth]\darg{1280bp}\darg{720bp}\darg{calliope}}
+\begin{dCmd*}{\bxSize}
+\rmAnnot[width=.5\linewidth]{1280bp}{720bp}{calliope}
+\end{dCmd*}
+{\noindent}resizes so the width of the annot is \texttt{.5\string\linewidth}.
+    \item[\key{height}=\meta{length}] Resizes the {\RMA} to a height
+        of \meta{length}; the aspect ratio of the annot is preserved.
+    \item[\key{scale}=\meta{pos-num}] Rescales the {\RMA} by a scale factor of \meta{pos-num}; eg,
+    \texttt{scale=.5}.
+\end{description}
+
+\begin{comment}
+\paragraph*{The \cs{Name} and \cs{urlName} commands.}\label{NameCmds} Within the optional
+parameters of the \cs{rmAnnot} command, two convenience commands, \Com{Name}
+and \Com{urlName}, are defined. They can be used, for example, with the
+\texttt{flashvars} key.
+
+The \cs{Name} command may be used to set the value of a flash
+variable. \cs{Name} has one argument, the symbolic name of a file
+embedded by \cs{saveNamedPath}. The expansion of
+\cs{Name\{\meta{name}\}} will appear in the Resources tab of the Edit
+Flash dialog box. For example, if we define \texttt{myVid} as
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\defineRMPath{\myRMFiles}{C:/acrotex/video}
+\saveNamedPath{myVid}{\myRMFiles/assets/myVid.flv}
+\end{Verbatim}
+then \cs{Name\{myVid\}} expands to \texttt{myVid.flv}. If the path is grouped
+with braces, like so,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\saveNamedPath{myVid}{\myRMFiles/{assets/myVid.flv}}
+\end{Verbatim}
+then \verb!\Name{myVid}! expands to \texttt{assets/myVid.flv}. This latter form
+corresponds to adding a directory using the Add Directory button on the
+Resources tab of the Edit Flash dialog box.
+
+We can then use \cs{Name} as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\rmAnnot[flashvars={source=\Name{myVid}},
+    resources={myVid}]{320bp}{240bp}{mySWF}
+\end{Verbatim}
+where \texttt{mySWF} is the name of an \textsf{SWF} application that takes a flash variable named \texttt{source}, the value
+of the variable is the video to be played.
+
+The \cs{urlName} command is designed for resources on the Internet, and which are passed to the
+\textsf{SWF} application with a flash variable.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
+\defineRMPath{\myRMURLs}{http://www.example.com/~dpspeaker/videos}
+\saveNamedPath{myVid}{\myRMURLs/myVid.flv}
+\end{Verbatim}
+The expansion of \verb!\urlName{myVid}! is
+\begin{Verbatim}[xleftmargin=\amtIndent]
+http://www.example.com/~dpspeaker/videos/myVid.flv
+\end{Verbatim}
+We can then use \cs{urlName} as follows:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\rmAnnot[flashvars={source=\urlName{myVid}}]{320bp}{240bp}{mySWF}
+\end{Verbatim}
+Note that we don't list \texttt{myVid} as a resource, we just pass the URL to
+\texttt{mySWF} as a flash variable.
+
+\paragraph*{Note.} The \cs{Name} and \cs{urlName} commands are defined within
+the optional parameters of \app{Acrobat} form fields created by the \textsf{eforms}
+package.
+\end{comment}
+
+\begin{comment}
+\paragraph*{On Cue Points.}\label{cuepoints} A cue point is any significant
+moment in time occurring within a video clip. Cue points can be embedded
+in the \textsf{FLV} using \textsf{Adobe Flash Professional}, or some other video encoder.
+
+The value of the \texttt{cuepoints} key is a list of cue points data, a
+``typical example'' is
+\begin{Verbatim}[fontsize=\footnotesize]
+\newcommand{\myCuePoints}{%
+    {type=nav,name=Chapter1,time=0,action={console.println("Chapter1")}},%
+    {type=nav,name=Chapter2,time=1883,action={console.println("Chapter2")}},%
+    {type=nav,name=Chapter3,time=5197,action={console.println("Chapter3")}},%
+    {type=nav,name=Chapter4,time=6817,action={console.println("Chapter4")}},%
+    {type=nav,name=Chapter5,time=9114,action={console.println("Chapter6")}},%
+    {type=nav,name=Chapter6,time=12712,action={console.println("Chapter6")}}
+}
+\end{Verbatim}
+\textbf{\textcolor{red}{Comments:}} Having made such a definition, we then say
+\verb!cuepoints={\myCuePoints}!, note that \cs{myCuePoints} must be enclosed in
+braces. Note also in the above example, that the comment character
+(\texttt{\%}) is used after each comma (\texttt{,}) in a line break. Because of the way the
+argument is initially parsed, these comment characters are needed.
+
+\newtopic\indent Each of the cue points is a comma-delimited list of key-value pairs; the
+keys are \texttt{type}, \texttt{name}, \texttt{time}, and \texttt{action}.
+Each of these are briefly described.
+
+\begin{aebDescript}
+    \item [\texttt{type=\meta{\upshape nav|event}}] Possible values for this key are \texttt{nav} and
+    \texttt{event}, and describes the type of cue point this is.
+    \begin{description}
+        \item [\texttt{type=nav}] Navigation cue points enable users to seek
+        to a specified part of a file. Embed Navigation cue points in the
+        \textsf{FLV} stream and \textsf{FLV} metadata packet when the \textsf{FLV} file is encoded.
+
+        Navigation cue points create a keyframe at the specified
+        cue point location, so you can use code to move a video player’s
+        playhead to that location. You can set particular points in an \textsf{FLV}
+        file where you might want users to seek. For example, your video
+        might have multiple chapters or segments, and you can control the
+        video by embedding navigation cue points in the video
+        file.\footnote{Taken in part from
+        \url{http://www.peachpit.com/articles/article.aspx?p=663087}}
+    \item [\texttt{type=event}] Event cue points can also be embedded in
+    your \textsf{FLV} stream and \textsf{FLV} metadata packet when video clip is encoded.
+    You can write code to handle the events that are triggered at
+    specified points during \textsf{FLV} playback.\footnote{Ibid.}
+    \end{description}
+    \item [\texttt{name=\meta{name}}] The name of the cue point
+    \item [\texttt{time=\meta{time}}] The time in milliseconds the cue point
+    occurs.
+    \item [\texttt{action=\meta{script}}] JavaScript code that is executed
+    when this cue point is reached.
+\end{aebDescript}
+\end{comment}
+
+\subsubsection{Setting the Floating Window Parameters}\label{winparams}
+
+When the \key{windowed} key is set to \texttt{true}, the rich media
+annotation appears in a floating window. Use the \Com{setWindowDimPos}
+command to set the dimensions of the window and its
+positioning.\takeMeasure{\string\setWindowDimPos\darg{\meta{KV-pairs}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\setWindowDimPos{!meta(KV-pairs)}
+\end{dCmd}
+\CmdLoc This command may be placed anywhere and will take affect for the next rich media annotation
+created by \cs{rmAnnot}.
+
+\PD There are a number of key-value pairs (\meta{KV-pairs}) for setting the floating window; the default values are
+normally adequate for most applications.
+
+\begin{description}
+\item [\texttt{width=\meta{KV-pairs}}] The width is described by three
+    \emph{key-value pairs}, \texttt{default}, \texttt{max}, and
+    \texttt{min}, measured in default user space units. The \meta{KV-pairs}
+    have the form \texttt{\meta{key}=\meta{value}}.
+
+    For example, \texttt{width=\darg{default=300,max=600,min=80}}.
+
+    Default values:
+    \texttt{default=288}, \texttt{max=576}, \texttt{min=72}.
+
+\item [\texttt{height=\meta{KV-pairs}}] The height is described by three
+    \emph{key-value pairs}, \texttt{default}, \texttt{max}, and
+    \texttt{min}, measured in default user space units. The \meta{KV-pairs}
+    have the form \texttt{\meta{key}=\meta{value}}.
+
+    For example, \texttt{height=\darg{default=300,max=600,min=80}}.
+
+    Default values: \texttt{default=216},
+    \texttt{max=432}, \texttt{min=72}.
+
+\item[\texttt{position=\meta{\upshape{halign|valign|hoffset|voffset}}}] The
+    position of the floating window is described by four key-value pairs.
+\begin{description}
+    \item [\texttt{halign=\meta{\upshape{near|center|far}}}] The
+        \texttt{halign} describes the horizontal alignment of
+        the window. Valid values are \texttt{near}, \texttt{center} and
+        \texttt{far}. The default is \texttt{far}. For languages that
+        read from left-to-right, a value of \texttt{near} refers to the
+        left edge of the viewing window; whereas \texttt{far} refers to
+        the right edge of the viewing window. (For right-to-left reading
+        languages, the description of \texttt{near} and \texttt{far} are
+        reversed.)
+
+    \item [\texttt{valign=\meta{\upshape{near|center|far}}}] The \texttt{valign} parameter describes
+        the vertical alignment of the window. Valid values are
+        \texttt{near}, \texttt{center} and \texttt{far}. The default is
+        \texttt{near}.
+
+    \item [\texttt{hoffset=\meta{num}}] The description of \texttt{hoffset} is
+        paraphrased from the \textsl{Adobe Supplement} document: The
+        offset from the alignment point specified by the \texttt{halign}
+        key. A positive value for \texttt{hoffset}, when \texttt{halign}
+        is either \texttt{near} or \texttt{center}, offsets the position
+        towards the \texttt{far} direction. A positive value for
+        \texttt{hoffset}, when \texttt{halign} is \texttt{far}, offsets
+        the position towards the \texttt{near} direction. The default is~18.
+    \item[\texttt{voffset=\meta{num}}] The description of \texttt{voffset} is
+        paraphrased from the \textsl{Adobe Supplement}
+        document: The offset from the alignment point
+        specified by the \texttt{valign} key. A positive
+        value for \texttt{voffset}, when \texttt{valign} is
+        either \texttt{near} or \texttt{center}, offsets the
+        position towards the \texttt{far} direction. A positive value
+        for \texttt{voffset}, when \texttt{valign} is \texttt{far}, offsets the
+        position towards the \texttt{near} direction. The default is~18.
+\end{description}
+\end{description}
+In layman's terms the combination of \texttt{halign=far,\,valign=near} puts
+the floating window in the upper right corner of the active window of
+\textsf{Adobe Reader/Acrobat}, assuming a left-to-right reading language.  The
+values of \texttt{voffset=18,\,hoffset=18}, moves the floating window 18
+points down and 18 points to the left. That would be its initial position.
+
+\paragraph*{\textcolor{red}{Note}}: This feature, the positioning of the
+window, never worked in Version~9, but has been implemented for
+Version~10.
+
+\newtopic\indent
+The \Com{resetWindowDimPos} command can be used to reset the
+floating window parameters to their default values.
+\takeMeasure{\string\resetWindowDimPos}
+\begin{dCmd}{\bxSize}
+\resetWindowDimPos
+\end{dCmd}
+
+\subsection{Examples}
+
+In this section, several examples are presented that illustrate the \cs{rmAnnot}
+and some of the key-value pairs.
+
+\subsubsection{Posters}
+
+The poster is an image that is displayed when the rich media annotation is not activated.
+If a poster is not specified using the \texttt{poster} key, one is supplied for it.
+Consider the following Flash animation.
+\begin{center}
+    \rmAnnot[width=1.5in]{176bp}{144bp}{oceanwaves}\quad
+    \rmAnnot[poster=ow-poster,width=1.5in,windowed]{176bp}{144bp}{oceanwaves}
+\end{center}
+Above are two rich media annotations, each running the same \FT{3GP}
+file. The one on the left uses the default poster, the one on the
+right uses a custom poster. In the annotation on the left, you see
+the default \texttt{posternote}, this can be changed using the
+\texttt{posternote} key.
+
+%The custom poster was obtained by viewing the \FT{3GP} file in a media player
+%and taking a snapshot of the first frame.
+%cropping the PDF, then saving the resulting PDF as an EPS file.
+%After you crop the printed image, you can determine its dimensions
+%by moving your mouse to the lower-left corner; the width and height
+%values should appear. Use these in setting up your annotation.
+
+The verbatim listing for the two above annotations is found below.
+\takeMeasure{\small\quad\string\rmAnnot[poster=ow-poster,width=1.5in,windowed]\darg{176bp}\darg{144bp}\darg{oceanwaves}}
+\begin{dCmd*}[commandchars=!(),fontsize=\small]{\bxSize}
+\begin{center}
+!quad\rmAnnot[width=1.5in]{176bp}{144bp}{oceanwaves}\quad
+!quad\rmAnnot[poster=ow-poster,width=1.5in,windowed]{176bp}{144bp}{oceanwaves}
+\end{center}
+\end{dCmd*}
+{\noindent}The poster \texttt{ow-poster} was defined in the preamble of this document.
+
+Below is the same video, the one on the left is a generic poster
+created from a {\LaTeX} source file, then saved as an EPS file, the
+one on the right was obtained from the poster page generated by
+\app{Acrobat}. (See the paragraph below,
+\hyperref[acroposter]{page~\pageref*{acroposter}}, for details on
+how this was done.)
+\begin{center}
+\rmAnnot[poster=aebmovie_poster,width=2in]{640bp}{480bp}{horse1}\quad
+\rmAnnot[poster=horse1_poster,width=2in]{640bp}{480bp}{horse1}
+\end{center}
+The verbatim listing for the two above annotations follows:
+\takeMeasure{\small\string\rmAnnot[poster=aebmovie\_poster,width=2in]\darg{640bp}\darg{480bp}\darg{horse1}\string\quad}%
+\begin{dCmd*}[commandchars=!(),fontsize=\small]{\bxSize}
+\rmAnnot[poster=aebmovie_poster,width=2in]{640bp}{480bp}{horse1}\quad
+\rmAnnot[poster=horse1_poster,width=2in]{640bp}{480bp}{horse1}
+\end{dCmd*}
+{\noindent}Posters and media files are embedded only once, so using the same
+poster and/or media file multiple times does not increase the file
+size significantly.
+
+\paragraph*{Default \FT{MP3} poster.}\label{para:MP3DP}
+For \FT{MP3} files, the default poster is an EPS file that is an image of
+the player control bar, the example below shows the \FT{MP3} poster and audio
+player.
+\begin{center}
+\rmAnnot[height=14bp]{\cntrlbrWd}{\cntrlbrHt}{trek}
+\end{center}
+The code for the above annotation follows:
+\takeMeasure{\string\rmAnnot[height=14bp]\darg{\string\cntrlbrWd}\darg{\string\cntrlbrHt}\darg{trek}}%
+\begin{dCmd*}{\bxSize}
+\rmAnnot[height=14bp]{\cntrlbrWd}{\cntrlbrHt}{trek}
+\end{dCmd*}
+\noindent A custom poster can be inserted using the \texttt{poster} key, as
+usual.
+
+\paragraph*{The \textsf{Acrobat Pro} generated poster.}\label{acroposter}
+To acquire the same poster image that \app{Acrobat} generates,
+use the following steps:
+\begin{enumerate}
+    \item Open \app{Acrobat}
+    \item Drag and drop your media file onto an empty \app{Acrobat} window
+    \item Press \uif{Ctrl-P}, or select \uif{File > Print}
+    \item Select \app{Adobe PDF} as the printer
+    \item Select \uif{Choose paper source by PDF page size}
+    \item Select \uif{Use custom paper size when needed}
+    \item Press \uif{OK}
+    \item A new PDF should be created, and it should be the same
+        size as the poster image
+    \item Choose \uif{File > Save As}, select \uif{Encapsulated
+        PostScript (*.eps)} as the \uif{Save as type}
+    \item Press \uif{Save}, and save to an appropriate folder.
+\end{enumerate}
+
+\subsubsection{Additional remarks on \tops{\protect\FT}{}{MP3}}\label{ss:AddRrmsMP3}
+
+For versions of \app{AA}/\app{AR} prior to the EOL for \app{Flash} content, a
+control bar was used to control the playback of an MP3. The poster version is
+still available, as seen below:
+\begin{flushleft}
+\qquad\llap{\color{red}\raisebox{2pt}{\ding{182}}\enspace}\rmAnnot[height=14bp]{\cntrlbrWd}{\cntrlbrHt}{trek}\\[3pt]
+\qquad\small\ttfamily\string\rmAnnot[height=14bp]\darg{\string\cntrlbrWd}\darg{\string\cntrlbrHt}\darg{trek}
+\end{flushleft}
+however, the control bar \emph{does not appear} when the \FT{MP3} is played,
+rather, the new player appears. The \pkg{rmannot} package now offers
+alternatives to the old control bar:
+\begin{center}
+\rmAnnot[width=1.5in,defaultposter,posternote=trek]{640bp}{480bp}{trek}\quad
+\setPosterProps{textSize=14,xPos=20,yPos=20,textColor=1 0 0 setrgbcolor}%
+\rmAnnot[width=1.5in,defaultposter,posternote=trek]{640bp}{480bp}{trek}\quad
+\rmAnnot[width=1.5in,poster=aebmusic_poster]{640bp}{480bp}{trek}\\[3pt]
+\makebox[1.5in][c]{\footnotesize\textcolor{red}{\ding{183}} Default Poster}\quad
+\makebox[1.5in][c]{\footnotesize\textcolor{red}{\ding{184}} Customized Default Poster}\quad
+\makebox[1.5in][c]{\footnotesize\textcolor{red}{\ding{185}} Custom Poster}
+\end{center}
+The verbatim listing of the the above three {\RMA}s:
+\takeMeasure{\small\string\setPosterProps\darg{textSize=14,xPos=20,yPos=20,textColor=1 0 0 setrgbcolor}\%}%
+\begin{dCmd*}[fontsize=\small,commandchars=!(),codes={\def\1{\textcolor{red}{\ding{183}}\enspace}
+\def\2{\textcolor{red}{\ding{184}}\enspace}
+\def\3{\textcolor{red}{\ding{185}}\enspace}}
+]{\linewidth}
+!1\rmAnnot[width=1.5in,defaultposter,posternote=trek]{640bp}{480bp}{trek}
+!2\setPosterProps{textSize=14,xPos=20,yPos=20,textColor=1 0 0 setrgbcolor}%
+!2\rmAnnot[width=1.5in,defaultposter,posternote=trek]{640bp}{480bp}{trek}
+!3\rmAnnot[width=1.5in,poster=aebmusic_poster]{640bp}{480bp}{trek}
+\end{dCmd*}
+{\noindent}\textbf{Comments on \FT{MP3} posters}
+\begin{enumerate}
+\item[\textcolor{red}{\ding{182}}] When no poster option is taken, as in
+    display~\textcolor{red}{\ding{182}} above, the old control bar is used
+    as the poster.
+
+\item[\textcolor{red}{\ding{183}}] When \key{defaultposter} key appears,
+    the control bar poster \emph{is not used}; what is used in the default
+    poster image, refer to the paragraph titled \textbf{\nameref{para:DPI}}
+    on page~\pageref*{para:DPI} for information on this poster. In this
+    example, \key{posternote} is used to add text to the poster. Without
+    the \key{posternote} the default text appears as `\textsf{AcroTeX MP3}'
+    appears.
+
+\item[\textcolor{red}{\ding{184}}] The {\RMA} labeled as
+    \textcolor{red}{\ding{184}} uses the \cs{setPosterProps} command, as
+    described in paragraph \textbf{\nameref{para:sPP}} on
+    page~\pageref*{para:sPP}, to modify the size, positioning and color of
+    the poster note.
+
+\item[\textcolor{red}{\ding{185}}] In this {\RMA}, the \key{poster} key is specified.
+\end{enumerate}
+
+\begin{comment}
+
+\subsubsection{Skin Options}
+
+When a \textsf{FLV} video file is used, the video is played by the
+VideoPlayer.swf and uses one of the seven standard skins.
+Customizing information is actually passed using FlashVars. (For \textsf{FLV}
+files, the user does not have access to the FlashVars, the
+application, in this case, this package, uses the FlashVars.)
+Customizing options include a choice of skin, setting the auto hide
+flag, a choice of the color of the skin, setting the opacity of the
+skin and setting the initial volume level. The following illustrates
+some of the options on a short \textsf{FLV} video with a horse theme.
+\begin{center}
+\rmAnnot[posternote=All Controls,width=2in]{209bp}{157bp}{horse1}\quad
+\rmAnnot[posternote={skin6: Play, Seek, Stop},skin=skin6,
+    skinBGColor=0xFF0000,skinBGAlpha=0.25,width=2in]{209bp}{157bp}{horse1}
+\end{center}
+The video on the left shows the default settings (default skin, skin
+alpha, volume level, etc.), while the same video on the right uses
+skin6, with skin color of \texttt{0xFF0000} (red) and skin alpha
+level set to 0.25.
+
+\begin{center}
+        \setLinkText[\A{\JS{%
+            var rm=this.getAnnotRichMedia({nPage: this.pageNum, cName: "acrolimerick"});\r
+            if (rm.activated) rm.callAS("multimedia_play");\r
+            else rm.activated=true;
+        }}]{\includegraphics[width=2in]{AeB_Logo}}\\[1ex]
+        \rmAnnot[name=acrolimerick,height=14bp]{\cntrlbrWd}{\cntrlbrHt}{AcroLimerick}
+\end{center}
+Note, click on the {\AcroTeX} logo to play an \FT{MP3} file.
+
+\subsection{Third-party Video Players}
+
+When you play an \textsf{FLV} file, the \textsf{SWF} file \texttt{VideoPlayer.swf} is
+embedded in the PDF. It is \texttt{VideoPlayer.swf} that plays the \textsf{FLV}
+file. It is this \textsf{SWF} file that allows us to customize the look of the \RMA,
+what skin to use, skin color, skin opacity, value, speed, and so on.
+
+The \texttt{VideoPlayer.swf} file, which is shipped with Acrobat Pro, version~9 or
+later, lacks several useful features, among these are the ability to play
+more than one video in the same rich media annotation (\RMA).
+
+In the past year, there have been two extensions to Adobe's
+\texttt{VideoPlayer.swf}:
+\begin{itemize}
+
+    \item \texttt{VideoPlayerX.swf} is an extension to the video player
+        shipped by Adobe. This one is being developed by
+        \textbf{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/}{UVSAR}}.
+        Full documentation can be found on this page. Both documentation
+        and the widget itself are found in the \texttt{videoplayerx} folder
+        of the \pkg{rmannot} package distribution.
+
+    \item \texttt{VideoPlayerPlus.swf} is available from Joel Geraci's web
+    site \mlhref{http://blogs.adobe.com/pdfdevjunkie/2010/03/introducing_the_video_player_p.html}
+    {The PDF Developer Junkie Blog}. Joel is a guru at Adobe.  Extended
+    features are in the form of additional JavaScript API to play more
+    than one video in an \RMA, change skins, change skin color, and a few
+    others. Full documentation can be found on the reference blog page.
+
+    {\setlength{\fboxsep}{2\fboxsep}\fcolorbox{blue}{webyellow}{\parbox{\linewidth-2\fboxsep-2\fboxrule}{\bfseries
+    \color{red}Beginning 2016/10/09, the use of
+    \texttt{VideoPlayerPlus.swf} is deprecated, and defaults to
+    \texttt{VideoPlayerX.swf}.}}}
+
+%    I have extensively tested the \texttt{VideoPlayerPlus.swf}, and it seems to
+%    work as advertised, no problem.
+
+\end{itemize}
+\textbf{Installation of third-party players.} If you want to use either or
+both of these video players, download them from the appropriate web site:
+\begin{itemize}
+    \item \href{http://www.uvsar.com/projects/acrobat/videoplayerx/}
+    {VideoPlayerX.swf}: Also available in the \texttt{videoplayerx} folder.
+    \item \st{VideoPlayerPlus.swf}
+
+%    \href{http://blogs.adobe.com/pdfdevjunkie/2010/03/introducing_the_video_player_p.html}
+%    {VideoPlayerPlus.swf}
+\end{itemize}
+If you download from
+\href{http://www.uvsar.com/projects/acrobat/videoplayerx/}{UVSAR}, rename the
+SWF widget to \texttt{VideoPlayerX.swf}; or simply retrieve it from the
+\texttt{videoplayerx} folder. Place \texttt{VideoPlayerX.swf} into the same
+folder that contains Adobe's \texttt{VideoPlayer.swf}. This is where the
+\textsf{rmannot} package will look for it.
+
+Once you have installed the widgets \textsf{rmannot} can use it. If you want
+to the {UVSAR} extension \texttt{VideoPlayerX.swf}, make following declaration
+in the preamble:
+\bVerb\takeMeasure{\string\useVideoPlayerPlus}%
+\def\1{\makebox[0pt][l]{\hspace*{\linewidth}\quad\normalfont(defaults to \cs{useVideoPlayerX})}}
+\begin{minipage}{\bxSize}
+\begin{Verbatim}[frame=single,commandchars=!(),,rulecolor=\color{red}]
+\useVideoPlayerX
+!1!st(\useVideoPlayerPlus)
+\end{Verbatim}
+\end{minipage}\eVerb
+
+\redpoint On 13 Oct 2011,
+\textbf{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/}{UVSAR}}
+published build VP10.2 of \textbf{VideoPlayerX}. The new widget subsumes the
+\textbf{VideoPlayerPlus} of
+\mlhref{http://blogs.adobe.com/pdfdevjunkie/2010/03/introducing_the_video_player_p.html}{Joel
+Geraci}. The build is targeted at Flash Player~10, so \textbf{VideoPlayerX}
+requires \textsf{Adobe Acrobat} or \textsf{Adobe Reader~9.2}, \app{Acrobat} is
+required to build the document using \textsf{rmannot}, but \textbf{Reader} is only needed to view the
+document. Therefore, if extended API is needed for your document, I would recommend the
+use of \textbf{VideoPlayerX}.
+
+\redpoint On 28 Oct 2014,
+\textbf{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/}{UVSAR}}
+published build VP10.4 of \textbf{VideoPlayerX}; this is the one that in the
+\texttt{videoplayerx} folder.
+
+\exAeBBlogPDF{p=} Articles and examples of the use of these players are found at the
+\href{\urlAcroTeXBlog}{{\AcroTeX} Blog}, articles on the
+\href{\urlAcroTeXBlog/?tag=rmannot-package}{rmannot package}
+illustrate each of these players; more generally, there are multiple
+articles on \href{\urlAcroTeXBlog/?cat=22}{rich media annotations}.
+
+\newtopic In addition to  {\AcroTeX} Blog articles on the topic, sample files for the \textbf{VideoPlayerX}
+that come with the distribution are \texttt{vpx-btn.tex} and \texttt{vpn-combo.tex}.
+
+\subsubsection{JavaScript/ActionScript API for Video Players}
+
+{\setlength{\fboxsep}{2\fboxsep}\fcolorbox{blue}{webyellow}{\parbox{\linewidth-2\fboxsep-2\fboxrule}{\bfseries
+\color{red}After December 2020, the JavaScript Bridge is no longer available. The methods of this section
+are no longer supported.}}}
+
+\newtopic\noindent
+Normally, we use \cs{rmAnnot} to create a {\RMA} to play a \textsf{FLV} (or \textsf{SWF} or
+\FT{MP3}) without any controls. The user clicks on the {\RMA} and the media
+content plays. For \textsf{FLV} files, a skin may be provided to control over the
+movie once the {\RMA} becomes activated. For a fancier presentation, you
+might want to create control buttons to control the movie; to do that, you
+need to use the JavaScript API for the \RMA.
+
+In this section we document the JavaScript API for \RMA. The resources for
+this section are the
+\href{http://livedocs.adobe.com/acrobat_sdk/9.1/Acrobat9_1_HTMLHelp/wwhelp/wwhimpl/js/html/wwhelp.htm?href=JS_API_AcroJSPreface.87.1.html&accessible=true}
+{JavaScript for Acrobat API Reference}
+and \textbf{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/}{UVSAR}}.
+
+%\href{http://blogs.adobe.com/pdfdevjunkie/2010/03/introducing_the_video_player_p.html}{The PDF Developer Junkie Blog},
+
+\newtopic\noindent The basic methodology for passing a command to the the video player:
+\begin{enumerate}
+    \item \textbf{Get the RMA object.} To do this use either the
+    \texttt{Doc.getAnnotRichMedia()} or \texttt{Doc.getAnnotsRichMedia()}
+    methods. Note that in the latter method the word \texttt{Annots} is
+    plural, the plural form distinguishes these to methods from each
+    other. The former gets a single {\RMA} object, while the latter returns
+    an array of {RMA} objects. For work with \textsf{rmannot}, I prefer the
+    use of \texttt{Doc.getAnnotRichMedia()}.
+
+    \item[] \texttt{Doc.getAnnotRichMedia()} takes two arguments, the
+    first is the page number, and second is the name (a string) of the
+    annot. For example
+\begin{Verbatim}[xleftmargin=\amtIndent]
+var rma = this.getAnnotRichMedia(this.pageNum, "myCoolRMA");
+\end{Verbatim}
+The first argument is normally \texttt{this.pageNum}, which is a
+JavaScript property referring to the current page.
+    \item \textbf{Activate the RMA.} Use the \texttt{RMA.activated}
+    property, a Boolean:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+rma.activated=true;
+\end{Verbatim}
+    You can, as an alternative say, \verb|if(!rma.activated) rma.activated=true;|
+    \item \textbf{Make the call(s).} Use the \texttt{callAS} method of the {RMA}
+    object. For example, if you want to play the video, you might say,
+\begin{Verbatim}[xleftmargin=\amtIndent]
+rma.callAS("multimedia_play");
+\end{Verbatim}
+\end{enumerate}
+Putting these lines together to play media, we have
+\begin{Verbatim}[xleftmargin=\amtIndent]
+var rma = this.getAnnotRichMedia(this.pageNum, "myCoolRMA");
+if(!rma.activated) rma.activated=true;
+rma.callAS("multimedia_play");
+\end{Verbatim}
+Those are the basics of making a call over the ``bridge'' to the video
+player widget. In the rest of the section, we concentrate on the
+JavaScript APIs, the third line above
+\texttt{rma.callAS("multimedia\_play");}. The first argument of the
+\texttt{callAS} method is a string which names the method to use. Note
+that this first argument is a string. Additional argument may be used if
+the multimedia method requires them.
+
+\paragraph*{The Scripting Bridge between JavaScript and ActionScript.}
+When a JavaScript method, such as  \texttt{rma.callAS("multimedia\_play")}, is
+executed on the PDF side, the specified ActionScript function
+\texttt{multimedia\_play()} is executed in the \textsf{SWF} widget
+(for example, in \texttt{VideoPlayer.swf}). The \texttt{callAS} communicates
+across what is called the ``scripting bridge'' to the ActionScript engine. For more
+information on the scripting bridge, see the \textbf{\href{\urlAcroTeXBlog/?tag=scripting-bridge}
+{\AcroTeX{} Blog}}.
+
+\subsubsection{Core API}
+
+The following methods are defined for all three players. The first
+argument of the \texttt{callAS} method is a string, which names the
+(ActionScript) method to use in the video player widget. The
+\pkg{rmannot} package defines some convenience commands to give the
+user a consistent experience between video players (\textbf{VideoPlayer},
+\textbf{VideoPlayerX}). %\textbf{VideoPlayerPlus},
+
+\begin{flushleft}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}>{\small}b{4in}>{\small}l@{}}
+\multicolumn{1}{>{\bfseries}l}{Method/Description}&\multicolumn{1}{>{\bfseries}l}{Command}\\\hline
+{\Large\strut}\texttt{multimedia\_play():void}&\cs{mmPlay}\\
+Play the video or sound clip from the current location\\[6pt]
+%
+\texttt{multimedia\_pause():void}&\cs{mmPause}\\
+Pause playback of the current media\\[6pt]
+%
+\texttt{multimedia\_rewind():void}&\cs{mmRewind}\\
+Rewind the media clip to the beginning. This method does not pause the
+clip.\\[6pt]
+%
+\texttt{multimedia\_nextCuePoint():void}&\cs{mmNextCuePoint}\\
+Move the play head to the next cue (chapter) point\\[6pt]
+%
+\texttt{multimedia\_prevCuePoint():void}&\cs{mmPrevCuePoint}\\
+Move the play head to the previous (chapter) point\\[6pt]
+%
+\texttt{multimedia\_seek(time:Number):void}&\cs{mmSeek}\\
+Move the play location to an offset of time from the beginning of the media, where time is measured in
+seconds.\\[6pt]
+%
+\texttt{multimedia\_mute():void}&\cs{mmMute}\\
+Mute the audio of the media\\[6pt]
+%
+\texttt{multimedia\_volume(volume:Number):void}&\cs{mmVolume}\\
+Set the volume level. The volume is a number between 0 and 1 inclusive. A value of 0 mutes the audio,
+while a volume of 1 sets the volume level to the maximum level.
+\end{tabular*}
+\end{flushleft}
+
+\goodbreak
+
+\paragraph*{Examples of usage}\leavevmode
+\begin{Verbatim}[xleftmargin=\amtIndent]
+var rma = this.getAnnotRichMedia(this.pageNum, "myCoolRMA");
+if(!rma.activated) rma.activated=true;
+rma.callAS(\mmVolume, .5);  // half-volume
+rma.callAS(\mmPlay);        // and play it
+\end{Verbatim}
+
+\begin{comment}
+\subsubsection{API of VideoPlayerPlus}
+
+The \textbf{VideoPlayerPlus} supports all the functions of the core API,
+and adds four more functions.
+
+\begin{flushleft}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}>{\small}b{4in}>{\small}l@{}}
+\multicolumn{1}{>{\bfseries}l}{Method/Description}&\multicolumn{1}{>{\bfseries}l}{Command}\\\hline
+{\Large\strut}\texttt{multimedia\_source(path:string):void}&\cs{mmSource}\\
+Sets a new source file for the  video. The video can either be
+embedded resource or a URL to streaming content.\\[6pt]
+%
+\texttt{multimedia\_skin(path:string):void}&\cs{mmSkin}\\
+Sets a new skin file to be used by the player. This should be an
+embedded resource.\\[6pt]
+%
+\texttt{multimedia\_skinBackgroundColor(color:uint):void}&\cs{mmSkinColor}\\
+Sets a new background color for the player skin in the form of
+\texttt{0xRRGGBB}.\\[6pt]
+%
+\texttt{multimedia\_skinAutoHide(state:boolean):void}&\cs{mmSkinAutoHide}\\
+Sets the auto hide behavior for the player bar. [\texttt{true} or \texttt{false}]
+\end{tabular*}
+\end{flushleft}
+
+\paragraph*{Examples of usage} %\vspace{-\baselineskip}
+\begin{Verbatim}
+    var rma = this.getAnnotRichMedia(this.pageNum, "myCoolRMA");
+    if(!rma.activated) rma.activated=true;
+    // use embedded video as source
+    rma.callAS(\mmSource, "myVideo.flv");
+    // use video on web as source
+//  rma.callAS(\mmSource, "http://www.example.com/myCool.flv");
+    rma.callAS(\mmPlay);        // and play it
+\end{Verbatim}
+
+\subsubsection{\tops{\st}{*}{API of VideoPlayerX}\tops{}{*}}
+
+{\setlength{\fboxsep}{2\fboxsep}\fcolorbox{blue}{webyellow}{\parbox{\linewidth-2\fboxsep-2\fboxrule}{\bfseries
+\color{red}After December 2020, \texttt{VideoPlayerX.swf} is no longer supported.}}}
+
+\newtopic\noindent
+The \textbf{VideoPlayerX} redefines many of the core API, which returned
+void, to methods that return meaningful information. It also adds many new
+methods.
+
+In the table below, the functions marked with an `$*$' are also core functions
+that have been re-defined to have a return value.
+\begingroup\setlength{\extrarowheight}{1mm}%\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}%
+\begin{longtable}{@{}>{\small}b{4in}>{\small}l!{\extracolsep{\fill}}}
+\multicolumn{1}{>{\bfseries}l}{Method/Description}&\multicolumn{1}{>{\bfseries}l}{Command}\\\hline
+\endfirsthead
+\multicolumn{1}{>{\bfseries}l}{Method/Description}&\multicolumn{1}{>{\bfseries}l}{Command}\\\hline
+\endhead
+\texttt{multimedia\_pause():Number}${}^*$&\cs{mmPause}\\[-\extrarowheight]
+Pause playback of the current media.\par \medskip
+Returns on success: Playhead time in seconds
+\\[6pt]
+%
+\texttt{multimedia\_mute():Number}${}^*$&\cs{mmMute}\\[-\extrarowheight]
+Mute the audio of the media\par\medskip
+Returns on success: Previous volume setting.
+\\[6pt]
+%
+\texttt{multimedia\_volume(volume:Number):Number}${}^*$&\cs{mmVolume}\\[-\extrarowheight]
+Set the volume level. The volume is a number between 0 and 1 inclusive. A value of 0 mutes the audio,
+while a volume of 1 sets the volume level to the maximum level.\par\medskip
+Returns on success: Previous volume setting.\\[6pt]
+%
+\texttt{multimedia\_seekCuePoint(cuePointName:String):String}&\makebox[1in+3pt][l]{\cs{mmSeekCuePoint}\hss}\\[-\extrarowheight]
+Seeks to the named navigation cue point in an \textsf{FLV} video.\par\medskip
+Returns on success: Empty string\\
+Returns on error: String ERROR: xxxx where xxx is one of the standard
+numeric error codes defined in ActionScript 3.0.
+\\[6pt]
+%
+\texttt{multimedia\_setSource(url:String):String}&\cs{mmSource}\\[-\extrarowheight]
+Sets the source for the video (a URL or a local file reference).\par\medskip
+Returns on success: \texttt{local=} or \texttt{remote=} and the source in string format.\par\medskip
+If the remote source cannot be played for any reason, the player automatically returns to playing the local source instead.
+\\[6pt]
+%
+\texttt{multimedia\_setSkin(skinName:String):void}&\cs{mmSkin}\\[-\extrarowheight]
+Sets a new skin file to be used by the player. This should be an
+embedded resource.\\[6pt]
+%
+\texttt{multimedia\_setSkinColor(color:uint):uint}&\cs{mmSkinColor}\\[-\extrarowheight]
+Sets a new background color for the player skin in the form of
+\texttt{0xRRGGBB}.\\[6pt]
+%
+\texttt{multimedia\_setSkinAlpha(alpha:uint):uint}&\cs{mmSkinAlpha}\\[-\extrarowheight]
+Sets the background alpha for the player skin (will only take effect where
+the skin supports alpha changes).\par\medskip
+Returns on success: Previous alpha value.
+\\[6pt]
+%
+\texttt{multimedia\_useLocal(isLocal:boolean):String}&\cs{mmUseLocal}\\[-\extrarowheight]
+Switches to the local source if \texttt{isLocal} is set to \texttt{true},
+or to the remote source if \texttt{isLocal} is \texttt{false}.\par\medskip
+Returns on success: source filename/URL in string format.\\
+Returns on error: \texttt{"NOT AVAILABLE"}.\\[6pt]
+%
+%\newpage
+%
+\texttt{multimedia\_getMetdata( attribute:String ):String}&\cs{mmGetMetaData}\\[-\extrarowheight]
+    Returns the video metadata associated with the attribute. Valid attribute strings are
+    \texttt{width}, \texttt{height}, \texttt{audiocodecid}, \texttt{videocodecid}, \texttt{framerate},
+    \texttt{videodatarate}, and \texttt{duration}.\\[6pt]
+%
+%\newpage
+%
+\texttt{multimedia\_getVideoState():String}&\cs{mmGetVideoState}\\[-\extrarowheight]
+Returns the video state. The possible values for the state property are
+\texttt{buffering}, \texttt{connectionError}, \texttt{disconnected},
+\texttt{loading}, \texttt{paused}, \texttt{playing}, \texttt{rewinding},
+\texttt{seeking}, and \texttt{stopped}.\\[6pt]
+%
+\texttt{multimedia\_setScaleMode(attribute:String):String}&\cs{mmSetScaleMode}\\[-\extrarowheight]
+    Sets video scale mode. Valid attribute strings are \texttt{exactFit},
+\texttt{noScale}, and \texttt{maintainAspectRatio}.\par\medskip
+Returns on success: Previous value.\par\medskip
+Note that if the scale mode is changed to \texttt{"maintain\-Aspect\-Ratio"}, the align
+mode will be switched to ``top left'' rather that ``center''.\\[6pt]
+%
+\texttt{multimedia\_getVersion():String}&\cs{mmGetVersion}\\[-\extrarowheight]
+Returns a string in the form \texttt{"NNNN fp=FFFF vp=VVVV"},
+where \texttt{NNNN} is the name of the Rich Media Annotation,
+\texttt{FFFF} is the version of Flash Player being used, and \texttt{VVVV} is the
+version of the \textsf{VideoPlayerX} code (currently 10.2). The length of each
+element is variable.\\[12pt]
+%
+\multicolumn{2}{@{}l}{\large\textbf{New API for version 10.2}}\\[6pt]
+%The \textsf{VideoPlayerX} now accepts all the extended ActionScript calls
+%defined by Joel Geraci's \textsf{VideoPlayerPlus}
+%widget.\\[6pt]
+The two functions \texttt{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/listener.php}{vpx\_listener()}} and
+\texttt{\href{http://www.uvsar.com/projects/acrobat/videoplayerx/init.php}{vpx\_init()}} are listening and initialization
+functions. Follow these two links for information on these functions.\\[6pt]
+%
+\newpage
+%
+\texttt{multimedia\_setStageColor(color:uint):void}&\cs{mmSetStageColor}\\[-\extrarowheight]
+Sets the background color for the Stage (the area around the video when it
+isn't scaled to fit the annotation). For example,
+\begin{Verbatim}
+var rm=this.getAnnotRichMedia(this.pageNum,"myRMA");
+rm.callAS(\mmSetStageColor,0xFF00FF);
+\end{Verbatim}
+\\[6pt]
+%
+\texttt{multimedia\_isLooping():Boolean}&\cs{mmIsLooping}\\[-\extrarowheight]
+Sets if the video should loop automatically when it reaches the end of the
+timeline. The default is \texttt{true}. \par\medskip
+Returns on success: Previous value of the setting.\\[6pt]
+%
+\texttt{multimedia\_skinAutoHide(state:Boolean):void}&\cs{mmSkinAutoHide}\\[-\extrarowheight]
+Sets the auto hide behavior for the player bar.\\[12pt]
+%
+%\newpage
+%
+\multicolumn{2}{@{}l}{\large\textbf{New API for version 10.4}}\\[6pt]
+\texttt{multimedia\_showLoopButton():Boolean}&\cs{mmShowLoopButton}\\[-\extrarowheight]
+Determines whether the video loop control button should appear on mouseover. A value of
+\texttt{true} shows the button, a value of false \texttt{hides} the button. This function
+is \emph{ineffective} when placed in the \texttt{vpx\_init()} function.
+ \par\medskip
+Returns on success: Previous value of the setting.
+\end{longtable}
+\endgroup
+
+\noindent
+There are considerably more functions that are not listed here. For a full list, go
+to the page \href{http://www.uvsar.com/projects/acrobat/videoplayerx/}
+{VideoPlayerX: Enhanced Video Tool for Adobe Acrobat}
+on the \textbf{UVSAR} website. The documentation is also in the \texttt{videoplayerx} folder.
+
+\paragraph*{Examples of usage} %\vspace{-\bigskipamount}
+\begin{Verbatim}
+    var rma = this.getAnnotRichMedia(this.pageNum, "myCoolRMA");
+    if(!rma.activated) rma.activated=true;
+    // use embedded video as source
+    rma.callAS(\mmSource, "myVideo.flv");
+    // use video on web as source
+//  rma.callAS(\mmSource, "http://www.example.com/myCool.flv");
+    rm.callAS(\mmShowLoopButton, false); // no loop button
+    rma.callAS(\mmPlay);        // and play it
+\end{Verbatim}
+
+\subsubsection{Methods shared by all Video Players}
+
+The three players (\textbf{VideoPlayer}, \textbf{VideoPlayerPlus}, and
+\textbf{VideoPlayerX}) all share the core API. Beyond the core API,
+extended API supported by \textbf{VideoPlayerPlus} and
+\textbf{VideoPlayerX} are different, but they do have some overlap. Though
+there is overlap, the common methods may have different names, this is one
+of the main reasons for the convenience commands. The command,
+\cs{mmSource}, for example, expands to the string
+\texttt{"multimedia\_source"} for \textbf{VideoPlayerPlus}, but for
+\textbf{VideoPlayerX} expands to the string
+\texttt{"multimedia\_setSource"}.
+
+\paragraph*{Extended API Overlap:} \cs{mmSource}, \cs{mmSkin}, and
+\cs{mmSkinColor}.
+
+\newtopic For either player (\textbf{VideoPlayerPlus} or \textbf{VideoPlayerX}), you
+can dynamically load in a new source file (either local or remote),
+designate the skin and skin color.
+
+\paragraph*{\textcolor{red}{Examples.}} Again, over time, I plan posting
+several example files to illustrate \textbf{VideoPlayerPlus} or \textbf{VideoPlayerX}
+and their capabilities. Keep your browser set to the
+\href{http://www.math.uakron.edu/~dpstory/aebblog.html}{AeB Blog}.
+\end{comment}
+
+
+
+\subsection{\texorpdfstring{\protect\cs{rmAnnot}}{\CMD{rmAnnot}}
+    and 3D}\label{RM3D}
+
+Here is something that I've only just come to realize: If you use the user
+interface (UI) of \app{Acrobat} and you create a 3D annotation in
+\app{Acrobat}, then give it a \textsf{SWF} as a resource, the 3D annot
+gets converted into a Rich Media annotation ({RMA}). Looking through the
+specification as described in the \emph{Adobe Supplement to ISO 32000}, I
+determined to implement this feature, and why not since most of the
+structure (that of an {RMA}) was already in place by way of my
+\textsf{rmannot} package. So, this version of \textsf{rmannot} supports
+what I'll call \emph{Rich Media 3D annotation} (\RMAD).
+
+Initially, it was not a challenge to get a 3D model to appear in a {\RMA}
+created by \pkg{rmannot}, some straight forward modifications to
+\textsf{rmannot} were required with \emph{ISO 32000} as a guide. Looking
+at Alexander Grahn's very fine and brilliant \pkg{movie15} package, I
+saw the difficulties of defining and creating \emph{view}s through the
+{\LaTeX} interface. With Alexander's permission, I gently lifted all the
+really heavy code from \pkg{movie15}, and placed it in
+\textsf{rmannot}. I offer up my great and humble thanks for his kindness
+in allowing the use of his code (characterized by commands beginning with
+\texttt{@MXV} in \texttt{rmannot.dtx}).
+
+If you want to insert an {\RMAD} annotation into your document, begin by
+calling the \pkg{rmannot} package with the \opt{use3D} option
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\usepackage[use3D]{rmannot}
+\end{Verbatim}
+Using this option brings in a large amount of code to support 3D. Regular
+{\RMA}s can be created as usual, if you do not use 3D there is no reason to
+use this option.
+
+The 3D Models support by \app{Acrobat}/\app{Adobe Reader} are \FT{U3D} and \FT{PRC}. To
+construct a \RMAD, you use one of these filetypes as the fourth argument
+of \cs{rmannot}, for example,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\rmAnnot[!meta(rmannot_opts)]{!meta(width)}{!meta(height)}{!meta(3dmodel)}
+\end{Verbatim}
+\cs{rmAnnot} files and resources are referred to symbolically, and need to
+be declared in the preamble. For example, we might declare
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\saveNamedPath{myDice}{c:/.../3dmodels/dice.u3d}
+\end{Verbatim}
+\cs{rmAnnot} parses the fourth argument, and looks at its extension. If
+the extension is \texttt{.u3d} or \texttt{.prc}, the appropriate 3D
+structure is generated for this annotation.
+
+The first optional argument of \cs{rmAnnot} has two new key-value pairs,
+both Boolean: \texttt{toolbar} and \texttt{modeltree}.
+\begin{itemize}
+    \item\key{toolbar}: A Boolean, which if true (the default), causes
+    the 3D toolbar to appear when the annot is activated.  If
+    \key{toolbar=false}, the toolbar does not appear when the
+    annotation is activated.
+    \item\key{modeltree}: A Boolean, which if true causes the \uif{Model
+    Tree} as viewed in the \uif{Navigation Pane}. The default is false,
+    the \uif{Model Tree} is not displayed when the annotation is activated.
+\end{itemize}
+There are a large number of key-values that support {\RMAD} annotations,
+rather than inserting them into the first optional parameter of \cs{rmAnnot},
+I've created a separate command, \cs{setRmOptions3D} for this purpose. The
+command may appear appear anywhere before the {\RMAD} it is referencing.
+The syntax is,
+\begin{Verbatim}[numbers=left,xleftmargin=\amtIndent,
+  commandchars={!()},fontsize=\fontsize{9}{11}\selectfont]
+\setRmOptions3D{!meta(annot_name)}
+{
+    3DOptions={!meta(options from movie15)},
+    !st(3DResources={%)
+    !st(none={rName=(!meta(name1))},...,)
+      !st(foreground={rName=(!meta(name2)),flashvars=(!meta(vars))},...,)
+      !st(background={rName=(!meta(name3)),flashvars=(!meta(vars))},...,)
+      !st(material={rName=(!meta(name4)),mName=(!meta(materialName)),flashvars=(!meta(vars))},...)
+   !st(})
+}
+\end{Verbatim}
+The command takes two arguments, the first \meta{annot\_name} is the name of
+the annot, as declared by the name key in the first optional argument of
+\cs{rmAnnot}, like so,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
+\rmAnnot[name=my3DDice,...]{4in}{3in}{myDice}
+\end{Verbatim}
+In the above example, we've named this annot \texttt{my3DDice}, and it is
+this name we would put in as the first argument of \cs{setRmOptions3D} in
+line~(1) above.
+
+The second argument of \cs{setRmOptions3D} takes key-value pairs, but there \st{are only two keys} is only one key:
+\texttt{3DOptions}\st{ and \texttt{3DResources}}. Each
+of these will be explained in turn.
+
+\paragraph*{\texttt{3DOptions}} As noted in line~(3), the value of
+this key are key-value pairs defined in \textsf{movie15}, appropriate to
+3D models. The keys supported are \texttt{3Dbg}, \texttt{3Djscript},
+\texttt{3Dcoo}, \texttt{3Dc2c}, \texttt{3Droo}, \texttt{3Daac},
+\texttt{3Droll}, \texttt{3Dviews}, \texttt{3Dlights}, and
+\texttt{3Drender}. See the \mlhref{http://mirror.ctan.org/macros/latex/contrib/movie15/doc/movie15.pdf}
+{{\protect\textsf{movie15}} documentation} for a description of these keys.
+
+There are a couple of differences. First \texttt{3Dviews} is the
+\texttt{3Dviews2} of \textsf{movie15}. Alexander Grahn had deprecated his
+original \texttt{3Dviews} key, and later came up with a better format for
+storing the views.  Since we are beginning anew, \texttt{3Dviews} uses the new
+format as described in the \mlhref{http://mirror.ctan.org/macros/latex/contrib/movie15/doc/movie15.pdf}
+{{\protect\textsf{movie15}} documentation} as
+\texttt{3Dviews2}.
+
+Another difference is with the \texttt{3Djscript} key. The file
+descriptor must be a symbolic name, defined by \cs{saveNamedPath} command.
+The value of \texttt{3Djscript} can be a comma delimited list of
+JavaScript files, for example,
+\begin{Verbatim}[xleftmargin=\amtIndent,codes={\let\1\quad},commandchars=!()]
+3DOptions={%
+!1...,
+!13Djscript={myScript,myTurntable},
+!1...,
+!1...
+}
+\end{Verbatim}
+Again \texttt{myScript} and \texttt{myTurntable} are defined by the \cs{saveNamedPath}
+command. In theory, one can build a library of general and specific JavaScripts to
+do 3D work, and you can concatenate them together in this way.
+
+The \texttt{3Dviews} key takes as its argument a views file. This is
+purely a {\LaTeX} object (not used or required by Distiller), to the usual
+filename is needed, for example,
+\begin{Verbatim}[xleftmargin=\amtIndent,codes={\let\1\quad},commandchars=!()]
+3DOptions={%
+!1...,
+!13Djscript={myScript,myTurntable},
+!13Dviews=dice.vws,
+!1...
+}
+\end{Verbatim}
+
+
+\paragraph*{\texttt{3DResources}.}\FmtMP{After Dec.~2020,\\the \texttt{3DResources} key is deprecated}
+\st{This is a key that is new, and
+separate from the \textsf{movie15} keys just outlined.
+\texttt{3DResources} recognizes four keys, these are \texttt{none},
+\texttt{foreground}, \texttt{background}, and \texttt{material}. The
+names and values found within \texttt{3DResources} are modeled after the
+\textbf{Resources} tab of the \textbf{Edit 3D} dialog box of Acrobat 9 or
+later.}
+\def\1{\ameta{name1}}\def\2{\ameta{name2}}
+\def\3{\ameta{name3}}\def\4{\ameta{name4}}\def\5{\ameta{vars}}
+\def\6{\ameta{materialName}}
+\begin{Verbatim}[numbers=left,xleftmargin=\amtIndent,
+  commandchars={!()},fontsize=\fontsize{9}{11}\selectfont]
+\setRmOptions3D{!meta(annot_name)}
+{
+    3DOptions={!meta(options from movie15)},
+    !st(3DResources={%)
+    !st(none={rName=!1},...,)
+      !st(foreground={rName=!2,flashvars=!5},...,)
+      !st(background={rName=!3,flashvars=!5},...,)
+      !st(material={rName=!4,mName=!6,flashvars=!5},...)
+   !st(})
+}
+\end{Verbatim}
+\st{A resource is usually a \textsf{SWF} file, but  can be a \textsf{FLV}, or
+another 3D model (\texttt{.u3d}, \texttt{.prc}); \textsf{rmannot} does not
+support image files are resources (\textsf{JPG}, \textsf{PNG},
+etc).}
+
+\paragraph*{\textcolor{red}{Note:}} \st{Convert all image files (\textsf{JPG}, \textsf{PNG},
+etc) to a \textsf{SWF} for used by \textsf{rmannot}. The
+conversion can be made by \textsf{Adobe Flash Professional}, or by using
+{\textbf{\href{http://www.swftools.org/}{SWF Tools}}} (use the \textsf{jpeg2swf} and \textsf{png2swf} tools).}
+
+\newtopic\st{\texttt{SWF} files may be bound to the background, foreground, a material
+of the 3D model, or not bound at all. \textsf{FLV} and 3D models must be
+not bound, and listed under the \texttt{none} key.}
+
+\st{The keys \texttt{none}, \texttt{foreground}, \texttt{background}, and
+\texttt{material} may appear multiple times.}
+
+\st{A brief description of the values of each key follows:}\bgroup\tightsettings
+\begin{itemize}
+    \item \st{\texttt{none}: The value of none is a single key-value
+    combination. {\texttt{rName=\meta{name}}}, where {\meta{name}} is the
+    symbolic name of a resource file declared by the {\cs{saveNamedPath}}.
+    These files can be \textsf{SWF}, \textsf{FLV}, or even another model (advanced).}
+    \item \st{\texttt{foreground}: This key binds a resource to the foreground
+    of the 3D scene. The \texttt{foreground} key takes at most
+    two key-value pairs, only \texttt{rName} is required, the symbolic
+    name of the resource. The \texttt{flashvars} key is used to pass flash
+    variables to the \textsf{SWF} application.}
+    \item \st{\texttt{background}: This key binds a resource to the background
+    canvas of the 3D scene. The \texttt{background} key takes at most
+    two key-value pairs, only \texttt{rName} is required, the symbolic
+    name of the resource. The \texttt{flashvars} key is used to pass flash
+    variables to the \textsf{SWF} application.}
+    \item \st{\texttt{material}: This key binds a resource to a material. The
+    resource name is \texttt{rName} (as defined by {\cs{saveNamedPath})},
+    the key \texttt{mName} is the name of the material the resource is to
+    be bound to; \texttt{flashvars} is used to pass variables to the \textsf{SWF}
+    application.}
+\end{itemize}\par\egroup\noindent
+\st{If a \textsf{SWF} resource is to be used as background, foreground, or a
+material using 3D JavaScript (through the JS file input by the
+\texttt{3Djscript} key), it must be listed through the none key.}
+
+
+
+\paragraph*{Example.}\label{RM3Dexample} %\previewOn
+We finish off this section with a simple example,\medskip
+
+\setRmOptions3D{my3DDice}{%
+    3DOptions={%
+        3Droo=27,
+        3Dlights=Cube,
+        3Drender=Solid,
+%        3Djscript=loadDon,
+        3Dbg=1 0 0,
+        3Dviews=../examples/rm3da/views/dice.vws,
+   },%
+%   3DResources={%
+%        none={rName=Don},none={rName=AcroAd}
+%   }%
+}
+\noindent\rmAnnot[name=my3DDice,toolbar]{\linewidth}{2.5in}{myDice}\smallskip
+
+%\noindent Notice the nice advertisement playing in the background of the 3D scene.
+%\verb!:-{)!
+%\newpage
+\newtopic\noindent The verbatim listing is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
+\setRmOptions3D{my3DDice}{%
+  3DOptions={%
+    3Droo=27,
+    3Dlights=Cube,
+    3Drender=Solid,
+    3Dbg=1 0 0,
+    3Dviews=../examples/rm3da/views/dice.vws,
+  }
+}
+\rmAnnot[name=my3DDice,toolbar]{\linewidth}{2.5in}{myDice}
+\end{Verbatim}
+Further examples will appear, in time, on my
+\href{\urlAcroTeXBlog//?tag=rmannot-package}{{\AcroTeX} Blog}.
+
+
+\bigskip\noindent
+That's all for now, I simply must get back to my retirement. \dps
+
+\end{document}
+
+\begin{Verbatim}[numbers=left,xleftmargin=\amtIndent,fontsize=\fontsize{9}{11}\selectfont]
+d

@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\usepackage[%
+    web={pro,tight,usesf},
+    eforms,graphicxsp={showembeds}
+]{aeb_pro}
+\usepackage{rmannot}
+\usepackage{graphicxbox}
+
+\margins{.25in}{.25in}{24pt}{.25in} % left,right,top, bottom
+\screensize{5in}{5.5in}             % web.sty dimensions
+
+\DeclareDocInfo
+{
+    title=The \textsf{rmannot} Package\texorpdfstring{\\[1ex]}{: } MP3 Audio,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=Demo of the rmannot package,
+    keywords={Adobe Acrobat, MP3},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={Aug.\ 2020},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+\newcommand{\myRMFiles}{C:/Users/Public/Documents/%
+  My TeX Files/tex/latex/aeb/aebpro/rmannot/RMfiles}
+\saveNamedPath{summertime}{\myRMFiles/Summertime.mp3}
+\makePoster[hiresbb]{aebmusic_poster}{aebmusic_poster}
+
+\parindent=0pt\parskip6pt\pagestyle{empty}
+
+%\previewOn
+
+\begin{document}
+
+\maketitle
+
+\null\vfil
+
+\begin{center}
+{\Large\bfseries\color{blue}Summertime}\\[2ex]
+    \rmAnnot[defaultposter,posternote=Summertime,width=.5\linewidth]{640bp}{480bp}{summertime}
+\end{center}
+
+This annotation uses the default poster with a poster note.
+
+
+\begin{center}\setPosterProps{textSize=14,xPos=20,yPos=20}
+{\Large\bfseries\color{blue}Summertime}\\[2ex]
+   \rmAnnot[defaultposter,width=.5\linewidth]{\cntrlbrWd}{\cntrlbrHt}{summertime} %posternote=Summertime,
+\end{center}
+
+Default poster with poster note. Dimensions conform to those of the control bar of the legacy
+audio player.
+
+\newpage
+
+\begin{center}
+{\Large\bfseries\color{blue}Summertime}\\[2ex]
+    \rmAnnot[poster=aebmusic_poster,width=.5\linewidth]{640bp}{480bp}{summertime}
+\end{center}
+
+This annotation uses the aeb music poster.
+
+\begin{center}
+  \rmAnnot[height=14bp]{\cntrlbrWd}{\cntrlbrHt}{summertime}
+\end{center}
+
+This annotation uses the legacy music poster, it is a screen shot of
+the legacy control bar.
+
+\end{document}

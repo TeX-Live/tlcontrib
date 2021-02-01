@@ -39,6 +39,7 @@ $special{'fitr'}        = '&MAKEdps';
 $special{'artthreads'}  = '&MAKEdps';
 $special{'popupmenu'}   = '&MAKEdps';
 $special{'ltx4yt'}      = '&MAKEdps';
+$special{'rmannot'}     = '&MAKEdps';
 
 
 sub MAKEdps {

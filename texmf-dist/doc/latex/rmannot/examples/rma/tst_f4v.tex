@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage{amsmath}
+%
+% the driver line is not necessary if you
+% have aebpro.cfg configured to your driver.
+%
+\usepackage[%
+    web={pro,tight,usesf},
+    eforms,graphicxsp={showembeds}
+]{aeb_pro}
+\usepackage{rmannot}
+
+\margins{.25in}{.25in}{24pt}{.25in} % left,right,top, bottom
+\screensize{5in}{5.5in}             % height, width
+
+\DeclareDocInfo
+{
+    title=The \textsf{rmannot} Package\texorpdfstring{\\[1ex]}{: }H.264 encoded F4V Video,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject={Demo of the rmannot package},
+    keywords={Adobe Acrobat, rich media annotation, F4V video, H.264},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={Aug.\ 2020},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) 2008--\the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+\def\AcroTeX{Acro\!\TeX}
+
+\defineRMPath{\myRMFiles}{%
+    C:/Users/Public/Documents/My TeX Files/%
+    tex/latex/aeb/aebpro/rmannot/RMfiles}
+\saveNamedPath{alex-fishes}{\myRMFiles/alex-fishes.f4v}
+
+\makePoster[hiresbb]{aebmovie_poster}{aebmovie_poster}
+
+\parindent=0pt\parskip6pt\pagestyle{empty}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+  \rmAnnot[poster=aebmovie_poster,width=.75\linewidth]{640bp}{480bp}{alex-fishes}
+\end{center}
+
+
+\end{document}

@@ -1,0 +1,136 @@
+\documentclass{article}
+%
+% the driver line is not necessary if you
+% have aebpro.cfg configured to your driver.
+%
+\usepackage[%
+  web={extended,tight},
+  eforms={req=2020/09/15},graphicxsp={showembeds}
+]{aeb_pro}
+\usepackage{rmannot}
+
+\usepackage{lipsum}
+
+%\previewOn\pmpvOn
+
+\margins{.25in}{.5in}{24pt}{.25in} % left,right,top, bottom
+\screensize{5in}{5.5in}            % height, width
+
+\DeclareDocInfo
+{
+    title=The \textsf{rmannot} Package\texorpdfstring{\\[1ex]}{: }Hidden MP4 Movies,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject={Demo of the rmannot package, hidden MP4 movies},
+    keywords={Adobe Acrobat, JavaScript, ActionScript},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={Aug 2020},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) 2008--\the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+\def\AcroTeX{Acro\!\TeX}
+\let\uif\textsf
+\let\app\textsf
+
+\newcommand{\myRMFiles}{%
+  C:/Users/Public/Documents/My TeX Files/%
+  tex/latex/aeb/aebpro/rmannot/RMfiles}
+\saveNamedPath{horse1}{\myRMFiles/horse.mp4}
+\makePoster[hiresbb]{aebmovie_poster}{aebmovie_poster}
+%\makePoster[hiresbb]{horse1_poster}{horse1_poster}
+
+\parindent=0pt\parskip6pt\pagestyle{empty}
+
+\begin{insDLJS}{invrma}{Invisible RMA Support}
+var playPressed=new Object;
+var appFocusRect=app.focusRect;
+function playHiddenRMA(coverFld) {
+  if (app.viewerVersion >= 20 ) {
+    var f=this.getField(coverFld);
+    if (f.display==display.hidden||app.focusRect) {
+      playPressed[coverFld]=false;
+      f.readonly=true;
+      f.display=display.visible;
+      app.focusRect=false;
+      event.target.buttonSetCaption("Play");
+      event.target.userName="Press Play, then double-click RMA annot";
+    } else {
+      playPressed[coverFld]=true;
+      f.readonly=false;
+      app.focusRect=true;
+      f.setFocus();
+      event.target.buttonSetCaption("Read");
+      event.target.userName="Press to continue reading";
+    }
+  } else {
+    var rma = this.getAnnotsRichMedia(this.pageNum)[0];
+    if (event.shift) rma.activated=false;
+    else {
+      rma.activated=true;
+      rma.callAS("multimedia_play");
+    }
+  }
+}
+function coverMU() {
+  if (app.viewerVersion >= 20 ) {
+    var f=event.target;
+    var fname=event.target.name;
+    if ( (f.display==display.visible) && playPressed[fname])
+      f.display=display.hidden;
+  }
+}
+\end{insDLJS}
+
+
+\setlength{\marginparsep}{4pt}
+
+\begin{document}
+
+\maketitle
+
+\def\playBtn{\pushButton[\TU{Click to play, shift-click to hide the movie}\CA{Play}
+  \AAmouseenter{if(app.viewerVersion >= 20)
+    event.target.userName="Press Play, then double-click RMA annot";}
+  \AAmouseup{playHiddenRMA("coverRMA")}]{playRMA}{\widthof{\,Read\,}}{11bp}}
+
+\noindent At the time of writing this document, \app{Acrobat DC} and \app{Adobe Reader DC} (\app{AA/AR})
+no longer support JavaScript control over RMA. To have a \emph{hidden RMA} that plays
+on the page it is necessary to play some tricks:
+\vadjust{\makebox[\linewidth][c]
+{%
+  \raisebox{-\height}[0pt][\depth]{\makebox[0pt][l]
+  {%
+    \pushButton[\Ff\FfReadOnly\autoCenter{n}\S{S}\BG{}\BC{}\H{N}
+      \AApageopen{app.focusRect=false;}
+      \AApageclose{app.focusRect=appFocusRect;}
+      \AAmouseup{coverMU()}\width{.75\linewidth}]{coverRMA}{320bp}{240bp}
+    }%   
+    \rmAnnot[invisible,width=.75\linewidth,enabled=onclick,
+      deactivated=pageclose]{320bp}{240bp}{horse1}%
+  }%
+}\smash{\makebox[0pt][l]{\raisebox{-\height}{\playBtn}}}}%
+\begin{enumerate}
+  \item Click or tap the \uif{Play} control
+  \item Go to the center of the page and double click or double tap
+  \item After the video plays, dismiss the video by right-clicking
+  the video and choosing \uif{Disable Content}. Then press the \uif{Read} again.
+\end{enumerate}
+This file demonstrates how to place a RMA (MP4 in this case) on
+the page without taking up any ``\TeX'' space. Because we have
+not JavaScript control over RMA anymore, we must require the
+user to first press the ``\uif{Play}'' button then double-click
+on the region outline by the dotted line. Once the media has
+finished playing (or before), dismiss the player by right
+clicking the annotation and choosing \uif{Disable Content}.
+After that, the user should then click the ``\uif{Read}''
+button. This restores the page so that the user can read the
+content without accidentally starting the video again. We place
+a \setLink[\A{\JS{app.alert("You can interact with content.")}}]{link}
+to demonstrate you can interact with the page.
+
+\end{document}
+\url{htt://www.acrotex.net/blog} \lipsum[1]

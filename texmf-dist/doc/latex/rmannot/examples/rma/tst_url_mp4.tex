@@ -1,0 +1,61 @@
+\documentclass{article}
+%
+% the driver line is not necessary if you
+% have aebpro.cfg configured to your driver.
+%
+\usepackage[%
+    web={pro,tight,usesf},
+    eforms]{aeb_pro}
+\usepackage{rmannot}
+
+\AcroVer[win=64]{Beta}
+
+\margins{.25in}{.25in}{24pt}{.25in} % left,right,top, bottom
+\screensize{5in}{5.5in}             % height, width
+
+\DeclareDocInfo
+{
+    title=The \texttt{rmannot} Package\texorpdfstring{\\[1ex]}{: }Reference MP4 with URL,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject={Demo of the rmannot package, MP4 movies},
+    keywords={Adobe Acrobat, Rich Media Annotations, MP4, URL},
+    talksite=\url{http://www.acrotex.net},
+    talkdate={August 2020},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+\def\AcroTeX{Acro\negthinspace\TeX}
+
+\defineRMPath{\myRMFiles}{%
+    C:/Users/Public/Documents/My TeX Files/%
+    tex/latex/aeb/aebpro/rmannot/RMfiles}
+
+\saveNamedPath{calliope}{http://www.math.uakron.edu/\%7Edpstory/calliope.mp4}
+\makePoster[hiresbb]{aebmovie_poster}{aebmovie_poster}
+
+%\additionalOpenAction{\JS{%
+%    console.println("reading policy file");\jsR
+%    app.loadPolicyFile("http://www.math.uakron.edu/\%7Edpstory/crossdomain.xml");}}
+
+\parindent=0pt\parskip6pt\pagestyle{empty}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\rmAnnot[url,poster=aebmovie_poster,skinAutoHide=false,width=.75\linewidth]{640bp}{480bp}{calliope}
+\end{center}
+For information on the MP4 video format, see the \textbf{WikipediA} article
+\begin{quote}
+    \url{http://en.wikipedia.org/wiki/MPEG-4_Part_14}
+\end{quote}
+This movie was taken with my digital camera while we were on vacation in New Hampshire.
+The calliope is at \textbf{Clark's Trading Post}, where we spent a very
+nice afternoon.
+\end{document}

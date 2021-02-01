@@ -29,6 +29,7 @@
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
 
+\let\uif\textsf
 
 \def\AcroBlog{{Acro\!\TeX} Blog}
 
@@ -232,10 +233,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2020/03/14}
+\version{2021/01/20}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2020/03/14}
+\prepared{2021/01/20}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -697,9 +698,9 @@ writing to this document level. For those who use the
 
 In this section, we describe how to insert document level
 Java\-Scripts into a \textsf{PDF} file, prepared from a
-\LaTeX{} source that uses the \texttt{exerquiz} package. Even
+\LaTeX{} source that uses the \pkg{exerquiz} package. Even
 though the handling and insertion of document level JavaScript is
-done with the package \textsf{insdljs}, a little care must be
+done with the package \pkg{insdljs}, a little care must be
 taken, at least in the Distiller case, when building your
 {\PDF} document.
 
@@ -1695,7 +1696,7 @@ The syntax \cs{optionalPageMatter} is\dots
 \begin{dCmd}[commandchars=!()]{\bxSize}
 \optionalPageMatter[!ameta(vspace)]{!ameta(content)}
 \end{dCmd}
-\smallskip\eVerb where \ameta{content} content to be displayed in middle title region, and
+\eVerb where \ameta{content} content to be displayed in middle title region, and
 \texttt{[\ameta{vspace}]} consists of one (or more) \cs{vspace} commands. The default
 is
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -3585,7 +3586,7 @@ The {\Web} package has several commands for customizing the \cs{part} and
 
 The appearance of the part title can be controlled by \cs{formatPartTitle}.
 
-\settowidth{\aebdimen}{\ttfamily\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
+\settowidth{\aebdimen}{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \formatPartTitle{!anglemeta(tex_code)}
 \noPartNumbers
@@ -4704,7 +4705,7 @@ the questions when the questions are in tabular form.\endredpoint
 website for examples.
 
 
-\subsubsection{Inputting the Solution Set}
+\subsubsection{Moving the Solution Set}
 
 The solution set, by default, comes last in the file.  You can
 move its positioning by including the command
@@ -4712,20 +4713,6 @@ move its positioning by including the command
 exercise.  You'll note that I have moved the solutions in this
 file \emph{before} the \nameref{references} section, as indicated, for
 example, by its position in the table of contents.
-
-By default, the exercise solutions are brought into the document as a
-\cs{section*} titled \cs{exsectitle}. The default settings can be changed
-with the \cs{InputExrSolnsLevel} command :
-\settowidth{\aebdimen}{\ttfamily\string\InputExrSolnsLevel*[\ameta{label}]\darg{\ameta{level}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\InputExrSolnsLevel*[!ameta(label)]{!ameta(level)}
-\end{dCmd}
-\smallskip\noindent
-where, \ameta{level} is the section-level (usually \texttt{section} or
-\texttt{chapter}); if the \texttt*-option is specified, then the solutions
-are placed in a starred-section (\cs{section*} or \cs{chapter*}). If
-\ameta{label} is specified, then \cs{label\darg{\ameta{label}}} is placed
-just after the section title. The default is \cs{InputExrSolnsLevel*\darg{section}}.
 
 \subsubsection{Grouping the solutions at end}\label{ss:grpEx}
 
@@ -4736,6 +4723,7 @@ in one solution, for example, may affect all subsequent solutions.
 You can now declare \cs{makeExSolnsLocalOn} or \cs{makeExSolnsLocalOff}
 anywhere in the document to turn on grouping for all exercises that follow,
 or to turn off this feature again. The default is \cs{makeExSolnsLocalOff}.
+
 
 \subsection{Redesigning the
 \texorpdfstring{\protect\texttt{exercise}}{exercise}
@@ -5701,29 +5689,15 @@ transparent, keep it that way.
 this command can be redefined as desired. See the source file \texttt{exerquiz.dtx}.
 Also see the definition of \Com{bottomOfAnsfStack}.
 
-\subsubsection{Inputting the Solution Set}
+\subsubsection{Moving the Solution Set}
 
-The solution set, by default, comes last in the file.  You can move its
-positioning by including the command \cs{includequizsolutions} at any point
-\emph{after} the last quiz (created by the \texttt{shortquiz} and
-\texttt{quiz} environments).  You'll note that I have moved the solutions in
-this file before the \nameref{references} section, as indicated, for example,
-by its position in the table of contents.
-
-By default, the quiz solutions are brought into the document as a
-\cs{section*} titled \cs{sqslsectitle}. The default settings can be changed
-with the \cs{InputQzSolnsLevel} command:
-\settowidth{\aebdimen}{\ttfamily\string\InputQzSolnsLevel*[\ameta{label}]\darg{\ameta{level}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\InputQzSolnsLevel*[!ameta(label)]{!ameta(level)}
-\end{dCmd}
-\smallskip\noindent
-where, \ameta{level} is the section-level (usually \texttt{section} or
-\texttt{chapter}); if the \texttt*-option is specified, then the solutions
-are placed in a starred-section (\cs{section*} or \cs{chapter*}). If
-\ameta{label} is specified, then \cs{label\darg{\ameta{label}}} is placed
-just after the section title. The default is \cs{InputQzSolnsLevel*\darg{section}}.
-
+The solution set, by default, comes last in the file.  You can move
+its positioning by including the command \cs{includequizsolutions}
+at any point \emph{after} the last quiz (created by the \texttt{shortquiz} and \texttt{quiz} environments).  You'll note
+that I
+have moved the solutions in this file before the
+\nameref{references} section, as indicated, for example, by its
+position in the table of contents.
 
 \subsubsection{Grouping the solutions at end}\label{ss:grpQzs}
 
@@ -6997,25 +6971,24 @@ how to use the ``every'' command.\footnote{eforms manual on Web:
 
 \subsubsection{Change color of Correction Marks}
 
-The colors used to mark the quiz can be changed by redefining the
-commands \cs{check\-Color}, \cs{crossColor} and \cs{correctColor} in
-the \textit{preamble} or before. Below are the
-defaults:
-\begin{Verbatim}[xleftmargin=\amtIndent]
-\renewcommand\checkColor{["RGB", 0, .6, 0]}
-\renewcommand\crossColor{color.red}
-\renewcommand\correctColor{["RGB", 0, .6, 0]} % webgreen
+The colors used to mark quizzes are changed in the \textit{preamble} by
+redefining the commands listed below. The default definitions are,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+\newcommand\rghtColorJSDef{["RGB",!,0,!,.6,!,0]} %!textsf( color for right response)
+\newcommand\wrngColorJSDef{color.red}       %!textsf( color for wrong response)
+\newcommand\partialColorJSDef{color.blue}   %!textsf( color for partial credit)
+\newcommand\defaultColorJSDef{color.black}  %!textsf( reset color)
 \end{Verbatim}
 \noindent The colors are inserted into the field using JavaScript, so the color definitions
-are in the color space of the JavaScript object model.
+are in the color space of the JavaScript color object model.
 
 
 \subsubsection{The `Correction' Button}\label{sss:CorrButton}
 
 The `Correction' button is defined by the \cs{CorrButton} has two
 parameters.
-\begin{Verbatim}[xleftmargin=\amtIndent]
-\CorrButton[mod_appear]{field_name}
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\CorrButton[!ameta(mod_appear)]{!ameta(field_name)}
 \end{Verbatim}
 The second parameter is the field name that contains the total score for the
 quiz (see the above examples).  It also has one optional argument that can be
@@ -8114,25 +8087,7 @@ credit of zero, and may as well not be included in the list of words.
 extensive examples, and discusses techniques of searching using regular
 expressions.
 
-\subsubsection{\texorpdfstring{\protect\cs{RespBoxEssay}}%
-    {\textbackslash RespBoxEssay}: Extended Responses}\label{ss:respboxessay}
 
-The \cs{RespBoxEssay} command is used to provide space for the student to
-type in an extended response to a question. The student's response is not
-evaluated, it must be reviewed by the instructor, who can assign additional
-credit.
-\aebdimen0pt\bVerb\takeMeasure{\string\RespBoxEssay[\ameta{options}]\ameta{dest}\darg{\ameta{wd}}\darg{\ameta{ht}}}%
-\begin{dCmd}[commandchars=!()]{\bxSize}
-\RespBoxEssay[!ameta(options)]!ameta(dest){!ameta(wd)}{!ameta(ht)}
-\end{dCmd}
-\medskip\eVerb The first (optional) parameter (\ameta{options}) is used to pass key-value
-pairs to the form field. The second (optional) argument (\ameta{dest}) takes
-on one of two forms: (1) a named destination \texttt{[\meta{dest}]} to the
-solution (if provided), were \meta{dest} is a string the document author
-specifies; or (2) an asterisk (\texttt*), where the named destination is
-automatically generated by \pkg{exerquiz}. The third and fourth parameters
-are the width  and height of the field. The field is, by default, a
-multi-line text field.
 
 \subsection{Some Enhancements}\label{enhancements}
 
@@ -8155,7 +8110,7 @@ than the default variable of $x$.
 \begin{oQuestion}{sine2}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dt} \sin^2(t) =$
-\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\olBdry\CorrAnsButton{2*sin(t)*cos(t)}
+\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
 
 \medskip\noindent
@@ -8163,14 +8118,14 @@ The listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{oQuestion}{sine2}\\[1ex]
 \redpoint Differentiate $\dfrac d{dt} \sin^2(t) =$
-\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\olBdry
+\RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry
 \CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
 \end{Verbatim}
 
 \noindent The \cs{CorrAnsButton} takes one parameter, the correct answer.
 This answer is (usually) the same as the one given as the second
-argument (the optional argument is the first) in the \cs{RespBoxMath}r
+argument (the optional argument is the first) in the \cs{RespBoxMath}
 command.
 
 \redpoint The \cs{CorrAnsButton} also controls access to the (optional) solution, see
@@ -8241,7 +8196,7 @@ An example of this optional parameter is
 \redpoint Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ \text{9} + \text{8} =$
-\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\olBdry\CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\olBdry
+\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 
@@ -8252,8 +8207,8 @@ The listing follows:
 \redpoint Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ 9 + 8 = $
-\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\olBdry
-    \CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\olBdry
+\RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry
+    \CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 \end{Verbatim}
@@ -8269,7 +8224,7 @@ For example,
 \begin{oQuestion}{sine4}
 \redpoint \hypertarget{exofT}{Differentiate}\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\olBdry\CorrAnsButton{2*sin(x)*cos(x)}\olBdry
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 
@@ -8279,8 +8234,8 @@ The listing follows:
 \begin{oQuestion}{sine4}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\olBdry
-\CorrAnsButton{2*sin(x)*cos(x)}\olBdry
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\cgBdry
+\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox
 \end{oQuestion}
 \end{Verbatim}
@@ -8299,8 +8254,8 @@ insert \cs{sqClearButton}.
 \begin{oQuestion}{sine5}
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
-\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\olBdry\CorrAnsButton{2*sin(x)*cos(x)}\olBdry
-\sqTallyBox\olBdry\sqClearButton
+\RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
+\sqTallyBox\cgBdry\sqClearButton
 \end{oQuestion}
 
 
@@ -8311,8 +8266,8 @@ The listing follows:
 \redpoint Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}%
-\CorrAnsButton{2*sin(x)*cos(x)}\olBdry
-\sqTallyBox\olBdry\sqClearButton
+\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
+\sqTallyBox\cgBdry\sqClearButton
 \end{oQuestion}
 \end{Verbatim}
 
@@ -8420,6 +8375,34 @@ statement involves the variable $x$, then \texttt{x} must be used;
 if the problem statement uses $t$, then \texttt{t} must be used.
 To enter an expression using $t$ when an expression with variable $x$ is expected will,
 no doubt, result in missed problem.
+
+\subsection{More on Text Fill-in Questions}\label{s:moretxt}
+
+In this section, additional features or enhancements of text fill-in question are presented.
+
+\subsubsection{Spell checking text fill-in questions}
+
+To properly evaluate text fill-in questions (questions posed by commands
+\cs{RespBoxTxt} and \cs{RespBoxTxtPC}), spelling in critical. The student may
+know the correct response but may flub the answer with bad spelling. When
+such a problem is marked by a human teacher, he/she may give full credit or
+may dock the credit slightly.
+
+Beginning with \pkg{exerquiz} dated 2020/11/11, the \cs{SpellCheck} command
+and the JavaScript function \texttt{checkTheSpelling()} are
+defined.\footnote{This feature was suggested to me by Thorsten G.} This a
+feature allows the student to use the spell checking of \app{Adobe Reader} to
+inspect each word and to optionally change the word to one of the words
+offered by the spell checker. Words that are spelled correctly, but are
+incorrect, are \emph{not flagged} by the spell checker. For example, if the
+correct response is \uif{John Adams} and the student enters \uif{John
+Addams}, the spell checker returns the message \uif{<No Misspellings>}; thus
+the student will lose credit for his/her response unless the answer is
+serendipitously changed manually.
+
+\exAeBBlogPDF{p=1437} The demo file for this feature is
+\texttt{\href{\urlAcroTeXBlog/?p=1437}{spell-check.pdf}}.  The file contains
+extensive examples of how to use \cs{SpellCheck} command.
 
 \subsection{The \texttt{shortquiz} Environment}\label{s:oQsq}
 
@@ -9321,10 +9304,12 @@ for example, it could read \cs{randomi=132088850}, then use
 \end{Verbatim}
 Of course comment out \cs{inputRandomSeed}.
 
-\settowidth{\aebdimen}{\cs{obeyLocalRandomize}}%
+\settowidth{\aebdimen}{\cs{allowRandomizedChoices}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \turnOnRandomize
 \obeyLocalRandomize
+\doNotRandomizeChoices
+\allowRandomizedChoices
 \end{dCmd}
 
 \newtopic\indent The command \cs{turnOnRandomize} overrides all local settings of \cs{bChoices}
@@ -9356,22 +9341,30 @@ the choices will not be randomized, because the \texttt{random}
 option was not specified; or they will be randomized if the
 \texttt{random} option is used.
 
-\newtopic\textcolor{red}{Limitations:} There are natural limitations on the use
-of \cs{bChoices} and \cs{eChoices} and consequently, there are
-limitations on the randomization.  The content between \cs{Ans} and
-\cs{eAns} cannot have any verbatim text. This is usually not a
-problem for mathematical content, but could be a limitation for
-computer science where questions about syntax may be posed. I have
-in mind a work-around, but haven't pursued the problem as of yet.
+\newtopic\indent The command \cs{doNotRandomizeChoices} overrides the
+\opt{allowrandomize} option; when in effect, randomization of the choices
+does not occur. The companion command \cs{allowRandomizedChoices} restores the
+authority of the \opt{allowrandomize} option.
+
+\newtopic\textcolor{red}{Limitations:} There are natural limitations on the
+use of \cs{bChoices} and \cs{eChoices} and consequently, there are
+limitations on the randomization.  The content between \cs{Ans} and \cs{eAns}
+cannot have any verbatim text. This is usually not a problem for mathematical
+content, but could be a limitation for computer science where questions about
+syntax may be posed.
+
+% I have in mind a work-around, but haven't pursued the
+% problem as of yet.
 
 \section{Creating a Quiz Summary Table}\label{s:sumrytbl}
 
 This feature is designed for a \texttt{quiz} (as opposed to a
 \texttt{shortquiz}) and is probably most useful for a long quiz, spanning
-several pages. The \cs{displaySumryTbl} command creates a table that summarizes
-the user's effort for the quiz; \cs{displaySumryTbl} must follow the final
-\verb!\end{questions}! and \emph{must be on a separate page} from the last question of the quiz.
-An example of the generated table is shown below in \hyperref[fig:qzSumryTbl]{Figure~\ref*{fig:qzSumryTbl}}.
+several pages. The \cs{displaySumryTbl} command creates a table that
+summarizes the user's effort for the quiz; \cs{displaySumryTbl} must follow
+the final \verb!\end{questions}! and \emph{must be on a separate page} from
+the last question of the quiz. An example of the generated table is shown
+below in \hyperref[fig:qzSumryTbl]{Figure~\ref*{fig:qzSumryTbl}}.
 
 \exAeBBlogPDF{p=377} The demo file for this section is
 \texttt{\href{\urlAcroTeXBlog/?p=377}{sumry\_tbl.pdf}}, found

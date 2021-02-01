@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle 
 Author: D. P. Story 
-Dated: 2020-03-14
+Dated: 2021-01-20
 
 AeB contains the following:
 
@@ -19,6 +19,29 @@ AeB contains the following:
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eForms
     (including insdljs and dljslib).
 
+What's New (2021-01-20) Defined two commands \doNotRandomizeChoices
+  and \allowRandomizedChoices; these turn off and turn on the randomization
+  of choices in MC and MS questions.
+
+What's New (2020-12-30) 
+  exerquiz: Minor bug fixes; converted some inline JS to JS in 
+    the defineJS env. 
+  eforms: New keys for option list of form macros: \rectW, \rectH,
+    \width, \height, \scalefactor. Also introduced are \textFontDefault,
+    \textSizeDefault, and \btnSpcr. All form fields and link annotations
+    now obey \pdfSpacesOn (and \pdfSpacesOff).
+  insdljs: Added \Thread and \Launch actions; \dfnJSCR and \dfnJSCRDef.
+    New options of defineJS: \makecmt and \typeset. Improved the defineJS
+    environment. Refer to http://www.acrotex.net/blog/?p=1442
+    for a full discussion of the defineJS and all its features.
+    
+What's New (2020-11-20) Fixed minor, yet critical, bug converning duplicate
+definition of \URI.
+
+What's New (2020-11-11) Added new command \SpellCheck, to check the spelling 
+of a fill-in question (exerquiz). Added width, height, scalefactor keys to 
+form fields to rescale fields (eforms). 
+
 What's New (2020-03-14) Minor changes that support new features of eqexam.
 
 What's New (2020-01-01) Replace use of \count0 with new counter \eqtmpcnta, 
@@ -31,13 +54,14 @@ make it easy to change the section-type for the solution pages.
 What's New (2019-08-13) Use \protect when formatting a enhanced preview value.
 Other minor changes and bug fixes.
 
-What's New (2019-05-24) Added the enhanced preview feature. When in effect along with
-ordinary preview, captions of buttons and initial values of other fields are viewable 
-in non-conforming PDF readers.
+What's New (2019-05-24) Added the enhanced preview feature. When in effect 
+along with ordinary preview, captions of buttons and initial values of other 
+fields are viewable in non-conforming PDF readers. 
 
-What's New (2019/03/16) minor bug fixes; added \bParams/\eParams command pair to pass
-arguments to JS code snippets declared within the defineJS environment. Fixed the spacing
-problem when dvips is used to compile a doc containing the defineJS environment.
+What's New (2019/03/16) minor bug fixes; added \bParams/\eParams command pair 
+to pass arguments to JS code snippets declared within the defineJS 
+environment. Fixed the spacing problem when dvips is used to compile a doc 
+containing the defineJS environment. 
 
 What's New (2018/12/13) More changes in exerquiz to support mi-solns; misc. bug fixes.
 

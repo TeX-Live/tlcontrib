@@ -18,13 +18,13 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebsumrytbls.def}
- [2020/03/14 v8.5.10 %
+ [2021/01/20 v8.6.2 %
  Exerquiz support for summary tables (dps)]
 \def\ccatCurrQzWith(#1){\currQuiz#1}
 \def\pbPopulateSumTable{\pushButton[\W0\BG{}\BC{}\S{S}\autoCenter{n}
-    \TU{\thequestionno}\Ff{\FfReadOnly}
-    \AA{\AAPageVisible{try{popVisitsTbl("\currQuiz",\thequestionno)}%
-        catch(e){}}}]{\currQuiz activateSC}{0pt}{0pt}}
+  \TU{\thequestionno}\Ff{\FfReadOnly}
+  \AA{\AAPageVisible{try{popVisitsTbl("\currQuiz",\thequestionno)}%
+      catch(e){}}}]{\currQuiz activateSC}{0pt}{0pt}}
 \def\pbDoNoCorrectSumryTbl{\makebox[0pt][l]{\pushButton[\F{\FHidden}]%
     {\currQuiz NoCorrections}{0pt}{0pt}}}
 \newcount\eq@rowcnt
@@ -32,81 +32,81 @@
 \newcommand{\sumryTblR}{Responded}
 \newcommand{\sumryTblP}{Page}
 \define@key{smrytbl}{ntables}{%
-    \@tempcntb=#1
-    \ifnum\@tempcntb<1 \@tempcntb=1 \fi
-    \ifnum\@tempcntb>3 \@tempcntb=3 \fi
-    \edef\smrytbl@ntables{\the\@tempcntb}%
+  \@tempcntb=#1
+  \ifnum\@tempcntb<\@ne\@tempcntb=\@ne\fi
+  \ifnum\@tempcntb>\thr@@\@tempcntb=\thr@@\fi
+  \edef\smrytbl@ntables{\the\@tempcntb}%
 }
 \def\smrytbl@ntables{2}
 \define@key{smrytbl}{showmarkup}[true]{%
-    \csname if#1\endcsname\eqshowmarkuptrue
-        \else\eqshowmarkupfalse\fi
+  \csname if#1\endcsname\eqshowmarkuptrue
+    \else\eqshowmarkupfalse\fi
 }
 \newif\ifsmrytbl@corrections\smrytbl@correctionstrue
 \define@key{smrytbl}{nocorrections}[true]{%
-    \csname if#1\endcsname\smrytbl@correctionsfalse
-        \else\smrytbl@correctionstrue\fi
+  \csname if#1\endcsname\smrytbl@correctionsfalse
+    \else\smrytbl@correctionstrue\fi
 }
 \define@key{smrytbl}{showOutOf}[true]{%
-    \csname if#1\endcsname\eqshowOutOftrue\def\stfmtType{OO}%
-        \gdef\showOutOfinSmryTbl{true}\let\stmarkupbox\relax
-    \else
-        \eqshowOutOffalse\let\stfmtType\@empty
-        \gdef\showOutOfinSmryTbl{false}%
-    \fi
+  \csname if#1\endcsname\eqshowOutOftrue\def\stfmtType{OO}%
+    \gdef\showOutOfinSmryTbl{true}\let\stmarkupbox\relax
+  \else
+    \eqshowOutOffalse\let\stfmtType\@empty
+    \gdef\showOutOfinSmryTbl{false}%
+  \fi
 }
 \let\stfmtType\@empty
 \define@key{smrytbl}{setDimens}[]{#1}
 \def\showOutOfinSmryTbl{false}
 \def\stmarkupbox{\makebox[0pt][l]}
 \newcommand{\displaySumryTbl}[2][]{%
-    \begingroup\edef\currQuiz{#2}\edef\oField{#2}\edef\curr@quiz{#2}%
-    \setkeys{smrytbl}{#1}%
-    \eqtmpcnta\smrytbl@ntables\relax
-    \eq@rowcnt\z@\@tempcntb=\value{questionno}%
-    \ifnum\eqtmpcnta=\tw@
-        \divide\@tempcntb\tw@
-        \advance\@tempcntb\ifodd\value{questionno}2\else1\fi
-        \xdef\@beginSecCol{\the\@tempcntb}%
-        \advance\@tempcntb-1\relax
-    \fi
-    \ifnum\eqtmpcnta=\thr@@
-        \edef\eq@n{\the\@tempcntb}%
-        \divide\@tempcntb\eqtmpcnta
-        \edef\eq@q{\the\@tempcntb}%
-        \@tempcnta=\@tempcntb\multiply\@tempcnta3
-        \edef\eq@p{\the\@tempcnta}%
-        \@tempcnta=\eq@n
-        \advance\@tempcnta-\eq@p\relax
-        \ifnum\@tempcnta=\z@
-            \@tempcntb=\eq@q \advance\@tempcntb\@ne
-            \xdef\@beginSecCol{\the\@tempcntb}%
-            \advance\@tempcntb\eq@q\relax
-            \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=\@ne
-            \@tempcntb=\eq@q \advance\@tempcntb\@ne
-            \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb\@ne
-            \xdef\@beginSecCol{\the\@tempcntb}%
-            \advance\@tempcntb\eq@q\relax
-            \xdef\@beginThrdCol{\the\@tempcntb}%
-        \else\ifnum\@tempcnta=2\relax
-            \@tempcntb=\eq@q \advance\@tempcntb1
-            \edef\nB@lCols{\the\@tempcntb}%
-            \advance\@tempcntb\@ne
-            \xdef\@beginSecCol{\the\@tempcntb}%
-            \advance\@tempcntb\nB@lCols
-            \xdef\@beginThrdCol{\the\@tempcntb}%
-        \fi\fi\fi
-        \@tempcntb=\eq@n
-    \fi
+  \begingroup\edef\currQuiz{#2}\edef\oField{#2}\edef\curr@quiz{#2}%
+  \setkeys{smrytbl}{#1}%
+  \eqtmpcnta\smrytbl@ntables\relax
+  \eq@rowcnt\z@\@tempcntb=\value{questionno}%
+  \ifnum\eqtmpcnta=\tw@
+    \divide\@tempcntb\tw@
+    \advance\@tempcntb\ifodd\value{questionno}\tw@\else\@ne\fi
+    \xdef\@beginSecCol{\the\@tempcntb}\advance
+    \@tempcntb\m@ne
+  \fi
+  \ifnum\eqtmpcnta=\thr@@
+    \edef\eq@n{\the\@tempcntb}%
+    \divide\@tempcntb\eqtmpcnta
+    \edef\eq@q{\the\@tempcntb}%
+    \@tempcnta=\@tempcntb\multiply\@tempcnta3
+    \edef\eq@p{\the\@tempcnta}%
+    \@tempcnta=\eq@n
+    \advance\@tempcnta-\eq@p\relax
+    \ifnum\@tempcnta=\z@
+      \@tempcntb=\eq@q \advance\@tempcntb\@ne
+      \xdef\@beginSecCol{\the\@tempcntb}%
+      \advance\@tempcntb\eq@q\relax
+      \xdef\@beginThrdCol{\the\@tempcntb}%
+    \else\ifnum\@tempcnta=\@ne
+      \@tempcntb=\eq@q \advance\@tempcntb\@ne
+      \edef\nB@lCols{\the\@tempcntb}%
+      \advance\@tempcntb\@ne
+      \xdef\@beginSecCol{\the\@tempcntb}%
+      \advance\@tempcntb\eq@q\relax
+      \xdef\@beginThrdCol{\the\@tempcntb}%
+    \else\ifnum\@tempcnta=\tw@
+      \@tempcntb=\eq@q \advance\@tempcntb\@ne
+      \edef\nB@lCols{\the\@tempcntb}%
+      \advance\@tempcntb\@ne
+      \xdef\@beginSecCol{\the\@tempcntb}%
+      \advance\@tempcntb\nB@lCols
+      \xdef\@beginThrdCol{\the\@tempcntb}%
+    \fi\fi\fi
+    \@tempcntb=\eq@n
+  \fi
     \let\@eqListExp\@@eqListExp
     \eqQzQuesList
     \endgroup
 }
 \def\eq@begintab{%
-    \begin{tabular}[t]{lcc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
-    {\Large\strut}}
+  \begin{tabular}[t]{lcc}\sumryTblQ&\sumryTblR&\sumryTblP\\\sthline
+  {\Large\strut}}
 \def\sthline{\hline}
 \def\eq@endtab{\end{tabular}}
 \def\sumrytblCkMUsep{\kern3bp}
@@ -115,44 +115,46 @@
 \newcommand{\sumrytablesep}{\space}
 \def\stmarkupWidth{12bp}\def\stmarkupHeight{9bp}\def\stmarkupTextSize{0}
 \def\st@scndclmn{%
-    \checkBox[\Ff{\FfReadOnly}]%
-        {\ccatCurrQzWith(SanityCheck).\the\eq@rowcnt}%
-        {\markupHeight}{\markupHeight}{Yes}\ifeqshowmarkup
-        \stmarkupbox{\sumrytblCkMUsep\textField[%
-            \Ff\FfReadOnly\BC{}\textColor{\pcMarkupColor}%
-            \textSize{\stmarkupTextSize}\autoCenter{n}%
-        ]{\ccatCurrQzWith(SanityCheck\stfmtType Pts).\the\eq@rowcnt}%
-        {\stmarkupWidth}{\stmarkupHeight}}\fi
+  \checkBox[\Ff{\FfReadOnly}]
+    {\ccatCurrQzWith(SanityCheck).\the\eq@rowcnt}
+    {\markupHeight}{\markupHeight}{Yes}%
+  \ifeqshowmarkup
+    \stmarkupbox{\sumrytblCkMUsep\textField[%
+      \Ff\FfReadOnly\BC{}\textColor{\pcMarkupColor}
+      \textSize{\stmarkupTextSize}\autoCenter{n}]
+    {\ccatCurrQzWith(SanityCheck\stfmtType Pts).\the\eq@rowcnt}%
+    {\stmarkupWidth}{\stmarkupHeight}}%
+  \fi
 }
 \def\st@thrdclmn#1{%
-    \setLink[\linktxtcolor{\@linkcolor}
-        \A{\JS{this.pageNum=(#1-1)}}]{\sumrytbllinkHook{#1}}}
+  \setLink[\linktxtcolor{\@linkcolor}
+    \A{\JS{this.pageNum=(#1-1)}}]{\sumrytbllinkHook{#1}}}
 \def\@@eqListExp#1#2{\global\advance\eq@rowcnt\@ne
-    \ifnum\eq@rowcnt=\@ne
-        \pbPopulateSumTable\ifsmrytbl@corrections\else
-        \pbDoNoCorrectSumryTbl\fi\expandafter\eq@begintab\fi
-    \ifnum\eqtmpcnta>\@ne\ifnum\eq@rowcnt=\@beginSecCol\relax
-        \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
-    \fi\fi
-    \ifnum\eqtmpcnta=\thr@@\ifnum\eq@rowcnt=\@beginThrdCol\relax
-        \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
-    \fi\fi
+  \ifnum\eq@rowcnt=\@ne
+    \pbPopulateSumTable\ifsmrytbl@corrections\else
+    \pbDoNoCorrectSumryTbl\fi\expandafter\eq@begintab\fi
+  \ifnum\eqtmpcnta>\@ne\ifnum\eq@rowcnt=\@beginSecCol\relax
+    \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
+  \fi\fi
+  \ifnum\eqtmpcnta=\thr@@\ifnum\eq@rowcnt=\@beginThrdCol\relax
+    \eq@endtab\expandafter\sumrytablesep\expandafter\eq@begintab
+  \fi\fi
     \sumryTblProbFmt{#1}&\st@scndclmn&\st@thrdclmn{#2}\\[1bp]
-    \ifnum\eq@rowcnt=\thequestionno\relax\expandafter\eq@endtab\fi
+  \ifnum\eq@rowcnt=\value{questionno}\expandafter\eq@endtab\fi
 }
 \def\writeProListAux{%
-    \eq@IWAuxOut{\string
-      \csarg\string\gdef{\currQuiz QzQuesList}{\eqQzQuesList}}%
-    \eq@IWAuxOut{\string
-      \csarg\string\gdef{\currQuiz nQuestions}{\thequestionno}}%
+  \eq@IWAuxOut{\string
+    \csarg\string\gdef{\currQuiz QzQuesList}{\eqQzQuesList}}%
+  \eq@IWAuxOut{\string
+    \csarg\string\gdef{\currQuiz nQuestions}{\thequestionno}}%
 }
 \def\setParamSumryTblAux{%
-    \edef\eqQzQuesList{\@nameuse{\currQuiz QzQuesList}}%
-    \@ifundefined{\currQuiz nQuestions}{}{%
-        \value{questionno}=\@nameuse{\currQuiz nQuestions}}%
+  \edef\eqQzQuesList{\@nameuse{\currQuiz QzQuesList}}%
+  \@ifundefined{\currQuiz nQuestions}{}{%
+    \value{questionno}=\@nameuse{\currQuiz nQuestions}}%
 }
 \newenvironment{sumryTblAux}[1]{%
-    \DeclareQuiz{#1}\setParamSumryTblAux}{}%
+  \DeclareQuiz{#1}\setParamSumryTblAux}{}%
 \begin{insDLJS}[correctSumryTbl]{sumtbljs}{Eq: Populate Summary Table}
 function correctSumryTbl(qtfield,nQuestions) {
     var oQName=eval(qtfield);

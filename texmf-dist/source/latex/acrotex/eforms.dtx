@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2019  D. P. Story                 %%
+%% Copyright (C) 2002-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,10 +16,11 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2019/10/23 v2.3.2 Provides general eforms support (dps)]
+%<package> [2020/12/14 v2.4.1 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
+\usepackage{fancyvrb}
 \pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription
 \EnableCrossrefs
@@ -31,14 +32,20 @@
 \let\env\texttt
 \let\opt\texttt
 \let\app\textsf
+\let\key\texttt
+\let\uif\textsf
 \def\visispace{\symbol{32}}
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \def\ltag{<}\def\rtag{>}
 \let\app\textsf\let\pkg\textsf
+\let\tops\texorpdfstring
+\makeatletter
+\let\@latex@warning\@gobble
+\makeatother
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{eforms}{Inputting aebdocfmt.def}}
-    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro} \let\setupFullwidth\relax
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{eforms}{aebdocfmt.def cannot be found}}
 \begin{document}
   \GetFileInfo{eforms.sty}
@@ -70,13 +77,12 @@
 %
 %    \section{Introduction}
 %
-% This {\LaTeX} code was originally part of the \textsf{exerquiz} package.
-% I decided it would be useful to others if I separated the two and make
-% the forms part of \pkg{exerquiz} into a separate package.  The
-% \pkg{eforms} package is now a part of the \textsf{{Acro\TeX} eDucation
-% Bundle} and is called by \pkg{exerquiz}, but it is  now a stand alone
-% package for others who may want to use PDF form fields and JavaScript
-% interactivity.
+% \textbf{Form Response Files.}
+% The \pkg{eforms} package supports the creation of \app{Acrobat} \hyperref[formsSupport]{form fields},
+% as well as the creation of \hyperref[linkSupport]{link annotations}. Most all features of fields and links are supported, though
+% for some features, such as signatures and tabbing, the \app{Acrobat/\allowbreak Distiller} pair is needed.
+% Inserting PDF form fields into your document creates a \emph{Form Response File}, to use the latest
+% nomenclature of \app{Adobe}.
 %
 %    \section{Package Options}
 %
@@ -161,7 +167,7 @@
   \def\eq@drivercode{edvipdfm.def}\def\ef@driver{xetex}%
 }
 %    \end{macrocode}
-%    \IndexOpt{textures}
+%    \leavevmode\IndexOpt{textures}^^A%
 % This option, and testing are due to Ross Moore  3/6/02
 %    \begin{macrocode}
 \DeclareOption{textures}{%
@@ -243,7 +249,7 @@
     }%
 }
 %    \end{macrocode}
-%    \begin{macrocode}
+%    \begin{macrocode}`
 \ProcessOptions
 \ifx\ef@driver\@empty
   \PackageError{eforms}%
@@ -258,18 +264,31 @@
 \edef\ef@CatChngs{\the\catcode`\$}
 \@makeother\$\relax
 \newlength\eflength
+%    \end{macrocode}
+%    To support a variations of \app{dvipdfm}, we change the logic from
+%    \cs{ifxetex} to |\ifnum\eq@drivernum=2\relax|, a driver number of 2
+%    includes \app{dvipdfm} and all its variants.
+%    \changes{v2.3.4}{2020/07/05}{Change logic from \string\cs{ifxetex} to
+%    \string\cs{ifnum}\string\cs{eq@drivernum=2\string\relax}}
+%    \begin{macrocode}
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\ifpdf\else\ifnum\eq@drivernum=2\relax\else\pdfmarkuptrue\fi\fi
 \RequirePackage{hyperref}
 %    \end{macrocode}
 %    Changed \textsf{hyperref} definitions/parameters to add \texttt{1bp} rather than \texttt{1pt} around a form field
 %    or link.
 %    \changes{v2.9e}{2016/12/22}{Changed hyperref to add 1bp rather than 1pt}
+%    \changes{v2.3.4}{2020/07/05}{Change logic from \string\cs{ifxetex} to
+%    \string\cs{ifnum}\string\cs{eq@drivernum=2\string\relax}}
 %    \begin{macrocode}
-\ifxetex\else\ifpdf\pdflinkmargin1bp\relax\else
+\ifnum\eq@drivernum=2\relax
+\else
+  \ifpdf\pdflinkmargin1bp\relax
+  \else
     \g@addto@macro\Hy@FirstPageHook{%
     \headerps@out{/HyperBorder {1.00375 PDFToDvips} def}}
-\fi\fi
+  \fi
+\fi
 %    \end{macrocode}
 %    Changed the requirement for \textsf{insdljs}
 % \changes{v2.9a}{2016/06/09}{Change in \string\textsf{insdljs} package}
@@ -279,17 +298,17 @@
 %    \end{macrocode}
 % \changes{v1.0a}{2006/10/03}
 % {
-%   If \string\textsf{exerquiz} is not loaded, we do an automatic begin and end of Form.
+%   If \string\pkg{exerquiz} is not loaded, we do an automatic begin and end of Form.
 %   Also, if \string\textsf{exerquiz} is loaded, then we use the driver declared in
-%   \string\textsf{exerquiz}; otherwise, we set the default to 0
+%   \string\pkg{exerquiz}; otherwise, we set the default to 0
 %   (\string\texttt{dvipsone}/\string\texttt{dvips}).
 % }
-% If exerquiz is not loaded, we insert |\begin{Form}| and |\end{Form}|,
+% If \pkg{exerquiz} is not loaded, we insert |\begin{Form}| and |\end{Form}|,
 % and if undefined, we set the default driver.
 %    \begin{macrocode}
 \@ifpackageloaded{exerquiz}{}{%
-    \AtBeginDocument{\Form}
-    \AtEndDocument{\csname endForm\endcsname}
+  \AtBeginDocument{\Form}%
+  \AtEndDocument{\@nameuse{endForm}}
 }
 \@ifpackageloaded{aeb_pro}{}{%
   \newcommand{\taggedPDF}{%
@@ -312,12 +331,19 @@
 %    \end{macrocode}
 % When the \texttt{preview} option is used, draw a frame box
 % around the \textit{inner} bounding rectangle.
+%
+% \paragraph*{Utility commands, boxes, dimension and token registers}
 %    \begin{macrocode}
 %<*package>
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \@ifundefined{eq@tmpbox}{\newsavebox{\eq@tmpbox}}{}
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
 \@ifundefined{eq@tmpdimb}{\newdimen\eq@tmpdimb}{}
+%    \end{macrocode}
+% Define new dimension of \cs{b@} which is assigned a value of 1bp.
+% \changes{v2.3.6}{2020/10/10}{Defined new dimension \string\cs{b@} (1bp)}
+%    \begin{macrocode}
+\newdimen\b@ \b@=1bp
 \newlength\ef@dimena
 \newtoks\ef@scratchtoks
 %    \end{macrocode}
@@ -391,31 +417,7 @@
 %   The public version of \cs{ef@Bbox} is simply \DescribeMacro\Bbox\cs{Bbox}.
 %    \begin{macrocode}
 \let\Bbox\ef@Bbox
-%</package>
 %    \end{macrocode}
-%    \section{eForms Support}
-%    \begin{macrocode}
-%<*package>
-%    \end{macrocode}
-% Listed below are the various types of form objects available in PDF.
-%\begin{itemize}
-% \item \hyperref[button]{Button}
-%   \begin{itemize}
-%       \item \hyperref[pushbutton]{Push buttons}
-%       \item \hyperref[checkbox]{Check boxes}
-%       \item \hyperref[radiobutton]{Radio Buttons}
-%   \end{itemize}
-% \item \hyperref[textfield]{Text Fields}
-% \item \hyperref[choice]{Choice Fields}
-%   \begin{itemize}
-%       \item \hyperref[listbox]{list box}
-%       \item \hyperref[combobox]{combo box}
-%   \end{itemize}
-%\item \hyperref[sigfield]{Signature Fields}
-%\end{itemize}
-% \normalcolor
-%
-% \subsection{Some utility commands}
 % The following two commands were created as a convenience to changing the definition of certain
 % JavaScript actions. Use \cs{efsave} to save the original definition of the action, then redefine the action,
 % the later, restore the JS action to its original definition.\par\medskip\noindent
@@ -438,6 +440,37 @@
 % has the same definition as |\x| does. Now |\x| is free to be redefined. Later in the document,
 % we can say |\efrestore\x\from\y| (eg, |\let\x\y|). Now the
 % definition of |\x| has its original definition (at the time when it was saved).
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+%    \section{\tops{\app}{}{Adobe} Forms Support}\label{formsSupport}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+% Listed below are the various types of form objects available in PDF.
+%\par\medskip\noindent
+%\begin{minipage}{.67\linewidth}\raggedcolumns
+%\begin{multicols}{2}
+%\begin{itemize}
+% \item \hyperref[button]{Button}
+%   \begin{itemize}
+%       \item \hyperref[pushbutton]{Push buttons}
+%       \item \hyperref[checkbox]{Check boxes}
+%       \item \hyperref[radiobutton]{Radio Buttons}
+%   \end{itemize}
+% \item \hyperref[textfield]{Text Fields}
+% \item \hyperref[choice]{Choice Fields}
+%   \begin{itemize}
+%       \item \hyperref[listbox]{list box}
+%       \item \hyperref[combobox]{combo box}
+%   \end{itemize}
+%\item \hyperref[sigfield]{Signature Fields}
+%\end{itemize}
+%\end{multicols}
+%\end{minipage}
+%
+%\bigskip
+%
 %
 % \subsection{Process Key-Value Pairs: Main Macro}\label{procArgs}
 %
@@ -455,10 +488,10 @@
 % \cs{@eq\ameta{name}\darg{\ameta{arg}}}. Each of the macros \cs{@eq\ameta{name}} must be
 % defined. Such a macro defines another macro as follows
 % \cs{def\string\eq@\ameta{name}\darg{\ameta{arg}}}. For example if the user enters the token
-% pair  |\RC{Users}|, \cmd{\processAppArgs} will construct
-% |\@eqRC|, with argument |{Users}|, this macro will be
-% executed, which expands to |\def\eq@RC{Users}|.  The macro
-% \cmd{\eq@RC} may then be used within the construction of the
+% pair  |\TU{|\ameta{text}|}|, \cmd{\processAppArgs} will construct
+% |\@eqTU|, with argument |{|\ameta{text}|}|, this macro will be
+% executed, which expands to |\def\eq@TU{/TU(|\ameta{text}|)}| (a simplified definition).  The macro
+% \cmd{\eq@TU} is then be used within the construction of the
 % widget object.\medskip
 %
 % \noindent
@@ -478,11 +511,7 @@
 % and there is no user redefinition of that form field attribute allowed. Normally,
 % this is done for \cs{A} and \cs{AA} to prevent overwriting critical functionality.
 %    \begin{macrocode}
-    \ifx#1\@empty
-%      \@getCmdName{#1}\PackageWarning{eforms}
-%        {Redefining the \eqbs\@CmdName\space key is not allowed}%
-      \def\ef@next{\processAppArgs}%
-    \else
+    \ifx#1\@empty\def\ef@next{\processAppArgs}\else
 %    \end{macrocode}
 % This is the user interface to the new optional argument of links and forms. If
 % the key is \cs{ui}, we pass its argument to |\setkeys{eforms}{#2}| to process
@@ -563,7 +592,7 @@
 %      the argument of \cs{presets} is a macro of the form \cs{csname}/\cs{endcsname}.
 %      An ordinary \cs{presets} does not work, we must use \cs{epresets}:
 %\begin{verbatim}
-%   \expandafter\def\csname fld1\endcsname#1{\protect\BG{#1}}
+%   \csarg\def{fld1}#1{\protect\BG{#1}}
 %   \textField[\epresets{\nameuse{fld1}{yellow}}]{mytxt}{2in}{13bp}
 %\end{verbatim}
 %In the above example we use \cs{nameuse} rather than \cs{@nameuse}, since in a recent
@@ -572,7 +601,7 @@
 %\begin{verbatim}
 %   \protectedKeys{pKeys}{\BG{red}\BC{blue}}
 %%  \nameuse is expanded within the argument below, where it is defined
-%   \expandafter\def\csname fld2\endcsname{\nameuse{pKeys}}
+%   \csarg\def{fld2}{\nameuse{pKeys}}
 %   \pushButton[\CA{Push Me}\epresets{\nameuse{fld2}}]{pb1}{}{13bp}
 %\end{verbatim}
 %where \cs{protectedKeys} is used to protected each of the keys in its argument.
@@ -582,7 +611,7 @@
               \ifx\arg@epresets\@CmdName
                 \def\ef@next{\let\protect\noexpand
                   \edef\x{#2}\set@typeset@protect\expandafter
-                  \processAppArgs\x}% dps27
+                  \processAppArgs\x}%
               \else
 %    \end{macrocode}
 % This is the last, and the most frequent case. We process an ordinary key, one
@@ -604,16 +633,13 @@
 % Process the field defaults and the `every' changes. Build up the required command
 % in a token list, then execute.
 %    \begin{macrocode}
-\def\@processEvery{\edef\eqtemp{}\toks0={}\@@processEvery}
-\def\@@processEvery#1{%
-    \ifx#1\end\def\ef@next{\the\toks0 }%
-    \else
-        \edef\eqtemp{\the\toks0 }%
-        \toks0=\expandafter{\eqtemp
-            \expandafter\processAppArgs#1\end\@nil}%
-        \def\ef@next{\@@processEvery}%
-    \fi
-    \ef@next
+\def\@processEvery{\edef\eqtemp{}\toks@={}\@@processEvery}
+\def\@@processEvery#1{\ifx#1\end
+  \def\ef@next{\the\toks@}\else
+  \edef\eqtemp{\the\toks@}%
+  \toks@=\expandafter{\eqtemp\expandafter
+    \processAppArgs#1\end\@nil}%
+  \def\ef@next{\@@processEvery}\fi\ef@next
 }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -625,36 +651,79 @@
 % inline form fields.}
 %    \begin{macrocode}
 \def\centerWidget#1{%
-    \ifeq@inlineCenter
+  \ifeq@inlineCenter
 %    \end{macrocode}
 % Inline form field, do a better job at centering it.
 %    \begin{macrocode}
-        \eqcenterWidget=#1\relax
-        \eqcenterWidget=.5\eqcenterWidget
-        \ifnum\eq@textSize=0\relax
-        \dimen@=-\eq@textSizeDefault bp\else
-        \dimen@=-\eq@textSize bp\fi
-        \dimen@=0.9167\dimen@ % 11/12
-        \dimen@=.5\dimen@
-        \advance\dimen@\eq@W@value bp
-        \ifx\eq@S\@empty\else
-            \def\eq@S@cmp{B}%
-            \ifx\eq@S@value\eq@S@cmp
-                \advance\dimen@ by \eq@W@value bp
-            \else
-                \def\eq@S@cmp{I}%
-                \ifx\eq@S@value\eq@S@cmp
-                    \advance\dimen@ by \eq@W@value bp
-                \else\advance\dimen@ by 1bp
-        \fi\fi\fi
-        \advance\eqcenterWidget by \dimen@
-    \else
-        \eqcenterWidget=#1\relax
-        \eqcenterWidget=.5\eqcenterWidget
-        \advance\eqcenterWidget by -4bp
-    \fi
+    \eqcenterWidget=#1\relax
+    \eqcenterWidget=.5\eqcenterWidget
+    \ifnum\eq@textSize=0\relax
+    \dimen@=-\eq@textSizeDefault\b@\else
+    \dimen@=-\eq@textSize\b@\fi
+    \dimen@=0.9167\dimen@ % 11/12
+    \dimen@=.5\dimen@
+    \advance\dimen@\eq@W@value\b@
+    \ifx\eq@S\@empty\else
+      \def\eq@S@cmp{B}%
+      \ifx\eq@S@value\eq@S@cmp
+        \advance\dimen@ by \eq@W@value\b@
+      \else
+        \def\eq@S@cmp{I}%
+        \ifx\eq@S@value\eq@S@cmp
+          \advance\dimen@ by \eq@W@value\b@
+        \else\advance\dimen@\b@
+    \fi\fi\fi
+    \advance\eqcenterWidget\dimen@
+  \else
+    \eqcenterWidget=#1\relax
+    \eqcenterWidget=.5\eqcenterWidget
+    \advance\eqcenterWidget-4\b@
+  \fi
 }
 %    \end{macrocode}
+%    \begin{macro}{\ef@optscale}
+%    This macro supports the \texttt{width}, \texttt{height}, and \texttt{scale} option keys for forms.
+%    We obey these three keys in the order listed above.
+%    \changes{v2.3.5}{2020/09/15}{Added \string\cs{ef@optscale}}
+%    \begin{macrocode}
+\def\ef@optscale{%
+  \ifx\eq@width\@empty
+    \ifx\eq@height\@empty
+      \ifx\eq@scalefactor\@empty
+      \else
+%    \end{macrocode}
+%    Re-scale using scale factor of \cs{eq@scale}.
+%    \begin{macrocode}
+        \@tempdima\eq@scalefactor\p@
+        \ifdim\@tempdima<\z@\edef\eq@scalefactor{-\eq@scalefactor}\fi
+        \setlength{\eflength}{\eq@rectH*\real{\eq@scalefactor}}%
+        \edef\eq@rectH{\the\eflength}%
+        \setlength{\eflength}{\eq@rectW*\real{\eq@scalefactor}}%
+        \xdef\eq@rectW{\the\eflength}%
+      \fi
+    \else
+%    \end{macrocode}
+%    Re-scale according to height.
+%    \begin{macrocode}
+      \setlength{\eflength}{\eq@rectH}%
+      \ifdim\eflength>\z@
+        \setlength{\eflength}{\eq@height*\ratio{\eq@rectW}{\eq@rectH}}%
+        \edef\eq@rectW{\the\eflength}\edef\eq@rectH{\eq@height}%
+      \fi
+    \fi
+  \else
+%    \end{macrocode}
+%    Re-scale according to width.
+%    \begin{macrocode}
+    \setlength{\eflength}{\eq@rectW}%
+    \ifdim\eflength>\z@
+      \setlength{\eflength}{\eq@width*\ratio{\eq@rectH}{\eq@rectW}}%
+      \edef\eq@rectH{\the\eflength}\edef\eq@rectW{\eq@width}%
+    \fi
+  \fi
+}
+%    \end{macrocode}
+%    \end{macro}
 %
 % \subsection{\textsf{eforms} key-values}\label{eformvariables}
 %
@@ -694,17 +763,23 @@
   \ifx\eq@W\@empty\let\link@BS\@empty\fi
 }\def\link@BS{}
 %    \end{macrocode}
-% \changes{v1.0e}{2008/03/04}
-% {
-%   Added a \string\cs{presets} key to make it easier to dynamically change options%
-% }
+% \noindent\DescribeMacro{\presets}\hskip-\marginparsep\texttt{\darg{\meta{\cs{cmd}}}}
+% We define the \cs{presets} key. The argument of \key{presets} is a macro (\meta{\cs{cmd}}) consisting of key-value pairs.
+% The macro \meta{\cs{cmd}} expanded by \cs{expandafter}
+% and put back into the parsing stream.\par\medskip
+% \changes{v1.0e}{2008/03/04}{%
+%   Added a \string\cs{presets} key to make it easier to dynamically change options}
 %
-% \noindent\DescribeMacro{\presets} We define the \cs{presets} key. The argument of presets is a macro, that is
-% expanded and put back into the parsing stream. The \DescribeMacro{\epresets}\cs{epresets} keys is used
-% when the properties are to be expanded early. (properties need to be protected \cs{protect}\cs{BG})
-% \changes{v2.9.23}{2019/01/22}{Added \string\cs{epresets} key}
+% \noindent \DescribeMacro{\epresets}\hskip-\marginparsep\texttt{\darg{\meta{\cs{cmd}}}} The \cs{epresets} key is used
+% when the properties are to be expanded early. The command argument \meta{\cs{cmd}} is fully expanded within
+% an \cs{edef}; as a result, the keys need to be protected, for example, |\epresets{\protect\BC{red}}|.
+% The command \cs{protectedKeys} can be used to protect the keys to all the key-value pairs.
+% \changes{v2.9.23}{2019/01/22}{Added \string\cs{epresets} key}\par\medskip
+%
+% \noindent Both \cs{presets} and \cs{epresets} are handled within the \cs{proccessAppArgs} macro;
+% the definitions below actually do nothing and are never expanded.
 %    \begin{macrocode}
-\def\@eqpresets#1{#1}%
+\def\@eqpresets#1{#1}
 \def\@eqepresets#1{#1}
 %    \end{macrocode}
 % \DescribeMacro{\W} The width of the boundary line.
@@ -716,9 +791,9 @@
 %    (2016/12/22) Add a global value for boundary width, used to adjust the spacing between form fields
 %    \changes{v2.9d}{2016/12/22}{Add a global value for boundary width}
 %    \begin{macrocode}
-  \xdef\g@eq@W@value@bp{\eq@W@value bp}}
+  \xdef\g@eq@W@value@bp{\eq@W@value\b@}}
 \def\eq@W{}\def\eq@W@value{0}
-\def\g@eq@W@valu@bp{0bp} % dps 12/22
+\def\g@eq@W@valu@bp{0bp}
 %    \end{macrocode}
 % \DescribeMacro{\S} Line style, values are \texttt{S} (solid), \texttt{D} (dashed),
 %      \texttt{B} (beveled), \texttt{I} (inset), \texttt{U} (underlined)
@@ -897,24 +972,81 @@
 \def\@eqmlLink#1{\def\eq@arg{#1}\ifx\eq@arg\ef@true
   \let\ef@mlLink\ef@One\else\let\ef@mlLink\ef@Zero\fi}
 %    \end{macrocode}
-% \DescribeMacro{\Lock} The Lock key is used with signature fields, currently, there is
-% no nice user interface to this key. Typical entries are
-%\begin{verbatim}
-%   \Lock{/Action/All} % all fields in the doc
-%   \Lock{/Action/Include % include all fields listed in Fields
-%         /Fields [(field1)(field2)...]}
-%   \Lock{/Action/Exclude % exclude all fields listed in Fields
-%         /Fields [(field1)(field2)...]}
-%\end{verbatim}
+% \DescribeMacro{\Lock} The \cs{Lock} key is used with signature fields.
+% We allow the document author to either use raw PDF markup, or the simplified
+% \pkg{eforms} key-value or UF key-values. To do this, we determine if
+% \texttt{/Action} appears somewhere in the argument, if yes, then it is raw;
+% otherwise, it is key-value markup.
+%    \begin{macrocode}
+\def\ef@searchAction#1/Action#2\@nil{\def
+  \ef@argii{#2}\ifx\ef@argii\ef@end\let\ef@Action\ef@One\else
+  \let\ef@Action\ef@Zero\fi}
+%    \end{macrocode}
+%    The definition of \cs{@eqLock}, we determine if raw or KV-Pairs.
 %    \begin{macrocode}
 \def\@eqLock#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-  \let\eq@Lock\@empty\else\def\eq@Lock{/Lock <<#1>>}\fi}
-\def\eq@Lock{}
+  \let\eq@Lock\@empty\else\def\lckArgs{#1}%
+  \ef@searchAction#1/Action\end\@nil
+  \ifx\ef@Action\ef@One\def\ef@next{\let\Action\lckAction#1}\else
+    \let\ef@next\relax\fi\ef@next
+  \def\eq@Lock{/Lock <<\lckArgs>>}\fi}
+\let\eq@Lock\@empty
 %    \end{macrocode}
+%Various examples using \emph{raw PDF markup} follow:
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%\Lock{/Action/All}     !% !textsf~all fields in the doc@
+%\Lock{/Action/Include  !% !textsf~include all fields listed in Fields@
+%      /Fields [(field1)(field2)...]}
+%\Lock{/Action/Exclude  !% !textsf~exclude all fields listed in Fields@
+%      /Fields [(field1)(field2)...]}
+%\end{Verbatim}
+%    A simplified syntax for the arguments of \cs{Lock}; sample
+%    syntax for the same three examples above are,
+%\changes{v2.3.6}{2020/10/10}{Addition support for the \string\cs{Lock} key}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%\Lock{\Action\All}
+%\Lock{\Action\IncludeFields{field1,field2,...}}
+%\Lock{\Action\ExcludeFields{field1,field2,...}}
+%\end{Verbatim}
+%The code for the simplified markup for the \cs{Lock} key.
+%    \begin{macrocode}
+\def\lckAll{\All}
+\def\lckIncludeFields{\IncludeFields}
+\def\lckExcludeFields{\ExcludeFields}
+\def\lckActionTst#1{\let\X\ef@Yes#1}%
+\def\lckAction#1{\def\@rgi{#1}\ifx\@rgi\lckAll
+  \def\lckArgs{/Action/All}\let\ef@next\relax\else
+  \ifx\@rgi\lckIncludeFields
+    \def\ef@next{\lckGetFieldsFor{Include}}\else
+    \ifx\@rgi\lckExcludeFields
+      \def\ef@next{\lckGetFieldsFor{Exclude}}\else
+      \PackageWarning{eforms}%
+        {The argument of the \string\Lock key\MessageBreak
+        is not correctly expressed. Review the documentation}%
+    \fi
+  \fi
+\fi\ef@next
+}
+\def\lckGetFieldsFor#1#2{\@temptokena={}\@for\@fld:={#2}\do
+  {\edef\@etmp{\the\@temptokena(\@fld)}%
+    \@temptokena=\expandafter{\@etmp}%
+  }\edef\lckArgs{/Action/#1/Fields[\the\@temptokena]}%
+}
+%    \end{macrocode}
+% Another option that is included in the Signed tab is titled ``This script executes
+% when field is signed.''
+% This is an option that, through the user interface, is mutually exclusive from
+% locking fields. This option appears to be implemented through the format event.
+% For example,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\catcode`\%=9}]
+%\AAformat={app.alert("Thank you for signing this field.");}
+%\end{Verbatim}
 %\paragraph*{Additional Actions.}
-% We search for \cs{AACalculate}.
-% The \cs{ef@searchCalc} searches for \cs{AACalculate}. If, for some reason,
-% \cs{AA\-Cal\-cu\-late} is within a pair of braces, this search will not find it,
+% \cs{ef@searchCalc} searches for the \cs{AACalculate} token. If, for some reason,
+% \cs{AACalculate} is within a pair of braces, this search will not find it,
 % so don't group \cs{AACalculate} within braces, there is no reason to do so
 % anyway. If we find \cs{AACalculate}, we set \cs{isCalculate} to \texttt{true}, which is normally
 % \texttt{false}.
@@ -1058,16 +1190,26 @@
 \def\@eqDA#1{\def\eq@DA{#1}}
 \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
 %    \end{macrocode}
-% \DescribeMacro{\textFont} PDF form font
+% \DescribeMacro{\textFont} PDF form font. This is a simple assignment; we define
+% \DescribeMacro{\textFontDefault}\cs{textFontDefault} to conveniently change the default font over
+% all form fields, with the exception of checkboxes and radio button fields. The default
+% is \uif{Helv}.
+% \changes{v2.4.1}{2020/12/14}{Defined \string\cs{eqtextFontDefault}}
 %    \begin{macrocode}
 \def\@eqtextFont#1{\def\eq@textFont{/#1}}
-\def\eq@textFont{/Helv}
+\def\textFontDefault#1{\def\eq@textFontDefault{#1}
+  \def\eq@textFont{/#1}}
+\textFontDefault{Helv}
 %    \end{macrocode}
-% \DescribeMacro{\textSize} PDF form text size
+% \DescribeMacro{\textSize} PDF form text size. This is a simple assignment; we define
+% \DescribeMacro{\textSizeDefault}\cs{textSizeDefault} to conveniently change the default font size for all
+% form fields, including checkboxes and radio buttons. The default is 9 (points).
+% \changes{v2.4.1}{2020/12/14}{Defined \string\cs{eqtextSizeDefault}}
 %    \begin{macrocode}
 \def\@eqtextSize#1{\def\eq@textSize{#1}}
-\def\eq@textSizeDefault{9}
-\edef\eq@textSize{\eq@textSizeDefault}
+\def\textSizeDefault#1{\def\eq@textSizeDefault{#1}
+  \def\eq@textSize{#1}}
+\textSizeDefault{9}
 %    \end{macrocode}
 % \DescribeMacro{\RV} Rich text value
 %\changes{v2.5l}{2011/01/28}{%
@@ -1135,8 +1277,6 @@
 %   of the combo box (only), the code below \cs{let}s \cs{eq@DV} to \cs{@empty} in enhanced
 %   preview mode, for combo boxes only.
 %    \begin{macrocode}
-%  \ifx\annot@type\annot@type@combobox
-%    \ifefpmpv\let\eq@DV\@empty\fi\fi
   \makespecialJS\fi\fi}\def\eq@DV{}
 %    \end{macrocode}
 % \DescribeMacro{\nuDV} \cs{@eqnuDV} is the old definition of DV. This version does not
@@ -1248,7 +1388,9 @@
   \let\eq@Ff\@empty\else\def\eq@Ff{/Ff #1}\fi}
 \def\eq@Ff{}
 %    \end{macrocode}
-% \paragraph*{keys specific to text fields:} \texttt{MaxLen}
+% \goodbreak
+% \paragraph*{Keys specific to text fields:} The following keys are specific to
+% text fields.
 %    \begin{macrocode}
 %    \end{macrocode}
 % \DescribeMacro{\MaxLen} text fields only. Restricts number of characters
@@ -1259,15 +1401,16 @@
   \def\eq@MaxLen{}
 %    \end{macrocode}
 % \DescribeMacro{\H} Highlight, used in button fields and link annotation. Possible values
-% are None, Push, Outline, Invert (respectively, \verb!\H{N}!, \verb!\H{P}!,
-% \verb!\H{O}!, \verb!\H{I}!)
-% The default highlighting is invert (I).
+% are None, Push, Outline, Invert (respectively, |\H{N}|, |\H{P}|,
+% |\H{O}|, |\H{I}|)
+% The default highlighting is invert (\texttt{I}).
 %    \begin{macrocode}
 \def\@eqH#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
   \let\eq@H\@empty\else\def\eq@H{/H/#1}\fi}\def\eq@H{}
 %    \end{macrocode}
 % \paragraph*{Appearance characteristics dictionary:}
-% \texttt{MK=R, BC, BG, CA, RC, AC, I, RI, IX, IF, TP}
+% \texttt{MK\,=\,R,\,BC,\,BG,\,CA,\,RC,\,AC,\,I,\,RI,\allowbreak\,IX,\,IF,^^A
+% \,TP}
 %    \begin{macrocode}
 %    \end{macrocode}
 % \DescribeMacro{\MK} A dictionary containing other keys
@@ -1596,13 +1739,37 @@
 %    \end{macrocode}
 %    \begin{macro}{\rectH}
 %    \begin{macro}{\rectW}
-% Use to set the height and width of a widget.
+% Used to set the height and width of a widget, useful when the width and height arguments
+% of the widget is not accessible.
 %    \begin{macrocode}
 \def\@eqrectH#1{\def\eq@rectH{#1}\ifx\eq@rectH\@empty\else
   \setlength\eflength\eq@rectH\edef\eq@rectH{\the\eflength}\fi}
 \def\@eqrectW#1{\def\eq@rectW{#1}\ifx\eq@rectW\@empty\else
   \setlength\eflength\eq@rectW\edef\eq@rectW{\the\eflength}\fi}
 %    \end{macrocode}
+%    \end{macro}
+%    \end{macro}
+%    \begin{macro}{\width}
+%    Re-scale the widget to have a specified width, keeping the height in proportion
+% \changes{v2.3.5}{2020/09/15}{Added \string\pkg{eforms} keys \string\texttt{width}, \string\texttt{height},
+% and \string\texttt{scale}}
+%    \begin{macrocode}
+\def\@eqwidth#1{\def\eq@width{#1}}
+\let\eq@width\@empty
+%    \end{macrocode}
+%    \begin{macro}{\height}
+%    Re-scale the widget to have a specified height, keeping the height in proportion
+%    \begin{macrocode}
+\def\@eqheight#1{\def\eq@height{#1}}
+\let\eq@height\@empty
+%    \end{macrocode}
+%    \begin{macro}{\scale}
+%    Re-scale the widget by a scale factor.
+%    \begin{macrocode}
+\def\@eqscalefactor#1{\def\eq@scalefactor{#1}}
+\let\eq@scalefactor\@empty
+%    \end{macrocode}
+%    \end{macro}
 %    \end{macro}
 %    \end{macro}
 % \DescribeMacro{\objdef} Insert an indirect reference (ps only drivers). The value of this
@@ -1766,32 +1933,36 @@
 \def\eq@protect#1{\let#1\@empty}
 %    \end{macrocode}
 %    \leavevmode
-%    \DescribeMacro{\protectedKeys}\hskip-\marginparsep\texttt{\darg{\ameta{cmd-name}}\darg{\ameta{KV-pairs}}}
-%    is a key that protects each key in a \pkg{eforms} key-value list; eg, it replaces
-%    \cs{BG\darg{red}} with \cs{protect\cs{BG\darg{red}}}. The results are saved under the command
+%    \DescribeMacro{\protectedKeys}\hskip-\marginparsep\texttt{*\darg{\ameta{cmd-name}}\darg{\ameta{KV-pairs}}}
+%    is a command that protects each key in a \pkg{eforms} key-value list; eg, it replaces
+%    \cs{BC\darg{red}} with \cs{protect\cs{BC\darg{red}}}. The results are saved under the command
 %    name \cs{\ameta{cmd-name}}. Designed to be used with the \cs{epresets} key, which expands its arguments
 %    early; the keys are not defined so we prevent them from expanding prior to being passed to
-%    the parsing mechanism. \cs{protectedKeys} is used in the \pkg{bargraph-js} package.
+%    the parsing mechanism. \cs{protectedKeys} is used in the \pkg{bargraph-js} package. If \cs{\ameta{cmd-name}}
+%    is already defined, a warning message is written to the TEX LOG, unless the \texttt*-option is taken.
 %    \changes{v2.10}{2019/03/16}{Added \string\cs{protectedKeys}}
 %    \begin{macrocode}
-%    \end{macrocode}
-% \DescribeMacro{\multigroupradios} Declares whether there are multiple sets of radio button groups
-% with the same names and values,
-%    \begin{macrocode}
-\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
-\let\ef@multigroupradios\ef@NO
-%    \end{macrocode}
-%    \begin{macrocode}
-\def\ef@stop{\relax} %\def\ef@relax{\relax}
-\def\protectedKeys#1#2{\ef@scratchtoks={}%
-  \@ifundefined{#1}{}{\PackageWarning{eforms}
+\def\ef@stop{\relax}
+\let\isst@r\ef@NO
+\def\protectedKeys{\@ifstar
+  {\let\isst@r\ef@YES\protectedKeys@i}
+  {\let\isst@r\ef@NO\protectedKeys@i}%
+}
+\def\protectedKeys@i#1#2{\ef@scratchtoks={}%
+  \@ifundefined{#1}{}{\ifx\isst@r\ef@NO\PackageWarning{eforms}
     {Be aware command name #1 is already\MessageBreak
-    in use}}\protectedKeys@gettwo#2\ef@stop\relax
-   \expandafter\edef\csname #1\endcsname{\the\ef@scratchtoks}}
+    in use}\fi}\protectedKeys@gettwo#2\ef@stop\relax
+   \csarg\edef{#1}{\the\ef@scratchtoks}}
 \def\protectedKeys@gettwo#1#2{%
   \ifx#1\ef@stop\else\ef@scratchtoks=\expandafter
     {\the\ef@scratchtoks\protect#1{#2}}\expandafter
     \protectedKeys@gettwo\fi}
+%    \end{macrocode}
+% \DescribeMacro{\multigroupradios} Declares whether there are multiple sets of
+% radio button groups with the same names and values,
+%    \begin{macrocode}
+\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
+\let\ef@multigroupradios\ef@NO
 %    \end{macrocode}
 %
 % \subsubsection{Support for Hex escapes in PDF names}
@@ -2258,20 +2429,20 @@
 %
 %    \begin{macro}{\JS}
 %    \begin{macro}{\Named}
-%    \begin{macro}{\URI}
 %    \begin{macro}{\Next}
 %    \begin{macro}{\toggleAttachmentsPanel}
 % Convenience commands for writing JavaScript and for executing named events.
+% \changes{v2.3.5}{2020/11/20}{Remove \string\cs{URI} from \string\pkg{eforms}, already
+% defined in \string\pkg{insdljs}. (Jason G.)}
 %    \begin{macrocode}
 \providecommand{\JS}[1]{/S/JavaScript/JS(#1)}
-\newcommand{\URI}[1]{/S/URI/URI(#1)}
+%\newcommand{\URI}[1]{/S/URI/URI(#1)}
 \providecommand{\Named}[1]{/S/Named/N/#1}
 \newcommand{\Next}[1]{/Next<<#1>>}
 \providecommand{\toggleAttachmentsPanel}[2]{%
     \setLink[\Border{0 0 0}\A{\Named{ShowHideFileAttachment}}]
     {\textcolor{#1}{#2}}}%
 %    \end{macrocode}
-%    \end{macro}
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
@@ -2382,7 +2553,7 @@
 %Hidden (and does not print)   &|\F\FHidden|
 %\end{tabular}
 %
-%\subsubsection{Field Flags /Ff Definitions}\label{Ff}
+%\subsubsection{Field Flags \texttt{/Ff} Definitions}\label{Ff}
 %    \begin{macrocode}
 \def\FfReadOnly{1}                   % all
 \def\FfRequired{2}                   % all
@@ -2485,8 +2656,8 @@
         \edef\eq@rectH{\the\eflength}%
     \fi
 }
-\def\ef@djXPD{\ifxetex\ifmakeXasPD\ef@adjrectWH{2bp}\fi
-    \else\ifmakePDasX\ef@adjrectWH{-2bp}\fi\fi}
+\def\ef@djXPD{\ifxetex\ifmakeXasPD\ef@adjrectWH{2\b@}\fi
+    \else\ifmakePDasX\ef@adjrectWH{-2\b@}\fi\fi}
 %    \end{macrocode}
 %    \begin{macro}{\eq@setButtonProps}
 % This macro measure the width of the largest text on defined for the
@@ -2496,10 +2667,14 @@
 % #1 is the driver specific macro to build the button widget
 % #2 are the button properties
 %\end{verbatim}
+%\DescribeMacro\btnSpcr\hskip-\marginparsep\texttt{\darg{\ameta{content}}} Adds space on either
+%side of a pushbutton caption; the amount of the spacing is the width of \ameta{content} in the current
+%current font, the fontsize is the one determined by the \cs{textSize} key.
 %\changes{v2.5m}{2012/01/27}{Added \string\cs{ef@btnspcr} to give user
 % ability to adjust the spacing around text for a button.}
+% \changes{v2.3.5}{2020/09/15}{Added \string\cs{tbnSpcr} to populate \string\cs{eq@btnspcr}}
 %    \begin{macrocode}
-%\def\ef@btnspcr{\ }
+\def\btnSpcr#1{\def\ef@btnspcr{#1}}
 \def\ef@btnspcr{}
 %    \end{macrocode}
 %    \subsubsection{Enhanced preview}\label{pmpv}
@@ -2562,9 +2737,34 @@
 %    \changes{v2.11}{2019/05/24}{Enhanced preview introduced}
 %
 %    \subsubsection{Set push button properties}
+%    \leavevmode\DescribeMacro\ef@adjcapfont^^A
+%    When \cs{pmpvOn} is expanded, the caption text is previewed, we try to adjust
+%    the typeset caption font size to match the font size used by the push button.
+%    \changes{v2.3.5}{2020/09/15}{Added \string\cs{ef@adjcapfont}}
 %    \begin{macrocode}
+\def\ef@adjcapfont{%
+  \dimen@=\eq@textSize\b@
+  \dimen@1.00375\dimen@
+  \edef\eq@textSize@pt{\strip@pt\dimen@}%
+  \fontsize{\eq@textSize@pt}{0}\selectfont
+}
 \def\eq@setButtonProps#1#2{\makeJSspecials
   \processAppArgs#2\end\@nil  % set widget properties
+%    \end{macrocode}
+%    If \cs{eq@rectW} is not a positive dimension, mark it as empty.
+%    \changes{v2.3.5}{2020/09/15}{If \string\cs{rectW} is not a positive dimension,
+%    make it empty for push buttons.}
+%    \begin{macrocode}
+  \ifx\eq@rectW\@empty\else
+    \ifdim\eq@rectW>0pt \else\let\eq@rectW\@empty\fi\fi
+%    \end{macrocode}
+%    Re-scale dimensions as requested. If \cs{eq@rectW} is empty, then the width is calculated
+%    from the \cs{CA} key; re-scaling is ignored in this case.
+%    \changes{v2.3.5}{2020/09/15}{Added \string\cs{ef@optscale}}
+%    \changes{v2.3.5}{2020/09/15}{If \string\cs{rectW} is not a positive dimension,
+%    make it empty for push buttons.}
+%    \begin{macrocode}
+  \ifx\eq@rectW\@empty\else\expandafter\ef@optscale\fi
 %    \end{macrocode}
 %    Coordinate the values of \cs{BC} and \cs{W}, if one is empty
 %    the other is too.
@@ -2576,22 +2776,19 @@
   \ifx\eq@rectW\@empty
     \ifnum\eq@textSize=0 \else
 %    \end{macrocode}
-% If \cs{rectW} is nonempty, and \cs{textSize} is not zero, we calculate with
+% If \cs{rectW} is empty and \cs{textSize} is not zero, we calculate with
 % width of the caption on the button by first adjusting the font size
 % to properly gauge the width of the text. This may not be really accurate
 % because the font used by tex will no doubt be different from the font used
 % by the button.
 %    \begin{macrocode}
-      \dimen@=\eq@textSize bp
-      \dimen@1.00375\dimen@
-      \edef\eq@textSize@pt{\strip@pt\dimen@}%
-      \fontsize{\eq@textSize@pt}{0}\selectfont
+      \ef@adjcapfont
     \fi
 %    \end{macrocode}
 % If the button is beveled, we pad the width by 2 times the width of the border,
 % the beveled edge taking up a width approx equal to the border.
 %    \begin{macrocode}
-    \dimen@\eq@W@value bp
+    \dimen@\eq@W@value\b@
     \def\eq@S@B{B}\ifx\eq@S@value\eq@S@B
       \def\eq@btn@sp{\hbox to2\dimen@{\hfill}}%
     \else
@@ -2612,7 +2809,7 @@
 %    (2017/01/22) If X-like, increase by 2bp
 %    \changes{v2.9k}{2017/01/22}{If X-like, increase by 2bp}
 %    \begin{macrocode}
-    \ifmakePDasX\advance\eq@tmpdima2bp\fi
+    \ifmakePDasX\advance\eq@tmpdima2\b@\fi
     \wd\eq@tmpbox=\eq@tmpdima
   \else % if \eq@rectW is not \@empty
     \wd\eq@tmpbox=\eq@rectW
@@ -2629,7 +2826,10 @@
 %    \begin{macrocode}
     \ifx\ef@isBGtransparent\ef@YES
       \let\ef@kvCA\@empty\fi
-    \ifx\ef@CApv\ef@YES\PMPV{\eq@CA}\fi\fi
+%    \end{macrocode}
+%    Adjust the font size for the preview text.
+%    \begin{macrocode}
+    \ifx\ef@CApv\ef@YES\ef@adjcapfont\PMPV{\eq@CA}\fi\fi
   \ef@djXPD#1%
 }
 %    \end{macrocode}
@@ -2652,6 +2852,11 @@
 %    \changes{v2.9f}{2017/01/01}{BC=empty iff W=0 or empty}
 %    \begin{macrocode}
   \ifx\annot@type@link\annot@type\else
+%    \end{macrocode}
+%    Re-scale dimensions as requested
+%    \changes{v2.3.5}{2020/09/15}{Added \string\cs{ef@optscale}}
+%    \begin{macrocode}
+    \ef@optscale
     \ifx\eq@BC\@empty\@eqW{}\else
     \if\eq@W@value0\let\eq@BC\@empty\fi\fi
   \fi
@@ -2701,13 +2906,14 @@
 %    \begin{macro}{\efKern}
 % A convenience macro to adjust spacing between fields.
 %\begin{itemize}
-%   \item \texttt{\#1} is the spacing for ps/pdftex drivers
-%   \item \texttt{\#2} is the spacing for xetex
+%   \item \texttt{\#1} is the spacing for non-\app{xelatex} apps
+%   \item \texttt{\#2} is the spacing for \app{xelatex}
 %\end{itemize}
-%Unlike ps/pdftex, xetex includes the border width as part of the bounding rectangle
-%dimensions. As a result, this wider boundary is known to {\TeX} as it lays out the line. For
-% ps/pdftex, the boundary width is invisible to {\TeX}. The command \cs{ef@adjHWxetex} tries to
-% adjust the dimensions for xetex so the form field dimensions are the over all platforms. The boundary
+% The \app{xelatex} application includes the border width as part of the bounding rectangle
+%dimensions; all other PDF creators do not include the border as part of the dimensions
+%of the bounding rectangle. As a result, this wider boundary is known to {\TeX} as it lays out the line. For
+% non-\app{xelatex} applications, the boundary width is \emph{invisible} to {\TeX}. The command \cs{ef@adjHWxetex} tries to
+% adjust the dimensions for \app{xelatex} so the form field dimensions are the same over all platforms. The boundary
 % is still ``visible'' in {\TeX} space.
 %
 %\paragraph*{Sample uses:}
@@ -2721,6 +2927,7 @@
 \newcommand\efKern[2]{\ifxetex\kern#2\else\kern#1\fi}
 %    \end{macrocode}
 %    \end{macro}
+%    The use of \cs{efKern} has been largely subsumed by \cs{olBdry} and \cs{cgBdry}, however.
 %    \DescribeMacro{\olBdry}\cs{olBdry} and \DescribeMacro{\cgBdry}\cs{cgBdry}
 %    are convenience commands to setting the gap between two contiguous fields.
 %    \cs{olBdry} gives positions the fields so that the boundary lines overlap
@@ -2729,19 +2936,23 @@
 %    \changes{v2.9d}{2016/12/22}{Added \string\cs{olBdry} and\string\cs{cgBdry}}
 %    \begin{macrocode}
 \newcommand\olBdry{\bgroup\ifxetex
-    \@tempdima-\g@eq@W@value@bp\relax
-    \edef\@mtkern{\the\@tempdima}\else
-    \@tempdima2bp\relax\advance\@tempdima-\g@eq@W@value@bp\relax % 12/26
-    \edef\@mtkern{\the\@tempdima}\fi\kern\@mtkern\egroup
+  \@tempdima-\g@eq@W@value@bp
+  \edef\@mtkern{\the\@tempdima}\else
+  \@tempdima2\b@\advance\@tempdima-\g@eq@W@value@bp
+  \edef\@mtkern{\the\@tempdima}\fi\kern\@mtkern\egroup
 }
 %    \end{macrocode}
-%    (2017/01/15) Add optional argument to \cs{cgBdry}
+%    \DescribeMacro\cgBdry\hskip-\marginparsep\texttt{[\ameta{length}]}
+%    This command inserts spacing between to fields so they are
+%    contiguous (boundary-to-boundary); it insert additional space based in the
+%    optional argument \ameta{length}. Normally, when the boundaries are the same
+%    color, \cs{olBdry} is used; otherwise, \cs{cgBdry} looks best.
 %    \changes{v2.9h}{2017/01/15}{Add optional argument to \string\cs{cgBdry}}
 %    \begin{macrocode}
-\newcommand\cgBdry[1][0bp]{\bgroup\def\ef@rgi{#1}\ifx\ef@rgi\@empty
-    \def\ef@rgi{0bp}\fi\setlength{\@tempdima}{\ef@rgi}%
-    \ifxetex\else\addtolength{\@tempdima}{2bp}\fi
-    \kern\@tempdima\egroup\ignorespaces}
+\newcommand\cgBdry[1][0\b@]{\bgroup\def\ef@rgi{#1}\ifx\ef@rgi\@empty
+  \def\ef@rgi{0\b@}\fi\setlength{\@tempdima}{\ef@rgi}%
+  \ifxetex\else\addtolength{\@tempdima}{2\b@}\fi
+  \kern\@tempdima\egroup\ignorespaces}
 %    \end{macrocode}
 %    \DescribeMacro{\volBdry}\cs{volBdry} and \DescribeMacro{\vcgBdry}\cs{vcgBdry}
 %    are convenience commands to setting the gap between two vertically oriented fields.
@@ -2749,11 +2960,13 @@
 %    (ol) and \cs{vcgBdry} positions the field so the boundary lines are
 %    contiguous (cg).
 %    \changes{v2.9h}{2017/01/15}{Added \string\cs{volBdry} and\string\cs{vcgBdry}}
-%    \changes{v2.9n}{2017/09/04}{Added \string\cs{efSupprIndent}}.
+%    \changes{v2.9n}{2017/09/04}{Added \string\cs{efSupprIndent}}
+%    \changes{v2.3.3}{2020/04/15}{Use \string\cs{toks@} in \string\cs{efSupprIndent};
+%     use of \string\cs{ef@scratchtoks} proved to be a problem.}
 %    \begin{macrocode}
-\newcommand{\efSupprIndent}{\ef@scratchtoks=\expandafter{\the\everypar}%
+\newcommand{\efSupprIndent}{\toks@=\expandafter{\the\everypar}%
   \everypar{{\setbox\z@\lastbox}\clubpenalty\@M
-  \everypar=\expandafter{\the\ef@scratchtoks}}}
+  \everypar=\expandafter{\the\toks@}}}
 \newcommand\volBdry{\bgroup\parskip0pt\relax\@@par\nointerlineskip
   \olBdry\egroup\efSupprIndent}
 \newcommand\vcgBdry{\@ifstar{\edef\ef@offset{\the\parskip}\vcgBdry@i}
@@ -2908,13 +3121,30 @@
   \ef@pdfstrCLOpti}
 %    \end{macrocode}
 % \subsubsection{List Box}\label{listbox}
+%
+%\changes{v2.4}{2020/11/28}{Allow \cs{list@@Box} to obey \string\cs{pdfStringsOn}}
+%
 % The main list box code that can be used to build list box commands, such as
 % \cs{listBox}, defined below. Within
 % the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
 % and \cs{tops} for \cs{texorpdfstring}.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(list of key-values for list/combo box)
+%#6 = !textsf(not used)
+%#7 = !textsf(set props and driver macros)
+%#8 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\annot@type@listbox{listbox}
-\newcommand\list@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\list@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\list@@@Box}\egroup
+\newcommand\list@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@listbox}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -2926,22 +3156,20 @@
   \eqf@setDimens{#3}{#4}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#8\end\noindent#6#7{#1}}
-%    \end{macrocode}
-%   \DescribeMacro restores the obey spaces space to its default,
-%   saved earlier. This command is placed at the end of each of the form field
-%   commands to reverse the earlier change to \cs{pdfSP}.
-%    \begin{macrocode}
 \bgroup\obeyspaces
 \gdef\listBox{\global\let =\dl@sp@ce}\egroup
 %    \end{macrocode}
-%    \begin{macro}{\listBox}
-%\begin{verbatim}
-% #1 = optional, used to enter any modification of the appearance/actions
-% #2 = the title of the list box field
-% #3 = the width of the bounding rectangle
-% #4 = the height of the bounding rectangle
-% #5 = the face values/export values of list.
-%\end{verbatim}
+%    \begin{macro}{\listBox}\hskip-\marginparsep
+%    \texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}\darg{\ameta{face-export-list}}} The user interface to creating a list box field.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the list box field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the face values/export values of list)
+%\end{Verbatim}
 %\noindent Below are the default settings for the list box
 %    \begin{macrocode}
 \def\listBoxDefaults{\W{1}\S{I}\F{\FPrint}\BC{0 0 0}}
@@ -2962,11 +3190,28 @@
 %    \end{macrocode}
 %    \end{macro}
 % \subsubsection{Combo Box}\label{combobox}
+%
+%\changes{v2.4}{2020/11/28}{Allow \cs{combo@@Box} to obey \string\cs{pdfStringsOn}}
+%
 % Within the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
 % and \cs{tops} for \cs{texorpdfstring}.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(list of key-values for list/combo box)
+%#6 = !textsf(not used)
+%#7 = !textsf(set props and driver macros)
+%#8 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\annot@type@combobox{combobox}
-\newcommand\combo@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\combo@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\combo@@@Box}\egroup
+\newcommand\combo@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@combobox}%
   \@eqFf{\FfCombo}\pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -2979,15 +3224,18 @@
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#8\end\noindent#6#7{#1}}
 %    \end{macrocode}
-%    \begin{macro}{\comboBox}
+%    \begin{macro}{\comboBox}\hskip-\marginparsep
+%    \texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}\darg{\ameta{face-export-list}}}\\
 % A general combo box command.
-%\begin{verbatim}
-% #1 = optional, used to enter any modification of the appearance/actions
-% #2 = the title of the radio field
-% #3 = the width of the bounding rectangle
-% #4 = the height of the bounding rectangle
-% #5 = the face values/export values of combo box.
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the radio field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the face values/export values of combo box)
+%\end{Verbatim}
 %\noindent The default settings for the \cs{comboBox}
 %    \begin{macrocode}
 \def\comboBoxDefaults{\W{1}\S{I}\F{\FPrint}\BC{0 0 0}}
@@ -3124,26 +3372,44 @@
 %   when setting the dimensions of this widget. Made the same
 %   changes for all AcroForm elements and for linking.
 %}
+%\changes{v2.4}{2020/11/28}{Rewrite of \string\cs{push@@Button} to support \string\cs{pdfSpacesOn}}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(not used)
+%#6 = !textsf(set props and driver macros)
+%#7 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\annot@type@button{pushbtn}
-\newcommand\push@@Button[7]{\begingroup
-  \let\nameuse\@nameuse\let\tops\texorpdfstring
+\bgroup\obeyspaces
+\gdef\push@@Button{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\push@@@Button}\egroup
+\newcommand\push@@@Button[7]{\endgroup\begingroup
+  \let\nameuse\@nameuse\let\tops\texorpdfstring%
   \edef\annot@type{\annot@type@button}%
-  \pdfstringdef\Fld@name{#2}\dl@paramlocal
-  \makeJSspecials\ef@preProcDefns
+  \pdfstringdef\Fld@name{#2}\dl@paramlocal%
+  \makeJSspecials\ef@preProcDefns%
   \def\eq@Ff{/Ff \FfPushButton}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \eqf@setDimens{#3}{#4}%
   \@processEvery#7\end\noindent#5#6{#1}}
+
 %    \end{macrocode}
 %    \begin{macro}{\pushButton}
-%\begin{verbatim}
-%#1 = optional, used to enter any modification of the appearance/actions
-%#2 = the title of the button field
-%#3 = the width of the bounding rectangle
-%#4 = the height of the bounding rectangle
-%\end{verbatim}
-%\noindent The default for \cs{pushButton}
+%    \hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    The user command for creating a push button form field.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%\end{Verbatim}
+%The defaults for \cs{pushButton}
 %    \begin{macrocode}
 \def\pushButtonDefaults{%
   \W{1}\S{B}\F{\FPrint}\BC{0 0 0}
@@ -3168,11 +3434,28 @@
 % The basic command for creating check boxes. For \emph{enhanced preview} we define
 % \DescribeMacro\pmpvMrk\cs{pmpvMrk\darg{mrk}}, which defines \cs{pmpv@mrk} that is eventually
 % used in the core of \cs{ef@Bbox}.
+%\changes{v2.4}{2020/11/28}{Rewrite of \string\cs{check@@Box} to support \string\cs{pdfSpacesOn}}
 %    \begin{macrocode}
 \def\pmpvMrk#1{\def\pmpv@mrk{#1}}
 \pmpvMrk{X}
+%    \end{macrocode}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the `on' value, usually Yes)
+%#6 = !textsf(not used)
+%#7 = !textsf(set props and driver macros)
+%#8 = !textsf(every macros)
+%\end{Verbatim}
+%    \begin{macrocode}
 \def\annot@type@checkbox{checkbox}
-\newcommand\check@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\check@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\check@@@Box}\egroup
+\newcommand\check@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \let\#\ef@Hx\edef\annot@type{\annot@type@checkbox}%
   \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
@@ -3195,13 +3478,17 @@
   \@processEvery#8\end\noindent#6#7{#1}}
 %    \end{macrocode}
 %    \begin{macro}{\checkBox}
-%\begin{verbatim}
-%#1 = optional, used to enter any modification of the appearance/actions
-%#2 = the title of the check box field
-%#3 = the width of the bounding rectangle
-%#4 = the height of the bounding rectangle
-%#5 = the 'on value' or export value, the default is "Yes".
-%\end{verbatim}
+%    \hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}\darg{\ameta{on-value}}}
+%    The user interface for creating a check box.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the check box field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the `on value' or export value, the default is "Yes")
+%\end{Verbatim}
 %\noindent The default for \cs{checkBox}
 %    \begin{macrocode}
 \def\checkBoxDefaults{\F{\FPrint}\W{1}\S{S}\BC{0 0 0}}
@@ -3226,7 +3513,7 @@
 % is  available when \DescribeMacro\useNewRadiosOff\cmd{\useNewRadiosOff} is expanded. This is the default.
 %
 % When \DescribeMacro\useNewRadiosOn\cmd{\useNewRadiosOn} is expanded, the new code for radio buttons is used.
-% As a result, you need t\emph{hree compiles} to bring the AUX files up to date. The AUX files now
+% As a result, you need \emph{three compiles} to bring the AUX files up to date. The AUX files now
 % contain PDF object references to radio buttons. Because this new scheme degrades the experience
 % of creating radio buttons (heavy I/O usage), use this option if you and the consumers of your PDF\emph{ do not use}
 % Adobe PDF viewers (on a desktop/laptop).
@@ -3234,6 +3521,7 @@
 % Use the default setting (\cmd{\useNewRadiosOff}) when you will view the PDF in AA/AR and save it; otherwise, if the PDF is to be viewed in non-conforming
 % PDF readers, never having been saved using AA/AR, use the \cmd{\useNewRadiosOn} setting.
 % \changes{v2.3}{2019/06/14}{Rewrote radio buttons so they work in non-conforming PDF readers}
+% \changes{v2.4}{2020/11/28}{Rewrite of \string\cs{radio@@Button} to support \string\cs{pdfSpacesOn}}
 %
 % \medskip\noindent\textbf{Discussion.} The default scheme is to create the radio buttons \begin{quote}\footnotesize
 % \cs{radioButton\darg{\ameta{name}}\darg{\ameta{width}}\darg{\ameta{height}}} ...\\
@@ -3287,38 +3575,33 @@
 %    \begin{macrocode}
 \def\ef@NewRadiosLateOpts{%
 %    \end{macrocode}
-%    We do nothing if the new scheme is not being used.
-%    \begin{macrocode}
-  \ifuseNewRadios
-%    \end{macrocode}
 %     If this is a multi-group radio button field that work independently, we adjust the `on' value, as in this case,
 %     the `on' value is referenced by an index, 0, 1, 2,...
 %    \begin{macrocode}
-    \@nameuse{multigroup@\Fld@name}%
-    \ifx\ef@multigroupradios\ef@YES
-      \ifpdfmarkup
-        \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
-        \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
-      \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
-        \@eqAS{Off}\else % today
-      \ifnum\@nameuse{OnVal@\Fld@name}=%
-        \@nameuse{radioindex@\Fld@name}\relax
-      \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
-    \else
-      \edef\x{\@nameuse{OnVal@\Fld@name}}%
-      \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
-        \@eqAS{Off}\fi
-    \fi
+  \@nameuse{multigroup@\Fld@name}%
+  \ifx\ef@multigroupradios\ef@YES
+    \ifpdfmarkup
+      \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
+      \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
+    \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
+      \@eqAS{Off}\else % today
+    \ifnum\@nameuse{OnVal@\Fld@name}=%
+      \@nameuse{radioindex@\Fld@name}\relax
+    \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
+  \else
+    \edef\x{\@nameuse{OnVal@\Fld@name}}%
+    \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
+      \@eqAS{Off}\fi
+  \fi
 %    \end{macrocode}
 %    If these are groups of radio button fields that light up in unison, we
 %    take to get the \cs{/AS} entry right.
 %    \begin{macrocode}
-    \@nameuse{uniradios@\Fld@name}%
-    \ifx\isRadiosInUnison\ef@YES
-      \edef\x{\@nameuse{value@\Fld@name}}%
-      \ifx\x\ef@thisChoice\expandafter\@eqAS
-        \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
-    \fi
+  \@nameuse{uniradios@\Fld@name}%
+  \ifx\isRadiosInUnison\ef@YES
+    \edef\x{\@nameuse{value@\Fld@name}}%
+    \ifx\x\ef@thisChoice\expandafter\@eqAS
+      \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
   \fi
 }
 %    \end{macrocode}
@@ -3359,8 +3642,23 @@
 %    \end{macrocode}
 %    Finally, we arrive at the low-level radio button command, where
 %    changes for the 2019/06/14 version have been made.
+%The arguments for this command are,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the `on' value, usually Yes)
+%#6 = !textsf(not used)
+%#7 = !textsf(set props and driver macros)
+%#8 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
-\newcommand\radio@@Button[8]{\begingroup\let\#\ef@Hx
+\bgroup\obeyspaces
+\gdef\radio@@Button{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\radio@@@Button}\egroup
+\newcommand\radio@@@Button[8]{\endgroup\begingroup\let\#\ef@Hx
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@radio}%
   \pdfstringdef\Fld@name{#2}%
@@ -3419,15 +3717,18 @@
   \@eqMK{\eq@R\eq@BC\eq@BG/CA(\symbol@choice)\eq@mkIns}%
   \@processEvery#8\end\noindent#6#7{#1}}
 %    \end{macrocode}
-%    \begin{macro}{\radioButton}
-%\begin{verbatim}
-%#1 = optional, used to enter any modification of the appearance/actions
-%#2 = the title of the radio button field
-%#3 = the width of the bounding rectangle
-%#4 = the height of the bounding rectangle
-%#5 = the 'on value' or export value, the default is "Yes"
-%\end{verbatim}
-%\noindent The default for \cs{radioButton}
+%    \begin{macro}{\radioButton}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}\darg{\ameta{on-value}}}
+%    User interface to creating a radio button.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the radio button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(the `on value' or export value, the default is "Yes")
+%\end{Verbatim}
+%The default for \cs{radioButton}
 %    \begin{macrocode}
 \def\radioButtonDefaults{\W{1}\S{S}\BC{0 0 0}\F{\FPrint}}
 %    \end{macrocode}
@@ -3451,6 +3752,7 @@
 % The template for a text field. Within
 % the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
 % and \cs{tops} for \cs{texorpdfstring}.
+%\changes{v2.4}{2020/11/28}{Rewrite of \string\cs{text@@Field} to support \string\cs{pdfSpacesOn}}
 %    \begin{macrocode}
 \def\common@TextFieldCode
 {%
@@ -3472,9 +3774,23 @@
 }
 %    \end{macrocode}
 % The basic text field macro for constructing all other text fields.
+%The arguments for this command are,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(not used)
+%#6 = !textsf(set props and driver macros)
+%#7 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\annot@type@text{textfld}
-\newcommand\text@@Field[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\text@@Field{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\text@@@Field}\egroup
+\newcommand\text@@@Field[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@text}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -3482,14 +3798,17 @@
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#7\end\noindent#5#6{#1}}
 %    \end{macrocode}
-%    \begin{macro}{\textField}
-%\begin{verbatim}
-%#1 = optional, used to enter any modification of the appearance/actions
-%#2 = the title of the text field
-%#3 = the width of the bounding rectangle
-%#4 = the height of the bounding rectangle
-%\end{verbatim}
-%\noindent The default for \cs{textField}
+%    \begin{macro}{\textField}\hskip-\marginparsep
+%    \texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}} The user interface to creating a text field.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the text field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%\end{Verbatim}
+%\noindent The defaults for \cs{textField}
 %    \begin{macrocode}
 \def\textFieldDefaults{\F{\FPrint}\BC{0 0 0}\W{1}\S{S}}
 %    \end{macrocode}
@@ -3519,6 +3838,7 @@
 % The template for a signature field. Within
 % the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
 % and \cs{tops} for \cs{texorpdfstring}.
+%\changes{v2.4}{2020/11/28}{Rewrite of \string\cs{sig@@Field} to support \string\cs{pdfSpacesOn}}
 %    \begin{macrocode}
 \def\common@SigFieldCode
 {%
@@ -3536,9 +3856,23 @@
 }
 %    \end{macrocode}
 % The basic text field macro for constructing all other text fields.
+%The arguments for this command are,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the button field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%#5 = !textsf(not used)
+%#6 = !textsf(set props and driver macros)
+%#7 = !textsf(every macros)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\annot@type@sig{sigfld}
-\newcommand\sig@@Field[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\sig@@Field{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\sig@@@Field}\egroup
+\newcommand\sig@@@Field[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@sig}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -3546,14 +3880,17 @@
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \@processEvery#7\end\noindent#5#6{#1}}
 %    \end{macrocode}
-%    \begin{macro}{\sigField}
-%\begin{verbatim}
-%#1 = optional, used to enter any modification of the appearance/actions
-%#2 = the title of the text field
-%#3 = the width of the bounding rectangle
-%#4 = the height of the bounding rectangle
-%\end{verbatim}
-%\noindent Defaults for \cs{sigField}
+%    \begin{macro}{\sigField}\hskip-\marginparsep
+%    \texttt{[\ameta{options}]\darg{\ameta{fld-name}}\darg{\ameta{wd}}^^A
+%    \darg{\ameta{ht}}} The user interface to creating a signature field.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars=!(),codes={\catcode`\%=9}]
+%#1 = !textsf(optional, used to enter any modification of the appearance/actions)
+%#2 = !textsf(the title of the text field)
+%#3 = !textsf(the width of the bounding rectangle)
+%#4 = !textsf(the height of the bounding rectangle)
+%\end{Verbatim}
+%Defaults for \cs{sigField}
 %    \begin{macrocode}
 \def\sigFieldDefaults{\F{\FPrint}\BC{}\BG{}\W{1}\S{S}}
 %    \end{macrocode}
@@ -3568,12 +3905,13 @@
 %    \end{macrocode}
 %    \end{macro}
 %
-% \section{Additional Link Support}
+% \section{Additional Link Support}\label{linkSupport}
 %
 % The links in \textsf{hyperref} are not sufficiently general to
 % allow actions other than jumping. I've included a general link
 % that increases the usage of the links provided by
 % \textsf{hyperref}.
+%\changes{v2.4}{2020/11/28}{Rewrite of \string\cs{set@@Link} to support \string\cs{pdfSpacesOn}}
 % \paragraph{Common Link Code.} All the link commands eventually come back
 % to this template for constructing a link annotation.
 %    \begin{macrocode}
@@ -3588,7 +3926,7 @@
 %    \end{macrocode}
 % \cs{set@@Link} is the low-level link command and is the building block of all the
 % other, more user-friendly link commands. Takes seven parameters:
-%\begin{enumerate}
+%\begin{enumerate}\sffamily
 %\item[\texttt{\#1}:] Optional arguments to modify the appearance and actions of the link.
 %\item[\texttt{\#2}:] The width of the bounding rectangle.
 %\item[\texttt{\#3}:] The height of the bounding rectangle.
@@ -3599,7 +3937,10 @@
 %\end{enumerate}
 %    \begin{macrocode}
 \def\annot@type@link{link}
-\newcommand\set@@Link[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\set@@Link{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\set@@@Link}\egroup
+\newcommand\set@@@Link[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \dl@paramlocal
   \makeJSspecials
@@ -3628,18 +3969,19 @@
   \let\ef@colorthislink\relax\fi}
 \AtBeginDocument{\setDef@ultLinkColor}
 %    \end{macrocode}
-%    \begin{macro}{\setLink}
+%    \begin{macro}{\setLink}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{text}}}
 % \cs{setLink} is the basic high-level link command, it is used to surround text
 % with a link annotation.
-%    \begin{macro}{\setLinkText}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%\setLink[\A{\JS{this.pageNum=6;}}\Color{1 0 0}]{Go There!}
+%\end{Verbatim}
+%    \begin{macro}{\setLinkText}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{text}}}
 % \cs{setLinkText} is a synonym for \cs{setLink}.
-%    \begin{macro}{\mlhypertext}
+%    \begin{macro}{\mlhypertext}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{text}}}
 % A command defined in the \pkg{aeb\_mlink} package.
-%    \begin{macro}{\mlsetLink}
+%    \begin{macro}{\mlsetLink}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{text}}}
 % \cs{mlsetLink} expands to \cs{mlhypertext}
-%\begin{verbatim}
-% \setLink[\A{\JS{this.pageNum=6;}}\Color{1 0 0}]{Go There!}
-%\end{verbatim}
 % \paragraph{Link Parameters.} These high-level links takes two parameters, one of which
 % is optional.
 %\begin{enumerate}
@@ -3723,12 +4065,13 @@
 %    \end{macro}
 %    \begin{macro}{\setLinkBbox}
 % Set a link around a |\parbox|.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\catcode`\%=9}]
 %\setLinkBbox [\Color{1 0 0}}]{50bp}{30bp}[b]{\centering Press Me!}
-%\end{verbatim}
+%\end{Verbatim}
 % \paragraph{Link Parameters.} There are four parameters, two of which
 % are optional.
-%\begin{enumerate}
+%\begin{enumerate}\sffamily
 %\item[\texttt{[\#1]}:] Optional key-value pairs to change the appearance or action
 % of this link.
 %\item[\texttt{\#2}:] The width of the \cs{parbox}.
@@ -3806,10 +4149,6 @@
 %    \begin{macrocode}
 %<*userinterface>
 %    \end{macrocode}
-% Let's bring in the \textsf{xkeyval} package.
-%    \begin{macrocode}
-%\usepackage{xkeyval}
-%    \end{macrocode}
 % The |\ui| interface is undefined if the \texttt{useui} option is not taken. We use this fact
 % to send a message to the user that using |\ui| most accompany the \texttt{useui}.
 %    \begin{macrocode}
@@ -3829,7 +4168,7 @@
 %    \begin{macrocode}
 \def\getargs#1#2{\def\aeb@argi{#1}\def\aeb@argii{#2}}
 \def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
-    {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
+  {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
 \def\aeb@exiii{\expandafter\expandafter\expandafter}
 \newtoks\ef@flagtoks
 \newtoks\ef@jstoks
@@ -3847,25 +4186,25 @@
 %    \begin{macrocode}
 \define@choicekey{eforms}{border}[\val\nr]{visible,invisible}
 {%
-    \ifcase\nr
+  \ifcase\nr
 %    \end{macrocode}
 % Author has chosen a visible border |\eq@W@buffered|.
 %    \begin{macrocode}
-        \def\eq@visibleborder{1}%
-        \ifx\eq@W\@empty
-            \ifx\eq@W@buffered\@empty\@eqW{1}\else
-            \@eqW{\eq@W@buffered}\fi
-        \else
-            \ifnum\eq@W@value=0 \@eqW{1}\fi
-            \ifx\eq@W@buffered\@empty\else
-            \@eqW{\eq@W@buffered}\fi
-        \fi
-        \@eqBorder{0 0 \eq@W@value}%
-    \or
-        % author has chosen invisible border
-        \def\eq@visibleborder{0}\@eqW{}%
-        \@eqBorder{0 0 0}\@eqBC{}%
+    \def\eq@visibleborder{1}%
+    \ifx\eq@W\@empty
+      \ifx\eq@W@buffered\@empty\@eqW{1}\else
+      \@eqW{\eq@W@buffered}\fi
+    \else
+      \ifnum\eq@W@value=0 \@eqW{1}\fi
+      \ifx\eq@W@buffered\@empty\else
+      \@eqW{\eq@W@buffered}\fi
     \fi
+    \@eqBorder{0 0 \eq@W@value}%
+  \or
+    % author has chosen invisible border
+    \def\eq@visibleborder{0}\@eqW{}%
+    \@eqBorder{0 0 0}\@eqBC{}%
+  \fi
 }
 %    \end{macrocode}
 % This choice key is for the \texttt{linewidth}\IndexKey{linewidth} of a link or form. The user interface choices
@@ -3874,62 +4213,66 @@
 %    \begin{macrocode}
 \define@choicekey{eforms}{linewidth}[\val\nr]{thin,medium,thick}
 {%
-    \ifx\annot@type\annot@type@link
+  \ifx\annot@type\annot@type@link
 %    \end{macrocode}
 % This is a link, so, depending on whether the color package is loaded, we show or don't
 % show the boundary, depending on the explicate choices of the author
 %    \begin{macrocode}
-        \ifx\eq@visibleborder\@empty
+    \ifx\eq@visibleborder\@empty
 %    \end{macrocode}
 % Author has not committed to a border type, so we'll assume the default
 %    \begin{macrocode}
-            \ifnum\eq@bordervisibledefault=0
+      \ifnum\eq@bordervisibledefault=0
 %    \end{macrocode}
 % A color package is loaded, use invisible border by default.
 %    \begin{macrocode}
-                \edef\eq@W@buffered{\ifcase\nr 1\or2\or3\fi}%
-                \@eqW{}%
-            \else
+        \edef\eq@W@buffered{\ifcase\nr 1\or2\or3\fi}%
+        \@eqW{}%
+      \else
 %    \end{macrocode}
 % No color is loaded, show the border.
 %    \begin{macrocode}
-                \ifcase\nr \@eqW{1}\or\@eqW{2}\or
-                \@eqW{3}\else\@eqW{1}\fi\@eqBorder{0 0 \eq@W@value}%
-            \fi
-        \else
+        \ifcase\nr\@eqW{1}\or\@eqW{2}\or
+          \@eqW{3}\else\@eqW{1}\fi
+          \@eqBorder{0 0 \eq@W@value}%
+      \fi
+    \else
 %    \end{macrocode}
 % Author has set the border type before line width, we'll do what the
 % author wants. If invisible, ignore |\W|, if visible obey |\W|.
 %    \begin{macrocode}
-            \ifnum\eq@visibleborder=1 % visible border
-                \ifcase\nr \@eqW{1}\or\@eqW{2}\or
-                \@eqW{3}\else\@eqW{1}\fi\@eqBorder{0 0 \eq@W@value}%
-            \fi
-        \fi
-    \else
+      \ifnum\eq@visibleborder=1 % visible border
+        \ifcase\nr\@eqW{1}\or\@eqW{2}\or
+          \@eqW{3}\else\@eqW{1}\fi
+        \@eqBorder{0 0 \eq@W@value}%
+      \fi
+    \fi
+  \else
 %    \end{macrocode}
 % This is not a link, its a form, so things are easier. The invisible border will override
 % the linewidth. If the author wants a border, s/he better get her/his act together and
 % remove \texttt{border=invisible}.
 %    \begin{macrocode}
-        \ifx\eq@visibleborder\@empty
+    \ifx\eq@visibleborder\@empty
 %    \end{macrocode}
 % If the value of |\eq@visibleborder|, author has not used the border key at this time,
 % so just set the \texttt{linewidth} as stated.
 %    \begin{macrocode}
-            \ifcase\nr \@eqW{1}\or\@eqW{2}\or
-            \@eqW{3}\else\@eqW{1}\fi\@eqBorder{0 0 \eq@W@value}%
-            \edef\eq@W@buffered{\ifcase\nr 1\or2\or3\fi}%
-        \else
+      \ifcase\nr \@eqW{1}\or\@eqW{2}\or
+        \@eqW{3}\else\@eqW{1}\fi
+      \@eqBorder{0 0 \eq@W@value}%
+      \edef\eq@W@buffered{\ifcase\nr1\or2\or3\fi}%
+    \else
 %    \end{macrocode}
 % The author has used the border key, so we don't need to save this value.
 %    \begin{macrocode}
-            \ifnum\eq@visibleborder>0
-                \ifcase\nr \@eqW{1}\or\@eqW{2}\or
-                \@eqW{3}\else\@eqW{1}\fi\@eqBorder{0 0 \eq@W@value}%
-            \fi
-        \fi
+      \ifnum\eq@visibleborder>0
+        \ifcase\nr \@eqW{1}\or\@eqW{2}\or
+          \@eqW{3}\else\@eqW{1}\fi
+        \@eqBorder{0 0 \eq@W@value}%
+      \fi
     \fi
+  \fi
 }
 \let\eq@visibleborder\@empty
 \let\eq@W@buffered\@empty
@@ -3995,7 +4338,7 @@
 % of the field can be set, such visibility, printability, readonly,
 % orientation, captions (for button), values, default values, etc.
 % can be set.
-%
+%\par\medskip\noindent
 % The \texttt{annotflags}\IndexKey{annotflags} is a bit field, possible values are \texttt{hidden}, \texttt{print},
 % \texttt{-print}, \texttt{noview}, and \texttt{lock}. Multiple values can
 % be specified. The values are ``or-ed'' together. Most all forms are printable
@@ -4004,19 +4347,19 @@
 % locked, so the field cannot be moved through the UI.
 %    \begin{macrocode}
 \define@key{eforms}{annotflags}[]{\ef@flagtoks={}%
-    \setkeys{annotflags}{#1}}
+  \setkeys{annotflags}{#1}}
 \@tfor\ef@flagopts:={{hidden}{FHidden}}{{print}{FPrint}}{{noprint}%
-    {FNoPrint}}{{-print}{FNoPrint}}{{noview}{FNoView}}{{lock}{FLock}}%
-    \do{\expandafter\getargs\ef@flagopts
-    \edef\temp@expand@def{%
-        \noexpand\define@key{annotflags}{\aeb@argi}[true]{%
-            \noexpand\ef@flagtoks=%
-                \noexpand\expandafter{\noexpand\ef@passedArgs}%
-            \noexpand\edef\noexpand\ef@passedArgs{\noexpandiii%
-                \F{\noexpandiii\csname\aeb@argii\noexpandiii\endcsname}%
-                \noexpand\the\noexpand\ef@flagtoks}%
-        }%
-    }\temp@expand@def
+  {FNoPrint}}{{-print}{FNoPrint}}{{noview}{FNoView}}{{lock}{FLock}}%
+  \do{\expandafter\getargs\ef@flagopts
+    \edef\temp@expand@def{\noexpand
+    \define@key{annotflags}{\aeb@argi}[true]{%
+      \noexpand\ef@flagtoks=\noexpand
+        \expandafter{\noexpand\ef@passedArgs}%
+      \noexpand\edef\noexpand\ef@passedArgs{\noexpandiii
+        \F{\noexpandiii\@nameuse{\aeb@argii\noexpandiii}}%
+        \noexpand\the\noexpand\ef@flagtoks}%
+    }%
+  }\temp@expand@def
 }
 %    \end{macrocode}
 % A large number of fields that sets a number of properties of a field. Some of these
@@ -4024,40 +4367,39 @@
 % These appear in the first of the paired groups listed below. Normally, a document
 % author would not specify \texttt{radio}, \texttt{pushbutton} or \texttt{combo}.
 % These properties are used
-% by eforms to construct a radio button field, a push button and a combo box.
+% by \pkg{eforms} to construct a radio button field, a push button and a combo box.
 % The others can be used as appropriate.
 %    \begin{macrocode}
 \define@key{eforms}{fieldflags}[]{\ef@flagtoks={}%
-    \setkeys{fieldflags}{#1}}
+  \setkeys{fieldflags}{#1}}
 \@tfor\ef@flagopts:={{readonly}{FfReadOnly}}{{required}{FfRequired}}%
-    {{noexport}{FfNoExport}}{{multiline}{FfMultiline}}%
-    {{password}{FfPassword}}{{notoggleoff}{FfNoToggleToOff}}%
-    {{radio}{FfRadio}}{{pushbutton}{FfPushButton}}{{combo}{FfCombo}}%
-    {{edit}{FfEdit}}{{sort}{FfSort}}{{fileselect}{FfFileSelect}}%
-    {{multiselect}{FfMultiSelect}}{{nospellcheck}{FfDoNotSpellCheck}}%
-    {{noscrolling}{FfDoNotScroll}}{{comb}{FfComb}}%
-    {{radiosinunison}{FfRadiosInUnison}}%
-    {{commitonchange}{FfCommitOnSelChange}}{{richtext}{FfRichText}}\do{%
-    \expandafter\getargs\ef@flagopts
-    \edef\temp@expand@def{%
-        \noexpand\define@key{fieldflags}{\aeb@argi}[true]%
-        {%
-            \noexpand\ef@flagtoks=\noexpand\expandafter{%
-                \noexpand\ef@passedArgs}%
-            \noexpand\edef\noexpand\ef@passedArgs{\noexpandiii%
-               \Ff{\noexpandiii\csname\aeb@argii\noexpandiii\endcsname}%
-               \noexpand\the\noexpand\ef@flagtoks}%
-        }%
-    }\temp@expand@def
+  {{noexport}{FfNoExport}}{{multiline}{FfMultiline}}%
+  {{password}{FfPassword}}{{notoggleoff}{FfNoToggleToOff}}%
+  {{radio}{FfRadio}}{{pushbutton}{FfPushButton}}{{combo}{FfCombo}}%
+  {{edit}{FfEdit}}{{sort}{FfSort}}{{fileselect}{FfFileSelect}}%
+  {{multiselect}{FfMultiSelect}}{{nospellcheck}{FfDoNotSpellCheck}}%
+  {{noscrolling}{FfDoNotScroll}}{{comb}{FfComb}}%
+  {{radiosinunison}{FfRadiosInUnison}}%
+  {{commitonchange}{FfCommitOnSelChange}}{{richtext}{FfRichText}}\do{%
+  \expandafter\getargs\ef@flagopts
+  \edef\temp@expand@def{\noexpand
+    \define@key{fieldflags}{\aeb@argi}[true]{\noexpand
+      \ef@flagtoks=\noexpand\expandafter{\noexpand
+        \ef@passedArgs}\noexpand
+      \edef\noexpand\ef@passedArgs{\noexpandiii
+        \Ff{\noexpandiii\@nameuse{\aeb@argii\noexpandiii}}%
+        \noexpand\the\noexpand\ef@flagtoks}%
+    }%
+  }\temp@expand@def
 }
 %    \end{macrocode}
 % Enter a text value to appear as a tool tip\IndexKey{tooltip}. For example,
-% \texttt{tooltip={Hi, press me and see what happens!}}. Enclose in
+% \texttt{tooltip={\darg{\textsf{Hi, press me and see what happens!}}}}. Enclose in
 % parentheses if the text string contains a comma.
 %    \begin{macrocode}
 \define@key{eforms}{tooltip}{\@eqTU{#1}}
 %    \end{macrocode}
-% The default value\IndexKey{default}\IndexKey{defaultstyle} of a field (text, list, combobox) what is used
+% The default value\IndexKey{default}\IndexKey{defaultstyle} of a field (text, list, combo box) what is used
 % when the field is reset. Example: \texttt{default=Name}
 %    \begin{macrocode}
 \define@key{eforms}{default}{\@eqDV{#1}}
@@ -4111,14 +4453,7 @@
 % The color of the text\IndexKey{textcolor} in the field. This can be in \textsf{G}, \textsf{RGB} or \textsf{CMYK} color
 % space.
 %    \begin{macrocode}
-\define@key{eforms}{textcolor}{%
-    \@eqtextColor{#1}%
-%    \aeb@cntargs#1 \\\relax
-%    \ifcase\aeb@nArgs\relax\or
-%    \@eqtextColor{#1 g}\or\or
-%    \@eqtextColor{#1 rg}\or
-%    \@eqtextColor{#1 k}\fi
-}
+\define@key{eforms}{textcolor}{\@eqtextColor{#1}}
 %    \end{macrocode}
 % Use \texttt{maxlength}\IndexKey{maxlength} to limit the number of characters input into a text field.
 % Example: \texttt{maxlength=12}.
@@ -4133,43 +4468,44 @@
 \define@key{eforms}{rollappr}{\@eqRI{#1}}
 \define@key{eforms}{downappr}{\@eqIX{#1}}
 \define@choicekey{eforms}{layout}[\val\nr]{labelonly,icononly,%
-    icontop,iconbottom,iconleft,iconright,labelover}{%
-    \ifx\annot@type\annot@type@button
-        \expandafter\@eqTP\expandafter{\nr}\fi}{}
+  icontop,iconbottom,iconleft,iconright,labelover}{%
+  \ifx\annot@type\annot@type@button\expandafter
+    \@eqTP\expandafter{\nr}\fi}{}
 %    \end{macrocode}
 % Scaling keys, \texttt{scalewhen}\IndexKey{scalewhen} and \texttt{scale}\IndexKey{scale}
 %    \begin{macrocode}
 \define@choicekey{eforms}{scalewhen}[\val\nr]{always,never,%
-    iconbig,iconsmall}{%
-    \ifx\annot@type\annot@type@button
-    \ifcase\nr\relax
-        \def\eq@@SW{A}\or
-        \def\eq@@SW{N}\or
-        \def\eq@@SW{B}\or
-        \def\eq@@SW{S}\else
-        \def\eq@@SW{A}\fi
-    \expandafter\@eqSW\expandafter{\eq@@SW}\fi}{}
+  iconbig,iconsmall}{%
+  \ifx\annot@type\annot@type@button
+  \ifcase\nr\relax
+    \def\eq@@SW{A}\or
+    \def\eq@@SW{N}\or
+    \def\eq@@SW{B}\or
+    \def\eq@@SW{S}\else
+    \def\eq@@SW{A}\fi
+  \expandafter\@eqSW\expandafter{\eq@@SW}\fi}{}
 \define@choicekey{eforms}{scale}[\val\nr]{proportional,%
-    nonproportional}{%
-    \ifx\annot@type\annot@type@button
-    \ifcase\nr\relax
-        \def\eq@@ST{P}\or
-        \def\eq@@ST{A}\else
-        \def\eq@@ST{P}\fi
-    \expandafter\@eqST\expandafter{\eq@@ST}\fi}{}
+  nonproportional}{%
+  \ifx\annot@type\annot@type@button
+  \ifcase\nr\relax
+      \def\eq@@ST{P}\or
+      \def\eq@@ST{A}\else
+      \def\eq@@ST{P}\fi
+  \expandafter\@eqST\expandafter{\eq@@ST}\fi}{}
 %    \end{macrocode}
 % Positioning keys, \texttt{position}\IndexKey{position} and \texttt{fitbounds}\IndexKey{fitbounds}
 %    \begin{macrocode}
 \define@key{eforms}{position}{\@eqPA{#1}}
 \define@choicekey{eforms}{fitbounds}[\val\nr]{true,false}[true]{%
-    \ifx\annot@type\annot@type@button
+  \ifx\annot@type\annot@type@button
     \ifcase\nr\relax
-        \def\eq@@FB{true}\or
-        \def\eq@@FB{false}\else
-        \def\eq@@FB{false}\fi
-    \expandafter\@eqFB\expandafter{\eq@@FB}\fi}{}
+      \def\eq@@FB{true}\or
+      \def\eq@@FB{false}\else
+      \def\eq@@FB{false}\fi
+  \expandafter\@eqFB\expandafter{\eq@@FB}\fi}{}
 %    \end{macrocode}
-% This set of key-values\IndexKey{norm}\IndexKey{roll}\IndexKey{down} are designed to fill in the AP dictionary for the check box
+% This set of key-values\IndexKey{norm}\IndexKey{roll}\IndexKey{down} are
+% designed to fill in the AP dictionary for the check box
 % and the radio button field.
 %\begin{verbatim}
 % appr={norm={on={},off={}}},roll={on={},off={}}},down={on={},off={}}}}
@@ -4180,10 +4516,10 @@
 \define@key{efappr}{roll}[]{\def\efappr@roll{#1}}
 \define@key{efappr}{down}[]{\def\efappr@down{#1}}
 \setkeys{efappr}{norm,roll,down}
-\define@key{efappr@state}{on}[]{%
-    \expandafter\def\csname \ef@state @on\endcsname{#1}}
-\define@key{efappr@state}{off}[]{%
-    \expandafter\def\csname \ef@state @off\endcsname{#1}}
+\define@key{efappr@state}{on}[]{\expandafter
+  \def\csname \ef@state @on\endcsname{#1}}
+\define@key{efappr@state}{off}[]{\expandafter
+  \def\csname \ef@state @off\endcsname{#1}}
 \let\norm@on\@empty\let\norm@off\@empty
 \let\roll@on\@empty\let\roll@off\@empty
 \let\down@on\@empty\let\down@off\@empty
@@ -4192,22 +4528,22 @@
 % and the radio button field.
 %\begin{macrocode}
 \define@key{eforms}{appr}{\setkeys{efappr}{#1}%
-    \def\ef@state{norm}%
-    \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@norm}}%
-    \ef@edef@tmp\def\ef@state{roll}%
-    \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@roll}}%
-    \ef@edef@tmp\def\ef@state{down}%
-    \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@down}}%
-    \ef@edef@tmp\def\eq@AP{%
-        /AP<<
-            \ifx\efappr@norm\@empty\else/N <<
-                \eq@On\space{\norm@on}/Off {\norm@off}>>\fi
-            \ifx\efappr@roll\@empty\else/R <<
-                \eq@On\space{\roll@on}/Off {\roll@off}>>\fi
-            \ifx\efappr@down\@empty\else/D <<
-                \eq@On\space{\down@on}/Off {\down@off}>>\fi
-        \space>>
-    }%
+  \def\ef@state{norm}%
+  \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@norm}}%
+  \ef@edef@tmp\def\ef@state{roll}%
+  \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@roll}}%
+  \ef@edef@tmp\def\ef@state{down}%
+  \edef\ef@edef@tmp{\noexpand\setkeys{efappr@state}{\efappr@down}}%
+  \ef@edef@tmp\def\eq@AP{%
+    /AP<<%
+      \ifx\efappr@norm\@empty\else/N <<%
+        \eq@On\space{\norm@on}/Off {\norm@off}>>\fi
+      \ifx\efappr@roll\@empty\else/R <<%
+        \eq@On\space{\roll@on}/Off {\roll@off}>>\fi
+      \ifx\efappr@down\@empty\else/D <<%
+        \eq@On\space{\down@on}/Off {\down@off}>>\fi
+    \space>>
+  }%
 }
 %    \end{macrocode}%
 % \subsection{Miscellaneous keys}
@@ -4216,31 +4552,31 @@
 %    \begin{macrocode}
 \define@choicekey{eforms}{autocenter}[\val\nr]{yes,no}
 {%
-    \ifcase\nr\relax\@eqautoCenter{y}\or
-    \@eqautoCenter{n}\fi
+  \ifcase\nr\relax\@eqautoCenter{y}\or
+  \@eqautoCenter{n}\fi
 }{}
 \define@choicekey{eforms}{inline}[\val\nr]{yes,no}
 {%
-    \ifcase\nr\relax\@eqinline{y}\or
-    \@eqinline{n}\fi
+  \ifcase\nr\relax\@eqinline{y}\or
+  \@eqinline{n}\fi
 }{}
 \define@choicekey{eforms}{mlfix}[\val\nr]{yes,no}
 {%
-    \ifcase\nr\relax\@eqmlfix{y}\or
-    \@eqmlfix{n}\fi
+  \ifcase\nr\relax\@eqmlfix{y}\or
+  \@eqmlfix{n}\fi
 }{}
 \define@choicekey{eforms}{importicons}[\val\nr]{yes,no}
 {%
-    \ifcase\nr\relax\@eqimportIcons{y}\or
-    \@eqimportIcons{n}\fi
+  \ifcase\nr\relax\@eqimportIcons{y}\or
+  \@eqimportIcons{n}\fi
 }{}
 \define@key{eforms}{mlstrut}[\strut]{\@eqmlstrut{#1}}
 \define@key{eforms}{mlcrackat}[]{\@eqmlcrackat{#1}}
 \define@key{eforms}{mlcrackinat}[]{\@eqmlcrackinsat{#1}}
 \define@choicekey{eforms}{mlhyph}[\val\nr]{yes,no}
 {%
-    \ifcase\nr\relax\@eqmlhyph{y}\or
-    \@eqmlhyph{n}\fi
+  \ifcase\nr\relax\@eqmlhyph{y}\or
+  \@eqmlhyph{n}\fi
 }{}
 %    \end{macrocode}
 %    \changes{v2.10}{2019/03/16}{Added \string\cs{cmd} to optional args of forms}
@@ -4279,33 +4615,77 @@
   \ef@temp@expand
 }
 %    \end{macrocode}
-% \texttt{symbolchoice}\IndexKey{symbolchoice}is used with a checkbox or radio button field. This sets the symbol
+% \texttt{symbolchoice}\IndexKey{symbolchoice} is used with a checkbox or radio button field. This sets the symbol
 % that appears in the field with the box is checked, choices are
 % \texttt{check}, \texttt{circle}, \texttt{cross}, \texttt{diamond},
 % \texttt{square}, and \texttt{star}.
 %    \begin{macrocode}
 \define@choicekey{eforms}{symbolchoice}[\val\nr]%
-    {check,circle,cross,diamond,square,star}
-    {\expandafter\@eqsymbolchoice\expandafter{\val}}{}
+  {check,circle,cross,diamond,square,star}
+  {\expandafter\@eqsymbolchoice\expandafter{\val}}{}
+%    \end{macrocode}
+%\paragraph*{Set rectangle keys}
+%The dimensions of the bounding rectangle is generally passed to the widget
+%using required arguments; however, for \pkg{exerquiz}, those arguments are
+%not directly accessible. The \IndexKey{rectW}\key{rectW} and \IndexKey{rectH}\key{rectH}
+%may be used to pass the dimensions of the rectangle through the optional
+%optional argument of the field.
+%    \begin{macrocode}
+\define@key{eforms}{rectW}{\@eqrectW{#1}}
+\define@key{eforms}{rectH}{\@eqrectH{#1}}
+%    \end{macrocode}
+%\paragraph*{Resizing keys}
+%These keys resize the field while preserving the aspect ratio; these are
+%\IndexKey{width}\key{width}, \IndexKey{height}\key{height}, and \IndexKey{scalefactor}\key{scalefactor}
+%    \begin{macrocode}
+\define@key{eforms}{width}{\@eqwidth{#1}}
+\define@key{eforms}{height}{\@eqheight{#1}}
+\define@key{eforms}{scalefactor}{\@eqscalefactor{#1}}
 %    \end{macrocode}
 %
 % \subsection{The Signed Tab}
 %
 % A signature field has a signed tab. On that tab is an option to mark a set of fields
-% as readonly (locked). The locked key controls that option.
+% as readonly (locked). The locked key controls that option.\medskip
 %
-% The \texttt{lock}\IndexKey{lock} key is used with signature fields, currently, there is
-% no nice user interface to this key. Typical entries are
-%\begin{verbatim}
-%   lock={/Action/All}          % lock all fields in the doc
-%   lock={/Action/Include       % lock all fields listed in Fields
-%         /Fields [(field1)(field2)...]}
-%   lock={/Action/Exclude       % lock  all fields not listed in Fields
-%         /Fields [(field1)(field2)...]}
-%\end{verbatim}
+% {\noindent}The \texttt{lock}\IndexKey{lock} key is used with signature fields.
+% Typical entries, using \emph{raw PDF markup}, are,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%lock={/Action/All}          !% !textsf~lock all fields in the doc@
+%lock={/Action/Include       !% !textsf~lock all fields listed in Fields@
+%      /Fields [(field1)(field2)...]}
+%lock={/Action/Exclude       !% !textsf~lock  all fields not listed in Fields@
+%      /Fields [(field1)(field2)...]}
+%\end{Verbatim}
+%Simplified syntax for UF key-values:
+%\changes{v2.3.6}{2020/10/10}{Addition support for the \string\texttt{lock} key}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%lock={action=all}             !% !textsf~lock all fields in the doc@
+%lock={action=include,
+%   fields={field1,field2,...}}!% !textsf~lock all fields listed in Fields@
+%lock={action=exclude,
+%   fields{field1,field2,...}} !% !textsf~lock all fields not listed in Fields@
+%\end{Verbatim}
 %
 %    \begin{macrocode}
-\define@key{eforms}{lock}{\@eqLock{#1}}
+\define@key{eforms}{lock}{\setkeys{lckflds}{#1}%
+  \ifx\lckFlds\@empty
+    \edef\ActnArgs{\noexpand\Action\noexpand\All}\else
+    \edef\ActnArgs{\noexpand\Action\expandafter
+      \noexpand\lckActnArg{\lckFlds}}\fi
+  \expandafter\@eqLock\expandafter{\ActnArgs}%
+}
+\define@choicekey{lckflds}{action}[\val\nr]{all,include,exclude}
+{%
+  \ifcase\nr\relax
+  \def\lckActnArg{\All}\or
+  \def\lckActnArg{\IncludeFields}\or
+  \def\lckActnArg{\ExcludeFields}\fi
+}{}
+\define@key{lckflds}{fields}{\def\lckFlds{#1}}
+\let\lckFlds\@empty
 %    \end{macrocode}
 %
 % Another option that is included in the Signed tab is titled ``This script executes
@@ -4344,18 +4724,13 @@
             % Jump within the file
             \def\ef@subtype{/S/GoTo }%
             \ifcase\eq@drivernum
-                \def\ef@formatpage{{Page\ef@page}}%
-            \or
-                \def\ef@formatpage{\pdfpageref\ef@page\space\space 0 R}%
-            \or
-                \def\ef@formatpage{@page\ef@page}%
-            \fi
+              \def\ef@formatpage{{Page\ef@page}}\or
+              \def\ef@formatpage{\pdfpageref\ef@page\space\space 0 R}\or
+              \def\ef@formatpage{@page\ef@page}\fi
             \let\ef@open\@empty
             \let\ef@formatfile\@empty
         \else
             % Jump to another PDF
-%            \ifx\ef@linktxtcolor@set0%
-%                \def\ef@thislinkcolor{\@filecolor}\fi
             \def\ef@subtype{/S/GoToR }%
             \count0=\ef@page\advance\count0by-1
             \edef\ef@formatpage{\the\count0 }%
@@ -4364,25 +4739,21 @@
         \ifx\ef@goto@targetdest\@empty
             \ifx\ef@labeldest\@empty
             % we will jump to a page, it might be the default page
-                \expandafter\@eqA\expandafter{\ef@subtype
-                    /D[\ef@formatpage\ef@view]%
-                    \ef@formatfile\ef@open}%
-            \else
+              \expandafter\@eqA\expandafter{\ef@subtype
+                /D[\ef@formatpage\ef@view]\ef@formatfile\ef@open}\else
             % jump to a label
-                \expandafter\@eqA\expandafter{\ef@subtype%
-                    /D (\labelRef{\ef@labeldest})%
-                    \ef@formatfile\ef@open}%
-            \fi
+              \expandafter\@eqA\expandafter{\ef@subtype%
+                /D (\labelRef{\ef@labeldest})%
+                \ef@formatfile\ef@open}\fi
         \else
         % jump to a target
-            \expandafter\@eqA\expandafter{\ef@subtype%
-                /D (\ef@goto@targetdest)%
-                \ef@formatfile\ef@open}%
+          \expandafter\@eqA\expandafter{\ef@subtype%
+            /D (\ef@goto@targetdest)\ef@formatfile\ef@open}%
         \fi
     \else % go to url
         \ifx\ef@goto@openparams\@empty
-            \@eqA{/S/URI/URI(\ef@goto@url)}\else
-            \@eqA{/S/URI/URI(\ef@goto@url\#\ef@goto@openparams)}%
+          \@eqA{/S/URI/URI(\ef@goto@url)}\else
+          \@eqA{/S/URI/URI(\ef@goto@url\#\ef@goto@openparams)}%
         \fi
     \fi
 }
@@ -4458,7 +4829,7 @@
 %    \begin{macrocode}
 \define@choicekey{efgoto}{open}[\val\nr]{userpref,new,existing}
 {%
-    \ifcase\nr\relax
+  \ifcase\nr\relax
     \let\ef@open\@empty\or
     \def\ef@open{/NewWindow true }\or
     \def\ef@open{/NewWindow false }\fi
@@ -4479,20 +4850,20 @@
 %    (2017/01/03) Use \cs{cxkvsetkeys} for \texttt{launch}
 %    \changes{v2.9g}{2017/01/03}{Use \string\cs{cxkvsetkeys} for \string\texttt{launch}}
 %    \begin{macrocode}
-    \cxkvsetkeys{eflaunch}{#1}%
-    \@eqA{/S/Launch\ifx\ef@launch@file\@empty\else
-        /F(\ef@launch@file)\fi\ef@launch@open
-        \ifx\ef@launch@win\@empty\else
-            /Win<<\ifx\ef@launchwin@file\@empty
-            /F(\ef@launch@file)\else/F(\ef@launchwin@file)\fi
-            \ifx\ef@launchwin@params\@empty\else
-                /P(\ef@launchwin@params)\fi
-            \ifx\ef@launchwin@open\@empty\else
-                /O(\ef@launchwin@open)\fi
-            \ifx\ef@launchwin@dir\@empty\else
-                /D(\ef@launchwin@dir)\fi>>
-        \fi
-        }%
+  \cxkvsetkeys{eflaunch}{#1}%
+  \@eqA{/S/Launch\ifx\ef@launch@file\@empty\else
+    /F(\ef@launch@file)\fi\ef@launch@open
+    \ifx\ef@launch@win\@empty\else
+      /Win<<\ifx\ef@launchwin@file\@empty
+      /F(\ef@launch@file)\else/F(\ef@launchwin@file)\fi
+      \ifx\ef@launchwin@params\@empty\else
+        /P(\ef@launchwin@params)\fi
+      \ifx\ef@launchwin@open\@empty\else
+        /O(\ef@launchwin@open)\fi
+      \ifx\ef@launchwin@dir\@empty\else
+        /D(\ef@launchwin@dir)\fi>>
+    \fi
+  }%
 }
 %    \end{macrocode}
 %    The value of the \texttt{file} key can be an application or a file. If a
@@ -4510,7 +4881,7 @@
 %    \begin{macrocode}
 \define@choicekey{eflaunch}{open}[\val\nr]{userpref,new,existing}
 {%
-    \ifcase\nr\relax
+  \ifcase\nr\relax
     \let\ef@launch@open\@empty\or
     \def\ef@launch@open{/NewWindow true }\or
     \def\ef@launch@open{/NewWindow false }\fi
@@ -4558,7 +4929,7 @@
 % The \texttt{js}\IndexKey{js} key is used to execute JavaScript actions on a mouse up trigger.
 % The argument is a JavaScript text string: |js={app.alert("Hello World!"}|.
 % The value of \texttt{js} may be a macro containing JavaScript, which would include
-% a macro created by the \texttt{defineJS} environment of \textsf{insdljs}.
+% a macro created by the \env{defineJS} environment of \textsf{insdljs}.
 %    \begin{macrocode}
 \define@key{eforms}{js}[]{\@eqA{\JS{#1}}}
 %    \end{macrocode}
@@ -4586,18 +4957,18 @@
 % \end{itemize}
 %    \begin{macrocode}
 \@tfor\ef@AActions:={{mouseup}{AAmouseup}}{{mousedown}{AAmousedown}}%
-    {{onenter}{AAmouseenter}}{{onexit}{AAmouseexit}}%
-    {{onfocus}{AAonfocus}}{{onblur}{AAonblur}}%
-    {{format}{AAformat}}{{keystroke}{AAkeystroke}}%
-    {{validate}{AAvalidate}}{{calculate}{AAcalculate}}%
-    {{pageopen}{AApageopen}}{{pageclose}{AApageclose}}%
-    {{pagevisible}{AApagevisible}}%
-    {{pageinvisible}{AApageinvisible}}\do{%
-    \expandafter\getargs\ef@AActions\ef@jstoks={#1}%
-    \edef\temp@expand@def{\noexpand\define@key{eforms}{\aeb@argi}[]%
-    {\noexpand\csname @eq\aeb@argii\noexpand\endcsname%
-        {\the\ef@jstoks}}}%
-    \temp@expand@def
+  {{onenter}{AAmouseenter}}{{onexit}{AAmouseexit}}%
+  {{onfocus}{AAonfocus}}{{onblur}{AAonblur}}%
+  {{format}{AAformat}}{{keystroke}{AAkeystroke}}%
+  {{validate}{AAvalidate}}{{calculate}{AAcalculate}}%
+  {{pageopen}{AApageopen}}{{pageclose}{AApageclose}}%
+  {{pagevisible}{AApagevisible}}%
+  {{pageinvisible}{AApageinvisible}}\do{%
+  \expandafter\getargs\ef@AActions\ef@jstoks={#1}%
+  \edef\temp@expand@def{\noexpand\define@key{eforms}{\aeb@argi}[]%
+  {\noexpand\csname @eq\aeb@argii\noexpand\endcsname%
+      {\the\ef@jstoks}}}%
+  \temp@expand@def
 }
 %    \end{macrocode}
 % The \texttt{objdef}\IndexKey{objdef} key is used to create indirect references to the form field.
@@ -4612,13 +4983,9 @@
 %    \end{macrocode}
 %
 %    \section{Input Driver Specific Code}
-% Now bring in driver dependent macros.  The macros defined are
-% the answer macros for the \texttt{shortquiz} environment and most all
-% for the \texttt{quiz} environment.  These macros make heavy use of
-% JavaScript.  The method of introducing these JavaScripts and
-% PDF code related elements depends on the driver.
-% \changes{v2.9j}{2017/01/22}{\string\cs{eq@rectH} and \string\cs{eq@rectW} pass through \string\cs{setlength}
-% to enable arithmetic for the arguments of those commands}
+% Now bring in driver dependent macros that support form fields.
+% \changes{v2.9j}{2017/01/22}{\string\cs{eq@rectH} and \string\cs{eq@rectW} pass
+% through \string\cs{setlength} to enable arithmetic for the arguments of those commands}
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
@@ -4746,7 +5113,7 @@
       \fi
     \fi
   \fi
-  \ef@NewRadiosLateOpts
+  \ifuseNewRadios\expandafter\ef@NewRadiosLateOpts\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \pdf@rect{\lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}}%
   \literalps@out{\AEB@psMrk
@@ -4988,7 +5355,7 @@
       \fi
     \fi
   \fi
-  \ef@NewRadiosLateOpts
+  \ifuseNewRadios\expandafter\ef@NewRadiosLateOpts\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \hbox{\pdfstartlink user{\common@RadioCode}%
   \lower\eqcenterWidget\ef@Bbox{\eq@rectW}{\eq@rectH}\pdfendlink}%
@@ -5159,7 +5526,7 @@
       \fi
     \fi
   \fi
-  \ef@NewRadiosLateOpts
+  \ifuseNewRadios\expandafter\ef@NewRadiosLateOpts\fi
   \ifx\eq@rectW\@empty\def\eq@rectW{\wd\eq@tmpbox}\fi
   \HyField@AdvanceAnnotCount
   \setbox\pdfm@box=%
@@ -5262,42 +5629,42 @@
 var debugCalc=false;
 ef_setCalcOrder.lastIndex=0;
 function ef_setCalcOrder (a) {
-    var o1, o2, f;
-    while ( a.length > 0) {
-        if (a.length > 1) {
-            f=a.shift();
-            o1=this.getField(f);
-            if ( o1 == null ) {
-                ef_CalcOrderErr(f);
-                continue;
-            }
-            f = a[0];
-            o2=this.getField(f);
-            if ( o2 == null ) {
-                ef_CalcOrderErr(f);
-                a.shift();
-                continue;
-            }
-            if (  o2.calcOrderIndex < o1.calcOrderIndex ) {
-                o2.calcOrderIndex=o1.calcOrderIndex+1;
-				ef_setCalcOrder.lastIndex=o2.calcOrderIndex;
-			}
-        } else {
-            f=a.shift();
-			o1=this.getField(f);
-            if ( o1 == null ) {
-                ef_CalcOrderErr(f);
-                continue;
-            }
-			o1.calcOrderIndex=ef_setCalcOrder.lastIndex;			
-		}
+  var o1, o2, f;
+  while ( a.length > 0) {
+    if (a.length > 1) {
+      f=a.shift();
+      o1=this.getField(f);
+      if ( o1 == null ) {
+        ef_CalcOrderErr(f);
+        continue;
+      }
+      f = a[0];
+      o2=this.getField(f);
+      if ( o2 == null ) {
+        ef_CalcOrderErr(f);
+        a.shift();
+        continue;
+      }
+      if (  o2.calcOrderIndex < o1.calcOrderIndex ) {
+        o2.calcOrderIndex=o1.calcOrderIndex+1;
+        ef_setCalcOrder.lastIndex=o2.calcOrderIndex;
+      }
+    } else {
+      f=a.shift();
+      o1=this.getField(f);
+      if ( o1 == null ) {
+        ef_CalcOrderErr(f);
+        continue;
+      }
+      o1.calcOrderIndex=ef_setCalcOrder.lastIndex;			
     }
+  }
 }
 function ef_CalcOrderErr(f) {
-    console.show(); app.beep(0);
-    console.println("calcOrder: the field \""+ f
-        + "\" does not exist in this document, skipping it.\n\n"
-        + "calcOrder: Check the case sensitive spelling of the field.");
+  console.show(); app.beep(0);
+  console.println("calcOrder: the field \""+ f
+    + "\" does not exist in this document, skipping it.\n\n"
+    + "calcOrder: Check the case sensitive spelling of the field.");
 }
 var _EfCalcOrder=\efCalcOrder;
 ef_setCalcOrder(_EfCalcOrder);

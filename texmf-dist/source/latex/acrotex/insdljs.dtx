@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2019  D. P. Story                 %%
+%% Copyright (C) 2001-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2019/10/30 v2.4.8 Insert Document Level JavaScripts (dps)]
+%<package> [2020/12/20 v2.5 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -470,7 +470,7 @@
 %    \begin{macrocode}
 \let\isOpenAction\dl@NO
 %    \end{macrocode}
-%    \IndexOpt{nodljs}
+%    \leavevmode\IndexOpt{nodljs}^^A
 % Option to cancel the insertion of DLJS, useful for a document meant to be
 % printed only, or one that does not use the \texttt{shortquiz} or
 % \texttt{quiz} environments, for example.
@@ -483,7 +483,7 @@
 \let\firstdljs\dl@YES
 \let\dljspresent\dl@NO
 %    \end{macrocode}
-%    \IndexOpt{debug}
+%    \leavevmode\IndexOpt{debug}^^A
 % Use this option to help debug DLJS.
 %    \begin{macrocode}
 \DeclareOptionX{debug}{\let\dljs@debug\dl@YES}
@@ -507,24 +507,24 @@
 %    We set the driver, according to the following algorithm.
 %    \begin{macrocode}
 \@ifpackageloaded{web}{%
-    \ExecuteOptionsX{\eq@driver@name}%
+  \ExecuteOptionsX{\eq@driver@name}%
 }{%
-    \@ifpackageloaded{eforms}{%
-        \ExecuteOptionsX{\ef@driver}%
-    }{%
-        \ifpdf\ExecuteOptionsX{pdftex}\else
-        \ifxetex\ExecuteOptionsX{xetex}\else
-        \@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
-            {\ExecuteOptionsX{dvipsone}}\fi\fi
-    }%
+  \@ifpackageloaded{eforms}{%
+    \ExecuteOptionsX{\ef@driver}%
+  }{%
+    \ifpdf\ExecuteOptionsX{pdftex}\else
+    \ifxetex\ExecuteOptionsX{xetex}\else
+    \@ifundefined{l@tex@@@@driver}{\ExecuteOptionsX{dvips}}
+      {\ExecuteOptionsX{dvipsone}}\fi\fi
+  }%
 }
 %    \end{macrocode}
-%    \leavevmode\IndexOpt{reqjs}
+%    \leavevmode\IndexOpt{reqjs}^^A
 %    Beginning with PDF 1.7, a document can specify requirements, here we declare
 %    the document uses JavaScripts. The option \texttt{reqjs} is taken by default,
 %    that is, JavaScripts are required for this document
-%
-%    \DescribeMacro{!reqjs}
+%     \medskip\par\noindent
+%    \DescribeMacro{!reqjs}^^A
 %    The  option \texttt{!reqis} turns off this feature; that is, there is no notification
 %    via the \textsf{YMB} (\textsf{Yellow Message Bar}) that Javascripts are used in the document, and the
 %    document may not function as designed.
@@ -545,10 +545,10 @@
 %    the usealtadobe option}
 %    \begin{macrocode}
 \DeclareOptionX{usealtadobe}{\let\usedAdbFuncs\dl@YES
-  \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}
-    {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}
-    {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
-        Reinstall or refresh your file name database.}}}}
+\def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}
+  {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}
+  {\PackageWarning{insdljs}{Cannot find altadbfncs.def.\MessageBreak
+    Reinstall or refresh your file name database.}}}}
 \let\usedAdbFuncs\dl@NO
 \let\inputAltAdbFncs\relax
 %    \end{macrocode}
@@ -564,14 +564,13 @@
 %    \end{macrocode}
 %    Issue a package error if there is no driver specified or implied.
 %    \begin{macrocode}
-\@ifundefined{dljs@drivernum}{%
-    \PackageError{insdljs}%
-        {You have not specified dvips, dvipsone, pdftex,\MessageBreak
-        dvipdfm, dvipdfmx, or xetex in the option list
-        \MessageBreak of the insdljs package}
-        {Place one of the drivers dvips, dvipsone, pdftex,  dvipdfm,
-        dvipdfmx, or xetex
-        \MessageBreak in the option list of the insdljs package.}
+\@ifundefined{dljs@drivernum}{\PackageError{insdljs}%
+  {You have not specified dvips, dvipsone, pdftex,\MessageBreak
+  dvipdfm, dvipdfmx, or xetex in the option list
+  \MessageBreak of the insdljs package}
+  {Place one of the drivers dvips, dvipsone, pdftex,  dvipdfm,
+  dvipdfmx, or xetex
+  \MessageBreak in the option list of the insdljs package.}
 }{}
 %    \end{macrocode}
 % \subsection{Required Packages}
@@ -583,7 +582,6 @@
 %    \begin{macrocode}
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
 \ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
-%    \begin{macrocode}
 \RequirePackage{hyperref}
 %    \end{macrocode}
 % LuaTeX v0.85 has made some changes to primitives, the definition below follows
@@ -593,8 +591,8 @@
 %    \changes{v2.3a}{2016/07/31}{Added luatex85 definition of \string\cs{pdfpageref}}
 %    \begin{macrocode}
 \ifpdf\ifx\pdfextension\@undefined\else
-    \protected\def\pdfnames{\pdfextension names }
-    \def\pdfpageref{\pdffeedback pageref}\fi\fi
+  \protected\def\pdfnames{\pdfextension names }
+  \def\pdfpageref{\pdffeedback pageref}\fi\fi
 \RequirePackage{verbatim}
 %    \end{macrocode}
 %\changes{v2.4.1}{2019/02/11}{Save \string\cs{comment}\space as \string\cs{dlcomment}}
@@ -612,37 +610,37 @@
 %    Last minute adjustments in the driver.
 %    \begin{macrocode}
 \@ifundefined{dljs@drivernum}{%
-    \@ifundefined{eq@drivernum}{%
-        \PackageWarning{insdljs}
-            {No driver specified, will check for pdftex.}
-        \@ifundefined{pdfoutput}{%
-            \@ifundefined{@pdfm@mark}{\def\eq@drivernum{2}%
-            \def\dljs@drivernum{1}\let\isOpenAction\dl@NO
-            \PackageWarning{insdljs}{No pdftex, but detected dvipdfm}}%
-            {\PackageWarning{insdljs}{Neither pdftex nor dvipdfm,
-                assuming dvips/dvipsone.}%
-            \def\eq@drivernum{0}\def\dljs@drivernum{0}%
-            \let\isOpenAction\dl@YES}
-        }{%
-            \ifcase\pdfoutput
-                \def\eq@drivernum{1}\def\dljs@drivernum{1}%
-                \let\isOpenAction\dl@NO
-                \PackageInfo{insdljs}{Pdftex detected.}%
-            \else
-                \def\eq@drivernum{0}\def\dljs@drivernum{0}%
-                \let\isOpenAction\dl@YES
-                \PackageWarning{insdljs}{Pdftex engine detected,
-                but is outputting dvi. Assuming dvips as the driver.}%
-            \fi
-        }%
+  \@ifundefined{eq@drivernum}{%
+    \PackageWarning{insdljs}
+      {No driver specified, will check for pdftex.}
+    \@ifundefined{pdfoutput}{%
+      \@ifundefined{@pdfm@mark}{\def\eq@drivernum{2}%
+      \def\dljs@drivernum{1}\let\isOpenAction\dl@NO
+      \PackageWarning{insdljs}{No pdftex, but detected dvipdfm}}%
+      {\PackageWarning{insdljs}{Neither pdftex nor dvipdfm,
+          assuming dvips/dvipsone.}%
+      \def\eq@drivernum{0}\def\dljs@drivernum{0}%
+      \let\isOpenAction\dl@YES}
     }{%
-        \begingroup
-            \count0=\eq@drivernum
-            \xdef\dljs@drivernum{\ifcase\count0 0\or1\or2\or0\else0\fi}
-            \ifnum\dljs@drivernum=0\global\let\isOpenAction\dl@YES
-                \else\global\let\isOpenAction\dl@NO\fi
-        \endgroup
+      \ifcase\pdfoutput
+        \def\eq@drivernum{1}\def\dljs@drivernum{1}%
+        \let\isOpenAction\dl@NO
+        \PackageInfo{insdljs}{Pdftex detected.}%
+      \else
+        \def\eq@drivernum{0}\def\dljs@drivernum{0}%
+        \let\isOpenAction\dl@YES
+        \PackageWarning{insdljs}{Pdftex engine detected,
+        but is outputting dvi. Assuming dvips as the driver.}%
+      \fi
     }%
+  }{%
+    \begingroup
+      \count0=\eq@drivernum
+      \xdef\dljs@drivernum{\ifcase\count0 0\or1\or2\or0\else0\fi}
+      \ifnum\dljs@drivernum=0\global\let\isOpenAction\dl@YES
+        \else\global\let\isOpenAction\dl@NO\fi
+    \endgroup
+  }%
 }{}
 %    \end{macrocode}
 % I've always had problems with the pdftex option and inserting open page actions.
@@ -653,7 +651,7 @@
 % This approach seems to work.
 %    \begin{macrocode}
 \ifnum\dljs@drivernum=1\relax
-    \RequirePackage{everyshi}
+  \RequirePackage{everyshi}
 \fi
 %    \end{macrocode}
 % If \texttt{reqjs} is in effect, we execute the following code, otherwise, we
@@ -663,10 +661,10 @@
 \def\AEB@psMrk{[%]
   \space}
 \ifx\dl@reqJS\dl@YES
-   \def\dl@@reqJS{/Type/Requirement/S/EnableJavaScripts}
-   \ifpdf\pdfcatalog{\dl@@reqJS}\else
-   \ifxetex\immediate\@pdfm@mark{put @catalog <<\dl@@reqJS>>}\else
-   \literalps@out{\AEB@psMrk{Catalog} <<\dl@@reqJS>> /PUT pdfmark}\fi\fi
+  \def\dl@@reqJS{/Type/Requirement/S/EnableJavaScripts}
+  \ifpdf\pdfcatalog{\dl@@reqJS}\else
+  \ifxetex\immediate\@pdfm@mark{put @catalog <<\dl@@reqJS>>}\else
+  \literalps@out{\AEB@psMrk{Catalog} <<\dl@@reqJS>> /PUT pdfmark}\fi\fi
 \fi
 %    \end{macrocode}
 %     Added switch to mark whether djs is inserted
@@ -789,18 +787,62 @@
 %
 %\subsection{Begin Code}
 %
-% Some control sequences that are useful for formatting JavaScript.
-%    \begin{macro}{\JS}
-%    \begin{macro}{\Named}
-% A convenience command for writing JavaScript.
+% Some control sequences that are useful for various
+% actions. All appear within the \cs{A} key, eg, |\A{\JS{var x=17;}}|. Note the arguments
+% of some are delimited by parentheses, others by braces. Sorry for the inconsistency,
+% but these evolved over a period of years. Some keys require additional arguments which
+% are typically inserted in raw form; eg, |\A{\GoToR(|\ameta{dest}|)/F(example.pdf)}|.
+%    \begin{macro}{\JS}\hskip-\marginparsep\texttt{\darg{\ameta{code}}}
+%    A convenience command for writing a JavaScript action
 %    \begin{macrocode}
 \providecommand\JS[1]{/S/JavaScript/JS(#1)}
-\providecommand\Named[1]{/S/Named/N/#1}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\Named}\hskip-\marginparsep\texttt{\darg{\ameta{name}}}
+%    A named action, eg, |\A{\Named{NextPage}}|
+%    \begin{macrocode}
+\providecommand{\Named}[1]{/S/Named/N/#1}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\GoTo}\hskip-\marginparsep\texttt{(\ameta{name})}
+%    A go-to-action; eg, |\A{\GoTo(|\ameta{dest}|)}|. The argument can actually be a name
+%    (enclosed in parentheses), a byte string, or an array.
+%    \begin{macrocode}
 \providecommand{\GoTo}{/S/GoTo/D}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\GoToD}\hskip-\marginparsep\texttt{(\ameta{name})}
+%    A go-to-action destination; eg, |\A{\GoToD(|\ameta{dest}|)}| (same as \cs{GoTo})
+%    \begin{macrocode}
 \providecommand{\GoToD}{/S/GoTo/D}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\GoToR}\hskip-\marginparsep\texttt{(\ameta{name})/F(\ameta{file-spec})} A go-to-remote action,
+%    where \ameta{name} is the destination in the remote file \ameta{file-spec}; eg, |\A{\GoToR(|\ameta{dest}|)/F(example.pdf)}|
+%
+%    \begin{macrocode}
 \providecommand{\GoToR}{/S/GoToR}
 %    \end{macrocode}
 %    \end{macro}
+%    \begin{macro}{\Thread}\hskip-\marginparsep\texttt{\darg{\ameta{thread-title}}}
+%   \changes{v2.4.9}{2020/07/09}{Added \string\Thread}
+%    A thread action; this command is used in the \pkg{artthreads} package.
+%    \begin{macrocode}
+\providecommand{\Thread}[1]{/S/Thread/D(#1)}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\URI}\hskip-\marginparsep\texttt{\darg{\ameta{string}}}
+%    A URI action, eg, |\A{\URI{http://www.example.com}}|
+%    \begin{macrocode}
+\providecommand{\URI}[1]{/S/URI/URI(#1)}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\Launch}\hskip-\marginparsep\texttt{\darg{\ameta{file-spec}}}
+% \changes{v2.5}{2020/12/20}{Added \string\Launch}
+%    A launch action
+%    \begin{macrocode}
+\providecommand{\Launch}[1]{/Launch/F(#1)}
+%    \end{macrocode}
 %    \end{macro}
 %    \begin{macrocode}
 \def\previewMiKTeX{\def\jsR{\string\r}\def\jsT{\string\t}}
@@ -808,16 +850,30 @@
 \gdef\js@@R{\noexpand
 }}
 %    \end{macrocode}
-% We define space\DescribeMacro\pdfSp, left\DescribeMacro\pdfLBr\space and right\DescribeMacro\pdfRBr\space
+% We define space\DescribeMacro\pdfSp, left\DescribeMacro\pdfLBr, and right \DescribeMacro\pdfRBr
 % braces in pdf (PDFDocEncoding); these are also defined
 % in \pkg{exerquiz} but under different names (\cs{eqSP}, \cs{eqLBr}, and \cs{eqRBr}).
 % \changes{v2.4.2}{2019/03/16}{Added \string\cs{pdfSP}, and others, and \string\cs{dl@sp@ce}}
+% \changes{v2.4.10}{2020/11/28}{\string\cs{pdfSpacesOn} on by default,
+%   only for \string\app{dvips}; otherwise, \string\cs{pdfSpacesOff}}
 %    \begin{macrocode}
 \def\pdfSPDef{\string\040}
-\let\pdfSP\pdfSPDef
+\def\dl@sp@ce{ }
+%    \end{macrocode}
+%    Beginning with \pkg{insdljs} dated 2019/03/16, we solve an age-old problem with \app{dvips}: This problem
+%    is that is wraps code around to the next line, according to some unknown algorithm. Normally this is not
+%    a problem, but occasionally it will wrap some JavaScript code that breaks the code. Solve this problem,
+%    we make the space character active, and replace it with \cs{pdfSP} (\cs{040}), which is octal for the space
+%    character. Now there are no free spaces for \app{dvips} to break the line at in the PS file. The feature
+%    is turned on by default, and may be turned off with \DescribeMacro\pdfSpacesOff\cs{pdfSpacesOff}
+%    and back on by \DescribeMacro\pdfSpacesOn\cs{pdfSpacesOn}.
+%    \begin{macrocode}
+\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
+\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+\pdfSpacesOff
+\ifpdf\else\ifxetex\else\pdfSpacesOn\fi\fi
 \def\pdfLBr{\string\173}
 \def\pdfRBr{\string\175}
-\def\dl@sp@ce{ }
 %    \end{macrocode}
 %   \DescribeMacro\dl@restorespcs restores the obey spaces space to its default,
 %   saved earlier. This command is placed at the end of each of the form field
@@ -826,18 +882,24 @@
 \bgroup\obeyspaces
 \gdef\dl@restorespcs{\global\let =\dl@sp@ce}\egroup
 %    \end{macrocode}
+% \cs{dljstfor} is used in the \texttt{cc4js} segment.
 %    \begin{macrocode}
 \let\dljstfor\@tfor
 %    \end{macrocode}
-% 2012/06/20 Change the following code so there are no special cases.
+% \leavevmode\DescribeMacro{\dfnJSCR}\hskip-\marginparsep\texttt{\darg{\ameta{eol}}}
+% A help macro to define \cs{dfnJSR} in a convenient way; \cs{dfnJSR} is
+% used in the \env{defineJS} environment.
+% \changes{v2.5}{2020/12/20}{Helper commands \string\cs{dfnJSCR} to define
+% \string\cs{defineJSjsR} and \cs{dfnJSCRDef} to set default.}
 %    \begin{macrocode}
+\def\dfnJSCR#1{\gdef\dfnJSR{#1}\gdef\defineJSjsR{#1}}
+\def\dfnJSCRDef{\dfnJSCR{\string\r\eqbs^^J}}
+\dfnJSCRDef
 \def\jsR{\string\r\string\n}
-%\def\jsR{\string\r\eqbs\js@@R}
-\def\defineJSjsR{\string\r\eqbs^^J}
 %    \end{macrocode}
-% \changes{v2.0l}{2012/11/10}{Added \cs{jsN}}
 % \cs{r} is recognized by hyperref when \cs{pdfstringdef} is used. Hyperref
-% then modifies the expansion of \cs{r}. So, we'll use \cs{n} is those situations.
+% then modifies the expansion of \cs{r}. So, we'll use \cs{n} in those situations.
+% \changes{v2.0l}{2012/11/10}{Added \cs{jsN}}
 %    \begin{macrocode}
 \def\jsN{\string\n}
 {\catcode`\^^I\active %
@@ -872,7 +934,7 @@
 %    \begin{macrocode}
 \def\dl@lparen{(}\def\dl@rparen{)}
 \def\genericNL{^^J}
-\def\defjsLB{\expandafter\pdfmarkLB\@gobblefour}
+\def\defjsLB{\gobiv}
 \def\genericLB{\eqbs\eqbs^^J}
 \def\pdfmarkLB{\eqbs^^J}
 \def\jscsDflt{\let\protect\noexpand\let\jslit\string
@@ -1014,13 +1076,12 @@
 % This verbatim is used internally to write the \texttt{.djs} files, containing
 % the JavaScript.
 %    \begin{macrocode}
-\newenvironment{js@verbatimwrite}% writes to current \js@verbatim@out
- {%
-    \@bsphack
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    \def\verbatim@processline{%
-        \immediate\write\js@verbatim@out{\the\verbatim@line}}%
-    \verbatim@start}{\@esphack}
+\newenvironment{js@verbatimwrite}{% writes to current \js@verbatim@out
+  \@bsphack
+  \let\do\@makeother\dospecials\catcode`\^^M\active
+  \def\verbatim@processline{\immediate
+    \write\js@verbatim@out{\the\verbatim@line}}\verbatim@start
+}{\@esphack}
 %    \end{macrocode}
 % Unlike the example of verbatimwrite in the \texttt{verbatim} package, we do not
 % automatically close the stream when we finish out \texttt{js@verbatimwrite} environment.
@@ -1066,39 +1127,38 @@
 \begingroup
 \catcode`\~=\active \lccode`\~=`\^^M
 \lowercase{\endgroup
-    \def\eqverbatim@#1~{\verbatim@@#1*end\@nil}%
-    \def\eqverbatim@@#1*end{%
-    \verbatim@addtoline{#1}%
-    \futurelet\dl@next\eqverbatim@@@}%
-    \def\eqverbatim@@@#1\@nil{%
-    \ifx\dl@next\@nil
-        \verbatim@processline
-        \verbatim@startline
-        \let\dl@next\eqverbatim@
-    \else
-        \def\@tempa##1*end\@nil{##1}%
-        \@temptokena{*end}%
-        \def\dl@next{\expandafter\verbatim@test\@tempa#1\@nil~}%
-    \fi\dl@next}%
+  \def\eqverbatim@#1~{\verbatim@@#1*end\@nil}%
+  \def\eqverbatim@@#1*end{%
+  \verbatim@addtoline{#1}%
+  \futurelet\dl@next\eqverbatim@@@}%
+  \def\eqverbatim@@@#1\@nil{%
+  \ifx\dl@next\@nil
+    \verbatim@processline
+    \verbatim@startline
+    \let\dl@next\eqverbatim@
+  \else
+    \def\@tempa##1*end\@nil{##1}%
+    \@temptokena{*end}%
+    \def\dl@next{\expandafter\verbatim@test\@tempa#1\@nil~}%
+  \fi\dl@next}%
 }%
 \def\jsexpverbatimwrite
 {% writes to current \js@verbatim@out
-    \@bsphack
-%    \escapechar=-1%
-    \ccpdfmark
-    \catcode`\<=12 \catcode`\>=12
-    \input{dljscc.def}%
-% Attempt to redefine some macros from the the verbatim package
-    \let\verbatim@=\eqverbatim@
-    \let\verbatim@@=\eqverbatim@@
-    \let\verbatim@@@=\eqverbatim@@@
+  \@bsphack
+  \ccpdfmark
+  \catcode`\<=12 \catcode`\>=12
+  \input{dljscc.def}%
+% Attempt to redefine some macros from the verbatim package
+  \let\verbatim@=\eqverbatim@
+  \let\verbatim@@=\eqverbatim@@
+  \let\verbatim@@@=\eqverbatim@@@
 % end redefine of verbatim package
-    \let\do\@makeother\eqdospecials%
-    \catcode`\^^M=\active\catcode`\^^I=12%
-    \def\verbatim@processline{%
-        \edef\expVerb{\the\verbatim@line}%
-        \immediate\write\js@verbatim@out{\expVerb}}%
-        \verbatim@start%
+  \let\do\@makeother\eqdospecials%
+  \catcode`\^^M=\active\catcode`\^^I=12%
+  \def\verbatim@processline{%
+    \edef\expVerb{\the\verbatim@line}%
+    \immediate\write\js@verbatim@out{\expVerb}}%
+    \verbatim@start%
 }
 \def\endjsexpverbatimwrite{\immediate\closeout\js@verbatim@out\@esphack}
 %    \end{macrocode}
@@ -1140,21 +1200,21 @@
 \gdef\dl@tilda<\string~> \gdef\dl@sup<\string^>
 \endgroup
 \def\makeJSspecials{%
-    \def\\{\eqbs\eqbs}%         % define \\ to be \\
-    \let\jslit\string
+  \def\\{\eqbs\eqbs}%         % define \\ to be \\
+  \let\jslit\string
 %    \end{macrocode}
 % \changes{v2.0n}{2014/05/20}{Remake the definition of \cs{\char`\{} and \cs{\char`\}}}
 % In an attempt to avoid the use of \verb~\jslit\{~ and \verb~\jslit\}~, we remake
 % the definition of \verb~\{} and \verb~\}~.
 %    \begin{macrocode}
-    \let\{\dl@lBrace\let\}\dl@rBrace
+  \let\{\dl@lBrace\let\}\dl@rBrace
 %    \end{macrocode}
 % \changes{v2.1}{2015/07/12}{\cs{let} \cs{u} to \cs{@empty}.}
 % \cs{let} \cs{u} to \cs{@empty}.
 %    \begin{macrocode}
-    \let\u\@empty
-    \def\({\eqbs(}\def\){\eqbs)}%
-    \makespecialJS              % make \r=\jsR and \t=\jsT
+  \let\u\@empty
+  \def\({\eqbs(}\def\){\eqbs)}%
+  \makespecialJS              % make \r=\jsR and \t=\jsT
 }
 %    \end{macrocode}
 % \subsection{Open Document Actions}\label{opendocactions}
@@ -1180,12 +1240,12 @@
 \def\dl@inheritzoom{/XYZ 0 0 0}
 \def\dl@mag#1{/XYZ null null #1}
 \edef\dl@Page#1{\ifcase\dljs@drivernum
-    {Page#1}\or\noexpand\pdfpageref#1\space\space 0 R\or
-    @page#1\fi}
+  {Page#1}\or\noexpand\pdfpageref#1\space\space 0 R\or
+  @page#1\fi}
 \def\dl@preProcDefns{\let\Page\dl@Page\let\mag\dl@mag
-    \let\fitpage\dl@fitpage\let\actualsize\dl@actualsize
-    \let\fitwidth\dl@fitwidth\let\fitheight\dl@fitheight
-    \let\fitvisible\dl@fitvisible\let\inheritzoom\dl@inheritzoom
+  \let\fitpage\dl@fitpage\let\actualsize\dl@actualsize
+  \let\fitwidth\dl@fitwidth\let\fitheight\dl@fitheight
+  \let\fitvisible\dl@fitvisible\let\inheritzoom\dl@inheritzoom
 }
 \let\aeb@additionalOpenAction\@empty
 \let\aeb@addActionCode\@empty
@@ -1205,42 +1265,42 @@
 %\end{verbatim}
 %    \begin{macrocode}
 \newcommand{\addToDocOpen}[1]{%
-    \ifx\aebpFA\dl@NO
-        \g@addto@macro\aebpopentoks{#1}%
-        \def\aeb@additionalOpenAction{/Next {pubAddToDocOpen}}%
+  \ifx\aebpFA\dl@NO
+    \g@addto@macro\aebpopentoks{#1}%
+    \def\aeb@additionalOpenAction{/Next {pubAddToDocOpen}}%
 \ifpdf
-        \def\aeb@addActionCode{\immediate\pdfobj{<<
-        \aebpopentoks\aebp@rightDelimiters >>}%
-        \edef\addActionObj{\the\pdflastobj\space 0 R}}%
+    \def\aeb@addActionCode{\immediate\pdfobj{<<
+    \aebpopentoks\aebp@rightDelimiters >>}%
+    \edef\addActionObj{\the\pdflastobj\space 0 R}}%
 \else\ifxetex
-        \def\aeb@addActionCode{\immediate
-            \@pdfm@mark{obj @objAddActionObj
-            << \aebpopentoks\aebp@rightDelimiters >> }}%
-        \def\addActionObj{@objAddActionObj}%
+    \def\aeb@addActionCode{\immediate
+      \@pdfm@mark{obj @objAddActionObj
+        << \aebpopentoks\aebp@rightDelimiters >> }}%
+      \def\addActionObj{@objAddActionObj}%
 \else % postscript
-        \def\aeb@addActionCode{\literalps@out{%
-        \AEB@psMrk/_objdef {pubAddToDocOpen}
-            /type/dict /OBJ pdfmark^^J%
-        \AEB@psMrk{pubAddToDocOpen} <<
-        \aebpopentoks\aebp@rightDelimiters >> /PUT pdfmark}}%
-        \def\addActionObj{{pubAddToDocOpen}}%
+    \def\aeb@addActionCode{\literalps@out{%
+    \AEB@psMrk/_objdef {pubAddToDocOpen}
+      /type/dict /OBJ pdfmark^^J%
+    \AEB@psMrk{pubAddToDocOpen} <<
+    \aebpopentoks\aebp@rightDelimiters >> /PUT pdfmark}}%
+    \def\addActionObj{{pubAddToDocOpen}}%
 \fi\fi
-        \global\let\aebpFA\dl@YES
-        \let\@pdfstartview\@empty
-    \else
-        \edef\aebp@dljstmp{\aebp@rightDelimiters}%
-        \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
-        \g@addto@macro\aebpopentoks{/Next << #1 }%
-    \fi
+    \global\let\aebpFA\dl@YES
+    \let\@pdfstartview\@empty
+  \else
+      \edef\aebp@dljstmp{\aebp@rightDelimiters}%
+      \xdef\aebp@rightDelimiters{\aebp@dljstmp >> }%
+      \g@addto@macro\aebpopentoks{/Next << #1 }%
+  \fi
 }
 \def\dljs@OpenActions{/OpenAction \addActionObj}
 \def\dljs@setOpenActions{\bgroup\makeJSspecials\dl@preProcDefns
-    \aeb@addActionCode
-    \ifpdf\pdfcatalog{\dljs@OpenActions}\else
-    \ifxetex\immediate
-        \@pdfm@mark{put @catalog <<\dljs@OpenActions>>}\else
-    \literalps@out{\AEB@psMrk
-     {Catalog} <<\dljs@OpenActions>> /PUT pdfmark}\fi\fi\egroup}
+  \aeb@addActionCode
+  \ifpdf\pdfcatalog{\dljs@OpenActions}\else
+  \ifxetex\immediate
+      \@pdfm@mark{put @catalog <<\dljs@OpenActions>>}\else
+  \literalps@out{\AEB@psMrk
+   {Catalog} <<\dljs@OpenActions>> /PUT pdfmark}\fi\fi\egroup}
 %    \end{macrocode}
 % If \textsf{aeb\_pro} is not loaded, we set the open actions. If \textsf{aeb\_pro}
 % is loaded, we do nothing for \textsf{aeb\_pro} has its own contributions to the
@@ -1248,8 +1308,8 @@
 %    \changes{v2.3d}{2017/01/08}{Use \cs{aebpFA} to detect open actions}
 %    \begin{macrocode}
 \@ifpackageloaded{aeb_pro}{}
-    {\AtBeginDocument{\ifx\aebpFA\dl@YES\expandafter
-        \dljs@setOpenActions\fi}}
+  {\AtBeginDocument{\ifx\aebpFA\dl@YES\expandafter
+    \dljs@setOpenActions\fi}}
 %    \end{macrocode}
 %
 % \subsection{Open Page Actions}\label{openaction}
@@ -1267,18 +1327,17 @@
 %    \begin{macrocode}
 \let\@CloseAction\@empty
 \def\@OAction@pdfmark{\literalps@out{%
-     \AEB@psMrk{ThisPage} << /AA << /O << \theFirstAction\space
-    \opentoks\@rightDelimiters >> \@CloseAction >> >> /PUT pdfmark}}
+   \AEB@psMrk{ThisPage} << /AA << /O << \theFirstAction\space
+  \opentoks\@rightDelimiters >> \@CloseAction >> >> /PUT pdfmark}}
 \def\@POAction@pdfmark{\literalps@out{%
-    \AEB@psMrk{ThisPage} << /AA << \@thisOpenAction
-    \@thisCloseAction >> >> /PUT pdfmark}%
+  \AEB@psMrk{ThisPage} << /AA << \@thisOpenAction
+  \@thisCloseAction >> >> /PUT pdfmark}%
 }
 \def\@OAction@pdftex{%
-    \ifx\isOpenAction\dl@YES
-        \xdef\pdftexOAction{/AA << /O << \theFirstAction\space
-        \opentoks\@rightDelimiters >> \@CloseAction  >>}%
-        \AtNextShipout{\pdfpageattr=\expandafter{\pdftexOAction}}%
-    \fi
+  \ifx\isOpenAction\dl@YES
+    \xdef\pdftexOAction{/AA << /O << \theFirstAction\space
+    \opentoks\@rightDelimiters >> \@CloseAction  >>}%
+    \AtNextShipout{\pdfpageattr=\expandafter{\pdftexOAction}}\fi
 }
 \def\@POAction@pdftex{%
   \xdef\thisPageActionpdftex{/AA << \@thisOpenAction
@@ -1289,29 +1348,29 @@
 % For \textsf{dvipdfm}
 %    \begin{macrocode}
 \def\@OAction@dvipdfm{\ifx\isOpenAction\dl@YES
-    \@pdfm@mark{put @thispage << /AA << /O << \theFirstAction\space
-    \opentoks\@rightDelimiters >> \@CloseAction >> >>}\fi
+  \@pdfm@mark{put @thispage << /AA << /O << \theFirstAction\space
+  \opentoks\@rightDelimiters >> \@CloseAction >> >>}\fi
 }
 \def\@POAction@dvipdfm{%
-    \@pdfm@mark{put @thispage << /AA << \@thisOpenAction
-    \@thisCloseAction >> >>}%
+  \@pdfm@mark{put @thispage << /AA << \@thisOpenAction
+  \@thisCloseAction >> >>}%
 }
 %    \end{macrocode}
 % Now we choose the one appropriate to the user's driver option.
 %    \begin{macrocode}
 \ifcase\dljs@drivernum
-    \let\@OAction\@OAction@pdfmark
-    \let\@POAction\@POAction@pdfmark
-    \gdef\theFirstAction{/S/JavaScript/JS (\the\importfdftoks)}
-    \let\isOpenAction\dl@YES
+  \let\@OAction\@OAction@pdfmark
+  \let\@POAction\@POAction@pdfmark
+  \gdef\theFirstAction{/S/JavaScript/JS (\the\importfdftoks)}
+  \let\isOpenAction\dl@YES
 \or
-    \let\@OAction\@OAction@pdftex
-    \let\@POAction\@POAction@pdftex
-    \AtBeginDocument{\@OAction@pdftex}
+  \let\@OAction\@OAction@pdftex
+  \let\@POAction\@POAction@pdftex
+  \AtBeginDocument{\@OAction@pdftex}
 \or
-    \let\@OAction\@OAction@dvipdfm
-    \let\@POAction\@POAction@dvipdfm
-    \AtBeginDocument{\@OAction@dvipdfm}
+  \let\@OAction\@OAction@dvipdfm
+  \let\@POAction\@POAction@dvipdfm
+  \AtBeginDocument{\@OAction@dvipdfm}
 \fi
 %    \end{macrocode}
 %    \begin{macro}{\OpenAction}
@@ -1350,7 +1409,6 @@
 %\end{verbatim}
 %\cs{opentoks} accumulates the ``action''.
 %    \begin{macrocode}
-%\newtoks\opentoks \opentoks={}
 \def\opentoks{}
 %    \end{macrocode}
 % The open action is really not meant for anything too fancy, such as searching using regular
@@ -1360,14 +1418,14 @@
 % open page action.
 %    \begin{macrocode}
 \def\makespecialJS{%
-    \let\r\jsR\let\t\jsT\let\n\jsN}
+  \let\r\jsR\let\t\jsT\let\n\jsN}
 \def\@rightDelimiters{}
 %    \end{macrocode}
 % If the next token is \cs{Next} then we gobble it up, and begin \cs{@OpenAction}
 % otherwise we begin \cs{@OpenAction}. This allows the ``chaining'' as illustrated above.
 %    \begin{macrocode}
 \def\OpenAction{\@ifnextchar\Next
-    {\expandafter\@OpenAction\@gobble}{\@OpenAction}}
+  {\expandafter\@OpenAction\@gobble}{\@OpenAction}}
 %    \end{macrocode}
 % \cs{@OpenAction}: This is the macro that actually does the work. We differentiate between whether the
 % current argument \texttt{\#1} is the first of all open actions, or not. If the former,
@@ -1376,23 +1434,23 @@
 % the \cs{opentoks} token register.
 %    \begin{macrocode}
 \def\@OpenAction#1{%
-    \ifx\isOpenAction\dl@NO
-        {\makespecialJS\xdef\theFirstAction{#1}}%
-        \global\let\isOpenAction\dl@YES
-    \else
-        \edef\dljstmp{\@rightDelimiters}%
-        \xdef\@rightDelimiters{\dljstmp >> }%
-        {\makespecialJS\xdef\dljstmp{\opentoks /Next << #1 }}%
-        \xdef\opentoks{\dljstmp}%
-    \fi
-    \@nextOpenAction
+  \ifx\isOpenAction\dl@NO
+    {\makespecialJS\xdef\theFirstAction{#1}}%
+    \global\let\isOpenAction\dl@YES
+  \else
+    \edef\dljstmp{\@rightDelimiters}%
+    \xdef\@rightDelimiters{\dljstmp >> }%
+    {\makespecialJS\xdef\dljstmp{\opentoks /Next << #1 }}%
+    \xdef\opentoks{\dljstmp}%
+  \fi
+  \@nextOpenAction
 }
 %    \end{macrocode}
 % As its last act, \cs{@OpenAction} calls \cs{@nextOpenAction}, which is nearly identical to
 % \cs{OpenAction}, except if there is no \cs{Next} token, the macro terminates.
 %    \begin{macrocode}
 \def\@nextOpenAction{\@ifnextchar\Next{\expandafter
-    \@OpenAction\@gobble}{}}
+  \@OpenAction\@gobble}{}}
 %    \end{macrocode}
 %    \end{macro}
 % Here is a last example that uses the \texttt{insDLJS} environment and the \cs{OpenAction} command. This code
@@ -1427,58 +1485,56 @@
 % The first argument is on open page action, the second one is a closed page action.
 %    \begin{macrocode}
 \def\protectJSCtrls{\def\r{\string\r\string\n}%
-    \def\t{\string\t}\def\n{\string\n}}
+  \def\t{\string\t}\def\n{\string\n}}
 \def\dljs@tstlp{\@ifnextchar\bgroup
-    {\let\dljs@multi\dl@YES\dljs@tstlpi}%
-    {\let\dljs@multi\dl@NO\dljs@tstlpi}}
+  {\let\dljs@multi\dl@YES\dljs@tstlpi}%
+  {\let\dljs@multi\dl@NO\dljs@tstlpi}}
 \def\dljs@tstlpi#1\@nil{}%
 % #1=arg, #2=O|C, #3=cmd
-\def\dljs@bldScript#1#2#3{{%
-    \dljs@tstlp#1\@nil
-    \ifx\dljs@multi\dl@NO{\protectJSCtrls\xdef#3{/#2<<#1>>}}\else
-        \toks0={}\let\dljs@rAngles\@empty\count0=0
-        \@tfor\dljs@arg:=#1\do{%
-            \ifnum\count0=0
-                \toks0=\expandafter{\dljs@arg}\else
-                \toks2=\expandafter{\dljs@arg}%
-                \edef\holdtokstmp{\the\toks0
-                    /Next<<\the\toks2 }%
-                \edef\dljs@rAngles{\dljs@rAngles\space>>}%
-                \toks0=\expandafter{\holdtokstmp}%
-            \fi
-            \advance\count0by1
-        }%
-        {\protectJSCtrls\xdef#3{/#2<<\the\toks0 \dljs@rAngles>>}%
-         \xdef#3{#3}}%
-    \fi
-}}
+\def\dljs@bldScript#1#2#3{\bgroup
+  \dljs@tstlp#1\@nil
+  \ifx\dljs@multi\dl@NO{\protectJSCtrls\xdef#3{/#2<<#1>>}}\else
+    \toks0={}\let\dljs@rAngles\@empty\count0=0
+    \@tfor\dljs@arg:=#1\do{%
+      \ifnum\count0=0
+        \toks0=\expandafter{\dljs@arg}\else
+        \toks2=\expandafter{\dljs@arg}%
+        \edef\holdtokstmp{\the\toks0
+          /Next<<\the\toks2 }%
+        \edef\dljs@rAngles{\dljs@rAngles\space>>}%
+        \toks0=\expandafter{\holdtokstmp}%
+      \fi
+      \advance\count0by\@ne
+    }{\protectJSCtrls\xdef#3{/#2<<\the\toks0 \dljs@rAngles>>}%
+     \xdef#3{#3}}%
+  \fi
+\egroup}
 \newcommand{\thisPageAction}[2]{%
-    \let\@CloseAction\@empty
-    \let\@thisOpenAction\@empty
-    \let\@thisCloseAction\@empty
-    \def\dljs@argi{#1}\def\dljs@argii{#2}%
+  \let\@CloseAction\@empty
+  \let\@thisOpenAction\@empty
+  \let\@thisCloseAction\@empty
+  \def\dljs@argi{#1}\def\dljs@argii{#2}%
 %    \end{macrocode}
 % On the first page, \cs{OpenAction} is used to process the open action
 %    \begin{macrocode}
-    \ifnum\value{page}=1\relax
-        \ifx\dljs@argii\@empty\else
-            \dljs@bldScript{#2}{C}{\@CloseAction}\fi
-        \ifx\dljs@argi\@empty\else\dljs@tstlp#1\@nil
-            \ifx\dljs@multi\dl@NO\OpenAction{#1}\else
-            \@tfor\dljs@arg:=#1\do{\expandafter
-                \OpenAction\expandafter{\dljs@arg}%
-            }\fi
-        \fi
-    \else
+  \ifnum\value{page}=1\relax
+    \ifx\dljs@argii\@empty\else
+      \dljs@bldScript{#2}{C}{\@CloseAction}\fi
+    \ifx\dljs@argi\@empty\else\dljs@tstlp#1\@nil
+      \ifx\dljs@multi\dl@NO\OpenAction{#1}\else
+        \@tfor\dljs@arg:=#1\do{\expandafter
+          \OpenAction\expandafter{\dljs@arg}%
+        }\fi\fi
+  \else
 %    \end{macrocode}
 % If this is not the first page, we just populate the \texttt{/O} dictionary
 %    \begin{macrocode}
-        \ifx\dljs@argi\@empty\else
-            \dljs@bldScript{#1}{O}{\@thisOpenAction}\fi
-        \ifx\dljs@argii\@empty\else
-            \dljs@bldScript{#2}{C}{\@thisCloseAction}\fi
-        \@POAction
-    \fi
+    \ifx\dljs@argi\@empty\else
+      \dljs@bldScript{#1}{O}{\@thisOpenAction}\fi
+    \ifx\dljs@argii\@empty\else
+      \dljs@bldScript{#2}{C}{\@thisCloseAction}\fi
+    \@POAction
+  \fi
 }
 %    \end{macrocode}
 % \subsection{The \texttt{insDLJS} Environments}
@@ -1544,10 +1600,10 @@
 \let\insdljsloadVar\@empty
 \newenvironment{insDLJS}[3][]
 {%
-    \gdef\detectdljs{#1}\gdef\dljsBase{#2}%
-    \ifxetex{\def\1{\string\1}\def\2{\string2}%
-    \def\3{\string\3}\xdef\dljsName{#3}}\else
-    \Hy@unicodefalse\pdfstringdef{\dljsName}{#3}\fi
+  \gdef\detectdljs{#1}\gdef\dljsBase{#2}%
+  \ifxetex{\def\1{\string\1}\def\2{\string2}%
+  \def\3{\string\3}\xdef\dljsName{#3}}\else
+  \Hy@unicodefalse\pdfstringdef{\dljsName}{#3}\fi
 %    \end{macrocode}
 % If the optional argument is not passed,
 % we generate one for the user.
@@ -1555,32 +1611,32 @@
 % we generate one for the user.}
 %    \begin{macrocode}
 \ifx\detectdljs\@empty
-    \stepcounter{dljs@cnt}%
-    \xdef\detectdljs{_bInsdljsload\arabic{dljs@cnt}}%
-    \edef\insdljsloadVar{var \detectdljs=true;}%
-    \addtocounter{dljs@cnt}{-1}%
+  \stepcounter{dljs@cnt}%
+  \xdef\detectdljs{_bInsdljsload\arabic{dljs@cnt}}%
+  \edef\insdljsloadVar{var \detectdljs=true;}%
+  \addtocounter{dljs@cnt}{-1}%
 \fi
-    \global\let\multisegments\dl@NO\setcounter{dljssegs}{2}%
-    \global\dljsobjtoks={}%
-    \expandafter\ifx\csname dljs\dljsBase\endcsname\relax
-        \else\@insjserrDuplicate\fi
-    \ifcase\dljs@drivernum
-        \let\insert@DLJS=\insert@DLJS@pdfmark
-        \let\endinsDLJS=\endinsert@DLJS@pdfmark
-        \let\newsegment=\newsegment@pdfmark
-        \let\endnewsegment=\endnewsegment@pdfmark
-    \or
-        \let\insert@DLJS=\insert@DLJS@pdftex
-        \let\endinsDLJS=\endinsert@DLJS@pdftex
-        \let\newsegment=\newsegment@pdftex
-        \let\endnewsegment=\endnewsegment@pdftex
-    \or
-        \let\insert@DLJS=\insert@DLJS@dvipdfm
-        \let\endinsDLJS=\endinsert@DLJS@dvipdfm
-        \let\newsegment=\newsegment@dvipdfm
-        \let\endnewsegment=\endnewsegment@dvipdfm
-    \fi
-    \insert@DLJS
+  \global\let\multisegments\dl@NO\setcounter{dljssegs}{2}%
+  \global\dljsobjtoks={}\expandafter
+  \ifx\csname dljs\dljsBase\endcsname\relax
+    \else\@insjserrDuplicate\fi
+  \ifcase\dljs@drivernum
+    \let\insert@DLJS=\insert@DLJS@pdfmark
+    \let\endinsDLJS=\endinsert@DLJS@pdfmark
+    \let\newsegment=\newsegment@pdfmark
+    \let\endnewsegment=\endnewsegment@pdfmark
+  \or
+    \let\insert@DLJS=\insert@DLJS@pdftex
+    \let\endinsDLJS=\endinsert@DLJS@pdftex
+    \let\newsegment=\newsegment@pdftex
+    \let\endnewsegment=\endnewsegment@pdftex
+  \or
+    \let\insert@DLJS=\insert@DLJS@dvipdfm
+    \let\endinsDLJS=\endinsert@DLJS@dvipdfm
+    \let\newsegment=\newsegment@dvipdfm
+    \let\endnewsegment=\endnewsegment@dvipdfm
+  \fi
+  \insert@DLJS
 }{}
 %    \end{macrocode}
 %
@@ -1634,7 +1690,7 @@
 %    \begin{macrocode}
 \newenvironment{insDLJS*}[2][]
 {%
-    \gdef\detectdljs{#1}\gdef\dljsBase{#2}%
+  \gdef\detectdljs{#1}\gdef\dljsBase{#2}%
 %    \end{macrocode}
 % If the optional argument is not passed,
 % we generate one for the user.
@@ -1642,43 +1698,40 @@
 % we generate one for the user.}
 %    \begin{macrocode}
 \ifx\detectdljs\@empty
-    \stepcounter{dljs@cnt}%
-    \xdef\detectdljs{_bInsdljsload\arabic{dljs@cnt}}%
-    \edef\insdljsloadVar{var \detectdljs=true;}%
-    \addtocounter{dljs@cnt}{-1}%
+  \stepcounter{dljs@cnt}%
+  \xdef\detectdljs{_bInsdljsload\arabic{dljs@cnt}}%
+  \edef\insdljsloadVar{var \detectdljs=true;}%
+  \addtocounter{dljs@cnt}{-1}%
 \fi
-    \global\let\multisegments\dl@YES\setcounter{dljssegs}{2}%
-    \global\dljsobjtoks={}%
-    \expandafter\ifx\csname dljs\dljsBase\endcsname\relax
-        \else\@insjserrDuplicate\fi
-    \ifcase\dljs@drivernum
-        \let\insert@DLJS=\insert@DLJS@pdfmark
-        \expandafter
-            \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdfmark
-        \let\newsegment=\newsegment@pdfmark
-        \let\endnewsegment=\endnewsegment@pdfmark
-    \or
-        \let\insert@DLJS=\insert@DLJS@pdftex
-        \expandafter
-            \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdftex
-        \let\newsegment=\newsegment@pdftex
-        \let\endnewsegment=\endnewsegment@pdftex
-    \or
-        \let\insert@DLJS=\insert@DLJS@dvipdfm
-        \expandafter
-            \let\csname endinsDLJS*\endcsname\endinsert@DLJS@dvipdfm
-        \let\newsegment=\newsegment@dvipdfm
-        \let\endnewsegment=\endnewsegment@dvipdfm
-    \fi
-    \insert@DLJS
+  \global\let\multisegments\dl@YES\setcounter{dljssegs}{2}%
+  \global\dljsobjtoks={}%
+  \expandafter\ifx\csname dljs\dljsBase\endcsname\relax
+    \else\@insjserrDuplicate\fi
+  \ifcase\dljs@drivernum
+    \let\insert@DLJS=\insert@DLJS@pdfmark\expandafter
+    \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdfmark
+    \let\newsegment=\newsegment@pdfmark
+    \let\endnewsegment=\endnewsegment@pdfmark
+  \or
+    \let\insert@DLJS=\insert@DLJS@pdftex\expandafter
+    \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdftex
+    \let\newsegment=\newsegment@pdftex
+    \let\endnewsegment=\endnewsegment@pdftex
+  \or
+    \let\insert@DLJS=\insert@DLJS@dvipdfm\expandafter
+    \let\csname endinsDLJS*\endcsname\endinsert@DLJS@dvipdfm
+    \let\newsegment=\newsegment@dvipdfm
+    \let\endnewsegment=\endnewsegment@dvipdfm
+  \fi
+  \insert@DLJS
 }{}
 \def\@insjserrDuplicate{%
-    \typeout{^^J! insdljs Package error.}
-    \typeout{! insDLJS environment: On line number \the\inputlineno,}
-    \typeout{! the base name `\dljsBase' has already been chosen.}
-    \typeout{! A DLJS earlier defined has been overwritten!}
-    \typeout{! Choose another name for the first required argument}
-    \typeout{! of the insDLJS environment.^^J}
+  \typeout{^^J! insdljs Package error.}
+  \typeout{! insDLJS environment: On line number \the\inputlineno,}
+  \typeout{! the base name `\dljsBase' has already been chosen.}
+  \typeout{! A DLJS earlier defined has been overwritten!}
+  \typeout{! Choose another name for the first required argument}
+  \typeout{! of the insDLJS environment.^^J}
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -1708,18 +1761,18 @@
 %    \begin{macrocode}
 \let\DLspecialDefs\@empty
 \def\fdfAfterheader#1{%
-    \iwvo{\string\begingroup\string\efdlspecials}
-    \iwvo{\string\DLspecialDefs\string#1}
-    \iwvo{\string\isdljstrue}
-    \iwvo{\string\makeatletter}
-    \iwvo{\string\immediate\string\openout\string
+  \iwvo{\string\begingroup\string\efdlspecials}
+  \iwvo{\string\DLspecialDefs\string#1}
+  \iwvo{\string\isdljstrue}
+  \iwvo{\string\makeatletter}
+  \iwvo{\string\immediate\string\openout\string
 \js@verbatim@out=\string\js@Path\space\dljsBase.fdf}%
-    \iwvo{\string\begin{jsexpverbatimwrite}}
-    \iwvo{\string\firstFDFline}
-    \iwvo{1 0 obj}
-    \iwvo{<< /FDF << /JavaScript << /Doc 2 0 R /After 3 0 R >> >> >> }
-    \iwvo{endobj}
-    \iwvo{2 0 obj}
+  \iwvo{\string\begin{jsexpverbatimwrite}}
+  \iwvo{\string\firstFDFline}
+  \iwvo{1 0 obj}
+  \iwvo{<< /FDF << /JavaScript << /Doc 2 0 R /After 3 0 R >> >> >> }
+  \iwvo{endobj}
+  \iwvo{2 0 obj}
 %    \end{macrocode}
 %    When a non-Distiller workflow, ensure execJSs are listed first.
 %    \changes{v2.2h}{2016/06/09}{When a non-Distiller workflow, ensure execJSs are listed first}
@@ -1753,34 +1806,34 @@
 \def\restoreDLspecialDefs{\let\DLspecialDefs\@empty}
 \newenvironment{execJS}[2][\relax]
 {%
-    \def\x{#1}\ifx\x\@empty\def\x{\relax}\fi
-    \gdef\detectdljs{\string_#2}\gdef\dljsBase{#2}%
-    \global\dljsobjtoks={}%
-    \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
-    \ifx\importdljs\dl@YES\ifx\execjs\dl@YES
-        \ifx\dl@gopro\dl@YES
-        \ifnum\dljs@drivernum=0\relax
-            \addImportAnFDF\importAnFDFTemplate
-        \else
-            \OpenAction{/S/JavaScript/JS (\importAnFDFTemplate)}%
-        \fi\fi
+  \def\x{#1}\ifx\x\@empty\def\x{\relax}\fi
+  \gdef\detectdljs{\string_#2}\gdef\dljsBase{#2}%
+  \global\dljsobjtoks={}%
+  \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
+  \ifx\importdljs\dl@YES\ifx\execjs\dl@YES
+    \ifx\dl@gopro\dl@YES
+    \ifnum\dljs@drivernum=0\relax
+      \addImportAnFDF\importAnFDFTemplate
+    \else
+      \OpenAction{/S/JavaScript/JS (\importAnFDFTemplate)}%
     \fi\fi
-    \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \expandafter\fdfAfterheader\expandafter{\x}%
-    \js@verbatimwrite
+  \fi\fi
+  \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
+  \expandafter\fdfAfterheader\expandafter{\x}%
+  \js@verbatimwrite
 }{%
-    \fdfendstreamobj
-    \endjs@verbatimwrite
-    \fdftrailer
+  \fdfendstreamobj
+  \endjs@verbatimwrite
+  \fdftrailer
 %    \end{macrocode}
 %    Added \cs{restoreDLspecialsDefs} to restore \cs{DLspecialDefs} to its default of \cs{@empty}.
 %    \changes{v2.4.4}{2019/07/14}{Added \string\cs{restoreDLspecialsDefs}}
 %    \begin{macrocode}
-    \iwvo{\string\restoreDLspecialDefs}%
-    \closejs@verbatim@out
-    \expandafter\xdef\csname\dljsBase OBJ\endcsname{\the\dljsobjtoks}%
-    \edef\@dljstmp{\noexpand\AtBeginDocument{%
-        \noexpand\input{\js@Path\dljsBase.djs}}}\@dljstmp
+  \iwvo{\string\restoreDLspecialDefs}%
+  \closejs@verbatim@out
+  \expandafter\xdef\csname\dljsBase OBJ\endcsname{\the\dljsobjtoks}%
+  \edef\@dljstmp{\noexpand\AtBeginDocument{%
+    \noexpand\input{\js@Path\dljsBase.djs}}}\@dljstmp
 %    \end{macrocode}
 %\changes{v2.2g}{2016/05/11}{Removed \string\cs{AtBeginDocument} code
 %from the \string\texttt{execJS} environment. This causes problems with
@@ -1825,7 +1878,7 @@
 %   of the environment. (Note, within the body, there is no escape character unless you change catcode of another character
 %   within the optional argument of the \env{defineJS} environments.)
 %\begin{verbatim}
-%   \begin{defineJS}[\catcode`\!=0\relax]{\myCode}
+%   \begin{defineJS}[\makeesc\!]{\myCode}
 %   var p1=!p(1), p2=!p(2);
 %   app.alert("p1 + p2 = " + Number(p1+p2) );
 %   \end{defineJS}
@@ -1882,58 +1935,61 @@
   \JStoks=\expandafter{\x}\expandafter
   \edef\csname\p@r@m\the\c@dljs@cnt\endcsname{\the\JStoks}}}
 %    \end{macrocode}
-%    Beginning with \pkg{insdljs} dated 2019/03/16, we solve an age-old problem with \app{dvips}: This problem
-%    is that is wraps code around to the next line, according to some unknown algorithm. Normally this is not
-%    a problem, but occassionally it will wrap some JavaScript code that breaks the code. Solve this problem,
-%    we make the space character active, and replace it with \cs{pdfSP} (\cs{040}), which is octal for the space
-%    character. Now there are no free spaces for \app{dvips} to break the line at in the PS file. The feature
-%    is turned on by default, and may be turned off with \DescribeMacro\pdfSpacesOff\cs{pdfSpacesOff}
-%    and back on by \DescribeMacro\pdfSpacesOn\cs{pdfSpacesOn}.
-%    \begin{macrocode}
-\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
-\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
-%    \end{macrocode}
 %    \DescribeMacro{\dlcombine}\hskip-\marginparsep\texttt{(\#1)(\#2)}
-%    Within the \env{defineJS} environment, spaces are obeyed, at time, we want to says
-%    \verb*|@currQuiz MyField|, for example. which within \env{defineJS} gets expanded to
+%    (In this discussion, it is assumed `\texttt{@}' is the escape character
+%    within \env{defineJS}.)
+%    Within the \env{defineJS} environment, spaces are obeyed; at times, we want to say
+%    \verb*|@currQuiz MyField|, for example, which within \env{defineJS} gets expanded to
 %    \verb*|q1 MyField|, not \texttt{q1MyField} as it should be. To solve this and other
 %    problems like it, use \verb|@dlcombine(@currQuiz)(MyField)| which does expand
-%    to the intended expression. (In this discussion, it is assumed \texttt{@} is the escape character
-%    within \env{defineJS}.)
+%    to the intended expression.
 %    \changes{v2.4.3}{2019/06/27}{Added \string\cs{dlcombine}}
 %    \begin{macrocode}
 \def\dlcombine(#1)(#2){#1#2}
 %    \end{macrocode}
+%    \DescribeMacro{\dlcontig}\hskip-\marginparsep\texttt{(\#1)} Perhaps a better method than
+%    just described (\cs{dlcombine}) is to have a single argument delimited by parentheses.
+%    Thus \verb|@currQuiz@dlcontig(MyField)| also produces \texttt{q1MyField}.
+%    \begin{macrocode}
+\def\dlcontig(#1){#1}
+%    \end{macrocode}
 %    When you declare a character to be an escape within the optional argument of \env{defineJS},
-%    that character may be needed in the code; for example if we say |\catcode`\!=0\relax|, and
-%    within the JavaScript code you have \texttt{if (x != 0 ) ...}, there is a problem: the JavaScript
+%    that character may be needed in the code; for example if we declare |\makeesc\!|, and
+%    within the JavaScript code we have \texttt{if (x != 0 )...}, the JavaScript
 %    code is broken. As a fix for this problem, you can declare \DescribeMacro\escIs|\escIs{!}|,
-%    which in turn defines \DescribeMacro\Eschr\cs{Eschr}. the above code
-%    should then be written as \texttt{if (x !Eschr= 0 ) ...}; messy, but it works. The lines
-%    below is the recommended method of declaring \cs{escIs}:
+%    which in turn defines \DescribeMacro\Eschr\cs{Eschr} to expand to `\texttt!'. The above code
+%    may then be written as \texttt{if (x !Eschr= 0 )...}; messy, but it works. The lines
+%    below are the recommended method of declaring \cs{escIs}:
 %\begin{verbatim}
 %   \pushButton[\cmd{\escIs{!}\bParams{77}{11}\eParams}
 %     \A{\JS{\myCode}}]{pbfld2}{.5in}{11bp}
 %\end{verbatim}
-%   These declarations makes everything local to the group within which the button is built.
+%   These declarations make everything local to the group within which the button is built.
 %    \begin{macrocode}
 \def\escIs#1{\def\Eschr{#1}}
 %    \end{macrocode}
 %    \DescribeMacro\makeesc\hskip-\marginparsep\texttt{\cs{\ameta{char}}}
 %    \cs{dl@makeesc} is a helper command that sets the escape character,
-%     Within the \env{defineJS} environments, it is \cs{let} to \DescribeMacro\makeesc\cs{makeesc};
-%     eg, |\makeesc\@|
+%     Within the \env{defineJS} environments, it is \cs{let} to \cs{makeesc};
+%     eg, |\makeesc\!|.
 %    \changes{v2.4.3}{2019/06/27}{Added \string\cs{dl@makeesc}}
 %    \begin{macrocode}
 \def\dl@makeesc#1{\catcode`#1=0\relax}
 %    \end{macrocode}
-%    \leavevmode\DescribeMacro\dlgobToFi Used to format \env{defineJS} content
-%    when a conditional leaves an empty space; for example,
+%     \DescribeMacro\makecmt\hskip-\marginparsep\texttt{\cs{\ameta{char}}} Likewise,
+%     you can conviently declare the comment character, if any; eg, |\makecmt\%|.
+%    \changes{v2.4.10}{2020/11/28}{Added \string\cs{dl@makecmt}}
+%    \begin{macrocode}
+\def\dl@makecmt#1{\catcode`#1=14\relax}
+%    \end{macrocode}
+%    \paragraph*{Incorporating {\LaTeX} conditionals in \env{defineJS}.} {\LaTeX} conditionals
+%    need to be handled carefull so as not to produce any specious spaces. Normally, there is
+%    a comment character declared (|\makecmt\%|). Use the comment character to suppress the beginning
+%    of a new line until it is known whether there is content on that next line. Eg,
 %\begin{verbatim}
-%\begin{defineJS}[%
-%  \makeesc\*\catcode`\%=14\relax]{\X}
-%var w=1;
-%*ifx*Y*@empty*dlgobToFi*else%
+%\begin{defineJS}[\makeesc\*\makecmt\%]{\X}
+%var w=1;%
+%*ifx*Y*@empty*else
 %var x=1;
 %var y=1;*fi
 %var z=1;
@@ -1951,59 +2007,97 @@
 %var y=1;
 %var z=1;
 %\end{verbatim}
+%    The following two commands are no longer used by this package.
 %    \changes{v2.4.8}{2019/10/30}{Added \string\cs{dlgobToFi} to help format
 %    \string\env{defineJS} code}
 %    \begin{macrocode}
-\def\dlgobToFi#1\fi{\defjsLB}
+\def\dlgobToFi#1\fi{\fi\defjsLB}
+\let\gobiv\@gobblefour
+%    \end{macrocode}
+%    \textbf{Typesetting content with the \cs{typeset} keyword macro.}
+%    To aid typesetting the contents of a \env{defineJS} environment,
+%    the keyword macro \DescribeMacro{\typeset}\cs{typeset}, which is defined only within the environment,
+%    can be used. Pass \cs{typeset} to \env{defineJS} through the optional argument.
+%    \changes{v2.5}{2020/12/20}{Added the command \string\cs{typeset} to typeset the
+%    contents of the \string\env{defineJS} environment}
+%    \begin{macrocode}
+\newif\ifdlfortypeset \dlfortypesetfalse
+%    \end{macrocode}
+%    The macro \cs{dl@typesetthis} defined here, is the external version of the local command
+%    \cs{typeset}. It globally sets the switch \cs{ifdlfortypeset} to true and defines the value
+%    of \cs{dfnJSR} and the legacy command \cs{defineJSjsR}. For \cs{dfnJSCR}, we use only {\TeX}
+%    primitives to maintain compatibilty with the now defunct YandY System, which I still use.
+%    \begin{macrocode}
+\def\dl@typesetthis{\global\dlfortypesettrue
+  \dfnJSCR{\hfil\break\null}}
+%    \end{macrocode}
+%    Next, we define some components common to all define-js environments. First, we initialize
+%    the environment with several \cs{let}s.
+%    \begin{macrocode}
+\def\@initdfnJS{\let\jsFrstLne\dl@One\let\makeesc\dl@makeesc
+  \let\makecmt\dl@makecmt\let\typeset\dl@typesetthis}
+%    \end{macrocode}
+%    (2020/12/20) Insert \cs{defineJSJsR} (an alias of \cs{dfnJSR}) at the \emph{beginning} of the second line
+%    onward. This gives better formatting of the code within the editor, without
+%    an empty final line.
+%    \changes{v2.5}{2020/12/20}{Modified \string\cs{verbatim@line} in \string\env{defineJS}}
+%    \begin{macrocode}
+\def\@vrbsetupdfnJS{\def\verbatim@processline{\ifx\jsFrstLne\dl@One
+  \let\jsFrstLne\dl@Zero
+  \xdef\JS@temp{\the\JStoks\the\verbatim@line}\else
+  \xdef\JS@temp{\the\JStoks\defineJSjsR\the\verbatim@line}\fi
+  \global\JStoks=\expandafter{\JS@temp}}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active}
+%    \end{macrocode}
+%   We \cs{let} \cs{space} to \cs{pdfSP}, and declare \cs{obeyspaces}, in this way, the space
+%   character is active and is equal to \cs{040} (space). Start the verbatim environment.
+%    \begin{macrocode}
+\def\b@vrbdfnJS#1{\global\let\space\pdfSP\makeatletter\obeyspaces%
+%    \end{macrocode}
+%     Pass the first argument here. If this environment is for typesetting,
+%     initialize the tokens \cs{JStoks} to be in a group, and such. The insertion
+%     of \cs{dl@paramlocal} is to support the \cs{bParams}/\allowbreak\cs{eParams} construct.
+%    \begin{macrocode}
+  #1\ifdlfortypeset\global\JStoks={\bgroup\leavevmode\dl@paramlocal}\fi%
+  \verbatim@start}
+%    \end{macrocode}
+%    The end of the environment code
+%    \begin{macrocode}
+\def\e@vrbdfnJS{\gdef\eq@JStemp{\ifdlfortypeset\global
+  \JStoks=\expandafter{\the\JStoks\egroup}\fi\expandafter
+  \edef\defineJSArg{\the\JStoks}\global
+  \dlfortypesetfalse}\global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
 %    \end{macrocode}
 %    Finally, we get to the definition of \env{defineJS}, and its compatriates.
 %    \begin{macrocode}
-\newenvironment{defineJS}[2][]{%
-  \let\makeesc\dl@makeesc
+\newenvironment{defineJS}[2][]{\@initdfnJS
   \expandafter\@ifundefined\expandafter{%
-  \expandafter\@gobble\string#2}{}{%
-  \PackageWarning{insdljs}{The command
-    \string#2 already defined}}%
-  \gdef\defineJSArg{#2}\JStoks={}%
-  \def\verbatim@processline{%
-    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-    \global\JStoks=\expandafter{\JS@temp}}%
-  \let\do\@makeother\dospecials\catcode`\^^M\active
-%    \end{macrocode}
-%   We let \cs{space} to \cs{pdfSP}, and declare \cs{obeyspaces}, in this way, the space
-%   character is active and is equal to \cs{040} (space).
-%    \begin{macrocode}
-  \global\let\space\pdfSP\makeatletter\obeyspaces
-  #1%
-  \verbatim@start
-}{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
+  \expandafter\@gobble\string#2}{}{\PackageWarning{insdljs}
+    {The command \string#2 already defined}}%
+  \gdef\defineJSArg{#2}\global\JStoks={}%
+  \@vrbsetupdfnJS
+  \b@vrbdfnJS{#1}}{\e@vrbdfnJS}
 %    \end{macrocode}
 %    \end{environment}
 %    \begin{environment}{@defineJS}
 % Silent version of \texttt{defineJS}, can repeatedly be used to redefine the same
-% macro.
+% macro. Note: |\makeesc\@| cannot be declared with the \env{@defineJS} environment.
 %    \begin{macrocode}
-\newenvironment{@defineJS}[2][]
-{%
-  \let\makeesc\dl@makeesc
-  \gdef\defineJSArg{#2}\JStoks={}%
-  \def\verbatim@processline{%
-    \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-    \global\JStoks=\expandafter{\JS@temp}}%
-  \let\do\@makeother\dospecials\catcode`\^^M\active
-  \global\let\space\pdfSP\makeatletter\obeyspaces
-  #1%
-  \verbatim@start
-}{\gdef\eq@JStemp{\expandafter\edef\defineJSArg{\the\JStoks}}%
-    \global\let\space\dl@sp@ce\aftergroup\eq@JStemp}
+\newenvironment{@defineJS}[2][]{\@initdfnJS
+  \gdef\defineJSArg{#2}\global\JStoks={}%
+  \@vrbsetupdfnJS
+  \b@vrbdfnJS{#1}}{\e@vrbdfnJS}
 %    \end{macrocode}
 %    \end{environment}
 %    \begin{environment}{defineJS*}
-%    We declare a public version of \env{@defineJS}
+%    A silent public version of \env{defineJS}.
+%   The \env{defineJS*} environment cannot use |\makeesc\*| in its optional argument.
 % \changes{v2.4.2}{2019/03/16}{define \string\env{defineJS*} a public version of \string\env{@defineJS}}
 %    \begin{macrocode}
-\newenvironment{defineJS*}{\@defineJS}{\end@defineJS}
+\newenvironment{defineJS*}[2][]{\@initdfnJS
+  \gdef\defineJSArg{#2}\global\JStoks={}%
+  \@vrbsetupdfnJS
+  \b@vrbdfnJS{#1}}{\e@vrbdfnJS}
 %    \end{macrocode}
 %    \end{environment}
 % An author might want these definitions to be local in definition, so the
@@ -2050,33 +2144,33 @@
 {\end@defineJS}
 \let\did@Print\@empty
 \def\dljs@willDidActions{/AA <<
-   \ifx\test@will@Close\@empty\else/WC <<
-        \JS{\will@Close} >>\fi
-   \ifx\test@will@Save\@empty\else/WS <<
-        \JS{\will@Save} >>\fi
-   \ifx\test@did@Save\@empty\else/DS <<
-        \JS{\did@Save} >>\fi
-   \ifx\test@will@Print\@empty\else/WP <<
-        \JS{\will@Print} >>\fi
-   \ifx\test@did@Print\@empty\else/DP <<
-        \JS{\did@Print} >>\fi
-    >>
+  \ifx\test@will@Close\@empty\else/WC <<
+    \JS{\will@Close} >>\fi
+  \ifx\test@will@Save\@empty\else/WS <<
+    \JS{\will@Save} >>\fi
+  \ifx\test@did@Save\@empty\else/DS <<
+    \JS{\did@Save} >>\fi
+  \ifx\test@will@Print\@empty\else/WP <<
+    \JS{\will@Print} >>\fi
+  \ifx\test@did@Print\@empty\else/DP <<
+    \JS{\did@Print} >>\fi
+  >>
 }
 \newcommand\dljs@setDocActions{%
-    \edef\test@will@Close{\will@Close}%
-    \edef\test@will@Save{\will@Save}%
-    \edef\test@did@Save{\did@Save}%
-    \edef\test@will@Print{\will@Print}%
-    \edef\test@did@Print{\did@Print}%
+  \edef\test@will@Close{\will@Close}%
+  \edef\test@will@Save{\will@Save}%
+  \edef\test@did@Save{\did@Save}%
+  \edef\test@will@Print{\will@Print}%
+  \edef\test@did@Print{\did@Print}%
 %    \end{macrocode}
 % Driver dependent code to put any document actions into the additional actions
 % dictionary of the document catalog.
 %    \begin{macrocode}
-    \ifpdf\pdfcatalog{\dljs@willDidActions}\else
-    \ifxetex\immediate
-        \@pdfm@mark{put @catalog <<\dljs@willDidActions>>}\else
-    \literalps@out{\AEB@psMrk
-     {Catalog} <<\dljs@willDidActions>> /PUT pdfmark}\fi\fi
+  \ifpdf\pdfcatalog{\dljs@willDidActions}\else
+  \ifxetex\immediate
+    \@pdfm@mark{put @catalog <<\dljs@willDidActions>>}\else
+  \literalps@out{\AEB@psMrk
+   {Catalog} <<\dljs@willDidActions>> /PUT pdfmark}\fi\fi
 }
 \@ifpackageloaded{aeb_pro}{}
     {\AtBeginDocument{\dljs@setDocActions}}
@@ -2107,7 +2201,7 @@
   \iwvo{\string\isdljstrue}
   \iwvo{\string\makeatletter}
   \iwvo{\string\immediate\string\openout\string
-      \js@verbatim@out=\string\js@Path\space\dljsBase.fdf}%
+    \js@verbatim@out=\string\js@Path\space\dljsBase.fdf}%
   \iwvo{\string\begin{jsexpverbatimwrite}}
   \iwvo{\string\firstFDFline}
   \iwvo{1 0 obj}
@@ -2115,7 +2209,7 @@
   \iwvo{endobj}
   \iwvo{2 0 obj}
   \iwvo{[ \string\csname\string\@gobble\space\dljsBase%
-      OBJ\string\endcsname]}
+    OBJ\string\endcsname]}
   \iwvo{endobj}
 }
 \def\fdfbeginstreamobj
@@ -2130,10 +2224,9 @@
 %\changes{v2.0k}{2012/06/21}{If the user has not passed the optional
 % name, we generated one for him, now we insert it into the \texttt{stream}.}
 %    \begin{macrocode}
-    \ifx\insdljsloadVar\@empty\else
-        \iwvo{\insdljsloadVar}
-        \global\let\insdljsloadVar\@empty
-    \fi
+  \ifx\insdljsloadVar\@empty\else
+    \iwvo{\insdljsloadVar}
+    \global\let\insdljsloadVar\@empty\fi
 }
 \def\fdfendstreamobj{%
   \iwvo{endstream}
@@ -2174,20 +2267,18 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 %   through a trusted function.
 %}
 %    \begin{macrocode}
-    ( app.viewerVersion > 8 ) ? %
-        aebTrustedFunctions( this, aebImportAnFDF, %
-        "\js@Path\dljsBase.fdf") : %
-        this.importAnFDF("\js@Path\dljsBase.fdf");\jsR
+  ( app.viewerVersion > 8 ) ? %
+    aebTrustedFunctions( this, aebImportAnFDF, %
+    "\js@Path\dljsBase.fdf") : %
+    this.importAnFDF("\js@Path\dljsBase.fdf");\jsR
 }
 %    \end{macrocode}
 % Add in another template into \cmd{\importfdftoks}.
 %    \begin{macrocode}
 \def\addImportAnFDF#1{%
-    \ifx\importdljs\dl@YES
-%        \let\jsR\relax\let\jsT\relax
-        \edef\importAnFDFtmp{\the\importfdftoks#1}%
-        \global\importfdftoks=\expandafter{\importAnFDFtmp}%
-    \fi
+  \ifx\importdljs\dl@YES
+    \edef\importAnFDFtmp{\the\importfdftoks#1}%
+    \global\importfdftoks=\expandafter{\importAnFDFtmp}\fi
 }
 %    \end{macrocode}
 % This is used by \texttt{insert@DLJS@pdfmark} and is placed
@@ -2201,47 +2292,47 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 % authorized way.
 %    \begin{macrocode}
 \newenvironment{newsegment@pdfmark}[1]{%
-    \addtocounter{dljssegs}{1}%
-    \addtocounter{dljs@cnt}{1}%
-    \Hy@unicodefalse\pdfstringdef{\dljsName}{#1}%
-    \edef\@dljstmp{\the\dljsobjtoks(\dljsName)
-        \thedljssegs\space 0 R\space}
-    \global\dljsobjtoks=\expandafter{\@dljstmp}
-    \fdfbeginstreamobj
-    \js@verbatimwrite
+  \addtocounter{dljssegs}{1}\addtocounter{dljs@cnt}{1}%
+  \Hy@unicodefalse\pdfstringdef{\dljsName}{#1}%
+  \edef\@dljstmp{\the\dljsobjtoks(\dljsName)
+    \thedljssegs\space 0 R\space}%
+  \global\dljsobjtoks=\expandafter{\@dljstmp}%
+  \fdfbeginstreamobj
+  \js@verbatimwrite
 }{%
-    \fdfendstreamobj
-    \endjs@verbatimwrite
+  \fdfendstreamobj
+  \endjs@verbatimwrite
 }
 \def\insert@DLJS@pdfmark{%
-    \global\let\dljspresent\dl@YES
-    \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
-    \ifx\importdljs\dl@YES\ifx\dl@gopro\dl@YES
-        \addImportAnFDF\importAnFDFTemplate
-    \fi\fi
-    \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
-    \fdfheader
-    \ifx\multisegments\dl@NO\expandafter
-        \newsegment\expandafter{\expandafter\dljsName\expandafter}\fi
+  \global\let\dljspresent\dl@YES
+  \expandafter\gdef\csname dljs\dljsBase\endcsname{}%
+  \ifx\importdljs\dl@YES\ifx\dl@gopro\dl@YES
+    \addImportAnFDF\importAnFDFTemplate\fi\fi
+  \immediate\openout \js@verbatim@out \js@Path\dljsBase.djs
+  \fdfheader
+  \ifx\multisegments\dl@NO\expandafter
+    \newsegment\expandafter{\expandafter\dljsName\expandafter}\fi
 }
 \def\endinsert@DLJS@pdfmark{%
-    \ifx\importdljs\dl@YES
-        \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
-        \fdftrailer
-        \closejs@verbatim@out
-        \expandafter\xdef\csname\dljsBase%
-            OBJ\endcsname{\the\dljsobjtoks}%
-        \edef\@dljstmp{\noexpand\AtBeginDocument{%
-            \noexpand\input{\js@Path\dljsBase.djs}}}%
-        \@dljstmp
-        \ifx\firstdljs\dl@YES
-            \AtBeginDocument{\edef\@dljstmp{\importAnFDF}%
-                \@dljstmp}\global\let\firstdljs\dl@NO
-        \fi
+  \ifx\importdljs\dl@YES
+    \ifx\multisegments\dl@NO\expandafter\endnewsegment\fi
+    \fdftrailer
+    \closejs@verbatim@out
+    \expandafter\xdef\csname\dljsBase%
+      OBJ\endcsname{\the\dljsobjtoks}%
+    \edef\@dljstmp{\noexpand\AtBeginDocument{%
+      \noexpand\input{\js@Path\dljsBase.djs}}}%
+    \@dljstmp
+    \ifx\firstdljs\dl@YES
+      \AtBeginDocument{\edef\@dljstmp{\importAnFDF}%
+        \@dljstmp}\global\let\firstdljs\dl@NO
     \fi
+  \fi
 }
 %    \end{macrocode}
+%
 %    \subsection{For \texttt{pdftex}/\texttt{dvipdfm}}
+%
 % Again, we break the problem of creating DLJS into four parts: \cmd{\begindljs},
 % \cmd{\enddljs}, the code itself, driver dependent material, \cmd{\write@pdftex@obj}
 % and \cmd{\write@dvipdfm@obj}.
@@ -2358,9 +2449,8 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 % of the PDF document. This code is inserted into the document in \texttt{insert@DLJS@pdftex}
 % using \cmd{\AtEndDocument}.
 %    \begin{macrocode}
-\def\setDLJSRef@pdftex
-{%
-  \noexpand\immediate\noexpand\pdfobj {%
+\def\setDLJSRef@pdftex{\noexpand
+  \immediate\noexpand\pdfobj {%
     << /Names [\the\importfdftoks] >> }%
   \edef\noexpand\objNames{\noexpand\the\noexpand\pdflastobj\space 0 R}%
   \pdfnames {/JavaScript \noexpand\objNames}%
@@ -2371,8 +2461,7 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 %    \begin{macrocode}
 \newenvironment{newsegment@dvipdfm}[1]
 {%
-  \addtocounter{dljssegs}{1}%
-  \addtocounter{dljs@cnt}{1}%
+  \addtocounter{dljssegs}{1}\addtocounter{dljs@cnt}{1}%
   \edef\tmp{^^J\string\immediate\string
     \csname\space @pdfm@mark\string\endcsname
     {obj @obj\dljsBase\roman{dljssegs}\space << /S/JavaScript%

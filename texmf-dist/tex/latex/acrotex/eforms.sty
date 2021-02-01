@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2019  D. P. Story                 %%
+%% Copyright (C) 2002-2020  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2019/10/23 v2.3.2 Provides general eforms support (dps)]
+ [2020/12/14 v2.4.1 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
@@ -115,16 +115,20 @@
 \@makeother\$\relax
 \newlength\eflength
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifxetex\else\pdfmarkuptrue\fi\fi
+\ifpdf\else\ifnum\eq@drivernum=2\relax\else\pdfmarkuptrue\fi\fi
 \RequirePackage{hyperref}
-\ifxetex\else\ifpdf\pdflinkmargin1bp\relax\else
+\ifnum\eq@drivernum=2\relax
+\else
+  \ifpdf\pdflinkmargin1bp\relax
+  \else
     \g@addto@macro\Hy@FirstPageHook{%
     \headerps@out{/HyperBorder {1.00375 PDFToDvips} def}}
-\fi\fi
+  \fi
+\fi
 \RequirePackage{insdljs}[2019/02/11] % incl conv-xkv
 \@ifpackageloaded{exerquiz}{}{%
-    \AtBeginDocument{\Form}
-    \AtEndDocument{\csname endForm\endcsname}
+  \AtBeginDocument{\Form}%
+  \AtEndDocument{\@nameuse{endForm}}
 }
 \@ifpackageloaded{aeb_pro}{}{%
   \newcommand{\taggedPDF}{%
@@ -145,6 +149,7 @@
 \@ifundefined{eq@tmpbox}{\newsavebox{\eq@tmpbox}}{}
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
 \@ifundefined{eq@tmpdimb}{\newdimen\eq@tmpdimb}{}
+\newdimen\b@ \b@=1bp
 \newlength\ef@dimena
 \newtoks\ef@scratchtoks
 \newif\ifmakeXasPD \makeXasPDtrue
@@ -185,9 +190,7 @@
   \ifx\end#1% if #1=\end, #2=\@nil.
     \let\ef@next\relax
   \else
-    \ifx#1\@empty
-      \def\ef@next{\processAppArgs}%
-    \else
+    \ifx#1\@empty\def\ef@next{\processAppArgs}\else
       \@getCmdName{\ui}\edef\arg@ui{\@CmdName}%
       \@getCmdName{#1}%
       \ifx\arg@ui\@CmdName
@@ -243,7 +246,7 @@
               \ifx\arg@epresets\@CmdName
                 \def\ef@next{\let\protect\noexpand
                   \edef\x{#2}\set@typeset@protect\expandafter
-                  \processAppArgs\x}% dps27
+                  \processAppArgs\x}%
               \else
                 \csname @eq%
                 \expandafter\@gobble\string#1\endcsname{#2}%
@@ -257,44 +260,68 @@
   \fi
   \ef@next
 }
-\def\@processEvery{\edef\eqtemp{}\toks0={}\@@processEvery}
-\def\@@processEvery#1{%
-    \ifx#1\end\def\ef@next{\the\toks0 }%
-    \else
-        \edef\eqtemp{\the\toks0 }%
-        \toks0=\expandafter{\eqtemp
-            \expandafter\processAppArgs#1\end\@nil}%
-        \def\ef@next{\@@processEvery}%
-    \fi
-    \ef@next
+\def\@processEvery{\edef\eqtemp{}\toks@={}\@@processEvery}
+\def\@@processEvery#1{\ifx#1\end
+  \def\ef@next{\the\toks@}\else
+  \edef\eqtemp{\the\toks@}%
+  \toks@=\expandafter{\eqtemp\expandafter
+    \processAppArgs#1\end\@nil}%
+  \def\ef@next{\@@processEvery}\fi\ef@next
 }
 \newdimen\eqcenterWidget
 \def\centerWidget#1{%
-    \ifeq@inlineCenter
-        \eqcenterWidget=#1\relax
-        \eqcenterWidget=.5\eqcenterWidget
-        \ifnum\eq@textSize=0\relax
-        \dimen@=-\eq@textSizeDefault bp\else
-        \dimen@=-\eq@textSize bp\fi
-        \dimen@=0.9167\dimen@ % 11/12
-        \dimen@=.5\dimen@
-        \advance\dimen@\eq@W@value bp
-        \ifx\eq@S\@empty\else
-            \def\eq@S@cmp{B}%
-            \ifx\eq@S@value\eq@S@cmp
-                \advance\dimen@ by \eq@W@value bp
-            \else
-                \def\eq@S@cmp{I}%
-                \ifx\eq@S@value\eq@S@cmp
-                    \advance\dimen@ by \eq@W@value bp
-                \else\advance\dimen@ by 1bp
-        \fi\fi\fi
-        \advance\eqcenterWidget by \dimen@
+  \ifeq@inlineCenter
+    \eqcenterWidget=#1\relax
+    \eqcenterWidget=.5\eqcenterWidget
+    \ifnum\eq@textSize=0\relax
+    \dimen@=-\eq@textSizeDefault\b@\else
+    \dimen@=-\eq@textSize\b@\fi
+    \dimen@=0.9167\dimen@ % 11/12
+    \dimen@=.5\dimen@
+    \advance\dimen@\eq@W@value\b@
+    \ifx\eq@S\@empty\else
+      \def\eq@S@cmp{B}%
+      \ifx\eq@S@value\eq@S@cmp
+        \advance\dimen@ by \eq@W@value\b@
+      \else
+        \def\eq@S@cmp{I}%
+        \ifx\eq@S@value\eq@S@cmp
+          \advance\dimen@ by \eq@W@value\b@
+        \else\advance\dimen@\b@
+    \fi\fi\fi
+    \advance\eqcenterWidget\dimen@
+  \else
+    \eqcenterWidget=#1\relax
+    \eqcenterWidget=.5\eqcenterWidget
+    \advance\eqcenterWidget-4\b@
+  \fi
+}
+\def\ef@optscale{%
+  \ifx\eq@width\@empty
+    \ifx\eq@height\@empty
+      \ifx\eq@scalefactor\@empty
+      \else
+        \@tempdima\eq@scalefactor\p@
+        \ifdim\@tempdima<\z@\edef\eq@scalefactor{-\eq@scalefactor}\fi
+        \setlength{\eflength}{\eq@rectH*\real{\eq@scalefactor}}%
+        \edef\eq@rectH{\the\eflength}%
+        \setlength{\eflength}{\eq@rectW*\real{\eq@scalefactor}}%
+        \xdef\eq@rectW{\the\eflength}%
+      \fi
     \else
-        \eqcenterWidget=#1\relax
-        \eqcenterWidget=.5\eqcenterWidget
-        \advance\eqcenterWidget by -4bp
+      \setlength{\eflength}{\eq@rectH}%
+      \ifdim\eflength>\z@
+        \setlength{\eflength}{\eq@height*\ratio{\eq@rectW}{\eq@rectH}}%
+        \edef\eq@rectW{\the\eflength}\edef\eq@rectH{\eq@height}%
+      \fi
     \fi
+  \else
+    \setlength{\eflength}{\eq@rectW}%
+    \ifdim\eflength>\z@
+      \setlength{\eflength}{\eq@width*\ratio{\eq@rectH}{\eq@rectW}}%
+      \edef\eq@rectH{\the\eflength}\edef\eq@rectW{\eq@width}%
+    \fi
+  \fi
 }
 \def\@eqF#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
     \let\eq@F\@empty\else\def\eq@F{/F #1}\fi}\def\eq@F{}
@@ -306,14 +333,14 @@
   \edef\link@BS{\if\eq@BS1/BS<<\eq@W\eq@S\eq@D>>\fi}%
   \ifx\eq@W\@empty\let\link@BS\@empty\fi
 }\def\link@BS{}
-\def\@eqpresets#1{#1}%
+\def\@eqpresets#1{#1}
 \def\@eqepresets#1{#1}
 \def\@eqW#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
   \let\eq@W\@empty\def\eq@W@value{0}\else
   \def\eq@W@value{#1}\def\eq@W{/W #1}\fi
-  \xdef\g@eq@W@value@bp{\eq@W@value bp}}
+  \xdef\g@eq@W@value@bp{\eq@W@value\b@}}
 \def\eq@W{}\def\eq@W@value{0}
-\def\g@eq@W@valu@bp{0bp} % dps 12/22
+\def\g@eq@W@valu@bp{0bp}
 \def\@eqS#1{\def\eq@S@value{#1}\ifx\eq@S@value\@empty
   \let\eq@S\@empty\else
   \def\eq@S{/S/#1}\def\eq@temp{D}%
@@ -395,9 +422,38 @@
   \def\eq@A{/A <<#1>>}\fi}\def\eq@A{}
 \def\@eqmlLink#1{\def\eq@arg{#1}\ifx\eq@arg\ef@true
   \let\ef@mlLink\ef@One\else\let\ef@mlLink\ef@Zero\fi}
+\def\ef@searchAction#1/Action#2\@nil{\def
+  \ef@argii{#2}\ifx\ef@argii\ef@end\let\ef@Action\ef@One\else
+  \let\ef@Action\ef@Zero\fi}
 \def\@eqLock#1{\def\eq@arg{#1}\ifx\eq@arg\@empty
-  \let\eq@Lock\@empty\else\def\eq@Lock{/Lock <<#1>>}\fi}
-\def\eq@Lock{}
+  \let\eq@Lock\@empty\else\def\lckArgs{#1}%
+  \ef@searchAction#1/Action\end\@nil
+  \ifx\ef@Action\ef@One\def\ef@next{\let\Action\lckAction#1}\else
+    \let\ef@next\relax\fi\ef@next
+  \def\eq@Lock{/Lock <<\lckArgs>>}\fi}
+\let\eq@Lock\@empty
+\def\lckAll{\All}
+\def\lckIncludeFields{\IncludeFields}
+\def\lckExcludeFields{\ExcludeFields}
+\def\lckActionTst#1{\let\X\ef@Yes#1}%
+\def\lckAction#1{\def\@rgi{#1}\ifx\@rgi\lckAll
+  \def\lckArgs{/Action/All}\let\ef@next\relax\else
+  \ifx\@rgi\lckIncludeFields
+    \def\ef@next{\lckGetFieldsFor{Include}}\else
+    \ifx\@rgi\lckExcludeFields
+      \def\ef@next{\lckGetFieldsFor{Exclude}}\else
+      \PackageWarning{eforms}%
+        {The argument of the \string\Lock key\MessageBreak
+        is not correctly expressed. Review the documentation}%
+    \fi
+  \fi
+\fi\ef@next
+}
+\def\lckGetFieldsFor#1#2{\@temptokena={}\@for\@fld:={#2}\do
+  {\edef\@etmp{\the\@temptokena(\@fld)}%
+    \@temptokena=\expandafter{\@etmp}%
+  }\edef\lckArgs{/Action/#1/Fields[\the\@temptokena]}%
+}
 \newif\ifisCalculate\isCalculatefalse
 \def\ef@searchCalc#1\AACalculate#2\@nil{%
   \ifx#2\end\else\aftergroup\isCalculatetrue\fi
@@ -475,10 +531,13 @@
 \def\@eqDA#1{\def\eq@DA{#1}}
 \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
 \def\@eqtextFont#1{\def\eq@textFont{/#1}}
-\def\eq@textFont{/Helv}
+\def\textFontDefault#1{\def\eq@textFontDefault{#1}
+  \def\eq@textFont{/#1}}
+\textFontDefault{Helv}
 \def\@eqtextSize#1{\def\eq@textSize{#1}}
-\def\eq@textSizeDefault{9}
-\edef\eq@textSize{\eq@textSizeDefault}
+\def\textSizeDefault#1{\def\eq@textSizeDefault{#1}
+  \def\eq@textSize{#1}}
+\textSizeDefault{9}
 \def\eq@RV@Body{<?xml version="1.0"?><body %
   xfa:APIVersion="Acroform:2.7.0.0" %
   xfa:contentType="text/html" %
@@ -742,6 +801,12 @@
   \setlength\eflength\eq@rectH\edef\eq@rectH{\the\eflength}\fi}
 \def\@eqrectW#1{\def\eq@rectW{#1}\ifx\eq@rectW\@empty\else
   \setlength\eflength\eq@rectW\edef\eq@rectW{\the\eflength}\fi}
+\def\@eqwidth#1{\def\eq@width{#1}}
+\let\eq@width\@empty
+\def\@eqheight#1{\def\eq@height{#1}}
+\let\eq@height\@empty
+\def\@eqscalefactor#1{\def\eq@scalefactor{#1}}
+\let\eq@scalefactor\@empty
 \def\@eqobjdef#1{\def\ef@arg{#1}\ifx\ef@arg\@empty
   \let\eq@objdef\@empty\else\def\eq@objdefName{#1}%
   \def\eq@objdef{/_objdef {#1}}\fi
@@ -812,18 +877,23 @@
 \let\eq@mlcrackinsat\@empty
 \def\@eqprotect#1{\eq@protect{#1}}
 \def\eq@protect#1{\let#1\@empty}
-\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
-\let\ef@multigroupradios\ef@NO
-\def\ef@stop{\relax} %\def\ef@relax{\relax}
-\def\protectedKeys#1#2{\ef@scratchtoks={}%
-  \@ifundefined{#1}{}{\PackageWarning{eforms}
+\def\ef@stop{\relax}
+\let\isst@r\ef@NO
+\def\protectedKeys{\@ifstar
+  {\let\isst@r\ef@YES\protectedKeys@i}
+  {\let\isst@r\ef@NO\protectedKeys@i}%
+}
+\def\protectedKeys@i#1#2{\ef@scratchtoks={}%
+  \@ifundefined{#1}{}{\ifx\isst@r\ef@NO\PackageWarning{eforms}
     {Be aware command name #1 is already\MessageBreak
-    in use}}\protectedKeys@gettwo#2\ef@stop\relax
-   \expandafter\edef\csname #1\endcsname{\the\ef@scratchtoks}}
+    in use}\fi}\protectedKeys@gettwo#2\ef@stop\relax
+   \csarg\edef{#1}{\the\ef@scratchtoks}}
 \def\protectedKeys@gettwo#1#2{%
   \ifx#1\ef@stop\else\ef@scratchtoks=\expandafter
     {\the\ef@scratchtoks\protect#1{#2}}\expandafter
     \protectedKeys@gettwo\fi}
+\def\@eqmultigroupradios#1{\let\ef@multigroupradios\ef@YES}
+\let\ef@multigroupradios\ef@NO
 \begingroup\catcode`\#=12 \catcode`*=6
   \ifpdfmarkup
     \gdef\ef@Hx*1*2{\@nameuse{efHex*1*2}}\else
@@ -936,7 +1006,6 @@
 \let\symbolchoice\@eqsymbolchoice
 \symbolchoice{check}
 \providecommand{\JS}[1]{/S/JavaScript/JS(#1)}
-\newcommand{\URI}[1]{/S/URI/URI(#1)}
 \providecommand{\Named}[1]{/S/Named/N/#1}
 \newcommand{\Next}[1]{/Next<<#1>>}
 \providecommand{\toggleAttachmentsPanel}[2]{%
@@ -1013,27 +1082,34 @@
         \edef\eq@rectH{\the\eflength}%
     \fi
 }
-\def\ef@djXPD{\ifxetex\ifmakeXasPD\ef@adjrectWH{2bp}\fi
-    \else\ifmakePDasX\ef@adjrectWH{-2bp}\fi\fi}
+\def\ef@djXPD{\ifxetex\ifmakeXasPD\ef@adjrectWH{2\b@}\fi
+    \else\ifmakePDasX\ef@adjrectWH{-2\b@}\fi\fi}
+\def\btnSpcr#1{\def\ef@btnspcr{#1}}
 \def\ef@btnspcr{}
 \@ifundefined{ifefpmpv}{\newif\ifefpmpv\efpmpvfalse}{}
 \def\pmpvOn{\efpmpvtrue\PackageInfo{eforms}
   {Turning on enhanced preview (\string\pmpvOn)}}\let\pmcaOn\pmpvOn
 \def\pmpvOff{\efpmpvfalse\PackageInfo{eforms}
   {Turning off enhanced preview (\string\pvpmOff)}}\let\pmcaOff\pmpvOff
+\def\ef@adjcapfont{%
+  \dimen@=\eq@textSize\b@
+  \dimen@1.00375\dimen@
+  \edef\eq@textSize@pt{\strip@pt\dimen@}%
+  \fontsize{\eq@textSize@pt}{0}\selectfont
+}
 \def\eq@setButtonProps#1#2{\makeJSspecials
   \processAppArgs#2\end\@nil  % set widget properties
+  \ifx\eq@rectW\@empty\else
+    \ifdim\eq@rectW>0pt \else\let\eq@rectW\@empty\fi\fi
+  \ifx\eq@rectW\@empty\else\expandafter\ef@optscale\fi
   \ifx\eq@BC\@empty\@eqW{}\else
     \if\eq@W@value0\let\eq@BC\@empty\fi\fi
   \Hy@pdfstringfalse
   \ifx\eq@rectW\@empty
     \ifnum\eq@textSize=0 \else
-      \dimen@=\eq@textSize bp
-      \dimen@1.00375\dimen@
-      \edef\eq@textSize@pt{\strip@pt\dimen@}%
-      \fontsize{\eq@textSize@pt}{0}\selectfont
+      \ef@adjcapfont
     \fi
-    \dimen@\eq@W@value bp
+    \dimen@\eq@W@value\b@
     \def\eq@S@B{B}\ifx\eq@S@value\eq@S@B
       \def\eq@btn@sp{\hbox to2\dimen@{\hfill}}%
     \else
@@ -1050,7 +1126,7 @@
     \sbox{\eq@tmpbox}{\ef@btnspcr\eq@AC\ef@btnspcr}%
     \ifdim\eq@tmpdima>\wd\eq@tmpbox\else
       \eq@tmpdima=\wd\eq@tmpbox\fi
-    \ifmakePDasX\advance\eq@tmpdima2bp\fi
+    \ifmakePDasX\advance\eq@tmpdima2\b@\fi
     \wd\eq@tmpbox=\eq@tmpdima
   \else % if \eq@rectW is not \@empty
     \wd\eq@tmpbox=\eq@rectW
@@ -1058,12 +1134,13 @@
   \ifefpmpv\Hy@pdfstringfalse
     \ifx\ef@isBGtransparent\ef@YES
       \let\ef@kvCA\@empty\fi
-    \ifx\ef@CApv\ef@YES\PMPV{\eq@CA}\fi\fi
+    \ifx\ef@CApv\ef@YES\ef@adjcapfont\PMPV{\eq@CA}\fi\fi
   \ef@djXPD#1%
 }
 \def\eq@setWidgetProps#1#2{\makeJSspecials
   \processAppArgs#2\end\@nil  % set widget properties
   \ifx\annot@type@link\annot@type\else
+    \ef@optscale
     \ifx\eq@BC\@empty\@eqW{}\else
     \if\eq@W@value0\let\eq@BC\@empty\fi\fi
   \fi
@@ -1080,18 +1157,18 @@
     \@makeother\"\@makeother\_}
 \newcommand\efKern[2]{\ifxetex\kern#2\else\kern#1\fi}
 \newcommand\olBdry{\bgroup\ifxetex
-    \@tempdima-\g@eq@W@value@bp\relax
-    \edef\@mtkern{\the\@tempdima}\else
-    \@tempdima2bp\relax\advance\@tempdima-\g@eq@W@value@bp\relax % 12/26
-    \edef\@mtkern{\the\@tempdima}\fi\kern\@mtkern\egroup
+  \@tempdima-\g@eq@W@value@bp
+  \edef\@mtkern{\the\@tempdima}\else
+  \@tempdima2\b@\advance\@tempdima-\g@eq@W@value@bp
+  \edef\@mtkern{\the\@tempdima}\fi\kern\@mtkern\egroup
 }
-\newcommand\cgBdry[1][0bp]{\bgroup\def\ef@rgi{#1}\ifx\ef@rgi\@empty
-    \def\ef@rgi{0bp}\fi\setlength{\@tempdima}{\ef@rgi}%
-    \ifxetex\else\addtolength{\@tempdima}{2bp}\fi
-    \kern\@tempdima\egroup\ignorespaces}
-\newcommand{\efSupprIndent}{\ef@scratchtoks=\expandafter{\the\everypar}%
+\newcommand\cgBdry[1][0\b@]{\bgroup\def\ef@rgi{#1}\ifx\ef@rgi\@empty
+  \def\ef@rgi{0\b@}\fi\setlength{\@tempdima}{\ef@rgi}%
+  \ifxetex\else\addtolength{\@tempdima}{2\b@}\fi
+  \kern\@tempdima\egroup\ignorespaces}
+\newcommand{\efSupprIndent}{\toks@=\expandafter{\the\everypar}%
   \everypar{{\setbox\z@\lastbox}\clubpenalty\@M
-  \everypar=\expandafter{\the\ef@scratchtoks}}}
+  \everypar=\expandafter{\the\toks@}}}
 \newcommand\volBdry{\bgroup\parskip0pt\relax\@@par\nointerlineskip
   \olBdry\egroup\efSupprIndent}
 \newcommand\vcgBdry{\@ifstar{\edef\ef@offset{\the\parskip}\vcgBdry@i}
@@ -1153,7 +1230,10 @@
   \g@addto@macro\eq@Opt{)}%
   \ef@pdfstrCLOpti}
 \def\annot@type@listbox{listbox}
-\newcommand\list@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\list@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\list@@@Box}\egroup
+\newcommand\list@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@listbox}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -1172,7 +1252,10 @@
   \mbox{\list@@Box{#1}{#2}{#3}{#4}{#5}{}{\eq@setWidgetProps
     \eq@choice@driver}{\listBoxDefaults\every@listBox}}}
 \def\annot@type@combobox{combobox}
-\newcommand\combo@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\combo@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\combo@@@Box}\egroup
+\newcommand\combo@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@combobox}%
   \@eqFf{\FfCombo}\pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -1268,15 +1351,19 @@
   \eq@rawPDF
 }
 \def\annot@type@button{pushbtn}
-\newcommand\push@@Button[7]{\begingroup
-  \let\nameuse\@nameuse\let\tops\texorpdfstring
+\bgroup\obeyspaces
+\gdef\push@@Button{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\push@@@Button}\egroup
+\newcommand\push@@@Button[7]{\endgroup\begingroup
+  \let\nameuse\@nameuse\let\tops\texorpdfstring%
   \edef\annot@type{\annot@type@button}%
-  \pdfstringdef\Fld@name{#2}\dl@paramlocal
-  \makeJSspecials\ef@preProcDefns
+  \pdfstringdef\Fld@name{#2}\dl@paramlocal%
+  \makeJSspecials\ef@preProcDefns%
   \def\eq@Ff{/Ff \FfPushButton}%
   \def\eq@DA{\eq@textFont\space\eq@textSize\space Tf \eq@textColor}%
   \eqf@setDimens{#3}{#4}%
   \@processEvery#7\end\noindent#5#6{#1}}
+
 \def\pushButtonDefaults{%
   \W{1}\S{B}\F{\FPrint}\BC{0 0 0}
   \H{P}\BG{.7529 .7529 .7529}}
@@ -1290,7 +1377,10 @@
 \def\pmpvMrk#1{\def\pmpv@mrk{#1}}
 \pmpvMrk{X}
 \def\annot@type@checkbox{checkbox}
-\newcommand\check@@Box[8]{\begingroup
+\bgroup\obeyspaces
+\gdef\check@@Box{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\check@@@Box}\egroup
+\newcommand\check@@@Box[8]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \let\#\ef@Hx\edef\annot@type{\annot@type@checkbox}%
   \pdfstringdef\Fld@name{#2}\@eqAS{Off}\dl@paramlocal
@@ -1323,28 +1413,26 @@
 \let\ef@lateWidgetOpts\relax
 \def\annot@type@radio{radiobtn}
 \def\ef@NewRadiosLateOpts{%
-  \ifuseNewRadios
-    \@nameuse{multigroup@\Fld@name}%
-    \ifx\ef@multigroupradios\ef@YES
-      \ifpdfmarkup
-        \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
-        \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
-      \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
-        \@eqAS{Off}\else % today
-      \ifnum\@nameuse{OnVal@\Fld@name}=%
-        \@nameuse{radioindex@\Fld@name}\relax
-      \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
-    \else
-      \edef\x{\@nameuse{OnVal@\Fld@name}}%
-      \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
-        \@eqAS{Off}\fi
-    \fi
-    \@nameuse{uniradios@\Fld@name}%
-    \ifx\isRadiosInUnison\ef@YES
-      \edef\x{\@nameuse{value@\Fld@name}}%
-      \ifx\x\ef@thisChoice\expandafter\@eqAS
-        \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
-    \fi
+  \@nameuse{multigroup@\Fld@name}%
+  \ifx\ef@multigroupradios\ef@YES
+    \ifpdfmarkup
+      \def\eq@On{(\@nameuse{radioindex@\Fld@name}) cvn }\else
+      \def\eq@On{/\@nameuse{radioindex@\Fld@name}}\fi
+    \expandafter\ifx\csname OnVal@\Fld@name\endcsname\relax
+      \@eqAS{Off}\else % today
+    \ifnum\@nameuse{OnVal@\Fld@name}=%
+      \@nameuse{radioindex@\Fld@name}\relax
+    \@eqAS{\@nameuse{radioindex@\Fld@name}}\else\@eqAS{Off}\fi\fi
+  \else
+    \edef\x{\@nameuse{OnVal@\Fld@name}}%
+    \ifx\x\ef@thisChoice\@eqAS{\@nameuse{OnVal@\Fld@name}}\else
+      \@eqAS{Off}\fi
+  \fi
+  \@nameuse{uniradios@\Fld@name}%
+  \ifx\isRadiosInUnison\ef@YES
+    \edef\x{\@nameuse{value@\Fld@name}}%
+    \ifx\x\ef@thisChoice\expandafter\@eqAS
+      \expandafter{\ef@thisChoice}\else\@eqAS{Off}\fi
   \fi
 }
 \def\ef@advanceRadioIndex#1{\bgroup
@@ -1367,7 +1455,10 @@
     \@ifundefined{parent@\Fld@name}
     {\ef@radioWarning\global\let\ef@radioWarning\relax}{}\fi
 }
-\newcommand\radio@@Button[8]{\begingroup\let\#\ef@Hx
+\bgroup\obeyspaces
+\gdef\radio@@Button{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\radio@@@Button}\egroup
+\newcommand\radio@@@Button[8]{\endgroup\begingroup\let\#\ef@Hx
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@radio}%
   \pdfstringdef\Fld@name{#2}%
@@ -1448,7 +1539,10 @@
   \eq@rawPDF
 }
 \def\annot@type@text{textfld}
-\newcommand\text@@Field[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\text@@Field{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\text@@@Field}\egroup
+\newcommand\text@@@Field[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@text}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -1480,7 +1574,10 @@
   \eq@rawPDF
 }
 \def\annot@type@sig{sigfld}
-\newcommand\sig@@Field[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\sig@@Field{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\sig@@@Field}\egroup
+\newcommand\sig@@@Field[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \edef\annot@type{\annot@type@sig}%
   \pdfstringdef\Fld@name{#2}\dl@paramlocal
@@ -1503,7 +1600,10 @@
   \eq@rawPDF      % everything else
 }
 \def\annot@type@link{link}
-\newcommand\set@@Link[7]{\begingroup
+\bgroup\obeyspaces
+\gdef\set@@Link{\begingroup\global\let =\pdfSP
+\ef@sanitize@toks\set@@@Link}\egroup
+\newcommand\set@@@Link[7]{\endgroup\begingroup
   \let\nameuse\@nameuse\let\tops\texorpdfstring
   \dl@paramlocal
   \makeJSspecials

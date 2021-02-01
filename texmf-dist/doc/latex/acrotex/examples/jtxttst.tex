@@ -5,8 +5,6 @@
 \usepackage{exerquiz}
 \usepackage[indefIntegral]{dljslib}
 
-% \previewOn \pmpvOn
-
 \title{Extending the Exerquiz Package Text Fill-in Questions}
 \author{D. P. Story}
 \subject{Sample file}
@@ -37,11 +35,11 @@ Department of Mathematics}
 
 \section{Text Fill-in Questions}
 
-\textsf{Exerquiz} can now create text fill-in questions,
-questions in which the response is text (as opposed to a
-mathematical expression). The underlying JavaScript compares the
-user's response against acceptable alternatives, as supplied by
-the author of the question. If there is a match, the response is
+\textsf{Exerquiz} can now create text fill-in questions, questions
+in which the response is text (as opposed to a mathematical
+expression). The underlying JavaScript compares the user's
+response against acceptable alternatives, as supplied by the
+author of the question. If there is a match, the response is
 deemed correct. For example:
 
 \redpoint\begin{oQuestion}{ex1}%
@@ -51,59 +49,52 @@ Who was the first President\footnote{of the United States}?\
 \end{oQuestion}
 
 \medskip\noindent
-The command \cs{RespBoxTxt} is the one that creates a text
-fill-in question. Its syntax is
+The command \cs{RespBoxTxt} is the one that creates a text fill-in question. Its
+syntax is
 \begin{verbatim}
 \RespBoxTxt[#1]#2#3[#4]#5<plus listing of alternatives>
 \end{verbatim}
 \noindent\textbf{\hypertarget{paraRespBoxTxt}{Parameters:}}
 \begin{enumerate}
-\item[\ttfamily\#1:]Optional parameter used to modify the
-    appearance of the text field.
-\item[\ttfamily\#2:]This required parameter is a number that
-    indicates the filtering method to be used. Permissible
-    values of this parameter are
+\item[\ttfamily\#1:]Optional parameter used to modify the appearance of the
+    text field.
+\item[\ttfamily\#2:]This required parameter is a number that indicates
+the filtering method to be used. Permissible values of this parameter are
 \begin{enumerate}
-    \item[\ttfamily-1:] (The default) The author's and
-        user's answers are not filtered in any way. (Spaces,
-        case, and punctuation are preserved.)
-    \item[\ttfamily0:] The author's and user's answers are
-        converted to lower case, any white space and
-        non-word characters are removed.
-    \item[\ttfamily1:] The author's and user's answers are
-        converted to lower case, any white space is removed.
-    \item[\ttfamily2:] The author's and user's answers are
-        stripped of white space.
+    \item[\ttfamily-1:] (The default) The author's and user's answers are not filtered
+    in any way. (Spaces, case, and punctuation are preserved.)
+    \item[\ttfamily0:] The author's and user's answers are converted to
+    lower case, any white space and non-word characters are removed.
+    \item[\ttfamily1:] The author's and user's answers are converted to
+    lower case, any white space is removed.
+    \item[\ttfamily2:] The author's and user's answers are stripped of
+    white space.
 \end{enumerate}
-See the JavaScript function \texttt{eqFilter} in
-\texttt{exerquiz.dtx} for program code details.  Additional
-filtering options may be added.
+See the JavaScript function \texttt{eqFilter} in \texttt{exerquiz.dtx} for
+program code details.  Additional filtering options may be added.
 
-\item[\ttfamily\#3:] This parameter is a number that indicates
-    the compare method to be used. Permissible values of this
-    parameter are
+\item[\ttfamily\#3:] This parameter is a number that indicates the compare
+method to be used. Permissible values of this parameter are
 \begin{enumerate}
-    \item[\ttfamily0:] (The default) The author's and user's
-        answers are compared for an exact match. (These
-        answers are filtered before they are compared.)
-    \item[\ttfamily1:] The user's response is searched in an
-        attempt to get a substring match with the author's
-        alternatives. Additional comparison methods may be
-        added.
+    \item[\ttfamily0:] (The default) The author's and user's answers are
+    compared for an exact match. (These answers are filtered before they are
+    compared.)
+    \item[\ttfamily1:] The user's response is searched in an attempt to
+    get a substring match with the author's alternatives. Additional comparison
+    methods may be added.
 \end{enumerate}
 See the JavaScript function \texttt{compareTxt} in
 \texttt{exerquiz.dtx} for the program code details.
 
 \item[\ttfamily\#4:] Optional, a named destination to the
-    solution to the question. If this parameter appears, then
-    a solution must follow the question, enclosed in a
-    \texttt{solution} environment.  If the forth parameter is
-    a `\texttt*', then an automatic naming scheme is used
-    instead.
-\item[\ttfamily\#5:] This required parameter is the number of
-    alternative answers that are acceptable. The alternative
-    answers are listed immediately after this parameter. (The
-    example above specified that $4$ alternatives follow.)
+solution to the question. If this parameter appears, then a
+solution must follow the question, enclosed in a \texttt{solution}
+environment.  If the forth parameter is a `\texttt*', then an automatic
+naming scheme is used instead.
+\item[\ttfamily\#5:] This required parameter is the
+number of alternative answers that are acceptable. The alternative
+answers are listed immediately after this parameter. (The example
+above specified that $4$ alternatives follow.)
 \end{enumerate}
 
 \makeatletter

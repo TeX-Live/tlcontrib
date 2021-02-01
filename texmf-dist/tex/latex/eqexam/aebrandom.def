@@ -18,11 +18,11 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebrandom.def}
- [2020/03/14 v8.5.10 %
+ [2021/01/20 v8.6.2 %
  Exerquiz support for randomization (dps)]
 \@ifundefined{nextrandom}{\input{random.tex}}{}
 \def\nextrandom{\begingroup
- \ifnum\randomi<\@ne % then initialize with time
+  \ifnum\randomi<\@ne % then initialize with time
     \global\randomi\time
     \global\multiply\randomi388 \global\advance\randomi\year
     \global\multiply\randomi31 \global\advance\randomi\day
@@ -30,139 +30,138 @@
     \message{Randomizer initialized to \the\randomi.}%
     \nextrandom \nextrandom \nextrandom
     \xdef\InitSeedValue{\the\randomi}%
- \fi
- \count@ii\randomi
- \divide\count@ii 127773 % modulus = multiplier * 127773 + 2836
- \count@\count@ii
- \multiply\count@ii 127773
- \global\advance\randomi-\count@ii % random mod 127773
- \global\multiply\randomi 16807
- \multiply\count@ 2836
- \global\advance\randomi-\count@
- \ifnum\randomi<\z@ \global\advance\randomi 2147483647\relax\fi
+  \fi
+  \count@ii\randomi
+  \divide\count@ii 127773 % modulus = multiplier * 127773 + 2836
+  \count@\count@ii
+  \multiply\count@ii 127773
+  \global\advance\randomi-\count@ii % random mod 127773
+  \global\multiply\randomi 16807
+  \multiply\count@ 2836
+  \global\advance\randomi-\count@
+  \ifnum\randomi<\z@\global\advance\randomi 2147483647\relax\fi
  \endgroup
 }
 \def\writeSeedToSolnFile{\writeT@ExSolns{\string\randomi=\the\randomi}}
-\def\@ansChoices[#1]%
-{%
-    \global\let\@tempholdSaveAns\@empty % 5/24
-    \global\let\@tempholdSaveChoice\@empty % 5/24
-    \global\let\bChoiceLabel\@empty % 5/24
-    \ifeq@randomizeallChoices
-        \setkeys{bchoice}{#1,random=true}\else
-        \setkeys{bchoice}{#1}\fi
-    \global\eq@tabColCnt=0
-    \ifeq@randomizeChoices\expandafter\@@bChoices
-    \else\expandafter\@@ansChoices\fi
+\def\@ansChoices[#1]{%
+  \global\let\@tempholdSaveAns\@empty
+  \global\let\@tempholdSaveChoice\@empty
+  \global\let\bChoiceLabel\@empty
+  \ifeq@randomizeallChoices
+    \setkeys{bchoice}{#1,random=true}\else
+    \setkeys{bchoice}{#1}\fi
+  \global\eq@tabColCnt=\z@
+  \if@DoNotRandomize\eq@randomizeChoicesfalse\fi
+  \ifeq@randomizeChoices\expandafter\@@bChoices
+  \else\expandafter\@@ansChoices\fi
 }
 \def\@@ansChoices{%
-    \ifnum\aeb@numCols=1 % list mode
-        \def\eq@next{\@layoutListAns}%
-    \else % tabular mode
-        \edef\eq@next{\noexpand\@layoutTabularAns{\bChoiceNumCols}}%
-    \fi
-    \eq@next
+  \ifnum\aeb@numCols=\@ne % list mode
+    \def\eq@next{\@layoutListAns}%
+  \else % tabular mode
+    \edef\eq@next{\noexpand\@layoutTabularAns{\bChoiceNumCols}}%
+  \fi
+  \eq@next
 }
 \newcount\aeb@numChoices
 \newcount\aeb@ranChoice
 \newtoks\aeb@hold\aeb@hold={}
 \def\@@bChoices{\gdef\@temphold{}\gdef\@tempholdrandom{}%
-    \gdef\@tempholdfreeze{}\aeb@searchfortoken{\@getAns}%
+  \gdef\@tempholdfreeze{}\aeb@searchfortoken{\@getAns}%
 }
 \def\aeb@searchfortoken#1{%
-    \@ifnextchar\Ans{\advance\aeb@numChoices1\relax#1}
-        {\@ifnextchar\eFreeze{\expandafter\@getFreezeAns\@gobble}
-        {\@ifnextchar\par{\def\@@temp{\aeb@searchfortoken{#1}}%
-        \expandafter\@@temp\@gobble}{\@eChoices}}}%
+  \@ifnextchar\Ans{\advance\aeb@numChoices1\relax#1}
+    {\@ifnextchar\eFreeze{\expandafter\@getFreezeAns\@gobble}
+    {\@ifnextchar\par{\def\@@temp{\aeb@searchfortoken{#1}}%
+    \expandafter\@@temp\@gobble}{\@eChoices}}}%
 }
 \long\def\@getAns\Ans#1\eAns{%
-    \g@addto@macro\@temphold{{\Ans#1\eAns}}%
-    \aeb@searchfortoken{\@getAns}%
+  \g@addto@macro\@temphold{{\Ans#1\eAns}}%
+  \aeb@searchfortoken{\@getAns}%
 }
 \def\@getFreezeAns{\aeb@searchfortoken{\@@getFreezeAns}}
 \long\def\@@getFreezeAns\Ans#1\eAns{%
-    \g@addto@macro\@tempholdfreeze{\Ans#1\eAns}%
-    \aeb@searchfortoken{\@@getFreezeAns}%
+  \g@addto@macro\@tempholdfreeze{\Ans#1\eAns}%
+  \aeb@searchfortoken{\@@getFreezeAns}%
 }
 \long\def\@eChoices#1\eChoices{%
-    \aeb@randomizeChoices{\the\aeb@numChoices}%
+  \aeb@randomizeChoices{\the\aeb@numChoices}%
 }
 \def\aeb@randomizeChoices#1{%
-    \setrannum{\aeb@ranChoice}{1}{#1}
-    \eqtmpcnta\z@\aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
-    \expandafter\@tfor\expandafter
-        \@temp\expandafter:\expandafter=\the\aeb@hold \do {%
-        \advance\eqtmpcnta\@ne
-        \ifnum\eqtmpcnta=\aeb@ranChoice\relax
-            \aeb@hold=\expandafter\expandafter\expandafter
-                {\expandafter\@tempholdrandom\@temp}%
-            \edef\@tempholdrandom{\the\aeb@hold}%
-        \else
-            \aeb@hold=\expandafter\expandafter\expandafter
-                {\expandafter\@temphold\expandafter{\@temp}}%
-            \edef\@temphold{\the\aeb@hold}%
-        \fi
-    }%
-    \aeb@numChoices=#1
-    \advance\aeb@numChoices-1
-    \ifnum\aeb@numChoices=0\relax
-        \def\aeb@next{\aeb@finishedRandomizing}\else
-        \def\aeb@next{\aeb@randomizeChoices{\the\aeb@numChoices}}\fi
-    \aeb@next
+  \setrannum{\aeb@ranChoice}{1}{#1}
+  \eqtmpcnta\z@\aeb@hold=\expandafter{\@temphold}\def\@temphold{}%
+  \expandafter\@tfor\expandafter
+    \@temp\expandafter:\expandafter=\the\aeb@hold \do {%
+    \advance\eqtmpcnta\@ne
+    \ifnum\eqtmpcnta=\aeb@ranChoice\relax
+      \aeb@hold=\expandafter\expandafter\expandafter
+        {\expandafter\@tempholdrandom\@temp}%
+        \edef\@tempholdrandom{\the\aeb@hold}%
+    \else
+      \aeb@hold=\expandafter\expandafter\expandafter
+        {\expandafter\@temphold\expandafter{\@temp}}%
+      \edef\@temphold{\the\aeb@hold}%
+    \fi
+  }%
+  \aeb@numChoices=#1
+  \advance\aeb@numChoices\m@ne
+  \ifnum\aeb@numChoices=\z@
+    \def\aeb@next{\aeb@finishedRandomizing}\else
+    \def\aeb@next{\aeb@randomizeChoices{\the\aeb@numChoices}}\fi
+  \aeb@next
 }
 \def\aeb@finishedRandomizing{%
-    \aeb@hold=\expandafter\expandafter\expandafter
-        {\expandafter\@tempholdrandom\@tempholdfreeze}%
-    \gdef\@temphold{}\gdef\@tempholdrandom{}\gdef\@tempholdfreeze{}%
-    \edef\finished@Randomizing{%
-    \noexpand\@@ansChoices
-    \the\aeb@hold
-    \noexpand\eChoices}%
-    \finished@Randomizing
+  \aeb@hold=\expandafter\expandafter\expandafter
+    {\expandafter\@tempholdrandom\@tempholdfreeze}%
+  \gdef\@temphold{}\gdef\@tempholdrandom{}\gdef\@tempholdfreeze{}%
+  \edef\finished@Randomizing{%
+  \noexpand\@@ansChoices
+  \the\aeb@hold
+  \noexpand\eChoices}%
+  \finished@Randomizing
 }
 \def\saveRandomSeed{\PackageInfo{exerquiz}
-    {The command \string\saveRandomSeed\space
-    is deprecated.\MessageBreak Seed automatically saved}}
+  {The command \string\saveRandomSeed\space
+  is deprecated.\MessageBreak Seed automatically saved}}
 \@ifpackageloaded{ran_toks}{%
-    \let\inputRandomSeed\useLastAsSeed
-    \let\useRandomSeed\useThisSeed
+  \let\inputRandomSeed\useLastAsSeed
+  \let\useRandomSeed\useThisSeed
 }{%
-    \def\inputRandomSeed{\eq@readRandomData}%
-    \def\useRandomSeed#1{\saveseedfalse\randomi=#1}%
+  \def\inputRandomSeed{\eq@readRandomData}%
+  \def\useRandomSeed#1{\saveseedfalse\randomi=#1}%
 }
 \def\InitSeedValue{\the\randomi} % dps
 \@ifundefined{ifsaveseed}{\newif\ifsaveseed\saveseedtrue}{} % dps
-\def\eq@writeRandomData
-{%
-    \ifsaveseed
-        \@ifundefined{saveseedinfo}{\newwrite\saveseedinfo}{}
-        \immediate\openout \saveseedinfo \jobname_rt.sav
-        \let\verbatim@out\saveseedinfo
-        \def\eqrt@msgi{initializing seed value}%
-        \def\eqrt@msgii{last random number used}%
-        \uccode`c=`\%\uppercase{%
-            \immediate\write\verbatim@out
-                {\InitSeedValue\space c \eqrt@msgi}%
-            \immediate\write\verbatim@out
-                {\the\randomi\space c \eqrt@msgii}%
-        }\immediate\closeout\saveseedinfo
-    \fi
+\def\eq@writeRandomData{%
+  \ifsaveseed
+    \@ifundefined{saveseedinfo}{\newwrite\saveseedinfo}{}
+    \immediate\openout \saveseedinfo \jobname_rt.sav
+    \let\verbatim@out\saveseedinfo
+    \def\eqrt@msgi{initializing seed value}%
+    \def\eqrt@msgii{last random number used}%
+    \uccode`c=`\%\uppercase{%
+      \immediate\write\verbatim@out
+        {\InitSeedValue\space c \eqrt@msgi}%
+      \immediate\write\verbatim@out
+        {\the\randomi\space c \eqrt@msgii}%
+    }\immediate\closeout\saveseedinfo
+  \fi
 }
 \AtEndDocument{\eq@writeRandomData}
 \def\eq@readRandomData{\IfFileExists{\jobname_rt.sav}{%
-    \PackageInfo{exerquiz}{Inputting \jobname_rt.sav}%
-   \@ifundefined{readsavfile}{\newread\readsavfile}{}%
-    \openin\readsavfile=\jobname_rt.sav
-    \read\readsavfile to \InitSeedValue
-    \read\readsavfile to \eqlastRandomNum
-    \closein\readsavfile
-    \randomi=\eqlastRandomNum
-    \xdef\InitSeedValue{\the\randomi}%
-    \immediate\closeout\readsavfile
+  \PackageInfo{exerquiz}{Inputting \jobname_rt.sav}%
+ \@ifundefined{readsavfile}{\newread\readsavfile}{}%
+  \openin\readsavfile=\jobname_rt.sav
+  \read\readsavfile to \InitSeedValue
+  \read\readsavfile to \eqlastRandomNum
+  \closein\readsavfile
+  \randomi=\eqlastRandomNum
+  \xdef\InitSeedValue{\the\randomi}%
+  \immediate\closeout\readsavfile
 }{%
-    \PackageInfo{exerquiz}{\jobname_rt.sav cannot
-    be found, \MessageBreak
-    using the random initializer}%
+  \PackageInfo{exerquiz}{\jobname_rt.sav cannot
+  be found, \MessageBreak
+  using the random initializer}%
 }}
 \endinput
 %%

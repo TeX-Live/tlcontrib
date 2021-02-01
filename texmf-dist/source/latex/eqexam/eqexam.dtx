@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2020  D. P. Story                %%
+%% Copyright (C) 2005--2021  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,8 +16,8 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eqexam}
-%<package>  [2020/03/14 v5.1.10 An Exam Construction Package (dps)]
-%<package>\def\eqexamdefReq{2020/03/14}
+%<package>  [2021/01/20 v5.1.13 An Exam Construction Package (dps)]
+%<package>\def\eqexamdefReq{2021/01/20}
 %<*driver>
 \documentclass{ltxdoc}
 \GlossaryPrologue{\section{{Change History}}}%
@@ -26,7 +26,7 @@
 \value{GlossaryColumns}=2
 \usepackage{makeidx}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
-\def\darg#1{\texttt{\{#1\}}}
+\gdef\darg#1{\texttt{\char123\relax#1\char125\relax}}
 \let\env\texttt
 \let\opt\texttt
 \let\app\textsf
@@ -2291,8 +2291,8 @@
 %    \end{macrocode}
 % \DescribeMacro{\optsMlTxtFld} is used to pass options to the multi-line
 % text field.
-% \changes{v5.1.10}{2020/03/14}{Introduced control over width of text field in
-% for \string\texttt{online} option.}
+% \changes{v5.1.10}{2020/03/14}{ \string\cs{optsMsTxtFld}: Pass options to the multi-line
+% text field. in for \string\texttt{online} option.}
 %    \begin{macrocode}
 \def\optsMlTxtFld#1{\def\eqe@optsmltf{#1}}
 \let\eqe@optsmltf\@empty
@@ -4215,6 +4215,7 @@
 %    \end{macrocode}
 % Since everything is put a box, we set the \cs{linewidth}, and
 % set \cs{solutionparshape} to \cs{@empty}.
+% \changes{v5.1.11}{2020/11/16}{Adj \string\cs{linewidth} in soln file}
 %    \begin{macrocode}
     \ifx\solutionparshape\@empty\else
         \advance\linewidth-\leadinIndentPrtSep\fi %%dps
@@ -4224,8 +4225,10 @@
         {\vfill}\hfill\fi
     \minipage[b][\eqedepth][t]{\mp@Width}%
     {\lccode`C=`\%\lowercase{\eqe@IW{%
-        \string\def\string\panelgap{\panelgap}%
-        \string\setlength{\string\panelwidth}{\ss@Argiii}%
+        \string\def\string\panelgap{\panelgap}C^^J%
+        \string\setlength{\string\panelwidth}{\ss@Argiii}C^^J%
+        \string\setlength{\string\linewidth}{\string
+          \linewidth-\string\eqemargin}C^^J%
         \string\def\string\eqedepth
             {\ifeq@nosolutions\ss@Argii\else\ss@Argii\fi}C}}}%
 %    \end{macrocode}
@@ -5082,6 +5085,37 @@
       \def\hidden@ttr{[#1]}\let\numpoints\@empty\else
       \let\hidden@ttr\relax\def\numpoints{#1}\fi
     \problem@cont}
+%    \end{macrocode}
+%    \DescribeMacro\probV@luesInsert This command writes the number of points to the AUX
+%    file; form of the macro name written is \texttt{value\ameta{exam-label}Prob\ameta{prob-no}}.
+%    \changes{v5.1.12}{2021/01/07}{Added \string\cs{probV@luesInsert} to support \string\pkg{skills} package}
+%    \begin{macrocode}
+\let\probV@luesInsert\relax
+\def\probV@@luesInsert{\bgroup\@tempcnta\value{eqquestionnoi}\advance
+  \@tempcnta\@ne % Jan21
+  \eqe@IWO\@auxout{\string\csarg\string
+    \gdef{value\thisexamlabel Prob\the\@tempcnta}{\numpoints}}\egroup
+}
+%    \end{macrocode}
+%    \DescribeMacro\trackProblemsOn This command (\cs{trackProblemsOn}) activates problem tracking (ie, write problems and values
+%    to the AUX file; \DescribeMacro\trackProblemsOff\cs{trackProblemsOff} turns off tracking. Tracking is
+%    off by default. When tracing is on, the value of each problem is saved in the form
+%    |\csarg\gdef{value|\ameta{exam-label}\texttt{Prob}\ameta{prob-num}|}|. This feature was developed to support
+%    the \pkg{skills} package.
+%    \changes{v5.1.12}{2021/01/07}{Added \string\cs{trackProblemsOn} and \string\cs{trackProblemsOff} to support \string\pkg{skills} package}
+%    \begin{macrocode}
+\def\trackProblemsOn{\let\probV@luesInsert\probV@@luesInsert}
+\def\trackProblemsOff{\let\probV@luesInsert\relax}
+\trackProblemsOff
+%    \end{macrocode}
+%     \DescribeMacro\numPtsOfProblem\hskip-\marginparsep\texttt{[\ameta{exam-label}]\darg{\ameta{prob-num}}}
+%     The command \cs{numPtsOfProblem} typesets the number of points of problem \ameta{prob-num} from part \ameta{label-name}.
+%    \begin{macrocode}
+\newcommand{\numPtsOfProblem}[2][\thisexamlabel]%
+  {\@nameuse{value#1Prob#2}}
+%    \end{macrocode}
+%    The \env{problem} environment continues.
+%    \begin{macrocode}
 \newcommand{\problem@cont}[1][]{\let\isProbEnv\eqe@YES
   \def\@rgi{#1}\ifx\hidden@ttr\relax % assume a number or empty
     \ifx\@rgi\@empty\else\def\hidden@ttr{[#1]}\fi\fi
@@ -5107,6 +5141,7 @@
       \def\@ltii{\let\@isitstar\eqe@Zero\eqe@gobbletoend}%
       \expandafter\@ifstar\expandafter\@lti
         \expandafter\@ltii\numpoints\end
+      \probV@luesInsert % Jan21
       \if\@isitstar\eqe@One\addtocounter{eqpointvalue}{\numpoints}%
         \@marktotalvalue
         \ifdispl@yPoints
@@ -5137,7 +5172,8 @@
 %    \begin{macrocode}
     \edef\ctrld@exp@exercise{\noexpand
       \begin{exercise}[eqquestionnoi]\hidden@ttr}%
-    \ctrld@exp@exercise\ignorespaces\eqe@p@gobnxtp@r}
+    \ctrld@exp@exercise\ignorespaces\eqe@p@gobnxtp@r
+}
 %    \end{macrocode}
 %    \textbf{end problem env.} The code for the end of the problem environment.
 %    \begin{macrocode}
@@ -5719,6 +5755,7 @@
 %    \begin{macrocode}
             \let\marginpoints\@empty
         \else
+          \probV@luesInsert % Jan21
 %    \end{macrocode}
 % Points are displayed in margins or inline
 %    \begin{macrocode}
@@ -5727,6 +5764,7 @@
 % \paragraph*{Total points specified}
 %    \begin{macrocode}
                 \ifx\marginpoints\@empty\else
+                    \probV@luesInsert % Jan21
                     \if\@isitstar\eqe@One
 %    \end{macrocode}
 % Points to appear ``in-line'' rather than in the margins
@@ -5797,6 +5835,7 @@
     \fi
 %    \addtocounter{eqpointvalue}{\numpoints}\@marktotalvalue
     \ifx\marginpoints\@empty\else
+        \probV@luesInsert % Jan21
         \ifdispl@yPoints
             \if\@isitstar\eqe@One
 %    \end{macrocode}
@@ -7242,6 +7281,7 @@
 %The \cs{eqTWSave} is the saved value of the \cs{textwidth} in effect when
 %the \env{exam} environment is opened. The right totals box is placed in the right
 %margin based on this value.
+%\changes{v5.1.10}{2020/03/14}{Define \string\cs{probInMinipage}}
 %    \begin{macrocode}
 \def\probInMinipage{%
   \ifanswerkey
@@ -7269,11 +7309,11 @@
 %    the total height of the typeset solution. It then calculates the difference between
 %    \cs{sameVspace}, which should hold the value of the optional argument of \env{solution},
 %    and the actual height of the solution. It then executes a \cs{vspace} for that amount calculated.
-%
+%     \changes{v5.1.10}{2020/03/14}{Add \string\env{vadjForSolnInBx} to correct for vertical space for a
+%     problem in a \string\env{minipage}}
 %    \begin{macrocode}
 \newenvironment{vadjForSolnInBx}[1]{%
-  \setlength\@tempdima{#1}%
-  \setbox\z@\vbox\bgroup\hsize\@tempdima
+  \setlength\@tempdima{#1}\setbox\z@\vbox\bgroup\hsize\@tempdima
 }{%
   \egroup
   \ifanswerkey
@@ -7296,6 +7336,7 @@
 %    use \cs{bProbInsert} with its argument. Place \DescribeMacro{\eProbInsert}\cs{eProbInsert} at the end of the statement of the
 %    question, as illustrated below. \cs{bProbInsert} puts the question into a group,
 %    \cs{eProbInsert} gets us out of the group.
+%    \changes{v5.1.10}{2020/03/14}{Define \string\cs{bProbInsert} and \string\cs{bItemInsert}}
 %\begin{verbatim}
 %\def\insertFig{\parpic[r]{\FIG}}
 %\bProbInsert{\insertFig}

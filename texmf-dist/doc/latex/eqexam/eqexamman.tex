@@ -11,6 +11,8 @@
 \usepackage[bypasspkgpagestyle,nomarginwrite,usecustomdesign,
     useclassmaketitle,flextended
 ]{eqexam}
+
+
 %\usepackage[designv,
 %    latextoc,forcolorpaper,
 %    centertitlepage]{web}
@@ -150,7 +152,7 @@ part of the\texorpdfstring{\\}{ }\texorpdfstring{\AcroTeX}{AcroTeX} eDucation Bu
 \keywords{LaTeX, hyperref, PDF, exercises, quizzes}
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
-\version{5.1.10, 2020/03/14}
+\version{5.1.13, 2021/01/20}
 \copyrightyears{2005-\the\year}
 
 \renewcommand{\exsectitletext}{Solutions to exams in this manual}
@@ -1603,7 +1605,7 @@ necessary in two situations:
   removing questions that have randomization).
 \end{enumerate}
 
-\newtopic\textbf{Things to look for:} If \textsf{eqexam} is not rearranging the order
+\newtopic\textbf{Things to look for: } If \textsf{eqexam} is not rearranging the order
 of the choices as you expect it to, it could be that
 \textsf{eqexam} is reading an old \texttt{.sav} file. Either delete that file
 in your source folder, or comment out \cs{inputRandomSeed} in your document.
@@ -1624,10 +1626,19 @@ use that seed value for that class, for example
 \end{Verbatim}
 Of course comment out \cs{inputRandomSeed}.
 
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\newtopic\textbf{Controlling randomization.} There are several commands that control whether
+randomization occurs.
+\settowidth{\aebdimen}{\cs{allowRandomizedChoices}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \turnOnRandomize
 \obeyLocalRandomize
-\end{Verbatim}
+\doNotRandomizeChoices
+\allowRandomizedChoices
+\end{dCmd}
+%\begin{Verbatim}[xleftmargin=\amtIndent]
+%\turnOnRandomize
+%\obeyLocalRandomize
+%\end{Verbatim}
 
 The command \cs{turnOnRandomize} overrides all local settings of \cs{bChoices}
 and causes all choice lists to be randomized. While \cs{obeyLocalRandomize}
@@ -1658,13 +1669,19 @@ the choices will not be randomized, because the \texttt{random}
 option was not specified; or they will be randomized if the
 \texttt{random} option is used.
 
+\newtopic\indent The command \cs{doNotRandomizeChoices} overrides the
+\opt{allowrandomize} option; when in effect, randomization of the choices
+does not occur. The companion command \cs{allowRandomizedChoices} restores the
+authority of the \opt{allowrandomize} option.
+
 \newtopic\textcolor{red}{Limitations:} There are natural limitations on the use
 of \cs{bChoices} and \cs{eChoices} and consequently, there are
 limitations on the randomization.  The content between \cs{Ans} and
 \cs{eAns} cannot have any verbatim text. This is usually not a
 problem for mathematical content, but could be a limitation for
-computer science where questions about syntax may be posed. I have
-in mind a work-around, but haven't pursued the problem as of yet.
+computer science where questions about syntax may be posed.
+
+%I have in mind a work-around, but haven't pursued the problem as of yet.
 
 \subsection{Labeling Choices}
 
@@ -5186,6 +5203,23 @@ the figure around the text of the question.
 environment, named \texttt{\href{\urlAcroTeXBlog/?p=1419}{ins-fig.pdf}},
 is found on the {\AcroBlog}.
 
+\subsection{Tracking problem values}
+
+As an application to the \pkg{skills} package, three new commands are introduced
+into the \pkg{eqexam} core.
+
+\settowidth{\aebdimen}{\ttfamily\string\numPtsOfProblem[\meta{exam-label}]\darg{\meta{prob-num}}}%
+\def\1{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ turn on problem tracking}}}%
+\def\2{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ turn off problem tracking}}}%
+\def\3{\rlap{\hskip\linewidth\texttt{ \%}\textsf{ typeset points for problem}}}%
+\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+!1\trackProblemsOn
+!2\trackProblemsOff
+!3\numPtsOfProblem[!meta(exam-label)]{!meta(prob-num)}
+\end{dCmd}
+When tracking is on (\cs{trackProblemsOn}), the number of points for each problem
+is written to the AUX file. Use \cs{numPtsOfProblem} to typeset the amount of points for \ameta{prob-num}
+of exam part \ameta{exam-label}. Turn off tracking with \cs{trackProblemsOff}.
 
 \newpage
 \markright{References}

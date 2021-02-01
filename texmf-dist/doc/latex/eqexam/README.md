@@ -1,5 +1,5 @@
 The eqexam Package 
-Dated: 2020-03-14
+Dated: 2021-01-20
 Author: D. P. Story
 
 eqExam is a LaTeX package for writing exams, tests, quizzes,
@@ -39,6 +39,9 @@ this package are as follows:
         authors. Documentation for this option is found in the doc/fortextbook
         folder. See also the series of blogs at
         http://www.acrotex.net/blog/?tag=fortextbook
+
+What's New (2021-01-20) Defined \trackProblemsOn and \numPtsOfProblem; 
+added \doNoRandomizeChoices and \allowRandomizedChoices. See documentation.
 
 What's New (2020-03-14) Defined several commands and one environment to 
 support the insertion of a figure into a problem. Demo file that illustrates 

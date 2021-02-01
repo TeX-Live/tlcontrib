@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eqexam.sty package,                                  %%
-%% Copyright (C) 2005--2020  D. P. Story                %%
+%% Copyright (C) 2005--2021  D. P. Story                %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,8 +19,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eqexam}
-  [2020/03/14 v5.1.10 An Exam Construction Package (dps)]
-\def\eqexamdefReq{2020/03/14}
+  [2021/01/20 v5.1.13 An Exam Construction Package (dps)]
+\def\eqexamdefReq{2021/01/20}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \usepackage{xkeyval}
@@ -1987,8 +1987,10 @@
         {\vfill}\hfill\fi
     \minipage[b][\eqedepth][t]{\mp@Width}%
     {\lccode`C=`\%\lowercase{\eqe@IW{%
-        \string\def\string\panelgap{\panelgap}%
-        \string\setlength{\string\panelwidth}{\ss@Argiii}%
+        \string\def\string\panelgap{\panelgap}C^^J%
+        \string\setlength{\string\panelwidth}{\ss@Argiii}C^^J%
+        \string\setlength{\string\linewidth}{\string
+          \linewidth-\string\eqemargin}C^^J%
         \string\def\string\eqedepth
             {\ifeq@nosolutions\ss@Argii\else\ss@Argii\fi}C}}}%
     {\lccode`C=`\%\lowercase{\eqe@IW{\string\vskip2pt
@@ -2551,6 +2553,17 @@
       \def\hidden@ttr{[#1]}\let\numpoints\@empty\else
       \let\hidden@ttr\relax\def\numpoints{#1}\fi
     \problem@cont}
+\let\probV@luesInsert\relax
+\def\probV@@luesInsert{\bgroup\@tempcnta\value{eqquestionnoi}\advance
+  \@tempcnta\@ne % Jan21
+  \eqe@IWO\@auxout{\string\csarg\string
+    \gdef{value\thisexamlabel Prob\the\@tempcnta}{\numpoints}}\egroup
+}
+\def\trackProblemsOn{\let\probV@luesInsert\probV@@luesInsert}
+\def\trackProblemsOff{\let\probV@luesInsert\relax}
+\trackProblemsOff
+\newcommand{\numPtsOfProblem}[2][\thisexamlabel]%
+  {\@nameuse{value#1Prob#2}}
 \newcommand{\problem@cont}[1][]{\let\isProbEnv\eqe@YES
   \def\@rgi{#1}\ifx\hidden@ttr\relax % assume a number or empty
     \ifx\@rgi\@empty\else\def\hidden@ttr{[#1]}\fi\fi
@@ -2568,6 +2581,7 @@
       \def\@ltii{\let\@isitstar\eqe@Zero\eqe@gobbletoend}%
       \expandafter\@ifstar\expandafter\@lti
         \expandafter\@ltii\numpoints\end
+      \probV@luesInsert % Jan21
       \if\@isitstar\eqe@One\addtocounter{eqpointvalue}{\numpoints}%
         \@marktotalvalue
         \ifdispl@yPoints
@@ -2586,7 +2600,8 @@
     \begin{eqequestions}%
     \edef\ctrld@exp@exercise{\noexpand
       \begin{exercise}[eqquestionnoi]\hidden@ttr}%
-    \ctrld@exp@exercise\ignorespaces\eqe@p@gobnxtp@r}
+    \ctrld@exp@exercise\ignorespaces\eqe@p@gobnxtp@r
+}
 \def\endproblem{\end{exercise}%
   \end{eqequestions}%
   \ifeqlocalversion\ifeqglobalversion
@@ -2849,8 +2864,10 @@
         \ifx\argi\@empty
             \let\marginpoints\@empty
         \else
+          \probV@luesInsert % Jan21
             \ifx\argii\@empty
                 \ifx\marginpoints\@empty\else
+                    \probV@luesInsert % Jan21
                     \if\@isitstar\eqe@One
                         \addtocounter{eqpointvalue}{#1}%
                         \@marktotalvalue\ifdispl@yPoints
@@ -2894,6 +2911,7 @@
         \edef\numpoints{\@nameuse{prob\thisexamlabel.\theeq@count}}%
     \fi
     \ifx\marginpoints\@empty\else
+        \probV@luesInsert % Jan21
         \ifdispl@yPoints
             \if\@isitstar\eqe@One
                 \def\marginparafterhook{\acp@mpah}\else
@@ -3518,8 +3536,7 @@
   \let\probInMinip@ge\eqTWSave\noindent}
 \let\probInMinip@ge\relax
 \newenvironment{vadjForSolnInBx}[1]{%
-  \setlength\@tempdima{#1}%
-  \setbox\z@\vbox\bgroup\hsize\@tempdima
+  \setlength\@tempdima{#1}\setbox\z@\vbox\bgroup\hsize\@tempdima
 }{%
   \egroup
   \ifanswerkey

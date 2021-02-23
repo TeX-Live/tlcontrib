@@ -1,6 +1,6 @@
 The eq-save Package
 Author: D. P. Story
-Dated: 2019-08-07
+Dated: 2021-02-17
 
 In the past, Adobe Reader did not save form data; consequently, work done by 
 the student is lost when the AeB document is closed. In the more recent 
@@ -17,10 +17,13 @@ Interactive document, such as those produced by AeB (including exerquiz)
 require Adobe Reader. Any such AeB document must be viewed in AR, outside a 
 browser. 
 
+What's New (2021-02-17) Minor modification of restoreQuizData() to accomodate
+  the eq-pin2corr package.
+
 What's New (2019-08-07) Minor reorganization of internal and public commands.
 
 What's New (2018-04-07) Bug fix, occassionally the data was not being 
-recorded correctly. 
+  recorded correctly. 
 
 Package works for dvips/Distiller, pdflatex, lualatex, and xelatex.
      

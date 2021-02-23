@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eq-save package,                                     %%
-%% Copyright (C) 2017-2019                              %%
+%% Copyright (C) 2017-2021                              %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{eq-save}
-%<package> [2019/08/07 v1.2.5 eq-save: save exerquiz quizzes and resume (dps)]
+%<package> [2021/02/17 v1.2 eq-save: save exerquiz quizzes and resume (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -213,16 +213,11 @@
 }
 %    \end{macrocode}
 %   \paragraph*{Open Page Action} We add a page open event to restore the data as needed. We only do this once
-%   per document session. The script used in contained in the command \DescribeMacro\restoreQD\cs{restoreQD}.
-%   \changes{v1.2.3}{2019/27/07}{Made the open doc script into a macro \string\cs{resoreQD}}
-%   \changes{v1.2.4}{2019/08/01}{Changed to page open}
-%   \changes{v1.2.5}{2019/08/07}{added dirty=false to \string\cs{restoreQD}}
+%   per document session.
 %    \begin{macrocode}
-\def\restoreQD{if(!restoreQuizData.hasRestoredData)\r\t
-  var\eqSP rqdTO=(app.setTimeOut("try{restoreQuizData()}catch(e){};%
-  app.clearTimeOut(rqdTO);%
-  restoreQuizData.hasRestoredData=true;dirty=false;",1000));}
-\thisPageAction{\JS{\restoreQD}}{}
+\thisPageAction{\JS{if(!restoreQuizData.hasRestoredData)\r\t
+  var rqdTO=(app.setTimeOut("restoreQuizData();app.clearTimeOut(rqdTO);%
+  restoreQuizData.hasRestoredData=true",1000));}}{}
 %    \end{macrocode}
 %   \paragraph*{Action prior to saving} It is important to save the quiz data, we can only do that if we save
 %   it to a field, the value of the field will be saved. We save the data to a hidden text field
@@ -371,9 +366,10 @@ cntCorrectResponses.nOutOfInDoc=0;
 cntCorrectResponses.nPtsCorrectInDoc=0;
 cntCorrectResponses.nPtsOutOfInDoc=0;
 %    \end{macrocode}
-%\leavevmode\IndexJS{cntCorrectResponses()}is the workhorse of \pkg{eq-save}. It keeps tabs on the
-%total number of correct answers and the total number of questions. All \env{shortquiz}es are known immediately,
-%but results from \env{quiz} environments are not known until the student presses the `End Quiz' button.
+%\leavevmode\IndexJS{cntCorrectResponses()}^^A
+% The workhorse of \pkg{eq-save}. It keeps tabs on the
+% total number of correct answers and the total number of questions. All \env{shortquiz}es are known immediately,
+  %but results from \env{quiz} environments are not known until the student presses the `End Quiz' button.
 %    \begin{macrocode}
 function cntCorrectResponses() {
   var f=this.getField("\eqsroot");
@@ -418,7 +414,6 @@ function cntCorrectResponses() {
 %    included when they should.
 %    \changes{v1.1}{2018/04/07}{Removed test for isCorrect}
 %    \begin{macrocode}
-%      if (typeof f.isCorrect=="undefined") continue;
       cntCorrectResponses.nOutOfInDoc+=1;
       if (f.isCorrect==1) {
           cntCorrectResponses.nCorrectInDoc+=1;
@@ -476,10 +471,11 @@ function cntCorrectResponses() {
 (cntCorrectResponses.nPtsOutOfInDoc));
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{addInQuizResults()} is called by \texttt{cntCorrectResponses()} to add in the results
+%   \leavevmode\IndexJS{addInQuizResults()}^^A
+%   Called by \texttt{cntCorrectResponses()} to add in the results
 %   from the quizzes, if known. Because `Begin Quiz' and `End Quiz' can be links (not recommended) we save
 %   the results of the quiz as the value of the field \texttt{ScoreData.\ameta{quizName}}. \pkg{exerquiz}
-%   package save the quiz data in the form \texttt{"Score;\penalty0NQuestions;\penalty0ptScore;\penalty0NPointTotal"}.
+%   package saved the quiz data in the form \texttt{"Score;\penalty0NQuestions;\penalty0ptScore;\penalty0NPointTotal"}.
 %   This string can be split and the individual
 %   values may be retrieved.
 %    \begin{macrocode}
@@ -506,7 +502,8 @@ cntCorrectResponses.nCorrectInDoc;
   }
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{clearAllSQElements()} clears all the quiz fields (all types). Much of the code
+%   \leavevmode\IndexJS{clearAllSQElements()}^^A
+%   Clears all the quiz fields (all types). Much of the code
 %   here is copied from \pkg{exerquiz}.
 %    \begin{macrocode}
 function clearAllSQElements() {
@@ -546,7 +543,8 @@ function clearAllSQElements() {
   oRecordOfQuizData=new Object();
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{chk4PassToQuestions()} This function is used in the keystroke and format
+%   \leavevmode\IndexJS{chk4PassToQuestions()}^^A
+%   This function is used in the keystroke and format
 %   phase of the \cs{nameField} command. If the student/user clears the field or changes the value
 %   of the field once it has been committed, \texttt{chk4PassToQuestions()} then calls \texttt{clearAllSQElements()}
 %   to clear all fields.
@@ -576,7 +574,8 @@ function chk4PassToQuestions(event) {
   }
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{collectQuizData()} is called by the \texttt{willSave} event. It save
+%   \leavevmode\IndexJS{collectQuizData()}^^A
+%   Called by the \texttt{willSave} event. It saves
 %   the object \texttt{oRecordOfQuizData} to the field \texttt{holdScoreData} as a string.
 %    \begin{macrocode}
 function collectQuizData() {
@@ -584,10 +583,9 @@ function collectQuizData() {
   f.value=(oRecordOfQuizData.toSource());
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{restoreQuizData()} is called when the document is opened and attempts to
+%   \leavevmode\IndexJS{restoreQuizData()}^^A
+%   Called when the document is opened and attempts to
 %   transfer the value of \texttt{holdScoreData} back into \texttt{oRecordOfQuizData}.
-%   \changes{v1.2}{2019/07/02}{Added ProbDist array}
-%   \changes{v1.2.1}{2019/07/05}{Added RightWrong array}
 %    \begin{macrocode}
 restoreQuizData.hasRestoredData=false;
 function restoreQuizData() {
@@ -599,31 +597,26 @@ function restoreQuizData() {
       // name of field is endQuiz.qzname
       var pos=fname.indexOf(".");
       var qzName=fname.substring(pos+1);
-      var qzRoot=fname.substring(0,pos);
-      switch(qzRoot) {
-        case "ScoreData":
-          lstOfQuizzes[qzName]=eval(qzName);
-          Score=1*oRecordOfQuizData[fname][0];
-          NQuestions=1*oRecordOfQuizData[fname][1];
-          ptScore=1*oRecordOfQuizData[fname][2];
-          NPointTotal=1*oRecordOfQuizData[fname][3];
-          var h=this.getField("ScoreData."+qzName);
-          h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
-          break;
-        case "ProbDist":
-          ProbDist=eval(oRecordOfQuizData[fname]);
-          break;
-        case "RightWrong":
-          RightWrong=eval(oRecordOfQuizData[fname]);
-          break;
-        default:
-          console.println("name not recognized:"+fname);
+%    \end{macrocode}
+%    (2021/02/17) Conditional to handle \texttt{ScoreData} only, this enables other
+%    data that are objects to be present in \texttt{oRecordOfQuizData}.
+%   \changes{v1.2}{2021/02/17}{Added conditional to process \texttt{ScoreData} only}
+%    \begin{macrocode}
+      if (fname.indexOf("ScoreData.")) {
+        lstOfQuizzes[qzName]=eval(qzName);
+        Score=1*oRecordOfQuizData[fname][0];
+        NQuestions=1*oRecordOfQuizData[fname][1];
+        ptScore=1*oRecordOfQuizData[fname][2];
+        NPointTotal=1*oRecordOfQuizData[fname][3];
+        var h=this.getField("ScoreData."+qzName);
+        h.value=Score+";"+NQuestions+";"+ptScore+";"+NPointTotal;
       }
     } else f.isCorrect=oRecordOfQuizData[fname];
   }
 }
 %    \end{macrocode}
-%   \leavevmode\IndexJS{IhrNameFormat()} is the format script for the \cs{nameField} command.
+%   \leavevmode\IndexJS{IhrNameFormat()}^^A
+%   The format script for the \cs{nameField} command.
 %    \begin{macrocode}
 function IhrNameFormat(event){
   if(event.value!="") {

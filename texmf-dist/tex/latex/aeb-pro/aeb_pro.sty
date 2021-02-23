@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2019  D. P. Story                %%
+%% Copyright (C) 2006--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{aeb_pro}
- [2019/03/21 v2.9.5 aeb_pro: A support package (dps)]
+ [2021/02/07 v2.10 aeb_pro: A support package (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{xkeyval}
@@ -70,7 +70,6 @@
     {\PackageInfo{aeb_pro}{Inputting code for the pro option}}%
     {\PackageInfo{aeb_pro}{Cannot find aebpro.def.
         Reinstall or refresh your file name database, as needed.}}}
-\AtEndOfPackage{\aeb@InputAeBPro}
 \let\aebp@uselayers=0
 \DeclareOptionX{uselayers}{%
     \ifx\aebp@uselayers0\AtEndOfPackage{\aeb@InputAeBLayers}%
@@ -98,10 +97,10 @@
   option}}{\PackageWarning{aeb_pro}{Cannot find linkto.def.
     Reinstall or refresh your file name database, as needed.}}}
 \let\aeb@InputUnicodes\@empty
-\DeclareOptionX{linktoattachments}{% dps23
+\DeclareOptionX{linktoattachments}{%
     \let\aeb@InputUnicodes\@aeb@InputUnicodes
 }
-\def\ap@RequireUnicode{\RequirePackage{forms16be}} % dps23
+\def\ap@RequireUnicode{\RequirePackage{forms16be}}
 \let\aeb@childofInput\@empty
 \let\aeb@childof\@empty
 \DeclareOptionX{childof}{\def\aeb@childof{#1}\def\aeb@childofInput{%
@@ -263,11 +262,11 @@
 \@ifpackageloaded{eforms}{\let\execjs\aebp@YES}
 {%
     \@ifundefined{aeb@eforms@opts}{}
-    {\ap@RP[execJS]{eforms}[2017/01/03]}%
+    {\ap@RP[execJS]{eforms}[2020/12/14]}%
 }
 \@ifpackageloaded{insdljs}{\let\execjs\aebp@YES}
 {%
-    \ap@RP[execJS]{insdljs}[2016/07/31]% incls conv-xkv
+    \ap@RP[execJS]{insdljs}[2021/02/07]%
 }
 \@ifpackageloaded{aebxmp}{\aebp@PkgWarningi{aebxmp}}
 {%
@@ -296,7 +295,7 @@
 \RequirePackage{calc}
 \RequirePackage{eso-pic}
 \ifx\aeb@InputUnicodes\@empty\else\expandafter
-\ap@RequireUnicode\fi% dps23
+\ap@RequireUnicode\fi
 \ifpdfmarkup\else\if\aebp@uselayers1
     \excludecomment{printRollover}%
     \excludecomment{rollover}%
@@ -348,6 +347,7 @@
     \addtocounter{page}{1}}%
 }
 \ap@restoreCats
+\aeb@InputAeBPro
 \endinput
 %%
 %% End of file `aeb_pro.sty'.

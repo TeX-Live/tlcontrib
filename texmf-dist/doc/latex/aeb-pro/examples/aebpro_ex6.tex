@@ -14,6 +14,9 @@
     linktoattachments,
     eforms
 ]{aeb_pro}
+\usepackage{fancyvrb}
+\usepackage[active]{srcltx}
+
 
 \DeclareDocInfo
 {
@@ -126,19 +129,18 @@ accessed through the menu item \texttt{View > Portfolio > Cover Sheet}.
 \newtopic\textbf{\textcolor{red}{TIP:}} Use the \cs{autolabelNum*}
 command to assign a more informative description of the attachments,
 like so.
-\begin{sverbatim}
-    \autolabelNum*{1}{European Currency \u20AC}
-    \autolabelNum*{2}{\u0022$|e^\u007B\u005Cln(17)\u007D|$\u0022}
-    \autolabelNum*[AeST]{3}{The AeBST Components}
-    \autolabelNum*[atease]{4}{The @EASE Control Panel}
-\end{sverbatim}
-
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\autolabelNum*{1}{European Currency \u20AC}
+\autolabelNum*{2}{\u0022$|e^\u007B\u005Cln(17)\u007D|$\u0022}
+\autolabelNum*[AeST]{3}{The AeBST Components}
+\autolabelNum*[atease]{4}{The @EASE Control Panel}
+\end{Verbatim}
 Note that there is an alternative that is commented out to the assignment of the
 second attachment, it is
-\begin{sverbatim}
-    \autolabelNum*
-        {2}{\u\DQUOTE$|e^\u\LBRACE\u005Cln(17)\u\RBRACE|$\u\DQUOTE}
-\end{sverbatim}
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\autolabelNum*{2}
+  {\u\DQUOTE$|e^\u\LBRACE\u005Cln(17)\u\RBRACE|$\u\DQUOTE}
+\end{Verbatim}
 One can use the ``helper'' commands, as described in \texttt{aeb\_pro.tex}; however,
 there is a slight problem.  Within the \texttt{<description>} argument, we obey spaces, so
 if we were to say \verb!\u\LBRACE\u\BSLASH ln(17)\u\RBRACE! there would be a space

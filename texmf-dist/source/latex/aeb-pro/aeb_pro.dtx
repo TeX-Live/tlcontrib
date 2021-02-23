@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2019  D. P. Story                %%
+%% Copyright (C) 2006--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{aeb_pro}
-%<package> [2019/03/21 v2.9.5 aeb_pro: A support package (dps)]
+%<package> [2021/02/07 v2.10 aeb_pro: A support package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -35,6 +35,9 @@
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\makeatother
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{aeb_pro}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{aeb_pro}{aebdocfmt.def cannot be found}}
@@ -60,10 +63,27 @@
 % \InputIfFileExists{aebdonotindex.def}{\PackageInfo{aeb_pro}{Inputting aebdonotindex.def}}
 %    {\PackageInfo{aeb_pro}{cannot find aebdonotindex.def}}
 %
+%
+% \section{Alternate package name: \texorpdfstring{\protect\pkg{aeb-pro}}{aeb-pro}}
+% CTAN lists this package (\pkg{aeb\_pro}) as \pkg{aeb-pro}, so we'll create
+% a dummy package by that name.
+% \changes{v1.2}{2018/04/26}{Added dummy package \string\pkg{annot-pro}}
 %    \begin{macrocode}
-% Begin package segment
+%<*altpkgname>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aeb-pro}
+  [2021/02/04 v1.0 aeb-pro Alt-name (dps)]
+\RequirePackage{xkeyval}
+\DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{aeb_pro}}
+\ProcessOptionsX\relax
+\RequirePackage{aeb_pro}
+%    \end{macrocode}
+%    \begin{macrocode}
+%</altpkgname>
 %<*package>
 %    \end{macrocode}
+% \changes{v2.9.7}{2021/02/04}{Updated documentation to reflect new Acrobat security restriction,
+% Acrobat may have to be configured.}
 % \changes{v2.9}{2017/08/25}{Extracted some of the code from unicode.def to create a new package, forms16be.
 % This package now includes forms16be.}
 % \changes{v1.9}{2016/03/03}{Allow users of pdftex and xetex to access JavaScript related
@@ -225,7 +245,7 @@
     {\PackageInfo{aeb_pro}{Inputting code for the pro option}}%
     {\PackageInfo{aeb_pro}{Cannot find aebpro.def.
         Reinstall or refresh your file name database, as needed.}}}
-\AtEndOfPackage{\aeb@InputAeBPro}
+%\AtEndOfPackage{\aeb@InputAeBPro}
 %    \end{macrocode}
 %
 % \subsection{\texttt{uselayers} option}
@@ -292,10 +312,10 @@
 % (2015/08/06) Added code so that the childof is read after linktoattachments
 % \changes{v2.4}{2016/08/03}{Removed the \string\texttt{latin1} option as unworkable across some workflows}
 %    \begin{macrocode}
-\DeclareOptionX{linktoattachments}{% dps23
+\DeclareOptionX{linktoattachments}{%
     \let\aeb@InputUnicodes\@aeb@InputUnicodes
 }
-\def\ap@RequireUnicode{\RequirePackage{forms16be}} % dps23
+\def\ap@RequireUnicode{\RequirePackage{forms16be}}
 \let\aeb@childofInput\@empty
 \let\aeb@childof\@empty
 \DeclareOptionX{childof}{\def\aeb@childof{#1}\def\aeb@childofInput{%
@@ -541,7 +561,7 @@
 \@ifpackageloaded{eforms}{\let\execjs\aebp@YES}
 {%
     \@ifundefined{aeb@eforms@opts}{}
-    {\ap@RP[execJS]{eforms}[2017/01/03]}%
+    {\ap@RP[execJS]{eforms}[2020/12/14]}%
 }
 %    \end{macrocode}
 %    load \pkg{eforms} before \pkg{insdljs} so \pkg{eforms} can properly pass options
@@ -550,7 +570,7 @@
 %    \begin{macrocode}
 \@ifpackageloaded{insdljs}{\let\execjs\aebp@YES}
 {%
-    \ap@RP[execJS]{insdljs}[2016/07/31]% incls conv-xkv
+    \ap@RP[execJS]{insdljs}[2021/02/07]%
 }
 \@ifpackageloaded{aebxmp}{\aebp@PkgWarningi{aebxmp}}
 {%
@@ -586,7 +606,7 @@
 %     \changes{v2.9}{2017/08/25}{require \string\pkg{forms16be} as needed}
 %    \begin{macrocode}
 \ifx\aeb@InputUnicodes\@empty\else\expandafter
-\ap@RequireUnicode\fi% dps23
+\ap@RequireUnicode\fi
 \ifpdfmarkup\else\if\aebp@uselayers1
     \excludecomment{printRollover}%
     \excludecomment{rollover}%
@@ -2077,6 +2097,8 @@ try {
 % \cs{maketitle}) is a special case: When setting the open and close
 % page actions for the first page, these environments \emph{must go}
 % in the preamble.
+% \changes{v2.10}{2021/02/07}{Fix a long standing problem with page open
+% and close events}
 %    \begin{macrocode}
 \def\canceleveryPageOpen{\global\@everyPageOpenfalse
     \global\let\every@PageOpen\@empty}
@@ -2085,14 +2107,14 @@ try {
 \newenvironment{everyPageOpen}[1][]
 {\global\@everyPageOpentrue\@defineJS[#1]{\every@PageOpen}}
 {\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\every@PageOpen}}{}}%
     \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
 }
 \newenvironment{everyPageClose}[1][]
 {\global\@everyPageClosetrue\@defineJS[#1]{\every@PageClose}}
 {\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoCloseJS{\thisPageAction{}{\JS{\every@PageClose}}}%
     \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
 }
@@ -2100,7 +2122,7 @@ try {
 \let\every@PageClose\@empty
 \newenvironment{addJSToPageOpen}[1][]
 {\@defineJS[#1]{\addJST@PageOpen}}{\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\addJST@PageOpen}}{}}%
     \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
 }
@@ -2111,19 +2133,19 @@ try {
 % The \texttt{addJSToPageOpenAt} and \texttt{addJSToPageCloseAt} can now be used
 % in the preamble on the first page.
 %    \begin{macrocode}
-    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+    \ifnum\value{page}=\@ne\if\frstPageSpec\aebp@YES
         \thisPageAction{\JS{\@nameuse{addJST@PageOpenAt1}}}{}\fi\fi
 }
 \newenvironment{addJSToPageClose}[1][]
-{\@defineJS[#1]{\addJST@PageClose}}{\end@defineJS
-    \ifnum\value{page}=1\relax
+{\pdfSpacesOff\@defineJS[#1]{\addJST@PageClose}}{\end@defineJS
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoCloseJS{%
         \thisPageAction{}{\JS{\addJST@PageClose}}}%
     \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
 }
 \newenvironment{addJSToPageCloseAt}[2][]
-{\@@defineJS[#1]{addJST@PageCloseAt}{#2}}{\end@@defineJS
-    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+{\pdfSpacesOff\@@defineJS[#1]{addJST@PageCloseAt}{#2}}{\end@@defineJS
+    \ifnum\value{page}=\@ne\if\frstPageSpec\aebp@YES
         \thisPageAction{}{\JS{\@nameuse{addJST@PageCloseAt1}}}\fi\fi
 }
 \let\addJST@PageOpen\@empty
@@ -2138,18 +2160,20 @@ try {
 % define how our page actions are to be inserted.
 %    \begin{macrocode}
 \def\aebp@PageOpenCloseHandler{%
-    \@ifundefined{addJST@PageOpenAt\arabic{page}}%
-        {\global\let\thisOpenPageActionAt\@empty}%
-        {\gdef\thisOpenPageActionAt{%
-            \@nameuse{addJST@PageOpenAt\arabic{page}}}}%
-    \@ifundefined{addJST@PageCloseAt\arabic{page}}%
-        {\global\let\thisClosePageActionAt\@empty}%
-        {\gdef\thisClosePageActionAt{%
-            \@nameuse{addJST@PageCloseAt\arabic{page}}}}%
-    \aebPageAction{\thisOpenPageActionAt\addJST@PageOpen}%
-        {\thisClosePageActionAt\addJST@PageClose}%
-    \global\let\addJST@PageOpen\@empty
-    \global\let\addJST@PageClose\@empty
+  \@ifundefined{addJST@PageOpenAt\arabic{page}}%
+    {\global\let\thisOpenPageActionAt\@empty}%
+    {\gdef\thisOpenPageActionAt{%
+      \@nameuse{addJST@PageOpenAt\arabic{page}}}}%
+  \@ifundefined{addJST@PageCloseAt\arabic{page}}%
+    {\global\let\thisClosePageActionAt\@empty}%
+    {\gdef\thisClosePageActionAt{%
+      \@nameuse{addJST@PageCloseAt\arabic{page}}}}%
+  \ifx\addJST@PageOpen\@empty\def\x{}\else\def\x{^^J}\fi
+  \ifx\addJST@PageClose\@empty\def\y{}\else\def\y{^^J}\fi
+  \aebPageAction{\thisOpenPageActionAt\x\addJST@PageOpen}%
+    {\thisClosePageActionAt\y\addJST@PageClose}%
+  \global\let\addJST@PageOpen\@empty
+  \global\let\addJST@PageClose\@empty
 }
 %    \end{macrocode}
 % (2016/05/15) Added \cs{aebp@PageTransHandler} to handle the page
@@ -2158,48 +2182,42 @@ try {
 % transitions}
 %    \begin{macrocode}
 \def\aebp@PageTransHandler{\@ifundefined{aebpP@geTr@nsP@ge\arabic{page}}
-    {}{\@nameuse{aebpP@geTr@nsP@ge\arabic{page}}}}
+  {}{\@nameuse{aebpP@geTr@nsP@ge\arabic{page}}}}
 %    \end{macrocode}
 % The two handlers are executed on each page
 % \changes{v2.1}{2016/05/15}{Added the command \string\cs{aebp@PageTransHandler}
 % to the shipout cmd \string\cs{AddToShipoutPicture}.}
 %    \begin{macrocode}
-\AddToShipoutPicture{\aebp@PageOpenCloseHandler
-    \aebp@PageTransHandler}
+\AddToShipoutPicture{\aebp@PageOpenCloseHandler\aebp@PageTransHandler}
 %    \end{macrocode}
 %    \end{macro}
-% \DescribeMacro{\@@defineJS} is a variation of \cs{@defineJS}, as defined in the \textsf{insdljs} package.
+% \DescribeEnv{@@defineJS} is a variation of \cs{@defineJS}, as defined in the \textsf{insdljs} package.
 % This version, at the end of the environment, calls the \cs{aebp@rse} command to parse the
 % complex command argument, then makes a series of definitions to be used in the open/close
 % page events.
+% \changes{v2.10}{2021/02/07}{The \string\env{@@defineJS} uses macros
+% defined in \string\pkg{insdljs}, dated 2021/02/07 or later.}
 %    \begin{macrocode}
 \newenvironment{@@defineJS}[3][]
 {%
-    \gdef\argType{#2}\gdef\defineJSArg{#3}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
+  \@initdfnJS
+  \gdef\argType{#2}\gdef\defineJSArg{#3}\JStoks={}\dlfortypesetfalse
+  \@vrbsetupdfnJS\b@vrbdfnJS{#1}%
 }{%
-    \expandafter\aebp@rse\expandafter{\defineJSArg}%
-    \edef\shakeandbake{%
-        \noexpand\@for\noexpand\@mytoks:=\the\aeb@parsetoks}%
-    \aeb@parsecnt=0 \shakeandbake \do {%
-        \ifnum\aeb@parsecnt=0
-            \edef\firsttok{\@mytoks}%
-            \csarg\xdef{\argType\@mytoks}{\the\JStoks}%
-        \else
-            \edef\letsmakelet{\global\let\expandafter\noexpand
-                \csname\argType\@mytoks\endcsname=\expandafter\noexpand
-                \csname\argType\firsttok\endcsname}%
-            \letsmakelet
-        \fi
-        \advance\aeb@parsecnt1\relax
-    }%
+  \expandafter\aebp@rse\expandafter{\defineJSArg}%
+  \edef\sh@keandbake{\noexpand
+    \@for\noexpand\@mytoks:=\the\aeb@parsetoks}%
+  \aeb@parsecnt=\z@\sh@keandbake\do{%
+    \ifnum\aeb@parsecnt=\z@
+      \edef\firsttok{\@mytoks}%
+      \csarg\xdef{\argType\@mytoks}{\the\JStoks}%
+    \else
+      \edef\letsmakelet{\global\let\expandafter\noexpand
+        \csname\argType\@mytoks\endcsname=\expandafter\noexpand
+        \csname\argType\firsttok\endcsname}\letsmakelet
+    \fi
+    \advance\aeb@parsecnt\@ne
+  }%
 }
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -2218,51 +2236,59 @@ try {
 % environments. See \cs{aeb@addToPageOpenCloseActions} for usage by this package.
 % \changes{v2.1}{2016/05/15}{Final changes to \string\cs{aebPageAction} to include non-Distiller
 % workflows.}
+% \changes{v2.10}{2021/02/07}{Hack: redefine \string\cs{@acrivechar@in} from \string\cs{LaTeX}
+% core; this was disrupting the page events.}
 %    \begin{macrocode}
 \newcommand\aebPageAction[3][ThisPage]{%
-    \let\ispageactions=0\aeb@PageOpenfalse\aeb@PageClosefalse
-    \def\@aebOpen{#2}%
-    \if1\@aebOpen1%
-        \if@everyPageOpen
-            \aeb@PageOpentrue\let\ispageactions=1%
-            \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
-        \fi
-    \else
-        \let\ispageactions=1%
-        \aeb@PageOpentrue
-        \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
-    \fi
-    \def\@aebClose{#3}%
-    \if1\@aebClose1%
-        \if@everyPageClose
-            \aeb@PageClosetrue\let\ispageactions=1%
-            \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
-        \fi
-    \else
-        \let\ispageactions=1%
-        \aeb@PageClosetrue
-        \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
-    \fi
-    \if@everyPageOpen\aeb@PageOpentrue\let\ispageactions=1\fi
-    \if@everyPageClose\@everyPageClosetrue\let\ispageactions=1\fi
-    \if\ispageactions1%
-        \xdef\aebp@PageActionCode{/AA <<
-            \ifaeb@PageOpen\@aebOpen\space\fi
-            \ifaeb@PageClose\@aebClose\space\fi >>}
+%    \end{macrocode}
+%    (2021/02/07) The core {\LaTeX} \cs{@activechar@info} macro was breaking the page open and
+%    close events by inserting an unwanted message into the code. We
+%    redefine this macro to remove the message and insert \cs{pdfSP}, which either
+%    a normal space or \cs{pdfSPDef} depending on whether \cs{pdfSpacesOff} or
+%    \cs{pdfSpacesOn}, respectively, is operational. This change is local (I hope).
+%    \begin{macrocode}
+  \def\@activechar@info{\pdfSP\@gobbletwo}\let\ispageactions\aebp@Zero
+  \aeb@PageOpenfalse\aeb@PageClosefalse
+  \def\@aebOpen{#2}%
+  \if1\@aebOpen1%
+    \if@everyPageOpen
+      \aeb@PageOpentrue\let\ispageactions\aebp@One
+      \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}\fi
+  \else
+    \let\ispageactions\aebp@One
+    \aeb@PageOpentrue
+    \def\@aebOpen{/O << \JS{\every@PageOpen^^J#2} >>}%
+  \fi
+  \def\@aebClose{#3}%
+  \if1\@aebClose1%
+    \if@everyPageClose
+      \aeb@PageClosetrue\let\ispageactions\aebp@One
+      \def\@aebClose{/C << \JS{\every@PageClose#3} >>}\fi
+  \else
+    \let\ispageactions\aebp@One
+    \aeb@PageClosetrue
+    \def\@aebClose{/C << \JS{\every@PageClose^^J#3} >>}%
+  \fi
+  \if@everyPageOpen\aeb@PageOpentrue\let\ispageactions\aebp@One\fi
+  \if@everyPageClose\@everyPageClosetrue\let\ispageactions\aebp@One\fi
+  \if\ispageactions\aebp@One
+    \xdef\aebp@PageActionCode{/AA <<
+      \ifaeb@PageOpen\@aebOpen\space\fi
+      \ifaeb@PageClose\@aebClose\space\fi >>}%
 %    \end{macrocode}
 % For page 1, the open page is handled by \textsf{insdljs}
 % \changes{v2.0a}{2016/05/11}{Let \string\textsf{insdljs} handle page open
 % for page 1.}
 %    \begin{macrocode}
-        \ifnum\value{page}=1\relax\else
-            \ifpdfmarkup\literalps@out{\AEB@psMrk{#1} <<
-                \aebp@PageActionCode\space >> /PUT pdfmark}\else
-            \ifpdf\global\pdfpageattr=\expandafter
-                {\aebp@PageActionCode}\else
-            \ifxetex\@pdfm@mark{put @thispage <<
-                \aebp@PageActionCode\space>>}\fi\fi\fi
-        \fi
+    \ifnum\value{page}=\@ne\else
+      \ifpdfmarkup\literalps@out{\AEB@psMrk{#1} <<
+        \aebp@PageActionCode\space >> /PUT pdfmark}\else
+      \ifpdf\global\pdfpageattr=\expandafter
+        {\aebp@PageActionCode}\else
+      \ifxetex\@pdfm@mark{put @thispage <<
+        \aebp@PageActionCode\space>>}\fi\fi\fi
     \fi
+  \fi
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -2290,8 +2316,8 @@ try {
 \def\ap@gobtonil#1\@nil{}
 \def\ap@gettonil#1\@nil{\def\to@nilarg{#1}}
 \def\ap@ifspc{\ifx\@let@token\@sptoken
-    \let\ap@next\ap@xifspc\else
-    \let\ap@next\ap@gettonil\fi\ap@next}
+  \let\ap@next\ap@xifspc\else
+  \let\ap@next\ap@gettonil\fi\ap@next}
 \begingroup
 \def\:{\ap@xifspc}
 \expandafter\gdef\: {\futurelet\@let@token\ap@ifspc}
@@ -3216,13 +3242,13 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % \changes{v2.9}{2017/08/25}{Test for \string\env{attachmentNames} environment}
 %    \begin{macrocode}
 \let\aeb@isFromAutoLabelNum\aebp@Zero
-\def\attachmentNamesEnv{attachmentNames} % dps23
+\def\attachmentNamesEnv{attachmentNames}
 %    \end{macrocode}
 % If \cs{labelName} is outside the \env{attachmentNames} environment, use
 % \cs{defUniStr}, defined in \pkg{forms16be}.
 % \changes{v2.9}{2017/08/25}{Pass control to \string\pkg{forms16be}}
 %    \begin{macrocode}
-\def\labelName{\ifx\attachNamesEnv\attachmentNamesEnv % dps23
+\def\labelName{\ifx\attachNamesEnv\attachmentNamesEnv
   \def\ap@next{\labelName@Env}\else\def\ap@next{\defUniStr}\fi\ap@next}
 \def\labelName@Env#1{\bgroup\let\aeb@isFromAutoLabelNum\aebp@Zero %dps23
     \@for\x:=ABCDEFabcdef\do{\@makeother\x}%
@@ -3483,6 +3509,16 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 \DeclareJSHelper{\docSaveAs}{aebDocSaveAs}
 %    \end{macrocode}
 %    \end{macro}
+%    \begin{macro}{\browseForDoc}
+%    Access to using the method \texttt{app.browseForDoc()}, for example,
+%\begin{verbatim}
+%var oRetn=\browseForDoc({bSave:true,cFilenameInit: "myNewDoc.pdf"});
+%\end{verbatim}
+%    See the Acrobat JavaScript API reference for details on what is returned.
+%    \begin{macrocode}
+\DeclareJSHelper{\browseForDoc}{aebBrowseForDoc}
+%    \end{macrocode}
+%    \end{macro}
 %    \begin{macro}{\insertPages}
 % This is the method \texttt{Doc.insertPages}.
 %    \begin{macrocode}
@@ -3581,31 +3617,32 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % gets the security handler object, logs into the handler, calls
 % \texttt{signatureSetSeedValue} if the \texttt{sv} property is in the
 % \texttt{oSigInfo} object, and signs the field.
+% \changes{v2.9.6}{2029/12/24}{Use \string\cs{dfnJSCR} of \string\pkg{insdljs}}
 %    \begin{macrocode}
-\begin{defineJS}[\def\defineJSjsR{^^J}]{\signatureSign}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\signatureSign}
 if ( typeof oSigInfo.oHandler=="undefined" )
-    oSigInfo.oHandler=security.PPKLiteHandler;
-var engine=aebTrustedFunctions( security,
-    aebSecurityGetHandler, oSigInfo.oHandler );
-var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ?
-    aebTrustedFunctions( this, aebAppGetPath,
-        {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert :
-    oSigInfo.path2Cert;
-aebTrustedFunctions( engine, aebSecurityHandlerLogin,
-    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,%
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ? %
+aebTrustedFunctions( this, aebAppGetPath,%
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert : %
+oSigInfo.path2Cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,%
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
 var oSigField = this.getField(oSigInfo.cSigFieldName);
 oSigInfo.oInfo.password=oSigInfo.password;
 if ( typeof oSigInfo.sv!="undefined" ) {
-    for (var o in oSigInfo.sv )
-        oSigInfo.oInfo[o]=oSigInfo.sv[o];
+  for (var o in oSigInfo.sv )
+    oSigInfo.oInfo[o]=oSigInfo.sv[o];
 }
 var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
 if ( typeof oSigInfo.cLegalAttest!="undefined" )
-    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
 if ( typeof oSigInfo.cDIPath!="undefined")
-        oSigArgs.cDIPath=oSigInfo.cDIPath;
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
 if ( typeof oSigInfo.bUI!="undefined")
-        oSigArgs.bUI=oSigInfo.bUI;
+  oSigArgs.bUI=oSigInfo.bUI;
 aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
 \end{defineJS}
 %    \end{macrocode}
@@ -3628,23 +3665,23 @@ aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
 %\end{docassembly}
 %\end{verbatim}
 %    \begin{macrocode}
-\begin{defineJS}[\def\defineJSjsR{^^J}]{\certifyInvisibleSign}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\certifyInvisibleSign}
 if ( typeof oSigInfo.oHandler=="undefined" )
-    oSigInfo.oHandler=security.PPKLiteHandler;
-var engine=aebTrustedFunctions( security,
-    aebSecurityGetHandler, oSigInfo.oHandler );
-var path2Cert=aebTrustedFunctions( this, aebAppGetPath,
-    {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
-aebTrustedFunctions( engine, aebSecurityHandlerLogin,
-    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security, %
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert=aebTrustedFunctions( this, aebAppGetPath, %
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin, %
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
 oSigInfo.oInfo.password=oSigInfo.password;
 var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
 if ( typeof oSigInfo.cLegalAttest!="undefined" )
-    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
 if ( typeof oSigInfo.cDIPath!="undefined")
-        oSigArgs.cDIPath=oSigInfo.cDIPath;
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
 if ( typeof oSigInfo.bUI!="undefined")
-        oSigArgs.bUI=oSigInfo.bUI;
+  oSigArgs.bUI=oSigInfo.bUI;
 aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
 \end{defineJS}
 %    \end{macrocode}
@@ -4057,7 +4094,7 @@ aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
 %    \end{macrocode}
 % Calculate the value of \cs{@btnanimerowsep}, the distance between rows
 %    \begin{macrocode}
-    \edef\@btnanimerowsep{\btnanimerowsep}% dps10
+    \edef\@btnanimerowsep{\btnanimerowsep}%
 %    \setlength{\@tempdima}{\btnanimerowsep+2bp}%
 %    \edef\@btnanimerowsep{\the\@tempdima}%
 %    \end{macrocode}
@@ -4153,7 +4190,7 @@ aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
 %    \end{macrocode}
 % A command to set the space between control buttons, uses \cs{btnanimebtnsep}
 %    \begin{macrocode}
-\newcommand{\@ctrlsbtnsep}{\cgBdry[\btnanimebtnsep]} % dps10
+\newcommand{\@ctrlsbtnsep}{\cgBdry[\btnanimebtnsep]}
 %    \end{macrocode}
 %    \begin{macro}{\btnanimebtnsep}
 % The space between buttons
@@ -4752,6 +4789,7 @@ function btnAnimeNewFrame(fieldName, type)
 % Begin package segment
 %<*package>
 \ap@restoreCats
+\aeb@InputAeBPro
 %</package>
 %    \end{macrocode}
 %  \Finale

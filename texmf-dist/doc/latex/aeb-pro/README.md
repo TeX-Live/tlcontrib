@@ -1,6 +1,6 @@
 The AeB Pro Package
 Author: D. P. Story
-Dated: 2019-03-21
+Dated: 2021-02-07
 
 The AeB Pro Package complements and extends AcroTeX eDucation Bundle.
 
@@ -37,6 +37,13 @@ me at dpstory@uakron.edu or dpstory@acrotex.net
 The AcroTeX Blog (http://blog.acrotex.net/) lists the distribution files at
 http://www.acrotex.net/blog/?page_id=835, all demo files that use AeB Pro
 are listed at http://www.acrotex.net/blog/?tag=aeb-pro.
+
+What's New (2021-02-07) Fix a long time bug of page events.
+
+What's New (2021-02-04) Updated documentation to reflect new security restriction
+by Adobe Acrobat DC (purchased or updated after December 2020). Authored the document
+acrobat-in-workflow.pdf to explain the procedure to configure Acrobat DC. Creating
+an altnernative name of aeb-pro, to conform to CTAN naming.
 
 What's New (2019/03/21) This new version requires aeb-comment 
 (version 3.2 of the comment package). Changed the order of 

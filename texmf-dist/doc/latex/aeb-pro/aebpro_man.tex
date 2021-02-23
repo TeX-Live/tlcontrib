@@ -36,7 +36,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for {\AEBP} from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={2.9.5, 2019/03/21},
+    version={2.10, 2021/02/07},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -85,6 +85,7 @@
 \newcommand\refctan[1]{\href{http://ctan.org/pkg/#1}{ctan.org/pkg/#1}}
 \newlength{\aebdimen}
 \def\anglemeta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\let\ameta\anglemeta
 \def\meta#1{\textit{\texttt{#1}}}
 \let\pkg\textsf
 \let\env\texttt
@@ -101,7 +102,9 @@
 \def\AcroTeX{Acro\!\TeX}
 \def\HTML{HTML}\def\FDF{FDF}
 \def\PDF{PDF}\def\URL{URL}
-\edef\amtIndent{\the\parindent} %\leftmargini
+%\let\amtIndent\leftmargini
+\edef\amtIndent{\the\parindent}
+\def\PDFM{\textsf{\textbf{pdfmark}}}
 \def\bNH{\begin{NoHyper}}\def\eNH{\end{NoHyper}}
 \def\nhnameref#1{\bNH\nameref{#1}\eNH}
 \def\nhNameref#1{\bNH\Nameref{#1}\eNH}
@@ -111,8 +114,7 @@
 \def\parboxValign{t}
 \renewcommand*{\backrefalt}[4]{%
     \ifcase #1\or
-       See page~#2.\else See pages~#2.\fi
-}
+       See page~#2.\else See pages~#2.\fi}
 \newenvironment{aebQuote}
    {\list{}{\leftmargin\amtIndent}%
     \item\relax}{\endlist}
@@ -121,19 +123,20 @@
     \expandafter\parbox\expandafter[\parboxValign]%
         {\marginparwidth}{\aebbkFmtMp#2}}}}
 \def\aebbkFmtMp{\hfill\kern0pt\itshape\small
-    \color{blue}\raggedright\hspace{0pt}}
+    \color{blue}\raggedleft\hspace{0pt}}
 \newcommand{\BlogArticle}{\makebox[0pt][l]{\hspace{-1pt}\color{blue}\Pisymbol{webd}{254}%
     }\raisebox{.5pt}{\color{red}\ding{045}}}
 \def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
    \kern-.6em \hbox{$\mathcal S$}}$}
 \def\FitItIn{\eq@fititin}
-\def\endredpoint{\FitItIn{{\large\ifusebw\color{black}\else\color{red}\fi$\blacktriangleleft$}}}
+\def\endredpoint{\FitItIn{{\large
+  \ifusebw\color{black}\else
+  \color{red}\fi$\blacktriangleleft$}}}
 
 \reversemarginpar
 
 \def\addWatermarkFromFile#1#2{%
-aebTrustedFunctions#1\theDocObject, aebAddWatermarkFromFile, #2}
-
+aebTrustedFunctions#1\theDocObject,aebAddWatermarkFromFile,#2}
 
 %\definePath\bgPath{"C:/Users/Public/Documents/%
 %    ManualBGs/Manual_BG_Print_AeB.pdf"}
@@ -204,7 +207,7 @@ on this documentation. \verb!:-{)!
 
 \begin{flushright}
 Dr. D. P. Story\\[3pt]
-\today
+January 20, 2016
 \end{flushright}
 
 
@@ -212,23 +215,23 @@ Dr. D. P. Story\\[3pt]
 
 \AEBP, package file base name \texttt{aeb\_pro}
 (\href{http://ctan.org/pkg/aeb-pro}{ctan.org/pkg/aeb-pro}), is an assortment
-of features (see Section~\ref*{features} below) implemented through a
-combination of \textbf{pdfmark} operators~\cite{tech:pdfmark}, which are
-native to a PostScript file, and JavaScript techniques, some of which require
-\textsf{Acrobat Professional}. These features were meant to be used with
-{\AEB} (\AcroEB); in particular, the \texttt{insdljs} and \texttt{eforms}
-packages are essential to {\AEBP}. To have access to all the features of
-{\AEBP}, the document author must have \textsf{Acrobat Pro}~7.0 or later and
-use \textsf{dvips/\penalty0 Distiller} workflow to create the {\PDF}. For the
-most part, once the document is assembled, it can be viewed by \app{Adobe
-Reader}~7.0 or later.
+of features (see \hyperref[features]{Section~\ref*{features}} below)
+implemented through a combination of {\PDFM} operators~\cite{tech:pdfmark},
+which are native to a Postscript file, and JavaScript techniques, some of
+which require \textsf{Acrobat Professional}. These features were meant to be
+used with {\AEB} (\AcroEB); in particular, the \texttt{insdljs} and
+\texttt{eforms} packages are essential to {\AEBP}. To have access to all the
+features of {\AEBP}, the document author must have \textsf{Acrobat Pro}~7.0
+or later and use \textsf{dvips/\penalty0Distiller} workflow to create the
+{\PDF}. For the most part, once the document is assembled, it can be viewed
+by \app{Adobe Reader}~7.0 or later.
 
 Despite the declaration in the \textbf{Forward} to the
-contrary\marginpar{\small\raggedleft v2.1 notes}, this manual will be updated
+contrary, this manual will be updated
 for Version~2.1 of {\AEBP} to reflect the creation of a significant new
 feature, the \opt{useacrobat} option. For a document author who prefers
 \app{pdflatex} (including \app{lualatex}) or
-\app{xelatex}\marginpar{\small\raggedleft non-\app{Distiller} workflow}, this
+\app{xelatex}\FmtMP{non-\app{Distiller} workflow}, this
 option opens the features of {\AEBP} provided the document author has the
 full \app{Acrobat} application and has set it up as the primary {\PDF} viewer
 on his/\penalty0 her computer system. Continue reading about the
@@ -480,7 +483,7 @@ The next three packages are less important, some are ``novelty'' packages.
         number of rows and columns.
 \end{description}
 These, as well as the {\AEBP} distribution itself, are available through CTAN
-or the {\AEBP} family website:
+or the {\AEBP} family web site:
 \begin{equation*}
     \text{\url{www.math.uakron.edu/~dpstory/aeb_pro.html}}
 \end{equation*}
@@ -488,6 +491,12 @@ or the {\AEBP} family website:
 
 \subsection{Package Options}
 
+The general syntax for \pkg{aeb\_pro} is,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\usepackage[!ameta(options)]{aeb_pro}
+!strut!textsf(or)
+\usepackage[!ameta(options)]{aeb-pro}
+\end{Verbatim}
 Below is a list of all options of the {\cAEBP} package:
 \begin{description}
   \item [\texttt{driver=\anglemeta{driver}}\enspace] The permissible values
@@ -501,7 +510,7 @@ Below is a list of all options of the {\cAEBP} package:
       own the \app{Acrobat} application, use the \opt{useacrobat} option to
       open all features of this package except for any features associated
       with the \app{uselayers} option. The creation of layers is still only
-      supported through the \textbf{pdfmark} operator.
+      supported through the {\PDFM} operator.
 
       As you go through the examples provided by this package, all sample
       files work except for the ones using the \opt{uselayers} or
@@ -699,6 +708,14 @@ installation of the JavaScript files by navigating to the \texttt{examples}
 subfolder and opening the file \texttt{test\_install.pdf} in \app{Acrobat};
 follow the directions contained on that one page document.
 
+\paragraph*{\app{Adobe Acrobat DC} authors.} If you have \app{Acrobat DC} that was purchased or updated after December 2020,
+\app{Acrobat} needs to be configured\FmtMP{Configure \app{Acrobat DC}} to
+function correctly. For detailed discussion, refer to the document
+\texttt{\href{acrobat-in-workflow.pdf}{acrobat-in-workflow.pdf}} found in the
+\texttt{doc} folder of this distribution.
+
+
+
 \begin{comment}
 
 The JavaScript methods used by the \texttt{docassemble} environment, see
@@ -815,33 +832,33 @@ for links to this resource.
 option}\label{useacrobatOpt}
 
 For document authors who have the full \app{Acrobat} application but prefer a
-non-\app{Distiller} workflow, use the \opt{useacrobat} option to declare to {\AEBP}
-that you have \app{Acrobat}. Traditionally, if neither \app{pdflatex}
+non-\app{Distiller} workflow, use the \opt{useacrobat} option to declare to
+{\AEBP} that you have \app{Acrobat}. Traditionally, if neither \app{pdflatex}
 (including \app{lualatex}) nor \app{xelatex} are used, a \app{dvips/\penalty0
 Distiller} workflow is assumed. Declaring the \opt{useacrobat} option opens
 up all features except for those that depend on the use of layers (also
 called {\EXT{OCG}s); in particular, the options \opt{uselayers} and
 \opt{ocganime} are disallowed}. All features, therefore, described in this
-manual are available to \app{pdflatex} and \app{xelatex} document authors who
-have \app{Acrobat}, \emph{except for those features} described in
-Section~\ref{layers} and Section~\ref{ss:ocganime}.
+manual are available to \app{pdflatex}, \app{lualatex}, and \app{xelatex}
+document authors who have \app{Acrobat}, \emph{except for those features}
+described in \hyperref[layers]{Section~\ref*{layers}} and \hyperref[ss:ocganime]{Section~\ref*{ss:ocganime}}.
 
 \paragraph*{Syntax.} The syntax for this option is simple:
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[!textbf(useacrobat),
-    !meta(options)
+!quad!ameta(options)
 ]{aeb_pro}
 \end{Verbatim}
-where \meta{options} \emph{does not include} the
+where \ameta{options} \emph{does not include} the
 \opt{uselayers} and \opt{ocganime} options.
 
 \newtopic
-Regarding \app{{\AEB} Control Central} (Section~\ref*{AeBCC}), when you
+Regarding \app{{\AEB} Control Central} (\hyperref[AeBCC]{Section~\ref*{AeBCC}}), when you
 specify \opt{useacrobat},\footnote{This implies you are not using
 \opt{Distiller} as the {\PDF} creator.} the packages \pkg{graphicxsp} and \pkg{rmannot} of
-display~\eqref{display:ACCopts} are not allowed to be specified in the option
-list of \pkg{aeb\_pro}. These two packages use the \textbf{pdfmark} operator
-to implement their features; a \app{dvips/\penalty0 Distiller} workflow is
+\hyperref[display:ACCopts]{display~\bNH\eqref{display:ACCopts}\eNH} are not allowed to be specified in the option
+list of \pkg{aeb\_pro}. These two packages use the {\PDFM} operator
+to implement their features; a \app{dvips/\penalty0Distiller} workflow is
 required in this case.
 
 \section{The \texorpdfstring{\protect\opt{nopro}}{nopro} option}\label{s:noproOpt}
@@ -855,7 +872,7 @@ option.
 in the option list:
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[!textbf(nopro),
-    !meta(options)
+!quad!ameta(options)
 ]{aeb_pro}
 \end{Verbatim}
 Specifying this option excludes the use of layers (the options
@@ -1085,7 +1102,7 @@ includes examples of the use of the \texttt{willClose},
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{willClose}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{willClose}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{willClose}
 \end{dCmd}
 \EnvDescription The JS code in the body of the \texttt{willClose}
@@ -1096,7 +1113,7 @@ environment will execute just before the document closes.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{willSave}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{willSave}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{willSave}
 \end{dCmd}
 \EnvDescription The JS code in the body of the \texttt{willSave}
@@ -1107,7 +1124,7 @@ environment will execute just before the document is saved.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{didSave}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{didSave}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{didSave}
 \end{dCmd}
 \EnvDescription The JS code in the body of the \texttt{didSave}
@@ -1118,7 +1135,7 @@ environment will execute just after the document is saved.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{willPrint}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{willPrint}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{willPrint}
 \end{dCmd}
 \EnvDescription The JS code in the body of the \texttt{willPrint}
@@ -1129,7 +1146,7 @@ environment will execute just before the document is Printed.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{didPrint}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{didPrint}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{didPrint}
 \end{dCmd}
 \EnvDescription The JS code in the body of the \texttt{didPrint}
@@ -1152,9 +1169,10 @@ behave as desired, while the document author can use the above environments to a
 additional scripts.
 
 The correct way of using these commands is
+
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \begin{defineJS}{\my@WillClose}
-!quad!anglemeta(some willClose script)
+    !anglemeta(some willClose script)
 \end{defineJS}
 \let\my@save@developer@will@Close\developer@will@Close
 \def\developer@will@Close{%
@@ -1181,10 +1199,10 @@ independently of the page the document is opened at.
 
 The following example gets the time the user first opens the document,
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily\small    var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());\}\}}%
+\settowidth{\aebdimen}{\ttfamily\small\quad{var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());\}\}}}%
 \begin{dCmd*}[fontsize=\small,commandchars=!@~]{\aebdimen+2\fboxsep+2\fboxrule}
 \additionalOpenAction{\JS{%
-    var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());}}
+!quad@var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());}}~
 \end{dCmd*}
 \egroup
 \noindent\textcolor{red}{\textbf{Important:}} This open action takes place rather
@@ -1258,11 +1276,11 @@ to combine several actions, including an action for checking for the version num
 \cs{afterRe\-quire\-ment\-PassedJS}. For example,
 
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily\small    var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());\}\}}%
+\settowidth{\aebdimen}{\ttfamily\small\quad{var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());}}%
 \begin{dCmd*}[fontsize=\small,commandchars=!@~]{\aebdimen+2\fboxsep+2\fboxrule}
 \afterRequirementPassedJS
 {%
-    var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());
+!quad@var timestamp = util.printd("mm-dd-yy, H:MM:ss.", new Date());~
 }
 \end{dCmd*}
 \egroup\noindent The above code will be executed if the version requirement is passed.
@@ -1310,38 +1328,39 @@ action, see the documentation of \texttt{insdljs} for some details.
 \settowidth{\aebdimen}{\ttfamily\small    console.println("Show the output of the page actions");}%
 \begin{dCmd*}[fontsize=\small,commandchars=!@~]{\aebdimen+2\fboxsep+2\fboxrule}
 \OpenAction{\JS{%
-    console.show();\r
-    console.clear();\r
-    console.println("Show the output of the page actions");
+!quad@console.show();\r~
+!quad@console.clear();\r~
+!quad@console.println("Show the output of the page actions");~
 }}
 \end{dCmd*}
 \egroup
-
+\noindent
 In addition to \cs{OpenAction}, \texttt{addJSToPageOpen} and
 \texttt{addJSToPageClose} are also defined by {\cAEBP}. The
-\meta{script} is executed each time the page is opened or
+\ameta{script} is executed each time the page is opened or
 closed.
 
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageOpen}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageOpen}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageOpen}
 \end{dCmd}
-
+\noindent
 For page close events, we have the \texttt{addJSToPageClose}
 environment.
 
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageClose}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageClose}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageClose}
 \end{dCmd}
 
 \EnvDescription  When placed in the preamble, these provide
 JavaScript support for page open/close events of the first page.
 
+\newtopic
 Below are examples of usage. These appear in the document
 \texttt{aebpro\_ex1}.
 \bgroup\obeyspaces%
@@ -1377,14 +1396,14 @@ on.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageOpen}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageOpen}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageOpen}
 \end{dCmd}
 
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageClose}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageClose}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageClose}
 \end{dCmd}
 
@@ -1401,7 +1420,7 @@ open/close effects you want.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageOpenAt}\darg{\meta{page-ranges}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageOpenAt}{!meta(page-ranges)}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageOpenAt}
 \end{dCmd}
 
@@ -1411,7 +1430,7 @@ environment.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{addJSToPageCloseAt}\darg{\meta{page-ranges}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{addJSToPageCloseAt}{!meta(page-ranges)}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{addJSToPageCloseAt}
 \end{dCmd}
 
@@ -1489,7 +1508,7 @@ To cancel out the every page action you can use
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{everyPageOpen}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{everyPageOpen}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{everyPageOpen}
 \end{dCmd}
 
@@ -1498,7 +1517,7 @@ For page close events, we have the \texttt{everyPageClose} environment.
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{everyPageClose}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{everyPageClose}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{everyPageClose}
 \end{dCmd}
 
@@ -1565,7 +1584,7 @@ object.
 \end{dCmd}
 The command for setting how you want to viewer to behave in fullscreen.
 This command is implemented through JavaScript, as opposed to the
-\textbf{pdfmark} operator. See \emph{JavaScript for Acrobat API Reference}
+{\PDFM} operator. See \emph{JavaScript for Acrobat API Reference}
 \cite{tech:AcroJSRef}, the section on the \texttt{FullScreen} object.
 
 \CmdLoc This command must be executed in the preamble.
@@ -1686,7 +1705,7 @@ effects of individual pages, use the \cs{setPageTransition} command.
 \end{dCmd}
 Sets the transition effect for the \emph{next page only}, viewer must be
 in full screen mode. The command \cs{setPageTransition} is implemented
-using the \textbf{pdfmark} operator.
+using the {\PDFM} operator.
 
 \CmdLoc This command should be used in the preamble for the first page,
 and between slides for subsequent pages.
@@ -1887,9 +1906,9 @@ you to develop a list of attachments that are attached if the
 \texttt{!optattachments} option is taken. {\AEBP} defines
 \cs{ifoptattachments}, a Boolean switch, which is set to true by
 \texttt{optattachments} and to false by \texttt{!optattachments}.
-\settowidth{\aebdimen}{\ttfamily\string\addtoOptAttachments\darg{\meta{list\_of\_files}}}%
+\settowidth{\aebdimen}{\ttfamily\string\addtoOptAttachments\darg{\meta{list-of-files}}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\addtoOptAttachments{!meta(list_of_files)}
+\addtoOptAttachments{!meta(list-of-files)}
 \end{dCmd}
 This command can be used anywhere in the document and adds the listed
 files to the ones to be attached. The list is comma delimited.
@@ -1917,12 +1936,12 @@ of optional attachments, then passes the argument to the two user commands
 Above you see the default definitions of these user commands. They may be
 redefined as desired to achieve some special effect.
 
-\bgroup\obeyspaces%
+\bgroup\def\1{\quad}\obeyspaces%
 \settowidth{\aebdimen}{\ttfamily    \string\marginpar\darg{\string\fbox\darg{\string\footnotesize\string\ttfamily\#1}}}%
 \begin{dCmd*}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \renewcommand{\prjInputUser}[1]{%
-    \marginpar{\fbox{\footnotesize\ttfamily#1}}
-    \input{#1}}
+!1\marginpar{\fbox{\footnotesize\ttfamily#1}}
+!1\input{#1}}
 \end{dCmd*}
 \egroup
 It is possible to define \cs{prjInputUser} to be a link or button that
@@ -1934,15 +1953,15 @@ two commands \cs{prjinput} and \cs{prjinclude} are \cs{prjInputUser} and
 to the list of optional attachments. The switch \cs{ifoptattachments} can be
 used, as needed, in a custom definition of \cs{prjInputUser} or
 \cs{prjIncludeUser}; for example,
-\bgroup\obeyspaces%
+\bgroup\def\1{\quad}\def\2{\qquad}\obeyspaces%
 \settowidth{\aebdimen}{    \ttfamily\string\marginpar%
 \darg{\string\fbox\darg{\string\footnotesize\string\ttfamily\string\ifoptattachments}}}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\begin{dCmd*}[commandchars={!~@}]{\aebdimen+2\fboxsep+2\fboxrule}
 \renewcommand{\prjInputUser}[1]{%
-    \marginpar{\fbox{\footnotesize\ttfamily\ifoptattachments
-    \setLink[\A{\JS{this.exportDataObject({%
-        cName: "\getcNameFromFileName{#1}",nLaunch: 0});}}
-    ]{\textcolor{\ahrefcolor}{#1}}\else#1\fi}}\input{#1}}
+!1\marginpar{\fbox{\footnotesize\ttfamily\ifoptattachments
+!1\setLink[\A{\JS{this.exportDataObject({%
+!1!1cName: "\getcNameFromFileName{#1}",nLaunch: 0});}}
+!1]{\textcolor{\ahrefcolor}{#1}}\else#1\fi}}\input{#1}}
 \end{dCmd*}
 \egroup This code creates a link that saves the attachment, if
 \texttt{optattachments} is taken, and simply puts the file name the margin,
@@ -1966,7 +1985,7 @@ environment).
 \settowidth{\aebdimen}{\ttfamily\string\begin\darg{docassembly}}%
 \begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{docassembly}
-    !anglemeta(script)
+!quad!anglemeta(script)
 \end{docassembly}
 \end{dCmd}
 \noindent
@@ -2170,12 +2189,12 @@ on these methods and their parameters.
 background graphic on every page the document. This is the kind of code
 that is executed for this document.
 \bgroup\small\obeyspaces%
-\settowidth{\aebdimen}{\small\ttfamily   cDIPath: "/C/AcroPackages/ManualBGs/Manual\_BG\_DesignV\_AeB.pdf"}%
-\begin{dCmd*}[fontsize=\small]{\aebdimen+2\fboxsep+2\fboxrule}
+\settowidth{\aebdimen}{\small\ttfamily\quad{cDIPath: "/C/AcroPackages/ManualBGs/Manual\_BG\_DesignV\_AeB.pdf"}}%
+\begin{dCmd*}[fontsize=\small,commandchars={!~@}]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{docassembly}
 \addWatermarkFromFile({
-    bOnTop:false,
-    cDIPath: "/C/AcroPackages/ManualBGs/Manual_BG_DesignV_AeB.pdf"
+!quad~bOnTop:false,@
+!quad~cDIPath: "/C/AcroPackages/ManualBGs/Manual_BG_DesignV_AeB.pdf"@
 });
 \end{docassembly}
 \end{dCmd*}
@@ -2332,11 +2351,11 @@ Multiple images can be imported and set by simply executing
 arguments, or, by executing \cs{declare\-Multi\-Images}.
 
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily    \darg{\meta{KV-pairs\_1}}\darg{\meta{KV-pairs\_2}}\darg{\meta{KV-pairs\_3}}...\darg{\meta{KV-pairs\_n}}}%
+\settowidth{\aebdimen}{\ttfamily\quad\darg{\meta{KV-pairs\_1}}\darg{\meta{KV-pairs\_2}}\darg{\meta{KV-pairs\_3}}...\darg{\meta{KV-pairs\_n}}}%
 \begin{dCmd}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
 \declareMultiImages
 {
-    {!meta(KV-pairs_1)}{!meta(KV-pairs_2)}{!meta(KV-pairs_3)}...{!meta(KV-pairs_n)}
+!quad{!meta(KV-pairs_1)}{!meta(KV-pairs_2)}{!meta(KV-pairs_3)}...{!meta(KV-pairs_n)}
 }
 \end{dCmd}
 \egroup\CmdDescription This command calls the \cs{declareImageAndPlacement}
@@ -2348,13 +2367,13 @@ command \cs{declareMultiImages} loops through the list, calling
 example follows.
 
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily    \darg{path=graphics/girl.png,placement=\darg{Avatar3,Avatar4}}}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\settowidth{\aebdimen}{\ttfamily\quad\darg{path=graphics/girl.png,placement=\darg{Avatar3,Avatar4}}}%
+\begin{dCmd*}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
 \declareMultiImages
 {%
-    {path=graphics/girl.png,placement={Avatar3,Avatar4}}
-    {path=graphics/AcroFord.jpg,placement=AcroFord}
-    {path=graphics/scot.gif,placement=Scot}
+!quad{path=graphics/girl.png,placement={Avatar3,Avatar4}}
+!quad{path=graphics/AcroFord.jpg,placement=AcroFord}
+!quad{path=graphics/scot.gif,placement=Scot}
 }
 \end{dCmd*}
 \egroup
@@ -2427,13 +2446,13 @@ optional parameter allows you to specify what appearance state the icon is to be
 The optional parameter is shown in the example below.
 
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily    \darg{path=graphics/girl.png,placement=\darg{[2]Avatar1,[0]Avatar2}}}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\settowidth{\aebdimen}{\ttfamily\quad\darg{path=graphics/girl.png,placement=\darg{[2]Avatar1,[0]Avatar2}}}%
+\begin{dCmd*}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
 \declareMultiImages
 {%
-    {path=graphics/man1.pdf,placement={Avatar1,[2]Avatar2}}
-    {path=graphics/scot.gif,placement={[1]Avatar1,[1]Avatar2}}
-    {path=graphics/girl.png,placement={[2]Avatar1,[0]Avatar2}}
+!quad{path=graphics/man1.pdf,placement={Avatar1,[2]Avatar2}}
+!quad{path=graphics/scot.gif,placement={[1]Avatar1,[1]Avatar2}}
+!quad{path=graphics/girl.png,placement={[2]Avatar1,[0]Avatar2}}
 }
 \end{dCmd*}
 \egroup The optional argument precedes the field name and determines the
@@ -2528,6 +2547,7 @@ button appearances of the buttons used to control the button animation.
     names of the anima created by \cs{btnAnima} that will be using these
     appearance icons.
 \end{description}
+
 \textbf{Example:}
 \settowidth{\aebdimen}{\ttfamily\string\placeAnimeCtrlBtnFaces\darg{btn\_anime\_icons1.pdf}\darg{myclock,mysine}}%
 \begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
@@ -2686,7 +2706,7 @@ in the \texttt{attachment\-Names} environment in the preamble.
 \settowidth{\aebdimen}{\ttfamily    \anglemeta{\string\autolabelNum{} and \string\labelName{} commands}}%
 \begin{dCmd}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{attachmentNames}
-    !anglemeta(\autolabelNum and \labelName commands)
+!quad!anglemeta(\autolabelNum and \labelName commands)
 \end{attachmentNames}
 \end{dCmd}
 \egroup
@@ -2777,7 +2797,7 @@ left and right braces, and double quotes, or using unicode above
 00FF (Basic Latin + Latin-1). To illustrate, suppose we wish the
 description of \texttt{cooltarget} to be
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-"$|e^{\ln(17)}|$"
+    "$|e^{\ln(17)}|$"
 \end{Verbatim}
 All the bad characters!
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
@@ -2934,9 +2954,9 @@ with \texorpdfstring{\protect\cs{ahyperref}}{\textbackslash ahyperref}}
 the \cs{label} command we use the \textsf{xr-hyper} package that
 comes with \texttt{hyperref}; the code might be
 
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \ahyperref[dest=target1-s:intro]{attach1}
-    {Section~\ref*{target1-s:intro}}
+!quad{Section~\ref*{target1-s:intro}}
 \end{Verbatim}
 we set \verb!dest=target1-s:intro!.
 
@@ -3230,7 +3250,7 @@ layer. This could be a button or a link that executes JavaScript.
 \darg{\meta{layer\_name}}}%
 \begin{dCmd}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
 \xBld[true|false|print=!anglemeta(!upshape(true|false))]{!meta(layer_name)}
-    !anglemeta(content of layer)
+!quad!anglemeta(content of layer)
 \eBld
 \end{dCmd}
 
@@ -3301,8 +3321,9 @@ provides help to the document consumer.
 \exPDFSrc{aebpro_ex4} These topics are illustrated in the support
 file \texttt{aebpro\_ex4}.
 
-\exAeBBlogPDF{tag=rollovers} Additional examples of \emph{rollover animation} using \cs{texHelp} can be found
-at the \mlhref{\urlAcroTeXBlog}{{\AcroTeX} Blog} web site.
+\exAeBBlogPDF{tag=rollovers} Additional examples of \emph{rollover animation}
+using \cs{texHelp} can be found at the \mlhref{\urlAcroTeXBlog}{{\AcroTeX}
+Blog} web site.
 
 
 %See also \url{http://www.acrotex.net/blog/?p=1359}
@@ -3584,10 +3605,10 @@ is titled \textsl{\texttt{ocgAnime}: Animation using OCG (Layers) with \AEBP} ca
 environment.
 
 \bgroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily    \anglemeta{a set of ocg frames built using \string\animeBld/\string\eBld pairs}}%
+\settowidth{\aebdimen}{\ttfamily\quad\anglemeta{a set of ocg frames built using \string\animeBld/\string\eBld pairs}}%
 \begin{dCmd}[commandchars={!()}]{\aebdimen+2\fboxsep+2\fboxrule}
 \begin{ocgAnime}{!meta(KV-pairs)}
-    !anglemeta(a set of ocg frames built using \animeBld/\eBld pairs)
+!quad!anglemeta(a set of ocg frames built using \animeBld/\eBld pairs)
 \end{ocgAnime}
 \end{dCmd}
 \egroup\KVP The key-value pairs are the same ones described in

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% aeb_pro.sty package,                                 %%
-%% Copyright (C) 2006--2019  D. P. Story                %%
+%% Copyright (C) 2006--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -586,14 +586,14 @@ ZoomOutUp,CombHorizontal,CombVertical}[Replace]%
 \newenvironment{everyPageOpen}[1][]
 {\global\@everyPageOpentrue\@defineJS[#1]{\every@PageOpen}}
 {\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\every@PageOpen}}{}}%
     \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
 }
 \newenvironment{everyPageClose}[1][]
 {\global\@everyPageClosetrue\@defineJS[#1]{\every@PageClose}}
 {\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoCloseJS{\thisPageAction{}{\JS{\every@PageClose}}}%
     \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
 }
@@ -601,118 +601,111 @@ ZoomOutUp,CombHorizontal,CombVertical}[Replace]%
 \let\every@PageClose\@empty
 \newenvironment{addJSToPageOpen}[1][]
 {\@defineJS[#1]{\addJST@PageOpen}}{\end@defineJS
-    \ifnum\value{page}=1\relax
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoOpenJS{\thisPageAction{\JS{\addJST@PageOpen}}{}}%
     \expandafter\aftergroup\expandafter\ap@AddtoOpenJS\fi
 }
 \newenvironment{addJSToPageOpenAt}[2][]
 {\@@defineJS[#1]{addJST@PageOpenAt}{#2}}{\end@@defineJS
-    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+    \ifnum\value{page}=\@ne\if\frstPageSpec\aebp@YES
         \thisPageAction{\JS{\@nameuse{addJST@PageOpenAt1}}}{}\fi\fi
 }
 \newenvironment{addJSToPageClose}[1][]
-{\@defineJS[#1]{\addJST@PageClose}}{\end@defineJS
-    \ifnum\value{page}=1\relax
+{\pdfSpacesOff\@defineJS[#1]{\addJST@PageClose}}{\end@defineJS
+    \ifnum\value{page}=\@ne
     \gdef\ap@AddtoCloseJS{%
         \thisPageAction{}{\JS{\addJST@PageClose}}}%
     \expandafter\aftergroup\expandafter\ap@AddtoCloseJS\fi
 }
 \newenvironment{addJSToPageCloseAt}[2][]
-{\@@defineJS[#1]{addJST@PageCloseAt}{#2}}{\end@@defineJS
-    \ifnum\value{page}=1\relax\if\frstPageSpec\aebp@YES
+{\pdfSpacesOff\@@defineJS[#1]{addJST@PageCloseAt}{#2}}{\end@@defineJS
+    \ifnum\value{page}=\@ne\if\frstPageSpec\aebp@YES
         \thisPageAction{}{\JS{\@nameuse{addJST@PageCloseAt1}}}\fi\fi
 }
 \let\addJST@PageOpen\@empty
 \let\addJST@PageClose\@empty
 \def\aebp@PageOpenCloseHandler{%
-    \@ifundefined{addJST@PageOpenAt\arabic{page}}%
-        {\global\let\thisOpenPageActionAt\@empty}%
-        {\gdef\thisOpenPageActionAt{%
-            \@nameuse{addJST@PageOpenAt\arabic{page}}}}%
-    \@ifundefined{addJST@PageCloseAt\arabic{page}}%
-        {\global\let\thisClosePageActionAt\@empty}%
-        {\gdef\thisClosePageActionAt{%
-            \@nameuse{addJST@PageCloseAt\arabic{page}}}}%
-    \aebPageAction{\thisOpenPageActionAt\addJST@PageOpen}%
-        {\thisClosePageActionAt\addJST@PageClose}%
-    \global\let\addJST@PageOpen\@empty
-    \global\let\addJST@PageClose\@empty
+  \@ifundefined{addJST@PageOpenAt\arabic{page}}%
+    {\global\let\thisOpenPageActionAt\@empty}%
+    {\gdef\thisOpenPageActionAt{%
+      \@nameuse{addJST@PageOpenAt\arabic{page}}}}%
+  \@ifundefined{addJST@PageCloseAt\arabic{page}}%
+    {\global\let\thisClosePageActionAt\@empty}%
+    {\gdef\thisClosePageActionAt{%
+      \@nameuse{addJST@PageCloseAt\arabic{page}}}}%
+  \ifx\addJST@PageOpen\@empty\def\x{}\else\def\x{^^J}\fi
+  \ifx\addJST@PageClose\@empty\def\y{}\else\def\y{^^J}\fi
+  \aebPageAction{\thisOpenPageActionAt\x\addJST@PageOpen}%
+    {\thisClosePageActionAt\y\addJST@PageClose}%
+  \global\let\addJST@PageOpen\@empty
+  \global\let\addJST@PageClose\@empty
 }
 \def\aebp@PageTransHandler{\@ifundefined{aebpP@geTr@nsP@ge\arabic{page}}
-    {}{\@nameuse{aebpP@geTr@nsP@ge\arabic{page}}}}
-\AddToShipoutPicture{\aebp@PageOpenCloseHandler
-    \aebp@PageTransHandler}
+  {}{\@nameuse{aebpP@geTr@nsP@ge\arabic{page}}}}
+\AddToShipoutPicture{\aebp@PageOpenCloseHandler\aebp@PageTransHandler}
 \newenvironment{@@defineJS}[3][]
 {%
-    \gdef\argType{#2}\gdef\defineJSArg{#3}\JStoks={}%
-    \def\verbatim@processline
-        {%
-            \xdef\JS@temp{\the\JStoks\the\verbatim@line\defineJSjsR}%
-            \global\JStoks=\expandafter{\JS@temp}%
-        }%
-    \let\do\@makeother\dospecials\catcode`\^^M\active
-    #1%
-    \verbatim@start
+  \@initdfnJS
+  \gdef\argType{#2}\gdef\defineJSArg{#3}\JStoks={}\dlfortypesetfalse
+  \@vrbsetupdfnJS\b@vrbdfnJS{#1}%
 }{%
-    \expandafter\aebp@rse\expandafter{\defineJSArg}%
-    \edef\shakeandbake{%
-        \noexpand\@for\noexpand\@mytoks:=\the\aeb@parsetoks}%
-    \aeb@parsecnt=0 \shakeandbake \do {%
-        \ifnum\aeb@parsecnt=0
-            \edef\firsttok{\@mytoks}%
-            \csarg\xdef{\argType\@mytoks}{\the\JStoks}%
-        \else
-            \edef\letsmakelet{\global\let\expandafter\noexpand
-                \csname\argType\@mytoks\endcsname=\expandafter\noexpand
-                \csname\argType\firsttok\endcsname}%
-            \letsmakelet
-        \fi
-        \advance\aeb@parsecnt1\relax
-    }%
+  \expandafter\aebp@rse\expandafter{\defineJSArg}%
+  \edef\sh@keandbake{\noexpand
+    \@for\noexpand\@mytoks:=\the\aeb@parsetoks}%
+  \aeb@parsecnt=\z@\sh@keandbake\do{%
+    \ifnum\aeb@parsecnt=\z@
+      \edef\firsttok{\@mytoks}%
+      \csarg\xdef{\argType\@mytoks}{\the\JStoks}%
+    \else
+      \edef\letsmakelet{\global\let\expandafter\noexpand
+        \csname\argType\@mytoks\endcsname=\expandafter\noexpand
+        \csname\argType\firsttok\endcsname}\letsmakelet
+    \fi
+    \advance\aeb@parsecnt\@ne
+  }%
 }
 \newif\ifaeb@PageOpen
 \newif\ifaeb@PageClose
 \newif\if@everyPageOpen\@everyPageOpenfalse
 \newif\if@everyPageClose\@everyPageClosefalse
 \newcommand\aebPageAction[3][ThisPage]{%
-    \let\ispageactions=0\aeb@PageOpenfalse\aeb@PageClosefalse
-    \def\@aebOpen{#2}%
-    \if1\@aebOpen1%
-        \if@everyPageOpen
-            \aeb@PageOpentrue\let\ispageactions=1%
-            \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
-        \fi
-    \else
-        \let\ispageactions=1%
-        \aeb@PageOpentrue
-        \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}%
+  \def\@activechar@info{\pdfSP\@gobbletwo}\let\ispageactions\aebp@Zero
+  \aeb@PageOpenfalse\aeb@PageClosefalse
+  \def\@aebOpen{#2}%
+  \if1\@aebOpen1%
+    \if@everyPageOpen
+      \aeb@PageOpentrue\let\ispageactions\aebp@One
+      \def\@aebOpen{/O << \JS{\every@PageOpen#2} >>}\fi
+  \else
+    \let\ispageactions\aebp@One
+    \aeb@PageOpentrue
+    \def\@aebOpen{/O << \JS{\every@PageOpen^^J#2} >>}%
+  \fi
+  \def\@aebClose{#3}%
+  \if1\@aebClose1%
+    \if@everyPageClose
+      \aeb@PageClosetrue\let\ispageactions\aebp@One
+      \def\@aebClose{/C << \JS{\every@PageClose#3} >>}\fi
+  \else
+    \let\ispageactions\aebp@One
+    \aeb@PageClosetrue
+    \def\@aebClose{/C << \JS{\every@PageClose^^J#3} >>}%
+  \fi
+  \if@everyPageOpen\aeb@PageOpentrue\let\ispageactions\aebp@One\fi
+  \if@everyPageClose\@everyPageClosetrue\let\ispageactions\aebp@One\fi
+  \if\ispageactions\aebp@One
+    \xdef\aebp@PageActionCode{/AA <<
+      \ifaeb@PageOpen\@aebOpen\space\fi
+      \ifaeb@PageClose\@aebClose\space\fi >>}%
+    \ifnum\value{page}=\@ne\else
+      \ifpdfmarkup\literalps@out{\AEB@psMrk{#1} <<
+        \aebp@PageActionCode\space >> /PUT pdfmark}\else
+      \ifpdf\global\pdfpageattr=\expandafter
+        {\aebp@PageActionCode}\else
+      \ifxetex\@pdfm@mark{put @thispage <<
+        \aebp@PageActionCode\space>>}\fi\fi\fi
     \fi
-    \def\@aebClose{#3}%
-    \if1\@aebClose1%
-        \if@everyPageClose
-            \aeb@PageClosetrue\let\ispageactions=1%
-            \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
-        \fi
-    \else
-        \let\ispageactions=1%
-        \aeb@PageClosetrue
-        \def\@aebClose{/C << \JS{\every@PageClose#3} >>}%
-    \fi
-    \if@everyPageOpen\aeb@PageOpentrue\let\ispageactions=1\fi
-    \if@everyPageClose\@everyPageClosetrue\let\ispageactions=1\fi
-    \if\ispageactions1%
-        \xdef\aebp@PageActionCode{/AA <<
-            \ifaeb@PageOpen\@aebOpen\space\fi
-            \ifaeb@PageClose\@aebClose\space\fi >>}
-        \ifnum\value{page}=1\relax\else
-            \ifpdfmarkup\literalps@out{\AEB@psMrk{#1} <<
-                \aebp@PageActionCode\space >> /PUT pdfmark}\else
-            \ifpdf\global\pdfpageattr=\expandafter
-                {\aebp@PageActionCode}\else
-            \ifxetex\@pdfm@mark{put @thispage <<
-                \aebp@PageActionCode\space>>}\fi\fi\fi
-        \fi
-    \fi
+  \fi
 }
 \def\aeb@exiii{\expandafter\expandafter\expandafter}
 \let\ahrefexafter\aeb@exiii
@@ -725,8 +718,8 @@ ZoomOutUp,CombHorizontal,CombVertical}[Replace]%
 \def\ap@gobtonil#1\@nil{}
 \def\ap@gettonil#1\@nil{\def\to@nilarg{#1}}
 \def\ap@ifspc{\ifx\@let@token\@sptoken
-    \let\ap@next\ap@xifspc\else
-    \let\ap@next\ap@gettonil\fi\ap@next}
+  \let\ap@next\ap@xifspc\else
+  \let\ap@next\ap@gettonil\fi\ap@next}
 \begingroup
 \def\:{\ap@xifspc}
 \expandafter\gdef\: {\futurelet\@let@token\ap@ifspc}
@@ -1039,6 +1032,7 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 \DeclareJSHelper{\importSound}{aebImportSound}
 \DeclareJSHelper{\appopenDoc}{aebAppOpenDoc}
 \DeclareJSHelper{\docSaveAs}{aebDocSaveAs}
+\DeclareJSHelper{\browseForDoc}{aebBrowseForDoc}
 \DeclareJSHelper{\insertPages}{aebInsertPages}
 \DeclareJSHelper{\createTemplate}{aebCreateTemplate}
 \DeclareJSHelper{\importDataObject}{aebImportDataObject}
@@ -1049,49 +1043,49 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 \def\sigFieldObj(#1){var oSigField=this.getField(#1)}
 \def\signatureSetSeedValue#1{%
     \ap@TF( oSigField, aebSignatureSetSeedValue, }
-\begin{defineJS}[\def\defineJSjsR{^^J}]{\signatureSign}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\signatureSign}
 if ( typeof oSigInfo.oHandler=="undefined" )
-    oSigInfo.oHandler=security.PPKLiteHandler;
-var engine=aebTrustedFunctions( security,
-    aebSecurityGetHandler, oSigInfo.oHandler );
-var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ?
-    aebTrustedFunctions( this, aebAppGetPath,
-        {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert :
-    oSigInfo.path2Cert;
-aebTrustedFunctions( engine, aebSecurityHandlerLogin,
-    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,%
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ? %
+aebTrustedFunctions( this, aebAppGetPath,%
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert : %
+oSigInfo.path2Cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,%
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
 var oSigField = this.getField(oSigInfo.cSigFieldName);
 oSigInfo.oInfo.password=oSigInfo.password;
 if ( typeof oSigInfo.sv!="undefined" ) {
-    for (var o in oSigInfo.sv )
-        oSigInfo.oInfo[o]=oSigInfo.sv[o];
+  for (var o in oSigInfo.sv )
+    oSigInfo.oInfo[o]=oSigInfo.sv[o];
 }
 var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
 if ( typeof oSigInfo.cLegalAttest!="undefined" )
-    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
 if ( typeof oSigInfo.cDIPath!="undefined")
-        oSigArgs.cDIPath=oSigInfo.cDIPath;
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
 if ( typeof oSigInfo.bUI!="undefined")
-        oSigArgs.bUI=oSigInfo.bUI;
+  oSigArgs.bUI=oSigInfo.bUI;
 aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
 \end{defineJS}
-\begin{defineJS}[\def\defineJSjsR{^^J}]{\certifyInvisibleSign}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\certifyInvisibleSign}
 if ( typeof oSigInfo.oHandler=="undefined" )
-    oSigInfo.oHandler=security.PPKLiteHandler;
-var engine=aebTrustedFunctions( security,
-    aebSecurityGetHandler, oSigInfo.oHandler );
-var path2Cert=aebTrustedFunctions( this, aebAppGetPath,
-    {cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
-aebTrustedFunctions( engine, aebSecurityHandlerLogin,
-    { cPassword: oSigInfo.password, cDIPath: path2Cert});
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security, %
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert=aebTrustedFunctions( this, aebAppGetPath, %
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin, %
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
 oSigInfo.oInfo.password=oSigInfo.password;
 var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
 if ( typeof oSigInfo.cLegalAttest!="undefined" )
-    oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
 if ( typeof oSigInfo.cDIPath!="undefined")
-        oSigArgs.cDIPath=oSigInfo.cDIPath;
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
 if ( typeof oSigInfo.bUI!="undefined")
-        oSigArgs.bUI=oSigInfo.bUI;
+  oSigArgs.bUI=oSigInfo.bUI;
 aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
 \end{defineJS}
 \let\predocassemJS\@empty

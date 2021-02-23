@@ -2,6 +2,8 @@
 % use useacrobat option with pdftex and xetex if you have acrobat
 \documentclass{article}
 \usepackage{graphicx,fancyvrb}
+% Edit this command as needed
+\def\pthToExtras{../extras}
 \usepackage[%
     web={
         pro,
@@ -13,7 +15,7 @@
     },
     eforms,
 %
-% Attach source file, and the tex log (I've renamed \jobname.log
+% Attach source file, and the tex log (renamed \jobname.log
 % to \jobname.tex.log to avoid the distiller from overwriting it.
 % The distiller only creates the log if there some sort of error message; consequently,
 % the log for distiller is not attached (no error), but the tex log is destroyed by distiller
@@ -21,7 +23,7 @@
 %
 % Just for laughs, let's include Robot Man.
 %
-    attachments={extras.zip.txt, ../extras/robot_man.pdf},
+    attachments={extras.zip.txt, \pthToExtras/robot_man.pdf},
     aebxmp,
 ]{aeb_pro}
 
@@ -42,15 +44,13 @@
 }
 \DeclareInitView{layoutmag={navitab=UseAttachments},windowoptions=fit}
 
+\newbox\aebpbox
 \newcommand{\cs}[1]{\texttt{\char`\\#1}}
 \newcommand\newtopic{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
 \vskip\medskipamount\noindent}
-\newenvironment{sverbatim}
-{\par\footnotesize\verbatim}{\endverbatim}
 %
 % As you do not have the necessary background files, the \addWatermarkFromFile
 % will silently fail.
-%
 \begin{forpaper}
 \begin{docassembly}
 var pos=this.path.indexOf(this.documentFileName,"/");
@@ -58,15 +58,15 @@ var myPath=this.path.substring(0,pos);
 try {
 \addWatermarkFromFile({
     bOnTop:false,
-    cDIPath:myPath+"../extras/Manual_BG_Print_AeB.pdf"
+    cDIPath:myPath+"\pthToExtras/Manual_BG_Print_AeB.pdf"
 }); } catch(e) { console.println(e.toString()) };
 try {
-    \importSound({cName: "StarTrek", cDIPath: "../extras/trek.wav" });
+    \importSound({cName: "StarTrek", cDIPath: "\pthToExtras/trek.wav" });
 } catch(e) { console.println(e.toString()) };
 try {
-    \importIcon({cName: "logo", cDIPath: "../extras/AeB_Logo.pdf"});
-    \importIcon({cName: "logopush", cDIPath: "../extras/AeB_Logo_bw15.pdf"});
-    \importIcon({cName: "logorollover", cDIPath: "../extras/AeB_Logo_bw50.pdf"});
+    \importIcon({cName: "logo", cDIPath: "\pthToExtras/AeB_Logo.pdf"});
+    \importIcon({cName: "logopush", cDIPath: "\pthToExtras/AeB_Logo_bw15.pdf"});
+    \importIcon({cName: "logorollover", cDIPath: "\pthToExtras/AeB_Logo_bw50.pdf"});
     var f = this.getField("cheesySound");
     f.buttonPosition = position.iconOnly;
     var oIcon = this.getIcon("logo");
@@ -76,7 +76,10 @@ try {
     oIcon = this.getIcon("logorollover");
     f.buttonSetIcon(oIcon,2);
 } catch(e) { console.println(e.toString()) };
-try {\importDataObject({cName: "AeB Pro Example #2",cDIPath: "aebpro_ex2.pdf"});} catch(e){}
+try {
+  \importDataObject({cName: "AeBProEx2",cDIPath: "aebpro_ex2.pdf"});
+  this.getDataObject("AeBProEx2").description="AeB Pro Example #2";
+} catch(e){}
 \end{docassembly}
 \end{forpaper}
 \begin{forscreen}
@@ -86,16 +89,16 @@ var myPath=this.path.substring(0,pos);
 try {
     \addWatermarkFromFile({
         bOnTop:false,
-        cDIPath:myPath+"../extras/Manual_BG_DesignV_AeB.pdf"
+        cDIPath:myPath+"\pthToExtras/Manual_BG_DesignV_AeB.pdf"
     });
 } catch(e) { console.println(e.toString()) };
 try {
-    \importSound({cName: "StarTrek", cDIPath: "../extras/trek.wav" });
+    \importSound({cName: "StarTrek", cDIPath: "\pthToExtras/trek.wav" });
 } catch(e) { console.println(e.toString()) };
 try {
-    \importIcon({cName: "logo", cDIPath: "../extras/AeB_Logo.pdf"});
-    \importIcon({cName: "logopush", cDIPath: "../extras/AeB_Logo_bw15.pdf"});
-    \importIcon({cName: "logorollover", cDIPath: "../extras/AeB_Logo_bw50.pdf"});
+    \importIcon({cName: "logo", cDIPath: "\pthToExtras/AeB_Logo.pdf"});
+    \importIcon({cName: "logopush", cDIPath: "\pthToExtras/AeB_Logo_bw15.pdf"});
+    \importIcon({cName: "logorollover", cDIPath: "\pthToExtras/AeB_Logo_bw50.pdf"});
     var f = this.getField("cheesySound");
     f.buttonPosition = position.iconOnly;
     var oIcon = this.getIcon("logo");
@@ -105,7 +108,10 @@ try {
     oIcon = this.getIcon("logorollover");
     f.buttonSetIcon(oIcon,2);
 } catch(e) { console.println(e.toString()) };
-try {\importDataObject({cName: "AeB Pro Example #2",cDIPath: "aebpro_ex2.pdf"});} catch(e){}
+try {
+  \importDataObject({cName: "AeBProEx2",cDIPath: "aebpro_ex2.pdf"});
+  this.getDataObject("AeBProEx2").description="AeB Pro Example #2";
+} catch(e){}
 \end{docassembly}
 \end{forscreen}
 
@@ -175,7 +181,7 @@ relative paths to the file required to attach. For example,
 \usepackage[%
     driver=dvips,
     web={pro,usesf,...},
-    attachments={extras.zip.txt,../extras/robot_man.pdf,
+    attachments={extras.zip.txt,\pthToExtras/robot_man.pdf,
     /C/Documents and Settings/dps/My Documents/My Pictures/birthday17.jpg},
     ...
 ]{aeb_pro}
@@ -244,7 +250,7 @@ var myPath=this.path.substring(0,pos);
 \begin{docassembly}
 \addWatermarkFromFile({
     bOnTop:false,
-    cDIPath:myPath+"../extras/Manual_BG_Print_AeB.pdf"
+    cDIPath:myPath+"\pthToExtras/Manual_BG_Print_AeB.pdf"
 });
 \end{docassembly}
 \end{Verbatim}
@@ -265,12 +271,12 @@ re-inserts \verb!({! in a different location. (See the
 For another cheesy demonstration, let's import a sound, associate it
 with a button. I leave it to you to press the button at your
 discretion.
-\begin{center}
-\setbox0=\hbox{\includegraphics[height=16bp]{extras/AeB_Logo.eps}}
+\begin{center}%\previewOn
+\setbox\aebpbox=\hbox{\includegraphics[height=16bp]{\pthToExtras/AeB_Logo.eps}}
 \newtopic\pushButton[\S{S}\W{0}\A{\JS{%
     var s = this.getSound("StarTrek");\r
     s.play();
-}}]{cheesySound}{\the\wd0 }{\the\ht0 }
+}}]{cheesySound}{\wd\aebpbox}{\ht\aebpbox}
 \end{center}
 
 \begin{Verbatim}
@@ -278,11 +284,11 @@ discretion.
 try {
     \addWatermarkFromFile({
         bOnTop:false,
-        cDIPath:myPath+"../extras/Manual_BG_DesignV_AeB.pdf"
+        cDIPath:myPath+"\pthToExtras/Manual_BG_DesignV_AeB.pdf"
     });
 } catch(e) { console.println(e.toString()) };
 try {
-    \importSound({cName: "StarTrek", cDIPath: "../extras/trek.wav" });
+    \importSound({cName: "StarTrek", cDIPath: "\pthToExtras/trek.wav" });
 } catch(e) { console.println(e.toString()) };
 \end{docassembly}
 \end{Verbatim}
@@ -303,9 +309,9 @@ code, with some comments added.
 ...
 ...
 // Import the sounds into the document
-\importIcon({cName: "logo", cDIPath: "../extras/AeB_Logo.pdf"});
-\importIcon({cName: "logopush", cDIPath: "../extras/AeB_Logo_bw15.pdf"});
-\importIcon({cName: "logorollover", cDIPath: "../extras/AeB_Logo_bw50.pdf"});
+\importIcon({cName: "logo", cDIPath: "\pthToExtras/AeB_Logo.pdf"});
+\importIcon({cName: "logopush", cDIPath: "\pthToExtras/AeB_Logo_bw15.pdf"});
+\importIcon({cName: "logorollover", cDIPath: "\pthToExtras/AeB_Logo_bw50.pdf"});
 var f = this.getField("cheesySound");    // get the field object of the button
 f.buttonPosition = position.iconOnly;    // set it to receive icon appearances
 var oIcon = this.getIcon("logo");        // get the "logo" icon
@@ -326,7 +332,8 @@ your own files using the \texttt{docassembly} environment.
 ...
 ...
 try {
-    \importDataObject({cName: "AeB Pro Example #2",cDIPath: "aebpro_ex2.pdf"});
+  \importDataObject({cName: "AeBProEx2",cDIPath: "aebpro_ex2.pdf"});
+  this.getDataObject("AeBProEx2").description="AeB Pro Example #2";
 } catch(e){}
 \end{docassembly}
 \end{Verbatim}

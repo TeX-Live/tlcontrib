@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2020  D. P. Story                 %%
+%% Copyright (C) 1999-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2021/01/20 v8.6.2 %
+ [2021/02/17 v8.6.4 %
  Exerquiz document level JavaScript (dps)]
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
@@ -53,6 +53,7 @@
 var exerquizLoaded = true;
 this.disclosed = true;
 app.runtimeHighlight=false;
+var bDisplaySilent=false; // dps
 \end{newsegment}
 \begin{newsegment}{Eq: Global Data}
 var ok2Continue = true;
@@ -1045,14 +1046,17 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
 (typeof oQName.GradeScaleLoc=="undefined")%
 ?GradeScaleDefault:oQName.GradeScaleLoc;
     quizGrade = GetGrade.apply(null,gradeScale);
-    var f = this.getField("ScoreField."+qtfield);
-    if ( f != null ) f.value=(\eqQuizTotalMsg);
-    f = this.getField("PointsField."+qtfield);
-    if ( f != null) f.value=(\eqQuizPointsMsg);
-    f = this.getField("PercentField."+qtfield);
-    if ( f != null) f.value=(\eqQuizPercentMsg);
-    f = this.getField("GradeField."+qtfield);
-    if ( f != null) f.value=(\eqQuizGradeMsg);
+    var _bSilent=(arguments.length > 3 ) ? arguments[3] : false;
+    if (!_bSilent) {
+      var f = this.getField("ScoreField."+qtfield);
+      if ( f != null ) f.value=(\eqQuizTotalMsg);
+      f = this.getField("PointsField."+qtfield);
+      if ( f != null) f.value=(\eqQuizPointsMsg);
+      f = this.getField("PercentField."+qtfield);
+      if ( f != null) f.value=(\eqQuizPercentMsg);
+      f = this.getField("GradeField."+qtfield);
+      if ( f != null) f.value=(\eqQuizGradeMsg);
+    }
 }
 function GetGrade()
 {
@@ -1168,7 +1172,7 @@ function correctQuiz(qtfield,nQuestions)
 ?\eqCorrChoiceFully:oQName.fullyCorrectLoc;
   var f = this.getField("mcq." + qtfield);
   if ( f != null) {
-    if (bFullyCorrect) { // dpsf07
+    if (bFullyCorrect) {
       f.display = display.visible;
     } else {
       for (var n=1; n<=nQuestions; n++) {

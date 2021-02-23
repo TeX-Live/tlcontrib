@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2020  D. P. Story                 %%
+%% Copyright (C) 1999-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2021/01/20 v8.6.2 %
+ [2021/02/17 v8.6.4 %
  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -2172,7 +2172,8 @@ else {
 *if@inclkey
     *curr@quiz.CorrAns=new Array(*corrAnsArray);*fi
     DisplayQuizResults("*curr@quiz",*theeqpointvalue,%
-*thequestionno);
+*thequestionno,bDisplaySilent);
+    bDisplaySilent=false;
     var h=this.getField("ScoreData.*curr@quiz");
     h.value=Score+";"+NQuestions+";"%
 +ptScore+";"+NPointTotal;%
@@ -3840,7 +3841,7 @@ if(event.willCommit){
   ProcUserResp(retn,event.value,*thequestionno,0%
 *ifx*grpquestions*eq@One,*thegrpquestionno*fi);
 }
-if (!isQuizInitialized("!currQuiz")) {
+if (!isQuizInitialized("*currQuiz")) {
   *eqObjAlert*eqAppAlert(InitMsg("*bqlabelISO"),3);
   event.rc = false;
 }
@@ -3859,10 +3860,10 @@ if (!isQuizInitialized("!currQuiz")) {
 if(event.willCommit) {
   var retn = ProcRespTxt(!rbTxtAlt);%
 !ifx!@sqTurnOffAlerts!eq@One
-  !RespBoxTxtOnBlur!fi%
-!ifx!eqAddAAKeystroke!@empty!else
-!eqAddAAKeystroke!fi
-}
+  !RespBoxTxtOnBlur!fi
+}%
+!ifx!eqAddAAKeystroke!@empty!else%
+!eqAddAAKeystroke!fi%
 \end{defineJS}
 \def\@@RespBoxTxtActions{%
   \AA{\if\eqQuizType\isQZ
@@ -3961,6 +3962,8 @@ if(event.willCommit) {
   \spaceskip=2pt\xspaceskip=2pt
   \expandafter\gobbleTxt\meaning\rbTxtAlt
 }
+\def\txtRef#1{\@ifundefined{r@#1}
+  {??}{\aeb@exiii\@firstoffive\csname r@#1\endcsname}}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\AAKqRespBoxTxtPC}
 if(event.willCommit){
   RecordPointValue(*eqPTs,*thequestionno*ifx*grpquestions*eq@One,%
@@ -4645,7 +4648,7 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
   \expandafter\edef\csname eq\@CmdName\endcsname{\the\toks@}%
 }
 \def\@eqAddAAKeystroke#1{\def\argi{#1}\ifx\argi\@empty
-  \def\eqAddAAKeystroke{}\else\def\eqAddAAKeystroke{#1}\fi} %\r
+  \def\eqAddAAKeystroke{}\else\def\eqAddAAKeystroke{\r #1}\fi} %\r
 \def\eqAddAAKeystroke{}
 \def\@eqAddAAMouseUpMC#1{\def\argi{#1}\ifx\argi\@empty
   \def\eqAddAAMouseUpMC{}\else\def\eqAddAAMouseUpMC{#1}\fi}

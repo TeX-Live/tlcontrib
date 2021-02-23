@@ -21,6 +21,7 @@
 \DeclareInitView{layoutmag={navitab:UseOutlines}}
 \xbmksetup{colors={int=red},styles={intbf}}
 
+\reversemarginpar
 \newbox\aebbox
 
 \usepackage{acroman}
@@ -29,6 +30,7 @@
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
 
+\let\tops\texorpdfstring
 \let\uif\textsf
 
 \def\AcroBlog{{Acro\!\TeX} Blog}
@@ -70,7 +72,7 @@
 \LTpre=0pt %\medskipamount
 \LTpost=-2\medskipamount
 %\LTpost=0pt %\medskipamount
-\setlength{\mathindent}{20pt}
+\setlength{\mathindent}{\the\parindent}
 
 \def\AEBBook{\textsl{{Acro\!\TeX} eDucation System Tools: {\LaTeX} for interactive PDF documents}}
 
@@ -175,7 +177,6 @@
 \def\nhurl#1{\bNH\url{#1}\eNH}
 \def\grayV#1{\textcolor{gray}{#1}}
 \def\darg#1{\{#1\}}
-\def\parboxValign{t}
 \renewcommand*{\backrefalt}[4]{%
     \ifcase #1\or
        See page~#2.\else See pages~#2.\fi
@@ -183,6 +184,7 @@
 \newenvironment{aebQuote}
    {\list{}{\leftmargin\amtIndent}%
     \item\relax}{\endlist}
+\def\parboxValign{t}
 \newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{%
     \raisebox{.5\baselineskip+#1}{%
     \expandafter\parbox\expandafter[\parboxValign]%
@@ -233,10 +235,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2021/01/20}
+\version{2021/02/17}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2021/01/20}
+\prepared{2021/02/17}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -547,64 +549,57 @@ are the installation files for the individual packages,
 \end{questions}
 
 
+\subsection{Concerning the use of \tops{\app}{}{Acrobat}}\label{ss:DistAcro}
 
-\subsection{Installing \texttt{aeb.js}}
+Some \hypertarget{DistAcroWF}{document} authors use the workflow
+\begin{equation}\text{\ttfamily
+tex\,->\,dvi\,->\,\app{dvips}\,->\,ps\,->\,\ameta{\upshape\app{Distiller}\string|\app{ps2pdf}}\,->\allowbreak
+\,\app{PDF viewer}}\label{eq:AcrobatWF}
+\end{equation}
+to create a PDF document. If the document contains quizzes created by the
+\pkg{exerquiz} package (see \Nameref{s:exerquiz}), \uif{Document JavaScripts}
+are required; as a result, at the end of the above workflow, the \app{PDF
+viewer} \emph{is required to be} \app{Acrobat}\FmtMP{\app{Acrobat}
+required}.\footnote{Other PDF creation workflows do not require \app{Acrobat}
+to embed \uif{Document JavaScripts}} The role of \app{Acrobat} is to embed
+the \uif{Document JavaScripts} in the document. The next two subsections
+discuss the use of \app{Acrobat}, first to install the folder JavaScript file
+\texttt{aeb.js}, and second to configure \app{Acrobat}, if needed.
 
+\subsubsection{Installing \texttt{aeb.js}}
 
-The JavaScript file \texttt{aeb.js} is only needed if you use \textbf{Acrobat
-Pro 8.1} or later and \textbf{Adobe Distiller} as the PDF creator. Increased
-security in that version has made it necessary to install a folder JavaScript
-file. The JavaScript within \texttt{aeb.js} raises the ``trust'' of certain
-JavaScript methods used to import document JavaScript into the document just
-after the distillation process and the newly created PDF is opened in
-\textbf{Acrobat} for the first time. The installation of this file is not
-needed if you use \textsf{pdftex}, or \textsf{dvipdfm} (or any of their
-variations), or use a version of \textbf{Acrobat} prior to 8.1.
+The JavaScript file \texttt{aeb.js} is only needed if you use the workflow of
+\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}
+and \uif{Document JavaScripts} are needed to be embedded.
+
+Increased security for the \app{Acrobat} application makes it necessary to
+install a folder JavaScript file. The JavaScript within \texttt{aeb.js}
+raises the ``trust'' of certain JavaScript methods used to import
+\uif{document JavaScript} into the document just after the PDF creation and
+the newly created PDF is opened in \app{Acrobat} for the first time. The
+installation of this file is not needed if you use \app{pdftex},
+\app{lualatex}, or \app{xelatex} (or any of its variants), or if you use
+a version of \app{Acrobat} prior to version 8.1.
 
 The instructions for installing \texttt{aeb.js} are in the
 \texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, which resides in
-the \texttt{doc} folder of the \texttt{acrotex} installation. If you use
-\textbf{Distiller} as your PDF creator, please refer to that document.
+the \texttt{doc} folder of the \texttt{acrotex} installation. if you use the workflow of
+\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}, please refer to that document.
 
-After you've installed the JavaScript files, as directed by the
+After you've installed the JavaScript file, as directed by the
 \texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, validate the
 installation of the JavaScript files by navigating to the \texttt{examples}
 subfolder and opening the file \texttt{test\_install.pdf} in \app{Acrobat};
 follow the directions contained on that one page document.
 
+\subsubsection{Configuring \tops{\app}{}{Acrobat}}
 
-\begin{comment}
-\paragraph*{Acrobat Pro~8.1 or later.}
-Start \textbf{Acrobat Pro~8.1}\footnote{The file will cause no harm if you
-install it in an earlier version of Acrobat, as early as version 7.} or
-later, and open the console window \textsf{Advanced \texttt> JavaScript
-\texttt> Debugger} (\texttt{Ctrl+J} for Windows or \texttt{Cmd+J} for Mac
-OS). Copy and paste the following code into the window.
-\begin{Verbatim}[xleftmargin=\amtIndent]
-app.getPath("user","javascript");
-\end{Verbatim}
-Now, with the mouse cursor on the line containing this script, press
-the \texttt{Ctrl+Enter} key. This will execute this JavaScript. This
-JavaScript method returns the path to where \texttt{aeb.js} should
-be placed. For example, on my system, the return string is
-\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-/C/Documents and Settings/story/
-    Application Data/Adobe/Acrobat/8.0/JavaScripts
-\end{Verbatim}
-Follow the path to this folder. If the \texttt{JavaScripts} folder
-does not exist, create it.  Finally, copy \texttt{aeb.js}
-into this folder. The file is read each time Acrobat starts.
+If you have \app{Acrobat DC} that was purchased or updated after December 2020,
+\app{Acrobat} needs to be configured for the workflow
+\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}
+to function correctly. For detailed discussion, refer to the document
+\texttt{\href{acrobat-in-workflow.pdf}{acrobat-in-workflow.pdf}}.
 
-\paragraph*{Acrobat Pro 10.1.1 for Windows only.} For this version of \textbf{Acrobat},
-things have tightened up even more. The user JavaScripts folder has moved to
-\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small]
-%AppData%\Adobe\Acrobat\Privileged\10.0\JavaScripts
-\end{Verbatim}
-\exAeBBlogArticle{p=737}where \verb!%AppData%! is an environment variable defined by Acrobat. For details
-of how to install the folder JavaScripts in the new location, see my blog
-article \mlhref{http://www.acrotex.net/blog/?p=737}{Acrobat Security Changes in 10.1.1 and
-Acro\!\TeX}.
-\end{comment}
 
 \subsection{Language Localizations}
 
@@ -789,6 +784,26 @@ document. At this point you can move your \textsf{PDF} to another
 folder, or to the web. The document does not need the
 \texttt{.fdf} files any more.
 
+\redpoint \textcolor{red}{Important:} If you use \app{Acrobat
+DC}\FmtMP{\app{Acrobat DC}} in your PDF creation workflow and have updated
+the application after December 2020, the {\AEB} workflow is broken. To
+restore the workflow, it is necessary \emph{to clear the checkbox} labeled
+\uif{Enable Protected Mode at startup}\FmtMP{Protected Mode}, this checkbox
+is found under the menu \uif{Edit > Preferences}
+(\uif{Ctrl+K}).\footnote{When the box is checked, importing FDF files, as
+described above, is prohibited. We want FDF files imported, so we clear the
+checkbox.}  In the \uif{Preferences} dialog box, select the \uif{Security
+(Enhanced)} category from the left panel; the targeted checkbox is at the top
+line on the right panel. Refer to \hyperref[fig:SP]{Figure~\ref*{fig:SP}} for
+a visual.
+
+
+\begin{figure}[htb]\fboxsep0pt\relax\centering
+  \fbox{\includegraphics[width=.5\linewidth]{figures/SecurityPrefs}}
+  \caption{\tops{\protect\uif}{}{Security (Enhanced) Preferences}}\label{fig:SP}
+\end{figure}
+
+
 \begin{comment}
 \redpoint \textbf{For Distiller~4.0--4.05 Users.} Versions prior
 to~5.0 of the Acrobat product cannot import document level
@@ -834,7 +849,7 @@ You can edit \textsf{eq\_dljs.pdf} and make whatever changes you
 please to the script, in terms of changing color.
 \end{comment}
 
-There are several ways the Distiller workflow can be accomplished:
+%There are several ways the Distiller workflow can be accomplished:
 %\begin{itemize}
 %    \item \textbf{Through the {\LaTeX} Editor.} Some editors, WinEdt, in particular, have toolbars that can distill
 %    a PostScript file. (The default is to use  Ghostscript, you'll have to change to Distiller.) From WinEdt, you
@@ -858,11 +873,12 @@ There are several ways the Distiller workflow can be accomplished:
 %        5. Open the .pdf file.
 %
 %        This will allow readers the opportunity to see what will happen if they fail to save the file before moving it
-to another location, like the web.
+%to another location, like the web.
 %
 %
 %    \end{enumerate}
 %\end{itemize}
+
 
 \newtopic For distiller users, the
 \href{http://www.math.uakron.edu/~dpstory/aeb_pro.html}{\AEB\ Pro package}
@@ -3688,7 +3704,7 @@ dot (.) at the end of the section number. To revert to this behavior, use the
     \par\vskip6pt\vskip0pt plus .25\vsize\penalty-1000 \vskip0pt plus-.25\vsize}
 
 %\addtocontents{toc}{\par\protect\vspace{\bigskipamount}\kern0pt\vspace{-\medskipamount}}
-\part{The Exerquiz Package}\label{s:exerquiz}
+\part{The Exerquiz Package}\chgCurrLblName{The Exerquiz Package}\label{s:exerquiz}
 
 %The \textsf{exerquiz} package contains a series of macros for
 %creating on-line exercises, short quizzes (with or without
@@ -3751,12 +3767,13 @@ discussed in this section.
 
 \section{\protect\textsf{Exerquiz} and Acrobat JavaScript}
 
-\textsf{Exerquiz} now uses the \textsf{insdljs} Package to insert
-Document level Java\-Scripts into the \textsf{PDF} file. The quizzes
-created using the \texttt{shortquiz} or \texttt{quiz} environment are
-graded, marked and scored using these inserted JavaScript functions.
+\pkg{Exerquiz} now uses the \pkg{insdljs} package to insert \uif{Document
+level Java\-Scripts} into the {PDF} file. (Review
+\hyperref[ss:DistAcro]{Section~\ref*{ss:DistAcro}} on page~\pageref*{ss:DistAcro}, as needed.) The quizzes
+created using the \texttt{shortquiz} or \texttt{quiz} environment are graded,
+marked and scored using these inserted JavaScript functions.
 
-Because the package \textsf{insdljs} is already loaded, it is easy
+Because the package pkg{insdljs} is already loaded, it is easy
 for the document author to develop JavaScripts that can be called
 from the standard \textsf{Exerquiz} commands. The ability to write
 JavaScript, therefore, right in the \LaTeX{} document gives a

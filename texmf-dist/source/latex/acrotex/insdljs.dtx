@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2020  D. P. Story                 %%
+%% Copyright (C) 2001-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2020/12/20 v2.5 Insert Document Level JavaScripts (dps)]
+%<package> [2021/02/07 v2.5.2 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -73,6 +73,9 @@
 % \textsf{dvips} or \textsf{dvipsone} to produce a postscript file,
 % which is then distilled), you are required to have Acrobat~5.0 (or
 % later).
+% \changes{v2.5.1}{2021/02/04}{Updated \string\texttt{aeb\_man.tex} and
+% \string\texttt{eformman.tex} to reflect additional security restriction
+% on \string\app{Acrobat}.}
 %
 % \section{Features of the \textsf{insdljs} package}
 % We present a few of the several features of the package to get some feel for its
@@ -868,8 +871,9 @@
 %    is turned on by default, and may be turned off with \DescribeMacro\pdfSpacesOff\cs{pdfSpacesOff}
 %    and back on by \DescribeMacro\pdfSpacesOn\cs{pdfSpacesOn}.
 %    \begin{macrocode}
-\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
-\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+\newif\ifpdfspaces\pdfspacesfalse
+\def\pdfSpacesOn{\global\pdfspacestrue\let\pdfSP\pdfSPDef}
+\def\pdfSpacesOff{\global\pdfspacesfalse\let\pdfSP\dl@sp@ce}
 \pdfSpacesOff
 \ifpdf\else\ifxetex\else\pdfSpacesOn\fi\fi
 \def\pdfLBr{\string\173}
@@ -2051,14 +2055,19 @@
 %    \end{macrocode}
 %   We \cs{let} \cs{space} to \cs{pdfSP}, and declare \cs{obeyspaces}, in this way, the space
 %   character is active and is equal to \cs{040} (space). Start the verbatim environment.
+%   We expand \cs{obeyspaces} only if \cs{pdfSpacesOn} is in effect.
+%   \changes{v2.5.2}{2021/02/07}{Modify \string\cs{b@vrbdfnJS}, remove \string\cs{global}
+%   on \string\cs{let}}
 %    \begin{macrocode}
-\def\b@vrbdfnJS#1{\global\let\space\pdfSP\makeatletter\obeyspaces%
+\def\b@vrbdfnJS#1{\ifpdfspaces\let\space\pdfSP
+  \makeatletter\obeyspaces\fi%
 %    \end{macrocode}
 %     Pass the first argument here. If this environment is for typesetting,
 %     initialize the tokens \cs{JStoks} to be in a group, and such. The insertion
 %     of \cs{dl@paramlocal} is to support the \cs{bParams}/\allowbreak\cs{eParams} construct.
 %    \begin{macrocode}
-  #1\ifdlfortypeset\global\JStoks={\bgroup\leavevmode\dl@paramlocal}\fi%
+  #1\ifdlfortypeset%
+  \global\JStoks={\bgroup\leavevmode\dl@paramlocal}\fi%
   \verbatim@start}
 %    \end{macrocode}
 %    The end of the environment code

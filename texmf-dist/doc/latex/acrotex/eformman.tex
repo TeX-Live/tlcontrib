@@ -11,7 +11,7 @@
 %\usepackage{myriadpro}
 
 \setlength{\marginparpush}{3pt}
-
+\setlength{\mathindent}{\the\parindent}
 %\previewOn\pmpvOn
 
 \usepackage{graphicx,array,longtable}
@@ -26,7 +26,7 @@
 \def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
 \def\mSTRUT{\makebox[0pt][l]{\phantom{$\frac00$}}}
 \let\vrbnormal\sffamily
-\let\uif\sffamily
+\let\uif\textsf
 \let\key\texttt
 
 
@@ -36,6 +36,7 @@
 %\def\numberline#1{\hb@xt@2.5em{#1\hfil}}
 %\makeatother
 \makeatletter
+\let\gob\@gobble
 \renewcommand*\l@subsection{\@dottedtocline{2}{2em}{3.5em}}
 \renewcommand*\l@subsubsection{\@dottedtocline{4}{5.5em}{1.5em}}
 \renewcommand\@pnumwidth{2.55em}
@@ -80,7 +81,7 @@
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2021/01/20},
+    prepared={2021/02/17},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -2688,8 +2689,8 @@ lock={action=include,fields={!ameta(field!SUB1),!ameta(field!SUB2),...}}
 lock={action=exclude,fields={!ameta(field!SUB1),!ameta(field!SUB2),...}}
 \end{Verbatim}
 
-\newtopic Another option that is included in the \uif{Signed tab} is titled ``This script executes
-when field is signed.''
+\newtopic Another option that is included in the \uif{Signed tab} is titled ``\uif{This script executes
+when field is signed.}''
 
 This is an option that, through the user interface, is mutually exclusive from
 locking fields. This option is implemented through the format event;
@@ -2860,7 +2861,7 @@ b\hspace{9.5pt}}}}}}\texttt{\href{\urlAcroTeXBlog/?p=334}{settaborder1.pdf}} for
 
 %\section{Introduction}
 
-The \hypertarget{\pkg{insdljs}}{insdljsPkg} package provides support to {\LaTeX} in four areas:
+The \hypertarget{insdljsPkg}{\pkg{insdljs}} package provides support to {\LaTeX} in four areas:
 \begin{enumerate}
   \item for embedding document level JavaScript into the PDF file created
       from a {\LaTeX} source, the \texttt{insDLJS} environment.
@@ -2876,12 +2877,32 @@ The \hypertarget{\pkg{insdljs}}{insdljsPkg} package provides support to {\LaTeX}
 
 \newtopic This package defines a new environment, \texttt{insDLJS}, used
 for inserting \app{Acrobat} JavaScript into a PDF file created from a
-\LaTeX{} source. This package works correctly for users of \textsf{pdftex}
-(and \app{luatex}), \textsf{dvipdfm}, \textsf{dvipdfmx}, and \texttt{xetex}.
-For\marginpar{\small\raggedleft\app{Acrobat} required for
-\app{dvips}} those who use either \app{dvips} or
-\app{dvipsone} to produce a postscript file, which is then distilled, you are
-required to have \app{Acrobat}~5.0 (or later).
+\LaTeX{} source. This package works correctly for users of \app{pdflatex},
+\app{lualatex}, or \app{xelatex}.
+\gob{For\FmtMP{\small\raggedleft\app{Acrobat} required for \app{dvips}} those
+who use \app{dvips} to produce a Postscript file,
+which is then distilled, you are required to have \app{Acrobat}~5.0 (or
+later).}
+For document authors that use the workflow
+\begin{equation}\text{\ttfamily
+tex\,->\,dvi\,->\,\app{dvips}\,->\,ps\,->\,\ameta{\upshape\app{Distiller}\string|\app{ps2pdf}}\,->\allowbreak
+\,\app{PDF viewer}}\label{eq:AcrobatWF}
+\end{equation}
+to create a PDF document, if the document (or one of the packages it
+imports) uses \uif{Document JavaScripts} created by this package, at the end
+of the above workflow, the \app{PDF viewer} \emph{is required to be}
+\app{Acrobat}\FmtMP{\app{Acrobat} required}.\footnote{Other PDF creation
+workflows do not require \app{Acrobat} to embed \uif{Document JavaScripts}}
+The role of \app{Acrobat} is to embed the \uif{Document JavaScripts} in the
+document for the workflow of
+\hyperref[eq:AcrobatWF]{display~\bNH\eqref{eq:AcrobatWF}\eNH}.
+It is necessary to install the folder JavaScript file \texttt{aeb.js} (read
+\texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}} for instructions)
+and to possibly configure \app{Acrobat} (read
+\texttt{\href{acrobat-in-workflow.pdf}{acrobat-in-workflow.pdf}} to see how
+to do this). For additional discussion on this workflow, refer to the section
+titled ``Concerning the use of \app{Acrobat}'' in the
+\texttt{\href{aeb_man.pdf\#DistAcroWF}{AeB Manual}}.
 
 \section{Package Options}
 
@@ -3415,7 +3436,7 @@ console.println("Enter the button area");
 \begin{defineJS}{\JSAAX}
 console.println("Exiting the button area");
 \end{defineJS}
-\pushButton[\A {\JS{\JSA}}
+\pushButton[\A{\JS{\JSA}}
     \AA{\AAMouseEnter{\JS{\JSAAE}}
         \AAMouseExit{\JS{\JSAAX}}}
 ]{myButton}{30bp}{15bp}

@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Exerquiz.sty package,                                %%
-%% Copyright (C) 1999-2020  D. P. Story                 %%
+%% Copyright (C) 1999-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/01/20 v8.6.2 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/02/17 v8.6.4 %
 %<package> Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver> Exerquiz documentation driver file (dps)]
 %<aebjs> Exerquiz document level JavaScript (dps)]
@@ -97,6 +97,8 @@
 %    {\PackageInfo{exerquiz}{aebdonotindex.def cannot be found}}
 %    \begin{macrocode}
 %    \end{macrocode}
+%\changes{v8.6.3}{2021/01/31}{Updated documentation, informing users of \string\app{Acrobat DC} that
+%   it is necessary to change their \string\uif{Security (Enhanced)} preferences.}
 %\changes{v8.2.8}{2018/12/13}{The SOL file is now written entirely when there is no solution option specified}
 % (v8.0 dated 2017/08/08) This version introduces multi-letter variables and what I'll term `alternate appearances'.
 % \changes{v8.0}{2017/08/08}{Introduce multi-letter variables and alternate appearances. Changes
@@ -1644,7 +1646,8 @@
 % one optional parameter, the name of a counter \texttt{<ctr>} that is to
 % be used.\medskip
 %
-% \noindent With the exercises\DescribeMacro{\exerSolnInExtFile}, you have the option of including them in the main document, or putting them
+% \noindent With the exercises\DescribeMacro{\exerSolnInExtFile},
+% you have the option of including them in the main document, or putting them
 % in an external document.  The \cs{exerSolnsInExtFile} command lets you specify an external file name.
 % Just use the \textit{basename}, hyperref will add the extension.  If an external file is specified, all
 % solution links are changed to links between documents. Usage:
@@ -4983,8 +4986,17 @@ else {
     ProbType=[*ptypeArray];%
 *if@inclkey
     *curr@quiz.CorrAns=new Array(*corrAnsArray);*fi
+%    \end{macrocode}
+%    (2021/02/17) Pass a fourth argument to \texttt{DisplayQuizResults()}, its default
+%    value is \texttt{bDisplaySilent=false}, but can be changed locally
+%    to \texttt{true}. When \texttt{bDisplaySilent=true}, \texttt{DisplayQuizResults()}
+%    does not write its results to any field (Score Field, Points Field, etc.).
+% \changes{v8.6.4}{2021/02/17}{We pass
+%  a new \texttt{bDisplaySilent} argument to \texttt{DisplayQuizResults} for ``silent reporting''}
+%    \begin{macrocode}
     DisplayQuizResults("*curr@quiz",*theeqpointvalue,%
-*thequestionno);
+*thequestionno,bDisplaySilent);
+    bDisplaySilent=false; 
     var h=this.getField("ScoreData.*curr@quiz");
     h.value=Score+";"+NQuestions+";"%
 +ptScore+";"+NPointTotal;%
@@ -8517,6 +8529,8 @@ if(event.willCommit) {
 \def\eqAppAlert{eqAppAlert}
 %    \end{macrocode}
 %    Keystroke action for \cs{RespBoxTxt}
+%    \changes{v8.6.4}{2021/02/15}{Corrected coding of  \string\cs{AAKqRespBoxTxt}, wrong
+%    escape char}
 %    \begin{macrocode}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\AAKqRespBoxTxt}
 if(event.willCommit){
@@ -8528,7 +8542,7 @@ if(event.willCommit){
   ProcUserResp(retn,event.value,*thequestionno,0%
 *ifx*grpquestions*eq@One,*thegrpquestionno*fi);
 }
-if (!isQuizInitialized("!currQuiz")) {
+if (!isQuizInitialized("*currQuiz")) {
   *eqObjAlert*eqAppAlert(InitMsg("*bqlabelISO"),3);
   event.rc = false;
 }
@@ -8547,10 +8561,10 @@ if (!isQuizInitialized("!currQuiz")) {
 if(event.willCommit) {
   var retn = ProcRespTxt(!rbTxtAlt);%
 !ifx!@sqTurnOffAlerts!eq@One
-  !RespBoxTxtOnBlur!fi%
-!ifx!eqAddAAKeystroke!@empty!else
-!eqAddAAKeystroke!fi
-}
+  !RespBoxTxtOnBlur!fi
+}%
+!ifx!eqAddAAKeystroke!@empty!else%
+!eqAddAAKeystroke!fi%
 \end{defineJS}
 \def\@@RespBoxTxtActions{%
   \AA{\if\eqQuizType\isQZ
@@ -8689,6 +8703,16 @@ if(event.willCommit) {
 %    \end{macrocode}
 %    \end{macro}
 %    \end{macro}
+%    \DescribeMacro{\txtRef}\hskip-\marginparsep\texttt{\darg{\ameta{label}}}
+%    The \cs{RespBoxTxt} can be used for a matching-type question. We define a special
+%    \cs{ref}-type command that produces plain text. Refer to demo file \texttt{qz-matching.tex} for
+%    details.
+%    \changes{v8.6.4}{2021/02/15}{Support for matching-type question based in
+%    \string\cs{RespBoxTxt}}
+%    \begin{macrocode}
+\def\txtRef#1{\@ifundefined{r@#1}
+  {??}{\aeb@exiii\@firstoffive\csname r@#1\endcsname}}
+%    \end{macrocode}
 %    \begin{macro}{\RespBoxTxtPC}
 % This is pretty much a copy of \cs{RespBoxTxt}, with slight modifications. Here,
 % we attempt to award partial credit for words that appear in the answer.
@@ -10165,7 +10189,7 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
 %\end{flushleft}
 %    Define a special value (\cs{formatInitAltApprs}) for \cs{AddAAFormat} used in initializing \cs{RespBoxMath} problems,
 %    where there are alternate appearances.
-%    See \url{http://www.acrotex.net/blog/?p=1335} for a discussion of the use of \cs{formatInitAltApprs}.
+%    See the {Acro\!\TeX} Blog article \url{http://www.acrotex.net/blog/?p=1335} for a discussion of the use of \cs{formatInitAltApprs}.
 %    \changes{v8.1a}{2017/09/03}{Define a special value (\string\cs{formatInitAltApprs}) for \string\cs{AddAAFormat}}
 %    \begin{macrocode}
 \def\formatInitAltApprs{\formatInitAltApprs}
@@ -10258,7 +10282,7 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
 %}
 %    \begin{macrocode}
 \def\@eqAddAAKeystroke#1{\def\argi{#1}\ifx\argi\@empty
-  \def\eqAddAAKeystroke{}\else\def\eqAddAAKeystroke{#1}\fi} %\r
+  \def\eqAddAAKeystroke{}\else\def\eqAddAAKeystroke{\r #1}\fi} %\r
 \def\eqAddAAKeystroke{}
 %    \end{macrocode}
 %    \end{macro}
@@ -10379,6 +10403,7 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
 var exerquizLoaded = true;
 this.disclosed = true;
 app.runtimeHighlight=false;
+var bDisplaySilent=false; // dps
 \end{newsegment}
 \begin{newsegment}{Eq: Global Data}
 var ok2Continue = true;
@@ -12153,15 +12178,24 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
 (typeof oQName.GradeScaleLoc=="undefined")%
 ?GradeScaleDefault:oQName.GradeScaleLoc;
     quizGrade = GetGrade.apply(null,gradeScale);
-%    quizGrade = GetGrade(\eqGradeScale);
-    var f = this.getField("ScoreField."+qtfield);
-    if ( f != null ) f.value=(\eqQuizTotalMsg);
-    f = this.getField("PointsField."+qtfield);
-    if ( f != null) f.value=(\eqQuizPointsMsg);
-    f = this.getField("PercentField."+qtfield);
-    if ( f != null) f.value=(\eqQuizPercentMsg);
-    f = this.getField("GradeField."+qtfield);
-    if ( f != null) f.value=(\eqQuizGradeMsg);
+%    \end{macrocode}
+%   (2021/02/17) If there is a fourth argument for this function, it should
+%   be either \texttt{true} or \texttt{false}; if \texttt{true}, \texttt{DisplayQuizResults()}
+%   does not display quiz results; the default is \texttt{false}. This feature is used in the
+%   demo file \texttt{qz-pin-to-correct.tex} found on the {Acro\!\TeX} Blog.
+%   \changes{v8.6.4}{2021/02/17}{Added conditional (\texttt{\_bSilent})}
+%    \begin{macrocode}
+    var _bSilent=(arguments.length > 3 ) ? arguments[3] : false;
+    if (!_bSilent) {
+      var f = this.getField("ScoreField."+qtfield);
+      if ( f != null ) f.value=(\eqQuizTotalMsg);
+      f = this.getField("PointsField."+qtfield);
+      if ( f != null) f.value=(\eqQuizPointsMsg);
+      f = this.getField("PercentField."+qtfield);
+      if ( f != null) f.value=(\eqQuizPercentMsg);
+      f = this.getField("GradeField."+qtfield);
+      if ( f != null) f.value=(\eqQuizGradeMsg);
+    }
 }
 function GetGrade()
 {
@@ -12261,7 +12295,12 @@ function ProcessQuestion (key,letterresp,probno,
     if ( typeof fieldPopTbl == "function" ) fieldPopTbl(qtfield);
 }
 %    \end{macrocode}
-% Dependencies: \texttt{RightWrong}, \texttt{ProbDist} (if \texttt{qMark} is present).
+%    \leavevmode
+%    \IndexJS{correctQuiz}\hskip-\marginparsep\texttt{(\ameta{fld-name},\ameta{num-ques})}
+%    This function is called when the \uif{Correct} control is pressed on a quiz.
+%    Dependencies: \texttt{RightWrong}, \texttt{ProbDist} (if \texttt{qMark} is present). Other dependencies
+%    needed to save the state of the quiz after the \uif{End Quiz} control is pressed and before the
+%    \uif{Correct} control is pressed:
 %    \begin{macrocode}
 function correctQuiz(qtfield,nQuestions)
 {
@@ -12275,6 +12314,9 @@ function correctQuiz(qtfield,nQuestions)
     RightWrong=oRecordOfQuizData["RightWrong."+qtfield];
     ProbDist=oRecordOfQuizData["ProbDist."+qtfield];
   }
+%    \end{macrocode}
+%    Determine the color scheme to be used.
+%    \begin{macrocode}
   var oQName=eval(qtfield);
   var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
 ?\defaultColorJS:oQName.DefaultColorJSLoc;
@@ -12303,7 +12345,7 @@ function correctQuiz(qtfield,nQuestions)
 %      show the correct answer, but only the incorrect ones.}
 %    \begin{macrocode}
   if ( f != null) {
-    if (bFullyCorrect) { // dpsf07
+    if (bFullyCorrect) {
       f.display = display.visible;
     } else {
       for (var n=1; n<=nQuestions; n++) {

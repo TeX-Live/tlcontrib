@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% insdljs.sty package,                                 %%
-%% Copyright (C) 2001-2020  D. P. Story                 %%
+%% Copyright (C) 2001-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2020/12/20 v2.5 Insert Document Level JavaScripts (dps)]
+ [2021/02/07 v2.5.2 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -165,8 +165,9 @@
 }}
 \def\pdfSPDef{\string\040}
 \def\dl@sp@ce{ }
-\def\pdfSpacesOn{\let\pdfSP\pdfSPDef}
-\def\pdfSpacesOff{\let\pdfSP\dl@sp@ce}
+\newif\ifpdfspaces\pdfspacesfalse
+\def\pdfSpacesOn{\global\pdfspacestrue\let\pdfSP\pdfSPDef}
+\def\pdfSpacesOff{\global\pdfspacesfalse\let\pdfSP\dl@sp@ce}
 \pdfSpacesOff
 \ifpdf\else\ifxetex\else\pdfSpacesOn\fi\fi
 \def\pdfLBr{\string\173}
@@ -645,8 +646,10 @@
   \xdef\JS@temp{\the\JStoks\defineJSjsR\the\verbatim@line}\fi
   \global\JStoks=\expandafter{\JS@temp}}%
   \let\do\@makeother\dospecials\catcode`\^^M\active}
-\def\b@vrbdfnJS#1{\global\let\space\pdfSP\makeatletter\obeyspaces%
-  #1\ifdlfortypeset\global\JStoks={\bgroup\leavevmode\dl@paramlocal}\fi%
+\def\b@vrbdfnJS#1{\ifpdfspaces\let\space\pdfSP
+  \makeatletter\obeyspaces\fi%
+  #1\ifdlfortypeset%
+  \global\JStoks={\bgroup\leavevmode\dl@paramlocal}\fi%
   \verbatim@start}
 \def\e@vrbdfnJS{\gdef\eq@JStemp{\ifdlfortypeset\global
   \JStoks=\expandafter{\the\JStoks\egroup}\fi\expandafter

@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Web package,                                         %%
-%% Copyright (C) 1999-2019  D. P. Story                 %%
+%% Copyright (C) 1999-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -21,7 +21,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{web}
-%<package> [2019/12/16 v6.1.4 web: A Screen Design Package (dps)]
+%<package> [2021/02/06 v6.1.5 web: A Screen Design Package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -75,6 +75,8 @@
 % \string\texttt{dnidefs} to format changes and index. Compile \string\texttt{web.ins}
 % to obtain the files \string\texttt{aebdocfmt.def} and \string\texttt{aebdonotindex.def}.}
 % \changes{v6.0l}{2016/08/17}{Switched over to \string\texttt{xkeyval} package}
+% \changes{v6.1.5}{2021/02/06}{Modified definitions of \string\cs{subsubsection}
+% to include usage of \string\cs{texorpdfstring}}
 %    \begin{macrocode}
 \RequirePackage{xkeyval}
 %    \end{macrocode}
@@ -2725,7 +2727,8 @@
 %<*websectioning>
 \renewcommand*\thesection{\arabic{section}}
 \renewcommand*\thesubsection{\thesection.\arabic{subsection}}
-\renewcommand*{\thesubsubsection}{\textbullet}
+\renewcommand*{\thesubsubsection}
+  {\texorpdfstring{$\bullet$}{\textbullet}}
 \renewcommand{\section}{\renewcommand{\@seccntformat}[1]{%
  \@nameuse{the##1}\web@finalDot\enspace}%
  \@startsection{section}{1}{\z@}%
@@ -3240,7 +3243,7 @@
   \@ifundefined{ddd@DingToc}{}{%
   \if\aeb@use@section@numbers\web@Zero\ifx\ddd@DingToc\@empty\else
     \def\numberline{\color{\ddd@DingTocColor}\strut\ddd@DingToc}%
-  \fi\fi}\hyperlink{#3}{\numberline}~\web@title\
+  \fi\fi}\hyperlink{#3}{\numberline}~\web@title\enspace\allowbreak
 }%
 %    \end{macrocode}
 %    \end{macro}
@@ -5032,7 +5035,8 @@
   \aeb@subsection@fontsize\aeb@subsection@halign
   \color{\aeb@subsectioncolor}\aeb@subsection@special}}
 \def\subsubDefaultDing#1{\def\web@subsubDefaultDing{{#1}}}
-\subsubDefaultDing{\textrm\textbullet}
+%\subsubDefaultDing{\textrm\textbullet}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textbullet}}
 \renewcommand\subsubsection{%
   \renewcommand{\@seccntformat}[1]{\aeb@subsubsectionNum{##1}}%
   \@startsection{subsubsection}{3}{\aeb@subsubsection@indent}%

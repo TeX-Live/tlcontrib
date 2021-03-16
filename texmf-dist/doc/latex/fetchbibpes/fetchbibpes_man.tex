@@ -62,6 +62,8 @@
 %\usepackage{makeidx}
 %\makeindex
 \usepackage{acroman}
+\edef\amtIndent{\the\parindent}
+\setlength{\leftmargini}{\the\parindent}
 \usepackage[active]{srcltx}
 
 \urlstyle{tt}
@@ -78,7 +80,7 @@
     email={dpstory@acrotex.net},
     subject=Documentation for the fetchbibpes and bibpes packages,
     talksite={\url{www.acrotex.net}},
-    version={2.4.9, 2018/07/30},
+    version={2.4.10, 2021/03/08},
     Keywords={LaTeX, e-sword, Bible passages, AcroTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -187,11 +189,11 @@ were written.
     \paragraph*{Package options} The package has several options, listed in display that follows.
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=*()]
 \usepackage[%
-    infolder=*ameta(infolder),
-    outfolder=*ameta(outfolder),
-    txtfilein=*ameta(base_name_txt),
-    deffileout=*ameta(base_name_def),
-    build|!build
+  infolder=*ameta(infolder),
+  outfolder=*ameta(outfolder),
+  txtfilein=*ameta(base_name_txt),
+  deffileout=*ameta(base_name_def),
+  build|!build
 ]{bibpes}
 \end{Verbatim}
 \paragraph*{Description of options}
@@ -313,15 +315,15 @@ were written.
 
     In some translations, Jesus' words are quoted in red and are not set off
     by quotation marks. You'll have to hand edit the \EXT{TXT} file.
-\begin{Verbatim}
-    (Mat 11:4) Jesus answered and said unto them, Go and shew John
-    again those things which ye do hear and see:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+(Mat 11:4) Jesus answered and said unto them, Go and shew John
+again those things which ye do hear and see:
 \end{Verbatim}
     can be changed to,
-\begin{Verbatim}
-    (Mat 11:4) Jesus answered and said unto them,
-    \textcolor{red}{Go and shew John again those things which ye do
-    hear and see:}
+\begin{Verbatim}[xleftmargin=\amtIndent]
+(Mat 11:4) Jesus answered and said unto them,
+\textcolor{red}{Go and shew John again those things which ye do
+hear and see:}
 \end{Verbatim}
 to be typeset as
     \begin{quote}
@@ -338,7 +340,7 @@ to be typeset as
 
 After you have created your \EXT{TXT} file, open the file
  \texttt{makebibpes.tex}, which is found in the \texttt{examples} folder.
- This is a short file, it reads:
+ This is a short file that reads:
 \begin{equation}
 \begin{minipage}{100pt}
 \begin{Verbatim}[numbers=left,commandchars=!()]
@@ -351,15 +353,15 @@ After you have created your \EXT{TXT} file, open the file
 \end{Verbatim}
 \end{minipage}\label{display:bibpes1}
 \end{equation}
- The \texttt{makebibpes.tex} file, found in the root folder of this
+ The \texttt{makebibpes.tex} file, also found in the root folder of this
  distribution, is used to convert a \texttt{TXT} file of Bible verses to a
- \EXT{DEF} file of Bible verses. The action of this package is to take
- each line of Bible verse in the \EXT{TXT} file, for example, the verse
- in the \EXT{TXT} file,
+ \EXT{DEF} file of Bible verses. The action of this package is to take each
+ line of Bible verse in the \EXT{TXT} file, for example, the verse in the
+ \EXT{TXT} file,
 \begin{Verbatim}[xleftmargin=0pt,fontsize=\small]
 (Gen 1:1 KJV) In the beginning God created the heaven and the earth.
 \end{Verbatim}
-is transformed the following verse in the \EXT{DEF} file,
+and to transformed it to the following verse in the \EXT{DEF} file,
 \begin{Verbatim}[xleftmargin=0pt,fontsize=\small]
 \BV(Gen 1:1 KJV) In the beginning God created the heaven and the earth.\null
 \end{Verbatim}
@@ -379,9 +381,9 @@ The first command expands to the input and output information given by the optio
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \documentclass{article}
 \usepackage[!textbf(build),
-    infolder=mytxts,
-    outfolder=mydefs,
-    txtfilein=Gen1-KJV
+  infolder=mytxts,
+  outfolder=mydefs,
+  txtfilein=Gen1-KJV
 ]{bibpes}
 \begin{document}
 \reportOnBibPes
@@ -439,10 +441,11 @@ given previously.
 {TXT and DEF} files}
 
 The file \texttt{makebibpes.tex} is found in the root folder of the
-\pkg{fetchbibpes} distribution. Modern {\LaTeX} systems, {MiK\TeX} comes do
+\pkg{fetchbibpes} distribution. Modern {\LaTeX} systems, {MiK\TeX} comes to
 mind, do not allow you to compile a source file from their application
 folder, and the folder itself is readonly. Therefore, you must move
-\texttt{makebibpes.tex} to another folder.
+\texttt{makebibpes.tex} to another folder.\footnote{That is why another copy
+of \texttt{makebibpes.tex} is in the \texttt{examples} folder.}
 
 \paragraph*{Production and organization.}
 There are two thoughts that come to mind for producing \texttt{DEF} files.
@@ -460,11 +463,11 @@ There are two thoughts that come to mind for producing \texttt{DEF} files.
     For example,
 \begin{equation}
 \begin{minipage}{100pt}
-\begin{Verbatim}
+\begin{Verbatim}[xleftmargin=\amtIndent]
 \usepackage[%
-    infolder=mytxtfiles,
-    outfolder=mydeffiles,
-    txtfilein=1Cor1
+  infolder=mytxtfiles,
+  outfolder=mydeffiles,
+  txtfilein=1Cor1
 ]{bibpes}
 \end{Verbatim}
 \end{minipage}\label{display:bibpes}
@@ -512,8 +515,8 @@ can specify your only file (\texttt{lession1}) in the option list of
 \pkg{fetchbibpes}:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \usepackage[%
-    useverses=lesson1,
-    deffolder=mydeffiles
+  useverses=lesson1,
+  deffolder=mydeffiles
 ]{fetchbibpes}
 \end{Verbatim}
 Here, \pkg{fetchbibpes} looks for \texttt{lession1.def} in the subfolder
@@ -527,8 +530,8 @@ Another choice is to use several \EXT{DEF} files, perhaps from your
 `data\-base' collection.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \usepackage[%
-    useverses={Gen1,Mat2,Rom1,1Cor1},
-    deffolder=mydeffiles
+  useverses={Gen1,Mat2,Rom1,1Cor1},
+  deffolder=mydeffiles
 ]{fetchbibpes}
 \end{Verbatim}
 Here, you plan to reference verses in the \texttt{Gen1.def} file (containing
@@ -782,9 +785,9 @@ It is perhaps always better to use \cs{fetchverses} for single and multiple vers
         \texttt{Gen 1:1 KJV} and add a line:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \BV(Gen 1:1 KJV) In the beginning
-    God created the heaven and the earth.\null
+   God created the heaven and the earth.\null
 \BV(Gen 1:1 KJV Alt) \dots
-    \emph{God created the heaven and the earth}.\null
+   \emph{God created the heaven and the earth}.\null
 \end{Verbatim}
 (Lines are wrapped around above to fit within the margins, this \emph{should not
 be done} in the \EXT{DEF} file itself.) To access this alternate version
@@ -1256,12 +1259,12 @@ how to create alternate passages, refer to the \opt{alt} key on
     global declaration, use the \opt{localdefs} key.
 \begin{Verbatim}[xleftmargin=\leftmargini]
 \fetchverses*[from=NKJV,
-    localdefs={\gobbleto{and}{\gobbletoand}%
-        \gobbleto{blood,}{\gobbletoblood}},
-    replace=
-        {But when}{\leavevmode\ldots when}
-        {who separated me from my}{who\gobbletoand}
-        {, that I might preach Him}{ \ldots\gobbletoblood}
+  localdefs={\gobbleto{and}{\gobbletoand}%
+    \gobbleto{blood,}{\gobbletoblood}},
+  replace=
+    {But when}{\leavevmode\ldots when}
+    {who separated me from my}{who\gobbletoand}
+    {, that I might preach Him}{ \ldots\gobbletoblood}
 ]{Gal 1:15-16}
 \end{Verbatim}
 This code expands to:
@@ -1353,12 +1356,12 @@ primitive \cs{expandafter}, which is a limited kind of expansion.
 The basic syntax for \pkg{fetchbibpes} is as follows:
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[%
-    useverses={!ameta(list)},
-    deffolder=!ameta(path),
-    useselverses,
-    usesr,
-    ignorecfg,
-    cfg=!ameta(name)
+  useverses={!ameta(list)},
+  deffolder=!ameta(path),
+  useselverses,
+  usesr,
+  ignorecfg,
+  cfg=!ameta(name)
 ]{fetchbibpes}
 \end{Verbatim}
 
@@ -1399,8 +1402,8 @@ in the folder of the source file, or in the search path of your {\LaTeX} system.
     only if \ameta{path} is nonempty.
 \begin{Verbatim}
 \usepackage[%
-    useverses={Gen1,Mat2,Rom1,1Cor1},
-    deffolder=mydeffiles
+  useverses={Gen1,Mat2,Rom1,1Cor1},
+  deffolder=mydeffiles
 ]{fetchbibpes}
 \end{Verbatim}
 Here, {\LaTeX} looks for the listed files (\texttt{Gen1.def},
@@ -2032,11 +2035,11 @@ a verse.
 For example, the following declaration is used in the example below.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \verseCmts{%
-    {In the beginning God creates\dots}    % v1
-    {Earth void}                           % v2
-    {Light!}                               % v3
-    {}                                     % v4
-    {First day}                            % v5
+  {In the beginning God creates\dots}    % v1
+  {Earth void}                           % v2
+  {Light!}                               % v3
+  {}                                     % v4
+  {First day}                            % v5
 }
 \end{Verbatim}
 Its argument is a series of tokens (comments enclosed in braces), the first token is the comment
@@ -2130,10 +2133,10 @@ enclosed in braces. Within the argument, three keys are recognized, \texttt{from
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \selectedVersesFrom
 {
-   {onlyverses={1Jn 1:1-5,3:3-8}}
-   {from=ISV,onlyverses={Gen 1:1-5}}
-   {from=ISV,alt=Alt,onlyverses={Gen 1:1}}
-   {onlyverses=Mat}
+  {onlyverses={1Jn 1:1-5,3:3-8}}
+  {from=ISV,onlyverses={Gen 1:1-5}}
+  {from=ISV,alt=Alt,onlyverses={Gen 1:1}}
+  {onlyverses=Mat}
 }
 \end{Verbatim}
     It is assumed the required \EXT{DEF} files are listed in the value of
@@ -2364,15 +2367,15 @@ Declare,
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{declareBVs*}
 \BV(Mat 6:31 NKJV) ``Therefore do not worry, saying,
-    `What shall we eat?' or `What shall we drink?' or
-    `What shall we wear?'\null
+   `What shall we eat?' or `What shall we drink?' or
+   `What shall we wear?'\null
 \end{declareBVs*}
 \end{Verbatim}
 Note the presence of quote marks, hence, we declare this verse using \env{declareBVs*}.
 We emit our \cs{markverse} command:
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \markverse[name=Mat6:31-,from=NKJV,
-!qquad(marks={}{eat?'}{}{drink?'}{}{wear?'}]{Mat 6:31})
+!quad(marks={}{eat?'}{}{drink?'}{}{wear?'}]{Mat 6:31})
 \end{Verbatim}
 \markverse[name=Mat6:31-,marks={}{eat?'}{}{drink?'}{}{wear?'},from=NKJV]{Mat 6:31}
 Now, let's read out the substrings:
@@ -2397,7 +2400,7 @@ the markers \ameta{bfind} and \ameta{efind} should \emph{occur once and
 only once} in the verse. For example the line
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \markverse[name=multihits,from=NKJV,
-!qquad(marks={`What}{wear?'}]{Mat 6:31})
+!quad(marks={`What}{wear?'}]{Mat 6:31})
 \end{Verbatim}
 produces the following \cs{BV} definition in the \texttt{\jobname-bv.cut} file:
 \begin{quote}\ttfamily\raggedright

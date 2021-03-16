@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{fetchbibpes}
-%<package> [2018/07/30 v2.4.9 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+%<package> [2021/03/08 v2.4.10 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -59,18 +59,6 @@
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \def\cs#1{\texttt{\bslash#1}}
-\DeclareRobustCommand{\tmspace}[3]{%
-  \ifmmode\mskip#1#2\else\kern#1#3\fi\relax}
-\renewcommand{\,}{\tmspace+\thinmuskip{.1667em}}
-\let\thinspace\,
-\renewcommand{\!}{\tmspace-\thinmuskip{.1667em}}
-\let\negthinspace\!
-\renewcommand{\:}{\tmspace+\medmuskip{.2222em}}
-\let\medspace\:
-\newcommand{\negmedspace}{\tmspace-\medmuskip{.2222em}}
-\renewcommand{\;}{\tmspace+\thickmuskip{.2777em}}
-\let\thickspace\;
-\newcommand{\negthickspace}{\tmspace-\thickmuskip{.2777em}}
 \makeatletter
 \renewcommand{\paragraph}
     {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
@@ -681,7 +669,7 @@
 % the second after; this results in a phrase that leads up to the passage itself.
 %
 %\medskip\noindent
-% The value of \IndexKey{enclosewith}\cs{enclosewith} key is a set of two tokens.
+% The value of \IndexKey{enclosewith}\texttt{enclosewith} key is a set of two tokens.
 % The first token is placed at the beginning of the passage, and the second one at the
 % end of the passage. A special value of \cs{quote} is recognized, this places quotation
 % marks around the passage.
@@ -849,12 +837,14 @@
 % \medskip\noindent
 % With the \IndexKey{caps}\texttt{caps}, you can make the display the chapter name in capital
 % letters `GENESIS' versus `Genesis'.
+% \changes{v2.4.10}{2021/03/08}{Changed default definition of \string\cs{fbpes@case} from
+% \string\cs{relax} to \string\cs{@empty} so \string\cs{versetxt} can be used in a label name.}
 %    \begin{macrocode}
 \define@boolkey{fbpes}{caps}[true]{\ifKV@fbpes@caps
     \def\fbpes@case{\uppercase}\else
-    \let\fbpes@case\relax\fi
+    \let\fbpes@case\@empty\fi
 }
-\let\fbpes@case\relax
+\let\fbpes@case\@empty
 %    \end{macrocode}
 %\paragraph*{Example} We capitalize the full book name:
 %\begin{quote}\small
@@ -954,7 +944,7 @@
 %    The \texttt{typeset} key is used with \cs{fetchversestxt}. If true,
 %    we assume the \cs{passagetxt} command is meant to be typeset and, as a result, the normal
 %    behavior of \cs{fetchverses} is followed; if false, certain special definitions are activated
-%    that allows \cs{passagetxt} to pass to another macro, such as \cs{pdfcomment}. This option is
+%    that allow \cs{passagetxt} to pass to another macro, such as \cs{pdfcomment}. This option is
 %    ignored within the optional list of \cs{fetchverses}.
 %    \par\medskip\noindent Added a value to the key \texttt{typeset}, which was a boolean key.
 %    Now, it is a combination, both a Boolean and a regular key.
@@ -1330,9 +1320,13 @@
         \fp@looptoreplace\fi
       \r@fbp@enclose
     \egroup}%
+%    \end{macrocode}
+%    \changes{v2.4.10}{2021/03/08}{Inserted \string\cs{if@versetxt} conditional}
+%    \begin{macrocode}
+    \if@versetxt\else
     \ifKV@fbpes@citeatend
       \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
-      \book@passage\fi}\fi
+      \book@passage\fi}\fi\fi
   \egroup
 }
 %    \end{macrocode}
@@ -1484,7 +1478,7 @@
   \ifbookexists
 %    \end{macrocode}
 %    We get the book abbreviation early, needed to get the proper expansion
-%    for \cs{fetchversestext}.
+%    for \cs{fetchversestxt}.
 %    \changes{v2.4.9}{2018/07/30}{Expand book abbr early}
 %    \begin{macrocode}
     \edef\expBkAbbrChoices{\@nameuse{bkfmt\bib@book}}% dpsjul30
@@ -1596,8 +1590,24 @@
           \@tempcnta\fb@verseEnd
         \else
           \ifKV@fbpes@typeset
-%            \fb@insrtvn
-            \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+%    \end{macrocode}
+%     (2021/03/08) Insert \cs{if@versetxt} conditional
+%     when \\cs{fetchversestxt[typeset]} is used, \cs{fetchversestxt[typeset]}
+%     typesets the error reference when the reference is not defined.
+%     \changes{v2.4.10}{2021/03/08}{Insert \string\cs{if@versetxt} conditional
+%     when \string\cs{fetchversestxt[typeset]} is used.}
+%    \begin{macrocode}
+            \if@versetxt
+              \PackageInfo{fetchbibpes}{For \string\fetchversestxt\space
+                with the typeset option:\MessageBreak
+                \bib@ver\space is not defined.
+                Expand \string\passagetxt\MessageBreak
+                to see the error message}%
+              \edef\x{\noexpand\g@addto@macro\noexpand
+                \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
+            \else
+              \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+            \fi
           \else
             \edef\x{\noexpand\g@addto@macro\noexpand
               \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
@@ -1639,8 +1649,12 @@
         \iffound@ltstarstop\let\fbpes@alt\@empty\fi
       }\ifKV@fbpes@typeset\r@fbp@enclose\fi % dps
     \egroup
+%    \end{macrocode}
+%    \changes{v2.4.10}{2021/03/08}{Inserted \string\cs{if@versetxt} conditional}
+%    \begin{macrocode}
+    \if@versetxt\else
     \ifKV@fbpes@citeatend
-    \fbp@priorRefSpc{\book@passage}\fi
+    \fbp@priorRefSpc{\book@passage}\fi\fi
   \egroup
 }
 %    \end{macrocode}
@@ -2522,7 +2536,7 @@
 %    Using these markers, we extract the substrings.
 %
 %    We begin by defining new keys and supporting commands. We rely heavily on the earlier replace code.
-%    \changes{v2.3}{2016/12/17}{}
+%    \changes{v2.3}{2016/12/17}{Added new keys and supporting commands}
 %    \begin{macrocode}
 \define@key{fbpesvprts}{marks}[]{\fp@cntArgs#1\stop@rg
   \xdef\nMarks{\fp@nReplace}\def\fbpesvprts@marks{#1}%

@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{fetchbibpes}
- [2018/07/30 v2.4.9 fetchbibpes: Fetch Bible passages from DEF files (dps)]
+ [2021/03/08 v2.4.10 fetchbibpes: Fetch Bible passages from DEF files (dps)]
 \RequirePackage{xkeyval}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \let\fb@Zero=0 \let\fb@One=1 \let\fb@Two=2
@@ -291,9 +291,9 @@
 \let\fbp@pformat\@empty
 \define@boolkey{fbpes}{caps}[true]{\ifKV@fbpes@caps
     \def\fbpes@case{\uppercase}\else
-    \let\fbpes@case\relax\fi
+    \let\fbpes@case\@empty\fi
 }
-\let\fbpes@case\relax
+\let\fbpes@case\@empty
 \define@boolkey{fbpes}{showfirst}[true]{}
 \KV@fbpes@showfirstfalse
 \define@key{fbpes}{shownone}[]{\let\verseFmt\@gobble}
@@ -463,9 +463,10 @@
         \fp@looptoreplace\fi
       \r@fbp@enclose
     \egroup}%
+    \if@versetxt\else
     \ifKV@fbpes@citeatend
       \fbp@priorRefSpc{\ifKV@fbpes@nocite\else
-      \book@passage\fi}\fi
+      \book@passage\fi}\fi\fi
   \egroup
 }
 \newif\if@versetxt\@versetxtfalse
@@ -610,7 +611,17 @@
           \@tempcnta\fb@verseEnd
         \else
           \ifKV@fbpes@typeset
-            \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+            \if@versetxt
+              \PackageInfo{fetchbibpes}{For \string\fetchversestxt\space
+                with the typeset option:\MessageBreak
+                \bib@ver\space is not defined.
+                Expand \string\passagetxt\MessageBreak
+                to see the error message}%
+              \edef\x{\noexpand\g@addto@macro\noexpand
+                \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
+            \else
+              \fb@insrtvn\fb@qq(\bib@ver)\fb@qq
+            \fi
           \else
             \edef\x{\noexpand\g@addto@macro\noexpand
               \passagetxt{\fb@insrtvn ??(\bib@ver)??}}\x
@@ -640,8 +651,9 @@
         \iffound@ltstarstop\let\fbpes@alt\@empty\fi
       }\ifKV@fbpes@typeset\r@fbp@enclose\fi % dps
     \egroup
+    \if@versetxt\else
     \ifKV@fbpes@citeatend
-    \fbp@priorRefSpc{\book@passage}\fi
+    \fbp@priorRefSpc{\book@passage}\fi\fi
   \egroup
 }
 \newif\iffound@ltstarstop \found@ltstarstopfalse

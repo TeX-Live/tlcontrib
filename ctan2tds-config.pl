@@ -40,6 +40,7 @@ $special{'artthreads'}  = '&MAKEdps';
 $special{'popupmenu'}   = '&MAKEdps';
 $special{'ltx4yt'}      = '&MAKEdps';
 $special{'rmannot'}     = '&MAKEdps';
+$special{'eq-fetchbbl'} = '&MAKEdps';
 
 
 sub MAKEdps {

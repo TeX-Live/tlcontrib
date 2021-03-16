@@ -1,0 +1,511 @@
+% D. P. Story
+\RequirePackage[use=forpub]{spdef}
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[
+    web={centertitlepage,designv,forcolorpaper,tight*,latextoc,pro},
+    exerquiz,
+    aebxmp
+]{aeb_pro}
+\usepackage[ignorecfg,useverses=none]{fetchbibpes}[2021/03/08]
+\usepackage{eq-fetchbbl}
+\addtoBibles{NKJV}
+
+\ifforpub\else\previewOn\pmpvOn\fi
+
+\useBeginQuizButton[\CA{Start}\textColor{blue}]
+\useEndQuizButton[\CA{End}\textColor{blue}]
+
+\usepackage[altbullet]{lucidbry}
+
+%\usepackage{makeidx}
+%\makeindex
+\usepackage{acroman}
+
+\usepackage[active]{srcltx}
+
+\edef\amtIndent{\the\parindent}
+
+\urlstyle{rm}
+
+%\def\tutpath{doc/tutorial}
+%\def\tutpathi{tutorial}
+\def\expath{../examples}
+\let\tops\texorpdfstring
+
+\DeclareDocInfo
+{
+    university={\AcroTeX.Net},
+    title={The \textsf{eq-fetchbbl} Package\tops{\\}{: }%
+        Creating Quizzes to match Bible Passages with Verses},
+    author={D. P. Story},
+    email={dpstory@acrotex.net},
+    subject=Documentation for the eq-fetchbbl package,
+    talksite={\url{www.acrotex.net}},
+    version={1.0, 2021/03/15},
+    Keywords={LaTeX,PDF,Quizzes,Matching,Bible passages},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL={http://www.acrotex.net}
+}
+
+\def\dps{$\hbox{$\mathfrak D$\kern-.3em\hbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\universityLayout{fontsize=Large}
+\titleLayout{fontsize=LARGE}
+\authorLayout{fontsize=Large}
+\tocLayout{fontsize=Large,color=aeb}
+\sectionLayout{indent=-62.5pt,fontsize=large,color=aeb}
+\subsectionLayout{indent=-31.25pt,color=aeb}
+\subsubsectionLayout{indent=0pt,color=aeb}
+\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+
+\def\ameta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\def\meta#1{\textit{\texttt{#1}}}
+\let\pkg\textsf
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+
+\def\vissp{{\fontfamily{cmtt}\selectfont\symbol{32}}}
+\def\SUB#1{\ensuremath{{}_{\text{#1}}}}
+
+
+\makeatletter
+\renewcommand*{\theparagraph}{\texorpdfstring{\protect\P\protect\ }{\textparagraph}}
+\renewcommand{\paragraph}
+    {\renewcommand{\@seccntformat}[1]{\theparagraph}%
+    \@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\color{\aeb@subsubsectioncolor}\bfseries}}
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5.0em}{1em}} %{7.0em}{4.1em}}
+
+\renewcommand{\makeinlinetitle}
+{%
+    \begingroup\parskip0pt\parindent0pt
+    \par\vspace*{6pt}
+    \noindent\makebox[\linewidth][c]{\bfseries
+    \color{\webuniversity@color}\webuniversity}\par\kern6pt\noindent
+    \makebox[\linewidth][c]{\parbox[c]{.75\linewidth}{\centering
+    \bfseries\color{\webtitle@color}\webtitle}}\par\kern12pt
+    \noindent\parbox{\linewidth}{\scriptsize
+        \web@copyright\space\the\year\hfill\thewebemail\\
+        \@date\hfill\@ifundefined{aeb@talksite}{\webversion}
+            {\ifx\aeb@talksite\@empty\webversion
+              \else\aeb@talksite\fi}%
+        }\par
+    \noindent\makebox[\linewidth]{\rule{.67\linewidth}{.4pt}}%
+    \par\endgroup
+}
+\makeatother
+
+%\pagestyle{empty}
+%\parindent0pt
+%\parskip\medskipamount
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="The eq-fetchbbl MANUAL";
+var manualfilename="Manual_BG_Print_eq-fetchbbl.pdf";
+var manualtemplate="Manual_BG_Green.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+ manualfilename + " file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\selectColors{linkColor=black}
+\tableofcontents
+\selectColors{linkColor=webgreen}
+
+\section{Introduction}
+
+The \pkg{eq-fetchbbl} package is an application to the \pkg{exerquiz} (eq)
+and \pkg{fetchbibpes} (fetchbbl) packages. This package defines several
+commands and two environments that are used to \emph{conveniently} build
+quizzes that challenges the user to match Bible passages with their
+corresponding verse references. Technically speaking, such quizzes may be
+built without this package using the techniques illustrated in
+\textsf{\href{http://www.acrotex.net/blog/?p=1446}{Exerquiz: Match-type
+questions}} and in
+\textsf{\href{http://www.acrotex.net/blog/?p=1449}{Exerquiz: Randomized
+matching-type questions}}.\relax
+\footnote{\url{http://www.acrotex.net/blog/?p=1446}}\ensuremath{{}^{\text{,}}}\footnote
+{\url{http://www.acrotex.net/blog/?p=1449}} When working with Biblical
+topics, however, it is easier to incorporate the fetching capabilities of
+\pkg{fetchbibpes}. All the examples given here are reproduced, with
+additional variations, in the sample file \texttt{doc-examples.tex}, found in
+the \texttt{examples} folder of this distribution.
+
+\begin{declareBVs*}
+\BV(Mat 10:26 NKJV) Therefore do not fear them. For there is nothing covered that will not be
+    revealed, and hidden that will not be known.\null
+\BV(Mar 1:11 NKJV) Then a voice came from heaven, \textcolor{red}{``You are My beloved Son, in whom I am well
+    pleased.''}\null
+\BV(Luk 12:2 NKJV) For there is nothing covered that will not be revealed, nor hidden that
+    will not be known.\null
+\BV(Act 10:15 NKJV) dummy entry\null
+\end{declareBVs*}
+\useBookStyle{abbr=none,from=NKJV}
+
+\begin{quiz}{q1}
+Match the quotations (\textsf{NKJV)} with the Bible references on the right.
+Each problem is worth 2 points; passing is 100\%.
+
+\noindent
+\begin{minipage}[t]{.75\linewidth} %{.75\linewidth-18pt}
+%\useNumbersOn
+\begin{questions}
+\begin{BblPsg}
+  \item\PTs*{2}\qFP{Mat 10:26}
+  \item\PTs*{2}\qFP{Mar 1:11}
+  \item\PTs*{2}\qFP{Luk 12:2}
+\end{BblPsg}
+\end{questions}
+\end{minipage}%\kern2.5em
+\hfill
+\begin{minipage}[t][0pt]{.25\linewidth-1em} %{.25\linewidth}
+\begin{questions}[itemsep={0pt},labelwidth={.5em}]
+\begin{BblVrs}
+  \item\qFV{Act 10:15}
+  \item\qFV{Luk 12:2}
+  \item\qFV{Mar 1:11}
+  \item\qFV{Eph 6:1}
+  \item\qFV{Mat 10:26}
+  \item\qFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}\hfill
+\par\medskip
+\end{quiz}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\widthof{AA}}]{\currQuiz}
+
+\noindent
+Throughout this document, the markup for the above quiz is used to illustrate
+the commands and environments of this package.
+
+\section{Declaring Bible verses and passages}
+
+There are two ways of declaring Bible verses and passages:
+\begin{itemize}
+\item Through a database of verses:
+\begin{Verbatim}
+\usepackage[deffolder=exmpldefs,
+  useverses=verses]{fetchbibpes}[2021/03/08]
+\end{Verbatim}
+  Refer to the demo file \texttt{bible-quiz-uv.tex} for an example of this
+  method.
+\item Through direct specification of passages in the document using the
+  \env{declareBVs} environment. Refer to the demo files \texttt{bible-quiz.tex} and
+  \texttt{bible-quiz-rt.tex}.
+\end{itemize}
+
+\newtopic\noindent
+This documentation earlier declares,\footnote{This is an abbreviated listing, see
+\texttt{bible-quiz.tex} for the complete listing.}\goodbreak
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
+\begin{declareBVs*}
+\BV(Mat 10:26 NKJV) Therefore do not fear them. For !dots\null
+\BV(Mar 1:11 NKJV) Then a voice came from heaven, !dots\null
+\BV(Luk 12:2 NKJV) For there is nothing covered !dots\null
+\end{declareBVs*}
+\end{Verbatim}
+These passages are used throughout this document.
+
+\section{Basic commands and environments}
+
+For Bible matching-type questions, Bible \emph{passages} are matched with their
+corresponding \emph{verse references}. In the discussion below, it is assumed
+that passages and verse references are within a \env{quiz} or \env{shortquiz}
+environment; they are listed in the \env{questions} environment of the quiz.
+Familiarity with the quizzes of {\AEB} is assumed.
+
+\paragraph*{Passages.} The passages are entered in the \env{BblPsg} (Bible Passages) environment.
+The passages themselves are typeset using the \cs{qFP} command
+(quiz-Fetch-Passage) for a quiz and the \cs{sFP} command
+(short-quiz-Fetch-Passage) for a short-quiz. The syntax is,
+\bVerb\takeMeasure{\quad\cs{item}\cs{qFP}[\ameta{opts\SUB1}]\darg{\ameta{book\SUB1}\vissp\ameta{ch\SUB1}:\ameta{vrs\SUB{1}}}}%
+%\setlength{\dimen0}{\bxSize}%
+\def\1{\rlap{\hskip\linewidth\textsf{(eg, \cs{qFP\darg{Mat 10:26}}\textsf{)}}}}%
+\def\2{\rlap{\hskip\linewidth\textsf{(eg, \cs{qFP\darg{Luk 12:2}}\textsf{)}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{BblPsg}
+!1!quad\item\qFP[!ameta(opts!SUB1)]{!ameta(book!SUB1)!vissp!ameta(ch!SUB1):!ameta(vrs!SUB1)}
+!quad!vdots!vdots!vdots
+!2!quad\item\qFP[!ameta(opts!SUB(n))]{!ameta(book!SUB(n))!vissp!ameta(ch!SUB(n)):!ameta(vrs!SUB(n))}
+\end{BblPsg}
+\end{dCmd}
+\eVerb The optional arguments (\meta{opts}) are passed to the underlying \cs{fetchversestxt}
+command of the \pkg{fetchbibpes} package; read the source file of
+\texttt{bible-quiz-uv.tex} for examples of the optional argument.
+
+
+\paragraph*{Verse References.} The verse references are entered into the \env{BblVrs} (Bible Verses) environment.
+The verses are typeset using the \cs{qFV} command (quiz-Fetch-Verse) for a
+quiz and the \cs{sFV} command (short-quiz-Fetch-Verse) for a short-quiz. The
+syntax is similar to the above.
+\bVerb\takeMeasure{\quad\cs{item}\cs{qFV}[\ameta{opts\SUB1}]\darg{\ameta{book\SUB1}\vissp\ameta{ch\SUB1}:\ameta{vrs\SUB{1}}}}%
+\def\1{\rlap{\hskip\linewidth\textsf{(eg, \cs{qFV\darg{Mat 10:26}}\textsf{)}}}}%
+\def\2{\rlap{\hskip\linewidth\textsf{(eg, \cs{qFV\darg{Luk 12:2}}\textsf{)}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\begin{BblVrs}
+!1!quad\item\qFV[!ameta(opts!SUB1)]{!ameta(book!SUB1)!vissp!ameta(ch!SUB1):!ameta(vrs!SUB1)}
+!quad!vdots!vdots!vdots
+!2!quad\item\qFV[!ameta(opts!SUB(n))]{!ameta(book!SUB(n))!vissp!ameta(ch!SUB(n)):!ameta(vrs!SUB(n))}
+\end{BblVrs}
+\end{dCmd}
+\eVerb It is natural to include \emph{more verse references} than passages as distractions.
+
+\paragraph*{Numbering the passages.} The Bible passages may be presented with or without problem numbers;
+the default is to provide no problem numbers.
+\bVerb\takeMeasure{\string\begin\darg{questions}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\useNumbersOn
+\useNumbersOff
+\begin{BblPsg}
+!vdots!vdots!vdots
+\end{BblPsg}
+\end{dCmd}
+\endgroup\noindent The command \cs{useNumbersOn} turns on numbering (within the \env{Bblpsg} environment only),
+while \cs{useNumbersOff} turns off numbering. The placement of these commands
+is prior to the opening of the \env{BblPsg} environment. The default is
+\cs{useNumbersOff}.
+
+\paragraph*{Positioning the \cs{CorrAnsButton} and \cs{sqTallyBox} controls.} The \pkg{eq-fetchbbl} package
+for positioning the \cs{CorrAnsButton} and \cs{sqTallyBox} controls.\footnote{Again, we assume familiarly with
+the quiz and short-quiz of \pkg{exerquiz}.}
+\bVerb\takeMeasure{\string\adjCAB[modify\#1]\darg{modify\#2}}%
+\def\1{\rlap{\hskip\linewidth\textsf{(positions \cs{CorrAnsButton})}}}%
+\def\2{\rlap{\hskip\linewidth\textsf{(positions \cs{sqTallyBox})}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\adjCAB[modify#1]{modify#2}
+!2\adjTBX[modify#1]{modify#2}
+\end{dCmd}
+\eVerb Here, \texttt{\#1} refers to \cs{hfill} that is inserted following the
+Bible passage, and \texttt{\#2} refers to \cs{CorrAnsButton} (for quiz) and
+\cs{sqTallyBox} (for short-quiz). The defaults are \verb~\adjCAB{#2}~ and
+\verb~\adjTBX{#2}~.
+
+\newtopic\noindent
+Let's go to the examples.
+\begin{itemize}
+      \item \verb!\adjCAB[\space]{#2}! places a space just after the end of the passage followed
+        by the control (either \cs{CorrAnsButton} or \cs{sqTallyBox}),
+      \item \verb!\adjCAB[]{}! removes the control \cs{CorrAnsButton}
+          (\cs{sqTallyBox}) from the quiz (short-quiz).
+      \item \verb!\adjCAB{\makebox[0pt][l]{\enspace#2\enspace}}! pushes control
+      into the right margin.
+\end{itemize}
+The placement of \cs{adjCAB} and \cs{adjTBX} is just above the question it is
+to effect.
+
+\paragraph*{Example.}
+In the quiz below, the commands,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\begin{questions}
+\useNumbersOn
+\adjCAB{\makebox[0pt][l]{\enspace#2\enspace}}
+\begin{BblPsg}
+!vdots!vdots!vdots
+\end{BblPsg}
+!vdots!vdots!vdots
+\end{questions}
+\end{Verbatim}
+are specified above the \verb~\begin{BblPsg}~ line, as shown. (They can, of
+course, appear above the \env{questions} environment as well.) The space
+between the passages on the left and the verse references on the right is
+increased to accommodate the \cs{CorrAnsButton}.
+
+%\newpage
+
+\begin{quiz*}{q2}
+Match the quotations (\textsf{NKJV)} with the Bible references on the right.
+Each problem is worth 2 points; passing is 100\%.
+
+\setlength{\eflength}{\widthof{\enspace\CorrAnsButton{A}\enspace}} %\previewOn
+\useMCCircles
+
+\noindent
+\begin{minipage}[t]{.75\linewidth-\eflength}
+\begin{questions}
+\useNumbersOn
+\adjCAB{\makebox[0pt][l]{\enspace#2\enspace}}
+\everyRespBoxTxt{\textColor{blue}}
+\begin{BblPsg}
+  \item\PTs*{2}\qFP{Mat 10:26}
+  \item\PTs*{2}\qFP{Mar 1:11}
+  \item\PTs*{2}\qFP{Luk 12:2}
+\end{BblPsg}
+\item\PTs*{2} The quotation ``Treasures of wickedness profit nothing, But righteousness delivers from death''
+is a verse from which of the following books?
+\begin{answers}{4}
+  \bChoices
+    \Ans0 Psalms\eAns
+    \Ans0 Isaiah\eAns
+    \Ans1 Proverbs\eAns
+    \Ans0 Jonah\eAns
+    \eChoices
+\end{answers}
+
+
+\end{questions}
+\end{minipage}%\kern2.5em
+\hfill
+\begin{minipage}[t]{.25\linewidth}
+\begin{questions}[itemsep={0pt},labelwidth={1em}]
+%\begin{minipage}[t]{100pt-\widthof{\enspace}} %{.25\linewidth+\eflength} %{.25\linewidth}
+%\begin{questions}[itemsep={0pt},labelwidthTo={\enspace}]
+\begin{BblVrs}
+  \item\qFV{Act 10:15}
+  \item\qFV{Luk 12:2}
+  \item\qFV{Mar 1:11}
+  \item\qFV{Eph 6:1}
+  \item\qFV{Mat 10:26}
+  \item\qFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}\hfil
+\par\medskip
+\end{quiz*}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\widthof{AA}}]{\currQuiz}\vcgBdry[6pt]
+
+
+There are two alternate positions for the \cs{CorrAnsButton} or \cs{sqTallyBox}
+controls The insertion point for \cs{priorRBT} is just \emph{prior} to the underlying
+\cs{RespBoxTxt} command, while the insertion point for \cs{priorPsg} is just \emph{prior}
+to the passage.
+\bVerb\takeMeasure{\string\priorRBT\darg{modify\#1}\quad\string\priorPsg\darg{modify\#1}}%
+\def\1{\rlap{\hskip\linewidth\textsf{(positions \cs{CorrAnsButton} or \cs{sqTallyBox})}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\priorRBT{modify#1}!quad\priorPsg{modify#1}
+\end{dCmd}
+\eVerb Here, \texttt{\#1} is \cs{CorrAnsButton} for the \env{quiz}
+environment and is \cs{sqTallyBox} for the \env{shortquiz} environment. The
+defaults are \verb!\priorRBT{}! and \verb~\priorPsg{}~, which means there is
+no insertion prior to \cs{RespBoxTxt} or to the passage.  For example,
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+\useNumbersOn
+\priorRBT{\makebox[0pt][l]{\hspace{\linewidth}\enspace#1\enspace}}
+\adjCAB{}      %!textsf( So Ans does not appear at the end of the line)
+\begin{BblPsg} %!textsf( make changes before BblPsg opens)
+\end{Verbatim}
+
+\begin{quiz*}{q3}
+Match the quotations (\textsf{NKJV)} with the Bible references on the right.
+Each problem is worth 2 points; passing is 100\%.
+
+\setlength{\eflength}{\widthof{\enspace\CorrAnsButton{A}\enspace}} %\previewOn
+\useMCCircles
+
+\noindent
+\begin{minipage}[t]{.75\linewidth-\eflength}
+\useNumbersOff
+\priorRBT{\makebox[0pt][l]{\hspace{\RBTWidth}\hspace{\labelsep}\hspace{\linewidth}\enspace#1\enspace}}
+\adjCAB{}
+\everyRespBoxTxt{\textColor{blue}}
+\begin{questions}
+\begin{BblPsg}
+  \item\PTs*{2}\qFP{Mat 10:26}
+  \item\PTs*{2}\qFP{Mar 1:11}
+  \item\PTs*{2}\qFP{Luk 12:2}
+\end{BblPsg}
+
+\end{questions}
+\end{minipage}%\kern2.5em
+\hfill
+\begin{minipage}[t]{.25\linewidth} %{.25\linewidth}
+\begin{questions}[itemsep={0pt},labelwidth={1em}]
+ \begin{BblVrs}
+  \item\qFV{Act 10:15}
+  \item\qFV{Luk 12:2}
+  \item\qFV{Mar 1:11}
+  \item\qFV{Eph 6:1}
+  \item\qFV{Mat 10:26}
+  \item\qFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}\hfil
+\par\medskip
+\end{quiz*}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\widthof{AA}}]{\currQuiz}\vcgBdry[6pt]
+
+When you take this quiz, you'll notice that the \cs{CorrAnsButton}
+(\textsf{Ans}) button is aligned with the first line of the passage rather
+than the last line of the passage.
+
+The previous quiz used \cs{priorRBT}, the command \cs{priorPsg} is
+illustrated in the \texttt{doc-example.tex} file.
+
+\newtopic\noindent Using a numbering scheme (\cs{useNumbersOn}) allows a consistent
+structure of incorporating other types of questions into the quiz, as shown above.
+
+\newtopic\noindent
+You can change the appearance properties of the underlying \cs{RespBoxTxt} command with the
+\cs{everyRespBoxTxt} command; as was done in the previous quiz, in which
+\verb|\everyRespBoxTxt{\textColor{blue}}| is expanded just below the \cs{adjCAB} command.
+
+\paragraph*{A final note.} For matching, there are two ``blocks'' of items,
+the passages and the verse references. The document author determines how to
+present these two blocks. Originally, I used a \env{multicols} environment;
+later, I switched over to enclosing the two blocks in separate
+\env{minipage}s and placing them side-by-side. Both methods have problems if
+your cross a page boundary.
+
+\section{Other customizations}
+
+The color of the verse references labels is, by default, blue.
+(\textcolor{blue}{A}, \textcolor{blue}{B}, \dots.) Change this color with the
+\pkg{exerquiz} command \cs{quesNumColor}; eg, \cs{quesNumColor\darg{red}}
+changes the verse references labels to the color red. Any other
+changes to the labeling of verse references requires a redefinition of
+\env{BibVrs}. Refer to \texttt{doc-examples.tex} for an example of redefining
+\env{BibVrs}.
+
+\bVerb\takeMeasure{\string\setRBTWidthTo\darg{\ameta{content}}}%
+\def\1{\rlap{\hskip\linewidth\textsf{(both define \cs{RBTWidth})}}}%
+%\def\2{\rlap{\hskip\linewidth\textsf{(eg, \cs{qFP\darg{Luk 12:2}}\textsf{)}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\setRBTWidthTo{!ameta(content)}
+\setRBTWidth{!ameta(length)}
+\end{dCmd}
+\eVerb Both commands define \cs{RBTWidth} to a width determined by their
+arguments. For \cs{setRBTWidthTo}, \ameta{content} is any text; it is
+measured to determine its width and the width becomes the expansion of
+\cs{RBTWidth}. For \cs{setRBTWidth}, \ameta{length} and any length,
+\cs{RBTWidth} then is defined to expand to \ameta{length}. The command
+\cs{RBTWidth} is the width of the \cs{RespBoxTxt} control; its default value
+is \verb~\setRBTWidthTo{AA}~.
+
+\vcgBdry[6pt]
+
+Now, I simply must get back to my retirement. \dps
+
+\end{document}

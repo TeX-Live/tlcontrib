@@ -1,0 +1,104 @@
+\documentclass[11pt]{article}
+\usepackage{web}
+\screensize{11in}{8.5in}
+\margins{1in}{1in}{1in}{1in}
+\usepackage{exerquiz}[2021/02/15]
+\usepackage{ran_toks}
+\usepackage[ignorecfg,useverses=none]{fetchbibpes}[2021/03/08]
+\usepackage{eq-fetchbbl}
+\addtoBibles{NKJV}
+
+%\useLastAsSeed
+% To reproduce the same pseudo-random sequence, you need to supply a seed
+\useThisSeed{344966662}
+
+
+\title{Matching-type questions for a Quiz\texorpdfstring{\\[1ex]}{: }Randomizing Bible Passages with their Verses}
+\author{D. P. Story}
+\subject{Matching-type questions}
+\date{\today}
+\keywords{AcroTeX, LaTeX, quiz, matching, randomized}
+\version{\url{http://blog.acrotex.net}}
+\versionLabel{}
+\revisionLabel{Published:}
+
+\university
+{%
+      The {Acro\negthinspace\TeX} Blog
+}
+\email{dpstory@acrotex.net}
+
+\useBeginQuizButton[\CA{Start}\textColor{blue}]
+\useEndQuizButton[\CA{End}\textColor{blue}]
+
+\def\cs#1{\texttt{\eqbs#1}}
+
+\PTsHook{($\eqPTs^{\scriptsize\mbox{pts}}$)}
+\showCreditMarkup
+
+\begin{declareBVs*}
+\BV(Mat 10:26 NKJV) Therefore do not fear them. For there is nothing covered
+  that will not be revealed, and hidden that will not be known.\null
+\BV(Mar 1:11 NKJV) Then a voice came from heaven, ``You are My beloved Son,
+  in whom I am well pleased.''\null
+\BV(Luk 12:2 NKJV) For there is nothing covered that will not be revealed,
+  nor hidden that will not be known.\null
+\end{declareBVs*}
+
+\useBookStyle{abbr=none,from=NKJV}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+Match the Bible quotations in the left column with their reference passages.
+Quotations are taken from the \textsf{New King James Version (NKJV)}.
+
+\section*{The New Testament}
+
+\ranToks{RandomQzQues}
+{%
+  {\PTs*{2}\qFP{Mat 10:26}}
+  {\PTs*{2}\qFP{Mar 1:11}}
+  {\PTs*{2}\qFP{Luk 12:2}}
+}
+\ranToks{RandomQzAlts}
+{%
+  {\qFV{Mat 10:26}}
+  {\qFV{Mar 1:11}}
+  {\qFV{Luk 12:2}}
+  {\qFV{Act 10:15}}
+  {\qFV{Eph 6:1}}
+  {\qFV{Joh 6:20}}
+}
+\showCreditMarkup
+
+
+\begin{quiz}{q2}
+Match the quotations (\textsf{NKJV}) with the Bible references on the right.
+Each problem is worth 2 points.
+
+\noindent
+\begin{minipage}[t]{.75\linewidth}
+\useNumbersOn
+\begin{questions}
+\begin{BblPsg}
+\displayListRandomly[\item]{RandomQzQues}
+\end{BblPsg}
+\end{questions}
+\end{minipage}\hfill
+\begin{minipage}[t]{.25\linewidth-10pt}
+\hideCreditMarkup
+\begin{questions}[itemsep={0pt}]
+\begin{BblVrs}
+\displayListRandomly[\item]{RandomQzAlts}
+\end{BblVrs}
+\end{questions}
+\end{minipage}
+\medskip\par
+\end{quiz}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\RBTWidth}]{\currQuiz}
+
+\end{document}

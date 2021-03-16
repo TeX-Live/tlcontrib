@@ -1,0 +1,78 @@
+\documentclass[11pt]{article}
+\usepackage{web}
+\screensize{11in}{8.5in}
+\margins{1in}{1in}{1in}{1in}
+\usepackage{exerquiz}[2021/02/15]
+\usepackage[deffolder=exmpldefs,ignorecfg,
+  useverses=verses]{fetchbibpes}[2021/03/08]
+\usepackage{eq-fetchbbl}
+
+\title{Matching-type questions for a Quiz\texorpdfstring{\\[1ex]}{: }Bible Passages with their Verses}
+\author{D. P. Story}
+\subject{Matching-type questions}
+\date{\today}
+\keywords{AcroTeX, LaTeX, quiz, matching, randomized}
+\version{\url{http://blog.acrotex.net}}
+\versionLabel{}
+\revisionLabel{Published:}
+\university
+{%
+  The {Acro\negthinspace\TeX} Blog
+}
+\email{dpstory@acrotex.net}
+
+\useBeginQuizButton[\CA{Start}\textColor{blue}]
+\useEndQuizButton[\CA{End}\textColor{blue}]
+
+\def\cs#1{\texttt{\eqbs#1}}
+\let\pkg\textsf
+
+\useBookStyle{abbr=none}
+
+\PTsHook{($\eqPTs^{\scriptsize\mbox{pts}}$)}
+\showCreditMarkup
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+Match the Bible quotations in the left column with their reference passages.
+
+\section*{Various Passages}
+
+\begin{quiz}{q1}
+Match the quotations with the Bible references on the right.
+Each problem is worth 2 points; passing is 100\%.
+
+\noindent
+\begin{minipage}[t]{.75\linewidth}
+\useNumbersOn
+\begin{questions}
+\begin{BblPsg}
+  \item\PTs*{2}\qFP[from=ISV]{Gen 1:1}
+  \item\PTs*{2}\qFP[alt=Alt]{Col 1:6}
+  \item\PTs*{2}\qFP[from=ISV,alt=Alt]{1Ki 1:1}
+\end{BblPsg}
+\end{questions}
+\end{minipage}\hfill
+\begin{minipage}[t][0pt]{.25\linewidth-10pt}
+\hideCreditMarkup
+\begin{questions}[itemsep={0pt}]
+\begin{BblVrs}
+  \item\qFV{Act 10:15}
+  \item\qFV[from=ISV]{Gen 1:1}
+  \item\qFV[alt=Alt]{Col 1:6}
+  \item\qFV{Eph 6:1}
+  \item\qFV[from=ISV,alt=Alt]{1Ki 1:1}
+  \item\qFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}
+\par\medskip
+\end{quiz}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\RBTWidth}]{\currQuiz}
+
+\end{document}
+

@@ -1,0 +1,210 @@
+%\iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eq-fetchbbl.sty package                              %%
+%% Copyright (C) 2021                                   %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+%<package>\ProvidesPackage{eq-fetchbbl}
+%<package> [2021/03/15 v1.0 eq-fetchbbl: Match Bible passages to verses (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+%\pdfstringdefDisableCommands{\let\\\textbackslash}
+%\EnableCrossrefs \CodelineIndex
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{web}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{web}{aebdocfmt.def cannot be found}}
+\begin{document}
+\def\CMD#1{\textbackslash#1}
+\gdef\darg#1{\texttt{\char123\relax#1\char125\relax}}
+\def\CMD#1{\textbackslash#1}
+\let\pkg\textsf
+\let\opt\texttt
+\let\env\texttt
+\let\app\textsf
+\let\uif\textsf
+\def\STRUT{\rule{0pt}{14pt}}
+\def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\addtolength{\marginparwidth}{3pt}
+  \GetFileInfo{eq-fetchbbl.sty}
+  \title{\texorpdfstring{\protect\pkg{eq-fetchbbl}}{eq-fetchbbl}: Match Bible passages to verses}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \DocInput{eq-fetchbbl.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here.\\Execute
+    \begin{quote}\texttt{makeindex -s gind.ist -o eq-fetchbbl.ind eq-fetchbbl.idx}\end{quote}
+    on the command line and recompile \texttt{eq-fetchbbl.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \begin{quote}\texttt{makeindex -s gglo.ist -o eq-fetchbbl.gls eq-fetchbbl.glo}\end{quote}
+    on the command line and recompile \texttt{eq-fetchbbl.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{web}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{web}{cannot find aebdonotindex.def}}
+%
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+% \section{Introduction}
+%     This package provides several commands and two environment that make it easy to
+%     create quizzes that match Bible passages with their verse reference. This
+%     package is an application to the quizzes of \pkg{exerquiz} and to the fetching
+%     capability of the \pkg{fetchbibpes} package.
+%     \changes{v1.0}{2021/03/15}{First publication date}
+%    \begin{macrocode}
+%    \end{macrocode}
+% \section{Required Packages}
+%    \begin{macrocode}
+\RequirePackage{exerquiz}[2021/02/21]
+\RequirePackage{fetchbibpes}[2021/03/08]
+%    \end{macrocode}
+% \section{The environments and commands of \texorpdfstring{\protect\pkg}{}{eq-fetchbbl}}
+%    \begin{macrocode}
+\newif\ifeqf@usenumbers\eqf@usenumbersfalse
+%    \end{macrocode}
+%    Execute \DescribeMacro{\useNumbersOn}\cs{useNumbersOn} to display the natural
+%    numbering of the items within the \env{BblPsg} environment; the default is
+%    \DescribeMacro{\useNumbersOff}\cs{useNumbersOff}.
+%    \begin{macrocode}
+\let\useNumbersOn\eqf@usenumberstrue
+\let\useNumbersOff\eqf@usenumbersfalse
+%    \end{macrocode}
+%    The \DescribeMacro{\setRBTWidthTo}\cs{setRBTWidthTo} sets the
+%    contents of \cs{RBTWidth} to the width of the argument passed to it,
+%    \cs{RBTWidth} is used for the width of
+%    the underlying \cs{RespBoxTxt} control. The default is |\setRBTWidthTo{AA}|
+%    the width of two capital A's. Similarly, \DescribeMacro\setRBTWidth
+%    \cs{setRBTWidth} sets the contents of \cs{RBTWidth} based on a dimension
+%    passed by its argument (eg, |setRBTWidth{10pt}|).
+%    \begin{macrocode}
+\newcommand{\setRBTWidthTo}[1]{\settowidth{\eflength}{#1}\edef
+  \RBTWidth{\the\eflength}}
+\setRBTWidthTo{AA}
+\newcommand{\setRBTWidth}[1]{\setlength{\eflength}{#1}\edef
+  \RBTWidth{\the\eflength}}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\presetMBbl}
+%    We set the default properties of the questions of \cs{RespBoxTxt} (those
+%    within the \env{BblPsg} environment). May be redefined.
+%    \begin{macrocode}
+\newcommand{\presetMBbl}{\Q{1}\rectW{\RBTWidth}
+  \AddAAKeystroke{event.change=event.change.toUpperCase();}}
+%    \end{macrocode}
+%    Internal definition of markup common to \cs{@qFP} and \cs{@sFP}.
+%    \begin{macrocode}
+\newcommand{\priorRBT}[1]{\def\prior@RBT##1{#1}}
+\priorRBT{}
+\newcommand{\priorPsg}[1]{\def\prior@Psg##1{#1}}
+\priorPsg{}
+\def\CATorTBX#1{\ifx\eqQuizType\isQZ
+  \CorrAnsButton{\txtRef{\currQuiz#1}}\else
+  \sqTallyBox\fi}
+\def\eqf@RBTx#1{\prior@RBT{\CATorTBX{#1}}\RespBoxTxt[%
+  \presets{\presetMBbl}]{0}{0}{1}{\txtRef{\currQuiz#1}}}
+\def\@@qsFP#1#2{\fetchversestxt[typeset,#1]{#2}\strut
+  \ifeqf@usenumbers\efKern{1bp}{0pt}\eqf@RBTx{#2}\space\else
+    \makebox[0pt][r]{\eqf@RBTx{#2}\hskip\labelsep}\ignorespaces\fi
+  \prior@Psg{\CATorTBX{#2}}\passagetxt
+}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\@qFP}\nmpsep{[\ameta{options}]\darg{\ameta{verse}}}
+%    is an internal command that is \cs{let} to \DescribeMacro\qFP\cs{qFP} within the \env{BblPsg} environment.
+%    The \ameta{options} are passed to \cs{fetchversestxt} of the \pkg{fetchbibpes} package;
+%    \ameta{verse} is the verse of the passage to be used. For example, |\qFP{Mat 10:26}|.
+%    \begin{macrocode}
+\newcommand\adjCAB[2][\hfill]{\def\@djCAB##1##2{#1#2}}
+\adjCAB{#2}
+\newcommand{\@qFP}[2][]{\@@qsFP{#1}{#2}\relax
+  \@djCAB{\hfill}{\CorrAnsButton{\txtRef{\currQuiz#2}}}}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\@qFV}\nmpsep{[\ameta{options}]\darg{\ameta{verse}}}
+%    is an internal command that is \cs{let} to \DescribeMacro\qFV\cs{qFV} within the \env{BblPsg} environment.
+%    The \ameta{options} are passed to \cs{fetchversestxt} of the \pkg{fetchbibpes} package;
+%    \ameta{verse} is the verse of the passage to be used. For example, |\qFV{Mat 10:26}|.
+%    \begin{macrocode}
+\newcommand{\@qFV}[2][]{%
+  \fetchversestxt[typeset,#1]{#2}\label{\currQuiz#2}\strut
+  \versetxt
+}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\@sFP}\nmpsep{[\ameta{options}]\darg{\ameta{verse}}}
+%    is an internal command that is \cs{let} to \DescribeMacro\sFP\cs{sFP} within the \env{BblPsg} environment.
+%    The \ameta{options} are passed to \cs{fetchversestxt} of the \pkg{fetchbibpes} package;
+%    \ameta{verse} is the verse of the passage to be used. For example, |\sFP{Mat 10:26}|.
+%    \begin{macrocode}
+\newcommand\adjTBX[2][\hfill]{\def\@djTBX##1##2{#1#2}}
+\adjTBX{#2}
+\newcommand{\@sFP}[2][]{\@@qsFP{#1}{#2}\relax
+  \@djTBX{\hfill}{\sqTallyBox}}
+%    \end{macrocode}
+%    \leavevmode\DescribeMacro{\@sFV}\nmpsep{[\ameta{options}]\darg{\ameta{verse}}}
+%    is an internal command that is \cs{let} to \DescribeMacro\sFP\cs{sFV} within the \env{BblPsg} environment.
+%    The \ameta{options} are passed to \cs{fetchversestxt} of the \pkg{fetchbibpes} package;
+%    \ameta{verse} is the verse of the passage to be used. For example, |\sFV{Mat 10:26}|.
+%    \begin{macrocode}
+\newcommand{\@sFV}[2][]{%
+  \fetchversestxt[typeset,#1]{#2}\label{\currQuiz#2}\strut
+  \versetxt}
+%    \end{macrocode}
+%    The code of \DescribeMacro{\eqfQorS}\cs{eqfQorS} appears twice, one in
+%    \env{BblPsg} and once in \env{BblVrs}. Do not redefine this command.
+%    When redefining either \env{BblPsg} or \env{BblVrs}, do not remove
+%    this required command.
+%    \begin{macrocode}
+\def\eqfQorS{\ifx\eqQuizType\isQZ
+  \let\qFP\@qFP\let\qFV\@qFV\else
+  \let\sFP\@sFP\let\sFV\@sFV\fi}
+%    \end{macrocode}
+%    \begin{environment}{BblPsg}
+%    Enclose the questions (the passages) in the \env{BblPsg} environment. The environment
+%    makes some local changes in definitions. It makes a series of \cs{let}s
+%    of internal command names to public names; available only within this
+%    environment.
+%    \begin{macrocode}
+\newenvironment{BblPsg}{\ifeqf@usenumbers\else
+  \renewcommand{\labeleqquestionnoi}{}\fi
+  \eqfQorS
+}{}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{environment}{BblVrs}
+%    Enclose the answers (the verses) in the \env{BblVrs} environment. The environment
+%    makes some local changes in definitions. It makes a series of \cs{let}s
+%    of internal command names to public names; available only within this
+%    environment.
+%    \begin{macrocode}
+\newenvironment{BblVrs}{%
+  \renewcommand{\theeqquestionnoi}{\Alph{eqquestionnoi}}%
+  \renewcommand{\labeleqquestionnoi}{%
+    \color{\eq@quesNumCol}\bfseries\theeqquestionnoi}%
+    \eqfQorS
+}{}
+%    \end{macrocode}
+%    \end{environment}
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+\endinput

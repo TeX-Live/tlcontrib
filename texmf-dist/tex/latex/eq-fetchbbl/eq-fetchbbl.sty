@@ -1,0 +1,79 @@
+%%
+%% This is file `eq-fetchbbl.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% eq-fetchbbl.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% eq-fetchbbl.sty package                              %%
+%% Copyright (C) 2021                                   %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1 of the  %%
+%% License, or (at your option) any later version.      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{eq-fetchbbl}
+ [2021/03/15 v1.0 eq-fetchbbl: Match Bible passages to verses (dps)]
+\RequirePackage{exerquiz}[2021/02/21]
+\RequirePackage{fetchbibpes}[2021/03/08]
+\newif\ifeqf@usenumbers\eqf@usenumbersfalse
+\let\useNumbersOn\eqf@usenumberstrue
+\let\useNumbersOff\eqf@usenumbersfalse
+\newcommand{\setRBTWidthTo}[1]{\settowidth{\eflength}{#1}\edef
+  \RBTWidth{\the\eflength}}
+\setRBTWidthTo{AA}
+\newcommand{\setRBTWidth}[1]{\setlength{\eflength}{#1}\edef
+  \RBTWidth{\the\eflength}}
+\newcommand{\presetMBbl}{\Q{1}\rectW{\RBTWidth}
+  \AddAAKeystroke{event.change=event.change.toUpperCase();}}
+\newcommand{\priorRBT}[1]{\def\prior@RBT##1{#1}}
+\priorRBT{}
+\newcommand{\priorPsg}[1]{\def\prior@Psg##1{#1}}
+\priorPsg{}
+\def\CATorTBX#1{\ifx\eqQuizType\isQZ
+  \CorrAnsButton{\txtRef{\currQuiz#1}}\else
+  \sqTallyBox\fi}
+\def\eqf@RBTx#1{\prior@RBT{\CATorTBX{#1}}\RespBoxTxt[%
+  \presets{\presetMBbl}]{0}{0}{1}{\txtRef{\currQuiz#1}}}
+\def\@@qsFP#1#2{\fetchversestxt[typeset,#1]{#2}\strut
+  \ifeqf@usenumbers\efKern{1bp}{0pt}\eqf@RBTx{#2}\space\else
+    \makebox[0pt][r]{\eqf@RBTx{#2}\hskip\labelsep}\ignorespaces\fi
+  \prior@Psg{\CATorTBX{#2}}\passagetxt
+}
+\newcommand\adjCAB[2][\hfill]{\def\@djCAB##1##2{#1#2}}
+\adjCAB{#2}
+\newcommand{\@qFP}[2][]{\@@qsFP{#1}{#2}\relax
+  \@djCAB{\hfill}{\CorrAnsButton{\txtRef{\currQuiz#2}}}}
+\newcommand{\@qFV}[2][]{%
+  \fetchversestxt[typeset,#1]{#2}\label{\currQuiz#2}\strut
+  \versetxt
+}
+\newcommand\adjTBX[2][\hfill]{\def\@djTBX##1##2{#1#2}}
+\adjTBX{#2}
+\newcommand{\@sFP}[2][]{\@@qsFP{#1}{#2}\relax
+  \@djTBX{\hfill}{\sqTallyBox}}
+\newcommand{\@sFV}[2][]{%
+  \fetchversestxt[typeset,#1]{#2}\label{\currQuiz#2}\strut
+  \versetxt}
+\def\eqfQorS{\ifx\eqQuizType\isQZ
+  \let\qFP\@qFP\let\qFV\@qFV\else
+  \let\sFP\@sFP\let\sFV\@sFV\fi}
+\newenvironment{BblPsg}{\ifeqf@usenumbers\else
+  \renewcommand{\labeleqquestionnoi}{}\fi
+  \eqfQorS
+}{}
+\newenvironment{BblVrs}{%
+  \renewcommand{\theeqquestionnoi}{\Alph{eqquestionnoi}}%
+  \renewcommand{\labeleqquestionnoi}{%
+    \color{\eq@quesNumCol}\bfseries\theeqquestionnoi}%
+    \eqfQorS
+}{}
+\endinput
+%%
+%% End of file `eq-fetchbbl.sty'.

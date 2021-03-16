@@ -1,0 +1,120 @@
+\documentclass[11pt]{article}
+\usepackage{web}
+\screensize{11in}{8.5in}
+\margins{1in}{1in}{1in}{1in}
+\usepackage{exerquiz}[2021/02/15]
+\usepackage[ignorecfg,useverses=none]{fetchbibpes}[2021/03/08]
+\usepackage{eq-fetchbbl}
+\addtoBibles{NKJV}
+
+\title{Matching-type questions for a Quiz\texorpdfstring{\\[1ex]}{: }Bible Passages with their Verses}
+\author{D. P. Story}
+\subject{Matching-type questions}
+\date{\today}
+\keywords{AcroTeX, LaTeX, quiz, matching, randomized}
+\version{\url{http://blog.acrotex.net}}
+\versionLabel{}
+\revisionLabel{Published:}
+\university
+{%
+      The {Acro\negthinspace\TeX} Blog
+}
+\email{dpstory@acrotex.net}
+
+\useBeginQuizButton[\CA{Start}\textColor{blue}]
+\useEndQuizButton[\CA{End}\textColor{blue}]
+
+\def\cs#1{\texttt{\eqbs#1}}
+\let\pkg\textsf
+
+\begin{declareBVs*}
+\BV(Mat 10:26 NKJV) Therefore do not fear them. For there is nothing covered that will not be
+    revealed, and hidden that will not be known.\null
+\BV(Mar 1:11 NKJV) Then a voice came from heaven, \textcolor{red}{``You are My beloved Son, in whom I am well
+    pleased.''}\null
+\BV(Luk 12:2 NKJV) For there is nothing covered that will not be revealed, nor hidden that
+    will not be known.\null
+\BV(Act 10:15 NKJV) dummy entry\null
+\end{declareBVs*}
+
+\useBookStyle{abbr=none,from=NKJV}
+
+\PTsHook{($\eqPTs^{\scriptsize\mbox{pts}}$)}
+\showCreditMarkup
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+Match the Bible quotations in the left column with their reference passages.
+Quotations are taken from the \textsf{New King James Version (NKJV)}.
+
+\section*{The New Testament}
+
+\begin{quiz}{q1}
+Match the quotations (\textsf{NKJV)} with the Bible references on the right.
+Each problem is worth 2 points; passing is 100\%.
+
+\noindent
+\begin{minipage}[t]{.75\linewidth}
+\useNumbersOn
+\begin{questions}
+\begin{BblPsg}
+  \item\PTs*{2}\qFP{Mat 10:26}
+  \item\PTs*{2}\qFP{Mar 1:11}
+  \item\PTs*{2}\qFP{Luk 12:2}
+\end{BblPsg}
+\end{questions}
+\end{minipage}\hfill
+\begin{minipage}[t][0pt]{.25\linewidth-10pt}
+\hideCreditMarkup
+\begin{questions}[itemsep={0pt}]
+\begin{BblVrs}
+  \item\qFV{Act 10:15}
+  \item\qFV{Luk 12:2}
+  \item\qFV{Mar 1:11}
+  \item\qFV{Eph 6:1}
+  \item\qFV{Mat 10:26}
+  \item\qFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}
+\par\medskip
+\end{quiz}\quad\PointsField\currQuiz\olBdry\CorrButton\currQuiz\cgBdry[6pt]
+Answers: \AnswerField[\Q{1}\textColor{blue}\rectW{\RBTWidth}]{\currQuiz}
+
+\section*{A short-quiz with matching}
+
+\begin{shortquiz}
+Match the quotations (\textsf{NKJV)} with the Bible references on the right.
+Passing is to have no errors.
+
+\noindent
+\begin{minipage}[t]{.75\linewidth}
+%\useNumbersOn
+\begin{questions}[labelsep={3bp}]
+\begin{BblPsg}
+  \item\PTs*{2}\sFP{Mat 10:26}
+  \item\PTs*{2}\sFP{Mar 1:11}
+  \item\PTs*{2}\sFP{Luk 12:2}
+\end{BblPsg}
+\end{questions}
+\hfill\sqClearButton\olBdry\sqTallyTotal
+\end{minipage}\hfill
+\begin{minipage}[t]{.25\linewidth-10pt}
+\begin{questions}[itemsep=0pt]
+\begin{BblVrs}
+  \item\sFV{Act 10:15}
+  \item\sFV{Luk 12:2}
+  \item\sFV{Mar 1:11}
+  \item\sFV{Eph 6:1}
+  \item\sFV{Mat 10:26}
+  \item\sFV{Joh 6:20}
+\end{BblVrs}
+\end{questions}
+\end{minipage}
+\end{shortquiz}
+
+\end{document}

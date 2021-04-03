@@ -1,5 +1,5 @@
 #!/bin/bash
-# (c) 2016-2019 Norbert Preining
+# (c) 2016-2021 Norbert Preining
 # License: GPLv3+
 #
 # USAGE:
@@ -12,7 +12,7 @@
 # use tlmgr key add etc, see manual.
 
 TLCHECKOUT=${TLCHECKOUT:-/home/norbert/Development/TeX/texlive.git}
-TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/2019}
+TLNETDEST=${TLNETDEST:-/home/norbert/Domains/server/texlive.info/contrib/current}
 TLCATALOGUE=${TLCATALOGUE:-/home/norbert/Development/TeX/texcatalogue-svn}
 
 # how to sign

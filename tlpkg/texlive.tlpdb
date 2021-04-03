@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2100-nonfree
-depend revision/308
+depend revision/314
 
 name 00texlive.installation
 category TLCore
@@ -32,7 +32,7 @@ depend opt_sys_info:/usr/local/share/info
 depend opt_sys_man:/usr/local/share/man
 depend opt_w32_multi_user:1
 depend opt_write18_restricted:1
-depend setting_available_architectures:amd64-freebsd amd64-netbsd armel-linux armhf-linux i386-cygwin i386-darwin i386-freebsd i386-linux i386-netbsd i386-solaris powerpc-darwin powerpc-linux sparc-solaris win32 x86_64-cygwin x86_64-darwin x86_64-darwinlegacy x86_64-linux x86_64-solaris
+depend setting_available_architectures:amd64-freebsd amd64-netbsd armel-linux armhf-linux i386-cygwin i386-darwin i386-freebsd i386-linux i386-netbsd i386-solaris powerpc-darwin powerpc-linux sparc-solaris universal-darwin win32 x86_64-cygwin x86_64-darwin x86_64-darwinlegacy x86_64-linux x86_64-solaris
 
 name acmtrans
 category Package
@@ -1203,6 +1203,13 @@ shortdesc sparc-solaris files of cjk-gs-integrate-macos
 binfiles arch=sparc-solaris size=1
  bin/sparc-solaris/cjk-gs-integrate-macos
 
+name cjk-gs-integrate-macos.universal-darwin
+category Package
+revision 313
+shortdesc universal-darwin files of cjk-gs-integrate-macos
+binfiles arch=universal-darwin size=1
+ bin/universal-darwin/cjk-gs-integrate-macos
+
 name cjk-gs-integrate-macos.win32
 category Package
 revision 95
@@ -1406,7 +1413,7 @@ catalogue-version 0.6
 
 name collection-contrib
 category Collection
-revision 308
+revision 314
 shortdesc tlcontrib packages
 longdesc collections of all packages in contrib.texlive.info
 depend acmtrans
@@ -1450,7 +1457,6 @@ depend garamond
 depend garamondx
 depend getnonfreefonts
 depend graphicxsp
-depend harftex
 depend hiraprop
 depend icon-appr
 depend imprintmtshadow
@@ -3999,6 +4005,14 @@ binfiles arch=sparc-solaris size=2
  bin/sparc-solaris/getnonfreefonts
  bin/sparc-solaris/getnonfreefonts-sys
 
+name getnonfreefonts.universal-darwin
+category Package
+revision 313
+shortdesc universal-darwin files of getnonfreefonts
+binfiles arch=universal-darwin size=2
+ bin/universal-darwin/getnonfreefonts
+ bin/universal-darwin/getnonfreefonts-sys
+
 name getnonfreefonts.win32
 category Package
 revision 3
@@ -4081,86 +4095,6 @@ catalogue-contact-home http://www.math.uakron.edu/~dpstory/graphicxsp.html
 catalogue-ctan /macros/latex/contrib/graphicxsp
 catalogue-license lppl1.2
 catalogue-topics graphics-incl
-
-name harftex
-category Package
-revision 235
-depend harftex.ARCH
-execute AddFormat name=harflatex engine=harftex options="lualatex.ini"   patterns=language.dat,language.dat.lua
-execute AddFormat name=harflatex-dev engine=harftex options="lualatex.ini"   patterns=language.dat,language.dat.lua
-execute AddFormat name=harftex engine=harftex options="luatex.ini"   patterns=language.def,language.dat.lua
-docfiles size=9123
- texmf-dist/doc/generic/harftex/COPYING
- texmf-dist/doc/generic/harftex/README.md
- texmf-dist/doc/generic/harftex/tests/ArefRuqaa-Bold.ttf
- texmf-dist/doc/generic/harftex/tests/ArefRuqaa-Regular.ttf
- texmf-dist/doc/generic/harftex/tests/AwamiNastaliq-Regular.ttf
- texmf-dist/doc/generic/harftex/tests/BungeeColor1.ttf
- texmf-dist/doc/generic/harftex/tests/Free-HK-Kai_4700-v1.02.subset.ttf
- texmf-dist/doc/generic/harftex/tests/Makefile
- texmf-dist/doc/generic/harftex/tests/NotoColorEmoji.ttf
- texmf-dist/doc/generic/harftex/tests/NotoNastaliqUrdu-Regular.ttf
- texmf-dist/doc/generic/harftex/tests/NotoSerifCJK-Regular.ttc
- texmf-dist/doc/generic/harftex/tests/URWGothicL-Book.subset.otf
- texmf-dist/doc/generic/harftex/tests/emojione-mac.subset.ttf
- texmf-dist/doc/generic/harftex/tests/test-latex.pdf
- texmf-dist/doc/generic/harftex/tests/test-latex.tex
- texmf-dist/doc/generic/harftex/tests/test.pdf
- texmf-dist/doc/generic/harftex/tests/test.tex
-runfiles size=18
- texmf-dist/tex/harftex/base/harf-base.lua
- texmf-dist/tex/harftex/base/harf-load.lua
- texmf-dist/tex/harftex/base/harf-luaotfload.lua
- texmf-dist/tex/harftex/base/harf-node.lua
- texmf-dist/tex/harftex/base/harf-plain.lua
- texmf-dist/tex/harftex/base/harf.lua
- texmf-dist/tex/harftex/base/harfload.sty
-
-name harftex.i386-linux
-category Package
-revision 227
-shortdesc i386-linux files of harftex
-binfiles arch=i386-linux size=1741
- bin/i386-linux/harflatex
- bin/i386-linux/harflatex-dev
- bin/i386-linux/harftex
-
-name harftex.win32
-category Package
-revision 225
-shortdesc win32 files of harftex
-binfiles arch=win32 size=1164
- bin/win32/harflatex-dev.exe
- bin/win32/harflatex.exe
- bin/win32/harftex.dll
- bin/win32/harftex.exe
-
-name harftex.x86_64-darwin
-category Package
-revision 227
-shortdesc x86_64-darwin files of harftex
-binfiles arch=x86_64-darwin size=1210
- bin/x86_64-darwin/harflatex
- bin/x86_64-darwin/harflatex-dev
- bin/x86_64-darwin/harftex
-
-name harftex.x86_64-darwinlegacy
-category Package
-revision 227
-shortdesc x86_64-darwinlegacy files of harftex
-binfiles arch=x86_64-darwinlegacy size=1210
- bin/x86_64-darwinlegacy/harflatex
- bin/x86_64-darwinlegacy/harflatex-dev
- bin/x86_64-darwinlegacy/harftex
-
-name harftex.x86_64-linux
-category Package
-revision 227
-shortdesc x86_64-linux files of harftex
-binfiles arch=x86_64-linux size=1400
- bin/x86_64-linux/harflatex
- bin/x86_64-linux/harflatex-dev
- bin/x86_64-linux/harftex
 
 name hiraprop
 category Package

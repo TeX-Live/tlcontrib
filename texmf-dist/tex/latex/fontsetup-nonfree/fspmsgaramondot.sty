@@ -1,0 +1,55 @@
+%\RequirePackage[no-math]{fontspec}
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+%\RequirePackage[garamond]{mathdesign}
+
+\setmainfont[%
+  NFSSFamily=Garamond,%
+  ItalicFont=Garamond-Italic,%
+  BoldFont=Garamond-Bold,%
+  BoldItalicFont=Garamond-Bold,%
+  SlantedFont=Garamond,%
+  BoldSlantedFont=Garamond-Bold,%
+  SlantedFeatures={FakeSlant=0.25},%
+  BoldSlantedFeatures={FakeSlant=0.25},%
+]{Garamond}
+\newfontfamily{\greekfont}[%
+  ItalicFont=Garamond-Italic,%
+  BoldFont=Garamond-Bold,%
+  BoldItalicFont=Garamond-Bold,%
+  SlantedFont=Garamond,%
+  BoldSlantedFont=Garamond-Bold,%
+  SlantedFeatures={FakeSlant=0.25},%
+  BoldSlantedFeatures={FakeSlant=0.25},%
+]{Garamond}
+\newfontfamily{\defaultfont}[%
+  NFSSFamily=Garamond,%
+  ItalicFont=Garamond-Italic,%
+  BoldFont=Garamond-Bold,%
+  BoldItalicFont=Garamond-Bold,%
+  SlantedFont=Garamond,%
+  BoldSlantedFont=Garamond-Bold,%
+  SlantedFeatures={FakeSlant=0.25},%
+  BoldSlantedFeatures={FakeSlant=0.25},%
+]{Garamond}
+
+
+\RequirePackage{iftex}
+\ifxetex
+\RequirePackage[Latin, Greek]{ucharclasses}
+\setDefaultTransitions{\defaultfont}{}
+\setTransitionsForLatin{\defaultfont}{}
+\setTransitionsForGreek{\greekfont}{}
+\else
+\relax
+\fi
+
+\RequirePackage{unicode-math}
+\setmathfont{Garamond-Math.otf}
+\setmathfont[range=\mathup/{num,latin,Latin,greek,Greek}]{Garamond} 
+\setmathfont[range=\mathbfup/{num,latin,Latin,greek,Greek}]{Garamond-Bold} 
+\setmathfont[range=\mathit/{num,latin,Latin,greek,Greek}]{Garamond-Italic}
+\setmathfont[range=\mathbfit/{num,latin,Latin,greek,Greek}]{Garamond-Bold}
+
+
+\endinput

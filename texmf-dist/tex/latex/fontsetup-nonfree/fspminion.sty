@@ -1,0 +1,46 @@
+
+
+
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont[SmallCapsFeatures={Numbers=OldStyle},%
+  NFSSFamily=MinionPro,%
+  ItalicFont=MinionPro-It,%
+  BoldFont=MinionPro-Bold,%
+  BoldItalicFont=MinionPro-BoldIt,%
+]{MinionPro-Regular}
+\setsansfont[SmallCapsFeatures={Numbers=OldStyle},%
+  NFSSFamily=MyriadPro,%
+  ItalicFont=MyriadPro-It,%
+  BoldFont=MyriadPro-Bold,%
+  BoldItalicFont=MyriadPro-BoldIt,%
+]{MyriadPro-Regular}
+\newfontfamily{\greekfont}[SmallCapsFont=fspmnscel,%
+  ItalicFont=MinionPro-It,%
+  BoldFont=MinionPro-Bold,%
+  BoldItalicFont=MinionPro-BoldIt,%
+]{MinionPro-Regular}
+
+\newfontfamily{\defaultfont}[SmallCapsFeatures={Numbers=OldStyle},%
+  NFSSFamily=MinionPro,%
+  ItalicFont=MinionPro-It,%
+  BoldFont=MinionPro-Bold,%
+  BoldItalicFont=MinionPro-BoldIt,%
+]{MinionPro-Regular}
+\RequirePackage{iftex}
+\ifxetex
+\RequirePackage[Latin, Greek]{ucharclasses}
+\setDefaultTransitions{\defaultfont}{}
+\setTransitionsForLatin{\defaultfont}{}
+\setTransitionsForGreek{\greekfont}{}
+\else
+\relax
+\fi
+
+
+\RequirePackage{unicode-math}
+\setmathfont{STIXTwoMath-Regular.otf}
+\setmathfont[range=\mathup/{num,latin,Latin,greek,Greek}]{MinionPro-Regular} 
+\setmathfont[range=\mathbfup/{num,latin,Latin,greek,Greek}]{MinionPro-Bold} 
+\setmathfont[range=\mathit/{num,latin,Latin,greek,Greek}]{MinionPro-It} 
+\setmathfont[range=\mathbfit/{num,latin,Latin,greek,Greek}]{MinionPro-BoldIt}

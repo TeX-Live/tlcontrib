@@ -1,0 +1,35 @@
+\RequirePackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont[SmallCapsFeatures={Numbers=OldStyle},%
+  NFSSFamily=Palatino Linotype,%
+  ItalicFont=PalatinoLinotype-Italic,%
+  BoldFont=PalatinoLinotype-Bold,%
+  BoldItalicFont=PalatinoLinotype-BoldItalic,%
+]{PalatinoLinotype-Roman}
+\newfontfamily{\greekfont}[SmallCapsFont=fsplpscel,
+  ItalicFont=PalatinoLinotype-Italic,%
+  BoldFont=PalatinoLinotype-Bold,%
+  BoldItalicFont=PalatinoLinotype-BoldItalic,%
+]{PalatinoLinotype-Roman}
+\newfontfamily{\defaultfont}[SmallCapsFeatures={Numbers=OldStyle},%
+  NFSSFamily=Palatino Linotype,%
+  ItalicFont=PalatinoLinotype-Italic,%
+  BoldFont=PalatinoLinotype-Bold,%
+  BoldItalicFont=PalatinoLinotype-BoldItalic,%
+]{PalatinoLinotype-Roman}
+
+\RequirePackage{iftex}
+\ifxetex
+\RequirePackage[Latin, Greek]{ucharclasses}
+\setDefaultTransitions{\defaultfont}{}
+\setTransitionsForLatin{\defaultfont}{}
+\setTransitionsForGreek{\greekfont}{}
+\else
+\relax
+\fi
+
+\RequirePackage{unicode-math}
+\setmathfont{texgyrepagella-math.otf}
+
+
+\endinput

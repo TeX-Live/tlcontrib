@@ -85,7 +85,7 @@ are no longer supported.}}}
     email={dpstory@acrotex.net},
     subject={Documentation for AeB Pro from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={2.2, 2020/08/21},
+    version={v2.2.1, 2021/04/21},
     keywords={Rich Media Annotations, SWF, FLV, MP3, AcroTeX, AcroFlex, LaTeX},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -140,7 +140,7 @@ are no longer supported.}}}
 %\pagestyle{empty}
 %\parindent0pt\parskip\medskipamount
 
-\AcroVer{11}
+%\AcroVer{11}
 
 %\def\expath{./../examples/rma}
 \def\expath{./../examples/graphics}
@@ -279,7 +279,7 @@ with the \textsf{rmannot} package, there are numerous examples of
 \href{\urlAcroTeXBlog//?tag=rmannot-package}{{\AcroTeX} Blog} (having tag
 \textsl{rmannot-package}). There is also a whole series of articles on the
 \textbf{\href{\urlAcroTeXBlog/?cat=22}{Rich Media Annotation}} using
-\textbf{AeB Pro} and \textsf{rmannot}.\footnote{Articles that use \FT{FLV} or
+\pkg{AeB Pro} and \textsf{rmannot}.\footnote{Articles that use \FT{FLV} or
 \FT{SWF} files, or uses the ``JavaScript bridge'' will not work in recent versions
 of \app{Acrobat DC} or \app{Acrobat Reader DC} after EOL of Flash player.}
 
@@ -292,11 +292,11 @@ The requirements for your {\LaTeX} system are highlighted in this section.
 The following packages, in addition to the standard {\LaTeX}
 distribution, are required:
 \begin{enumerate}
-   \item AeB (\AcroTeX{} eDucation Bundle) The most recent version.
-      In particular the \texttt{eforms} package and its companion
-      package \texttt{insdljs}. The AeB Pro package is recommended. (All
-      the demo files use AeB Pro.) Get it at \href{http://ctan.org/pkg/acrotex}{ctan.org/pkg/acrotex}.
-  \item The \texttt{graphicxsp} Package. The latest version, I made
+   \item \pkg{AeB} (\AcroTeX{} eDucation Bundle) The most recent version.
+      In particular the \pkg{eforms} package and its companion
+      package \pkg{insdljs}. The \pkg{AeB Pro} package is recommended. (All
+      the demo files use \pkg{AeB Pro}.) Get it at \href{http://ctan.org/pkg/acrotex}{ctan.org/pkg/acrotex}.
+  \item The \pkg{graphicxsp} package. The latest version, I made
       some slight modifications of this package for \pkg{rmannot}.
       This package allows the embedding of poster graphics for use in
       the appearances of the annotations when they are not activated.
@@ -319,7 +319,7 @@ its companion application \app{Distiller}.\footnote{Current \app{Acrobat} is \ap
 \app{dvips} to produce a Postscript file, which is then distilled to obtain a
 PDF.
 
-If you are using \app{Acrobat DC} to build \pkg{rmannot} , it is necessary \emph{to clear the checkbox}
+If you are using \app{Acrobat DC} to build \pkg{rmannot}, it is necessary \emph{to clear the checkbox}
 \uif{Enable Protected Mode at startup}\FmtMP{Protected Mode}, this checkbox is found under the menu
 \uif{Edit > Preferences}. In the \uif{Preferences} dialog box, select
 \uif{Security (Enhanced)} category from the left panel; the targeted checkbox
@@ -330,10 +330,19 @@ is at the top line on the right panel. Refer to \hyperref[fig:SP]{Figure~\ref*{f
   \caption{\tops{\protect\uif}{}{Security (Enhanced) Preferences}}\label{fig:SP}
 \end{figure}
 
+\subsubsection{\tops{\protect\pkg}{}{rmannot} and non-Distiller workflows}
+
+With \pkg{rmannot} dated 2021/04/21 or later, a non-Distiller workflow can be
+utilized to compile and build a PDF; however, any Rich Media annotation
+created by \cs{rmAnnot} is non-functional and is represented by a frame box
+with the caption \textsf{Distiller required}. This allows the document author
+to use his/her favorite PDF creator and favorite PDF previewer to develop the
+document. To build the document to be published, \app{Acrobat/Distiller} are
+required at the tail end of the workflow \textsf{tex -> dvi -> ps -> pdf}.
+
 \subsection{Supported Media Formats}\label{s:MediaFmts}
 
 \definePath{\urlFmts}{https://helpx.adobe.com/acrobat/kb/supported-file-formats-acrobat-reader.html}
-
 
 \subsubsection{Supported video formats}
 
@@ -505,8 +514,8 @@ When no optional argument is passed, \texttt{win} is assumed (\uif{Windows
 OS}). Possible values for \meta{version} are \texttt{DC}, a year
 (\texttt{2015} or later), or a version number, such as \texttt{9},
 \texttt{10}, or \texttt{11}.\footnote{A value of \texttt{Beta} is also
-recognized, for those in the Beta Program of \app{Acrobat}.}
-The default is \cs{AcroVer\darg{DC}}, which is equivalent to \cs{AcroVer[win=32]\darg{DC}}.
+recognized, for those in the Beta Program of \app{Acrobat}.} The default is
+\cs{AcroVer\darg{DC}}, which is equivalent to \cs{AcroVer[win=32]\darg{DC}}.
 
 The \textsf{rmannot} package, based on the information passed to it by
 \cs{AcroVer}, builds the appropriated path and passes this path to the

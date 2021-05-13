@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% rmannot.sty package,                                 %%
-%% Copyright (C) 2008--2020  D. P. Story                %%
+%% Copyright (C) 2008--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{rmannot}
- [2020/08/21 v2.2 Rich Media Annotations (dps)]
+ [2021/04/21 v2.2.1 Rich Media Annotations (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -38,6 +38,9 @@
 \DeclareOptionX*{}
 \ProcessOptionsX\relax
 \newcommand\AcroVer[2][]{}
+\newcommand{\defineRMPath}[1]{\def\rm@ctrlName{#1}%
+  \hyper@normalise\rm@defineURLPath}
+\def\rm@defineURLPath#1{\expandafter\xdef\rm@ctrlName{#1}}
 \let\saveNamedPath\@gobbletwo
 \def\rma@edefexecute#1{\edef\rm@@temp@@exp{#1}\rm@@temp@@exp}
 \newcommand\makePoster[3][]{}
@@ -72,8 +75,10 @@
     \xdef\rm@Annot@width{\the\dimen@}%
   \fi
   \egroup
-  {\previewOn\pushButton[\CA{Distiller required}\BC{}\BG{}
-  \S{S}\Ff{\FfReadOnly}]{btn}{\rm@Annot@width}{\rm@Annot@height}}}
+  {\previewOn\pushButton[\autoCenter{n}\CA{Distiller required}
+  \BC{}\BG{}\S{S}\Ff{\FfReadOnly}
+  ]{btn}{\rm@Annot@width}{\rm@Annot@height}}%
+}
 \def\setRmOptions3D#1#2{}
 \PackageWarningNoLine{rmannot}
   {PDF creation requires Adobe Distiller.\MessageBreak

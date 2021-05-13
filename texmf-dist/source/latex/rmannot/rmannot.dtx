@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% rmannot.sty package,                                 %%
-%% Copyright (C) 2008--2020  D. P. Story                %%
+%% Copyright (C) 2008--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{rmannot}
-%<package> [2020/08/21 v2.2 Rich Media Annotations (dps)]
+%<package> [2021/04/21 v2.2.1 Rich Media Annotations (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -26,6 +26,9 @@
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{web}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{web}{aebdocfmt.def cannot be found}}
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\makeatother
 \def\AcroFLeX{AcroF\kern-.1667em\lower.5ex\hbox{L}\kern-.3eme\kern-.125emX\@}
 \def\AcroTeX{Acro\negthinspace\TeX}
 \def\CMD#1{\textbackslash#1}
@@ -160,12 +163,16 @@
 %    \end{macrocode}
 % We provide definitions to all essential commands and environments
 % to, as best as we can, give a PDF that is viewable, but with no functionality.
+% \changes{v2.2.1}{2021/04/21}{Added definition of \string\cs{defineRMPath} for non-pdfmark case}
 %    \begin{macrocode}
 \RequirePackage{eforms}[2020/12/14]
 \DeclareOptionX*{}
 \ProcessOptionsX\relax
 %\let\AcroVer\@gobble
 \newcommand\AcroVer[2][]{}
+\newcommand{\defineRMPath}[1]{\def\rm@ctrlName{#1}%
+  \hyper@normalise\rm@defineURLPath}
+\def\rm@defineURLPath#1{\expandafter\xdef\rm@ctrlName{#1}}
 \let\saveNamedPath\@gobbletwo
 \def\rma@edefexecute#1{\edef\rm@@temp@@exp{#1}\rm@@temp@@exp}
 \newcommand\makePoster[3][]{}
@@ -200,8 +207,13 @@
     \xdef\rm@Annot@width{\the\dimen@}%
   \fi
   \egroup
-  {\previewOn\pushButton[\CA{Distiller required}\BC{}\BG{}
-  \S{S}\Ff{\FfReadOnly}]{btn}{\rm@Annot@width}{\rm@Annot@height}}}
+%    \end{macrocode}
+% \changes{v2.2.1}{2021/04/21}{Added definition of \string\cs{autoCenter\string\darg{n}} for non-pdfmark case}
+%    \begin{macrocode}
+  {\previewOn\pushButton[\autoCenter{n}\CA{Distiller required}
+  \BC{}\BG{}\S{S}\Ff{\FfReadOnly}
+  ]{btn}{\rm@Annot@width}{\rm@Annot@height}}%
+}
 \def\setRmOptions3D#1#2{}
 \PackageWarningNoLine{rmannot}
   {PDF creation requires Adobe Distiller.\MessageBreak

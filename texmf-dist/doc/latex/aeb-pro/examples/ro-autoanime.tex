@@ -1,0 +1,111 @@
+% dvips/Distiller workflow only
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage[%
+    web={
+        pro,
+        designv,
+        tight,
+%        forcolorpaper,
+        centertitlepage,
+        dvipsnames,
+        usesf
+    },
+    uselayers,
+    attachsource=tex,
+    eforms,
+    aebxmp,
+]{aeb_pro}
+\usepackage{fancyvrb}
+\usepackage[nomessages]{fp}
+%
+% The versions of pstricks-add and pstricks should be
+% fairly recent.
+%
+\usepackage{pstricks-add}
+\usepackage[absolute,overlay]{textpos}
+
+\DeclareDocInfo
+{
+    title=The AeB Pro Package\texorpdfstring{\\[1ex]}{: }Rollovers and Auto-anime,
+    author=D. P. Story,
+    university=Acro\negthinspace\TeX.Net,
+    email=dpstory@acrotex.net,
+    subject=Test file for the AeB Pro package,
+    keywords={Adobe Acrobat, JavaScript},
+    talksite=http://www.acrotex.net,
+    talkdate={January 12, 2018},
+    copyrightStatus=True,
+    copyrightNotice={Copyright (C) \the\year, D. P. Story},
+    copyrightInfoURL=http://www.acrotex.net
+}
+\talkdateLabel{Published:}
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+\newcommand\newtopic{\par\ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+\vskip\medskipamount\noindent}
+\newenvironment{sverbatim}
+{\par\footnotesize\verbatim}{\endverbatim}
+\def\AcroTeX{Acro\negthinspace\TeX}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Layers and Animation}
+
+Animations are usually started and stopped using control buttons; however,
+you can create a rollover animation (using \cs{texHelp}) that starts
+automatically when the user rolls over the target word.
+
+The key to running an animation in a rollover is the
+\verb!\addJStexHelpEnter{<code>}! command. The argument of this command is
+executed when the mouse pointer enters the target word. Similarly
+\verb!\addJStexHelpExit{<code>}! inserts JavaScript that is executed when the
+mouse exits the target word. Finally, \cs{resetaddJStexHelp} resets the
+inserted \verb!<code>! back to their default in preparation for the next
+rollover animation. Refer to the source file for details of setting up the
+rollover.
+
+\defineRC{roanime}
+{%
+\DeclareAnime{sinegraph}{10}{40}
+\def\thisframe{\animeBld\psplot[linecolor=red]{0}{\xi}{sin(x)}\eBld}
+\begin{minipage}{.65\linewidth}\centering
+\psset{llx =-12pt,lly=-12pt,urx =12pt,ury =12pt} % ,trigLabels=true,labelFontSize=\small
+\begin{psgraph*}[arrows=->,trigLabels=true,trigLabelBase=2,dx=\psPiH](0,0)(-.5,-1.5)(6.75,1.5){164pt}{70pt}
+    \psset{algebraic=true}%
+    \rput(4,1){$y=\sin(x)$}
+    \FPdiv{\myDelta}{\psPiTwo}{\nFrames}%
+    \def\xi{0}%
+    \multido{\i=1+1}{\nFrames}{\FPadd{\xi}{\xi}{\myDelta}\thisframe}
+\end{psgraph*}
+\end{minipage}
+}
+
+\begin{rollover}
+\begin{textblock*}{.45\linewidth}[.5,.5](.5\paperwidth,.5\paperheight)
+\xBld{roanime}\psshadowbox[framesep=0pt]{\fcolorbox{red}{cornsilk}{%
+\parbox{\linewidth}{\insertRC{roanime}}}}\eBld
+\end{textblock*}
+\end{rollover}
+\begin{printRollover}
+\definePR{roanime}{\parbox{.4\linewidth}{\insertRC{roanime}}}\insertPR{roanime}
+\end{printRollover}
+
+Recall that the \emph{initial period} of the \addJStexHelpEnter{aebAnimeLayersForward(\animSpeed,\nFrames,"\animBaseName");}%
+\addJStexHelpExit{aebAnimeLayersClear(\animSpeed,\nFrames,"\animBaseName");}%
+\texHelp{roanime}{sine function}\resetaddJStexHelp\space
+is that portion of the graph over the interval $ [0, 2\pi] $.
+
+The verbatim listing of the \cs{texHelp} command for this animation is
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small]
+\addJStexHelpExit{aebAnimeLayersClear(\animSpeed,\nFrames,"\animBaseName");}%
+\texHelp{roanime}{sine function}\resetaddJStexHelp
+\end{Verbatim}
+The arguments \cs{animSpeed}, \cs{nFrames}, and \cs{animBaseName} are defined by
+the \cs{DeclareAnime} command (not shown).
+
+
+\end{document}

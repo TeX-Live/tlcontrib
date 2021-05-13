@@ -1,12 +1,14 @@
 /* 
     AEB Pro Document Assembly Methods
 
-    Copyright (C) 2012 -- 2016 AcroTeX.Net
+    Copyright (C) 2012 -- 2021 AcroTeX.Net
     D. P. Story
     http://www.acrotex.net
     
-    Version 1.4
+    Version 1.5
 */
+/* v1.5 Added aebCertifyInvisibleSign */
+
 
 if ( typeof aebTrustedFunctions == "undefined") {
     aebTrustedFunctions = app.trustedFunction( function ( doc, oFunction, oArgs )
@@ -113,6 +115,12 @@ aebSignatureSetSeedValue = app.trustPropagatorFunction( function ( oArgs, field 
 {
     app.beginPriv();
         return retn = field.signatureSetSeedValue(oArgs);
+    app.endPriv();
+});
+aebCertifyInvisibleSign = app.trustPropagatorFunction( function ( oArgs, field )
+{
+    app.beginPriv();
+        return retn = field.certifyInvisibleSign( oArgs )
     app.endPriv();
 });
 aebAddIcon=app.trustPropagatorFunction( function ( oArgs, doc )

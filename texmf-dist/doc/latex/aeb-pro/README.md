@@ -38,6 +38,10 @@ The AcroTeX Blog (http://blog.acrotex.net/) lists the distribution files at
 http://www.acrotex.net/blog/?page_id=835, all demo files that use AeB Pro
 are listed at http://www.acrotex.net/blog/?tag=aeb-pro.
 
+What's New (2021-04-27) Added aebCertifyInvisibleSign() to aeb_pro.js 
+(Version 1.5) This JS function supports http://www.acrotex.net/blog/?p=1274,
+an article titled Certify Invisible Signing using AeB Pro.
+
 What's New (2021-02-07) Fix a long time bug of page events.
 
 What's New (2021-02-04) Updated documentation to reflect new security restriction

@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% dljsLib.sty package,                                 %%
-%% Copyright (C) 2001-2018  D. P. Story                 %%
+%% Copyright (C) 2001-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{dljslib}
- [2017/08/11 v2.1 Manage a Library of Document Level JavaScripts (dps)]
+ [2021/04/04 v2.2 Manage a Library of Document Level JavaScripts (dps)]
 \newcommand\dljsRegister[2][n]
     {\expandafter\let\csname checkout@#2\endcsname=#1}
 \def\@ifcheckedout#1{\expandafter\if\csname checkout@#1\endcsname y}
@@ -36,12 +36,14 @@
 \DeclareAndRegister{combinatorics}
 \DeclareAndRegister{setSupport}
 \DeclareOption{unordered}{\PackageWarning{dljslib}
-    {The `unordered' option is now combined with the\MessageBreak
-    `setSupport' option, will use the `setSupport' option\MessageBreak
-    instead}\ExecuteOptions{setSupport}}
+  {The `unordered' option is now combined with the\MessageBreak
+  `setSupport' option, will use the `setSupport' option\MessageBreak
+  instead}\ExecuteOptions{setSupport}}
 \DeclareAndRegister{complex}
 \DeclareAndRegister{satisfyEq}
 \DeclareAndRegister{useGermanNums}
+\DeclareOption{useDeNums}{\ExecuteOptions{useGermanNums}}
+\DeclareAndRegister{useEnNums}
 \DeclareAndRegister{factors}
 \DeclareAndRegister{point}
 \DeclareAndRegister{intervals}
@@ -63,6 +65,8 @@
     \let\dljs@verbatim\comment
     \let\enddljs@verbatim\endcomment\fi\dljs@verbatim
 }{\enddljs@verbatim}
+\newcommand{\SyntaxErrorAuthor}{"Syntax error in author's answer!
+  Check console."}
 \begin{library@holding}{dljslib}
 \begin{insDLJS*}[dljslib]{dljslib}
 \begin{newsegment}{dljslib: AcroTeX DLJS Library}
@@ -119,17 +123,17 @@ function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
     }
     zCorrAns = ParseInput(zCorrAns);
     if (!ok2Continue) {
-        eqAppAlert("Syntax error in author's answer! Check console.", 3);
+        eqAppAlert(\SyntaxErrorAuthor,3);
         console.println("Syntax Error: " + CorrAns);
         return null;
     }
     zUserAns = ParseInput(zUserAns);
     if (!ok2Continue) return null;
     indepVars = TypeParameters(indepVars);
-    var lambda = getNonZeroRatio (domain, indepVars, zCorrAns, zUserAns);
+    var lambda = getNonZeroRatio(domain,indepVars,zCorrAns,zUserAns);
     if ( lambda == null ) {
         eqAppAlert(\eqSyntaxErrorUndefVar,3); return null; };
-    if ( !ok2Continue ) return notifyField(false, flag, fieldname);
+    if ( !ok2Continue ) return notifyField(false,flag,fieldname);
     zCorrAns  = lambda + "*(" + zCorrAns + ")";
     success=randomPointCompare (n,domain,indepVars,epsilon,
         zCorrAns,zUserAns,comp)
@@ -260,7 +264,7 @@ typeof oComp.priorParse != "undefined" ) {
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
-            eqAppAlert("Author Syntax error!", 3);
+            eqAppAlert(\SyntaxErrorAuthor, 3);
             return null;
         }
         aUserAns[i] = ParseInput(aUserAns[i]);
@@ -867,18 +871,41 @@ isCorrect *=Number(success);
 \end{newsegment}
 \end{library@holding}
 \@ifcheckedout{useGermanNums}
-\newcommand{\noDecPtGerMsg}{"A period (.) is not allowed in answer,
-    use German notation for numbers"}
+  \dlJSStr[noquotes]{\noDecPtDeMsg}{%
+    "German Notation Syntax Error: A point (.) was found
+     in your response \"" + UserAns + "\".
+     Please remove the point, or this answer will be marked as wrong."}
+  \flJSStr*[noquotes]{\MsgDei}{"German decimal notation is expected,
+for example: 12,3456."}
+  \flJSStr*[noquotes]{\MsgDeiAlt}{"German decimal notation is expected,
+for example: 12,3456." +((warnDecDeOnly)?"\n\n
+The English decimal notation (12.2345) is also accepted,
+however.":"")}
+  \flJSStr*[noquotes]{\MsgDeii}{"A decimal number is required,
+rounded to two decimal places, for example: 12,34"}
+  \def\warnDecDeOnlyOn{\def\warnDecDeOnly{true}}
+  \def\warnDefDeOnlyOff{\def\warnDecDeOnly{false}}
+  \warnDefDeOnlyOff
+  \def\numDe#1{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*,?%
+    \redigit*\reestr/,(#1)))}}
+  \def\rndNumDeReq#1#2{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*,%
+    \redigit{#1}\reestr/,(#2)))}}
+  \def\rndNumDeOpt#1#2{{priorParse:\Array(% at most two decimal places
+    \preReqForm(/\rebstr\rechrclass{+-}?%
+    \redigit*,?\redigit{0,#1}\reestr/,(#2)))}}
 \fi
 \begin{library@holding}{useGermanNums}
 \begin{newsegment}
     {dljslib: Support for process numbers in the German format}
+var warnDecDeOnly=\warnDecDeOnly;
 function ProcRespNumsDe (flag,CorrAns,n,epsilon,%
 domain,indepVars,oComp) {
     if (!ProcessIt) return null;
     ok2Continue = true;
     var fieldname = event.target.name;
-    var bSubstVars=(arguments.length>7); // dps17
+    var bSubstVars=(arguments.length>7);
     var UserAns=(bSubstVars)?arguments[7]:event.value;
     var success = _ProcRespNumsDe(flag,CorrAns,UserAns,n,%
 epsilon,domain,indepVars,oComp);
@@ -891,14 +918,14 @@ domain,indepVars,oComp) {
     ok2Continue = true;
     CorrAns = ParseInput(CorrAns);
     if (!ok2Continue) {
-        eqAppAlert("Syntax error in author's answer! Check console.", 3);
+        eqAppAlert(\SyntaxErrorAuthor,3);
         return null;
     }
     var UserAnsSave=UserAns;
     var reDe=/,/g;
     var reDec=/\./g;
-    if ( reDec.test(UserAns) ) {
-        eqAppAlert(\noDecPtGerMsg,3);
+    if ( (!warnDecDeOnly) && (reDec.test(UserAns)) ) {
+        eqAppAlert(\noDecPtDeMsg,3);
         return -1;
     }
     UserAns=UserAns.replace(reDe,".");
@@ -908,12 +935,7 @@ domain,indepVars,oComp) {
     if ( (typeof(oComp)=="object") %
 && (typeof(oComp.priorParse)!="undefined") ) {
         var retn=processSpecialParse(oComp.priorParse,UserAnsSave);
-        if (retn==null) return -1;
-    }
-    var reComma=/,/;
-    if ( reComma.test(UserAns) ) {
-        eqAppAlert(\eqSyntaxErrorComma,3);
-        return -1;
+        if ( (!warnDecDeOnly) && (retn==null) ) return -1;
     }
     UserAns = ParseInput(UserAns);
     indepVars = TypeParameters(indepVars);
@@ -927,6 +949,25 @@ epsilon,CorrAns,UserAns,comp);
 }
 \end{newsegment}
 \end{library@holding}
+\@ifcheckedout{useEnNums}
+  \dlJSStr[noquotes]{\noDecPtEnMsg}{%
+    "Syntax Error: A comma (,) was found
+     in your response \"" + UserAns + "\".
+     Please remove the comma, or this answer will be marked as wrong."}
+  \flJSStr*[noquotes]{\MsgEni}{"English decimal notation is expected,
+for example: 12.3456."}
+  \flJSStr*[noquotes]{\MsgEnii}{"A decimal number is required,
+rounded to two decimal places, for example: 12.34"}
+  \def\numEn#1{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*\\.?%
+    \redigit*\reestr/,(#1)))}}
+  \def\rndNumEnReq#1#2{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*\\.%
+    \redigit{#1}\reestr/,(#2)))}}
+  \def\rndNumEnOpt#1#2{{priorParse:\Array(% at most two decimal places
+    \preReqForm(/\rebstr\rechrclass{+-}?%
+    \redigit*\\.?\redigit{0,#1}\reestr/,(#2)))}}
+\fi
 \begin{library@holding}{unordered}
 \begin{newsegment}{dljslib: Contrib - Processing Unordered Responses}
 /*
@@ -1146,7 +1187,7 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
-            eqAppAlert("Author Syntax error!", 3);
+            eqAppAlert(\SyntaxErrorAuthor, 3);
             return null;
         }
         aUserAns[i] = ParseInput(aUserAns[i]);
@@ -1167,7 +1208,8 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 \end{library@holding}
 \begin{library@holding}{intervals}
 \begin{newsegment}{dljslib: Contrib - Processing Interval Responses}
-function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
+function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,%
+indepVars,oComp)
 {
      ok2Continue = true;
      if (!ProcessIt) return null;
@@ -1444,57 +1486,56 @@ function NoExpAllowed (UserAns) {
 }
 function NoTrigAllowed (UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var aTrigfuncs = new Array
-    ( "acos","asin","atan","cos", "sin", "tan","sec","csc","cot",
-      "arcsin", "arccos", "arctan"
-    );
-    var re, regexp;
-    re = /[a-zA-Z]{2,}/g;
-    aF = UserAns.match(re);
-    if (  aF != null ) {
-        for (var i=0; i < aF.length; i++)
-        {
-            for(var j=0; j < aTrigfuncs.length; j++) {
-                if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
-                    return eqAppAlert(\NoTrigAllowedErrorMsg,3), null;
-            }
-        }
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var aTrigfuncs = new Array
+  ( "acos","asin","atan","cos", "sin", "tan","sec","csc","cot",
+    "arcsin", "arccos", "arctan"
+  );
+  var re, regexp;
+  re = /[a-zA-Z]{2,}/g;
+  aF = UserAns.match(re);
+  if (  aF != null ) {
+    for (var i=0; i < aF.length; i++) {
+      for(var j=0; j < aTrigfuncs.length; j++) {
+        if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
+          return eqAppAlert(\NoTrigAllowedErrorMsg,3), null;
+      }
     }
-    return true;
+  }
+  return true;
 }
 function NoPiAllowed(UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var re=/PI|pi/;
-    if ( re.test(UserAns) )
-        return eqAppAlert(\NoPiAllowedErrorMsg,3), null;
-    return true;
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var re=/PI|pi/;
+  if ( re.test(UserAns) )
+    return eqAppAlert(\NoPiAllowedErrorMsg,3), null;
+  return true;
 }
 function NoTrigLogAllowed (UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var aTrigfuncs = new Array
-    ( "acos","asin","atan","cos", "sin",
-      "tan","sec","csc","cot", "arcsin", "arccos", "arctan",
-      "logc","log", "ln"
-    );
-    var re, regexp;
-    re = /[a-zA-Z]{2,}/g;
-    aF = UserAns.match(re);
-    if (  aF != null ) {
-        for (var i=0; i < aF.length; i++)
-        {
-            for(var j=0; j < aTrigfuncs.length; j++) {
-                if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
-                    return eqAppAlert(\NoTrigLogAllowedErrorMsg,3), null;
-            }
-        }
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var aTrigfuncs = new Array
+  ( "acos","asin","atan","cos", "sin",
+    "tan","sec","csc","cot", "arcsin", "arccos", "arctan",
+    "logc","log", "ln"
+  );
+  var re, regexp;
+  re = /[a-zA-Z]{2,}/g;
+  aF = UserAns.match(re);
+  if (  aF != null ) {
+    for (var i=0; i < aF.length; i++)
+    {
+      for(var j=0; j < aTrigfuncs.length; j++) {
+        if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
+          return eqAppAlert(\NoTrigLogAllowedErrorMsg,3), null;
+      }
     }
-    return true;
+  }
+  return true;
 }
 var bAllowWrngNormSciNotn=false;
 var bItsNormSciNot=false;

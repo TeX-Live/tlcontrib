@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2020  D. P. Story                 %%
+%% Copyright (C) 2002-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{eforms}
-%<package> [2020/12/14 v2.4.1 Provides general eforms support (dps)]
+%<package> [2021/05/10 v2.4.3 Provides general eforms support (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}[2012/10/12]
@@ -95,18 +95,19 @@
 %    \textsf{web}; in this case, the options below must explicitly included.
 %    Set the driver dependent code for the |quiz| environments.
 %
-% \changes{v2.2v2.2}{2019/06/12}{Added fields to fields dict, conforming to hyperref}
+% \changes{v2.4.3}{2021/05/10}{Changed date for sync with \string\pkg{insdljs}}
+% \changes{v2.2v2.2}{2019/06/12}{Added fields to fields dict, conforming to \string\pkg{hyperref}}
 % \changes{v2.13}{2019/06/10}{Added various fields to the fields dictionary so they
 % can get appearances in non-conforming PDF viewers.}
-% \changes{v2.5o}{2012/06/18}{Added required package \string\textsf{ifpdf}}
-% \changes{v2.9m}{2017/09/03}{Added the ifluatex package}
+% \changes{v2.5o}{2012/06/18}{Added required package \string\pkg{ifpdf}}
+% \changes{v2.9m}{2017/09/03}{Added the \string\pkg{ifluatex} package}
 %    \begin{macrocode}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
 %    \end{macrocode}
 % The \pkg{calc} package is now required (2014/02/18).
-% \changes{v2.6c}{2014/02/18}{Added the \string\textsf{calc} package as required package.}
+% \changes{v2.6c}{2014/02/18}{Added the \string\pkg{calc} package as required package.}
 %    \begin{macrocode}
 \RequirePackage{calc}
 %    \end{macrocode}
@@ -131,7 +132,7 @@
 }
 %    \end{macrocode}
 % Set the driver for \texttt{pdftex}\IndexOpt{pdftex}
-% \changes{v2.9b}{2016/07/22}{Do not pass pdftex driver to insdljs or hyperref}
+% \changes{v2.9b}{2016/07/22}{Do not pass pdftex driver to \string\pkg{insdljs} or \string\pkg{hyperref}}
 %    \begin{macrocode}
 \DeclareOption{pdftex}{%
   \def\eq@drivernum{1}\def\eq@driver{pdftex}%
@@ -139,7 +140,7 @@
 }
 %    \end{macrocode}
 % Added \textsf{luatex} option
-% \changes{v2.9m}{2017/09/03}{Add luatex option}
+% \changes{v2.9m}{2017/09/03}{Add \string\opt{luatex} option}
 %    \begin{macrocode}
 \DeclareOption{luatex}{%
   \def\eq@drivernum{1}\def\eq@driver{luatex}%
@@ -190,7 +191,7 @@
 % The \texttt{preview}\IndexOpt{preview} option displays the bounding box of each form field with a frame box.
 % Useful for laying out field with a dvi previewer.
 % \changes{v2.5n}{2012/04/30}{Changed \string\cs{ifpreview} to a conditional
-% definition; this allows the \string\textsf{spdef} package to control the state
+% definition; this allows the \string\pkg{spdef} package to control the state
 % of \cs{ifpreview}.}
 %    \begin{macrocode}
 \DeclareOption{preview}{\previewtrue}
@@ -211,7 +212,7 @@
 %    Use\IndexOpt{useui} the \textsf{xkeyval} package to specify the options for the links and
 % forms, key-values are enclosed in the \cs{ui} command inside the option list.
 % \changes{v2.0}{2008/03/14}
-% {
+% {%
 %   Added the \string\texttt{useui} option, which inputs \string\textsf{xkeyval} package,
 %   and defines a user-friendly interface to the option arguments.
 % }
@@ -268,18 +269,15 @@
 %    To support a variations of \app{dvipdfm}, we change the logic from
 %    \cs{ifxetex} to |\ifnum\eq@drivernum=2\relax|, a driver number of 2
 %    includes \app{dvipdfm} and all its variants.
-%    \changes{v2.3.4}{2020/07/05}{Change logic from \string\cs{ifxetex} to
-%    \string\cs{ifnum}\string\cs{eq@drivernum=2\string\relax}}
+%    \changes{v2.3.4}{2020/07/05}{Change logic for \string\cs{ifxetex}}
 %    \begin{macrocode}
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifnum\eq@drivernum=2\relax\else\pdfmarkuptrue\fi\fi
+\ifpdf\else\ifnum\eq@drivernum=\tw@\else\pdfmarkuptrue\fi\fi
 \RequirePackage{hyperref}
 %    \end{macrocode}
-%    Changed \textsf{hyperref} definitions/parameters to add \texttt{1bp} rather than \texttt{1pt} around a form field
-%    or link.
+%    Changed \textsf{hyperref} definitions/parameters to add \texttt{1bp}
+%    rather than \texttt{1pt} around a form field or link.
 %    \changes{v2.9e}{2016/12/22}{Changed hyperref to add 1bp rather than 1pt}
-%    \changes{v2.3.4}{2020/07/05}{Change logic from \string\cs{ifxetex} to
-%    \string\cs{ifnum}\string\cs{eq@drivernum=2\string\relax}}
 %    \begin{macrocode}
 \ifnum\eq@drivernum=2\relax
 \else
@@ -297,7 +295,7 @@
 \RequirePackage{insdljs}[2019/02/11] % incl conv-xkv
 %    \end{macrocode}
 % \changes{v1.0a}{2006/10/03}
-% {
+% {%
 %   If \string\pkg{exerquiz} is not loaded, we do an automatic begin and end of Form.
 %   Also, if \string\textsf{exerquiz} is loaded, then we use the driver declared in
 %   \string\pkg{exerquiz}; otherwise, we set the default to 0
@@ -320,11 +318,11 @@
 \let\ef@YES=y \let\ef@NO=n
 \let\ef@One=1 \let\ef@Zero=0
 \ifnum\eq@drivername<2\relax
-\let\to@usepdfmark\ef@One
-\RequirePackage[structure]{taborder}\else
-\let\to@usepdfmark\ef@Zero
-\RequirePackage{taborder}
-\fi
+  \let\to@usepdfmark\ef@One
+  \def\reqPkg{\RequirePackage[structure]{taborder}}\else
+  \let\to@usepdfmark\ef@Zero
+  \def\reqPkg{\RequirePackage{taborder}}\fi
+\reqPkg
 %    \end{macrocode}
 %    \begin{macrocode}
 %</package>
@@ -439,11 +437,25 @@
 % For example, expanding |\efsave\x\as\y| (eg, |\let\y\x|), the definition of the macro |\y|
 % has the same definition as |\x| does. Now |\x| is free to be redefined. Later in the document,
 % we can say |\efrestore\x\from\y| (eg, |\let\x\y|). Now the
-% definition of |\x| has its original definition (at the time when it was saved).
+% definition of |\x| has its original definition (at the time when it was saved).\medskip
+%
+% \noindent The two commands \DescribeMacro\txtRef\cs{txtRef} and \DescribeMacro\labelRef\cs{labelRef}
+% return pure text: The first returns the value of \cs{ref} as plain text; similarly, \cs{labelRef} returns
+% the true destination name of a reference.
+% \changes{v2.4.2}{2021/03/11}{Defined \string\cs{txtRef}, also defined in \string\pkg{exerquiz};
+% moved \string\cs{labelRef} from the \string\textsf{userinterface} section of this DTX.}
+%    \begin{macrocode}
+\def\txtRef#1{\@ifundefined{r@#1}
+  {??}{\aeb@exiii\@firstoffive\csname r@#1\endcsname}}
+\def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
+  {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
+\def\aeb@exiii{\expandafter\expandafter\expandafter}
+\def\noexpandiii{\noexpand\noexpand\noexpand}
+%    \end{macrocode}
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}
-%    \section{\tops{\app}{}{Adobe} Forms Support}\label{formsSupport}
+%    \section{\tops{\protect\app}{}{Adobe} Forms Support}\label{formsSupport}
 %    \begin{macrocode}
 %<*package>
 %    \end{macrocode}
@@ -1213,7 +1225,7 @@
 %    \end{macrocode}
 % \DescribeMacro{\RV} Rich text value
 %\changes{v2.5l}{2011/01/28}{%
-%   Wrap the \cs{RV} key in an XHTML \string\texttt{{\string\ltag}body\string\rtag} element, part of adding
+%   Wrap the \string\cs{RV} key in an XHTML \string\texttt{{\string\ltag}body\string\rtag} element, part of adding
 %   better support for rich text strings for form fields.
 %}
 %    \begin{macrocode}
@@ -1255,7 +1267,7 @@
 % we pass the argument through \cs{pdfstringdef} to get the octal encoding,
 % which is the method hyperref uses.
 % \changes{v2.7}{2014/07/08}{Removed the use of \string\cs{ifHy@unicode}, now pass all PDF text strings
-% through \cs{pdfstringdef}.}
+% through \string\cs{pdfstringdef}.}
 % \changes{v2.8a}{2015/07/12}{Added \string\cs{ef@isunicode} to automatically detect
 % unicode}
 % (2015/07/12) Added \cs{ef@isunicode} to automatically detect
@@ -1850,7 +1862,7 @@
 %multi-line hyperlinks. Recognizable values are \texttt{y} and \texttt{n}. contiguous boxes
 %are combined by default. There are command versions of \cs{mlfix}, these are
 %\DescribeMacro{\mlfixOn} and \DescribeMacro{\mlfixOff}
-%\changes{v2.9.16}{2018/03/08}{Added \string\cs{mlfix} for multiline links}
+%\changes{v2.9.16}{2018/03/08}{Added \string\cs{mlfix} for multi-line links}
 %\changes{v2.9.19}{2018/03/22}{Added \string\cs{relax} following width dimension
 % in \string\cs{@eqmlstrut}}
 %    \begin{macrocode}
@@ -3028,7 +3040,7 @@
 \long\def\g@addto@macrogobble#1#2{\g@addto@macro{#1}{#2}\@gobbleto@@nil}
 %    \end{macrocode}
 % \changes{v2.8a}{2015/07/15}{New def for \string\cs{passthruCLOpts}, and modified
-% \cs{ef@pdfstrCLOpts} and its spawn.}
+% \string\cs{ef@pdfstrCLOpts} and its spawn.}
 % (2015/07/15) New def for \cs{passthruCLOpts}, and modified \cs{ef@pdfstrCLOpts} and its spawn.
 %    \begin{macrocode}
 \def\passthruCLOpts{*}
@@ -3122,7 +3134,7 @@
 %    \end{macrocode}
 % \subsubsection{List Box}\label{listbox}
 %
-%\changes{v2.4}{2020/11/28}{Allow \cs{list@@Box} to obey \string\cs{pdfStringsOn}}
+%\changes{v2.4}{2020/11/28}{Allow \string\cs{list@@Box} to obey \string\cs{pdfStringsOn}}
 %
 % The main list box code that can be used to build list box commands, such as
 % \cs{listBox}, defined below. Within
@@ -3191,7 +3203,7 @@
 %    \end{macro}
 % \subsubsection{Combo Box}\label{combobox}
 %
-%\changes{v2.4}{2020/11/28}{Allow \cs{combo@@Box} to obey \string\cs{pdfStringsOn}}
+%\changes{v2.4}{2020/11/28}{Allow \string\cs{combo@@Box} to obey \string\cs{pdfStringsOn}}
 %
 % Within the optional argument, the following aliases are used: \cs{nameuse} for \cs{@nameuse}
 % and \cs{tops} for \cs{texorpdfstring}.
@@ -4167,12 +4179,8 @@
 % we'll define them here as well.
 %    \begin{macrocode}
 \def\getargs#1#2{\def\aeb@argi{#1}\def\aeb@argii{#2}}
-\def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
-  {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
-\def\aeb@exiii{\expandafter\expandafter\expandafter}
 \newtoks\ef@flagtoks
 \newtoks\ef@jstoks
-\def\noexpandiii{\noexpand\noexpand\noexpand}
 %    \end{macrocode}
 %
 % \subsection{The Appearance Tab}

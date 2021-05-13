@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/02/17 v8.6.4 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/05/10 v8.7.7 %
 %<package> Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver> Exerquiz documentation driver file (dps)]
 %<aebjs> Exerquiz document level JavaScript (dps)]
@@ -47,6 +47,7 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
+\usepackage{fancyvrb}
 \gdef\darg#1{\texttt{\char123\relax#1\char125\relax}}
 \let\env\texttt
 \let\opt\texttt
@@ -55,8 +56,9 @@
 \def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
 \def\visispace{\symbol{32}}
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
-\def\meta#1{\textsl{\texttt{#1}}}
+\def\meta#1{\textit{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\def\GT{\string>}
 \pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription  % comment out for implementation details
 \EnableCrossrefs
@@ -71,6 +73,7 @@
 \begin{document}
   \let\env\texttt\let\pkg\textsf
   \let\app\textsf
+  \let\tops\texorpdfstring
   \GetFileInfo{exerquiz.sty}
   \title{Exerquiz: Exercises and Quizzes for \LaTeX/PDF}
   \author{D. P. Story\\
@@ -100,11 +103,11 @@
 %\changes{v8.6.3}{2021/01/31}{Updated documentation, informing users of \string\app{Acrobat DC} that
 %   it is necessary to change their \string\uif{Security (Enhanced)} preferences.}
 %\changes{v8.2.8}{2018/12/13}{The SOL file is now written entirely when there is no solution option specified}
-% (v8.0 dated 2017/08/08) This version introduces multi-letter variables and what I'll term `alternate appearances'.
+% (2017/08/08) This version introduces multi-letter variables and what I'll term `alternate appearances'.
 % \changes{v8.0}{2017/08/08}{Introduce multi-letter variables and alternate appearances. Changes
 % made are marked by `\texttt{dps17}' throughout the DTX.}
 % \changes{v7.7k}{2016/04/18}{Minor bug fixes, improved driver recognition}
-% \changes{v7.7j}{2016/04/05}{Change in eforms to 2016/04/05 v2.8f}
+% \changes{v7.7j}{2016/04/05}{Change in \string\pkg{eforms} to 2016/04/05 v2.8f}
 %
 % \section{Introduction}
 %
@@ -118,11 +121,11 @@
 % Introduce a number of useful options for \pkg{exerquiz}.
 % \subsection{Options for paper, solutions, JavaScript and preview}
 %    \begin{macrocode}
-% Begin package segment
 %<*package>
 \usepackage{keyval}
 %    \end{macrocode}
-%\changes{v6.4t}{2012/06/18}{Added ifpdf as a required package}
+%    Some early required packages.
+%\changes{v6.4t}{2012/06/18}{Added \string\pkg{ifpdf} as a required package}
 %\changes{v8.1a}{2017/09/03}{Added check for luatex}
 %    \begin{macrocode}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -140,21 +143,24 @@
 %    \begin{macrocode}
 \DeclareOption{noxcolor}{\def\eq@ColorPackage{color}}
 %    \end{macrocode}
-%    \leavevmode\IndexOpt{forpaper}\IndexOpt{forcolorpaper}^^A
-%    Pass the |monochrome| option to the color package
+%    \leavevmode\IndexOpt{forpaper}^^A
+%    Pass the \opt{monochrome} option to the color package
 %\changes{v6.06a}{2007/04/09}
 %{
-%   Added the \texttt{forcolorpaper} option for those using
-%   \textsf{exerquiz} without \textsf{web}.
+%   Added the \string\texttt{forcolorpaper} option for those using
+%   \string\textsf{exerquiz} without \string\textsf{web}.
 %}
 %    \begin{macrocode}
 \DeclareOption{forpaper}{%
    \eqforpapertrue\PassOptionsToPackage{monochrome}{\eq@ColorPackage}
-   \AtBeginDocument{\ifnum\eq@drivernum=4 \else\AllowPeeking\fi}
-}
-\DeclareOption{forcolorpaper}{\eqforpapertrue  % for print
-   \AtBeginDocument{\ifnum\eq@drivernum=4 \else\AllowPeeking\fi}
-}
+   \AtBeginDocument{\AllowPeeking}}
+%    \end{macrocode}
+%   \leavevmode\IndexOpt{forcolorpaper}^^A
+%   The \opt{forcolorpaper} is the same as \opt{forpaper}, but does not
+%   pass the \pkg{monochrome} option to the color package.
+%    \begin{macrocode}
+\DeclareOption{forcolorpaper}{\eqforpapertrue
+   \AtBeginDocument{\AllowPeeking}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{preview}^^A
 % With this option, the bounding boxes of all form fields appear in the
@@ -193,7 +199,7 @@
 %    \begin{macrocode}
 \DeclareOption{nohiddensolutions}{\eq@globalshowsolutionstrue}
 \DeclareOption{noHiddensolutions}%
-    {\eq@globalshowsolutionstrue\AtBeginDocument{\def\Hidesymbol{h}}}
+  {\eq@globalshowsolutionstrue\AtBeginDocument{\def\Hidesymbol{h}}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{solutionsafter}^^A
 %    Solutions will appear after the statement of the exercise.
@@ -202,10 +208,10 @@
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{solutionsonly}^^A
 % Here is a highly specialized option, put in at the request of a former friend.
-%\changes{v6.2f}{2007/12/21}{Added a solutionsonly option}
+%\changes{v6.2f}{2007/12/21}{Added a \string\opt{solutionsonly} option}
 %    \begin{macrocode}
 \DeclareOption{solutionsonly}{\solutionsonlytrue\answerkeytrue
-    \therearesolutionstrue\AtEndOfPackage{\let\exerSolnsHeadnToc\relax}}
+  \therearesolutionstrue\AtEndOfPackage{\let\exerSolnsHeadnToc\relax}}
 %    \end{macrocode}
 %    \changes{v8.1k}{2018/02/04}{Added \string\cs{ifanswerkey} switch}
 %    \begin{macrocode}
@@ -218,11 +224,11 @@
 %    is used.
 %    \begin{macrocode}
 \DeclareOption{contsolns}{\AtEndOfPackage{\InputIfFileExists
-    {contsolns.def}{\contsolnsInputMsg}{\contsolnsErrorMsg}}}
+  {contsolns.def}{\contsolnsInputMsg}{\contsolnsErrorMsg}}}
 \def\contsolnsInputMsg{\PackageInfo{exerquiz}{contsolns option,
-    inputting file contsolns.def}}
+  inputting file contsolns.def}}
 \def\contsolnsErrorMsg{\PackageWarning{exerquiz}{contsolns option,
-    cannot find file contsolns.def}}
+  cannot find file contsolns.def}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{nocorrections}^^A
 %    The code for correcting the |quiz| environment is
@@ -247,11 +253,11 @@
 % \textsf{eqexam}, but can be used in \textsf{exerquiz}. The switch
 % \cs{ifvspacewithsolns} is defined in \textsf{eqexam}, and we only
 % define it here if \textsf{eqexam} is not loaded.
-% \changes{v6.3x}{2011/04/05}{Added \texttt{vspacewithsolns}}
+% \changes{v6.3x}{2011/04/05}{Added \string\opt{vspacewithsolns}}
 %    \begin{macrocode}
 \@ifundefined{ifvspacewithsolns}{%
-    \DeclareOption{vspacewithsolns}{\vspacewithsolnstrue}
-    \newif\ifvspacewithsolns\vspacewithsolnsfalse
+  \DeclareOption{vspacewithsolns}{\vspacewithsolnstrue}
+  \newif\ifvspacewithsolns\vspacewithsolnsfalse
 }{}
 %    \end{macrocode}
 %    \changes{v8.1m}{2018/02/09}{\string\cs{ifdisplayworkarea} conditionally defined}
@@ -266,16 +272,22 @@
 %    \leavevmode\IndexOpt{nodljs}^^A
 %    An option for excluding all DLJS from the document. Useful with the
 %    \texttt{forpaper} option, or a document destined to be printed. Pass
-%    on to insdljs package.
+%    on to \pkg{insdljs} package.
 %    \begin{macrocode}
 \DeclareOption{nodljs}{\PassOptionsToPackage{nodljs}{insdljs}%
-     \AtEndOfPackage{\let\importdljs\eq@YES}}
+  \AtEndOfPackage{\let\importdljs\eq@YES}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{execAfter}^^A
-% Execute any JS defined within the \texttt{execJS} environment. Works only for
+% Execute any JS defined within the \env{execJS} environment. Works only for
 % authors using Acrobat 5.0 or Acrobat Approval.
 %    \begin{macrocode}
 \DeclareOption{execJS}{\PassOptionsToPackage{execJS}{insdljs}}
+%    \end{macrocode}
+%    \leavevmode\IndexOpt{usealtadobe}^^A
+%    Pass the \opt{usealtadobe} to \pkg{insdljs} as a convenience option.
+%    \changes{v8.7.7}{2021/05/10}{Pass \string\opt{usealtadobe} option to \string\pkg{insdljs}}
+%    \begin{macrocode}
+\DeclareOption{usealtadobe}{\PassOptionsToPackage{usealtadobe}{insdljs}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{exercisesonly}^^A
 % If the document author wants only to create a series of exercises, no quizzes, there is no
@@ -296,26 +308,26 @@
 %    \begin{macrocode}
 \DeclareOption{allowrandomize}{\AtEndOfPackage{\inputRandomizeChoices}}
 \def\inputRandomizeChoices{\InputIfFileExists{aebrandom.def}
-    {\PackageInfo{exerquiz}{inputting aebrandom.def}}
-    {cannot find aebrandom.def}}
+  {\PackageInfo{exerquiz}{inputting aebrandom.def}}
+  {cannot find aebrandom.def}}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{usesumrytbls}^^A
 %    The declare the use of summary tables
 %    \begin{macrocode}
 \newif \ifusesumrytbls \usesumrytblsfalse
 \DeclareOption{usesumrytbls}{\usesumrytblstrue
-    \def\inputSumryTblCode{\InputIfFileExists{aebsumrytbls.def}
-    {\PackageInfo{exerquiz}{inputting aebsumrytbls.def}}%
-    {cannot find aebsumrytbls.def}}}
+  \def\inputSumryTblCode{\InputIfFileExists{aebsumrytbls.def}
+  {\PackageInfo{exerquiz}{inputting aebsumrytbls.def}}%
+  {cannot find aebsumrytbls.def}}}
 \let\inputSumryTblCode\relax
 %    \end{macrocode}
 % The \IndexOpt{usemcfi}\texttt{usemcfi} option inputs special code for creating a MC/math fill-in question, a type
 % of question suggested to me by Stefka K.\ of Bulgaria.
 %    \begin{macrocode}
 \DeclareOption{usemcfi}{%
-    \def\inputMCFICode{\InputIfFileExists{usemcfi.def}
-    {\PackageInfo{exerquiz}{inputting usemcfi.def}}%
-    {cannot find usemcfi.def}}}
+  \def\inputMCFICode{\InputIfFileExists{usemcfi.def}
+  {\PackageInfo{exerquiz}{inputting usemcfi.def}}%
+  {cannot find usemcfi.def}}}
 \let\inputMCFICode\relax
 %    \end{macrocode}
 % \changes{v7.7o}{2016/07/08}{Added switch \string\cs{ifwithinMCFI}}
@@ -324,7 +336,17 @@
 %    \begin{macrocode}
 \newif\ifwithinMCFI\withinMCFIfalse
 %    \end{macrocode}
-%
+%    The \IndexOpt{userbmintrvl}\opt{userbmintrvl} option defines \cs{rbmIntrvl} command, which
+%    is a special \cs{RespBoxMath} command were some of the parameters are set by an
+%    interval. Refer to Section~\ref{ss:rbmi} for details.
+%    \changes{v8.7}{2021/04/24}{Added the option \string\opt{userbmintrvl}}
+%    \begin{macrocode}
+\DeclareOption{userbmintrvl}{%
+  \def\inputRBMICode{\InputIfFileExists{rbmintrvl.def}
+  {\PackageInfo{exerquiz}{Inputting rbmintrvl.def}}%
+  {cannot find rbmintrvl.def}}}
+\let\inputRBMICode\relax
+%    \end{macrocode}
 %    \subsection{Driver Options}
 %     The \textsf{web} package passes these driver options to \textsf{exerquiz}.
 %    These options are needed is \textsf{exerquiz} is used without
@@ -334,12 +356,12 @@
 %    \begin{macrocode}
 % \def\eq@drivernum{5} % 5 = no choice
 \DeclareOption{dvipsone}{%
-    \def\eq@drivernum{0}\def\eq@driver{dvipsone}%
-    \PassOptionsToPackage{dvipsone}{eforms}
+  \def\eq@drivernum{0}\def\eq@driver{dvipsone}
+  \PassOptionsToPackage{dvipsone}{eforms}
 }
 \DeclareOption{dvips}{%
-    \def\eq@drivernum{0}\def\eq@driver{dvips}%
-    \PassOptionsToPackage{dvips}{eforms}
+  \def\eq@drivernum{0}\def\eq@driver{dvips}
+  \PassOptionsToPackage{dvips}{eforms}
 }
 \DeclareOption{pdftex}{%
     \def\eq@drivernum{1}\def\eq@driver{pdftex}%
@@ -351,7 +373,7 @@
 %\changes{v8.1a}{2017/09/03}{Added a \string\texttt{luatex} option}
 %    \begin{macrocode}
 \DeclareOption{luatex}{%
-    \def\eq@drivernum{1}\def\eq@driver{luatex}%
+    \def\eq@drivernum{1}\def\eq@driver{luatex}
     \PassOptionsToPackage{luatex}{\eq@ColorPackage}
     \PassOptionsToPackage{luatex}{eforms}
 }
@@ -361,49 +383,51 @@
 %    environments.
 %    \begin{macrocode}
 \DeclareOption{dvipdfm}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfm}%
-    \PassOptionsToPackage{dvipdfm}{\eq@ColorPackage}%
+    \def\eq@drivernum{2}\def\eq@driver{dvipdfm}
+    \PassOptionsToPackage{dvipdfm}{\eq@ColorPackage}
     \PassOptionsToPackage{dvipdfm}{eforms}%
 }
 \DeclareOption{dvipdfmx}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}%
-    \PassOptionsToPackage{dvipdfmx}{\eq@ColorPackage}%
-    \PassOptionsToPackage{dvipdfmx}{eforms}%
+    \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}
+    \PassOptionsToPackage{dvipdfmx}{\eq@ColorPackage}
+    \PassOptionsToPackage{dvipdfmx}{eforms}
 }
 \DeclareOption{xetex}{%
-    \def\eq@drivernum{2}\def\eq@driver{xetex}%
+    \def\eq@drivernum{2}\def\eq@driver{xetex}
     \PassOptionsToPackage{xetex}{\eq@ColorPackage}
-    \PassOptionsToPackage{xetex}{eforms}%
+    \PassOptionsToPackage{xetex}{eforms}
 }
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{textures}^^A
 % This option, and testing are due to Ross Moore  3/6/02
 %    \begin{macrocode}
-\DeclareOption{textures}{\def\eq@drivernum{3}%
-  \def\eq@driver{textures}%
-  \PassOptionsToPackage{textures}{\eq@ColorPackage}%
-  \PassOptionsToPackage{textures}{eforms}%
+\DeclareOption{textures}{\def\eq@drivernum{3}
+  \def\eq@driver{textures}
+  \PassOptionsToPackage{textures}{\eq@ColorPackage}
+  \PassOptionsToPackage{textures}{eforms}
 }
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{dviwindo}^^A
 %    Set \cmd{\eq@noformstrue}, this inserts an \cmd{\endinput} just after
-%    the end of the |exercise| environment.  No quizzes for
+%    the end of the \env{exercise} environment.  No quizzes for
 %    \texttt{dviwindo}.
 %    \begin{macrocode}
-\DeclareOption{dviwindo}{\def\eq@drivernum{4}\def\eq@driver{dviwindo}%
-    \eq@noformstrue\PassOptionsToPackage{nodljs}{insdljs}}
+\DeclareOption{dviwindo}{\def\eq@drivernum{4}\def\eq@driver{dviwindo}
+  \eq@noformstrue\PassOptionsToPackage{nodljs}{insdljs}}
 %    \end{macrocode}
-% If no driver is passed to \textsf{exerquiz}, assume it is
-% dvipsone or dvips---\textsf{hyperref} defines the specials.
+% If no driver is passed to \pkg{exerquiz}, assume it is
+% dvipsone or dvips---\pkg{hyperref} defines the specials.
 % Default driver dvipsone/dvips
-% \def\eq@drivernum{5}
-% \def\eq@driver{dvipsone/dvips}
-% \def\eq@driver{no driver specified}
+%    \begin{macrocode}
+\def\eq@drivernum{5}
+\def\eq@driver{dvipsone/dvips}
+\def\eq@driver@nodriver{no driver specified}
+%    \end{macrocode}
 %    \leavevmode\IndexOpt{unicode}^^A
 % Passes the unicode option to \textsf{hyperref}.
 % \changes{v6.3}{2008/03/19}
 % {
-%   Added the \texttt{unicode} option, which is passed to hyperref.
+%   Added the \string\opt{unicode} option, which is passed to \string\pkg{hyperref}.
 % }
 %    \begin{macrocode}
 \DeclareOption{unicode}{\PassOptionsToPackage{unicode}{hyperref}}
@@ -413,7 +437,7 @@
 % the key-value pairs \textsl{\'{a} la xkeyval} can be used.
 % \changes{v6.3}{2008/03/19}
 % {
-%   Added the \texttt{useui} option, which is passed to eforms.
+%   Added the \string\opt{useui} option, which is passed to eforms.
 % }
 %    \begin{macrocode}
 \DeclareOption{useui}{\PassOptionsToPackage{useui}{eforms}}
@@ -611,7 +635,7 @@
 \@ifundefined{if@eqalignfilllinestoleft}
   {\newif\if@eqalignfilllinestoleft\@eqalignfilllinestoleftfalse}{}
 %    \end{macrocode}
-%   \changes{v6.3z}{2011/04/28}{Created a switch \cs{ifkeepdeclaredvspacing},
+%   \changes{v6.3z}{2011/04/28}{Created a switch \string\cs{ifkeepdeclaredvspacing},
 %     used primarily by \textsf{eqexam}}
 % (4/28/11) A switch to control whether the declared vertical space
 % for the \texttt{solution} environment is preserved during the \texttt{answerkey}
@@ -755,9 +779,9 @@
 % so we need to load in the AcroForm Dictionary---unless the
 % \texttt{dviwindo} (\cmd{\eq@noformstrue}) option is requested.
 %\changes{v6.3y}{2011/04/23}{%
-% As per Heiko's suggestion, I've change the \texttt{Form} environment
+% As per Heiko's suggestion, I've change the \string\env{Form} environment
 % no longer creates a grouping. This was causing problems with
-% the \textsf{atveryend} package.
+% the \string\pkg{atveryend} package.
 %}
 %    \begin{macrocode}
 \AtBeginDocument{\ifeq@noforms\else\Form\fi}
@@ -804,7 +828,7 @@
 \ProcessOptions
 %    \end{macrocode}
 % Input required packages.
-% \changes{v7.03}{2015/03/02}{Added the \texttt{array} package, mostly
+% \changes{v7.03}{2015/03/02}{Added the \string\pkg{array} package, mostly
 % for use in the tabular setup of parts in tabular mode.}
 %    \begin{macrocode}
 \RequirePackage{array}
@@ -824,7 +848,12 @@
 \RequirePackage{verbatim}
 \RequirePackage{hyperref}
 \RequirePackage{amssymb}% used for return symbols
-\RequirePackage{eforms}[2019/10/23]
+%    \end{macrocode}
+%    (2021/05/10) Newer version of \pkg{eforms} required, as this package uses
+%    \cs{dl@EForAF4}, which is defined by \pkg{insdljs} of the same date.
+%    \changes{v8.7.7}{2021/05/10}{Now require \string\pkg{eforms} dated 2021/05/10}
+%    \begin{macrocode}
+\RequirePackage{eforms}[2021/05/10]
 \dlSetPkgInfo
 %    \end{macrocode}
 %    \begin{macrocode}
@@ -839,7 +868,7 @@
 }{}
 %    \end{macrocode}
 %    \begin{macrocode}
-\edef\eq@restoreCats{% dps17
+\edef\eq@restoreCats{%
   \catcode`\noexpand\"=\the\catcode`\"\relax
   \catcode`\noexpand\'=\the\catcode`\'\relax
   \catcode`\noexpand\,=\the\catcode`\,\relax
@@ -860,7 +889,7 @@
     {\def\fleqnOn{\@fleqntrue}\def\fleqnOff{\@fleqnfalse}}
 %    \end{macrocode}
 % \changes{v7.7o}{2016/07/08}{Added Boolean \string\cs{if@inclkey} in support of the
-%    \string\textsf{eq2db} package}
+%    \string\pkg{eq2db} package}
 %    \begin{macrocode}
 \@ifundefined{if@inclkey}{\newif\if@inclkey\@inclkeytrue}{}
 %</package>
@@ -959,9 +988,9 @@
 % not change the default value.
 %\changes{v6.05g}{2007/01/28}
 %{
-% Added to commands for use in exerquiz or in \textsf{eqexam}. They are
-% \cs{renameSolnAfterTo} for conveniently changing the solution
-% after label, and \cs{resetSolnAfterToDefault} for resetting
+% Added to commands for use in exerquiz or in \string\pkg{eqexam}. They are
+% \string\cs{renameSolnAfterTo} for conveniently changing the solution
+% after label, and \string\cs{resetSolnAfterToDefault} for resetting
 % back to the default.
 %}
 %    \begin{macrocode}
@@ -1324,7 +1353,8 @@
     \ifOKToWriteExamData
       \set@display@protect
       \immediate\write\ex@solns{#1}\set@typeset@protect
-  \fi\fi}%
+  \fi\fi
+}
 \ifsolutionsonly
   \InputIfFileExists{\jobname_xdefs.cut}{%
     \typeout{^^JExerquiz|Eqexam: Reading \jobname_xdefs.cut^^J}}
@@ -1363,13 +1393,14 @@
 %   to close off the conditional. Where, \ameta{wrt-cmd} is either \cs{writeToSolnFile} (or \cs{writeToExSolns}), or
 %   \cs{writeToQzSolns}.
 %   For example,
-%\begin{verbatim}
-%   \bHideSolns\writeToSolnFile % for eqexam
-%   \begin{exam}{test}
-%   ...
-%   \end{exam}
-%   \eHideSolns\writeToSolnFile
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\bHideSolns\writeToSolnFile % for eqexam
+%\begin{exam}{test}
+%...
+%\end{exam}
+%\eHideSolns\writeToSolnFile
+%\end{Verbatim}
 %Now this exam has no footprint within the solution file.
 %    \begin{macrocode}
 \@ifundefined{ifOKToWriteExamData}{\newif\ifOKToWriteExamData
@@ -1393,8 +1424,9 @@
 %    use of \cs{count0}/\cs{count\cs{z@}}, possibly not used within a group. As a fix,
 %    replaced this usage with the counter \cs{eqtmpcnta}.
 % \changes{v8.5.7}{2020/01/01}{added public counter \string\cs{eqtmpcnta}}
-% \changes{v8.5.8}{2020/01/01}{Replaced \string\cs{count\cs{z@}} and \cs{count0} with \string\cs{eqtmpcnta},
-% this fixed the page number leakage problem}
+% \changes{v8.5.8}{2020/01/01}{Replaced \string\cs{count\string\cs{z@}} and
+% \string\cs{count0} with \string\cs{eqtmpcnta}, this fixed the page number
+% leakage problem}
 %    \begin{macrocode}
 \newcount\eqtmpcnta
 %</package|eqexam>
@@ -1445,11 +1477,12 @@
 %    (2017/01/11) Added \DescribeMacro{\numberParts}\cs{numberParts} to change how this counter is displayed
 %    as a number. The default is \DescribeMacro{\alphaParts}\cs{alphaParts} to display the \texttt{partno}
 %    counter as a letter.
-%\begin{verbatim}
-%   \renewcommand{\partnoFmt}{\arabic}
-%   \setPartsWidth{(00)}
-%   \partsformat{\makebox[\widthOfParts][c]{(\hfil\thepartno\hfil)}}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\renewcommand{\partnoFmt}{\arabic}
+%\setPartsWidth{(00)}
+%\partsformat{\makebox[\widthOfParts][c]{(\hfil\thepartno\hfil)}}
+%\end{Verbatim}
 %    With this code, the items in the \texttt{parts} environment are numbered.
 %    \changes{v7.8d}{2017/01/11}{Added \string\cs{partnoFmt} to change how this counter is displayed}
 %    \begin{macrocode}
@@ -1562,7 +1595,7 @@
 \newcommand\belowexsolnskip{\protect\medskip}
 %\let\eqafterexersolnskip\belowexsolnskip
 %    \end{macrocode}
-% \changes{v7.4}{2015/03/23}{added \cmd\removelastparskip}
+% \changes{v7.4}{2015/03/23}{added \string\cs{removelastparskip}}
 % \DescribeMacro\removelastparskip removes last \cmd\parskip, as needed.
 %    \begin{macrocode}
 \def\removelastparskip{\ifdim\parskip>0pt\vskip-\parskip\fi}
@@ -1576,8 +1609,8 @@
 % has been used
 % \changes{v6.05a}{2006/05/08}
 % {
-%   Changed \cs{nolinkcolor} into a text fill-in. Now, the command \cs{nolinkcolor}
-%   fills in \cs{@nolinkcolor}, which holds the named color.
+%   Changed \string\cs{nolinkcolor} into a text fill-in. Now, the command \string\cs{nolinkcolor}
+%   fills in \string\cs{@nolinkcolor}, which holds the named color.
 % }
 %    \begin{macrocode}
 \newcommand{\nolinkcolor}[1]{\def\@nolinkcolor{#1}}
@@ -1591,22 +1624,25 @@
 % links connect the statement of the exercise with its solution.
 %
 %\smallskip\noindent\textbf{Basic usage}
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\begin{exercise}
 %The exercise question is posed.
 %\begin{solution}
 %The solution to exercise goes here.
 %\end{solution}
 %\end{exercise}
-%\end{verbatim}
+%\end{Verbatim}
 % These environments should be nested as illustrated above.
 %
 % The \texttt{exercise} environment has three optional arguments. The syntax
 % for an exercise without parts is\dots
-%\begin{verbatim}
-%   \begin{exercise}[<ctr>][h|H] ...\end{exercise}
-%\end{verbatim}%
-%
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{exercise}[!ameta(ctr)][h|H]
+%...
+%\end{exercise}
+%\end{Verbatim}
 % (1) The value of this first optional argument, \texttt{<ctr>}, is a counter.
 % You can use the \texttt{exercise}
 % environment then to create other environments with their own
@@ -1622,11 +1658,11 @@
 %
 % The \texttt{exercise} environment has three optional arguments. The syntax
 % for an exercise with parts is\dots
-%\begin{verbatim}
-%   \begin{exercise}[<ctr>]* ...\end{exercise}
-%   \begin{exercise*}[<ctr>] ...\end{exercise*}
-%\end{verbatim}%
-%
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{exercise}[!ameta(ctr)]* ...\end{exercise}
+%\begin{exercise*}[!ameta(ctr)] ...\end{exercise*}
+%\end{Verbatim}
 % (1) The value of this first optional argument, \texttt{<ctr>}, is a counter.
 % You can use the \texttt{exercise}
 % environment then to create other environments with their own
@@ -1651,13 +1687,14 @@
 % in an external document.  The \cs{exerSolnsInExtFile} command lets you specify an external file name.
 % Just use the \textit{basename}, hyperref will add the extension.  If an external file is specified, all
 % solution links are changed to links between documents. Usage:
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\exerSolnsInExtFile{myExSonls}
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\exerSolnsInExtFile}[2][]
-    {\let\exerSolns@ExtFile\eq@YES\gdef\eq@exerSolns@fileName{#2}%
-     \gdef\exerSolns@ReturnPath{#1}}
+  {\let\exerSolns@ExtFile\eq@YES\gdef\eq@exerSolns@fileName{#2}%
+   \gdef\exerSolns@ReturnPath{#1}}
 \let\exerSolns@ExtFile\eq@NO
 \def\exerSolns@ReturnPath{}
 %</package>
@@ -1753,16 +1790,17 @@
 %    The \env{cq} environment is \cs{let} to the \env{cq@CQ} environment at the beginning of
 %    the \env{exercise} environment, \env{cq@CQ} begin the internal name of the environment.
 %    \par\medskip\noindent\textbf{Example}
-%\begin{verbatim}
-%   \begin{exercise}
-%   \begin{cq}
-%       This is the question
-%   \end{cq}
-%   \begin{solution}
-%       This is its solution
-%   \end{solution}
-%   \end{exercise}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{exercise}
+%\begin{cq}
+%!quad(This is the question)
+%\end{cq}
+%\begin{solution}
+%!quad(This is the question)
+%\end{solution}
+%\end{exercise}
+%\end{Verbatim}
 %    \begin{macrocode}
 \let\cq@star\eq@NO
 %    \end{macrocode}
@@ -1877,7 +1915,8 @@
 %    formatting after the copied question; in the default definition, we skip a \cs{medskip} and do a \cs{indent}.
 %    Trailing the string \cs{cqSStr}, the internal command defined by \cs{declCQSolnStr}, is a space and
 %    an \cs{ignorespaces}. Use \cs{writeToExSolns} to make local changes, for example,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %...
 %\end{exercise}
 % Changed the string from Solution to Answer, do this prior to the
@@ -1886,7 +1925,7 @@
 %
 %\begin{exercise*}
 %...
-%\end{verbatim}
+%\end{Verbatim}
 %Best placed between exercises.
 %    \begin{macrocode}
 \newcommand\declCQPre[1]{\def\cq@Pre{#1}}
@@ -1907,7 +1946,7 @@
 %    \end{macrocode}
 %    Inform the system that the definition of \cs{eqterminex} is changing. This to prevent
 %    writing the same line multiple times.
-%    \changes{v8.2.8}{2018/12/13}{write \cs{declareterminex} only if not solutionsafter}
+%    \changes{v8.2.8}{2018/12/13}{write \string\cs{declareterminex} only if not solutionsafter}
 %    \begin{macrocode}
     \global\terminexchangedtrue % dps cq
     \ifeq@solutionsafter\else
@@ -1924,7 +1963,7 @@
 %    \end{macrocode}
 %    \cs{restoreNormalSolns}\DescribeMacro{\restoreNormalSolns} restores \cs{eqterminex} to  its
 %    default definition. It is place between exercises.
-%    \changes{v8.2.8}{2018/12/13}{write \cs{declareterminex} only if not solutionsafter}
+%    \changes{v8.2.8}{2018/12/13}{write \string\cs{declareterminex} only if not \string\opt{solutionsafter}}
 %    \begin{macrocode}
 \newcommand\restoreNormalSolns{\ifeq@solutionsafter\else
     \writeT@ExSolns{\protect\decleqterminex{\protect
@@ -2016,7 +2055,7 @@
 %    \begin{macrocode}
 \newif\ifeq@exerciseheading \eq@exerciseheadingtrue
 %    \end{macrocode}
-% \changes{v6.7q}{2013/12/15}{Added this hook for use by \textsf{contsolns.dtx}}
+% \changes{v6.7q}{2013/12/15}{Added this hook for use by \string\textsf{contsolns.dtx}}
 % \changes{v8.5.10}{2020/03/14}{Added \string\cs{priorexlabelheader} to support \string\pkg{eqexam}}
 %    \begin{macrocode}
 \let\prior@exerSolnHeaderHook\@empty
@@ -2040,22 +2079,16 @@
 % package should be loaded after \textsf{eqexam} if the two are to be used
 % together, preferably by the \texttt{links} or \texttt{online} options of \textsf{eqexam}.
 %    \begin{macrocode}
-%\newif\iffirstitem
 \let\solnItemMngt\relax
-%\def\eqeSolnItemMngt{\iffirstitem\global\firstitemfalse
-%    \let\eqe@next\@empty\else\let\eqe@next\item\fi\eqe@next\relax}
-%\@ifpackageloaded{eqexam}{\let\solnItemMngt\eqeSolnItemMngt}
-%    {\let\solnItemMngt\relax}
 %    \end{macrocode}
 %    \end{macro}
 % \DescribeMacro{\eqEXt}These two mark the beginning and end of solution to an exercise. \cs{eqEXt} is
 % set up to have two required arguments, usually both empty. The arguments are
 % used for filtering. The first might be a number, so we can filter out even numbered
 % exercises from odd ones. The second one is a keyword, we can filter by keyword.
-%\changes{v6.7}{2013/04/07}{Changing \cs{eqEXt} so that it has two
+%\changes{v6.7}{2013/04/07}{Changing \string\cs{eqEXt} so that it has two
 %required arguments}
 %    \begin{macrocode}
-%\let\eqEXt\@gobble
 \let\eqEXt\@gobbletwo
 \let\endeqEXt\relax
 %    \end{macrocode}
@@ -2067,15 +2100,16 @@
 \let\eqFilterArg\@empty
 %    \end{macrocode}
 % The format of the solutions to exercises as they appear in the SOL file is,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\eqEXt{\eqExtArg}{\eqFilterArg}\exerSolnHeader
-%   {\exsecrunhead}{ex.1}{\textbf{Exercise\ 1.}}\relax
-%   ...
-%   <solution content>
-%   ...
+%!quad{\exsecrunhead}{ex.1}{\textbf{Exercise\ 1.}}\relax
+%!quad...
+%!quad!ameta(solution content)
+%!quad...
 %\ReturnTo{qex.1}{\hbox {$\square $}}\endeqEXt\par\medskip
-%\end{verbatim}
-% \changes{v6.7a}{2013/05/03}{Change name of \cs{eq@writeexheader} to \cs{eqExerSolnHeader}}
+%\end{Verbatim}
+% \changes{v6.7a}{2013/05/03}{Change name of \string\cs{eq@writeexheader} to \string\cs{eqExerSolnHeader}}
 %    \begin{macrocode}
 \let\eqExerSolnHeader\@empty
 %    \end{macrocode}
@@ -2084,7 +2118,7 @@
 %    \begin{macrocode}
 \let\solutionparshape\@empty
 %    \end{macrocode}
-%\changes{v7.2}{2015/03/22}{added \cs{setPrbSolnAftrIndent}}
+%\changes{v7.2}{2015/03/22}{added \string\cs{setPrbSolnAftrIndent}}
 % \DescribeMacro{\setPrbSolnAftrIndent}\cmd{\setPrbSolnAftrIndent} sets the amount of indent
 % for the statement of problem and the solution-after solution. The command saves its argument
 % in \cs{eq@pslnaindnt} (default \texttt{0pt}) and sets the hook
@@ -2094,11 +2128,11 @@
 \def\eq@pslnaindnt{0pt}
 \let\eq@setPrbSolnAftrIndnt\relax
 \newcommand{\setPrbSolnAftrIndent}[1]{\ifdim#1=0pt
-    \def\eq@pslnaindnt{0pt}\let\eq@setPrbSolnAftrIndnt\relax\else
-    \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{\expandafter
-    \noexpand\expandafter\parindent#1\noexpand\relax}\fi}
+  \def\eq@pslnaindnt{0pt}\let\eq@setPrbSolnAftrIndnt\relax\else
+  \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{\expandafter
+  \noexpand\expandafter\parindent#1\noexpand\relax}\fi}
 %    \end{macrocode}
-%\changes{v7.2}{2015/03/22}{added \cs{restorejustify}}
+%\changes{v7.2}{2015/03/22}{added \string\cs{restorejustify}}
 %The command \DescribeMacro\restorejustify\cmd{\restorejustify} is designed
 %for use in the \texttt{solution} environment of an \cs{item} within the
 %\texttt{parts} environment in \texttt{tabular} mode. By default,
@@ -2183,7 +2217,7 @@
 \def\eqterminexDEF{\relax\ignorespaces}
 \decleqterminex{\eqterminexDEF}
 %    \end{macrocode}
-%\changes{v6.7}{2013/04/07}{Inserted another argument into \cs{eqEXt}}
+%\changes{v6.7}{2013/04/07}{Inserted another argument into \string\cs{eqEXt}}
 % (2013/04/07) Added another argument into \cs{eqEXt}, used for filtering.\par\medskip
 %    \noindent
 %    (2018/02/13) When solutions are written to the SOL file, they are not normally in a group.
@@ -2210,7 +2244,7 @@
   \immediate\write\verbatim@out{\eqExerSolnHeaderSngl}%
   \set@typeset@protect\fi\fi}
 %    \end{macrocode}
-%\changes{v6.7}{2013/04/07}{Inserted another argument into \cs{eqEXt}}
+%\changes{v6.7}{2013/04/07}{Inserted another argument into \string\cs{eqEXt}}
 % Added another argument into \cs{eqEXt}, used for filtering.
 %    \begin{macrocode}
 \def\eqExerSolnHeaderList{%
@@ -2248,7 +2282,7 @@
 %    \cs{noSolnOpt} turns off the check for the option argument
 %    of the \texttt{solution} environment for the \texttt{exercise}
 %    environment. Designed for use with \textsf{eqexam}.
-% \changes{v6.4v}{2012/07/27}{Added \cs{ckSolnOpt} and \cs{noSolnOpt}
+% \changes{v6.4v}{2012/07/27}{Added \string\cs{ckSolnOpt} and \string\cs{noSolnOpt}
 % to switch on and off checking for the optional vertical space in the
 % \texttt{solution} environment.}
 %    \begin{macrocode}
@@ -2339,7 +2373,7 @@
       }\expandafter\leavevspace
   \fi}
 %    \end{macrocode}
-% \changes{v6.8g}{2014/04/08}{Added key-val here for \textsf{eqexam}.}
+% \changes{v6.8g}{2014/04/08}{Added key-val here for \string\pkg{eqexam}.}
 % New option for the \texttt{solution} environment, \IndexKey{nLines}\texttt{nLines}.
 %    \begin{macrocode}
 \define@key{soln@keys}{nLines}[]{\def\soln@keys@nLines{#1}}
@@ -2383,7 +2417,7 @@
         \restoreNormalSolns\fi\fi % dps cq
     \global\cqIsActivefalse
 %    \end{macrocode}
-% \changes{v6.3z}{2011/04/28}{Added definition of \cs{sameVspace} for the cases
+% \changes{v6.3z}{2011/04/28}{Added definition of \string\cs{sameVspace} for the cases
 % where there is no vertical space specified.}
 %    Is the argument \cs{null}? If yes, same as \texttt{0pt}.
 %    \begin{macrocode}
@@ -2391,7 +2425,7 @@
     \ifx\eq@argi\@empty\gdef\sameVspace{0pt}\else
         \ifx\eq@argi\eq@null\gdef\sameVspace{0pt}\else
 %    \end{macrocode}
-% \changes{v6.8g}{2014/04/08}{Added key-val here for \textsf{eqexam}.}
+% \changes{v6.8g}{2014/04/08}{Added key-val here for \string\pkg{eqexam}.}
 % Now, if the optional argument is non-null, we must discern the argument:
 % is it a vertical space or a key-value?
 %    \begin{macrocode}
@@ -2456,8 +2490,8 @@
 }
 %    \end{macrocode}
 %\changes{v6.4b}{2011/06/30}{%
-% Save the definitions of \cs{comment} and \cs{endcomment}. For some reason,
-% yet to be determined, there are problems when using the \texttt{fortextbook}
+% Save the definitions of \string\cs{comment} and \string\cs{endcomment}. For some reason,
+% yet to be determined, there are problems when using the \string\opt{fortextbook}
 % option when hiding solutions.
 %}
 %\changes{v8.2.9}{2019/02/11}{\string\cs{eqSavedComment}\string\cs{dlcomment}, \string\cs{dlcomment}\space
@@ -2466,7 +2500,7 @@
 \let\eqSavedComment\dlcomment
 \let\endeqSavedComment\enddlcomment
 %    \end{macrocode}
-%\changes{v7.4}{2015/03/23}{added \cs{setTabulrSolnEnv}}
+%\changes{v7.4}{2015/03/23}{added \string\cs{setTabulrSolnEnv}}
 %    \begin{macrocode}
 \def\setTabulrSolnEnv{%
     \@ifundefined{@listii@SAVE}{\global\let\@listii@SAVE\@listii}{}%
@@ -2663,7 +2697,7 @@
 %    the \texttt{flextended} option from \textsf{eqexam}. See the placement
 %    of this command below its default definition of \cs{relax}.
 %    \changes{v8.1i}{2018/01/20}{Added \string\cs{kdvsp@Restore} to support
-%    the \texttt{flextended} option from \string\textsf{eqexam}}
+%    the \string\opt{flextended} option from \string\pkg{eqexam}}
 %    \begin{macrocode}
 \let\kdvsp@Restore\relax
 \def\eq@clearMrkCpy{\if@targetforextr
@@ -2698,7 +2732,7 @@
 % to preserve the vertical space declared by the \textsf{solution} environment when
 % \cs{ifeq@solutionsafter} is true.
 % \changes{v6.3z}{2011/04/28}{if \string\cs{ifkeepdeclaredvspacing} is true, we attempt
-% to preserve the vertical space declared by the \textsf{solution} environment when
+% to preserve the vertical space declared by the \string\env{solution} environment when
 % \string\cs{ifeq@solutionsafter} is true.}
 %    \begin{macrocode}
       \ifx\minVspacet@bs\@empty
@@ -2710,10 +2744,10 @@
           \@tempdima\pagetotal
           \advance\@tempdima-\eq@startSoln
 %    \end{macrocode}
-% \changes{v6.4w}{2012/26/27}{Added \cs{relax} following the assignment.}
+% \changes{v6.4w}{2012/26/27}{Added \string\cs{relax} following the assignment.}
 % {\TeX} was looking ahead looking for the rest of the dimension, this caused
 % problems because later code was expanded when it should not have been. Inserted
-% \cs{relax}, \verb~\@tempdimb\sameVspace\relax~.
+% \cs{relax}, |\@tempdimb\sameVspace\relax|.
 %    \begin{macrocode}
           \@tempdimb\sameVspace\relax
 %    \end{macrocode}
@@ -2767,8 +2801,8 @@
 % \cs{endexercise}.
 %\changes{v6.07}{2007/05/05}
 %{
-%   Created the \texttt{exercise*} environment, this is equivalent to the \texttt{*} option of the
-%   \texttt{exercise} environment. You can use either version, but now, \texttt{exercise*} is preferred.
+%   Created the \string\texttt{exercise*} environment, this is equivalent to the \string\texttt{*} option of the
+%   \string\env{exercise} environment. You can use either version, but now, \string\env{exercise*} is preferred.
 %}
 %    \begin{macrocode}
 \let\eq@exerstarEnv\relax
@@ -2847,8 +2881,8 @@
 %    \begin{macro}{\setPartsWidth}
 % Convenience macro to set \cs{part@indent}.
 %\changes{v6.4h}{2011/07/28}{%
-%   Added \cs{setPartsWidth} to set \cs{part@indent}. Also
-%   defined \cs{eqe@prtsepPrb}.
+%   Added \string\cs{setPartsWidth} to set \string\cs{part@indent}. Also
+%   defined \string\cs{eqe@prtsepPrb}.
 %}
 %    \begin{macrocode}
 \newcommand{\setPartsWidth}[1]{\def\parts@indent{\normalfont#1}%
@@ -3042,11 +3076,11 @@
 % Now for the tabular style of multi-part exercise, the argument
 % \#1 is the number of columns requested.\medskip
 %
-%    \noindent(2017/02/09) Added \pkg{xkeyval} to optional argument of \texttt{parts}. Syntax is now
+%    \noindent(2017/02/09) Added \pkg{xkeyval} to optional argument of \env{parts}. Syntax is now
 %\begin{verbatim}
 %    \begin{parts}[<num>|nCols=<num>,minVspace=<length>]
 %\end{verbatim}
-%    \changes{v7.8e}{2017/02/09}{Added xkeyval to optional argument of \string\texttt{parts}}
+%    \changes{v7.8e}{2017/02/09}{Added xkeyval to optional argument of \string\env{parts}}
 %    \begin{macrocode}
 \define@key{tabp@rts}{nCols}{\def\exerwparts@cols{#1}}
 \define@key{tabp@rts}{minVspace}{\def\minVspacet@bs{#1}}
@@ -3217,9 +3251,9 @@
     \noindent\normalbaselines\kern0pt
     \prior@parts@hook\abovepartshook
 %    \end{macrocode}
-%\changes{v7.03}{2015/03/02}{Added \texttt{>\{\cs{strut}\}}, this gives
+%\changes{v7.03}{2015/03/02}{Added \string\texttt{\string\GT{\string\cs{strut}}}, this gives
 % better control over vertical spacing.}%
-% \changes{v7.4}{2015/03/23}{inserted \cmd\setTabulrSolnEnv}%
+% \changes{v7.4}{2015/03/23}{inserted \string\cs{setTabulrSolnEnv}}%
 %    \begin{macrocode}
     \tablrIndent\tabular[t]{@{}*{\exerwparts@cols}{>{\setTabulrSolnEnv
         \parskip\eqeques@parsep\relax
@@ -3229,7 +3263,7 @@
     \global\let\@listii@SAVE\relax}%
     \post@parts@hook\belowpartshook
 %    \end{macrocode}
-% \changes{v7.4}{2015/03/23}{added an adjustment to the command \cs{endexercise@parts@tabular}}
+% \changes{v7.4}{2015/03/23}{added an adjustment to the command \string\cs{endexercise@parts@tabular}}
 % A vertical space adjustment\par\medskip\noindent
 % (201/05/09) There is a problem of communicating the totals through
 % the \cs{mark} command (use in \textsf{eqexam}). In \textsf{eqexam}
@@ -3308,9 +3342,9 @@
   {\let\save@@xtabularcr\@xarraycr}
   {\let\save@@xtabularcr\@xtabularcr}}
 %    \end{macrocode}
-%\changes{v7.0}{2014/11/05}{Added \cs{tabControlOn} and \cs{tabControlOff}.
+%\changes{v7.0}{2014/11/05}{Added \string\cs{tabControlOn} and \string\cs{tabControlOff}.
 % Tab control is interfering with regular tabular environments, or anywhere
-% \texttt{d} is used.}
+% \string\texttt{d} is used.}
 %    \begin{macrocode}
 \def\tabControlOff{\@ifundefined{@xtabularcr}
   {\let\@xarraycr\save@@xtabularcr}
@@ -3355,7 +3389,7 @@
 % to \cs{setkeys}; therefore you can pass a command of key-value options through
 % the optional argument:
 % |\def\myOpts{topsep=0pt}|, |\begin{exEnumerate}[\myOpts]|.
-% \changes{v8.2.6}{2018/12/03}{Inserted \string\cs{eqprior} prior to exEnumerate env}
+% \changes{v8.2.6}{2018/12/03}{Inserted \string\cs{eqprior} prior to \string\env{exEnumerate} env}
 % The \cs{eqprior} command normally does nothing unless it is redefined.
 %    \begin{macrocode}
 \newenvironment{exEnumerate}[1][]{\everypar{}%
@@ -3545,7 +3579,7 @@
   \fi
 }
 %    \end{macrocode}
-%\changes{v6.4q}{2012/03/23}{define \cs{eq@defaultlheader}}
+%\changes{v6.4q}{2012/03/23}{define \string\cs{eq@defaultlheader}}
 % Determine whether \textsf{web} package is loaded, and define \cs{eq@normallheader}
 % and \cs{eq@defaultlheader}. These are designed to fix a problem of disappearing
 % headers in the solutions section of the document.
@@ -3583,7 +3617,7 @@
 %    \end{macrocode}
 % If there are solutions and this is not the \texttt{solutionsonly} option,
 % we start a new page, clear the right mark and start a normal header.
-% \changes{v6.4q}{2012/03/23}{Inserted \cs{eq@normalheader} after \cs{newpage}
+% \changes{v6.4q}{2012/03/23}{Inserted \string\cs{eq@normalheader} after \string\cs{newpage}
 % to get running headers to appear on each page of solutions}%
 % Inserted |\markright{}| and \cs{eq@normalheader} to fix a problem with
 % disappearing running headers.
@@ -3673,7 +3707,7 @@
 %
 %\changes{v6.2a}{2007/11/10 }
 %{
-%   Added \cs{expdfbookmark} to bookmark exercises.
+%   Added \string\cs{expdfbookmark} to bookmark exercises.
 %}
 % We have to increase the \texttt{tocdepth} so hyperref will create the bookmark at the
 % subsection level.
@@ -3745,7 +3779,7 @@
 % Here, we include a few commands common to both
 % quiz environments.
 %\medskip\par\noindent
-% Colors used by \textsf{exerquiz}: \texttt{webgreen} normally defined in \textsf{web}.
+% Colors used by \pkg{exerquiz}: \texttt{webgreen} normally defined in \pkg{web}.
 %    \begin{macrocode}
 \definecolor{webgreen}{rgb}{0,.6,0}
 %    \end{macrocode}
@@ -3755,20 +3789,20 @@
 % \changes{v6.05b}{2006/05/12}
 % {
 % added a command to change the color of the proofing symbol
-% changed the definition of \cs{proofingsymbol} to a text fillin. This creates the command
-% \cs{@proofingsymbol}. Can now control the symbol and the color (through \cs{proofingsymbolColor}
+% changed the definition of \string\cs{proofingsymbol} to a text fillin. This creates the command
+% \string\cs{@proofingsymbol}. Can now control the symbol and the color (through \string\cs{proofingsymbolColor}
 % }
 %    \begin{macrocode}
 \newcommand{\proofingsymbolColor}[1]{\def\@proofingsymbolColor{#1}}
 \proofingsymbolColor{red}
-\let\@proofsymbolredefined=0
-\newcommand{\proofingsymbol}[1]{\let\@proofsymbolredefined=1%
-    \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
+\let\@proofsymbolredefined\eq@Zero
+\newcommand{\proofingsymbol}[1]{\let\@proofsymbolredefined\eq@One
+  \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
 \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{\ding{52}}}
-\def\setproofingsymbol{%
-    \if\@proofsymbolredefined1\else
-    \@ifpackageloaded{pifont}{\proofingsymbol{\ding{52}}}
-    {\proofingsymbol{$\bullet$}}\fi}
+\def\setproofingsymbol{\ifx\@proofsymbolredefined\eq@One\else
+  \@ifpackageloaded{pifont}{\proofingsymbol{\ding{52}}}
+  {\proofingsymbol{$\bullet$}}\fi
+}
 \AtBeginDocument{\setproofingsymbol}
 %    \end{macrocode}
 %    \end{macro}
@@ -3794,22 +3828,22 @@
 \newcommand{\quesNumColor}[1]{\def\eq@quesNumCol{#1}}
 \quesNumColor{blue}
 \renewcommand{\theeqquestionnoi}{\arabic{eqquestionnoi}}
-\newcommand{\labeleqquestionnoi}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoi.}
+\newcommand{\labeleqquestionnoi}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoi.}
 \renewcommand\theeqquestionnoii{(\alph{eqquestionnoii})}
-\newcommand{\labeleqquestionnoii}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoii}
+\newcommand{\labeleqquestionnoii}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoii}
 \renewcommand\theeqquestionnoiii{(\roman{eqquestionnoiii})}
-\newcommand{\labeleqquestionnoiii}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoiii}
+\newcommand{\labeleqquestionnoiii}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoiii}
 %    \end{macrocode}
 % \paragraph*{Properties of the questions environment.} (2013/07/10) These include
 % \IndexKey{labelwidthTo}\texttt{labelwidthTo} and
 % \IndexKey{labelwidth}\texttt{labelwidth}.
 %    \begin{macrocode}
 \define@key{props@ques}{labelwidthTo}%
-    [\normalsize\normalfont\bfseries00.]%
-    {\def\propQ@labelwidthTo{#1}}
+  [\normalsize\normalfont\bfseries00.]%
+  {\def\propQ@labelwidthTo{#1}}
 \define@key{props@ques}{labelwidth}[]{\def\propQ@labelwidth{#1}}
 \let\propQ@labelwidth\@empty
 %    \end{macrocode}
@@ -3854,17 +3888,20 @@
   \insE@rlyAtQues\gdef\eqPTs{1}%
   \global\let\eqQT\eq@na%
 %    \end{macrocode}
-% (06/06/10) We create a macro \cs{@currentQues} that holds the current
-% problem number 2(a)(i), for example.
+% (06/06/10) We create a macro, \cs{@currentQues}, that holds the current
+% problem number; 2(a)(i), for example.
+% \changes{v8.6.7}{2021/04/12}{Remove the misplaced \string\cs{endcsname}
+% \string\cs{@thispr@b}, within the \string\env{questions} environment.}
 %    \begin{macrocode}
-  {\@tempcnta=0 \let\@thispr@b\@empty
+  {\@tempcnta\z@\let\@thispr@b\@empty
    \@whilenum\@tempcnta<\@eqquestiondepth\do{\advance\@tempcnta\@ne
-   \ifx\@thispr@b\@empty\edef\@thispr@b{%
-   \csname theeqquestionno\romannumeral\the\@tempcnta\endcsname}\else
-   \edef\@thispr@b{\@thispr@b%
-   \csname theeqquestionno\romannumeral\the\@tempcnta\endcsname}\fi
+   \ifx\@thispr@b\@empty\edef\@thispr@b{\@nameuse
+      {theeqquestionno\romannumeral\the\@tempcnta}}\else
+   \edef\@thispr@b{\@thispr@b\@nameuse
+    {theeqquestionno\romannumeral\the\@tempcnta}}\fi
   }\xdef\@currentQues{\@thispr@b}}%
-  \makebox[\labelwidth][r]{\normalfont\@nameuse{label\@quesctr}}%
+  \makebox[\labelwidth][r]{\normalfont
+    \@nameuse{label\@quesctr}}% format label
   \xdef\eq@pageThisQ{\the\c@page}%
   \post@questionsHook}{\usecounter{\@quesctr}%
 %    \end{macrocode}
@@ -3918,9 +3955,10 @@
 % the \texttt{shortquiz}
 %\par\medskip\noindent
 % After all the parsing is done, the parameters for this environment are
-%\begin{verbatim}
-% \begin{shortquiz}*[<basename>]
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{shortquiz}*[!ameta(basename)]
+%\end{Verbatim}
 %The `\texttt{*}' is optional and signals that forms should be used instead
 %of links. This option is regressed. The user should use the \texttt{shortquiz*}
 % environment. The \verb![<basename>]! is the basename of any form fields
@@ -3936,7 +3974,7 @@
 \abovesqskip{\par\medskip}
 %    \end{macrocode}
 %\changes{v6.4a}{2011/05/11}{%
-% Added \cs{sq@afterhook} for use by \textsf{eqexam}, but may be useful elsewhere.
+% Added \string\cs{sq@afterhook} for use by \string\pkg{eqexam}, but may be useful elsewhere.
 %}
 %\DescribeMacro\endsqhook\cmd\endsqhook is a late hook
 %    \begin{macrocode}
@@ -3949,8 +3987,7 @@
 %    \begin{macrocode}
 \let\sqhspace\space
 \let\ListOfSQuizNames\@empty
-\newenvironment{shortquiz}
-{%
+\newenvironment{shortquiz}{\def\eqPTs{1}%
 %    \end{macrocode}
 % (06/08/10) The next two lines initialize the macros for registering the
 % question label, i.e., \texttt{2(a)(ii)}. These two lines are repeated for
@@ -3970,15 +4007,15 @@
 % The \texttt{shortquiz*} is a short quiz that uses forms.
 %\par\medskip\noindent
 % The parameter for this environment is
-%\begin{verbatim}
-% \begin{shortquiz}[<basename>]
-%\end{verbatim}
-% The \verb![<basename>]! is the basename of any form fields
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{shortquiz}[!ameta(basename)]
+%\end{Verbatim}
+% The \texttt{[\ameta{basename}]} is the basename of any form fields
 % generated. If not present, an base fieldname is generated based on the
 % \cs{@shortquizCnt} macro (not a counter). The actual name is given in \cs{@sqGenBaseName}.
 %    \begin{macrocode}
-\newenvironment{shortquiz*}
-{%
+\newenvironment{shortquiz*}{%
   \xdef\eq@pageThisQ{\the\c@page}%
   {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
     \xdef\@shortquizCnt{\the\eqtmpcnta}}%
@@ -4016,6 +4053,7 @@
     \AA{\AAFormat{%
       if\eqSP(typeof\eqSP\oField=="undefined")\eqSP
         var\eqSP\oField=new\eqSP Object;\r
+      \oField.sqTlyTotCnt=0;\r
       \oField.Grp={};%
       \ifx\defaultColorJSLoc\@empty\else\r
       \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
@@ -4181,8 +4219,8 @@ if (typeof !oField=="undefined")
 %                                  \end{answers}
 %                                  \end{shortquiz}
 %\end{verbatim}
-% To further complicate matters, the \texttt{shortquiz} can be
-% used with the \texttt{questions} environment to create a series of
+% To further complicate matters, the \env{shortquiz} can be
+% used with the \env{questions} environment to create a series of
 % numbered short question quizzes. See the manual for examples.
 % \texttt{solution} environment is defined next.
 %    \begin{macro}{solution}
@@ -4194,8 +4232,8 @@ if (typeof !oField=="undefined")
 % option. In this case, solutions are separated by a
 % \cmd{\medskip} rather then put on a separate page.  It also
 % obeys the \texttt{solutionsafter} option
-% \changes{v6.4s}{2012/06/03}{Added hooks \cmd{\sqPostHeaderHook} and
-% \cmd{\qPostHeaderHook}}
+% \changes{v6.4s}{2012/06/03}{Added hooks \string\cs{sqPostHeaderHook} and
+% \string\cs{qPostHeaderHook}}
 %\par\medskip\noindent
 % Hooks \DescribeMacro\sqPostHeaderHook\cmd{\sqPostHeaderHook},
 % \DescribeMacro\qzPriorSolutionAfterHook\cmd\qzPriorSolutionAfterHook,
@@ -4266,20 +4304,19 @@ if (typeof !oField=="undefined")
     \expandafter\verbatimwrite\fi
 }
 \let\qzSolutionsAfterHook\@empty
-\def\endsolution@sq
-{%
-    \ifeq@solutionsafter
-        \eq@fititin{\mbox{\sqslrtnlabel}}\par\qzSolutionsAfterHook
-        \aftergroup\ignorespaces
-    \else
-        \endverbatimwrite
-        \eq@clearMrkCpy
-        \ifx\@qzsolndest\@empty\else\set@display@protect
-            \immediate\write\verbatim@out{\eqSqSolnTrailer}%
-         \set@typeset@protect
-        \fi
+\def\endsolution@sq{%
+  \ifeq@solutionsafter
+    \eq@fititin{\mbox{\sqslrtnlabel}}\par\qzSolutionsAfterHook
+    \aftergroup\ignorespaces
+  \else
+    \endverbatimwrite
+    \eq@clearMrkCpy
+    \ifx\@qzsolndest\@empty\else\set@display@protect
+      \immediate\write\verbatim@out{\eqSqSolnTrailer}%
+     \set@typeset@protect
     \fi
-    \global\let\@qzsolndest\@empty
+  \fi
+  \global\let\@qzsolndest\@empty
 }
 %</package|eqexam>
 %<*package>
@@ -4288,9 +4325,9 @@ if (typeof !oField=="undefined")
 % a new page. The argument is a vertical skip. If there is \texttt{\#1}
 % or more space remaining on the page, the command does nothing, otherwise
 % it issues a \cs{newpage}.
-% \changes{v6.4s}{2012/06/03}{Added \cs{promoteNewPageHere}}
+% \changes{v6.4s}{2012/06/03}{Added \string\cs{promoteNewPageHere}}
 % \changes{v6.8a}{2014/01/01}{Made an optional argument, but test for required argument as swell.}
-% \changes{v8.5.6}{2020/01/01}{\string\promoteNewPageHere: added condition, first arg must be greater
+% \changes{v8.5.6}{2020/01/01}{\string\cs{promoteNewPageHere}: added condition, first arg must be greater
 % then 0pt; otherwise, do nothing}
 %    \begin{macrocode}
 \newcommand\pnphDflt{.1\textheight}
@@ -4313,9 +4350,9 @@ if (typeof !oField=="undefined")
 % re-emitting it later, just prior to the solution. Useful for grouped questions.
 %    \begin{macrocode}
 \newcommand{\saveDest}[1][]{%
-    \def\sd@arg{#1}\ifx\sd@arg\@empty
-    \xdef\holdDest{\@qzsolndest}\else
-    \xdef\@qzsolndest{#1}\xdef\holdDest{#1}\fi}
+  \def\sd@arg{#1}\ifx\sd@arg\@empty
+  \xdef\holdDest{\@qzsolndest}\else
+  \xdef\@qzsolndest{#1}\xdef\holdDest{#1}\fi}
 \def\useDest{\def\@qzsolndest{\holdDest}}
 \let\holdDest\@empty
 %</package>
@@ -4324,17 +4361,17 @@ if (typeof !oField=="undefined")
 \let\eqSqSolnTrailerHook\@empty
 \let\eqQzSolnTrailerHook\@empty
 \newcommand\eqSqSolnTrailer{%
-    \if\eqQuizType\isQZ
-        \eqQzSolnTrailerHook
-        \protect\ReturnTo{page.\eq@pageThisQ}%
-            {\protect\mbox{\sqslrtnlabel}}\string\endeqQt
-    \else
-        \eqSqSolnTrailerHook
-        \protect\ReturnTo{page.\eq@pageThisQ}%
-            {\protect\mbox{\sqslrtnlabel}}\string\endeqSQt%
-    \fi
-    \ifeqforpaper\protect\fpAfterSolutionsSkip\fi^^J%
-    \ifmakeQzSlLocal\protect\endgroup^^J\fi
+  \if\eqQuizType\isQZ
+    \eqQzSolnTrailerHook
+    \protect\ReturnTo{page.\eq@pageThisQ}%
+      {\protect\mbox{\sqslrtnlabel}}\string\endeqQt
+  \else
+    \eqSqSolnTrailerHook
+    \protect\ReturnTo{page.\eq@pageThisQ}%
+      {\protect\mbox{\sqslrtnlabel}}\string\endeqSQt%
+  \fi
+  \ifeqforpaper\protect\fpAfterSolutionsSkip\fi^^J%
+  \ifmakeQzSlLocal\protect\endgroup^^J\fi
 }
 %</package|eqexam>
 %<*package>
@@ -4346,8 +4383,9 @@ if (typeof !oField=="undefined")
 %    \begin{macro}{\endeqSQt}
 % The \cmd{\eqQt} and \cmd{\eqSQt} are markers at the beginning of each
 % quiz (short quiz, respectively) solution. These markers, along with
-% ``end'' versions, \cmd{\endeqQt} and \cmd{\endeqSQt}, respectively, can be used to filter out the quiz solutions or the
-% short quiz solutions. The following example removes all short quizzes.
+% ``end'' versions, \cmd{\endeqQt} and \cmd{\endeqSQt}, respectively,
+% can be used to filter out the quiz solutions or the
+% short-quiz solutions. The following example removes all short quizzes.
 %\begin{verbatim}
 %\long\def\eqSQt#1\endeqSQt{}
 %\begin{document}
@@ -4370,13 +4408,13 @@ if (typeof !oField=="undefined")
 %    \begin{macro}{\quizSolnHeader}
 %  Each solution begins with \cmd{\quizSolnHeader}. This can be redefined
 %  for whatever reason. It takes three arguments, one of which is optional.
-%  \#1 is the \cmd{\noPeek} parameters; \#2 is the named destination to this
-%  solution; \#3 is the \cmd{\sqsllabel}.
+%  \texttt{\#1} is the \cmd{\noPeek} parameters; \texttt{\#2} is the named destination to this
+%  solution; \texttt{\#3} is the \cmd{\sqsllabel}.
 %
 % If you want to typeset solutions separately, you can redefine
 % \cmd{\quizSolnHeader} as desired, and used in conjunction with
 % \cmd{eqQt}.
-% \changes{v6.7q}{2013/12/15}{Added this hook for use by \textsf{contsolns.dtx}}
+% \changes{v6.7q}{2013/12/15}{Added this hook for use by \string\textsf{contsolns.dtx}}
 %    \begin{macrocode}
 \let\prior@quizSolnHeaderHook\@empty
 \newcommand\quizSolnHeader[3][]{%
@@ -4480,14 +4518,12 @@ if (typeof !oField=="undefined")
 %    \end{macrocode}
 % \DescribeMacro{\quizSolnsHeadnToc} sets up the quiz solution title.
 %    \begin{macrocode}
-\def\quizSolnsHeadnToc
-{%
+\def\quizSolnsHeadnToc{%
   \edef\eq@mkCmd{\expandafter\noexpand
     \csname\eq@QzSolnsLevel\endcsname\eq@QzSolnsStar}%
   \eq@mkCmd{\sqslsectitle}\if!\eq@QzSolnsLabel!\else
   \label{\eq@QzSolnsLabel}\fi
   \if\eq@QzSolnsStar*%
-%   \addtocontents{toc}{\protect\def\protect\web@finalDot{}}
     \addcontentsline{toc}{\eq@QzSolnsLevel}{%
       \@ifundefined{web@latextoc}{}{%
         \ifx\web@latextoc\eq@YES\else
@@ -4502,8 +4538,7 @@ if (typeof !oField=="undefined")
 % \changes{v8.2.6}{2018/12/03}{Placed \string\cs{endinput} at the end of
 % the quiz solutions file}
 %    \begin{macrocode}
-\newcommand{\quizSolnInput}
-{%
+\newcommand{\quizSolnInput}{%
   \global\let\webnewpage\relax
   \bgroup\OKToWriteExamDatatrue
   \writeT@QzSolns{\string\endinput}\egroup
@@ -4638,24 +4673,27 @@ if (typeof !oField=="undefined")
 % The \texttt{quiz} environment takes an optional `\texttt*'
 % and one required argument.  There are two styles of quizzes:
 % links or checkboxes. Beginning with v6.08, the use of the \texttt*-option
-% is discouraged, use the quiz* environment instead.
-%\begin{verbatim}
-%\begin{quiz}[*]{<base_name>}
+% is discouraged, use the \env{quiz*} environment instead.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\begin{quiz}[*]{!ameta(base-name)}
 % ...
 %\end{quiz}
-%\end{verbatim}
+%\end{Verbatim}
+%Brief description of parameters:
 % \begin{itemize}
-% \item optional \texttt{*} $=$ use checkboxes, otherwise use links
-% \item \texttt{<base\_name>}: required argument $=$ base name of quiz.
+% \item optional \texttt{*} means to use checkboxes, otherwise use links;
+% \item \texttt{\ameta{base-name}}: required argument is the base name of quiz.
 % \end{itemize}
-%
-% Note that I set \verb!\tabcolsep=0pt! in preparation for a tabular environment.
+% Note that I set \cs{tabcolsep=0pt} in preparation for a tabular environment.
 % If authors wants to use a tabular environment within a question, he/she must
-% reset this value to its default, \verb!\setlength{\tabcolsep}{6pt}!.
+% reset this value to its default, |\setlength{\tabcolsep}{6pt}|.
 %    \begin{macrocode}
-\newenvironment{quiz}
-{\goodbreak\@ifstar{\gdef\qstar{*}\@quiz*f}{\gdef\qstar{x}\@quiz*l}}
-    {\aeb@endquiz}
+\newenvironment{quiz}{\goodbreak
+  \@ifstar
+    {\gdef\qstar{*}\@quiz*f}
+    {\gdef\qstar{x}\@quiz*l}%
+}{\aeb@endquiz}
 \def\@quizCnt{0}
 %    \end{macrocode}
 %     \cs{ListOfQuizNames} and \cs{ListOfSQuizNames} are master lists of all
@@ -4702,9 +4740,9 @@ if (typeof !oField=="undefined")
   \gdef\eqPTs{1}\global\let\eqQT\eq@na
 %    \end{macrocode}
 % \changes{v6.3u}{2010/11/04}{%
-%    Added \cs{xdef}\cs{oField}\texttt{\{\#2\}}, this is
-%    needed for \textsf{apb.dtx}}
-%    Add \cs{listOfQuizNames} to track quizzes
+%    Added \string\cs{xdef}\string\cs{oField}\string\darg{\#2}, this is
+%    needed for \string\textsf{apb.dtx}}
+%    Add \string\cs{listOfQuizNames} to track quizzes
 %    \changes{v7.8k}{2017/07/25}{Added \string\cs{listOfQuizNames} to track quizzes}
 %    \begin{macrocode}
   \g@addto@macro\ListOfQuizNames{,#2}%
@@ -4996,7 +5034,7 @@ else {
 %    \begin{macrocode}
     DisplayQuizResults("*curr@quiz",*theeqpointvalue,%
 *thequestionno,bDisplaySilent);
-    bDisplaySilent=false; 
+    bDisplaySilent=false;
     var h=this.getField("ScoreData.*curr@quiz");
     h.value=Score+";"+NQuestions+";"%
 +ptScore+";"+NPointTotal;%
@@ -5105,7 +5143,7 @@ if (isEndQuizPushed("@eqBaseName")){
   \fi
 }
 %    \end{macrocode}
-% \changes{v6.7n}{2013/09/17}{\cs{CorrButton} is now an alias for \cs{eqButton}}
+% \changes{v6.7n}{2013/09/17}{\string\cs{CorrButton} is now an alias for \string\cs{eqButton}}
 % \DescribeMacro{\CorrButton} is a name better suited for the task of this button
 % than the \cs{eqButton} name.
 %    \begin{macrocode}
@@ -5359,8 +5397,8 @@ if (isEndQuizPushed("@eqBaseName")){
 % \changes{v6.05c}{2006/05/19}
 % {
 %   Added a convenience macro for setting the name of the quiz. This command defines the
-%   text macro \cs{currQuiz} which contains the quiz name. Can be used in conjunction
-%   with \cs{floatQuiz} and \cs{startQuizHere}.
+%   text macro \string\cs{currQuiz} which contains the quiz name. Can be used in conjunction
+%   with \string\cs{floatQuiz} and \string\cs{startQuizHere}.
 % }
 % \changes{v8.1k}{2018/02/04}{Added \string\cs{oField} to list in \string\cs{DeclareQuiz}}
 %    \begin{macrocode}
@@ -5378,12 +5416,12 @@ if (isEndQuizPushed("@eqBaseName")){
 % \texttt{quiz} environment.
 % \changes{v6.05c}{2006/05/19}
 % {
-%   Added \cs{floatQuiz}, \cs{dockQuiz} and \cs{startQuizHere} to start a quiz in an
+%   Added \string\cs{floatQuiz}, \string\cs{dockQuiz} and \string\cs{startQuizHere} to start a quiz in an
 %   arbitrary place prior to the beginning of the quiz.
 % }
 %\par\medskip\noindent Usage:
 %\begin{verbatim}
-%\Quiz{myQuiz}
+%\DeclareQuiz{myQuiz}
 %\floatQuiz
 %........
 %\begin{center}
@@ -5512,8 +5550,8 @@ if (isEndQuizPushed("@eqBaseName")){
 %quizzes only---the title of the quiz is used for the definition of
 %\cs{sqlabel}. Note that \cs{makeatletter} is invoked before the
 % parameters are read.
-% \changes{v6.7o}{2013/11/25}{Changed \cs{aeb@@titleQuzi} to \cs{aebTitleQuiz}}
-% \changes{v6.7p}{2013/12/11}{Added optional parameter to \cs{titleQuiz}
+% \changes{v6.7o}{2013/11/25}{Changed \string\cs{aeb@@titleQuzi} to \string\cs{aebTitleQuiz}}
+% \changes{v6.7p}{2013/12/11}{Added optional parameter to \string\cs{titleQuiz}
 %   to execute a command, such as incrementing a counter.}
 %    \begin{macrocode}
 \let\tqhspace\space
@@ -5578,11 +5616,11 @@ if (isEndQuizPushed("@eqBaseName")){
 %
 %\changes{v6.2c}{2007/11/14}
 %{
-%  Added the commands \cs{showCreditMarkup} and \cs{hideCreditMarkup} to show partial credit markup
+%  Added the commands \string\cs{showCreditMarkup} and \string\cs{hideCreditMarkup} to show partial credit markup
 %}
 %\changes{v6.3k}{2008/01/09}
 %{
-%  Added \cs{ptsLabel} and \cs{ptLabel} to localize the markup in the margin of a quiz
+%  Added \string\cs{ptsLabel} and \string\cs{ptLabel} to localize the markup in the margin of a quiz
 %}
 %    \begin{macrocode}
 \newcounter{qMarkCnt}
@@ -5709,7 +5747,7 @@ if (isEndQuizPushed("@eqBaseName")){
 % within a quiz.
 %\changes{v6.2a}{2007/11/10}
 %{
-%   Added \cs{quizpdfbookmark} to bookmark quizzes.
+%   Added \string\cs{quizpdfbookmark} to bookmark quizzes.
 %}
 %    \begin{macrocode}
 \newcommand{\sqbookmarkfmt}{Short Quiz \@shortquizCnt.\space}
@@ -5819,7 +5857,7 @@ if (isEndQuizPushed("@eqBaseName")){
 % \changes{v6.05e}{2006/18/06 v6.05e}
 % {
 %   Added control over the separation between the MC label and subsequent text:
-%   \cs{setMClabelsep} and \cs{resetMClabelsep}.
+%   \string\cs{setMClabelsep} and \string\cs{resetMClabelsep}.
 % }
 %    \begin{macro}{\resetMClabelsep}
 %    \begin{macro}{\eq@hspanner}
@@ -5928,7 +5966,7 @@ if (isEndQuizPushed("@eqBaseName")){
 %<*package|eqexam>
     \def\Ans{\Ans@list}%
   }% list
-}{\endlist\setcounter{quizno}{0}\eq@answersEndHook}
+}{\eq@answersEndHook\endlist\setcounter{quizno}{0}}
 %    \end{macrocode}
 % Answers environment for a tabular environment. This command picks
 % up the arguments of \cs{Ans}, then passes on the \cs{@Ans}
@@ -5994,7 +6032,7 @@ if (isEndQuizPushed("@eqBaseName")){
 %    \begin{macrocode}
     \expandafter\tabular\sq@TabPos{@{}*{#1}{p{\eq@tmpdima}}@{}}}%
 %    \end{macrocode}
-%    \changes{v7.4}{2015/03/23}{added \cmd{\reset@doendpe}}
+%    \changes{v7.4}{2015/03/23}{added \string\cs{reset@doendpe}}
 %    \DescribeMacro{\reset@doendpe} attempts to restore the \cs{parshape}
 %    following a list environment. It appears in several locations, includeing
 %    \cs{endanswers}, \cs{endmanswers}, and \cs{setTabulrSolnEnv}.
@@ -6018,10 +6056,12 @@ if (isEndQuizPushed("@eqBaseName")){
 %    \end{macrocode}
 %
 %    \begin{macro}{\endanswers}
-%    Close off \texttt{tabular} environment, and reinitialize the
+%    Close off \texttt{tabular} environment, and re-initialize the
 %    \texttt{quizno} counter. Added \cs{answersEndHook}.
 %    \begin{macrocode}
-\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}}
+\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
+  \ifx\eq@answersEndHook\@empty\else
+    \def\insertEndHookHere{#1}\fi}
 \let\eq@answersEndHook\@empty
 \def\endanswers@sq{\endtabular\setcounter{quizno}{0}%
     \eq@answersEndHook\reset@doendpe{\the\everypar}%
@@ -6124,7 +6164,7 @@ if (isEndQuizPushed("@eqBaseName")){
 % For the link multiple choice type question. The driver independent stuff starts
 % here, then goes to |\Ans@sq@f@driver| the rest of the code that depends on the
 % driver.
-% \changes{v7.7d}{2015/11/15}{Changed mc.\cs{oFields} so it is printable}
+% \changes{v7.7d}{2015/11/15}{Changed mc.\string\cs{oFields} so it is printable}
 %    \begin{macrocode}
 \def\@@Ans@sq@f@Defaults
 {%
@@ -6158,11 +6198,19 @@ var qzSolnDest="*@qzsolndest";
 var solnAfter=*ifeq@solutionsafter%
 true*else%
 false*fi;
-if ((qzSolnDest!="") && !solnAfter) %
-jmpToNamedDest("*oField","*@qzsolndest",%
-*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
-*ifx*eqAddAAMouseUpMC*empty*else
-*eqAddAAMouseUpMC*fi
+%    \end{macrocode}
+%    Introduce changes in this code in response to \cs{sqSolnBtn} command.
+%    \changes{v8.7.5}{2021/05/05}{\string\cs{sqSolnBtn} changes: execute block
+%    if \string\cs{sqSolnBtn} not detected}
+%    \begin{macrocode}
+var f=this.getField("corr.*oField.*thequestionno");
+if (f==null) {
+  if ((qzSolnDest!="") && !solnAfter) %
+  jmpToNamedDest("*oField","*@qzsolndest",%
+  *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
+  *ifx*eqAddAAMouseUpMC*empty*else
+  *eqAddAAMouseUpMC*fi
+}
 \end{defineJS}
 %    \end{macrocode}
 % JavaScript code for the mouse up action for the \emph{incorrect} choice of the radio button field
@@ -6237,6 +6285,9 @@ if( qzSolnDest!="") updateTally("*oField.*thequestionno");%
 %</package>
 %<*package|eqexam>
 \let\rbf@Opts\@empty
+%    \end{macrocode}
+%    The \cs{Ans} for a short-quiz, using forms.
+%    \begin{macrocode}
 \def\Ans@sq@f{\if\eq@listType\eq@One
   \stepcounter{quizno}\else
   \@ifundefined{ifwithinsoldoc}{\refstepcounter{quizno}}
@@ -6245,7 +6296,7 @@ if( qzSolnDest!="") updateTally("*oField.*thequestionno");%
   \PBS\raggedright
 %</package|eqexam>
 %    \end{macrocode}
-%\changes{v6.7d}{2013/05/27}{added \cs{rbf@Opts} to hardwire choices.}
+%\changes{v6.7d}{2013/05/27}{added \string\cs{rbf@Opts} to hardwire choices.}
 %    \begin{macrocode}
 %<*package>
   \if\Ans@choice\eq@One
@@ -6309,23 +6360,31 @@ for (var i=0; i<a.length; i++)
   if ( (a[i].isBoxChecked(0)) && %
 (a[i].value.charAt(0)==0) )
     a[i].checkThisBox(0,false);%
-*ifx*@sqTurnOffAlerts*eq@One%
-OnBlurRespBox(true,"*oField");
+*ifx*@sqTurnOffAlerts*eq@One
+OnBlurRespBox(true,"*oField");*else
 *fi%
 var qzSolnDest="*@qzsolndest";
 var solnAfter=*ifeq@solutionsafter%
 true*else%
 false*fi;
-if ( (qzSolnDest != "") && !solnAfter ) {
-  for (var i=0; i<a.length; i++){
-    if ((a[i].exportValues[0].charAt(0)==1) && %
+%    \end{macrocode}
+%    Introduce changes in this code in response to \cs{sqSolnBtn} command.
+%    \changes{v8.7.5}{2021/05/05}{\string\cs{sqSolnBtn} changes: execute block
+%    if \string\cs{sqSolnBtn} not detected}
+%    \begin{macrocode}
+var f=this.getField("corr.*oField.*thequestionno");
+if (f==null) {
+  if ( (qzSolnDest != "") && !solnAfter ) {
+    for (var i=0; i<a.length; i++){
+      if ((a[i].exportValues[0].charAt(0)==1) && %
 (!a[i].isBoxChecked(0))) break;
+    }
   }
+  if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
+  *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
+  *ifx*eqAddAAMouseUpMS*empty*else
+  *eqAddAAMouseUpMS*fi
 }
-if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
-*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
-*ifx*eqAddAAMouseUpMS*empty*else
-*eqAddAAMouseUpMS*fi
 \end{defineJS}
 %    \end{macrocode}
 %    Mouse up action for a \emph{incorrect answer box} (a checkbox) to MS question of short-quiz
@@ -6341,9 +6400,8 @@ for (var i=0; i<a.length; i++) {
     a[i].checkThisBox(0,false);
   }
 }%
-*ifx*@sqTurnOffAlerts*eq@One%
-OnBlurRespBox(false,"*oField");
-*fi%
+*ifx*@sqTurnOffAlerts*eq@One
+OnBlurRespBox(false,"*oField");*fi%
 *ifx*oField*@empty*else
 updateTally("*oField.*thequestionno");*fi%
 *ifx*eqAddAAMouseUpMS*empty*else
@@ -6472,9 +6530,9 @@ updateTally("*oField.*thequestionno");*fi%
 % in the sections that follow.
 % \changes{v6.2}{2007/11/08 }
 %{
-%   Added the \texttt{manswers} environment, and supporting elements, both {\LaTeX}
-%   and JavaScript. This \texttt{manswers} environment is for the \texttt{quiz} environment
-%   only. There is a \texttt{manswers} environment for the \texttt{shortquiz} environment, but
+%   Added the \string\texttt{manswers} environment, and supporting elements, both {\string\LaTeX}
+%   and JavaScript. This \string\texttt{manswers} environment is for the \string\texttt{quiz} environment
+%   only. There is a \string\texttt{manswers} environment for the \string\texttt{shortquiz} environment, but
 %   this is used by \textsf{eqExam} only.
 %}
 %
@@ -6519,8 +6577,7 @@ updateTally("*oField.*thequestionno");*fi%
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }%
-}{\endlist\setcounter{quizno}{0}%
-  \eq@answersEndHook
+}{\eq@answersEndHook\endlist\setcounter{quizno}{0}%
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
 %    \end{macrocode}
@@ -6784,8 +6841,8 @@ updateTally("*oField.*thequestionno");*fi%
 %    \end{macrocode}
 % \changes{v6.05d}{2007/04/14}
 % {
-%   Added the command \cs{insertGrayLetters}. This can be defined to place symbols under
-%   the multiple choice form boxes. The command \cs{bottomOfAnsfStack} is there as a
+%   Added the command \string\cs{insertGrayLetters}. This can be defined to place symbols under
+%   the multiple choice form boxes. The command \string\cs{bottomOfAnsfStack} is there as a
 %   hook for whatever purposes are desired.
 % }
 %    \begin{macrocode}
@@ -6793,7 +6850,7 @@ updateTally("*oField.*thequestionno");*fi%
 %</package>
 %<*package|eqexam>
 %    \end{macrocode}
-% \changes{v7.7}{2015/06/04}{Added \cs{graylettersColor}}
+% \changes{v7.7}{2015/06/04}{Added \string\cs{graylettersColor}}
 % \DescribeMacro\graylettersColor sets the color of the gray letters, the default is
 % \texttt{gray}.
 %    \begin{macrocode}
@@ -6803,9 +6860,12 @@ updateTally("*oField.*thequestionno");*fi%
     {\textcolor{\graylettersColor}{\Alph{quizno}}}}\else\relax\fi}
 %</package|eqexam>
 %<*package>
+%    \end{macrocode}
+%    The \cs{Ans} command for a quiz using forms.
+%    \begin{macrocode}
 \def\Ans@@f{%
   \settowidth{\eq@tmplength}{\eq@lw@f}%
-  \hangindent=\eq@tmplength\hangafter=1
+  \hangindent=\eq@tmplength\hangafter=\@ne
   \bottomOfAnsfStack\insertGrayLetters
   \edef\rbf@Opts{\ifaeb@usecircles\else
   \noexpand\symbolchoice{\qz@chksymb}\fi
@@ -6831,9 +6891,9 @@ updateTally("*oField.*thequestionno");*fi%
       \def\Ans@c@f@Choice{\Ff{\FfReadOnly}}%
     \fi
 %    \end{macrocode}
-% \changes{v6.7h}{2013/08/19}{When the \cs{useMCCircles} is used, the boundary
+% \changes{v6.7h}{2013/08/19}{When the \string\cs{useMCCircles} is used, the boundary
 % color is transparent. We try a fix for this to show the colored solution
-% boundary. The fix uses the \cs{late@options} commands.}
+% boundary. The fix uses the \string\cs{late@options} commands.}
 %    \begin{macrocode}
     \ifaeb@usecircles\def\late@options{\BC{}}\fi
     \if\Ans@choice\eq@One
@@ -7040,7 +7100,7 @@ updateTally("*oField.*thequestionno");*fi%
 }
 %    \end{macrocode}
 % \changes{v6.3x}{2011/04/05}{%
-% Added \texttt{label} parameter to \cs{bChoices}.
+% Added \string\texttt{label} parameter to \string\cs{bChoices}.
 %}
 % A new key, \IndexKey{label}\texttt{label}, if this label is specified, then we keep track of all the
 % correct alternatives, put them into a commands to make them accessible by the user.
@@ -7084,8 +7144,9 @@ updateTally("*oField.*thequestionno");*fi%
 }
 %    \end{macrocode}
 % \changes{v6.3x}{2011/04/05}{%
-% Supporting commands that use the value of the \texttt{label} parameter
-% of \cs{bChoices}: \cs{eq@saveAns}, \cs{eq@displayAns}, \cs{eq@displayAlts}, etc.
+% Supporting commands that use the value of the \string\texttt{label} parameter
+% of \string\cs{bChoices}: \string\cs{eq@saveAns}, \string\cs{eq@displayAns},
+% \string\cs{eq@displayAlts}, etc.
 %}
 % \texttt{4/5} We begin an experimental series of commands. The idea is to be able to
 % conveniently reference a multiple choice problem when the
@@ -7172,7 +7233,7 @@ updateTally("*oField.*thequestionno");*fi%
 %    \begin{macro}{\useSavedAltsAns}
 %    \begin{macro}{\useSavedNumAns}
 % \changes{v6.3x}{2011/04/05}{%
-% Added \cs{useSavedAns}, \cs{useSavedAlts}, and \cs{useSavedAltsAns}.
+% Added \string\cs{useSavedAns}, \string\cs{useSavedAlts}, and \string\cs{useSavedAltsAns}.
 %}
 % These three commands hold the correct alternatives and answers to a multiple choice
 % or multiple selection problem. The optional first argument allows you to display
@@ -7286,7 +7347,7 @@ updateTally("*oField.*thequestionno");*fi%
   }{\expandafter\@findendans\@gobble}}%
 %    \end{macrocode}
 % The command that processes the alternatives.
-% \changes{v6.7g}{2013/08/09}{Changed \texttt{\#1} to \cs{the}\cs{@temptokena} Fixing
+% \changes{v6.7g}{2013/08/09}{Changed \string\texttt{\string\#1} to \string\cs{the}\string\cs{@temptokena} Fixing
 % a nasty bug. Reported by Christopher C.}
 %    \begin{macrocode}
 \def\defineEachAns#1{\advance\eqtmpcnta\@ne
@@ -7382,7 +7443,7 @@ updateTally("*oField.*thequestionno");*fi%
     \nextrandom \nextrandom \nextrandom
 %    \end{macrocode}
 % Save the initial seed value to \cs{eqInitSeedValue}.
-% \changes{v6.7f}{2013/08/03}{Save the initial seed value to \cs{eqInitSeedValue}.}
+% \changes{v6.7f}{2013/08/03}{Save the initial seed value to \string\cs{eqInitSeedValue}.}
 %    \begin{macrocode}
     \xdef\InitSeedValue{\the\randomi}%
   \fi
@@ -7417,8 +7478,8 @@ updateTally("*oField.*thequestionno");*fi%
 % \cs{@ansChoices}.
 % \changes{v6.1}{2007/10/28}
 % {%
-%   Added support for randomizing the multiple choices, requires the use of \cs{bChoices}
-%   and \cs{eChoices}.
+%   Added support for randomizing the multiple choices, requires the use of \string\cs{bChoices}
+%   and \string\cs{eChoices}.
 % }
 % \changes{v8.6.2}{2021/01/20}{Incorporated \string\cs{if@DoNotRandomize}
 % into the \string\cs{@ansChoices} macro for MC and MS questions}
@@ -7653,10 +7714,10 @@ updateTally("*oField.*thequestionno");*fi%
 % equivalent to \cs{ref}.
 %\changes{v6.06c}{2007/04/26}
 %{
-%   Added \cs{REF} in support of the \texttt{showgrayletters} option.
+%   Added \string\cs{REF} in support of the \string\texttt{showgrayletters} option.
 %}
 %\changes{v6.4d}{2011/07/14}{%
-%   Correct \cs{REF} so that a link is created.
+%   Correct \string\cs{REF} so that a link is created.
 %}
 %    \begin{macrocode}
 \def\REF{\@ifstar{\let\isREFstar\eq@One\aeb@REFstar}
@@ -7698,7 +7759,7 @@ updateTally("*oField.*thequestionno");*fi%
 %
 %\changes{v6.3j}{2008/12/08}
 %{
-%   Added \cs{useMCCircles} and \cs{useMCCRects}.
+%   Added \string\cs{useMCCircles} and \string\cs{useMCCRects}.
 %}
 % \par\medskip\noindent We use a switch to keep track of ``circle mode.'' If the
 % document author invokes \cs{useMCCircles} when we are already in circle mode,
@@ -7794,6 +7855,11 @@ updateTally("*oField.*thequestionno");*fi%
   \global\let\aebtitleQuiz\@empty
   \global\let\aebTitleQuiz\@empty
   \global\let\eq@tq@star\relax
+%    \end{macrocode}
+%    (2021/05/07) Reset \cs{eqpriorhook} at end of \env{oQuestions} environment.
+%    \changes{v8.7.6}{2021/05/07}{Reset \string\cs{eqpriorhook} at end of \string\env{oQuestions} environment}
+%    \begin{macrocode}
+  \global\let\oqpriorhook\@empty
   \aftergroup\ignorespaces
 }
 \def\oSolution#1{\edef\@qzsolndest{#1}}
@@ -7813,8 +7879,8 @@ updateTally("*oField.*thequestionno");*fi%
 % in the preamble, we allow the score to go below zero.
 %\changes{v6.3i}{2008/10/22}
 %{
-%   Added \cs{negPointsAllowed} to allow negative scores on quizzes. This is only relevant
-%   when the quiz has a \texttt{manswers} environment.
+%   Added \string\cs{negPointsAllowed} to allow negative scores on quizzes. This is only relevant
+%   when the quiz has a \string\texttt{manswers} environment.
 %}
 %    \begin{macrocode}
 \def\negPointsAllowed{\def\negpointsallowed{true}}
@@ -7830,7 +7896,7 @@ updateTally("*oField.*thequestionno");*fi%
 % and multiple choice questions.
 %\changes{v6.3m}{2010/01/27}
 %{
-%   Added \cs{requireAlertBox} to turn off the ``Do not show this message again'' checkbox for objective questions.
+%   Added \string\cs{requireAlertBox} to turn off the ``Do not show this message again'' checkbox for objective questions.
 %}
 %The alert box displays the message \cs{doNotShowAgainMsg} which by default is
 %``Do not show this message again''
@@ -7992,8 +8058,8 @@ updateTally("*oField.*thequestionno");*fi%
   \ifShowAppr\altApprOn\let\eqAddAAFormat\@empty\fi}
 %    \end{macrocode}
 % Get any changes in the appearance of the text box
-% \changes{v6.4c}{2011/07/01}{\cs{RespBoxMath} now records its lists of
-% independent variables under the global variable \texttt{\_mathVars}.}
+% \changes{v6.4c}{2011/07/01}{\string\cs{RespBoxMath} now records its lists of
+% independent variables under the global variable \string\texttt{\_mathVars}.}
 %    \begin{macrocode}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\AAKqRespBoxMath}
 %    \end{macrocode}
@@ -8473,6 +8539,57 @@ if(event.willCommit) {
 %    \end{macro}
 %    \end{macro}
 %    \end{macro}
+%    \begin{macrocode}
+%</package>
+%<*rbmIntrvl>
+%    \end{macrocode}
+%   \subsubsection{The \texorpdfstring{\protect\cs}{\textbackslash}{rbmIntrvl} command}\label{ss:rbmi}
+%   This code segment is input into \pkg{exerquiz} when the \opt{userbmintrvl} is specified.
+%   The commands of this section are motivated by an {Acro\negthinspace\TeX} user (Thor G). He
+%   wants to ask his students to make a series of calculations, the result of
+%   which is to be entered into a \cs{RespBoxMath} input box. He is willing to
+%   accept the response as correct if the response falls into a designated
+%   interval $[a,b]$.
+%
+%   Two commands are defined, one internal (\cs{c@lcEPInfo}) and the other public {\cs{rbmIntrvl}}.
+%
+%   The first command \cs{c@lcEPInfo} takes as its parameters an (closed) interval of numbers.
+%   It calculates the midpoint \DescribeMacro\intrCAns\cs{intrCAns} and
+%   \DescribeMacro\intrPrec\cs{intrPrec}. The first number can be used as a (representative) point
+%   value of the answer; the second is used as the precision parameter of \cs{RespBoxMath}.
+%   \changes{v8.7}{2021/04/24}{Added \string\cs{rbmIntrvl}}
+%    \begin{macrocode}
+\def\c@lcEPInfo[#1,#2]{%
+  \setlength{\eflength}{(#1pt+#2pt)/2}%
+  \edef\intrCAns{\strip@pt\eflength}%
+  \setlength{\eflength}{(#2pt-#1pt)/2}%
+    \edef\intrPrec{\strip@pt\eflength}%
+}
+%    \end{macrocode}
+% \DescribeMacro\rbmIntrvl\hskip-\marginparsep\texttt{\darg{[\meta{a{\upshape,}b}]}}
+% This macro takes as its first argument the interval you want the student response
+% to fall into. The command expands \cs{c@lcEPInfo} then \cs{RespBoxMath}. Use \cs{intrCAns} and \cs{intrPrec}
+% in the arguments of \cs{RespBoxMath}.
+%    \begin{macrocode}
+\newcommand{\rbmIntrvl}[1]{\c@lcEPInfo#1\RespBoxMath}
+%    \end{macrocode}
+%      \cs{rbmIntrvl} has implied arguments, those of \cs{RespBoxMath}. Below is a simple example.
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,codes={\catcode`\%=9}]
+%\rbmIntrvl{[6.40,6.90]}{\intrCAns}{1}{\intrPrec}{[0,1]}
+%\end{Verbatim}
+%Following the interval declaration are the parameters of \cs{RespBoxMath}. The first
+%one following the interval is the correct answer (\cs{intrCAns}), the midpoint of the interval;
+%the third argument following the interval is the precision parameter of \cs{RespBoxMath},
+%which is taken to be \cs{intrPrec}, the half-width of the interval.
+%    \begin{macrocode}
+%</rbmIntrvl>
+%<*package>
+%    \end{macrocode}
+%    We input the definition of \cs{rbmIntrvl} here, if the \opt{userbmintrvl}
+%    option is taken.
+%    \begin{macrocode}
+\inputRBMICode
+%    \end{macrocode}
 %\subsection{Text Fill-In}
 %    \begin{macro}{\RespBoxTxt}
 %    \begin{macro}{\RespBoxTxtNT}
@@ -8528,7 +8645,7 @@ if(event.willCommit) {
   \else\eqObjAlertIfFalse\fi\fi\fi}
 \def\eqAppAlert{eqAppAlert}
 %    \end{macrocode}
-%    Keystroke action for \cs{RespBoxTxt}
+%    Keystroke action for \cs{RespBoxTxt} for a quiz
 %    \changes{v8.6.4}{2021/02/15}{Corrected coding of  \string\cs{AAKqRespBoxTxt}, wrong
 %    escape char}
 %    \begin{macrocode}
@@ -8557,6 +8674,11 @@ if (!isQuizInitialized("*currQuiz")) {
     \noexpand\Ff{\FfReadOnly}\fi\fi\fi
   }%
 }
+%    \end{macrocode}
+%    The keystroke action for \cs{RespBoxTxt} for a short-quiz
+%    \changes{v8.6.5}{2021/02/21}{Removed comment character from last line
+%    of \string\cs{rbtAAKey}}
+%    \begin{macrocode}
 \begin{defineJS}[\makeesc\!\makecmt\%]{\rbtAAKey}
 if(event.willCommit) {
   var retn = ProcRespTxt(!rbTxtAlt);%
@@ -8564,7 +8686,7 @@ if(event.willCommit) {
   !RespBoxTxtOnBlur!fi
 }%
 !ifx!eqAddAAKeystroke!@empty!else%
-!eqAddAAKeystroke!fi%
+!eqAddAAKeystroke!fi
 \end{defineJS}
 \def\@@RespBoxTxtActions{%
   \AA{\if\eqQuizType\isQZ
@@ -8705,8 +8827,8 @@ if(event.willCommit) {
 %    \end{macro}
 %    \DescribeMacro{\txtRef}\hskip-\marginparsep\texttt{\darg{\ameta{label}}}
 %    The \cs{RespBoxTxt} can be used for a matching-type question. We define a special
-%    \cs{ref}-type command that produces plain text. Refer to demo file \texttt{qz-matching.tex} for
-%    details.
+%    \cs{ref}-type command that produces plain text. Refer to demo file
+%    \texttt{qz-matching.tex} for details.
 %    \changes{v8.6.4}{2021/02/15}{Support for matching-type question based in
 %    \string\cs{RespBoxTxt}}
 %    \begin{macrocode}
@@ -8967,51 +9089,109 @@ if(event.willCommit) {
 }
 %    \end{macrocode}
 %    \end{macro}
-%\subsection{Fields that Support the Fill-Ins}
-%    \begin{macro}{\sqTallyBox}
+%    \section{Fields that play a supportive role}
+%
+%    \subsection{Support for the short-quiz}
+%
+%    \subsubsection{The \tops{\protect\cs}{\textbackslash}{sqTallyBox} command}
+%
+%    \begin{macro}{\sqTallyBox}\hskip-\marginparsep\texttt{[\ameta{options}]}
 % The \cmd{\sqTallyBox} holds the number of incorrect responses to the
-% question. This box is not required to appear. If it does not
-% appear, use \cmd{\RespBoxNT} to prevent the doc level JavaScript
-% from trying to write a nonexistent text field.
+% question. This box is not required to appear.
 %    \begin{macrocode}
 \let\@@sqTallyBoxActions\@empty
-\@ifundefined{calcOrder}{%
-\ifpdf\def\@@sqTallyBoxActions{%
-    \AA{\AAValidate{getTotalTally("\oField");}}}\fi}{}
+%\@ifundefined{calcOrder}{%
+%\ifpdf\def\@@sqTallyBoxActions{%
+%    \AA{\AAValidate{getTotalTally("\oField");}}}\fi}{}
+%\ifpdf\def\@@sqTallyBoxActions{%
+%  \AA{\AAValidate{getTotalTally("\oField");}}}\else
+%  \let\@@sqTallyBoxActions\@empty\fi
 \def\sqTallyBoxDefaults{%
-    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}
-}
-\ifpdf\def\@@sqTallyBoxActions{%
-  \AA{\AAValidate{getTotalTally("\oField");}}}\else
-  \let\@@sqTallyBoxActions\@empty
-\fi
+    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
 \newcommand\sqTallyBox[1][]{%
   \mbox{\text@@Field{#1}{tally.\oField.\thequestionno}%
     {\TBW}{\DefaultHeightOfWidget}%
     {}{\eq@setWidgetProps\eq@TextField}%
     {\sqTallyBoxDefaults\@@sqTallyBoxActions\every@eqTextField
-    \every@sqTallyBox}}%
-}
+    \every@sqTallyBox}}}
 %    \end{macrocode}
 %    \end{macro}
-%    \begin{macro}{\sqTallyTotal}
+%    \subsubsection{The \tops{\protect\cs}{\textbackslash}{sqTallyTotal} command}
+%    \begin{macro}{\sqTallyTotal}\hskip-\marginparsep\texttt{[\ameta{options}]}
 % This text field stores the tally total. Only used within the
 % \texttt{shortquiz} environment. Takes on optional parameter; this
-% parameter can be used to modify the appearance of the fields.
+% parameter can be used to modify the appearance of the fields. Two special
+% key-values are also recognized: \cs{weakpass\darg{\ameta{n}}} and \cs{strongpass\darg{\ameta{n}}}
 %    \begin{macrocode}
 \def\sqTallyTotalDefaults{%
-  \rawPDF{}\W{1}\BC{0 0 0}\S{I}\textColor{1 0 0 rg}%
-  \Q{2}\Ff{\FfReadOnly}%
+  \rawPDF{}\W{1}\BC{0 0 0}\S{I}\textColor{1 0 0 rg}
+  \Q{2}\Ff{\FfReadOnly}
 }
-\def\@@sqTallyTotalActions{%
-  \AA{%
-    \AAKeystroke{AFNumber_Keystroke(0,0,0,0,"",true);}
-    \AAFormat{AFNumber_Format(0,0,0,0,"",true);}
-    \AACalculate{%
-        AFSimple_Calculate("SUM",new Array("tally.\oField"));
-  }}%
-}
+%    \end{macrocode}
+%    \DescribeMacro{\sqWeakMsg} The message that appears in an alert box
+%    when the use has exceeded the weak-pass limit.
+%    \begin{macrocode}
+\flJSStr{\sqWeakMsg}{You have missed too many questions.
+After you finish, it is recommended you retake this quiz
+with fewer errors and greater understanding.}
+%    \end{macrocode}
+%    \DescribeMacro{\sqStrongMsg} The message that appears in an alert box
+%    when the use has exceeded the strong-pass limit.
+%    \begin{macrocode}
+\flJSStr{\sqStrongMsg}{You have missed too many questions.
+We are resetting the quiz. Start over, this time with
+fewer errors and greater understanding.}
+%    \end{macrocode}
+%    The code that formats the field and if needed, responds to the weak-pass
+%    or strong-pass parameter.
+%    \begin{macrocode}
+\def\@@sqTallyTotalActions{\AA{%
+  \AAKeystroke{\dl@EForAF4Number_Keystroke(0,0,0,0,"",true);}
+  \AAFormat{\dl@EForAF4Number_Format(0,0,0,0,"",true);}
+  \AACalculate{%
+    \dl@EForAF4Simple_Calculate("SUM",new Array("tally.\oField"));\r
+    var sqTlyTotl=event.value;
+    \ifx\eq@strongpass\@empty
+      \ifx\eq@weakpass\@empty\else\r
+%    \end{macrocode}
+%    \textbf{Weak pass:} When \uif{sqTlyTotl} exceeds \cs{eq@weakpass},
+%    an alert message with a message of \cs{sqWeakMsg}.
+%    \begin{macrocode}
+         if(sqTlyTotl > \eq@weakpass) {\r\t
+            if (\oField.sqTlyTotCnt==0)\r\t\t
+              app.alert(\sqWeakMsg);\r\t
+            \oField.sqTlyTotCnt++;\r
+          }
+      \fi
+    \else\r
+%    \end{macrocode}
+%    \textbf{Strong pass:} When \uif{sqTlyTotl} exceeds \cs{eq@strongpass},
+%    an alert message with a message of \cs{sqStrongMsg}, and the whole
+%    short-quiz is reset.
+%    \begin{macrocode}
+      if(sqTlyTotl > \eq@strongpass) {\r\t
+        app.alert(\sqStrongMsg);\r
+        \@@sqClearButtonJSCode\r
+        event.value=0;\r
+      }
+    \fi
+}}}
+%    \end{macrocode}
+%    \begin{macrocode}
+\def\@eqweakpass#1{\def\eq@weakpass{#1}}
+\def\@eqstrongpass#1{\def\eq@strongpass{#1}}
+\let\eq@weakpass\@empty
+\let\eq@strongpass\@empty
+%    \end{macrocode}
+%    On 2021/05/07, the action of \cs{sqTallyTotal} is enhanced; two special keys-values
+%    are defined: \cs{weakpass\darg{\ameta{n}}} and \cs{strongpass\darg{\ameta{n}}}.
+%    For the weak pass, as soon as the student misses more than \ameta{n} questions,
+%    an alert box message; for the strong pass, an alert message appears and the quiz
+%    is reset.
+%    \changes{v8.7.6}{2021/05/07}{Enhanced capabilities of \string\cs{sqTallyTotal}}
+%    \begin{macrocode}
 \newcommand\sqTallyTotal[1][]{%
+  \processAppArgs#1\end\@nil
   \mbox{\text@@Field{#1}{tallytotal.\oField}{\TBW}%
     {\DefaultHeightOfWidget}{\eq@protect\AA}%
     {\eq@setWidgetProps\eq@TextField}%
@@ -9020,6 +9200,160 @@ if(event.willCommit) {
 }
 %    \end{macrocode}
 %    \end{macro}
+%
+%    \subsubsection{The \tops{\protect\cs}{\textbackslash}{sqClearButton} command}
+%
+%    \begin{macro}{\sqClearButton}
+% This button will clear the tallyfields and change the color of
+% the \cmd{\RespBox} back to \cmd{\defaultColorJS}. The button clears the fields
+% based on the current value of \cmd{\oField}. This text macro is
+% given its value when the optional parameter in the
+% \texttt{shortquiz} environment is specified.
+%\changes{v6.3g}{2008/10/13}
+%{%
+% Fixed a problem with the clear button not setting the boundary color
+% back to the default. I must have changed the name of an objective field,
+% now, we say \string\texttt{this.getField("obj.\string\cs{oField}")}.
+%}
+%    \begin{macrocode}
+\def\sqClearButtonDefaults
+{%
+    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
+    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
+}
+%    \end{macrocode}
+% In an attempt to supply some custom colors for the shortquiz, we
+% define \cmd{\sqRespBoxResetColor}. It determines the clear color
+% \changes{v8.6}{2020/11/29}{Rewrote SQ clear button using \string\env{defineJS} env}
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\@@sqClearButtonJSCode}
+ProcessIt = false;
+if ( typeof *oField == "undefined" )
+    *oField = new Object;
+if (typeof appAlerts["*oField"] == "undefined")
+    appAlerts["*oField"] = new Object;
+this.resetForm(new Array("mc.*oField","obj.*oField",%
+"tally.*oField","grpobj.*oField"));
+var f = this.getField("obj.*oField");
+if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
+*defaultColorJS*else*defaultColorJSLoc*fi;
+f = this.getField("grpobj.*oField");
+%    \end{macrocode}
+%    Here, we give the user an opportunity to designate the color
+%    of the response boxes when they are reset by the \cs{sqClearButton}.
+%    The default is to use \cs{eqDefaultColor}.
+%    \begin{macrocode}
+if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
+*defaultColorJS*else*defaultColorJSLoc*fi;
+f = this.getField("rbmarkup.*oField");
+if ( f != null ) f.display=display.hidden;
+*oField.Grp = {};
+appAlerts["*oField"].bAfterValue=false;
+%    \end{macrocode}
+%    \begin{macrocode}
+*oField.sqTlyTotCnt=0;
+ProcessIt=true;
+\end{defineJS}
+\def\@@sqClearButtonActions{\A{\JS{\@@sqClearButtonJSCode}}}
+\newcommand\sqClearButton[1][]{%
+  \mbox{\push@@Button{#1}{clear.\oField}{}{\DefaultHeightOfWidget}%
+    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
+    {\sqClearButtonDefaults\@@sqClearButtonActions\every@ButtonField
+     \every@sqClearButton}}%
+}
+%    \end{macrocode}
+%    \end{macro}
+%
+%    \subsubsection{The \tops{\protect\cs}{\textbackslash}{sqSolnBtn} command}
+%    The default scheme for pointing the student to the soltuion to a MC or MS question
+%    is through the buttons themselves. For MC, when the student chooses the correct
+%    answer from the choice field, the page jumps to the soltution page automatically
+%    (assuming there is a solution); for MS, the same jump does not occur until all
+%    correct choices are made.
+%
+%    In this section, we introduce an alternate scheme for handling jumps to MC and
+%    MS questions.
+%    \changes{v8.7.5}{2021/05/05}{Defined \string\cs{sqSolnBtn}}
+%    \par\medskip\noindent
+%    \DescribeMacro{\sqSolnMCMsg} Alert message for MC question
+%    \begin{macrocode}
+\flJSStr{\sqSolnMCMsg}{You must first select the correct
+answer to see the solution.}
+%    \end{macrocode}
+%    \DescribeMacro{\sqSolnMSMsg} Alert message for MS question
+%    \begin{macrocode}
+\flJSStr{\sqSolnMSMsg}{You must first select all the correct
+answers to see the solution.}
+%    \end{macrocode}
+%    \DescribeMacro{\sqCorrSolCodeMC} The code for \cs{sqSolnBtn} when the choice
+%    field is MC
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\sqCorrSolCodeMC}
+var qzSolnDest="*@qzsolndest";
+var solnAfter=*ifeq@solutionsafter%
+true*else%
+false*fi;
+var qzSolnDest="*@qzsolndest";
+var f=this.getField("mc.*oField.*thequestionno");
+if(f.value.charAt(0)=="1") {
+  if ((qzSolnDest!="") && !solnAfter) %
+jmpToNamedDest("answer",qzSolnDest,1);
+} else app.alert(*sqSolnMCMsg);
+\end{defineJS}
+%    \end{macrocode}
+%    \DescribeMacro{\sqCorrSolCodeMS} The code for \cs{sqSolnBtn} when the choice
+%    field is MS
+%    \begin{macrocode}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\sqCorrSolCodeMS}
+// multiple selection
+var g=this.getField("mc.*oField.*thequestionno");
+var a=g.getArray();
+var qzSolnDest="*@qzsolndest";
+var solnAfter=*ifeq@solutionsafter%
+true*else%
+false*fi;
+var qzSolnDest="*@qzsolndest";
+var f=this.getField("corr.*oField.*thequestionno");
+if ( (qzSolnDest != "") && !solnAfter ) {
+  for (var i=0; i<a.length; i++){
+    if ((a[i].exportValues[0].charAt(0)==1) && %
+(!a[i].isBoxChecked(0))) break;
+  }
+}
+if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
+*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);
+else app.alert(*sqSolnMSMsg);
+\end{defineJS}
+%    \end{macrocode}
+%    The action for \cs{sqSolnBtn} as a function of whether
+%    this is a MC or MS button.
+%    \begin{macrocode}
+\def\sqCorrSolButtonActionHook{\ifx\aeb@answerType
+  \aeb@answerType@r\JS{\sqCorrSolCodeMC}\else
+  \JS{\sqCorrSolCodeMS}\fi
+}
+%    \end{macrocode}
+%    \DescribeMacro{\sqSolnBtn}\hskip-\marginparsep\texttt{[\ameta{options}]} The
+%    code for \cs{sqSolnBtn}. This command is usually inserted into the workflow
+%    through the \cs{answersEndHook} command.
+%    \begin{macrocode}
+\newcommand{\sqSolnBtn}[1][]{%
+  \def\Fld@name{corr.\oField.\thequestionno}%
+  \edef\@@CorrSolButtonActions{\noexpand
+    \A{\noexpand\sqCorrSolButtonActionHook}}%
+%    \end{macrocode}
+%   The \cs{sqSolnBtn} button only appears when \cs{@qasolndest} is nonempty.
+%    \begin{macrocode}
+  \ifx\@qzsolndest\@empty\else
+  \mbox{\push@@Button{#1}{\Fld@name}{}{\DefaultHeightOfWidget}%
+    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
+    {\CorrAnsButtonDefaults\@@CorrSolButtonActions
+    \every@ButtonField\every@CorrAnsButton}}\fi
+}
+%    \end{macrocode}
+%
+%    \subsection{The \tops{\protect\cs}{\textbackslash}{CorrAnsButton} buttons}
+%
 %    \begin{macro}{\CorrAnsButton}
 % The \cmd{\CorrAnsButton} is a button macro which, when pressed, will
 % display the correct answer for the user. This button is again
@@ -9084,7 +9418,8 @@ if(event.willCommit) {
 %    \end{macrocode}
 %    \leavevmode\DescribeMacro{\sqCorrAnsCode}
 %    The JavaScript code for \cs{CorrAnsButton} now in a \env{defineJS} env.
-%    \changes{v8.6}{2020/11/29}{code for \string\cs{CorrAnsButton} now in a \string\env{defineJS} env}
+%    \changes{v8.6}{2020/11/29}{code for \string\cs{CorrAnsButton} now in a
+%    \string\env{defineJS} env}
 %    \begin{macrocode}
 \begin{defineJS}[\makeesc\!\makecmt\%]{\sqCorrAnsCode}
 !ifx!@qzsolndest!@empty%
@@ -9142,63 +9477,9 @@ else !processJSfunc("obj.!oField.!thequestionno","!CorrectAns",%
 }
 %    \end{macrocode}
 %    \end{macro}
-%    \begin{macro}{\sqClearButton}
-% This button will clear the tallyfields and change the color of
-% the \cmd{\RespBox} back to \cmd{\defaultColorJS}. The button clears the fields
-% based on the current value of \cmd{\oField}. This text macro is
-% given its value when the optional parameter in the
-% \texttt{shortquiz} environment is specified.
-%\changes{v6.3g}{2008/10/13 }
-%{%
-% Fixed a problem with the clear button not setting the boundary color
-% back to the default. I must have changed the name of an objective field,
-% now, we say \texttt{this.getField("obj.\cs{oField}")}.
-%}
-%    \begin{macrocode}
-\def\sqClearButtonDefaults
-{%
-    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
-    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
-}
-%    \end{macrocode}
-% In an attempt to supply some custom colors for the shortquiz, we
-% define \cmd{\sqRespBoxResetColor}. It determines the clear color
-% \changes{v8.6}{2020/11/29}{Rewrote SQ clear button using \string\env{defineJS} env}
-%    \begin{macrocode}
-\begin{defineJS}[\makeesc\*\makecmt\%]{\@@sqClearButtonJSCode}
-ProcessIt = false;
-if ( typeof *oField == "undefined" )
-    *oField = new Object;
-if (typeof appAlerts["*oField"] == "undefined")
-    appAlerts["*oField"] = new Object;
-this.resetForm(new Array("mc.*oField","obj.*oField",%
-"tally.*oField","grpobj.*oField"));
-var f = this.getField("obj.*oField");
-if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
-*defaultColorJS*else*defaultColorJSLoc*fi;
-f = this.getField("grpobj.*oField");
-%    \end{macrocode}
-%    Here, we give the user an opportunity to designate the color
-%    of the response boxes when they are reset by the \cs{sqClearButton}.
-%    The default is to use \cs{eqDefaultColor}.
-%    \begin{macrocode}
-if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
-*defaultColorJS*else*defaultColorJSLoc*fi;
-f = this.getField("rbmarkup.*oField");
-if ( f != null ) f.display=display.hidden;
-*oField.Grp = {};
-appAlerts["*oField"].bAfterValue=false;
-ProcessIt=true;
-\end{defineJS}
-\def\@@sqClearButtonActions{\A{\JS{\@@sqClearButtonJSCode}}}
-\newcommand\sqClearButton[1][]{%
-  \mbox{\push@@Button{#1}{clear.\oField}{}{\DefaultHeightOfWidget}%
-    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
-    {\sqClearButtonDefaults\@@sqClearButtonActions\every@ButtonField
-     \every@sqClearButton}}%
-}
-%    \end{macrocode}
-%    \end{macro}
+%
+%    \subsection{The \tops{\protect\cs}{\textbackslash}{@PromptButton} command}
+%
 %    \begin{macro}{\@PromptButton}
 % The \cs{@PromptButton} is used to create a ``progressive-style'' question (for math fill-in).
 % Some series of questions build on one another. You can use this button to show the solution
@@ -9244,6 +9525,7 @@ if (!isQuizInitialized("*currQuiz")) {
 \end{defineJS}
 \def\PromptButtonActionHook{\JS{\PromptButtonActionCode}}
 %    \end{macrocode}
+% \DescribeMacro{\@PromptButton}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{answer}}}
 % This button takes the standard two arguments
 % \begin{flushleft}
 % \texttt{\#1}: Optional parameters to change the appearance of the field\\
@@ -9275,6 +9557,9 @@ if (!isQuizInitialized("*currQuiz")) {
 \newcommand{\PromptButton}{\makebox[0pt][r] % assumes xcolor
   {\@PromptButton[\textColor{1 0 0 rg}]{\CorrectAns}}}
 %    \end{macrocode}
+%
+%    \subsection{The \tops{\protect\env}{}{mathGrp} environment}
+%
 %    \begin{environment}{mathGrp}
 % An environment for enclosing a collection of math/text fill-ins that are to be grouped
 % together. This grouping should not cross a begin or end of another environment, or include more
@@ -10189,7 +10474,7 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
 %\end{flushleft}
 %    Define a special value (\cs{formatInitAltApprs}) for \cs{AddAAFormat} used in initializing \cs{RespBoxMath} problems,
 %    where there are alternate appearances.
-%    See the {Acro\!\TeX} Blog article \url{http://www.acrotex.net/blog/?p=1335} for a discussion of the use of \cs{formatInitAltApprs}.
+%    See the {Acro\negthinspace\TeX} Blog article \url{http://www.acrotex.net/blog/?p=1335} for a discussion of the use of \cs{formatInitAltApprs}.
 %    \changes{v8.1a}{2017/09/03}{Define a special value (\string\cs{formatInitAltApprs}) for \string\cs{AddAAFormat}}
 %    \begin{macrocode}
 \def\formatInitAltApprs{\formatInitAltApprs}
@@ -10277,8 +10562,8 @@ aCorrectAns[!currQuiz.Grp["!thequestionno"].offset],!oField);!fi
 %
 %\changes{v6.3b}{2008/06/29}
 %{
-% Added the \cs{AddAAKeystroke} to the recognizable set of keys. This will be obeyed
-% within the optional arguments of \cs{RespBoxMath} and \cs{RespBoxTxt}.
+% Added the \string\cs{AddAAKeystroke} to the recognizable set of keys. This will be obeyed
+% within the optional arguments of \string\cs{RespBoxMath} and \string\cs{RespBoxTxt}.
 %}
 %    \begin{macrocode}
 \def\@eqAddAAKeystroke#1{\def\argi{#1}\ifx\argi\@empty
@@ -10419,7 +10704,8 @@ var ok2Continue = true;
 % from the \texttt{manswer.tex} demo file. Question 1 is a multiple selection question; Question 2
 % is a multiple choice question; Question 3 is a math fill-in question; and Question 4
 % is a grouped question. (The \texttt{undefined} entries indicate an empty or a not used entry.)
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %RightWrong.toSource()
 %[undefined, [0, 1, [undefined, undefined, 0, 1, 1, 0, 1]], 1, 1,
 %   [undefined, 1, 1, 1, 0]]
@@ -10440,7 +10726,7 @@ var ok2Continue = true;
 %
 %aPointType.toSource()
 % [undefined, [2, "mc"], [4, "ms"], [2, "text"], [4, "math"], [4, "grp"]]
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 var ProcessIt = true;
 var retn;
@@ -10470,9 +10756,9 @@ var aDlLibSpecResp=new Array(\dlLibSpecRespJS);
 % JSf is an array of supported mathematical functions.
 %\changes{v6.06}{2007/02/23}
 %{
-% Separated the \texttt{JSf} array into \texttt{JSfBuiltIn} and \texttt{JSfCustom}. This
+% Separated the \string\texttt{JSf} array into \string\texttt{JSfBuiltIn} and \string\texttt{JSfCustom}. This
 % allows us to identify the built-in JavaScript functions. I concatenate these two
-% into \texttt{JSf}.
+% into \string\texttt{JSf}.
 %}
 %    \begin{macrocode}
 var JSfBuiltIn = new Array
@@ -10495,7 +10781,7 @@ var JSfBuiltIn = new Array
 %    recognized properly when implmulti from dljslib is active. I think that
 %    the problem is caused by the fact that arcsin(x) follows sin(x) in the
 %    field of known functions and converted into arc*sin(x) and then into
-%    a*r*c*sin(x). I enclose the patch for the exerquiz.dtx file which in my
+%    a*r*c*sin(x). I enclose the patch for the \textsf{exerquiz.dtx} file which in my
 %    opinion solves the problem.''
 %}
 %    \begin{macrocode}
@@ -10615,8 +10901,8 @@ function CkBalVert(UserInput)
 %   \texttt{UserInput}: a string\\
 %   Returns: 1 (if there is a match); 0 (if no match)
 %       also sets the global variable \texttt{ok2Continue} to \texttt{false}.
-% \changes{v6.4c}{2011/07/01}{Ckfunc now uses a global variable \texttt{\_mathVars} which
-% holds the variables of the current \cs{RespBoxMath} being processed. We search
+% \changes{v6.4c}{2011/07/01}{Ckfunc now uses a global variable \string\texttt{\_mathVars} which
+% holds the variables of the current \string\cs{RespBoxMath} being processed. We search
 % all substrings containing 2 or more letters; if it consists only of the variables
 % that substring is OK.}
 %    \begin{macrocode}
@@ -10674,10 +10960,7 @@ function DisplayAnswer(fieldname,theanswer)
         var oQName = new Object;
     var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
 ?\defaultColorJS:oQName.DefaultColorJSLoc;
-    try {
-    this.getField(fieldname).value=(theanswer);
-%    this.getField(fieldname).strokeColor = defaultColor;
-    } catch(e) {}
+    try { this.getField(fieldname).value=(theanswer); } catch(e) {}
     ProcessIt = true;
 }
 function EvalCorrAnsButton(fieldname,theanswer)
@@ -10867,11 +11150,8 @@ function ParseInput(UserInput)
 %    \end{macrocode}
 % We make a rough check of the user input, if it has alpha-words of size two or greater
 % that do not match up against a recognizable function, it must be an error.
-%
-% (09/07/09) Comment this out so we check for function in both cases, get same alert message
 %    \begin{macrocode}
-%    if (typeof(Ck4Exponents) == "undefined")
-        if(!Ckfuncs(UserInput)) return false;
+    if(!Ckfuncs(UserInput)) return false;
 %    \end{macrocode}
 % Now try to insert the multiplication operator where applicable.
 %    \begin{macrocode}
@@ -10976,22 +11256,21 @@ function ParseInput(UserInput)
             default:
                 ok2Continue=false;
         }
-% console.println("working.."+UserInput);
     }
     if (!ok2Continue)
     {
         eqAppAlert(\eqerrBadExp,3);
         return false;
-    }
-    else {
+    } else {
 %    \end{macrocode}
-%\changes{v6.06}{2007/02/23}
-%{
-% Now, just before we return the parsed expression, we append all built-in
+%(2007/02/23) Just before we return the parsed expression, we append all built-in
 % JavaScript functions and constants with \texttt{Math.}, this is to avoid
-% having to use the \texttt{with(Math)} construct. These changes are in support
-% of using scientific notation.
-%}
+% having to use the \texttt{with(Math)} construct.
+%\changes{v6.06}{2007/02/23}{%
+% Now, just before we return the parsed expression, we append all built-in
+% JavaScript functions and constants with \string\texttt{Math.}, this is to avoid
+% having to use the \string\texttt{with(Math)} construct. These changes are in support
+% of using scientific notation.}
 %    \begin{macrocode}
         UserInput=addMathObject(UserInput);
         return UserInput;
@@ -11240,8 +11519,6 @@ indepVars,oComp){
 % the combinatorics functions \texttt{C(x,y)} and \texttt{P(x,y)}.
 %    \begin{macrocode}
     var reCP=/((C|P)\(.+?)(,)(.+?\))/g
-%    str="P(12,4)"
-%    reCP.exec(str)
     UserAns=UserAns.replace(reCP,"$1@c@$4");
 %    \end{macrocode}
 % (2012/04/13) Bruce Wagner reports a problem with the user enters an answer containing
@@ -11301,37 +11578,31 @@ function processSpecialParse(oParse,UserAns) {
             if (typeof(_o)=="function") {
 %    \end{macrocode}
 % If \texttt{oParse} is an object (it should be an array), and the first entry is a function
-% then we have: \texttt{priorParse: [myfunction, optional arguments]}. The function is
+% then we have: \texttt{priorParse:\,[myfunction, optional arguments]}. The function is
 % evaluated with the args \texttt{(UserAns, optional args)}. In the code below, we remove
 % the name of the function at the beginning of the array, and insert the \texttt{UserAns}
 % in its place. Various syntax variations supported.
-%\begin{verbatim}
-% priorParse: nodec,
-% priorParse: [nodec,noBinFac],
-% priorParse: [nodec,noBinFac,[myFunc,arg1, arg2,..]],
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%priorParse: nodec,
+%priorParse: [nodec,noBinFac],
+%priorParse: [nodec,noBinFac,[myFunc,arg1, arg2,..]],
+%\end{Verbatim}
 %    \begin{macrocode}
-%			   _o=oParse.shift();
-%			   oParse.unshift(UserAns);
                retn=_o(UserAns);
-%			   retn = _o.apply(null,oParse);
                if (retn==null) return retn;
 %    \end{macrocode}
 % In this case, we break out of the loop, we don't expect any more properties
 % for \texttt{priorParse} or \texttt{postParse}.
 %    \begin{macrocode}
-%			   break;
             } else {
 %    \end{macrocode}
 % If \texttt{oComp.priorParse[i]} is not a function, it is required to be an array. The first
 % element of the array is the function, the rest of the entries are the additional arguments
 % (in addition to \texttt{UserAns}).
 %    \begin{macrocode}
-%                f=_o.shift();
-%                _o.unshift(UserAns);
-%                retn=f.apply(null,_o);
-                retn=_o[0].apply(null, [ UserAns ].concat(_o.slice(1)));
-                if (retn==null) return null;
+               retn=_o[0].apply(null, [ UserAns ].concat(_o.slice(1)));
+               if (retn==null) return null;
             }
         }
     } else {
@@ -11388,6 +11659,11 @@ CorrAns,userAns,comp)
 %          null if expression was not valid
 %          -1 if expression is not a number
 %    \begin{macrocode}
+var ckDZRe=/\b([^0-9]*)(\d*)\./g;
+function ckDZReRepl(match,a,b,offset,string){
+  if (b[0]!="0") return match;
+  else return util.printf(a+"\%d.",b);
+}
 function diffCompare(_a,_c,_v,_F,_G) {
     var aXY = _c.split(",");
     var _V = _v.split(",");  // e.g. _V[0] = "i:x"
@@ -11423,10 +11699,31 @@ function diffCompare(_a,_c,_v,_F,_G) {
 % the JavaScript interpreter does not see them. The other complication is that Acro5 objects
 % to having a \texttt{return} within an \texttt{eval()}, so we work around that with a
 % \texttt{rtnCode}. The returns are executed outside the \texttt{eval()}.
+% \changes{v8.7.4}{2021/05/03}{Changed logic in \string\texttt{diffCompare()} function}
 %    \begin{macrocode}
         var rtnCode = 0;
+%    \end{macrocode}
+%    JavaScript has problems with numbers that are not properly written.
+%    If a number has a decimal point, the integer part of the decimal must be blank, a zero (0),
+%    or must begin with a non-zero number. In the \texttt{String.replace()} method below,
+%    the regular expression \texttt{ckDZRe} identifies leading digits, and the function
+%    \texttt{ckDZReRepl} is a replacement function that implements the requirements described above.
+%    The same changes is made in \texttt{reldiffCompare()} below.
+%    \begin{macrocode}
+        _G=_G.replace(ckDZRe,ckDZReRepl);
         eval("try {if(isNaN(_G = eval(_G))) rtnCode=-1; }"
             +"catch (e) { rtnCode=1; }");
+%    \end{macrocode}
+%Below is the code removed on 2021/05/01 for the above two lines. When |_G="00.00"|, for example.
+%and |ifNaN(_G = eval(_G))| is executed, a exception is thrown and \texttt{null} is returned;
+%even though the string does evaluate to a number, but JavaScript does not recognize it as such.
+%As a result, we try an alternate strategy. The same change is made in the function
+%\texttt{reldiffCompare()}, below.
+%\begin{Verbatim}[xleftmargin=\parindent,codes={\catcode`\%=9}]
+%eval("try {if(isNaN(_G = eval(_G))) rtnCode=-1; }"
+%  +"catch (e) { rtnCode=1; }");
+%\end{Verbatim}
+%    \begin{macrocode}
         switch(rtnCode)
         {
             case  0: break;
@@ -11464,6 +11761,7 @@ function diffCompare(_a,_c,_v,_F,_G) {
 }
 %    \end{macrocode}
 % This function is the same as above, but returns the relative absolute error.
+% \changes{v8.7.1}{2021/05/01}{Changed logic in \string\texttt{reldiffCompare()} function}
 %    \begin{macrocode}
 function reldiffCompare(_a,_c,_v,_F,_G) {
     var aXY = _c.split(",");
@@ -11471,16 +11769,17 @@ function reldiffCompare(_a,_c,_v,_F,_G) {
     var _n = aXY.length
     for (var _i=0; _i < _n; _i++)
     {
-            if (_V[_i].charAt(0) == "r" )
-              eval ("var "+_V[_i].charAt(2)+"="+aXY[_i]+";");
-            else // assume type "i"
-              eval ("var "+_V[_i].charAt(2)+"="+Math.ceil(aXY[_i])+";");
+        if (_V[_i].charAt(0) == "r" )
+          eval ("var "+_V[_i].charAt(2)+"="+aXY[_i]+";");
+        else // assume type "i"
+          eval ("var "+_V[_i].charAt(2)+"="+Math.ceil(aXY[_i])+";");
     }
     _F = eval(_F);
     if ( app.viewerVersion >= 5)
     {
         var rtnCode = 0;
-        eval("try { if(isNaN(_G = eval(_G))) rtnCode=-1; }"
+        _G=_G.replace(ckDZRe,ckDZReRepl);
+        eval("try {if(isNaN(_G = eval(_G))) rtnCode=-1; }"
             +"catch (e) { rtnCode=1; }");
         switch(rtnCode)
         {
@@ -11512,7 +11811,7 @@ function reldiffCompare(_a,_c,_v,_F,_G) {
 %    ]\CorrAnsButton{-4z^3(3z+4)^2}
 %\end{verbatim}
 % where \cs{refac}, \cs{repow}, \cs{redigit}, and \cs{rediv} are convenience macros defined
-% earlier in \texttt{exerquiz.dtx}. The regular expression describe the form of the answer
+% earlier in \textsf{exerquiz.dtx}. The regular expression describe the form of the answer
 % acceptable.
 %
 % There seems to be a redundancy in the usage of \cs{Array}, but this is by design.
@@ -11548,7 +11847,6 @@ function denyForm(UserAns, regexpr) {
     var msg=\defaultReqFormMsg;
     UserAns = stripWhiteSpace (UserAns);
     if (!ok2Continue) return null;
-%    UserAns = stripOutMuli(UserAns);
     UserAns = ChngAllGrpsToParens(UserAns);
     if (arguments.length>2) msg=arguments[2];
     if (typeof(regexpr.length)=="undefined") {
@@ -11838,8 +12136,8 @@ function eqFilter(filterMethod) {
         case 3:
         default:
 %    \end{macrocode}
-%\changes{v6.4k}{2011/08/17}{Within the function eqFilter, changed \texttt{this} to
-% \texttt{this.toString()}. The comparisons were returning false when they shouldn't
+%\changes{v6.4k}{2011/08/17}{Within the function eqFilter, changed \string\texttt{this} to
+% \string\texttt{this.toString()}. The comparisons were returning false when they shouldn't
 % this is because in this case, we were comparing objects to objects}
 %    \begin{macrocode}
             return this.toString();
@@ -11859,9 +12157,6 @@ function checkTheSpelling(targetFieldName) {
 %    field. For the \texttt{spell.checkWord()} method, \app{PDF-XChange Editor} returns \texttt{undefined}.
 %    This (spell checking) is a AR/AA feature only.
 %    \begin{macrocode}
-%  var fName = "obj"+thisName.substring(3);
-%  var f=this.getField(fName);
-%  if (f==null) fName="grpobj"+thisName.substring(3);
   var f=this.getField(targetFieldName);
   var value=f.value;
   var valueStrip = value.replace(/\s+/g,"");
@@ -11933,23 +12228,31 @@ function ProcUserResp(key,userresp,probno,notify)
         fieldPopTbl(a[1]);
     }
 }
+%    \end{macrocode}
+% (2021/04/04) Added try/catch to catch exceptions.
+% \changes{v8.6.6}{2021/04/04}{Added some try/catch pairs to avoid tossing cookies}
+%    \begin{macrocode}
 function ProcUserNoResp(key,userresp,probno,notify)
 {
   if ( arguments.length > 4 ) {
-    RightWrong[probno][arguments[4]] = undefined;
-    Responses[probno][arguments[4]] = undefined;
+    try{
+      RightWrong[probno][arguments[4]] = undefined;
+      Responses[probno][arguments[4]] = undefined;
+    } catch(e){};
     var bVoidArray=true;
-    for (var i=0; i<Responses[probno].length; i++) {
-      if ( typeof Responses[probno][i] != "undefined") {
-        bVoidArray=false;
-        break;
-		  }
-    }
-		if (bVoidArray) {
-			Responses[probno]=undefined;
-			RightWrong[probno]=undefined;
+    try {
+      for (var i=0; i<Responses[probno].length; i++) {
+        if ( typeof Responses[probno][i] != "undefined") {
+          bVoidArray=false;
+          break;
+        }
+      }
+    } catch(e){};
+    if (bVoidArray) {
+      Responses[probno]=undefined;
+      RightWrong[probno]=undefined;
       ProbValue[probno]=undefined;
-		}
+    }
   } else {
       RightWrong[probno] = undefined;
       Responses[probno] = undefined;
@@ -12182,8 +12485,8 @@ function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
 %   (2021/02/17) If there is a fourth argument for this function, it should
 %   be either \texttt{true} or \texttt{false}; if \texttt{true}, \texttt{DisplayQuizResults()}
 %   does not display quiz results; the default is \texttt{false}. This feature is used in the
-%   demo file \texttt{qz-pin-to-correct.tex} found on the {Acro\!\TeX} Blog.
-%   \changes{v8.6.4}{2021/02/17}{Added conditional (\texttt{\_bSilent})}
+%   demo file \texttt{qz-pin-to-correct.tex} found on the {Acro\negthinspace\TeX} Blog.
+%   \changes{v8.6.4}{2021/02/17}{Added conditional (\string\texttt{\_bSilent})}
 %    \begin{macrocode}
     var _bSilent=(arguments.length > 3 ) ? arguments[3] : false;
     if (!_bSilent) {

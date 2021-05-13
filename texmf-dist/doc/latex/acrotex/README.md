@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle (AeB)
 Author: D. P. Story 
-Dated: 2021-02-17
+Dated: 2021-05-10
 
 AeB contains the following:
 
@@ -19,9 +19,33 @@ AeB contains the following:
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eforms
    (including insdljs and dljslib).
 
+What's New (2021-05-10) 
+  web: added navibar* option
+  exerquiz: new option usealtadobe is passed to insdljs
+      new option userbmintrvl, see http://www.acrotex.net/blog/?p=1482
+      shortquiz: Enhanced user experience, see http://www.acrotex.net/blog/?p=1489
+      and http://www.acrotex.net/blog/?p=1493.
+      
+  Other new demo files: 
+      eqexam: A Matching-type Problem: http://www.acrotex.net/blog/?p=1457
+      exerquiz
+        Matching-type questions: http://www.acrotex.net/blog/?p=1446
+        Randomized matching-type questions: http://www.acrotex.net/blog/?p=1449                
+        A spell checking feature: http://www.acrotex.net/blog/?p=1437
+      insdljs: Exploring the defineJS environment: http://www.acrotex.net/blog/?p=1442
+        
+What's New (2021-04-24)
+  exerquiz: Options usemcfi and userbmintrvl, bug fixes.
+  dljslib: Revised useGermanNums, created alias of useDeNums, see http://www.acrotex.net/blog/?p=1039
+    new option useEnNums, a companion to useDeNums, http://www.acrotex.net/blog/?p=1470
+
+What's New (2021-02-28) exerquiz: bug fix to \rbtAAKey. web: removed legacy code.
+
 What's New (2021-02-17) exerquiz: Added an optional fourth argument to the JavaScript
     function DisplayQuizResults(), this is in support of the eq-pin2corr 
     package.
+    
+What's New (2021-02-21) Bug fixes
 
 What's New (2021-02-07) Minor change in the defineJS environment that is 
   critical to a fix in the page events environments of aeb_pro.

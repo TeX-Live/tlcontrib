@@ -24,7 +24,7 @@
 %%---------------------------------------------------------
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{web}
- [2021/02/06 v6.1.5 web: A Screen Design Package (dps)]
+ [2021/05/06 v6.1.7 web: A Screen Design Package (dps)]
 \RequirePackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -192,6 +192,7 @@
   \def\@panelconfig{0}\def\@textX{0}\def\@panelX{0}}
 \templatedefaults
 \DeclareOptionX{navibar}{\web@navibartrue}
+\DeclareOptionX{navibar*}{\AtEndOfPackage{\ifeqforpaper\else\web@navibartrue\fi}}
 \DeclareOptionX{tight}{\AtEndOfPackage{\tightsettings}}
 \DeclareOptionX{tight*}{\AtEndOfPackage{\tightsettings*}}
 \let\web@tight\web@NO
@@ -573,59 +574,9 @@
     {The comment package is incompatible with the\MessageBreak
      aeb-comment package, do not use the comment package}}{}}
 \AtBeginDocument{\web@commentChkMsg}
-\ifnum\@usetemplates=\@ne\relax
-    \def\x{\RequirePackage{graphicx}}\expandafter\x\fi
-\ifnum\@usetemplates=\@ne
-  \RequirePackage{eso-pic}
-  \ifnum\eq@drivernum=\tw@
-    \def\web@set@paper{\AddToShipoutPicture*{%
-      \special{papersize=\the\paperwidth,\the\paperheight}}}%
-    \AtBeginShipoutFirst{%
-      \begingroup
-        \@ifundefined{stockwidth}{%
-          \ifx\special@paper\@empty
-            \special{papersize=\the\paperwidth,\the\paperheight}\else
-            \special{papersize=\special@paper}\fi
-        }{%
-          \ifdim\stockwidth=\z@\else
-            \special{papersize=\the\stockwidth,\the\stockheight}\fi
-        }%
-     \endgroup
-    }%
-    \@ifundefined{@ShipoutPicture}{}{%
-      \renewcommand{\@ShipoutPicture}{%
-        \bgroup
-          \@tempswafalse%
-          \ifx\ESO@HookI\@empty\else\@tempswatrue\fi%
-          \ifx\ESO@HookII\@empty\else\@tempswatrue\fi%
-          \if@tempswa%
-          \@tempdima=1in\@tempdimb=-\@tempdima%
-          \advance\@tempdimb\paperheight
-          \@ifundefined{stockwidth}{}{%
-            \advance\@tempdima+\trimedge%
-            \advance\@tempdima+\paperwidth%
-            \advance\@tempdima-\stockwidth%
-            \if@twoside\ifodd\c@page\else%
-            \advance\@tempdima-2\trimedge%
-            \advance\@tempdima-\paperwidth%
-            \advance\@tempdima+\stockwidth%
-            \fi\fi\advance\@tempdimb+\trimtop
-          }%
-          \unitlength=1pt%
-          \global\setbox\@cclv\vbox{%
-            \vbox{\let\protect\relax
-            \pictur@(0,0)%
-            (\strip@pt\@tempdima,\strip@pt\@tempdimb)%
-            \ESO@HookII\ESO@HookI\global\let\ESO@HookII\@empty%
-            \endpicture}%
-            \box\@cclv%
-          }%
-        \fi
-        \egroup
-      }% shipout
-    }% ifundefined shipout
-  \fi
-\fi
+\ifnum\@usetemplates=\@ne\def\x{%
+  \RequirePackage{graphicx}
+  \RequirePackage{eso-pic}}\expandafter\x\fi
 \def\getargs#1#2{\def\aeb@argi{#1}\def\aeb@argii{#2}}
 \let\getargsii\getargs
 \newlength{\textscreenwidth}

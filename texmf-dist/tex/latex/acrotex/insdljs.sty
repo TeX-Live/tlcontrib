@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2021/02/07 v2.5.2 Insert Document Level JavaScripts (dps)]
+ [2021/05/10 v2.5.3 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -38,6 +38,16 @@
 \let\dl@YES=y \let\dl@NO=n
 \let\dl@One=1 \let\dl@Zero=0
 \let\dljs@YES=y \let\dljs@NO=n
+\edef\dl@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\'=\the\catcode`\'\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\(=\the\catcode`\(\relax
+  \catcode`\noexpand\!=\the\catcode`\!\relax
+  \catcode`\noexpand\_=\the\catcode`\_\relax
+}
+\@makeother\"\@makeother\'\@makeother\,%
+\@makeother\(\@makeother\!\@makeother\_
 \def\dlpkgInfo{\@nameuse{ver@\@currname.\@currext}}
 \def\dlSetPkgInfo{%
   \edef\dlpkgInfoExpd{\dlpkgInfo}%
@@ -187,6 +197,7 @@
 \let\jsT=\js@@T
 \newwrite\js@verbatim@out
 \def\iwvo#1{\immediate\write\js@verbatim@out{#1}}
+\def\dl@EForAF4#1_{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi#1_}
 \def\dl@lparen{(}\def\dl@rparen{)}
 \def\genericNL{^^J}
 \def\defjsLB{\gobiv}
@@ -503,20 +514,20 @@
   \ifx\csname dljs\dljsBase\endcsname\relax
     \else\@insjserrDuplicate\fi
   \ifcase\dljs@drivernum
-    \let\insert@DLJS=\insert@DLJS@pdfmark
-    \let\endinsDLJS=\endinsert@DLJS@pdfmark
-    \let\newsegment=\newsegment@pdfmark
-    \let\endnewsegment=\endnewsegment@pdfmark
+    \let\insert@DLJS\insert@DLJS@pdfmark
+    \let\endinsDLJS\endinsert@DLJS@pdfmark
+    \let\newsegment\newsegment@pdfmark
+    \let\endnewsegment\endnewsegment@pdfmark
   \or
-    \let\insert@DLJS=\insert@DLJS@pdftex
-    \let\endinsDLJS=\endinsert@DLJS@pdftex
-    \let\newsegment=\newsegment@pdftex
-    \let\endnewsegment=\endnewsegment@pdftex
+    \let\insert@DLJS\insert@DLJS@pdftex
+    \let\endinsDLJS\endinsert@DLJS@pdftex
+    \let\newsegment\newsegment@pdftex
+    \let\endnewsegment\endnewsegment@pdftex
   \or
-    \let\insert@DLJS=\insert@DLJS@dvipdfm
-    \let\endinsDLJS=\endinsert@DLJS@dvipdfm
-    \let\newsegment=\newsegment@dvipdfm
-    \let\endnewsegment=\endnewsegment@dvipdfm
+    \let\insert@DLJS\insert@DLJS@dvipdfm
+    \let\endinsDLJS\endinsert@DLJS@dvipdfm
+    \let\newsegment\newsegment@dvipdfm
+    \let\endnewsegment\endnewsegment@dvipdfm
   \fi
   \insert@DLJS
 }{}
@@ -534,20 +545,20 @@
   \expandafter\ifx\csname dljs\dljsBase\endcsname\relax
     \else\@insjserrDuplicate\fi
   \ifcase\dljs@drivernum
-    \let\insert@DLJS=\insert@DLJS@pdfmark\expandafter
+    \let\insert@DLJS\insert@DLJS@pdfmark\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdfmark
-    \let\newsegment=\newsegment@pdfmark
-    \let\endnewsegment=\endnewsegment@pdfmark
+    \let\newsegment\newsegment@pdfmark
+    \let\endnewsegment\endnewsegment@pdfmark
   \or
-    \let\insert@DLJS=\insert@DLJS@pdftex\expandafter
+    \let\insert@DLJS\insert@DLJS@pdftex\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdftex
-    \let\newsegment=\newsegment@pdftex
-    \let\endnewsegment=\endnewsegment@pdftex
+    \let\newsegment\newsegment@pdftex
+    \let\endnewsegment\endnewsegment@pdftex
   \or
-    \let\insert@DLJS=\insert@DLJS@dvipdfm\expandafter
+    \let\insert@DLJS\insert@DLJS@dvipdfm\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@dvipdfm
-    \let\newsegment=\newsegment@dvipdfm
-    \let\endnewsegment=\endnewsegment@dvipdfm
+    \let\newsegment\newsegment@dvipdfm
+    \let\endnewsegment\endnewsegment@dvipdfm
   \fi
   \insert@DLJS
 }{}
@@ -952,6 +963,7 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 }
 \catcode`\"=\dl@dquoteCat
 \inputAltAdbFncs
+\dl@restoreCats
 \endinput
 %%
 %% End of file `insdljs.sty'.

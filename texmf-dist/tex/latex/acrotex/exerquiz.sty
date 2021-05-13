@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2021/02/17 v8.6.4 %
+ [2021/05/10 v8.7.7 %
  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -33,11 +33,9 @@
 \DeclareOption{noxcolor}{\def\eq@ColorPackage{color}}
 \DeclareOption{forpaper}{%
    \eqforpapertrue\PassOptionsToPackage{monochrome}{\eq@ColorPackage}
-   \AtBeginDocument{\ifnum\eq@drivernum=4 \else\AllowPeeking\fi}
-}
-\DeclareOption{forcolorpaper}{\eqforpapertrue  % for print
-   \AtBeginDocument{\ifnum\eq@drivernum=4 \else\AllowPeeking\fi}
-}
+   \AtBeginDocument{\AllowPeeking}}
+\DeclareOption{forcolorpaper}{\eqforpapertrue
+   \AtBeginDocument{\AllowPeeking}}
 \DeclareOption{preview}{\PassOptionsToPackage{preview}{eforms}}
 \DeclareOption{nosolutions}{\eq@nosolutionstrue\eq@nolinktrue}
 \DeclareOption{noquizsolutions}{\eq@noquizsolutionstrue\eq@nolinktrue}
@@ -48,58 +46,64 @@
 \let\eq@online\eq@NO
 \DeclareOption{nohiddensolutions}{\eq@globalshowsolutionstrue}
 \DeclareOption{noHiddensolutions}%
-    {\eq@globalshowsolutionstrue\AtBeginDocument{\def\Hidesymbol{h}}}
+  {\eq@globalshowsolutionstrue\AtBeginDocument{\def\Hidesymbol{h}}}
 \DeclareOption{solutionsafter}{\eq@solutionsaftertrue\eq@nolinktrue}
 \DeclareOption{solutionsonly}{\solutionsonlytrue\answerkeytrue
-    \therearesolutionstrue\AtEndOfPackage{\let\exerSolnsHeadnToc\relax}}
+  \therearesolutionstrue\AtEndOfPackage{\let\exerSolnsHeadnToc\relax}}
 \newif\ifsolutionsonly\solutionsonlyfalse
 \@ifundefined{ifanswerkey}{\newif\ifanswerkey\answerkeyfalse}{}
 \DeclareOption{contsolns}{\AtEndOfPackage{\InputIfFileExists
-    {contsolns.def}{\contsolnsInputMsg}{\contsolnsErrorMsg}}}
+  {contsolns.def}{\contsolnsInputMsg}{\contsolnsErrorMsg}}}
 \def\contsolnsInputMsg{\PackageInfo{exerquiz}{contsolns option,
-    inputting file contsolns.def}}
+  inputting file contsolns.def}}
 \def\contsolnsErrorMsg{\PackageWarning{exerquiz}{contsolns option,
-    cannot find file contsolns.def}}
+  cannot find file contsolns.def}}
 \DeclareOption{nocorrections}{\nocorrectionstrue}
 \DeclareOption{proofing}{\eq@proofingtrue}
 \newif\ifaebshowgrayletters\aebshowgraylettersfalse
 \DeclareOption{showgrayletters}{\aebshowgrayletterstrue}
 \@ifundefined{ifvspacewithsolns}{%
-    \DeclareOption{vspacewithsolns}{\vspacewithsolnstrue}
-    \newif\ifvspacewithsolns\vspacewithsolnsfalse
+  \DeclareOption{vspacewithsolns}{\vspacewithsolnstrue}
+  \newif\ifvspacewithsolns\vspacewithsolnsfalse
 }{}
 \@ifundefined{ifdisplayworkarea}{\newif\ifdisplayworkarea
   \displayworkareafalse}{}
 \providecommand\displayworkareaOn{\displayworkareatrue}
 \providecommand\displayworkareaOff{\displayworkareafalse}
 \DeclareOption{nodljs}{\PassOptionsToPackage{nodljs}{insdljs}%
-     \AtEndOfPackage{\let\importdljs\eq@YES}}
+  \AtEndOfPackage{\let\importdljs\eq@YES}}
 \DeclareOption{execJS}{\PassOptionsToPackage{execJS}{insdljs}}
+\DeclareOption{usealtadobe}{\PassOptionsToPackage{usealtadobe}{insdljs}}
 \DeclareOption{exercisesonly}{\PassOptionsToPackage{nodljs}{insdljs}}
 \DeclareOption{debug}{\PassOptionsToPackage{debug}{insdljs}}
 \DeclareOption{allowrandomize}{\AtEndOfPackage{\inputRandomizeChoices}}
 \def\inputRandomizeChoices{\InputIfFileExists{aebrandom.def}
-    {\PackageInfo{exerquiz}{inputting aebrandom.def}}
-    {cannot find aebrandom.def}}
+  {\PackageInfo{exerquiz}{inputting aebrandom.def}}
+  {cannot find aebrandom.def}}
 \newif \ifusesumrytbls \usesumrytblsfalse
 \DeclareOption{usesumrytbls}{\usesumrytblstrue
-    \def\inputSumryTblCode{\InputIfFileExists{aebsumrytbls.def}
-    {\PackageInfo{exerquiz}{inputting aebsumrytbls.def}}%
-    {cannot find aebsumrytbls.def}}}
+  \def\inputSumryTblCode{\InputIfFileExists{aebsumrytbls.def}
+  {\PackageInfo{exerquiz}{inputting aebsumrytbls.def}}%
+  {cannot find aebsumrytbls.def}}}
 \let\inputSumryTblCode\relax
 \DeclareOption{usemcfi}{%
-    \def\inputMCFICode{\InputIfFileExists{usemcfi.def}
-    {\PackageInfo{exerquiz}{inputting usemcfi.def}}%
-    {cannot find usemcfi.def}}}
+  \def\inputMCFICode{\InputIfFileExists{usemcfi.def}
+  {\PackageInfo{exerquiz}{inputting usemcfi.def}}%
+  {cannot find usemcfi.def}}}
 \let\inputMCFICode\relax
 \newif\ifwithinMCFI\withinMCFIfalse
+\DeclareOption{userbmintrvl}{%
+  \def\inputRBMICode{\InputIfFileExists{rbmintrvl.def}
+  {\PackageInfo{exerquiz}{Inputting rbmintrvl.def}}%
+  {cannot find rbmintrvl.def}}}
+\let\inputRBMICode\relax
 \DeclareOption{dvipsone}{%
-    \def\eq@drivernum{0}\def\eq@driver{dvipsone}%
-    \PassOptionsToPackage{dvipsone}{eforms}
+  \def\eq@drivernum{0}\def\eq@driver{dvipsone}
+  \PassOptionsToPackage{dvipsone}{eforms}
 }
 \DeclareOption{dvips}{%
-    \def\eq@drivernum{0}\def\eq@driver{dvips}%
-    \PassOptionsToPackage{dvips}{eforms}
+  \def\eq@drivernum{0}\def\eq@driver{dvips}
+  \PassOptionsToPackage{dvips}{eforms}
 }
 \DeclareOption{pdftex}{%
     \def\eq@drivernum{1}\def\eq@driver{pdftex}%
@@ -107,32 +111,35 @@
     \PassOptionsToPackage{pdftex}{eforms}
 }
 \DeclareOption{luatex}{%
-    \def\eq@drivernum{1}\def\eq@driver{luatex}%
+    \def\eq@drivernum{1}\def\eq@driver{luatex}
     \PassOptionsToPackage{luatex}{\eq@ColorPackage}
     \PassOptionsToPackage{luatex}{eforms}
 }
 \DeclareOption{dvipdfm}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfm}%
-    \PassOptionsToPackage{dvipdfm}{\eq@ColorPackage}%
+    \def\eq@drivernum{2}\def\eq@driver{dvipdfm}
+    \PassOptionsToPackage{dvipdfm}{\eq@ColorPackage}
     \PassOptionsToPackage{dvipdfm}{eforms}%
 }
 \DeclareOption{dvipdfmx}{%
-    \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}%
-    \PassOptionsToPackage{dvipdfmx}{\eq@ColorPackage}%
-    \PassOptionsToPackage{dvipdfmx}{eforms}%
+    \def\eq@drivernum{2}\def\eq@driver{dvipdfmx}
+    \PassOptionsToPackage{dvipdfmx}{\eq@ColorPackage}
+    \PassOptionsToPackage{dvipdfmx}{eforms}
 }
 \DeclareOption{xetex}{%
-    \def\eq@drivernum{2}\def\eq@driver{xetex}%
+    \def\eq@drivernum{2}\def\eq@driver{xetex}
     \PassOptionsToPackage{xetex}{\eq@ColorPackage}
-    \PassOptionsToPackage{xetex}{eforms}%
+    \PassOptionsToPackage{xetex}{eforms}
 }
-\DeclareOption{textures}{\def\eq@drivernum{3}%
-  \def\eq@driver{textures}%
-  \PassOptionsToPackage{textures}{\eq@ColorPackage}%
-  \PassOptionsToPackage{textures}{eforms}%
+\DeclareOption{textures}{\def\eq@drivernum{3}
+  \def\eq@driver{textures}
+  \PassOptionsToPackage{textures}{\eq@ColorPackage}
+  \PassOptionsToPackage{textures}{eforms}
 }
-\DeclareOption{dviwindo}{\def\eq@drivernum{4}\def\eq@driver{dviwindo}%
-    \eq@noformstrue\PassOptionsToPackage{nodljs}{insdljs}}
+\DeclareOption{dviwindo}{\def\eq@drivernum{4}\def\eq@driver{dviwindo}
+  \eq@noformstrue\PassOptionsToPackage{nodljs}{insdljs}}
+\def\eq@drivernum{5}
+\def\eq@driver{dvipsone/dvips}
+\def\eq@driver@nodriver{no driver specified}
 \DeclareOption{unicode}{\PassOptionsToPackage{unicode}{hyperref}}
 \DeclareOption{useui}{\PassOptionsToPackage{useui}{eforms}}
 \let\LangRedefinitions\relax
@@ -310,7 +317,7 @@
 \RequirePackage{verbatim}
 \RequirePackage{hyperref}
 \RequirePackage{amssymb}% used for return symbols
-\RequirePackage{eforms}[2019/10/23]
+\RequirePackage{eforms}[2021/05/10]
 \dlSetPkgInfo
 \@ifundefined{eq@drivernum}{%
     \PackageError{exerquiz}%
@@ -321,7 +328,7 @@
         dvipdfmx, or xetex
         \MessageBreak in the option list of the exerquiz package.}
 }{}
-\edef\eq@restoreCats{% dps17
+\edef\eq@restoreCats{%
   \catcode`\noexpand\"=\the\catcode`\"\relax
   \catcode`\noexpand\'=\the\catcode`\'\relax
   \catcode`\noexpand\,=\the\catcode`\,\relax
@@ -437,7 +444,8 @@
     \ifOKToWriteExamData
       \set@display@protect
       \immediate\write\ex@solns{#1}\set@typeset@protect
-  \fi\fi}%
+  \fi\fi
+}
 \ifsolutionsonly
   \InputIfFileExists{\jobname_xdefs.cut}{%
     \typeout{^^JExerquiz|Eqexam: Reading \jobname_xdefs.cut^^J}}
@@ -524,8 +532,8 @@
 \newcommand{\nolinkcolor}[1]{\def\@nolinkcolor{#1}}
 \nolinkcolor{blue}
 \newcommand{\exerSolnsInExtFile}[2][]
-    {\let\exerSolns@ExtFile\eq@YES\gdef\eq@exerSolns@fileName{#2}%
-     \gdef\exerSolns@ReturnPath{#1}}
+  {\let\exerSolns@ExtFile\eq@YES\gdef\eq@exerSolns@fileName{#2}%
+   \gdef\exerSolns@ReturnPath{#1}}
 \let\exerSolns@ExtFile\eq@NO
 \def\exerSolns@ReturnPath{}
 \let\marginparpriorhook\@empty % used to material before the exercise
@@ -736,9 +744,9 @@
 \def\eq@pslnaindnt{0pt}
 \let\eq@setPrbSolnAftrIndnt\relax
 \newcommand{\setPrbSolnAftrIndent}[1]{\ifdim#1=0pt
-    \def\eq@pslnaindnt{0pt}\let\eq@setPrbSolnAftrIndnt\relax\else
-    \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{\expandafter
-    \noexpand\expandafter\parindent#1\noexpand\relax}\fi}
+  \def\eq@pslnaindnt{0pt}\let\eq@setPrbSolnAftrIndnt\relax\else
+  \edef\eq@pslnaindnt{#1}\edef\eq@setPrbSolnAftrIndnt{\expandafter
+  \noexpand\expandafter\parindent#1\noexpand\relax}\fi}
 \newif\if@restorejustify \@restorejustifyfalse
 \newcommand\restoreJustifyOn{\@restorejustifytrue}
 \newcommand\restoreJustifyOff{\@restorejustifyfalse}
@@ -1612,14 +1620,14 @@
 \definecolor{webgreen}{rgb}{0,.6,0}
 \newcommand{\proofingsymbolColor}[1]{\def\@proofingsymbolColor{#1}}
 \proofingsymbolColor{red}
-\let\@proofsymbolredefined=0
-\newcommand{\proofingsymbol}[1]{\let\@proofsymbolredefined=1%
-    \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
+\let\@proofsymbolredefined\eq@Zero
+\newcommand{\proofingsymbol}[1]{\let\@proofsymbolredefined\eq@One
+  \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{#1}}}
 \def\@proofingsymbol{\textcolor{\@proofingsymbolColor}{\ding{52}}}
-\def\setproofingsymbol{%
-    \if\@proofsymbolredefined1\else
-    \@ifpackageloaded{pifont}{\proofingsymbol{\ding{52}}}
-    {\proofingsymbol{$\bullet$}}\fi}
+\def\setproofingsymbol{\ifx\@proofsymbolredefined\eq@One\else
+  \@ifpackageloaded{pifont}{\proofingsymbol{\ding{52}}}
+  {\proofingsymbol{$\bullet$}}\fi
+}
 \AtBeginDocument{\setproofingsymbol}
 \newcommand{\prior@questionsHook}{}
 \let\insE@rlyAtQues\@empty
@@ -1629,17 +1637,17 @@
 \newcommand{\quesNumColor}[1]{\def\eq@quesNumCol{#1}}
 \quesNumColor{blue}
 \renewcommand{\theeqquestionnoi}{\arabic{eqquestionnoi}}
-\newcommand{\labeleqquestionnoi}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoi.}
+\newcommand{\labeleqquestionnoi}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoi.}
 \renewcommand\theeqquestionnoii{(\alph{eqquestionnoii})}
-\newcommand{\labeleqquestionnoii}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoii}
+\newcommand{\labeleqquestionnoii}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoii}
 \renewcommand\theeqquestionnoiii{(\roman{eqquestionnoiii})}
-\newcommand{\labeleqquestionnoiii}{%
-    \color{\eq@quesNumCol}\bfseries\theeqquestionnoiii}
+\newcommand{\labeleqquestionnoiii}{\color{\eq@quesNumCol}\bfseries
+  \theeqquestionnoiii}
 \define@key{props@ques}{labelwidthTo}%
-    [\normalsize\normalfont\bfseries00.]%
-    {\def\propQ@labelwidthTo{#1}}
+  [\normalsize\normalfont\bfseries00.]%
+  {\def\propQ@labelwidthTo{#1}}
 \define@key{props@ques}{labelwidth}[]{\def\propQ@labelwidth{#1}}
 \let\propQ@labelwidth\@empty
 \define@key{props@ques}{topsep}[\the\topsep]{\edef\propQ@topsep{#1}}
@@ -1664,14 +1672,15 @@
   \list{\qMark@Hook\prior@questionsHook
   \insE@rlyAtQues\gdef\eqPTs{1}%
   \global\let\eqQT\eq@na%
-  {\@tempcnta=0 \let\@thispr@b\@empty
+  {\@tempcnta\z@\let\@thispr@b\@empty
    \@whilenum\@tempcnta<\@eqquestiondepth\do{\advance\@tempcnta\@ne
-   \ifx\@thispr@b\@empty\edef\@thispr@b{%
-   \csname theeqquestionno\romannumeral\the\@tempcnta\endcsname}\else
-   \edef\@thispr@b{\@thispr@b%
-   \csname theeqquestionno\romannumeral\the\@tempcnta\endcsname}\fi
+   \ifx\@thispr@b\@empty\edef\@thispr@b{\@nameuse
+      {theeqquestionno\romannumeral\the\@tempcnta}}\else
+   \edef\@thispr@b{\@thispr@b\@nameuse
+    {theeqquestionno\romannumeral\the\@tempcnta}}\fi
   }\xdef\@currentQues{\@thispr@b}}%
-  \makebox[\labelwidth][r]{\normalfont\@nameuse{label\@quesctr}}%
+  \makebox[\labelwidth][r]{\normalfont
+    \@nameuse{label\@quesctr}}% format label
   \xdef\eq@pageThisQ{\the\c@page}%
   \post@questionsHook}{\usecounter{\@quesctr}%
     \ifx\propQ@labelsep\@empty
@@ -1707,8 +1716,7 @@
 \def\@sqGenBaseName{eqSqBn\@shortquizCnt}
 \let\sqhspace\space
 \let\ListOfSQuizNames\@empty
-\newenvironment{shortquiz}
-{%
+\newenvironment{shortquiz}{\def\eqPTs{1}%
   \xdef\eq@pageThisQ{\the\c@page}%
   \let\@currentQues\@empty
   {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
@@ -1717,8 +1725,7 @@
     {\if\aeb@FLOverride\eq@f\def\sqstar{*}\else
      \def\sqstar{}\sqLinks\fi\@shortquiz}%
 }{\aeb@endshortquiz}
-\newenvironment{shortquiz*}
-{%
+\newenvironment{shortquiz*}{%
   \xdef\eq@pageThisQ{\the\c@page}%
   {\eqtmpcnta\@shortquizCnt\relax\advance\eqtmpcnta\@ne
     \xdef\@shortquizCnt{\the\eqtmpcnta}}%
@@ -1737,6 +1744,7 @@
     \AA{\AAFormat{%
       if\eqSP(typeof\eqSP\oField=="undefined")\eqSP
         var\eqSP\oField=new\eqSP Object;\r
+      \oField.sqTlyTotCnt=0;\r
       \oField.Grp={};%
       \ifx\defaultColorJSLoc\@empty\else\r
       \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
@@ -1864,20 +1872,19 @@ if (typeof !oField=="undefined")
     \expandafter\verbatimwrite\fi
 }
 \let\qzSolutionsAfterHook\@empty
-\def\endsolution@sq
-{%
-    \ifeq@solutionsafter
-        \eq@fititin{\mbox{\sqslrtnlabel}}\par\qzSolutionsAfterHook
-        \aftergroup\ignorespaces
-    \else
-        \endverbatimwrite
-        \eq@clearMrkCpy
-        \ifx\@qzsolndest\@empty\else\set@display@protect
-            \immediate\write\verbatim@out{\eqSqSolnTrailer}%
-         \set@typeset@protect
-        \fi
+\def\endsolution@sq{%
+  \ifeq@solutionsafter
+    \eq@fititin{\mbox{\sqslrtnlabel}}\par\qzSolutionsAfterHook
+    \aftergroup\ignorespaces
+  \else
+    \endverbatimwrite
+    \eq@clearMrkCpy
+    \ifx\@qzsolndest\@empty\else\set@display@protect
+      \immediate\write\verbatim@out{\eqSqSolnTrailer}%
+     \set@typeset@protect
     \fi
-    \global\let\@qzsolndest\@empty
+  \fi
+  \global\let\@qzsolndest\@empty
 }
 \newcommand\pnphDflt{.1\textheight}
 \newcommand{\promoteNewPageHere}[1][\pnphDflt]{%
@@ -1893,26 +1900,26 @@ if (typeof !oField=="undefined")
         \else\newpage\penalty1\fi\fi\egroup\fi
 }
 \newcommand{\saveDest}[1][]{%
-    \def\sd@arg{#1}\ifx\sd@arg\@empty
-    \xdef\holdDest{\@qzsolndest}\else
-    \xdef\@qzsolndest{#1}\xdef\holdDest{#1}\fi}
+  \def\sd@arg{#1}\ifx\sd@arg\@empty
+  \xdef\holdDest{\@qzsolndest}\else
+  \xdef\@qzsolndest{#1}\xdef\holdDest{#1}\fi}
 \def\useDest{\def\@qzsolndest{\holdDest}}
 \let\holdDest\@empty
 \def\fpAfterSolutionsSkip{\par\medskip}
 \let\eqSqSolnTrailerHook\@empty
 \let\eqQzSolnTrailerHook\@empty
 \newcommand\eqSqSolnTrailer{%
-    \if\eqQuizType\isQZ
-        \eqQzSolnTrailerHook
-        \protect\ReturnTo{page.\eq@pageThisQ}%
-            {\protect\mbox{\sqslrtnlabel}}\string\endeqQt
-    \else
-        \eqSqSolnTrailerHook
-        \protect\ReturnTo{page.\eq@pageThisQ}%
-            {\protect\mbox{\sqslrtnlabel}}\string\endeqSQt%
-    \fi
-    \ifeqforpaper\protect\fpAfterSolutionsSkip\fi^^J%
-    \ifmakeQzSlLocal\protect\endgroup^^J\fi
+  \if\eqQuizType\isQZ
+    \eqQzSolnTrailerHook
+    \protect\ReturnTo{page.\eq@pageThisQ}%
+      {\protect\mbox{\sqslrtnlabel}}\string\endeqQt
+  \else
+    \eqSqSolnTrailerHook
+    \protect\ReturnTo{page.\eq@pageThisQ}%
+      {\protect\mbox{\sqslrtnlabel}}\string\endeqSQt%
+  \fi
+  \ifeqforpaper\protect\fpAfterSolutionsSkip\fi^^J%
+  \ifmakeQzSlLocal\protect\endgroup^^J\fi
 }
 \let\eqSQt\@gobble
 \let\endeqSQt\relax
@@ -1952,8 +1959,7 @@ if (typeof !oField=="undefined")
 \newcommand{\InputQzSolnsLevel@i}[2][]{%
   \def\eq@QzSolnsLabel{#1}\def\eq@QzSolnsLevel{#2}}
 \InputQzSolnsLevel*{section}
-\def\quizSolnsHeadnToc
-{%
+\def\quizSolnsHeadnToc{%
   \edef\eq@mkCmd{\expandafter\noexpand
     \csname\eq@QzSolnsLevel\endcsname\eq@QzSolnsStar}%
   \eq@mkCmd{\sqslsectitle}\if!\eq@QzSolnsLabel!\else
@@ -1967,8 +1973,7 @@ if (typeof !oField=="undefined")
     }%
   \fi
 }
-\newcommand{\quizSolnInput}
-{%
+\newcommand{\quizSolnInput}{%
   \global\let\webnewpage\relax
   \bgroup\OKToWriteExamDatatrue
   \writeT@QzSolns{\string\endinput}\egroup
@@ -2029,9 +2034,11 @@ if (typeof !oField=="undefined")
 \newcommand\useLinks{\def\aeb@FLOverride{l}}
 \newcommand\restoreFLTypeDefault{\global\let\aeb@FLOverride\relax}
 \let\aeb@FLOverride\relax
-\newenvironment{quiz}
-{\goodbreak\@ifstar{\gdef\qstar{*}\@quiz*f}{\gdef\qstar{x}\@quiz*l}}
-    {\aeb@endquiz}
+\newenvironment{quiz}{\goodbreak
+  \@ifstar
+    {\gdef\qstar{*}\@quiz*f}
+    {\gdef\qstar{x}\@quiz*l}%
+}{\aeb@endquiz}
 \def\@quizCnt{0}
 \let\ListOfQuizNames\@empty
 \def\@quiz*#1#2{%
@@ -2569,7 +2576,7 @@ if (isEndQuizPushed("@eqBaseName")){
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }% list
-}{\endlist\setcounter{quizno}{0}\eq@answersEndHook}
+}{\eq@answersEndHook\endlist\setcounter{quizno}{0}}
 \newcommand\Ans@tabular[2][0]{\gdef\eq@pPTs{#1}\xdef\Ans@choice{#2}%
     \leavevmode\@Ans
 }
@@ -2606,7 +2613,9 @@ if (isEndQuizPushed("@eqBaseName")){
             \everypar{}\@endpefalse}\the\eq@scratchtoks
     }%
 }
-\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}}
+\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
+  \ifx\eq@answersEndHook\@empty\else
+    \def\insertEndHookHere{#1}\fi}
 \let\eq@answersEndHook\@empty
 \def\endanswers@sq{\endtabular\setcounter{quizno}{0}%
     \eq@answersEndHook\reset@doendpe{\the\everypar}%
@@ -2677,11 +2686,14 @@ var qzSolnDest="*@qzsolndest";
 var solnAfter=*ifeq@solutionsafter%
 true*else%
 false*fi;
-if ((qzSolnDest!="") && !solnAfter) %
-jmpToNamedDest("*oField","*@qzsolndest",%
-*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
-*ifx*eqAddAAMouseUpMC*empty*else
-*eqAddAAMouseUpMC*fi
+var f=this.getField("corr.*oField.*thequestionno");
+if (f==null) {
+  if ((qzSolnDest!="") && !solnAfter) %
+  jmpToNamedDest("*oField","*@qzsolndest",%
+  *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
+  *ifx*eqAddAAMouseUpMC*empty*else
+  *eqAddAAMouseUpMC*fi
+}
 \end{defineJS}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\Ans@sq@f@ActionsFalse}
 *ifx*@sqTurnOffAlerts*eq@One%
@@ -2776,23 +2788,26 @@ for (var i=0; i<a.length; i++)
   if ( (a[i].isBoxChecked(0)) && %
 (a[i].value.charAt(0)==0) )
     a[i].checkThisBox(0,false);%
-*ifx*@sqTurnOffAlerts*eq@One%
-OnBlurRespBox(true,"*oField");
+*ifx*@sqTurnOffAlerts*eq@One
+OnBlurRespBox(true,"*oField");*else
 *fi%
 var qzSolnDest="*@qzsolndest";
 var solnAfter=*ifeq@solutionsafter%
 true*else%
 false*fi;
-if ( (qzSolnDest != "") && !solnAfter ) {
-  for (var i=0; i<a.length; i++){
-    if ((a[i].exportValues[0].charAt(0)==1) && %
+var f=this.getField("corr.*oField.*thequestionno");
+if (f==null) {
+  if ( (qzSolnDest != "") && !solnAfter ) {
+    for (var i=0; i<a.length; i++){
+      if ((a[i].exportValues[0].charAt(0)==1) && %
 (!a[i].isBoxChecked(0))) break;
+    }
   }
+  if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
+  *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
+  *ifx*eqAddAAMouseUpMS*empty*else
+  *eqAddAAMouseUpMS*fi
 }
-if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
-*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
-*ifx*eqAddAAMouseUpMS*empty*else
-*eqAddAAMouseUpMS*fi
 \end{defineJS}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\Ans@ck@sq@f@ActionsFalse}
 var fName=event.target.name;
@@ -2804,9 +2819,8 @@ for (var i=0; i<a.length; i++) {
     a[i].checkThisBox(0,false);
   }
 }%
-*ifx*@sqTurnOffAlerts*eq@One%
-OnBlurRespBox(false,"*oField");
-*fi%
+*ifx*@sqTurnOffAlerts*eq@One
+OnBlurRespBox(false,"*oField");*fi%
 *ifx*oField*@empty*else
 updateTally("*oField.*thequestionno");*fi%
 *ifx*eqAddAAMouseUpMS*empty*else
@@ -2922,8 +2936,7 @@ updateTally("*oField.*thequestionno");*fi%
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }%
-}{\endlist\setcounter{quizno}{0}%
-  \eq@answersEndHook
+}{\eq@answersEndHook\endlist\setcounter{quizno}{0}%
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
     \eq@recordCorrAns{\eq@ansChoiceArray}\ifwithinMCFI
@@ -3130,7 +3143,7 @@ updateTally("*oField.*thequestionno");*fi%
     {\textcolor{\graylettersColor}{\Alph{quizno}}}}\else\relax\fi}
 \def\Ans@@f{%
   \settowidth{\eq@tmplength}{\eq@lw@f}%
-  \hangindent=\eq@tmplength\hangafter=1
+  \hangindent=\eq@tmplength\hangafter=\@ne
   \bottomOfAnsfStack\insertGrayLetters
   \edef\rbf@Opts{\ifaeb@usecircles\else
   \noexpand\symbolchoice{\qz@chksymb}\fi
@@ -3503,6 +3516,7 @@ updateTally("*oField.*thequestionno");*fi%
   \global\let\aebtitleQuiz\@empty
   \global\let\aebTitleQuiz\@empty
   \global\let\eq@tq@star\relax
+  \global\let\oqpriorhook\@empty
   \aftergroup\ignorespaces
 }
 \def\oSolution#1{\edef\@qzsolndest{#1}}
@@ -3821,6 +3835,7 @@ if(event.willCommit) {
   \color{\@proofingsymbolColor}\spaceskip=2pt\xspaceskip=2pt%
   \expandafter\gobbleMacro\meaning\eqCorrectAnsTeX
 }
+\inputRBMICode
 \newcommand\RespBoxTxtNT{\def\rbFlag{0}\@RespBoxTxt}
 \newcommand\RespBoxTxt{\def\rbFlag{0}\@RespBoxTxt}
 \def\RespBoxTxtOnBlur{OnBlurRespBox(%
@@ -3863,7 +3878,7 @@ if(event.willCommit) {
   !RespBoxTxtOnBlur!fi
 }%
 !ifx!eqAddAAKeystroke!@empty!else%
-!eqAddAAKeystroke!fi%
+!eqAddAAKeystroke!fi
 \end{defineJS}
 \def\@@RespBoxTxtActions{%
   \AA{\if\eqQuizType\isQZ
@@ -4134,41 +4149,140 @@ if(event.willCommit) {
    \every@eqTextField}}%
 }
 \let\@@sqTallyBoxActions\@empty
-\@ifundefined{calcOrder}{%
-\ifpdf\def\@@sqTallyBoxActions{%
-    \AA{\AAValidate{getTotalTally("\oField");}}}\fi}{}
 \def\sqTallyBoxDefaults{%
-    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}
-}
-\ifpdf\def\@@sqTallyBoxActions{%
-  \AA{\AAValidate{getTotalTally("\oField");}}}\else
-  \let\@@sqTallyBoxActions\@empty
-\fi
+    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
 \newcommand\sqTallyBox[1][]{%
   \mbox{\text@@Field{#1}{tally.\oField.\thequestionno}%
     {\TBW}{\DefaultHeightOfWidget}%
     {}{\eq@setWidgetProps\eq@TextField}%
     {\sqTallyBoxDefaults\@@sqTallyBoxActions\every@eqTextField
-    \every@sqTallyBox}}%
-}
+    \every@sqTallyBox}}}
 \def\sqTallyTotalDefaults{%
-  \rawPDF{}\W{1}\BC{0 0 0}\S{I}\textColor{1 0 0 rg}%
-  \Q{2}\Ff{\FfReadOnly}%
+  \rawPDF{}\W{1}\BC{0 0 0}\S{I}\textColor{1 0 0 rg}
+  \Q{2}\Ff{\FfReadOnly}
 }
-\def\@@sqTallyTotalActions{%
-  \AA{%
-    \AAKeystroke{AFNumber_Keystroke(0,0,0,0,"",true);}
-    \AAFormat{AFNumber_Format(0,0,0,0,"",true);}
-    \AACalculate{%
-        AFSimple_Calculate("SUM",new Array("tally.\oField"));
-  }}%
-}
+\flJSStr{\sqWeakMsg}{You have missed too many questions.
+After you finish, it is recommended you retake this quiz
+with fewer errors and greater understanding.}
+\flJSStr{\sqStrongMsg}{You have missed too many questions.
+We are resetting the quiz. Start over, this time with
+fewer errors and greater understanding.}
+\def\@@sqTallyTotalActions{\AA{%
+  \AAKeystroke{\dl@EForAF4Number_Keystroke(0,0,0,0,"",true);}
+  \AAFormat{\dl@EForAF4Number_Format(0,0,0,0,"",true);}
+  \AACalculate{%
+    \dl@EForAF4Simple_Calculate("SUM",new Array("tally.\oField"));\r
+    var sqTlyTotl=event.value;
+    \ifx\eq@strongpass\@empty
+      \ifx\eq@weakpass\@empty\else\r
+         if(sqTlyTotl > \eq@weakpass) {\r\t
+            if (\oField.sqTlyTotCnt==0)\r\t\t
+              app.alert(\sqWeakMsg);\r\t
+            \oField.sqTlyTotCnt++;\r
+          }
+      \fi
+    \else\r
+      if(sqTlyTotl > \eq@strongpass) {\r\t
+        app.alert(\sqStrongMsg);\r
+        \@@sqClearButtonJSCode\r
+        event.value=0;\r
+      }
+    \fi
+}}}
+\def\@eqweakpass#1{\def\eq@weakpass{#1}}
+\def\@eqstrongpass#1{\def\eq@strongpass{#1}}
+\let\eq@weakpass\@empty
+\let\eq@strongpass\@empty
 \newcommand\sqTallyTotal[1][]{%
+  \processAppArgs#1\end\@nil
   \mbox{\text@@Field{#1}{tallytotal.\oField}{\TBW}%
     {\DefaultHeightOfWidget}{\eq@protect\AA}%
     {\eq@setWidgetProps\eq@TextField}%
     {\sqTallyTotalDefaults\@@sqTallyTotalActions\every@eqTextField
      \every@sqTallyTotal}}%
+}
+\def\sqClearButtonDefaults
+{%
+    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
+    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
+}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\@@sqClearButtonJSCode}
+ProcessIt = false;
+if ( typeof *oField == "undefined" )
+    *oField = new Object;
+if (typeof appAlerts["*oField"] == "undefined")
+    appAlerts["*oField"] = new Object;
+this.resetForm(new Array("mc.*oField","obj.*oField",%
+"tally.*oField","grpobj.*oField"));
+var f = this.getField("obj.*oField");
+if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
+*defaultColorJS*else*defaultColorJSLoc*fi;
+f = this.getField("grpobj.*oField");
+if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
+*defaultColorJS*else*defaultColorJSLoc*fi;
+f = this.getField("rbmarkup.*oField");
+if ( f != null ) f.display=display.hidden;
+*oField.Grp = {};
+appAlerts["*oField"].bAfterValue=false;
+*oField.sqTlyTotCnt=0;
+ProcessIt=true;
+\end{defineJS}
+\def\@@sqClearButtonActions{\A{\JS{\@@sqClearButtonJSCode}}}
+\newcommand\sqClearButton[1][]{%
+  \mbox{\push@@Button{#1}{clear.\oField}{}{\DefaultHeightOfWidget}%
+    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
+    {\sqClearButtonDefaults\@@sqClearButtonActions\every@ButtonField
+     \every@sqClearButton}}%
+}
+\flJSStr{\sqSolnMCMsg}{You must first select the correct
+answer to see the solution.}
+\flJSStr{\sqSolnMSMsg}{You must first select all the correct
+answers to see the solution.}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\sqCorrSolCodeMC}
+var qzSolnDest="*@qzsolndest";
+var solnAfter=*ifeq@solutionsafter%
+true*else%
+false*fi;
+var qzSolnDest="*@qzsolndest";
+var f=this.getField("mc.*oField.*thequestionno");
+if(f.value.charAt(0)=="1") {
+  if ((qzSolnDest!="") && !solnAfter) %
+jmpToNamedDest("answer",qzSolnDest,1);
+} else app.alert(*sqSolnMCMsg);
+\end{defineJS}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\sqCorrSolCodeMS}
+// multiple selection
+var g=this.getField("mc.*oField.*thequestionno");
+var a=g.getArray();
+var qzSolnDest="*@qzsolndest";
+var solnAfter=*ifeq@solutionsafter%
+true*else%
+false*fi;
+var qzSolnDest="*@qzsolndest";
+var f=this.getField("corr.*oField.*thequestionno");
+if ( (qzSolnDest != "") && !solnAfter ) {
+  for (var i=0; i<a.length; i++){
+    if ((a[i].exportValues[0].charAt(0)==1) && %
+(!a[i].isBoxChecked(0))) break;
+  }
+}
+if (i>=a.length) jmpToNamedDest("*oField","*@qzsolndest",%
+*ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);
+else app.alert(*sqSolnMSMsg);
+\end{defineJS}
+\def\sqCorrSolButtonActionHook{\ifx\aeb@answerType
+  \aeb@answerType@r\JS{\sqCorrSolCodeMC}\else
+  \JS{\sqCorrSolCodeMS}\fi
+}
+\newcommand{\sqSolnBtn}[1][]{%
+  \def\Fld@name{corr.\oField.\thequestionno}%
+  \edef\@@CorrSolButtonActions{\noexpand
+    \A{\noexpand\sqCorrSolButtonActionHook}}%
+  \ifx\@qzsolndest\@empty\else
+  \mbox{\push@@Button{#1}{\Fld@name}{}{\DefaultHeightOfWidget}%
+    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
+    {\CorrAnsButtonDefaults\@@CorrSolButtonActions
+    \every@ButtonField\every@CorrAnsButton}}\fi
 }
 \def\CorrAnsButtonDefaults{%
   \CA{\eq@local@CorrAnsButton}\W{1}\S{S}
@@ -4245,38 +4359,6 @@ else !processJSfunc("obj.!oField.!thequestionno","!CorrectAns",%
           \every@ButtonField\every@CorrAnsButton}}%
     \fi
     \egroup
-}
-\def\sqClearButtonDefaults
-{%
-    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
-    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
-}
-\begin{defineJS}[\makeesc\*\makecmt\%]{\@@sqClearButtonJSCode}
-ProcessIt = false;
-if ( typeof *oField == "undefined" )
-    *oField = new Object;
-if (typeof appAlerts["*oField"] == "undefined")
-    appAlerts["*oField"] = new Object;
-this.resetForm(new Array("mc.*oField","obj.*oField",%
-"tally.*oField","grpobj.*oField"));
-var f = this.getField("obj.*oField");
-if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
-*defaultColorJS*else*defaultColorJSLoc*fi;
-f = this.getField("grpobj.*oField");
-if ( f != null ) f.strokeColor=*ifx*defaultColorJSLoc*@empty%
-*defaultColorJS*else*defaultColorJSLoc*fi;
-f = this.getField("rbmarkup.*oField");
-if ( f != null ) f.display=display.hidden;
-*oField.Grp = {};
-appAlerts["*oField"].bAfterValue=false;
-ProcessIt=true;
-\end{defineJS}
-\def\@@sqClearButtonActions{\A{\JS{\@@sqClearButtonJSCode}}}
-\newcommand\sqClearButton[1][]{%
-  \mbox{\push@@Button{#1}{clear.\oField}{}{\DefaultHeightOfWidget}%
-    {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%
-    {\sqClearButtonDefaults\@@sqClearButtonActions\every@ButtonField
-     \every@sqClearButton}}%
 }
 \def\PromptButtonDefaults{%
  \CA{\eq@local@CorrAnsButton}\W{1}\S{S}\BC{0 0 0}

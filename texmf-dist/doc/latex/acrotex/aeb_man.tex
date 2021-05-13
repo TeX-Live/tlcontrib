@@ -9,8 +9,16 @@
     exerquiz={nocorrections},aebxmp,
     dljslib={ImplMulti,limitArith,nodec,satisfyEq}
 ]{aeb_pro}
-%\usepackage{myriadpro}
 \usepackage[altbullet]{lucidbry}
+%\usepackage[LY1]{fontenc}
+%\usepackage{myriadpro}
+%\usepackage[scaled=0.93]{helvet}
+%\usepackage[noTS1]{mtpro}
+%%\usepackage{times}
+%\usepackage{timesNRMT}
+
+%\previewOn\pmpvOn
+
 \usepackage{aeb_mlink}
 \usepackage{longtable,colortbl}
 \usepackage{graphicx}
@@ -115,7 +123,7 @@
 \sectionLayout{indent=-62.5pt,fontsize=large,color=aeb,fontfamily=sffamily}
 \subsectionLayout{indent=-31.25pt,color=aeb,fontfamily=sffamily}
 \subsubsectionLayout{indent=0pt,color=aeb,fontfamily=sffamily}
-\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+\subsubDefaultDing{\tops{$\bullet$}{\textrm\textbullet}}
 %\renewcommand{\paragraph}
 %    {\@startsection{paragraph}{4}{0pt}{12pt}{-3pt}{\bfseries}}
 \renewcommand{\paragraph}
@@ -221,7 +229,7 @@
 \def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
    \kern-.6em \hbox{$\mathcal S$}}$}
 
-\title{\texorpdfstring{\LARGE
+\title{\tops{\LARGE
 %---------------------------------%
             The \AcroEB\space(AeB)%
 }{%-------------------------------%
@@ -235,10 +243,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2021/02/17}
+\version{2021/05/10}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2021/02/17}
+\prepared{2021/05/10}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -1095,7 +1103,7 @@ recommended that this class be used; however, {\Web} does support the
 %\end{comment}
 
 %\makeatletter\hy@bookmarksnumberedfalse\makeatother
-%\subsubsection{\texorpdfstring{}{\textbullet\space}Setting the Driver Option}
+%\subsubsection{\tops{}{\textbullet\space}Setting the Driver Option}
 %\makeatletter\hy@bookmarksnumberedtrue\makeatother
 
 \subsection{Setting the Driver Option}\label{sss:driver}
@@ -1124,7 +1132,7 @@ tested using the \Y&Y\ \TeX\ System for the
 (\url{www.miktex.org}) for the \texttt{dvips}, \texttt{pdftex} (which includes lua(la)tex),
 \texttt{dvipdfm}, \texttt{dvipdfmx}, and \texttt{xetex}
 
-%\subsubsection{The \texorpdfstring{\protect\texttt{pdftex}}{pdftex} Option}
+%\subsubsection{The \tops{\protect\texttt{pdftex}}{pdftex} Option}
 %
 %
 %The \texttt{pdftex} option requires \pkg{hyperref} version 6.60
@@ -1383,7 +1391,7 @@ creates a document with dimensions of \texttt{designv},  $6\,\text{in} \times 4.
 their parameters. To define a custom screen size, therefore, do
 not specify a screen design option for \pkg{web}.\endredpoint
 
-\subsection{\texorpdfstring{\protect\cs{setScreensizeFromGraphic}}{\CMD{setScreensizeFromGraphic}}}\label{setScreensizeFromGraphic}
+\subsection{\tops{\protect\cs{setScreensizeFromGraphic}}{\CMD{setScreensizeFromGraphic}}}\label{setScreensizeFromGraphic}
 
 If a design is \emph{not specified} in the option list of \Web, you
 can use a graphic to set the screen size with
@@ -1411,7 +1419,7 @@ It may become necessary with some graphics to use the
 size will be adjusted for the panel, and the graphic will be
 re-scaled appropriately.
 
-\subsection{Using \texorpdfstring{\protect\cs{addtoWebHeight} and \protect\cs{addtoWebWidth}}
+\subsection{Using \tops{\protect\cs{addtoWebHeight} and \protect\cs{addtoWebWidth}}
 {\CMD{addtoWebHeight} and \CMD{addtoWebWidth}}}
 
 There may be an occasion when you've chosen your design dimensions
@@ -1592,11 +1600,13 @@ specified with \cs{selectColors}, see
 
 \subsection{Basic Information Commands}\label{ss:BIM}
 
-The basic information commands allows you a convenient way to enter the title and author
-of the document, as well as other information. To enter this basic information,
-just fill in the values of all the basic macros briefly described below.
+The basic information commands allows you a convenient way to enter the title
+and author of the document, as well as other information. To enter this basic
+information, just fill in the values of all the basic macros briefly
+described below.
 
-For example, the following is a copy of the title information for this document:
+For example, the following is a copy of the title information for this
+document:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 % \title,\author,\subject,\keywords are sent to DocInfo
 \title{The Web and Exerquiz Packages Manual of Usage}
@@ -1632,7 +1642,7 @@ macro\footnote{The code for handling PDFDocEncoding for
 \pkg{hyperref} is due to Heiko Oberdiek} to avoid these kinds
 of problems.  For example,
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\title{The \texorpdfstring{$e^x$}{EXP} Function}
+\title{The \tops{$e^x$}{EXP} Function}
 \end{Verbatim}
 \noindent The first argument is the one that is typeset (on the title page,
 the title of the document will be `The $e^x$ Function'); the
@@ -1782,7 +1792,7 @@ can be entered by using \Com{DesignTitlePageTrailer}, see
 \Nameref{trailer}.\endredpoint
 
 \subsection{Redefining
-\texorpdfstring{\protect\cs{maketitle}}{\textbackslash maketitle}}
+\tops{\protect\cs{maketitle}}{\textbackslash maketitle}}
 
 The arguments of the \Nameref{ss:BIM} macros, as just discussed,
 are used to define text macros with no parameters; for example,
@@ -1849,39 +1859,38 @@ appears on the title page. The default structure of the directory is
     \end{flushleft}}
 \makeatother
 There are several commands that can be used to modify the directory.
-\settowidth{\aebdimen}{\cs{dirContentLink\darg{Begin \string\hyperlink\darg{\string\web@Start.1}\darg{Article}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{dirContentLink\darg{Begin \string\hyperlink\darg{\string\web@Start.1}\darg{Article}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \directoryName{Directory}
 \tocName{Table of Contents}
 \dirContentLink{Begin \hyperlink{\web@Start.1}{Article}}
 \end{dCmd}
-\newtopic These three define the default text strings
+\eVerb These three define the default text strings
 that appear. In the case of \cs{dirContentLink},
 there is a built-in \cs{hyperlink} to the start of
 the article.
-\settowidth{\aebdimen}{\cs{formatWordDirectory\darg{\string\bfseries\string\large}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{formatWordDirectory\darg{\string\bfseries\string\large}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \formatWordDirectory{\bfseries\large}
 \formatDirectoryItems{\bfseries}
 \end{dCmd}
-\newtopic The formatting of the \cs{directoryName} can be set by \cs{formatWordDirectory},
+\eVerb The formatting of the \cs{directoryName} can be set by \cs{formatWordDirectory},
 the default definition is given above.  The (global) formatting for the listing of the
 items can be set using \cs{formatDirectoryItems}, the default is shown above.
-\settowidth{\aebdimen}{\cs{removeDirTOC\quad\string\removeDirArticle}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{removeDirTOC\quad\string\removeDirArticle}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \removeDirTOC!quad\removeDirArticle
 \end{dCmd}
-\newtopic These two commands remove the ``Table of Contents'' and
+\eVerb These two commands remove the ``Table of Contents'' and
 the ``Begin Article'' items from the list, respectively.
 
-
-\settowidth{\aebdimen}{\cs{addtoDirList\darg{\meta{new\_item}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{addtoDirList\darg{\meta{new\_item}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \addtoDirList{!meta(new_item)}
 \dirTOCItem
 \dirArticleItem
 \end{dCmd}
-\newtopic To add a new item to the end of the directory list, use \cs{addtoDirList}, the argument
+\eVerb To add a new item to the end of the directory list, use \cs{addtoDirList}, the argument
 is the new item. The other two commands \cs{dirTOCItem} and \cs{dirArticleItem} are commands
 representing the first two default items. For example, typing
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -1901,14 +1910,14 @@ following
 \newtopic The following are for creating some special effects around the directory,
 such as putting the directory into a multicolumn format.
 
-\settowidth{\aebdimen}{\cs{priorDirMatter\darg{\meta{text/commands}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{priorDirMatter\darg{\meta{text/commands}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \priorDirMatter{!meta(text/commands)}
 \afterDirMatter{!meta(text/commands)}
 \priorDirList{!meta(text/commands)}
 \afterDirList{!meta(text/commands)}
 \end{dCmd}
-
+\eVerb
 Below is a partial listing of the definition of \cs{webdirectory}, the internal name
 for the directory. We present the code so you can see where the prior/after commands
 write to.
@@ -1930,16 +1939,13 @@ the beginning of the itemize list.
 
 A final command that may be useful is \Com{directoryhook}. It is used for manipulating
 the directory as a whole.
-
-\bgroup\obeyspaces %
-\settowidth{\aebdimen}{\ttfamily{    \anglemeta{code that manipulates \#1}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\ttfamily{\qquad\ameta{code that manipulates \#1}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \directoryhook{
-    !anglemeta(code that manipulates #1)
+!qquad!ameta(code that manipulates #1)
 }
 \end{dCmd}
-\egroup
-\newtopic The argument of \cs{directoryhook} is some \LaTeX{} code that manipulates \texttt{\#1}, within
+\eVerb The argument of \cs{directoryhook} is some \LaTeX{} code that manipulates \texttt{\#1}, within
 the argument \texttt{\#1} refers to \cs{webdirectory}, the internal name of the directory.
 The following example places a colored box around the directory, and centers it on the title page.
 
@@ -1982,10 +1988,11 @@ document, I've set \cs{widestNumber\darg{0.00.}}, since some subsection
 numbers have two digits.
 
 \newtopic The color of the heading of the table of contents is set through
-\settowidth{\aebdimen}{\cs{tocColor\darg{\meta{named\_color}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{tocColor\darg{\meta{named\_color}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \tocColor{!meta(named_color)}
 \end{dCmd}
+\eVerb
 Specifying a color through this command at any time before the creation of the table of contents
 will change the color of the heading. The default is blue.
 
@@ -1994,7 +2001,7 @@ will change the color of the heading. The default is blue.
 \texttt{\hyperref[sss:latextoc]{latextoc}} option can be used.\endredpoint
 
 \subsection{The
-\texorpdfstring{\protect\texttt{usedirectory}}{usedirectory}
+\tops{\protect\texttt{usedirectory}}{usedirectory}
 Option}\label{sss:nodir}
 
 When the \texttt{usedirectory} option is specified, a short
@@ -2009,7 +2016,7 @@ makes it appear. The \texttt{nodirectory} option is still defined,
 but does nothing.\endredpoint
 
 
-\subsection{The \texorpdfstring{\protect\texttt{latextoc}}{latextoc}
+\subsection{The \tops{\protect\texttt{latextoc}}{latextoc}
 Option}\label{sss:latextoc}
 
 If you don't like the default design for the table of contents,
@@ -2041,7 +2048,7 @@ is taken. The \cs{textwidth} is \cs{paperwidth} minus \texttt{2\cs{coverpagemarg
 The default value of the \emph{command} \cs{coverpagemargin} is \texttt{1\,in}.
 
 
-\subsection{The \texorpdfstring{\protect\cs{makeinlinetitle}}{\CMD{makeinlinetitle}} Command}\label{inlinetitle}
+\subsection{The \tops{\protect\cs{makeinlinetitle}}{\CMD{makeinlinetitle}} Command}\label{inlinetitle}
     \aebCng[makeinlinetitle]
 
 For some short documents,\footnote{Short documents such as white
@@ -2049,12 +2056,11 @@ papers, homework assignments, for example.} a formal title page may
 not be needed or desirable. In this case, use \cs{makeinlinetitle},
 the ``in-line'' title.
 
-\settowidth{\aebdimen}{\cs{makeinlinetitle}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{makeinlinetitle}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \makeinlinetitle
 \end{dCmd}
-
-\newtopic The command, which can be redefined to your needs, has the following design:
+\eVerb The command, which can be redefined to your needs, has the following design:
 \begin{center}\setlength{\tabcolsep}{0pt}
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcr}
                     & \cs{webtitle}  &\\
@@ -2121,14 +2127,16 @@ help you move around: the \texttt{navibar} Option, and some
 
 \subsection{A Navigation Bar}\label{sss:navibar}
 
-Use the \texttt{navibar} option of \pkg{web} to add a
-navigation toolbar, as seen at the bottom of this page.
-Usage:
+Use the \opt{navibar} or \opt{navibar*} option of \pkg{web} to add a
+navigation toolbar, as seen at the bottom of this page. Usage:
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \usepackage[!meta(driver),navibar]{web}
+\usepackage[!meta(driver),navibar*]{web}
 \end{Verbatim}
-The result is the navigation bar you see at the bottom of the
-page.
+The result is the navigation bar appearing at the bottom of the page. The
+\opt{navibar*} produces the navigation bar only if the document is for the
+screen; that is, only if a paper option (\opt{forpaper} or
+\opt{forcolorpaper}) is \emph{not taken}.
 
 \NaviBarOn\AddToShipoutPicture*{\NaviBarOff}
 
@@ -2168,7 +2176,7 @@ argument, a named color. The default colors are \texttt{webblue} and
 \texttt{webgray}, respectively.
 
 
-\subsection{\texorpdfstring{\protect\cs{newNaviIcon}}
+\subsection{\tops{\protect\cs{newNaviIcon}}
     {\textbackslash newNaviIcon}}\label{ss:newnaviicon}
 
 The \cs{newNaviIcon} can be used to define a navigation icon.
@@ -2260,7 +2268,7 @@ the commands \Com{directionIconTextColor} and
 \Com{directionIconBgColor}. Each command takes a named color as its argument;
 the default values are \texttt{webblue} and \texttt{webgray}, respectively.
 
-\subsection{\texorpdfstring{\protect\cs{panelNaviGroup}}
+\subsection{\tops{\protect\cs{panelNaviGroup}}
     {\textbackslash panelNaviGroup}}\label{ss:panelnavigroup}
 
 When the \texttt{\hyperref[ss:lrpanel]{leftpanel}} or
@@ -2313,7 +2321,7 @@ subject to the usual restrictions on these language packages.
 In this section, several paper options are discussed, and one command.
 
 \subsection{The
-\texorpdfstring{\protect\texttt{forpaper}}{forpaper}
+\tops{\protect\texttt{forpaper}}{forpaper}
 Option}\label{sss:webforpaper}
 
 Some people may want to create exercises using the
@@ -2342,7 +2350,7 @@ Finally, there is a Boolean switch \verb+\ifeqforpaper+, which you
 are free to use to refine the look your \texttt{forpaper} version.
 
 \subsection{The
-\texorpdfstring{\protect\texttt{forcolorpaper}}{forcolorpaper}
+\tops{\protect\texttt{forcolorpaper}}{forcolorpaper}
 Option}\label{forcolorpaper}
 
 Same as the \hyperref[sss:webforpaper]{\texttt{forpaper}} option,
@@ -2350,7 +2358,7 @@ but the color operators are not turned off.
 
 
 \subsection{The
-\texorpdfstring{\protect\texttt{latexlayout}}{latexlayout}
+\tops{\protect\texttt{latexlayout}}{latexlayout}
 Option}\label{sss:weblatexlayout}
 
 For those who want to go ``totally native,'' use the
@@ -2364,8 +2372,8 @@ are turned off, and the \texttt{for\-color\-option} is executed. To remove
 color, you need to explicitly take the \texttt{forpaper} option.
 
 \subsection{The
-\texorpdfstring{\protect\texttt{uselatexparts}}{uselatexparts}
-and \texorpdfstring{\protect\texttt{uselatexchapters}}{uselatexchapters}
+\tops{\protect\texttt{uselatexparts}}{uselatexparts}
+and \tops{\protect\texttt{uselatexchapters}}{uselatexchapters}
 Options}
 
 As described in \hyperref[partsChaptersDots]{section~\ref*{partsChaptersDots}},
@@ -2379,7 +2387,7 @@ want to use another package to define the look of the table of contents or
 of the \cs{part} and \cs{chapter} commands. (The other sectioning comments can be overridden
 as well, but any controls provided by the \texttt{extended} option will be lost.)
 
-\subsection{The \texorpdfstring{\protect\cs{useFullWidthForPaper}}
+\subsection{The \tops{\protect\cs{useFullWidthForPaper}}
     {\CMD{useFullWidthForPaper}}  Command}
 
 We introduce a command of resetting the page layout paper \emph{when
@@ -2408,39 +2416,40 @@ When the \texttt{forpaper} option is used, the switch
 this switch, to get different content for the printed page or the
 screen page, or you can use the convenience command \cs{prtscr}:
 
-\settowidth{\aebdimen}{\cs{prtscr\darg{\meta{print\_text}}\darg{\meta{screen\_text}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{prtscr\darg{\meta{print\_text}}\darg{\meta{screen\_text}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \prtscr{!meta(print_text)}{!meta(screen_text)}
 \end{dCmd}
+\endgroup
 \CmdDescription This command expands to \meta{print\_text} if the \texttt{forpaper} option
 is taken and to \meta{screen\_text} if not.
 
 The \cs{prtscr} command is useful for small changes in content, not
 involving verbatim text or paragraph breaks. {\Web} defines two additional environments,
 \texttt{forpaper} and \texttt{forscreen}.
-\settowidth{\aebdimen}{\cs{begin\darg{forscreen}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{begin\darg{forscreen}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \begin{forscreen}
 ....
 ....
 ....
 \end{forscreen}
 \end{dCmd}
-
+\endgroup
 \EnvLoc Anywhere.
 
 \newtopic Use the \texttt{forscreen} environment to insert commands or content meant only for
 the screen.
 
-\settowidth{\aebdimen}{\cs{begin\darg{forpaper}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{begin\darg{forpaper}}}
+\begin{dCmd}{\bxSize}
 \begin{forpaper}
 ....
 ....
 ....
 \end{forpaper}
 \end{dCmd}
-
+\endgroup
 \EnvLoc Anywhere.
 
 \newtopic Use the \texttt{forpaper} environment to insert commands
@@ -2449,11 +2458,11 @@ or content meant only for the paper document.
 \newtopic Another command, \cs{NewPage}, is useful for formatting
 the same document for print as well as screen
 
-\settowidth{\aebdimen}{\cs{NewPage}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{NewPage}}
+\begin{dCmd}{\bxSize}
 \NewPage
 \end{dCmd}
-
+\endgroup
 \CmdLoc Anywhere.
 
 \CmdDescription This command expands to \cs{newpage} if the
@@ -2607,11 +2616,11 @@ always be rebuilt using \cs{buildpanel}.\endredpoint
 \Com{minPanelWidth} command, the default size is 1in; that is,
 \verb!\minPanelWidth{1in}! is executed by the package at start up.
 
-\settowidth{\aebdimen}{\cs{minPanelWidth\darg{\meta{length}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{minPanelWidth\darg{\meta{length}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \minPanelWidth{!meta(length)}
 \end{dCmd}
-
+\endgroup
 \CmdLoc You can reset the minimal width by executing the
 command in the preamble before the \cs{screenwidth} and \cs{margins}
 commands. Or, place it in the \texttt{web.cfg}.
@@ -2704,7 +2713,7 @@ pairs.
 \end{questions}
 Details provided in subsequent sections.
 
-\subsection{\texorpdfstring{\protect\cs{DeclareDocInfo}}{\CMD{DeclareDocInfo}}}\label{docinfo}
+\subsection{\tops{\protect\cs{DeclareDocInfo}}{\CMD{DeclareDocInfo}}}\label{docinfo}
 
 The preamble of your document should contain a number of keys that
 identify the document, including the title and author of the
@@ -2719,11 +2728,11 @@ Information is passed through the \cs{DeclareDocInfo} command which
 takes a number of key-value pairs. This is a simple \textsf{xkeyval}
 interface to many of the text macros that are defined in \Web.
 
-\settowidth{\aebdimen}{\cs{DeclareDocInfo\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{DeclareDocInfo\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \DeclareDocInfo{!meta(KV-pairs)}
 \end{dCmd}
-
+\endgroup
 \CmdLoc Place in the preamble.
 
 \KVP The following is a description of the key value pairs.
@@ -2819,9 +2828,9 @@ descriptionwriter={A good, well-liked guy}
 customProperties={name=Developer,value={D. P. Story, Esq.}}
                  {name=Motivator,value=J\u00FCrgen Gilg}
 \end{Verbatim}
-Executing \texttt{this.info.Developer} returns the value of
-\texttt{"D. P. Story, Esq."}, while, \texttt{this.info.Motivator} returns
-\texttt{"J\"{u}rgen Gilg"}.
+Executing \texttt{this.info.Developer} returns the string value of \uif{D. P.
+Story, Esq.}, while, \texttt{this.info.Motivator} returns \uif{J\"{u}rgen
+Gilg}.
 
 \end{enumerate}
 
@@ -2848,7 +2857,7 @@ authors={D. Story,J. Gilg},
 You can do the same thing, with the \texttt{author} key only by using
 the \cs{texorpdfstring} command of \texttt{hyperref}:
 \begin{Verbatim}[xleftmargin=\amtIndent]
-author={\texorpdfstring{Dr. D. P. Story, Herr J. Gilg}
+author={\tops{Dr. D. P. Story, Herr J. Gilg}
         {D. Story,J. Gilg}},
 \end{Verbatim}
 The difference is that with \texttt{authors}, individual authors are accessible
@@ -2901,7 +2910,7 @@ from the {\AcroBlog} website. The source file \texttt{web\_pro.tex} is
 attached to the PDF, illustrates this command.
 
 
-\subsection{\texorpdfstring{\protect\cs{DeclarePageLayout}}{\CMD{DeclarePageLayout}}}\label{pagelayout}
+\subsection{\tops{\protect\cs{DeclarePageLayout}}{\CMD{DeclarePageLayout}}}\label{pagelayout}
 
 The \Com{DeclarePageLayout} command gathers together many page
 layout parameters, both for {\LaTeX} and for {\Web}, into one
@@ -3002,7 +3011,7 @@ or not.
 \end{enumerate}
 
 \subsection{The Title Page:
-    \texorpdfstring{\protect\cs{maketitle}}{\CMD{maketitle}}}\label{maketitlepro}
+    \tops{\protect\cs{maketitle}}{\CMD{maketitle}}}\label{maketitlepro}
 
 In this section, we described the enhanced features for controlling the title page.
 
@@ -3102,13 +3111,13 @@ defines three commands \cs{universityLayout}, \cs{titleLayout}, and
 \texttt{aebpro\_ex2.tex}, attached to the PDF, is a working example of the
 commands that follow.
 
-\settowidth{\aebdimen}{\cs{universityLayout\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{universityLayout\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \universityLayout{!meta(KV-pairs)}
 \titleLayout{!meta(KV-pairs)}
 \authorLayout{!meta(KV-pairs)}
 \end{dCmd}
-
+\endgroup
 \CmdLoc Place these optional commands in the preamble.
 
 \KVP Each of these commands have a number of key-value pairs. The
@@ -3199,18 +3208,17 @@ used to push the top down. The default value of this skip is
 \texttt{0pt}, but this can be changed through
 \cs{aboveTopTitleSkip}.
 
-\settowidth{\aebdimen}{\cs{aboveTopTitleSkip\darg{\meta{skip}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{aboveTopTitleSkip\darg{\meta{skip}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \aboveTopTitleSkip{!meta(skip)}
 \end{dCmd}
+\eVerb There is one other title page parameter that effects the layout.
 
-\newtopic There is one other title page parameter that effects the layout.
-
-\settowidth{\aebdimen}{\cs{topTitlePageProportion\darg{0..1}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{topTitlePageProportion\darg{0..1}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \topTitlePageProportion{0..1}
 \end{dCmd}
-
+\endgroup
 \CmdLoc Place this (optional) command in the preamble.
 
 \PD The top part of the title page is enclosed in a big \cs{parbox}
@@ -3261,11 +3269,11 @@ aligned within its \cs{makebox}, understand? Finally, for the
 The pro option defines the command \Com{DesignTitlePageTrailer} that takes a
 number of key-value pairs to describe the title page trailer. The use of this
 command is not needed unless you want something in the trailer other than the default
-information.\settowidth{\aebdimen}{\cs{DesignTitlePageTrailer\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+information.\bVerb\takeMeasure{\cs{DesignTitlePageTrailer\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \DesignTitlePageTrailer{KV-pairs}
 \end{dCmd}
-
+\endgroup
 \KVP The key-value pairs are described below:
 \begin{enumerate}
     \item \texttt{ul}: The text in the upper left corner of the trailer, the default is
@@ -3338,22 +3346,20 @@ illustrates this command.
 The pro option also defines \Com{tocLayout} for controlling the
 title of the table of contents.
 
-\settowidth{\aebdimen}{\cs{tocLayout\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{tocLayout\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \tocLayout{!meta(KV-pairs)}
 \end{dCmd}
-
-\newtopic The key-value pairs are the same as layout commands for the section titles, see
+\eVerb The key-value pairs are the same as layout commands for the section titles, see
 \mlNameref{secHead}.
 
 \CmdLoc Place this command in the preamble.
 
-\settowidth{\aebdimen}{\cs{selectTocDings\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{selectTocDings\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \selectTocDings{!meta(KV-pairs)}
 \end{dCmd}
-
-\newtopic When the \cs{noSectionNumbers} command is used (\Nameref{secHead}), the entries in the table of
+\eVerb When the \cs{noSectionNumbers} command is used (\Nameref{secHead}), the entries in the table of
 contents have no section number.  You can define a ding for each of the three
 levels of the table of contents with this command. The key-value entries in the
 \cs{selectTocDings} command are ignored if \cs{noSectionNumbers} is not in effect.
@@ -3384,11 +3390,11 @@ illustrates this command.
 The \cs{selectColors} command can be used to set the color of most all elements of
 the document that have a color attribute.
 
-\settowidth{\aebdimen}{\cs{selectColors\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{selectColors\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \selectColors{!meta(KV-pairs)}
 \end{dCmd}
-
+\endgroup
 \CmdLoc There are no restrictions on this command.  In the preamble,
 it will set the defaults for the entire document.
 
@@ -3426,11 +3432,11 @@ The {\Web} package uses the section heading commands \cs{section}, \cs{subsectio
 \texttt{extended} option modifies their definitions so that the document author can easily design how the section titles
 look.
 
-\settowidth{\aebdimen}{\cs{noSectionNumbers}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{noSectionNumbers}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \noSectionNumbers
 \end{dCmd}
-\newtopic The command \Com{noSectionNumbers} causes {\Web} to remove the usual
+\eVerb The command \Com{noSectionNumbers} causes {\Web} to remove the usual
 numbering system for a {\LaTeX} document.  This may be useful when
 preparing a document for presentation, and a numbering system is not
 needed. The default is to use section numbers.
@@ -3438,14 +3444,13 @@ needed. The default is to use section numbers.
 \CmdLoc The use of this command is restricted to the preamble. The
 decision must be made for the whole document at the beginning of the
 document.
-
-\settowidth{\aebdimen}{\cs{subsubsectionLayout\darg{\meta{KV-pairs}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{subsubsectionLayout\darg{\meta{KV-pairs}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \sectionLayout{!meta(KV-pairs)}
 \subsectionLayout{!meta(KV-pairs)}
 \subsubsectionLayout{!meta(KV-pairs)}
 \end{dCmd}
-
+\endgroup
 \CmdLoc No restriction on the use of this command. In the preamble, you set the layout
 for sections for the whole document. In the body of the document, changes occur immediately
 starting with the next relevant section.
@@ -3529,12 +3534,12 @@ title horizontally, and specify an after skip of \texttt{12pt}.
 
 % \expoint{ex7} Use \texttt{apb\_ex7.tex} to explore the section layout commands.
 
-\settowidth{\aebdimen}{\cs{subsubsectionLayout\darg{\meta{length}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{subsubsectionLayout\darg{\meta{length}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \shadowhoffset{!meta(length)}
 \shadowvoffset{!meta(length)}
 \end{dCmd}
-\newtopic When \texttt{$\text{special} = \text{shadow}$}, shadowing is
+\eVerb When \texttt{$\text{special} = \text{shadow}$}, shadowing is
 obtained by typesetting the text twice with different colors. The
 amount of horizontal and vertical offset are controlled by these two
 commands. The defaults are \verb!\shadowhoffset{.2ex}! and
@@ -3543,12 +3548,13 @@ commands. The defaults are \verb!\shadowhoffset{.2ex}! and
 \newtopic The interface for writing custom section layouts are the following three
 commands.
 
-\settowidth{\aebdimen}{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \customSecHead{!anglemeta(tex_code)}
 \customSubsecHead{!anglemeta(tex_code)}
 \customSubsubsecHead{!anglemeta(tex_code)}
 \end{dCmd}
+\endgroup
 \CmdLoc Use in the preamble or before a section head.
 
 \PD These three commands are used to write custom section,
@@ -3598,17 +3604,16 @@ illustrates these commands.
 The {\Web} package has several commands for customizing the \cs{part} and
 \cs{chapter} commands.
 
-\subsection{The \texorpdfstring{\protect\cs{part}}{\CMD{part}} command}
+\subsection{The \tops{\protect\cs{part}}{\CMD{part}} command}
 
 The appearance of the part title can be controlled by \cs{formatPartTitle}.
 
-\settowidth{\aebdimen}{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{customSubsubsecHead\darg{\anglemeta{tex\_code}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \formatPartTitle{!anglemeta(tex_code)}
 \noPartNumbers
 \end{dCmd}
-
-\newtopic The argument of \anglemeta{tex\_code} consists of formatting commands; within the
+\eVerb The argument of \anglemeta{tex\_code} consists of formatting commands; within the
 argument \texttt{\#1} represents the title.  The command \cs{noPartNumbers}
 is a convenience macro to turn off all part number, if you want to create
 a document that has no part numbers, such as this document.
@@ -3636,19 +3641,19 @@ gives a part title like this, {\large\bfseries\fbox{Part I: The Web Package}}
 A companion comment for changing the format of a part title, is \cs{tocPartTitle},
 which modifies how the part title appears in the table of contents.
 
-\settowidth{\aebdimen}{\cs{tocPartTitle\darg{\cs{thepart}\cs{hspace\darg{1em}\#1}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{tocPartTitle\darg{\cs{thepart}\cs{hspace\darg{1em}\#1}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \tocPartTitle{!anglemeta(tex_code)}
 \tocPartTitle{\thepart\hspace{1em}#1}
 \end{dCmd}
-
-\newtopic Again, within the argument of \cs{tocPartTitle}, \texttt{\#1} refers to the
+\eVerb
+Again, within the argument of \cs{tocPartTitle}, \texttt{\#1} refers to the
 text of the part title. The default definition is given above also.
 
 \redpoint Finer control over the formatting of the \cs{part} command can be obtained by redefining
 \cs{web@makeparthead} or \cs{web@makesparthead}, the latter one for \cs{part*}.\endredpoint
 
-\subsection{The \texorpdfstring{\protect\cs{chapter}}{\CMD{chapter}} command}
+\subsection{The \tops{\protect\cs{chapter}}{\CMD{chapter}} command}
 
 The \cs{chapter} command is available in the \texttt{book} and \texttt{report} classes.
 There are several defined in the {\Web} package for getting a little control over these.
@@ -3663,13 +3668,12 @@ There are several defined in the {\Web} package for getting a little control ove
     \noindent\hspace{1em}\large\bfseries#1\par\nobreak
 }
 
-\settowidth{\aebdimen}{\cs{formatChapterNumber\darg{\anglemeta{tex\_code}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{formatChapterNumber\darg{\anglemeta{tex\_code}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \formatChapterNumber{!anglemeta(tex_code)}
 \formatChapterTitle{!anglemeta(tex_code)}
 \end{dCmd}
-
-\newtopic The argument of \ameta{tex\_code} consists of formatting commands; within the
+\eVerb The argument of \ameta{tex\_code} consists of formatting commands; within the
 argument \texttt{\#1} represents the title.
 
 The default definitions for these are
@@ -3688,7 +3692,7 @@ The default definitions for these are
 formatting by redefining \cs{web@makechapterhead} or
 \cs{web@makeschapterhead}, the latter one is used for \cs{chapter*}.\endredpoint
 
-\subsection{The \texorpdfstring{\protect\cs{noFinalDot}}{\CMD{noFinalDot}} Command}\label{nofinaldot}
+\subsection{The \tops{\protect\cs{noFinalDot}}{\CMD{noFinalDot}} Command}\label{nofinaldot}
 
 The default behavior for the {\Web} package is to place a dot (.) at the end of the section
 number in both the body of the document and in the table of contents. Thus,
@@ -3886,7 +3890,7 @@ given.
 
 
 \begin{comment}
-\subsection{The \texorpdfstring{\protect\texttt{pdftex}}{pdftex}
+\subsection{The \tops{\protect\texttt{pdftex}}{pdftex}
 Option}\label{ss:pdftexerquiz}
 
 The \textsf{exerquiz} package is independent of the \pkg{web}
@@ -3993,7 +3997,7 @@ option.}\def\1{\hspace*{-\amtIndent}}
 %unicode \texttt{U+0130}.}
 
 \subsection{The
-\texorpdfstring{\protect\texttt{forpaper{\protect\normalfont\protect\space and }forcolorpaper}}{forpaper and
+\tops{\protect\texttt{forpaper{\protect\normalfont\protect\space and }forcolorpaper}}{forpaper and
 forcolorpaper}
  Options}\label{sss:exquizforpaper}
 
@@ -4025,13 +4029,20 @@ this option.
 \redpoint This option is not useful with the \texttt{pdftex} option, as
 \textsf{pdftex} does not (normally) produce a dvi file.
 
-\subsection{The \texttt{nodljs} Option}\label{sss:nodljs}
+%\subsection{The \texttt{nodljs} Option}\label{sss:nodljs}
+\subsection{Options passed through to the \tops{\protect\pkg}{}{insdljs} package}
 
+The following options are passed through to \pkg{insdljs}: \opt{nodljs},
+\opt{exercisesonly} (same as \opt{nodljs}), \opt{execAfter} (passes the
+option \opt{execJS}), and \opt{usealtadobe}.
+
+\begin{comment}
 If you are creating a document that is meant to be printed or your
 document only has exercises and solutions in it (which do not
 require JavaScript), the size of the document can be reduced
 significantly by using the \texttt{nodljs} option. This option is
 just passed on to the \textsf{insdljs} package.
+\end{comment}
 
 % \subsubsection{The \texttt{acrobativ} Option}\label{sss:acrobativ}
 %
@@ -4126,6 +4137,36 @@ continues on the next page. Further documentation can be found in
 \texttt{contsolns.pdf} in the \texttt{doc} folder, the demo file for this
 feature is \texttt{contsolns\_ex.tex}, found in the \texttt{examples}
 folder.
+
+\subsection{The \texttt{usemcfi} Option}\label{eq:usemcfi}
+
+The \opt{usemcfi} option inputs special code for creating a MC/math fill-in
+question, a type of question suggested to me by Stefka K.\ of Bulgaria. In
+this MCFI-type question, a question is posed with a multiple of choices
+offered; if the correct choice is not present, the student can enter his/her
+response in a text field (\cs{RespBoxMath}).
+
+\exAeBBlogPDF{p=1152} Read the \href{\urlAcroTeXBlog/?p=1152}{Illustrating the
+MCFI-type question} article at the {\AcroBlog} web site for more on
+this topic.
+
+\subsection{The \texttt{userbmintrvl} Option}\label{eq:userbmintrvl}
+
+The \opt{userbmintrvl} option defines \cs{rbmIntrvl} command, the syntax of which is,
+\bVerb\takeMeasure{\cs{rbmIntrvl\darg{[a,b]}\ameta{\textsf{arguments of \cs{RespBoxMath}}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\rbmIntrvl{[a,b]}!ameta(!textsf(arguments of !cs(RespBoxMath)))
+\end{dCmd}
+\eVerb
+The \cs{rbmIntrvl} command is a variation on \cs{RespBoxMath}, were some of
+the parameters of \cs{RespBoxMath} are set by the interval \texttt{[a,b]}.
+Here, any response that falls into the specified interval is accepted as
+correct. This approach was suggest to me by Thor G.\ of Germany.
+
+\exAeBBlogPDF{p=1482} Read the \href{\urlAcroTeXBlog/?p=1482}{The
+\texttt{userbmintrvl} option} article at the {\AcroBlog} web site for more on
+this topic.
+
 
 \section{The \texttt{exercise} Environment}\label{ss:online}
 
@@ -4566,7 +4607,7 @@ $a = 2$.
 Part (a) is hypertext linked to its solution, whereas part (b) is
 blue, indicating there is no link there.
 
-\redpoint Multipart exercises in the tabular format behave the same way; use
+\redpoint Multi-part exercises in the tabular format behave the same way; use
 \cs{item[h]} to ``hide'' a solution.
 
 \redpoint There is also an `\texttt{H}' option as well. Specifying
@@ -4622,7 +4663,7 @@ the following lines:
 \end{Verbatim}
 
 \subsubsection{The
-\texorpdfstring{\protect\texttt{nosolutions}}{nosolutions}
+\tops{\protect\texttt{nosolutions}}{nosolutions}
 Option}\label{sss:nosolutions}
 
 Some educators may initially want to post a series of exercises on the
@@ -4640,7 +4681,7 @@ with the \texttt{forpaper} option.
 
 
 \subsubsection{The
-\texorpdfstring{\texttt{solutions\-after}}{solutionsafter}
+\tops{\texttt{solutions\-after}}{solutionsafter}
 Option}\label{sss:solutionsafter}
 
 For additional flexibility with how you want the solutions to the
@@ -4743,7 +4784,7 @@ or to turn off this feature again. The default is \cs{makeExSolnsLocalOff}.
 
 
 \subsection{Redesigning the
-\texorpdfstring{\protect\texttt{exercise}}{exercise}
+\tops{\protect\texttt{exercise}}{exercise}
 Environment}\label{sss:redesignex}
 
 You can customize the \texttt{exercise} environment to suit your
@@ -5015,61 +5056,99 @@ There, you didn't need my help after all.
 feature for sorting out these different types of environments;
 they are all \texttt{exercise} environments, which is what they are.
 
-\section{The \texttt{shortquiz} Environment}\label{ss:QuizIR}
+\section{The \texttt{shortquiz} and \texttt{shortquiz*} Environments}\label{ss:QuizIR}
 
-The \texttt{shortquiz} environment is used to create multiple
-choice question and math/text fill-in questions with immediate
-response. The discussion of math and text fill-in questions is
-post-phoned to \hyperref[s:oQ]{Section~\ref*{s:oQ}}, entitled
-\nameref{s:oQ}.  The environment allows redefinition to customize
-the look of your quizzes. (See
-\mlNameref{sss:redefinesq}.)
+The \texttt{shortquiz} environment is used to create multiple choice
+questions (MC), multiple selection questions (MS), and math/text fill-in
+questions with immediate response. The discussion of math and text fill-in
+questions is post-phoned to \hyperref[s:oQ]{Section~\ref*{s:oQ}}, entitled
+\nameref{s:oQ}.  The environment allows redefinition to customize the look of
+your quizzes. (See \mlNameref{sss:redefinesq}.)
 
 % The presentation of the answers will either be in a \texttt{list}
 % or a \texttt{tabular} environment, depending on the parameter
 % \texttt{num\_cols}. (A \texttt{list} is used if \texttt{num\_col}
 % is set to~1.)
 
-\subsection{Basic Usage}\label{BasicUsage}
+\subsection{Syntax described}\label{BasicUsage}
 
-The syntax for the environment (\texttt{tabular} version) is as
-follows:
+For MC and MS questions, the \env{shortquiz} environment typesets choice
+fields consisting of links; the \env{shortquiz*} environment typesets choices
+fields consisting of form fields. The environments may appear with the \env{questions}
+environment or not. The latter case is designed to pose a single questions, the former
+is used to pose multiple questions. Refer to \Nameref{sss:quesEnv} for more information
+on the \env{questions} environment.
 
-\def\T#1{\makebox[0pt][l]{\hspace*{200pt}\% #1}}
-\def\1{\T{begin shortquiz}}
-\def\2{\T{begin proposed answers}}
-\def\3{\T{a wrong answer}}
-\def\4{\T{the right answer}}
-\def\5{\T{end listing of answers}}
-\def\6{\T{end shortquiz}}
-\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
-!1\begin{shortquiz}[!meta(base_name)]
-...Question goes here...
-!2\begin{answers}{!meta(num_cols)}
-...
-!3\Ans0 !anglemeta(an incorrect answer) &
-...
-!4\Ans1 !anglemeta(a correct answer) &
-...
-!5\end{answers}
-!6\end{shortquiz}
+\newtopic The syntax for the \env{shortquiz} and \env{shortquiz*} is given below.
+\bVerb\noindent\begin{minipage}[t]{170pt}
+\begin{Verbatim}[commandchars=!()]
+\begin{shortquiz}[!meta(base_name)]
+!ameta(one question)
+\end{shortquiz}
 \end{Verbatim}
-The optional \meta{base\_name} is used to build names of the form fields associated with
-this quiz; if one is not provided, a \meta{base\_name} is automatically created. The name
-must be unique to the entire document.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{\linewidth-180pt}
+\begin{Verbatim}[commandchars=!()]
+\begin{shortquiz}[!meta(base_name)]
+!ameta(Introduction to quiz)
+\begin{questions}
+  \item !ameta(first question)
+  ...
+  \item !ameta(last question)
+\end{questions}
+\end{shortquiz}
+\end{Verbatim}
+\end{minipage}
+\eVerb The syntax for \env{shortquiz*} is the same as above. The optional
+\ameta{base\_name} is used to build names of the form fields associated with
+this quiz; if one is not provided, a \ameta{base\_name} is automatically
+created. The name must be unique to the entire document.
 
-The parameter \meta{num\_cols} is the number of
-columns you want to typeset for your multiple choice responses. The
-environment sets up a \texttt{tabular} environment if
-\meta{num\_cols} is greater than~1, and a \texttt{list}
-environment if \texttt{num\_cols} is~1.
+When the \env{questions} environment is not present, a single question is
+expected to be posed and there is no numbering of this question.
 
-This type of quiz is suitable for asking a short series of
-question of the reader, perhaps after explaining some concept.
-Quizzes can be used to direct the reader's attention to an
-important point.
+%!1\begin{shortquiz}
+%!2\begin{answers}{!meta(num_cols)}
+%...
+%!3\Ans0 !anglemeta(an incorrect answer) &
+%...
+%!4\Ans1 !anglemeta(a correct answer) &
+%...
+%!5\end{answers}
+%!6\end{shortquiz}
 
-\redpoint Here is an example of the \texttt{shortquiz}
+This type of quiz is suitable for asking a short series of questions of the
+reader, perhaps after explaining some concept. Quizzes can be used to direct
+the reader's attention to an important point.
+
+\subsubsection{Multiple choice (MC) type questions}
+
+Multiple choice questions (MC) are posed using the \env{answers} environment.
+\begin{Verbatim}[commandchars=!()]
+\begin{answers}!ameta(dest!upshape|*){!ameta(n_cols)}
+  \Ans0 !ameta(a wrong choice alternative)   !ameta(!upshape(&|\\|empty)) % EOL marker
+  \Ans1 !ameta(a correct choice alternative) !ameta(!upshape(&|\\|empty)) % EOL marker
+  ...
+  \Ans0 !ameta(a wrong choice alternative)   !ameta(!upshape(&|\\|empty)) % EOL marker
+\end{answers}
+\end{Verbatim}
+where \ameta{n\_cols} is a positive integer. When \ameta{n\_cols} is 1, then
+the choice field is laid out in list format; if \ameta{n\_cols} is in tabular
+format. The document author must mark up the end of each line (EOL). If
+\ameta{n\_cols} is 1 (list-mode), no markers are needed; otherwise, type fields are
+laid out in tabular format, the ampersand (\texttt\&) is the marker between entries on the same line
+and double backslash (\verb!\\!) marks the end of a row. The usual {\LaTeX} style for a table.
+
+The argument \ameta{dest\upshape|*} is used to signal that this question has
+a solution provided. Refer to \Nameref{ss:QuizS} for more information on this
+argument.
+
+The \cs{Ans} command takes as its argument either 1 (for a correct
+alternative) or 0 (for a wrong alternative). For a MC choice field, there should
+be only one question marked with a 1 (\cs{Ans1} or \cs{Ans\darg{1}}).
+
+\redpoint Here is an example of the \env{shortquiz}
 environment.  Responses are graded without comment using
 JavaScript.
 
@@ -5080,6 +5159,7 @@ Which of the following is the $\dfrac{d}{dx}{\sin(x^3)}$?
 \Ans0 $3x^2\cos(3x^2)$ \\
 \end{answers}
 \end{shortquiz}
+Note that the alternative are labeled using links (a), (b), and so on.
 
 \noindent The verbatim listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -5093,8 +5173,8 @@ Which of the following is the $\dfrac{d}{dx}{\sin(x^3)}$?
 \end{answers}             % end answers environment
 \end{shortquiz}           % end shortquiz environment
 \end{Verbatim}
-If \texttt{num\_cols} is greater than 1, the
-\texttt{answers} sets up a \texttt{tabular} environment,
+If \ameta{num\_cols} is greater than 1, the
+\env{answers} sets up a \texttt{tabular} environment,
 \texttt{p\darg{\meta{width}}} to sets up the column widths. The \cs{parbox}es are
 typeset ragged right.
 
@@ -5124,8 +5204,8 @@ even to this day. % Leibniz
 \end{answers}
 \end{shortquiz}
 
-\noindent Here is the same example in which the \texttt{num\_cols} is set
-to~1; in this case, a \texttt{list} environment is used.
+\noindent Here is the same example in which the \ameta{num\_cols} is set
+to~1; in this case, a \env{list} environment is used.
 
 \begin{shortquiz}
 Which of the following best describes Augustin Cauchy?
@@ -5174,8 +5254,64 @@ this is
 \end{Verbatim}
 and this can be reset to any desired vertical skip.
 
+\subsubsection{Multiple selection (MS) type questions}
 
-\subsubsection{\texttt{shortquiz} with Radio Buttons}\label{sqwRadio}
+A multiple selection (MS) type question is one that offers a choice field,
+with more than one correct answer and it is expected for the respondent to
+choose all the correct alternatives. MS questions are posed using the
+\env{manswers} environment, this syntax of which is the same as that of the
+\env{answers} environment.
+\begin{Verbatim}[commandchars=!()]
+\begin{manswers}!ameta(dest!upshape|*){!ameta(n_cols)}
+  \Ans0 !ameta(a wrong choice alternative)   !ameta(!upshape(&|\\|empty)) % EOL marker
+  \Ans1 !ameta(a correct choice alternative) !ameta(!upshape(&|\\|empty)) % EOL marker
+  ...
+  \Ans1 !ameta(a correct choice alternative) !ameta(!upshape(&|\\|empty)) % EOL marker
+  ...
+  \Ans0 !ameta(a wrong choice alternative)   !ameta(!upshape(&|\\|empty)) % EOL marker
+\end{manswers}
+\end{Verbatim}
+Recall from the discussion of the MC type, the argument
+\ameta{dest\upshape|*} is used to signal that this question has a solution
+provided. Refer to \Nameref{ss:QuizS} for more information on this argument.
+
+\newtopic
+A brief example will suffice.
+\begin{shortquiz}
+Which of the following are prime numbers?
+\begin{manswers}{4}
+  \Ans0 1 &
+  \Ans1 2 &
+  \Ans1 3 &
+  \Ans0 4 \\
+  \Ans1 5 &
+  \Ans0 6 &
+  \Ans1 7 &
+  \Ans0 8
+\end{manswers}
+\end{shortquiz}
+The verbatim listing is as follows:
+\begin{Verbatim}
+\begin{shortquiz}
+Which of the following are prime numbers?
+\begin{manswers}{4}
+  \Ans0 1 & \Ans1 2 & \Ans1 3 & \Ans0 4 \\
+  \Ans1 5 & \Ans0 6 & \Ans1 7 & \Ans0 8
+\end{manswers}
+\end{shortquiz}
+\end{Verbatim}
+You'll note that the \env{shortquiz} environment is used, yet form fields
+(check boxes) are used; this is by design. Links are not available for MS
+questions, only for MC questions.
+
+\subsubsection{Other supported question types}
+
+In addition to MC and MS questions, any other supported types can be used
+in a \env{shortquiz} environment, these include math fill-in and text fill-in questions,
+the syntax of which is discussed in Section~\ref{s:oQ} on page~\pageref{s:oQ}.
+
+
+\subsubsection{\texttt{shortquiz} with radio buttons}\label{sqwRadio}
 
 The short quizzes (with multiple choices) can also be laid out using
 radio buttons rather than typeset lettering. Use a
@@ -5207,7 +5343,7 @@ Was it in Xanadu did Kubla Kahn a stately pleasure dome decree?
 \noindent Check the functionality of this question, and contrast it with
 the same question.
 
-\sqTurnOffAlerts \sqCorrections
+\sqTurnOffAlerts %\sqCorrections
 
 \begin{shortquiz*}[KublaKhan3]
 Was it in Xanadu did Kubla Kahn a stately pleasure dome decree?
@@ -5215,58 +5351,49 @@ Was it in Xanadu did Kubla Kahn a stately pleasure dome decree?
 \Ans1 True & \Ans0 False
 \end{answers}
 \end{shortquiz*}
-\noindent We have inserted two new commands prior to this last
-short quiz \cs{sqTurnOffAlerts} and \cs{sqCorrections} to change
-response feedback. The former turns off the alerts and the latter
-turns on the corrections: check for a correct answer and an cross
-for an incorrect answer. (It doesn't make sense to
-\cs{sqTurnOffAlerts} without \cs{sqCorrections};
-\cs{sqCorrections} can be used without turning off the alerts.)
+\noindent The command \cs{sqTurnOffAlerts} was inserted prior to this last
+short-quiz to change response feedback; \cs{sqTurnOffAlerts} turns off the
+(annoying) alerts.
 
-\redpoint These two commands only apply to a short quiz that uses radio buttons.
-You can reverse these two commands with \cs{sqTurnOnAlerts} and
-\cs{sqNoCorrections}, respectively. These settings are the
-defaults of the \texttt{shortquiz} with check boxes.
+\redpoint The \cs{sqTurnOffAlerts} command only apply to a short-quiz that
+uses radio buttons. You can reverse the effect of this command by expanding
+\cs{sqTurnOnAlerts}. The default is \cs{sqTurnOnAlerts}.
 
-\subsubsection{\texttt{shortquiz} with Solutions}\label{ss:QuizS}
+\subsubsection{\texttt{shortquiz} with solutions}\label{ss:QuizS}
 
-Another type of quiz that is easy to implement in PDF is the
-multiple choice quiz with immediate response with solution given.
-This too is a \texttt{shortquiz} environment:
+A question within a \env{shortquiz} or \env{shortquiz*} environment may optionally
+have a solution, or a more detailed discussion of the question.
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \begin{shortquiz}
-...Question goes here...
-\begin{answers}!anglemeta(dest){!meta(num_cols)}
-...
-\Ans0 !anglemeta(an incorrect answer) &
-...
-\Ans1 !anglemeta(a correct answer) &
-...
-\end{answers}
+!ameta(pose the question)
+!ameta(supported question type answer, manswer, or some other type)
 \begin{solution}
-    !anglemeta(solution to correct answer)
+!qquad!ameta(solution to correct answer)
 \end{solution}
 \end{shortquiz}
 \end{Verbatim}
+All questions types have an argument that signals the presence of a provide
+solution. For example. Recall from the previous discussion of \env{answers}
+and \env{manswers} there is an argument \ameta{dest\upshape|*} that signals
+the presence of a solution. This argument takes on two forms \ameta{dest},
+which is a simple text string in square brackets that names the destination;
+or, the argument can be an ampersand (\texttt*) where the name of the
+destination is automatically generated. The first form of \ameta{dest} is an
+explicit named destination that is enclosed in square brackets, such as
+\texttt{[myDest]}.\footnote{Technically, the named definition must be a
+JavaScript identifier, refer to page~\pageref*{quote:JSIdentifier} for the
+definition of a JavaScript identifier.} The other form is the star-form
+`\texttt{*}', when the star-form is used, \pkg{exerquiz} automatically
+generates the name. Use the \ameta{dest} form when you want to refer to a
+solution in another part of the document; otherwise, use `\texttt{*}' for
+convenience. The use of \ameta{dest} in a link is illustrated below.
 
-\newtopic The \anglemeta{name} takes on two forms, in either case, it is used to create a hypertext jump to
-the solution. The first form of \anglemeta{name} is an explicit named
-definition `\texttt{[\meta{named\_dest}]}', where \meta{named\_dest} is a
-word selected by the document author for a ``named destination.'' The other
-form is the star-form `\texttt{*}', when the star-form is used,
-\textsf{exerquiz} automatically generates the name. Use the
-`[\meta{named\_dest}]' form when you want to refer to a solution in another
-part of the document; otherwise, use `\texttt{*}' for convenience.
-
-\newtopic As before, \meta{num\_cols} is the number of columns to
-typeset the answers in.
-
-\newtopic The following example illustrates the quiz with
+\newtopic The following example illustrates a short-quiz with
 solution.
 
 %\renewcommand\sqslrtnlabel{\string\raisebox{1pt}{$\blacktriangleleft$}Return to Quiz}
 
-\begin{shortquiz}
+\begin{shortquiz*}
 Define a function $f(s)=4s^3$ and another function
 $F(t)=t^4$. Is $F$ an antiderivative of $f$?
 \begin{answers}[quiz:anti]{4}
@@ -5287,20 +5414,26 @@ differentiation, $F'(t)=4t^3$.  Thus, $F'(x)=4x^3$. Therefore,
 \]
 as required by the definition.
 \end{solution}
-\end{shortquiz}
+\end{shortquiz*}
+
+\newtopic\textbf{User experience.} For MC and MS type questions, as soon as the respondent
+correctly answers all choices, an alert dialog box appears with a message of
+``Right!'' (unless \cs{sqTurnOffAlerts} is expanded earlier), then the PDF viewer jumps to the page containing the solution, or
+a discussion of the answer.
 
 \newtopic The verbatim listing that uses the explicit form of the destination, shown
 in bold font.
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
-\begin{shortquiz}
+\begin{shortquiz*}
 Define a function $f(s)=4s^3$ and another
 function $F(t)=t^4$. Is $F$ an antiderivative of $f$?
 \begin{answers}!textbf([quiz:anti]){4}
 \Ans1 Yes &\Ans0 No
 \end{answers}
-...solution not shown...
+\begin{solution}
+!ameta(solution not shown)
 \end{solution}
-\end{shortquiz}
+\end{shortquiz*}
 \end{Verbatim}
 
 \newtopic Here is a listing of the same quiz using the \texttt{*} to
@@ -5312,27 +5445,30 @@ function $F(t)=t^4$. Is $F$ an antiderivative of $f$?
 \begin{answers}!textbf(*){4}
 \Ans1 Yes &\Ans0 No
 \end{answers}
-...solution not shown...
+\begin{solution}
+!ameta(solution not shown)
 \end{solution}
 \end{shortquiz}
 \end{Verbatim}
+The advantage of the first form is that you can, within the body of the document,
+provide a link to the solution: ``Please review the \hyperlink{quiz:anti}{solution}
+to the previous short-quiz.'' Use \cs{hyperlink} to set the link to the solution:
+\verb~\hyperlink{quiz:anti}{solution}~.
 
 
-
-\subsubsection{The \texorpdfstring{\protect\cs{bChoices}/\-\protect\cs{eChoices}}
+\subsubsection{The \tops{\protect\cs{bChoices}/\-\protect\cs{eChoices}}
     {\textbackslash bChoices/\textbackslash eChoices} Commands}\label{bChoices}
 
 
-Beginning with \textsf{exerquiz} version~6.03, the command pair
-\cs{bChoices} and \cs{eChoices} are defined to help lay out
-the list of choices for a multiple choice question. This pair of
-macros is not really an environment, the \cs{eChoices} really
-does nothing other than to act as an ending marker. The idea
-behind this pair of macros is twofold:
+Beginning with \textsf{exerquiz} version~6.03, the command pair \cs{bChoices}
+and \cs{eChoices} are defined to help lay out the list of choices for a MC or
+MS question. This pair of macros is not really an environment, the
+\cs{eChoices} really does nothing other than to act as an ending marker. The
+idea behind this pair of macros is twofold:
 \begin{questions}
 
 \item To provide a convenient way of listing alternate choices for
-a multiple choice questions, the ``environment'' makes it easy to
+MC and MS questions, the ``environment'' makes it easy to
 change the number of columns, or to change from tabular to list
 (or visa-versa);
 
@@ -5341,7 +5477,8 @@ make it easy to develop techniques of randomizing the
 alternatives.
 
 \end{questions}
-Here is an example of usage:
+Here is an example of usage, this example uses the \env{answers} environment, the
+\env{manswers} environment can similarly laid out.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{answers}{4}                  %<- 4 columns
 \bChoices[2]                        %<- use only first 2 columns
@@ -5366,9 +5503,9 @@ delimiter~`\texttt\&', or the end of line
 command~`\texttt{\string\\}', this is done by the \cs{bChoices}
 command.
 
-The commands \cs{bChoices} and \cs{eChoices} can be used within
-the \texttt{answers} environment as part of a \texttt{shortquiz} or a
-\texttt{\hyperref[ss:GradedQuizzes]{quiz}} environment.
+The commands \cs{bChoices} and \cs{eChoices} can be used within the
+\env{answers} or \env{manswers} environment as part of a \texttt{shortquiz}
+or a \texttt{\hyperref[ss:GradedQuizzes]{quiz}} environment.
 
 Concerning the example above, the argument of the \texttt{answers}
 environment is 4 which means we are going to use the tabular
@@ -5430,22 +5567,22 @@ your choices to contain verbatim text, use the style as described in
 \Nameref{BasicUsage}.
 
 \subsubsection{The
-\texorpdfstring{\protect\texttt{questions}}{questions} Environment}
+\tops{\protect\texttt{questions}}{questions} Environment}\label{sss:quesEnv}
 
 The \texttt{questions} environment was designed to work with the
 \texttt{quiz} environment---taken up in
 \hyperref[ss:GradedQuizzes]{Section~\ref*{ss:GradedQuizzes}}
 below---but it works equally well with \texttt{shortquiz}.
 
-Using the \texttt{questions} environment, quizzes defined by
+Using the \texttt{questions} environment, quizzes created by
 \texttt{shortquiz}, with/without solutions, can be
 mixed together and combined to make a ``mini-quiz''.  For example,
 
 \begin{shortquiz} Determine the LCD for each of the following.
 \begin{questions}
 \item  $\dfrac{3x}{2y^2z^3}-\dfrac2{xy^3 z^2}$.
-\begin{answers}{2}
-\bChoices
+\begin{answers}{3}
+\bChoices[2]
     \Ans0 $\text{LCD}=2xy^5z^5$\eAns
     \Ans0 $\text{LCD}=2y^3 z^3$\eAns
     \Ans1 $\text{LCD}=2x y^3 z^3$\eAns
@@ -5453,8 +5590,8 @@ mixed together and combined to make a ``mini-quiz''.  For example,
 \eChoices
 \end{answers}
 \item  $\dfrac{x+y}{3 x^{3/2}y^2}-\dfrac{x^2+y^2}{6 x y^4}$.
-\begin{answers}[quiz:LCB]{2}
-\bChoices
+\begin{answers}[quiz:LCB]{3}
+\bChoices[2]
     \Ans0 $\text{LCD}=18 x^{3/2}y^4$\eAns
     \Ans1 $\text{LCD}=6x^{3/2}y^4$\eAns
     \Ans0 $\text{LCD}=18 x y^4$\eAns
@@ -5506,13 +5643,17 @@ solution attached to it. An abbreviated verbatim listing follows.
 Determine the LCD for each of the following.
 \begin{questions}
 \item  $\dfrac{3x}{2y^2z^3}-\dfrac2{xy^3 z^2}$.
-\begin{answers}{2}
+\begin{answers}{3}
+\bChoices[2]
 ...
+\eChoices
 \end{answers}
 \item  $\dfrac{x+y}{3 x^{3/2}y^2}
           -\dfrac{x^2+y^2}{6 x y^4}$.
-\begin{answers}[quiz:LCB]{2}
+\begin{answers}[quiz:LCB]{3}
+\bChoices[2]
 ...
+\eChoices
 \end{answers}
 \begin{solution}
 If you erred on this one, ... ...
@@ -5569,7 +5710,7 @@ We now begin a multipart question.
 \subsection{Options of the \texttt{shortquiz} Environment}\label{sq:opts}
 
 \subsubsection{The
-\texorpdfstring{\protect\texttt{forpaper}}{forpaper} Option}
+\tops{\protect\texttt{forpaper}}{forpaper} Option}
 
 The \texttt{forpaper} option has already been described. The
 solutions to \texttt{short\-quiz} questions are not typeset on
@@ -5613,7 +5754,7 @@ quiz can be published, then later, the quiz with complete
 solutions.
 
 
-\subsubsection{The \texorpdfstring{\texttt{proof\-ing}}{proofing}
+\subsubsection{The \tops{\texttt{proof\-ing}}{proofing}
 Option}\label{sss:proofing}
 
 For proofreading, use the \texttt{proofing} option of
@@ -5727,14 +5868,295 @@ You can now declare \cs{makeQzSolnsLocalOn} or \cs{makeQzSolnsLocalOff}
 anywhere in the document to turn on grouping for all quizzes that follow, or
 to turn off this feature again. The default is \cs{makeQzSolnsLocalOff}.
 
+\subsection{Enhancing the \tops{\protect\env}{}{shortquiz} experience}
+
+In this section, several commands are discussed that enhance the user experience.
+
+\subsubsection{Using tally boxes}
+
+One way of making the short-quiz more interesting to the respondent is through
+the tally box.
+\bVerb\takeMeasure{\string\answersEndHook\darg{\ameta{content}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\sqTallyBox[!ameta(options)]
+\sqTallyTotal[!ameta(options)]
+\answersEndHook{!ameta(content)}
+\sqClearButton[!ameta(options)]
+\end{dCmd}
+\eVerb The first (\cs{sqTallyBox}) tracks the number of times the respondent has
+not answered a particular question correctly, while the second one keeps a
+running total of the number of missed questions in the short-quiz. The third
+command is a convenient way of inserting \ameta{content} (usually the
+\cs{sqTallyBox} command) into the MC and MS choice fields. Finally, the
+\cs{sqClearButton} command creates a pushbutton whose action is to clear the
+short-quiz, including the tally boxes.
+
+The example below illustrates all four of the commands. Within the
+\env{questions} environment, the following is declared:
+\begin{Verbatim}[xleftmargin=\amtIndent]
+\answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
+\end{Verbatim}
+which means \cs{sqTallyBox} is insert to the right of the choice field, push
+to the right margin, then moved to the left using the 0pt width \cs{makebox}.
+\begin{shortquiz*}
+Correctly respond to each, passing is not making a single incorrect choice.
+\begin{questions}
+\answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
+\item In what year did Columbus sail the ocean blue?
+\begin{answers}*{4}
+\bChoices
+\Ans0 1490\eAns
+\Ans0 1491\eAns
+\Ans1 1492\eAns
+\Ans0 1493\eAns
+\eChoices
+\end{answers}
+\begin{solution}
+Columbus sailed the ocean in 1492. It rhymes.
+\end{solution}
+
+\item Which of the following numbers are prime?
+\begin{manswers}*{4}\rowsep{3pt}
+\bChoices
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans1 3\eAns
+  \Ans0 4\eAns
+  \Ans1 5\eAns
+  \Ans0 6\eAns
+  \Ans1 7\eAns
+  \Ans0 8\eAns
+\eChoices
+\end{manswers}
+\end{questions}
+\hfill\sqClearButton\olBdry\sqTallyTotal
+\end{shortquiz*}
+\noindent\textbf{Important:} When positioning \cs{sqTallyBox}, be aware that the box
+may overwrite some of the content of the tabular field. It is the document
+author's responsibility to design the choice field so it is not so wide as to
+extend too closely to the right margin. This can be done by reducing the number
+of items in the row.
+
+\subsubsection{The Traditional versus Alternate user experience}
+
+This section addresses an optional change in how the user experiences viewing
+the solutions to multiple-choice (MC) and multiple-selection (MS) questions
+in a \env{shortquiz} environment.
+
+\newtopic\textbf{Traditional user experience}
+\begin{aebQuote}
+\begin{enumerate}
+\item[MC] As soon as the respondent selects the correct answer, the PDF
+    viewer jumps to the page containing the solution.
+
+\item[MS] As soon as the respondent selects \emph{all} the correct answers,
+    the PDF viewer jumps to the page containing the solution.
+\end{enumerate}
+\end{aebQuote}
+
+\newtopic\textbf{Alternate user experience}
+\begin{aebQuote}
+\begin{enumerate}
+\item[MC] Nothing happens after the respondent selects the correct answer,
+    s/he must press the new \uif{Ans} button to jump to the solution page.
+    If the respondent presses the \uif{Ans} button before selecting the
+    correct answer, an alert box appears with message determined by \cs{sqSolnMCMsg}.
+\item[MS] When the user has selected \emph{all correct answers}, s/he must press
+    the new \uif{Ans} button in order to jump to the solution page. If the
+    user presses the \uif{Ans} button before selecting all correct
+    answers, an alert box appears with message determined by \cs{sqSolnMSMsg}.
+\end{enumerate}
+If a MC or MS question does not have a solution, the \uif{Ans} button is not
+typeset into the document.
+\end{aebQuote}
+
+\noindent
+In additional to some internal changes, there are three new commands:
+\bVerb\takeMeasure{\string\flJSStr\darg{\string\sqSolnMCMsg}\{You must first select the correct}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+\sqSolnBtn[!ameta(options)] %!textsf( Creates the new Ans button)
+\flJSStr{\sqSolnMCMsg}{You must first select the correct
+answer to see the solution.}
+\flJSStr{\sqSolnMSMsg}{You must first select all the
+correct answers to see the solution.}
+\end{dCmd}
+\eVerb The first command is the one that creates the \uif{Ans} button, the
+\ameta{options} argument is used to modify the appearance of the button. The
+other two commands are the messages of the alert boxes that appear; these may
+be redefined as needed. The next two \cs{flJSStr} declarations define two
+commands \cs{sqSolnMCMsg} and \cs{sqSolnMSMsg}, these are the message strings
+for the alert boxes that appear. For information on \cs{flJSStr}, refer to
+the documentation, \texttt{eformman.pdf}, for the \pkg{eforms} and
+\pkg{insdljs} packages, which come with the \pkg{acrotex} bundle.
+
+\newtopic\textbf{Inserting \cs{sqSolnBtn} into the short-quiz.} Whether the alternate
+traditional user experience occurs depends on the insertion of \cs{sqSolnBtn}
+into the stream. To insert \cs{sqSolnBtn}, use \cs{answersEndHook}, which is
+also how \cs{sqTallyBox} is inserted. In this document,
+\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,commandchars=!()]
+%!textsf( Tradition experience: Insert !cs(sqTallyBox) only)
+\answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
+%!textsf( Alternate experience: Insert !cs(sqSolnBtn) and !cs(sqTallyBox))
+\answersEndHook{\hfill\makebox[0pt][r]{\sqSolnBtn\sqTallyBox}}
+\end{Verbatim}
+\begin{comment}
+The \cs{olBdry} is used to overlay the contiguous boundaries of the two
+button fields. Refer to the documentation, \texttt{eformman.pdf}, for the
+\pkg{eforms} and \pkg{insdljs} packages, which come with the \pkg{acrotex}
+bundle. \cs{answersEndHook} insert its content at the right margin, pushing
+it to the left; as a result, the content may overlay the text of the choice
+field. It is up to the document author, that's you, to design the layout of
+the choice field so the \cs{sqTallyBox} and/or the \cs{sqSolnBtn} does not
+overlay other content.
+
+\promoteNewPageHere[2\textheight]
+
+\paragraph*{A sample quiz to illustrate.}
+These new commands are illustrated in the following short-quiz.
+
+\begin{shortquiz*}
+Answer each of the following. Passing is to
+complete the quiz without selecting any wrong answers.
+
+\answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
+
+\medskip\noindent
+Problems~1 and~2 are in the style \emph{traditional user experience} that has been
+used since the very beginning of \pkg{exerquiz}.
+
+\begin{questions}
+
+\item\label{MC} In what year did Columbus sail the ocean blue?
+\begin{answers}*{4}
+\bChoices
+\Ans0 1490\eAns
+\Ans0 1491\eAns
+\Ans1 1492\eAns
+\Ans0 1493\eAns
+\eChoices
+\end{answers}
+\begin{solution}
+Columbus sailed the ocean in 1492. It rhymes.
+\end{solution}
+
+\item\label{MS} Which of the following numbers are prime?
+\begin{manswers}*{4}\rowsep{3pt}
+\bChoices
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans1 3\eAns
+  \Ans0 4\eAns
+  \Ans1 5\eAns
+  \Ans0 6\eAns
+  \Ans1 7\eAns
+  \Ans0 8\eAns
+\eChoices
+\end{manswers}
+\begin{solution}
+Yes, 2, 3, 5, and 7; they are the first four prime numbers.
+\end{solution}
+
+\pushquestions Problems~3 and~4 are in the style \emph{alternate user experience}.
+
+\popquestions
+
+\answersEndHook{\hfill\makebox[0pt][r]{\sqSolnBtn\olBdry\sqTallyBox}}
+
+
+\item\label{Alt:MC} In what year did Columbus sail the ocean blue?
+\begin{answers}*{4}
+\bChoices
+\Ans0 1490\eAns
+\Ans0 1491\eAns
+\Ans1 1492\eAns
+\Ans0 1493\eAns
+\eChoices
+\end{answers}
+\begin{solution}
+Columbus sailed the ocean in 1492. It rhymes.
+\end{solution}
+
+\item\label{Alt:MS} Which of the following numbers are prime?
+\begin{manswers}*{4}\rowsep{3pt}
+\bChoices
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans1 3\eAns
+  \Ans0 4\eAns
+  \Ans1 5\eAns
+  \Ans0 6\eAns
+  \Ans1 7\eAns
+  \Ans0 8\eAns
+\eChoices
+\end{manswers}
+\begin{solution}
+Yes, 2, 3, 5, and 7; they are the first four prime numbers.
+\end{solution}
+\end{questions}
+\hfill\sqClearButton\olBdry\sqTallyTotal
+\end{shortquiz*}
+\end{comment}
+
+% ?? revise after publication
+\exAeBBlogPDF{p=803} The discussion of the alternate viewing experience discussed in this section
+as well as the source markup for the above short quiz, can be found in the {\AcroTeX} Blog titled
+
+%Use the source file for
+%\texttt{\href{\urlAcroTeXBlog/?p=803}{webeqtst.pdf}} as a prototype or
+%template for your own document.
+
+\subsubsection{The concept of weak and strong pass levels}
+
+The short-quiz (the \env{shortquiz} environment) was originally created as a
+self-learning device, wherein the student reads some content (mathematics,
+for example), solves some exercises (the \env{exercise} environment), then
+takes a short quiz to reinforce and to assess their newly absorbed
+information.
+
+For many years, \pkg{exerquiz} has provided \cs{sqTallyBox} and
+\cs{sqTallyTotal} commands that keep track of incorrect responses. As a way
+to motivate the student more (and to annoy them more), this section
+introduces the notion of setting \emph{weak or strong passing levels}. These
+levels are set through the optional argument of \cs{sqTallyTotal}.
+
+\begin{aebQuote}
+\begin{description}
+\item[Weak passing level] Syntax: \cs{sqTallyTotal[\cs{weakpassing\darg{\ameta{n}}}]}\\[3pt]
+  \textbf{User Experience.} As soon as the student makes more than
+\ameta{n} errors, the following message appears in an alert box:
+\begin{Verbatim}
+\flJSStr{\sqWeakMsg}{You have missed too many questions.
+After you finish, it is recommended you retake this quiz
+with fewer errors and greater understanding.}
+\end{Verbatim}
+The student is allowed to continue the quiz, but with the knowledge that s/he
+is not performing to the expected standard, as set by the instructor.
+
+\item[Strong passing level] Syntax: \cs{sqTallyTotal[\cs{strongpassing\darg{\ameta{n}}}]}\\[3pt]
+\textbf{User Experience.} As soon as the student makes more than \ameta{n}
+errors, the following message appears in an alert box:
+\begin{Verbatim}
+\flJSStr{\sqStrongMsg}{You have missed too many questions.
+We are resetting the quiz. Start over, this time with
+fewer errors and greater understanding.}
+\end{Verbatim}
+After the student dismisses the alert dialog box, the short-quiz s/he is
+working is cleared. Perhaps this condition will inspire the student to
+spend more time and think about his/her responses.
+\end{description}
+\end{aebQuote}
+In both cases, \ameta{n} is a nonnegative integer.
+
+% ?? revise after publication
+\exAeBBlogPDF{p=803} The discussion of the alternate viewing experience discussed in this section
+as well as the source markup for the above short quiz, can be found in the {\AcroTeX} Blog titled
+
 \subsection{Redesigning the
-\texorpdfstring{\protect\texttt{shortquiz}}{shortquiz}
-Environment}\label{sss:redefinesq}
+\tops{\protect\texttt{shortquiz}}{shortquiz} Environment}\label{sss:redefinesq}
 
 The \texttt{shortquiz} environment can be redesigned to better suit
 your needs.  In the paragraphs below, we describe how you can change
 titles and form elements.
-
 
 \subsubsection{Changing Titles}
 
@@ -5818,7 +6240,7 @@ Prior to the short quiz below, the following command was executed
 \everysqRadioButton{\BC{.690 .769 .871}\BG{.941 1 .941}}
 \end{Verbatim}
 
-\sqTurnOffAlerts \sqCorrections
+\sqTurnOffAlerts %\sqCorrections
 \everysqRadioButton{\BC{.690 .769 .871}\BG{.941 1 .941}}
 
 \begin{shortquiz*}[KublaKhan3]
@@ -5841,8 +6263,8 @@ various other controls, these are described in
 Section~\ref{s:oQsq}, \nameref{s:oQsq}. There too, methods of
 modifying the appearance of the form elements are discussed.
 
-\subsection{\texorpdfstring{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}
-    and \texorpdfstring{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{titleQuizSQ}
+\subsection{\tops{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}
+    and \tops{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{titleQuizSQ}
 
 %\exPDF{title_quiz}The demo file for these features is \texttt{title\_quiz.tex}.
 
@@ -5851,7 +6273,7 @@ website for examples.
 
 
 
-\subsubsection{\texorpdfstring{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}}
+\subsubsection{\tops{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}}
 
 To assign a title to your short quiz use \Com{titleQuiz}. This title
 appears just after the typeset word ``Quiz''.
@@ -5930,7 +6352,7 @@ like so,
     \ifQuizType{\bfseries(#1)}{\slshape[#1]}}
 \end{Verbatim}
 
-\subsubsection{\texorpdfstring{\protect\cs{titleQuiz*}}{\CMD{titleQuiz*}}}
+\subsubsection{\tops{\protect\cs{titleQuiz*}}{\CMD{titleQuiz*}}}
 
 For \texttt{shortquiz} environment---not for the \texttt{quiz}
 environment---there is a `\texttt*' optional first parameter. When
@@ -6014,7 +6436,7 @@ the quiz is \nameref{myCoolSQ}.
 %\noindent This definition can be change using \cs{renewcommand}.
 
 
-\subsubsection{\texorpdfstring{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}
+\subsubsection{\tops{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}
 
 The \Com{fancyQuizHeaders} command, a companion feature to \Com{titleQuiz}, enhances
 the labeling of the quiz in the solutions section of the document. If
@@ -6087,12 +6509,12 @@ The quiz environment takes one required parameter, the
 variables; therefore, there are restrictions on the choice of the
 name. The name must be a (JavaScript) \emph{identifier}, the rules to
 be an identifier are these.
-\begin{quote}
-The first character shall be a letter, an underscore (\texttt{\_}),
+\begin{quote}\label{quote:JSIdentifier}
+The\FmtMP{JavaScript identifier described} first character shall be a letter, an underscore (\texttt{\_}),
 or a dollar sign (\texttt{\$}); subsequent characters may be any
 letter or digit, or an underscore or a dollar sign.
 \end{quote}
-Do not use other symbols, like a colon (\texttt{\:}) or a period as part of the field  name,
+Do not use other symbols, like a colon (\texttt{:}) or a period as part of the field  name,
 these will confuse the JavaScript interpreter, and may cause the quiz not to function as
 designed.
 
@@ -6182,7 +6604,7 @@ In addition to the options listed in the section \ref{sq:opts}, page \pageref*{s
 designed for quizzes.
 
 \subsubsection{The option
-\texorpdfstring{\protect\texttt{noquiz\-solutions}}{noquizsolutions}}\label{sss:noquizsolutions}
+\tops{\protect\texttt{noquiz\-solutions}}{noquizsolutions}}\label{sss:noquizsolutions}
 
 For online quizzing, where results are stored in some way (database,
 e-mail, text file) the presence of the solutions in the same file as the
@@ -6485,7 +6907,7 @@ of the buttons.
 \end{Verbatim}
 \noindent would create a `Begin Quiz' button with blue text for the button label.
 
-\subsubsection{The \texorpdfstring{\texttt{proof\-ing}}{proofing}
+\subsubsection{The \tops{\texttt{proof\-ing}}{proofing}
 Option}\label{ss:proofing}
 
 For proofreading, use the \texttt{proofing} option of
@@ -6741,7 +7163,7 @@ respond to each of the following questions.
 the design more compact and nicer looking.
 
 \subsubsection{The
-\texorpdfstring{\protect\texttt{nocorrections}}{nocorrections}
+\tops{\protect\texttt{nocorrections}}{nocorrections}
 Option}\label{sss:nocorrections}
 
 Including the corrections adds quite a bit more JavaScript code to
@@ -7158,8 +7580,8 @@ macros.
 
 
 
-\subsection{\texorpdfstring{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}
-    and \texorpdfstring{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{titleQuiz}
+\subsection{\tops{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}
+    and \tops{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{titleQuiz}
 
 %\exPDF{title_quiz} The demo file for these features is \texttt{title\_quiz.tex}.
 
@@ -7167,7 +7589,7 @@ macros.
 \texttt{\href{\urlAcroTeXBlog/?p=908}{title\_quiz.pdf}}.
 
 
-\subsubsection{\texorpdfstring{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}}
+\subsubsection{\tops{\protect\cs{titleQuiz}}{\CMD{titleQuiz}}}
 
 To assign a title to your quiz use \Com{titleQuiz}. This title appears just after
 the `Begin Quiz' button
@@ -7266,7 +7688,7 @@ quiz is \nameref{MyMCQuiz}.
 \end{Verbatim}
 \noindent This definition can be change using \cs{renewcommand}.
 
-\subsubsection{\texorpdfstring{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{fancyQuizHeadersQ}
+\subsubsection{\tops{\protect\cs{fancyQuizHeaders}}{\CMD{fancyQuizHeaders}}}\label{fancyQuizHeadersQ}
 
 The \Com{fancyQuizHeaders} command, a companion feature to \Com{titleQuiz}, enhances
 the labeling of the quiz in the solutions section of the document. If
@@ -7465,7 +7887,7 @@ messages to the student upon completion of the quiz.
 \end{Verbatim}
 \end{questions}
 
-\subsubsection{\texorpdfstring{\protect\cs{negPointsAllowed}}{\CMD{negPointsAllowed}}}\label{negPtsAllowed}
+\subsubsection{\tops{\protect\cs{negPointsAllowed}}{\CMD{negPointsAllowed}}}\label{negPtsAllowed}
 
 The \texttt{answers} and \texttt{manswers} environments allow for partial credit,
 and even assigning of negative points for wrong answers (see \Nameref{manswersQuiz});
@@ -7648,14 +8070,16 @@ The syntax for the \texttt{oQuestion} environment is
     !ameta(A math or text open ended question.)
 \end{oQuestion}
 \end{Verbatim}
-\noindent The environment takes one required argument, a unique name for the question.
-This name, \texttt{field\_name}, is used by other supporting
-macros.
+\noindent The environment takes one required argument, a unique name for the
+question. This name, \ameta{field\_name}, is used by other supporting macros.
+The \env{oQuestion} environment has one hook \cs{oqpriorhook} that is
+expanded just prior to the opening of the environment. If redefined, it is
+used once, then reset to its default empty definition.
 
-\subsubsection{\texorpdfstring{\protect\cs{RespBoxMath}}
+\subsubsection{\tops{\protect\cs{RespBoxMath}}
 {\textbackslash RespBoxMath}: The Math Question}\label{ss:respbox}
 
-%\subsubsection{\texorpdfstring{\protect\cs{RespBox},
+%\subsubsection{\tops{\protect\cs{RespBox},
 %\protect\cs{Resp\-BoxNT}}{\textbackslash RespBox, \textbackslash
 %RespBoxNT}}
 
@@ -7666,16 +8090,17 @@ section we discuss only the \texttt{oQuestion} environment.
 
 The following is a \hypertarget{minExample}{minimal example}.
 Additional enhancements will be discussed in subsequent sections.
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine1}
-\redpoint Differentiate $\dfrac d{dx} \sin^2(x) =
+Differentiate $\dfrac d{dx} \sin^2(x) =
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{[0,1]}$
 \end{oQuestion}
 \par\medskip\noindent
 The code for the above example is
 \begin{Verbatim}[xleftmargin=\amtIndent]
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine1}
-\redpoint Differentiate $\dfrac d{dx} \sin^2(x) =
+Differentiate $\dfrac d{dx} \sin^2(x) =
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{[0,1]}$
 \end{oQuestion}
 \end{Verbatim}
@@ -7688,16 +8113,17 @@ of the \cs{redpoint} command, a command written for this document follows.
 \end{Verbatim}
 
 \newtopic You can also pose multivariate questions as well, for example
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{multivariate}
-\redpoint $\dfrac{\partial}{\partial y} {4 x^2 y^3 }
+$\dfrac{\partial}{\partial y} {4 x^2 y^3 }
     = \RespBoxMath{12*x^2*y^2}(xy){4}{.0001}{[0,1]x[0,1]}$
 \end{oQuestion}
 \par\medskip\noindent
 The code for the above example is
 \begin{Verbatim}[xleftmargin=\amtIndent]
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{multivariate}
-\redpoint $\dfrac{\partial}{\partial y} {4 x^2 y^3 }
+$\dfrac{\partial}{\partial y} {4 x^2 y^3 }
     = \RespBoxMath{12*x^2*y^2}(xy){4}{.0001}{[0,1]x[0,1]}$
 \end{oQuestion}
 \end{Verbatim}
@@ -7930,16 +8356,16 @@ and the second can be used to modify all fields created using
 documentation on how to modify a field using the optional first
 argument, and how to use the ``every'' command.\footnote{eforms manual on Web: \url{\bUrl/eformman.pdf}}
 
-\subsubsection{\texorpdfstring{\protect\cs{RespBoxTxt}}%
+\subsubsection{\tops{\protect\cs{RespBoxTxt}}%
     {\textbackslash RespBoxTxt}: The Text Question}\label{ss:respboxtxt}
 
 You can also pose a question that takes a simple text response. The
 basic command for posing this type of question is
 \cs{RespBoxTxt}. Consider the example given
 earlier:
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{exTxt1}
-\redpoint Name the probability
-distribution popularly referred to as the ``bell-shaped curve''.\\[3pt]
+Name the probability distribution popularly referred to as the ``bell-shaped curve''.\\[3pt]
 \mbox{\strut\RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}%
 {Gaussian}{Gaussian Distribution}}
 %\raisebox{-3bp}{\RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}%
@@ -7952,8 +8378,9 @@ question. If there is a match, the response is deemed correct.
 
 The code for this example is
 \begin{Verbatim}[xleftmargin=\amtIndent]
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{exTxt1}
-\redpoint Name the probability distribution popularly
+Name the probability distribution popularly
 referred to as the ``bell-shaped curve''.\\
 \RespBoxTxt{0}{0}{4}{Normal}{Normal Distribution}%
 {Gaussian}{Gaussian Distribution}
@@ -8029,11 +8456,16 @@ field, the second can be used to modify all fields created using
 \cs{RespBoxTxt}.
 
 \redpoint See the document \href{eformman.pdf}{eFormMan.pdf} on
-\textit{\href{eformman.pdf}{eForm Support}} for complete
-documentation on how to modify a field using the optional first
-argument, and how to use the ``every'' command.\footnote{eforms manual on Web: \url{\bUrl/eformman.pdf}}
+\textit{\href{eformman.pdf}{eForm Support}} for complete documentation on how
+to modify a field using the optional first argument, and how to use the
+``every'' command. %\footnote{eforms manual on Web: \url{\bUrl/eformman.pdf}}
 
-\subsubsection{\texorpdfstring{\protect\cs{RespBoxTxtPC}}%
+\exAeBBlogPDF{p=1446} As an application to the \cs{RespBoxTxt} command, the article
+\textit{\mlhref{\urlAcroTeXBlog/?p=1446}{Exerquiz: Matching-type questions}} how to create a matching-type
+question; the article \textit{\mlhref{\urlAcroTeXBlog/?p=1446}{Exerquiz: Randomized matching-type questions}}
+discusses how to randomize a matching-type question.
+
+\subsubsection{\tops{\protect\cs{RespBoxTxtPC}}%
     {\textbackslash RespBoxTxtPC}: The Text Question with Partial Credit}\label{ss:respboxtxtpc}
 
 \textsf{Exerquiz} can now create text fill-in questions that awards
@@ -8114,7 +8546,7 @@ minimal examples given earlier. These enhancements can be used
 within the \texttt{oQuestion}, the \texttt{shortquiz}, and the
 \texttt{quiz} environments.
 
-\subsubsection{Including an Answer Key with \texorpdfstring
+\subsubsection{Including an Answer Key with \tops
 {\protect\cs{CorrAnsButton}}{\textbackslash CorrAnsButton}}
 
 The correct solution can be included in the question as well; just include
@@ -8124,8 +8556,9 @@ answer that will be viewed when the user clicks on the button.
 The example below also illustrates the (optional) third parameter of
 \cs{RespBoxMath}. Here we pose the question in the variable $t$ rather
 than the default variable of $x$.
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine2}
-\redpoint Differentiate\\[1ex]
+Differentiate\\[1ex]
 $\dfrac d{dt} \sin^2(t) =$
 \RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
@@ -8134,7 +8567,8 @@ $\dfrac d{dt} \sin^2(t) =$
 The listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{oQuestion}{sine2}\\[1ex]
-\redpoint Differentiate $\dfrac d{dt} \sin^2(t) =$
+\let\oqpriorhook\redpoint
+Differentiate $\dfrac d{dt} \sin^2(t) =$
 \RespBoxMath{2*sin(t)*cos(t)}(t){4}{.0001}{0}{1}\cgBdry
 \CorrAnsButton{2*sin(t)*cos(t)}
 \end{oQuestion}
@@ -8158,9 +8592,9 @@ environment containing the solution.
 
 The user \texttt{Shift-Click}s on the \cs{CorrAnsButton} button to jump
 to the solution.
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine3}
-\redpoint Differentiate\\[1ex]
+Differentiate\\[1ex]
 $\dfrac d{dt} \sin^2(t) =$
 \RespBoxMath{2*sin(t)*cos(t)}(t)[sine3]{4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(t)*cos(t)}
 \begin{solution}
@@ -8173,8 +8607,9 @@ $\dfrac d{dt} \sin^2(t) =$
 \medskip\noindent
 The listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine3}\\[1ex]
-\redpoint Differentiate $\dfrac d{dt} \sin^2(t) =$
+Differentiate $\dfrac d{dt} \sin^2(t) =$
 \RespBoxMath{2*sin(t)*cos(t)}(t)[sine3]{4}{.0001}{0}{1}\kern1bp
 \CorrAnsButton{2*sin(t)*cos(t)}
 \begin{solution}
@@ -8189,11 +8624,11 @@ The listing follows:
 the \texttt{quiz} environments.
 
 \newtopic Actually, \cs{CorrAnsButton} has an optional argument. The full syntax is
-\settowidth{\aebdimen}{\cs{CorrAnsButton\darg{\meta{display\_answer}}*\darg{\meta{JS\_function}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{CorrAnsButton\darg{\meta{display\_answer}}*\darg{\meta{JS\_function}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \CorrAnsButton{!meta(display_answer)}*{!meta(JS_function)}
 \end{dCmd}
-\newtopic When the \texttt* is detected following the \meta{display\_answer}, the \meta{JS\_function}
+\eVerb When the \texttt* is detected following the \meta{display\_answer}, the \meta{JS\_function}
 is used to evaluate \meta{display\_answer}, before displaying it.  There is
 one built-in function called \texttt{EvalCorrAnsButton}, the definition of
 which is
@@ -8208,9 +8643,9 @@ Other JavaScript functions may be defined using the \texttt{insDLJS} environment
 passed to \cs{CorrAnsButton} with the optional argument.
 
 An example of this optional parameter is
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{add1}
-\redpoint Perform the indicated operation, and enter
+Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ \text{9} + \text{8} =$
 \RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{9 + 8}*{EvalCorrAnsButton}\cgBdry
@@ -8220,8 +8655,9 @@ $ \text{9} + \text{8} =$
 \medskip\noindent
 The listing follows:
 \begin{Verbatim}[xleftmargin=\amtIndent]
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{add1}
-\redpoint Perform the indicated operation, and enter
+Perform the indicated operation, and enter
 result into the box.\\[1ex]
 $ 9 + 8 = $
 \RespBoxMath{9 + 8}{1}{.0001}{[0,1]}\cgBdry
@@ -8237,9 +8673,9 @@ The macro \cs{sqTallyBox} is used to keep a running total of the
 number of wrong answers a user has entered into the response box.
 
 For example,
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine4}
-\redpoint \hypertarget{exofT}{Differentiate}\\[1ex]
+\hypertarget{exofT}{Differentiate}\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\cgBdry\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox
@@ -8267,9 +8703,9 @@ For the \texttt{oQuestion} and the \texttt{shortquiz}
 environments, you can clear the response box fields by placing
 insert \cs{sqClearButton}.
 
-
+\let\oqpriorhook\redpoint
 \begin{oQuestion}{sine5}
-\redpoint Differentiate\\[1ex]
+Differentiate\\[1ex]
 $\dfrac d{dx} \sin^2(x) =$
 \RespBoxMath{2*sin(x)*cos(x)}{4}{.0001}{0}{1}\kern1bp\CorrAnsButton{2*sin(x)*cos(x)}\cgBdry
 \sqTallyBox\cgBdry\sqClearButton
@@ -8621,11 +9057,11 @@ founders of Calculus.
 \end{Verbatim}
 
 \noindent The \cs{AnswerField} has the following syntax:
-\settowidth{\aebdimen}{\cs{AnswerField[\anglemeta{field\_opts}]\darg{\meta{base\_name}}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{AnswerField[\anglemeta{field\_opts}]\darg{\meta{base\_name}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \AnswerField[!anglemeta(field_opts)]{!meta(base_name)}
 \end{dCmd}
-\noindent The parameter \anglemeta{field\_opts} is the typical optional
+\eVerb The parameter \anglemeta{field\_opts} is the typical optional
 parameter for all \textsf{eform} fields; it is used to change the appearance
 of the field. The parameter \meta{base\_name} is the (base) name of the quiz
 this field will hold the answers for.
@@ -8789,8 +9225,8 @@ any of the \cs{every\ameta{cmdname}} family of commands; however, that device
 cannot, by design, change any of the actions \pkg{exerquiz} has defined.
 S everal key-value pairs are used to insert JavaScript code into response
 boxes, multiple choice, and multiple selection fields.
-\settowidth{\aebdimen}{\cs{addToAction*\darg{\ameta{key}}\darg{\ameta{code}}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{addToAction*\darg{\ameta{key}}\darg{\ameta{code}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \AddAAFormat{!ameta(code)}
 \AddAAKeystroke{!ameta(code)}
 \AddAAMouseUpMC{!ameta(code)}
@@ -8798,7 +9234,7 @@ boxes, multiple choice, and multiple selection fields.
 \setActionKeys{!ameta(KV-pairs)}
 \addToAction*{!ameta(key)}{!ameta(code)}
 \end{dCmd}
-\newtopic
+\eVerb
 The command \cs{setActionKeys} is a special command used to process the
 KV-pairs of the \pkg{eforms} package. It only accepts these four keys:
 \cs{AddAAFormat}, \cs{AddAAKeystroke}, \cs{AddAAMouseUpMC}, and
@@ -9258,12 +9694,11 @@ nine items will be randomized, whereas, the last item (None of
 these) will placed at the end of the list.
 
 \newtopic Additional, there are five other commands that support the
-randomization feature.\settowidth{\aebdimen}{\ttfamily\string\saveRandomSeed\quad\string\inputRandomSeed}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+randomization feature.\bVerb\takeMeasure{\ttfamily\string\saveRandomSeed\quad\string\inputRandomSeed}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \saveRandomSeed!quad\inputRandomSeed
 \end{dCmd}
-
-\newtopic A pseudo-random sequence of numbers requires an initial \emph{seed
+\eVerb A pseudo-random sequence of numbers requires an initial \emph{seed
 value}. The example file \texttt{random.tex} creates, by default, a
 seed value based on the date and time (the number of minutes since
 midnight); consequently, after every minute, the random sequence
@@ -9304,12 +9739,11 @@ of the choices as you expect it to, it could be that
 \textsf{exerquiz} is reading an old \texttt{.sav} file. Either delete that file
 in your source folder, or comment out \cs{inputRandomSeed} in your document.
 
-\settowidth{\aebdimen}{\cs{useRandomSeed\darg{\meta{number}}}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{useRandomSeed\darg{\meta{number}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \useRandomSeed{!meta(number)}
 \end{dCmd}
-
-\newtopic\indent You may have several sections of the same class take a quiz with the
+\eVerb\indent You may have several sections of the same class take a quiz with the
 questions rearranged for each.  Save the seed value used by
 \textsf{exerquiz} to randomize the choices for the class by opening the
 \texttt{.sav} and by copying and pasting the line you see into your document;
@@ -9321,15 +9755,14 @@ for example, it could read \cs{randomi=132088850}, then use
 \end{Verbatim}
 Of course comment out \cs{inputRandomSeed}.
 
-\settowidth{\aebdimen}{\cs{allowRandomizedChoices}}%
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{allowRandomizedChoices}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \turnOnRandomize
 \obeyLocalRandomize
 \doNotRandomizeChoices
 \allowRandomizedChoices
 \end{dCmd}
-
-\newtopic\indent The command \cs{turnOnRandomize} overrides all local settings of \cs{bChoices}
+\eVerb\indent The command \cs{turnOnRandomize} overrides all local settings of \cs{bChoices}
 and causes all choice lists to be randomized. While \cs{obeyLocalRandomize}
 returns control to the local settings. For example,
 \begin{Verbatim}[xleftmargin=\amtIndent]
@@ -9426,11 +9859,11 @@ The table (as seen in \hyperref[fig:qzSumryTbl]{Figure~\ref*{fig:qzSumryTbl}}) s
 which the student gave a response. The student
 can review the table, and optionally return to questions that had no response.
 
-\settowidth{\aebdimen}{\cs{displaySumryTbl[\ameta{KV-pairs}]\darg{\ameta{quiz\_name}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{displaySumryTbl[\ameta{KV-pairs}]\darg{\ameta{quiz\_name}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \displaySumryTbl[!ameta(KV-pairs)]{!ameta(quiz_name)}
 \end{dCmd}
-\newtopic\textbf{Parameter Description:} The second parameter is the quiz name of the quiz this table represents,
+\eVerb\textbf{Parameter Description:} The second parameter is the quiz name of the quiz this table represents,
 in most cases, \cs{currQuiz} is used. The first parameter consists of key-value pairs, these
 are described below.
 
@@ -9509,21 +9942,21 @@ whatever reasons, you need additional commands.
 
 \newtopic In the area just after \cs{end\darg{questions}} and before `End
 Quiz,' place the command
-\settowidth{\aebdimen}{\cs{writeProListAux}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{writeProListAux}}
+\begin{dCmd}{\bxSize}
 \writeProListAux
 \end{dCmd}
-\newtopic\indent This command saves to the auxiliary file the two pieces of information the
+\eVerb\indent This command saves to the auxiliary file the two pieces of information the
 \cs{dis\-playSumryTbl} needs to build the table. Then, in the location of
 your choice---usually outside of any quiz environment---enclose
 \cs{displaySumryTbl} in the \texttt{sumryTblAux} environment.
-\settowidth{\aebdimen}{\cs{displaySumryTbl[\ameta{KV-keys}]\darg{\ameta{quiz\_name}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{displaySumryTbl[\ameta{KV-keys}]\darg{\ameta{quiz\_name}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \begin{sumryTblAux}{!meta(quiz_name)}
 \displaySumryTbl[!ameta(KV-keys)]{!ameta(quiz_name)}
 \end{sumryTblAux}
 \end{dCmd}
-\newtopic\indent Here, \ameta{quiz\_name} is the name of the quiz that this table represents. An example
+\eVerb\indent Here, \ameta{quiz\_name} is the name of the quiz that this table represents. An example
 of this environment follows.
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \begin{sumryTblAux}{\currQuiz}\small %<--make a little smaller
@@ -9556,11 +9989,11 @@ and quizzes.
 This ``intelligent'' bookmarking system requires
 the minimum of effort to use. For exercises, the command for bookmarking
 is \Com{expdfbookmark},
-\settowidth{\aebdimen}{\cs{expdfbookmark\darg{\ameta{bookmark\_title}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{expdfbookmark\darg{\ameta{bookmark\_title}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \expdfbookmark{!ameta(bookmark_title)}
 \end{dCmd}
-\newtopic and should be placed immediately following the beginning of an
+\eVerb and should be placed immediately following the beginning of an
 exercise environment, like so,\def\OR{\hspace*{-\amtIndent}\normalfont or,}
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \begin{exercise}\expdfbookmark{!ameta(bookmark_title)}
@@ -9591,11 +10024,11 @@ letter. These commands can be redefined.
 \subsection{For Quizzes}
 
 To bookmark a \texttt{shortquiz} or \texttt{quiz}, use \Com{quizpdfbookmark}.
-\settowidth{\aebdimen}{\cs{quizpdfbookmark\darg{\ameta{bookmark\_title}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\cs{quizpdfbookmark\darg{\ameta{bookmark\_title}}}}
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \quizpdfbookmark{!ameta(bookmark_title)}
 \end{dCmd}
-\newtopic\indent It should be placed immediately following the beginning of the environments,
+\eVerb It should be placed immediately following the beginning of the environments,
 \def\OR{\hspace*{-\amtIndent}\normalfont or,}
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \begin{shortquiz}\quizpdfbookmark{!ameta(bookmark_title)}
@@ -9800,7 +10233,7 @@ point we call a \texttt{resetQuiz("\cs{curr@quiz}")} which
 sets some values in an array to indicate the state of this quiz.
 
 \subsubsection{Gathering ID Information with
-\texorpdfstring{\protect\cs{textField}}{\textbackslash textField}}
+\tops{\protect\cs{textField}}{\textbackslash textField}}
 
 \redpoint What kind of information would one submit to a CGI?
 Well, there is the usual information concerning the identity of
@@ -9836,7 +10269,7 @@ support for complete documentation on
 \cs{textField}.
 
 \subsubsection{Gathering Quiz Specific Information with
-\texorpdfstring{\protect\cs{eqSubmit}}{\textbackslash eqSubmit}}
+\tops{\protect\cs{eqSubmit}}{\textbackslash eqSubmit}}
 
 In addition to ID information on the one taking the quiz,
 specific information about what quiz is being taken and where the
@@ -9907,7 +10340,7 @@ hidden text fields.
 
 \subsection{Features \protect\textit{apropos} to Submitting}
 
-%\subsubsection{\texorpdfstring{\protect\cs{RespBoxEssay}}
+%\subsubsection{\tops{\protect\cs{RespBoxEssay}}
 %{\textbackslash RespBoxEssay}: The Essay Question}
 %
 %Some disciplines make heavy use of the essay question. In an effort to
@@ -9934,7 +10367,7 @@ hidden text fields.
 
 See \Nameref{sss:asignPts} for information on this subject.
 
-\subsubsection{\texorpdfstring{\protect\cs{NoPeeking}}
+\subsubsection{\tops{\protect\cs{NoPeeking}}
 {\textbackslash NoPeeking}}\label{sss:nopeek}
 
 If you execute the command \cs{NoPeeking} in the preamble of your
@@ -10751,6 +11184,15 @@ The latter definition takes a delimited argument, necessary since it executes
 within a verbatim environment where braces \texttt{\{} and \texttt{\}} are
 not grouping delimiters.
 
+\subsubsection{\texttt{useDeNums} (\texttt{useGermanNums}}\label{useDeNums}
+
+An option to support the use of the German number system (1234,56), where, in that system
+the comma (,) is used as the decimal point.
+
+\exAeBBlogPDF{p=1039} Refer to the {\AcroTeX} Blog article
+\textit{\href{\urlAcroTeXBlog/?p=1129}{The \pkg{dljslib} package: German
+number format}} for more information and working examples.
+
 \subsection{Compare Functions} \label{compareFuncs}
 
 Compare functions are used to compare the author's answer with the
@@ -10799,7 +11241,7 @@ $\displaystyle\int\sin(x)\,dx =
 indefinite integration comparison.
 
 
-\subsubsection{satisfyEq}
+\subsubsection{\tops{\protect\opt}{}{satisfyEq}}
 
 The \texttt{satisfyEq} library of procedures supports the type of question where
 the student is asked to enter one or more points that satisfy an equation.
@@ -11090,6 +11532,17 @@ Convert 123.4 to scientific notation.
     keep working!"}
 \end{Verbatim}
 
+\subsubsection{\texttt{useEnNums}}
+
+This is an analog to \texttt{useDeNums}, but no new response function is
+defined. It deals with filtering the users' responses to a specified number
+of decimal places.
+
+\exAeBBlogPDF{p=1470} Refer to the {\AcroTeX} Blog article
+\textit{\href{\urlAcroTeXBlog/?p=1470}{The \pkg{dljslib} package: English
+number format}} for more information and working examples.
+
+
 \subsection{Extending Numerical Functions}  \label{extNumerFuncs}
 
 These JavaScript functions extend the collection of built-in
@@ -11266,7 +11719,7 @@ Sameshima)\\
 \markright{References}
 
 \begin{thebibliography}{[1]}\label{references}
-\addcontentsline{toc}{section}{\protect\numberline{}References}
+\addcontentsline{toc}{part}{References}
 \backrefparscanfalse
 \def\srtln{\vskip-\baselineskip\vskip-\parsep}
 \def\lngln{\vskip-\parsep}
@@ -12098,7 +12551,7 @@ is 100\%.
 
 
 \subsection{Greater Customization with
-  \texorpdfstring{\protect\cs{TextField}}
+  \tops{\protect\cs{TextField}}
   {\textbackslash TextField}}\label{ss:modoutputfield}
 
 The \cs{ScoreField} macro is defined as
@@ -12123,7 +12576,7 @@ ways: (1) by changing some of the options in \cs{TextField}; (2)
 changing the macro definition of \cs{LayoutTextField}.
 
 \subsubsection{Admissible key-value pairs of
-\texorpdfstring{\protect\cs{TextField}}
+\tops{\protect\cs{TextField}}
   {\textbackslash TextField}}\label{sss:modtextfield}
 
 In this section we will outline methods of modifying the
@@ -12180,7 +12633,7 @@ We next present several examples that illustrate the use of these
 options.
 
 \subsubsection{Some  Examples of
-\texorpdfstring{\protect\cs{Textfield}}
+\tops{\protect\cs{Textfield}}
   {\textbackslash Textfield}}\label{sss:exampltextfield}
 
 \def\LayoutTextField#1#2{\redpoint\raisebox{-3pt}{#2}}
@@ -12226,7 +12679,7 @@ code on the ``back'' of the \texttt{align} parameter.
 \end{Verbatim}
 
 \subsubsection{Modifying
-\texorpdfstring{\protect\cs{LayoutTextField}} {\textbackslash
+\tops{\protect\cs{LayoutTextField}} {\textbackslash
 LayoutTextField}}\label{sss:modlayout}
 
 \renewcommand\LayoutTextField[2]{#1 #2}

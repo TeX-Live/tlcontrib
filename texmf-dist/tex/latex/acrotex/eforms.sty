@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% eForms package,                                      %%
-%% Copyright (C) 2002-2020  D. P. Story                 %%
+%% Copyright (C) 2002-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{eforms}
- [2020/12/14 v2.4.1 Provides general eforms support (dps)]
+ [2021/05/10 v2.4.3 Provides general eforms support (dps)]
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{ifluatex}
@@ -115,7 +115,7 @@
 \@makeother\$\relax
 \newlength\eflength
 \@ifundefined{ifpdfmarkup}{\newif\ifpdfmarkup}{}\pdfmarkupfalse
-\ifpdf\else\ifnum\eq@drivernum=2\relax\else\pdfmarkuptrue\fi\fi
+\ifpdf\else\ifnum\eq@drivernum=\tw@\else\pdfmarkuptrue\fi\fi
 \RequirePackage{hyperref}
 \ifnum\eq@drivernum=2\relax
 \else
@@ -140,11 +140,11 @@
 \let\ef@YES=y \let\ef@NO=n
 \let\ef@One=1 \let\ef@Zero=0
 \ifnum\eq@drivername<2\relax
-\let\to@usepdfmark\ef@One
-\RequirePackage[structure]{taborder}\else
-\let\to@usepdfmark\ef@Zero
-\RequirePackage{taborder}
-\fi
+  \let\to@usepdfmark\ef@One
+  \def\reqPkg{\RequirePackage[structure]{taborder}}\else
+  \let\to@usepdfmark\ef@Zero
+  \def\reqPkg{\RequirePackage{taborder}}\fi
+\reqPkg
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
 \@ifundefined{eq@tmpbox}{\newsavebox{\eq@tmpbox}}{}
 \@ifundefined{eq@tmpdima}{\newdimen\eq@tmpdima}{}
@@ -185,6 +185,12 @@
 \def\efsavei#1\as#2{\global\let#2#1\egroup}
 \def\efrestore{\bgroup\let\from\relax\makeatletter\efrestorei}
 \def\efrestorei#1\from#2{\global\let#1#2\egroup}
+\def\txtRef#1{\@ifundefined{r@#1}
+  {??}{\aeb@exiii\@firstoffive\csname r@#1\endcsname}}
+\def\labelRef#1{\@ifundefined{r@#1}{Doc-Start}
+  {\aeb@exiii\@fourthoffive\csname r@#1\endcsname}}
+\def\aeb@exiii{\expandafter\expandafter\expandafter}
+\def\noexpandiii{\noexpand\noexpand\noexpand}
 \let\ef@passedArgs\@empty
 \def\processAppArgs#1#2{%
   \ifx\end#1% if #1=\end, #2=\@nil.

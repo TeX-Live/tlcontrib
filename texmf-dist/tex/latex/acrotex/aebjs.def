@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2021/02/17 v8.6.4 %
+ [2021/05/10 v8.7.7 %
  Exerquiz document level JavaScript (dps)]
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
@@ -189,9 +189,7 @@ function DisplayAnswer(fieldname,theanswer)
         var oQName = new Object;
     var defaultColor=(typeof oQName.DefaultColorJSLoc=="undefined")%
 ?\defaultColorJS:oQName.DefaultColorJSLoc;
-    try {
-    this.getField(fieldname).value=(theanswer);
-    } catch(e) {}
+    try { this.getField(fieldname).value=(theanswer); } catch(e) {}
     ProcessIt = true;
 }
 function EvalCorrAnsButton(fieldname,theanswer)
@@ -287,7 +285,7 @@ function ParseInput(UserInput)
     UserInput=UserInput.replace(re,"E+$1");
     re=/(\d)\*E/g;
     UserInput=UserInput.replace(re,"$1E");
-        if(!Ckfuncs(UserInput)) return false;
+    if(!Ckfuncs(UserInput)) return false;
     if (typeof(Ck4Exponents) != "undefined")
         UserInput = Ck4Exponents(UserInput);
     if (typeof(Ck4Products) != "undefined" )
@@ -363,8 +361,7 @@ function ParseInput(UserInput)
     {
         eqAppAlert(\eqerrBadExp,3);
         return false;
-    }
-    else {
+    } else {
         UserInput=addMathObject(UserInput);
         return UserInput;
     }
@@ -501,8 +498,8 @@ function processSpecialParse(oParse,UserAns) {
                retn=_o(UserAns);
                if (retn==null) return retn;
             } else {
-                retn=_o[0].apply(null, [ UserAns ].concat(_o.slice(1)));
-                if (retn==null) return null;
+               retn=_o[0].apply(null, [ UserAns ].concat(_o.slice(1)));
+               if (retn==null) return null;
             }
         }
     } else {
@@ -540,6 +537,11 @@ CorrAns,userAns,comp)
     }
     return true;
 }
+var ckDZRe=/\b([^0-9]*)(\d*)\./g;
+function ckDZReRepl(match,a,b,offset,string){
+  if (b[0]!="0") return match;
+  else return util.printf(a+"\%d.",b);
+}
 function diffCompare(_a,_c,_v,_F,_G) {
     var aXY = _c.split(",");
     var _V = _v.split(",");  // e.g. _V[0] = "i:x"
@@ -555,6 +557,7 @@ function diffCompare(_a,_c,_v,_F,_G) {
     if ( app.viewerVersion >= 5)
     {
         var rtnCode = 0;
+        _G=_G.replace(ckDZRe,ckDZReRepl);
         eval("try {if(isNaN(_G = eval(_G))) rtnCode=-1; }"
             +"catch (e) { rtnCode=1; }");
         switch(rtnCode)
@@ -574,16 +577,17 @@ function reldiffCompare(_a,_c,_v,_F,_G) {
     var _n = aXY.length
     for (var _i=0; _i < _n; _i++)
     {
-            if (_V[_i].charAt(0) == "r" )
-              eval ("var "+_V[_i].charAt(2)+"="+aXY[_i]+";");
-            else // assume type "i"
-              eval ("var "+_V[_i].charAt(2)+"="+Math.ceil(aXY[_i])+";");
+        if (_V[_i].charAt(0) == "r" )
+          eval ("var "+_V[_i].charAt(2)+"="+aXY[_i]+";");
+        else // assume type "i"
+          eval ("var "+_V[_i].charAt(2)+"="+Math.ceil(aXY[_i])+";");
     }
     _F = eval(_F);
     if ( app.viewerVersion >= 5)
     {
         var rtnCode = 0;
-        eval("try { if(isNaN(_G = eval(_G))) rtnCode=-1; }"
+        _G=_G.replace(ckDZRe,ckDZReRepl);
+        eval("try {if(isNaN(_G = eval(_G))) rtnCode=-1; }"
             +"catch (e) { rtnCode=1; }");
         switch(rtnCode)
         {
@@ -835,20 +839,24 @@ function ProcUserResp(key,userresp,probno,notify)
 function ProcUserNoResp(key,userresp,probno,notify)
 {
   if ( arguments.length > 4 ) {
-    RightWrong[probno][arguments[4]] = undefined;
-    Responses[probno][arguments[4]] = undefined;
+    try{
+      RightWrong[probno][arguments[4]] = undefined;
+      Responses[probno][arguments[4]] = undefined;
+    } catch(e){};
     var bVoidArray=true;
-    for (var i=0; i<Responses[probno].length; i++) {
-      if ( typeof Responses[probno][i] != "undefined") {
-        bVoidArray=false;
-        break;
-  }
-    }
-if (bVoidArray) {
-Responses[probno]=undefined;
-RightWrong[probno]=undefined;
+    try {
+      for (var i=0; i<Responses[probno].length; i++) {
+        if ( typeof Responses[probno][i] != "undefined") {
+          bVoidArray=false;
+          break;
+        }
+      }
+    } catch(e){};
+    if (bVoidArray) {
+      Responses[probno]=undefined;
+      RightWrong[probno]=undefined;
       ProbValue[probno]=undefined;
-}
+    }
   } else {
       RightWrong[probno] = undefined;
       Responses[probno] = undefined;

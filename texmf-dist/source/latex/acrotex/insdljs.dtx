@@ -16,10 +16,15 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2021/02/07 v2.5.2 Insert Document Level JavaScripts (dps)]
+%<package> [2021/05/10 v2.5.3 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
+\usepackage{fancyvrb}
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
+\makeatother
 \usepackage{makeidx}
 \makeindex
 \def\EXPT{!}
@@ -33,6 +38,7 @@
 \let\opt\texttt
 \let\app\textsf
 \let\pkg\textsf
+\let\uif\textsf
 \def\visispace{\symbol{32}}
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
 \def\meta#1{\textsl{\texttt{#1}}}
@@ -84,31 +90,26 @@
 % \subsection{The \texttt{insDLJS} Environment}
 %
 % The following is a quick illustration of the use of the new environment.
-% \begin{verbatim}
-% \documentclass{article}
-% \usepackage[pdftex]{hyperref}
-% \usepackage[pdftex]{insdljs}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~@},codes={\catcode`\%=9}]
+%\documentclass{article}
+%\usepackage{hyperref}
+%\usepackage{insdljs}
+%\newcommand\tugHello{Welcome to TUG 2001!}
+%\begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
+%function HelloWorld(){app.alert("\tugHello", 3);}
+%\end{insDLJS}
+%\begin{document}
+%\begin{Form}     !%!textsf~ needed for !cs~PushButton@@
 %
-% \newcommand\tugHello{Welcome to TUG 2001!}
+%\section{Test of the \textsf{insDLJS} Package}
 %
-% \begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
-% function HelloWorld()
-% {
-%     app.alert("\tugHello", 3);
-% }
-% \end{insDLJS}
-% \begin{document}
-% \begin{Form}     % needed for \PushButton
+%!%!textsf~ use the built-in form button of hyperref@
+%Push \PushButton[name=myButton,onclick={HelloWorld();}]{Button}
 %
-% \section{Test of the \texttt{insDLJS} Package}
-%
-% % use built in form button of hyperref
-% Push \PushButton[name=myButton,
-%        onclick={HelloWorld();}]{Button}
-%
-% \end{Form}
-% \end{document}
-% \end{verbatim}
+%\end{Form}
+%\end{document}
+%\end{Verbatim}
 % This environment takes three parameters, the first of which is required
 % for users of \texttt{dvips} and \texttt{dvipsone} and optional otherwise.
 % Within the environment, `|\|', is the escape character, and `|%|' is the comment
@@ -122,16 +123,16 @@
 % within the JavaScript. When the \texttt{debug} option is used, the markers
 % show up in the document level JavaScript; otherwise, they are not written
 % to the PDF document. Here is a simple example,
-% \begin{verbatim}
-%\begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
-%function HelloWorld()
-%{
-%    app.alert("\tugHello", 3);
-%    var x = "\\";
-%\db console.println("Entered HelloWorld function and x = " + x);\db%
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{insDLJS}{mydljs}{My Private DLJS}
+%function HelloWorld() {
+%*1app.alert("\tugHello", 3);
+%*1var x = "\\";
+%\db console.println("Entered HelloWorld function and x = " + x);\db!%
 %}
 %\end{insDLJS}
-%\end{verbatim}
+%\end{Verbatim}
 % The last line of the function will appear in the DLJS if compiled under
 % the \texttt{debug} option; otherwise, it is removed. Additional discussion
 % of this debugging device is given below.
@@ -141,34 +142,34 @@
 % This package also defines an \cs{OpenAction} command to introduce actions that are
 % executed when the PDF document is  opened on page~1. The open action command only
 % applies to page~1.
-% \begin{flushleft}
-% \textbf{Usage}
-%\begin{verbatim}
+%\paragraph*{Usage}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\catcode`\%=9}]
 %\OpenAction{/S/JavaScript/JS(app.alert("Hello World!");)}
-%\end{verbatim}
-% \end{flushleft}
-% The package defines a |\JS| that takes one argument. The code |\JS{#1}| expands to
-% |/S/JavaScript/JS (#1)|, and so the above example may be written as
-% \begin{flushleft}
-%\begin{verbatim}
+%\end{Verbatim}
+% The package defines a \cs{JS} command that takes one argument. The code |\JS{#1}| expands to
+% |/S/JavaScript/JS (#1)|, and so the above example may be written as,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\catcode`\%=9}]
 %\OpenAction{\JS{app.alert("Hello World!");}}
-%\end{verbatim}%
-%\end{flushleft}
+%\end{Verbatim}%
 % Multiple JavaScript commands can be entered. For nice formatting use \cs{r}
 % and \cs{t} for carriage return and tab, respectively.
 %\goodbreak
-%\begin{verbatim}
-%\OpenAction{\JS{%
-%     app.alert("Hello World!");\r
-%     app.alert("Good Day to You!");
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\OpenAction{\JS{*%
+%*1app.alert("Hello World!");\r
+%*1app.alert("Good Day to You!");
 %}}
-%\end{verbatim}
+%\end{Verbatim}
 % The open actions are placed in a token list. Additional actions are added to the token list, so
 % you say
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
 %\OpenAction{\JS{app.alert("Hello World!");}}
 %\OpenAction{\JS{app.alert("Good Day to You!");}}
-%\end{verbatim}
+%\end{Verbatim}
 % the two messages will appear each time you open page~1 of the document.
 %
 % In the case of users of the distiller, \textsf{insdljs} uses this mechanism to
@@ -181,15 +182,15 @@
 %
 % Let me describe in rough terms what goes on behind the scenes. In the discussion
 % below, the following example will be used:
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
 %\newcommand\tugHello{"Hello World!"}
-%\begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
-%function HelloWorld()
-%{
-%    app.alert("\tugHello", 3);
+%\begin{insDLJS}{mydljs}{My Private DLJS}
+%function HelloWorld(){
+%*1app.alert("\tugHello", 3);
 %}
 %\end{insDLJS}
-%\end{verbatim}
+%\end{Verbatim}
 %
 % \subsubsection{For the \texttt{pdftex} and \texttt{dvipdfm} Options}
 %
@@ -251,16 +252,16 @@
 % that function. However, if you can declare variables and initialize them at the document level outside
 % of a function, these variables will have document wide scope. Throughout the document, the values of these
 % global variables are known. For example
-%\begin{verbatim}
-%\begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
-%var myVar = 17;                // defined outside a function, global scope
-%function HelloWorld()
-%{
-%   var x = 3;                 // defined inside a function, local scope
-%   app.alert("\tugHello", 3);
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{insDLJS}{mydljs}{My Private DLJS}
+%var myVar = 17;                //*textsf~ defined outside a function, global scope@
+%function HelloWorld(){
+%*1var x = 3;                   //*textsf~ defined inside a function, local scope@
+%*1app.alert("\tugHello", 3);
 %}
-% \end{insDLJS}
-%\end{verbatim}
+%\end{insDLJS}
+%\end{Verbatim}
 % Both the function \texttt{HelloWorld()} and the variable \texttt{myVar} are known throughout
 % the document. The function \texttt{HelloWorld()} can be called by a mouse up button action;
 % some form field, executing some JavaScript, may access the value of \texttt{myVar} and/or
@@ -348,34 +349,36 @@
 %
 % The following environment, defines a command \cs{myCmd} what expands to the verbatim
 % contents of the environment.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\begin{defineJS}{\myCmd}
-% ...
-% <JavaScript code>
-% ...
+%...
+%!ameta(JavaScript code)
+%...
 %\end{defineJS}
-%\end{verbatim}
+%\end{Verbatim}
 %
 % There is also a \textsf{localJS} environment that makes any definitions within the
 % environment local.
 %
 %The following examples uses some macros from the \textsf{eforms} package:
-%\begin{verbatim}
-% % Define a text macro that will be expanded from within the
-% % defineJS environment
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~$},codes={\def\1{\quad}\catcode`\%=9}]
+%*%*uif~ Define a text macro that will be expanded from within$
+%*%*uif~ the *env~defineJS$ environment$
 %\def\HelloWorld{Hello World}
-% % Now define some JavaScript to execute with a button to be created.
-% % We enclose the defineJS and the \pushButton in the localJS environment
-% % That way, the macro definitions, \JSA, \JSAAE, \JSAAX will be local to
-% % this group
+%*%*uif~ Now define some JavaScript to execute with a button to be created.$
+%*%*uif~ We enclose the *env~defineJS$ and the *cs~pushButton$ in the *env~localJS$ environment$
+%*%*uif~ That way, the macro definitions, *cs~JSA$, *cs~JSAAE$, *cs~JSAAX$ will be local to$
+%*%*uif~ this group$
 %\begin{localJS}
-% % Make @ the escape so we can demonstrate the optional parameter.
-%\begin{defineJS}[\catcode`\@=0\relax]{\JSA}
+%*%*uif~ Make @ the escape so we can demonstrate the optional parameter.$
+%\begin{defineJS}[\makeesc\@]{\JSA}
 %var sum = 0;
 %for (var i = 0; i < 10; i++)
 %{
-%    sum += i;
-%    console.println("@HelloWorld i = " + i );
+%*1sum += i;
+%*1console.println("@HelloWorld i = " + i );
 %}
 %console.println("sum = "+sum);
 %\end{defineJS}
@@ -385,13 +388,14 @@
 %\begin{defineJS}{\JSAAX}
 %console.println("Exiting the button area");
 %\end{defineJS}
-%\pushButton[%
-%    \A{\JS{\JSA}}
-%    \AA{\AAMouseEnter{\JS{\JSAAE}}
-%       \AAMouseExit{\JS{\JSAAX}}}
+%\pushButton[*%
+%*1\A{\JS{\JSA}}
+%*1\AA{\AAMouseEnter{\JS{\JSAAE}}
+%*1*1  \AAMouseExit{\JS{\JSAAX}}
+%*1}
 %]{myButton}{30bp}{15bp}
 %\end{localJS}
-%\end{verbatim}
+%\end{Verbatim}
 %
 % See the section \Nameref{defineJS} for details of these two environments.
 % \section{Package Options and Requirements}
@@ -445,6 +449,16 @@
 \let\dl@YES=y \let\dl@NO=n
 \let\dl@One=1 \let\dl@Zero=0
 \let\dljs@YES=y \let\dljs@NO=n
+\edef\dl@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\'=\the\catcode`\'\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\(=\the\catcode`\(\relax
+  \catcode`\noexpand\!=\the\catcode`\!\relax
+  \catcode`\noexpand\_=\the\catcode`\_\relax
+}
+\@makeother\"\@makeother\'\@makeother\,%
+\@makeother\(\@makeother\!\@makeother\_
 %    \end{macrocode}
 %    \leavevmode\DescribeMacro{\dlpkgInfo} A command to identify package date
 %    from within document level Javascript
@@ -531,7 +545,7 @@
 %    The  option \texttt{!reqis} turns off this feature; that is, there is no notification
 %    via the \textsf{YMB} (\textsf{Yellow Message Bar}) that Javascripts are used in the document, and the
 %    document may not function as designed.
-%    \changes{v2.2d}{2016/04/06}{Added \texttt{reqjs} and \texttt{{\string\quotechar}reqjs}.}
+%    \changes{v2.2d}{2016/04/06}{Added \string\texttt{reqjs} and \string\texttt{{\string\EXPT}reqjs} options.}
 %    \begin{macrocode}
 \DeclareOptionX{reqjs}{\let\dl@reqJS\dl@YES}
 \let\dljs@reqJS\dl@YES
@@ -659,7 +673,7 @@
 %    \end{macrocode}
 % If \texttt{reqjs} is in effect, we execute the following code, otherwise, we
 % do not. The \textbf{\textsf{Requirements}} dictionary goes in the document \textbf{\textsf{Catalog}}.
-%    \changes{v2.2d}{2016/04/06}{Code to support \texttt{reqjs} and \texttt{{\string\EXPT}reqjs} options.}
+%    \changes{v2.2d}{2016/04/06}{Code to support \string\texttt{reqjs} and \string\texttt{{\string\EXPT}reqjs} options.}
 %    \begin{macrocode}
 \def\AEB@psMrk{[%]
   \space}
@@ -671,7 +685,7 @@
 \fi
 %    \end{macrocode}
 %     Added switch to mark whether djs is inserted
-%     \changes{v2.4}{2018/07/21}{Added switch}{Added \cs{ifthereisdjs}}
+%     \changes{v2.4}{2018/07/21}{Added switch}{Added \string\cs{ifthereisdjs}}
 %    \begin{macrocode}
 \newif\ifthereisdjs \thereisdjsfalse
 \def\applydljs#1{\ifthereisdjs\else#1
@@ -738,19 +752,16 @@
 %
 % Again, both JavaScript and \TeX, certain punctuation marks have special meaning; in the case of
 % JavaScript, punctuation has a special meaning within regular expressions:
-%\begin{flushleft}
-%\textbf{Special Punctuation in Regular Expressions}
+%\paragraph*{Special Punctuation in Regular Expressions}
 %\begin{verbatim}
 %     ^ $ . * + ? = ! : | \ / ( ) [ ] { }
 %\end{verbatim}
-%\end{flushleft}
-%
 % Complications continued. The distiller method (the \texttt{dvipsone} or the
 % \texttt{dvips} option), and the \textsf{pdftex}/\textsf{dvipdfm} applications
 % handle the backslash differently. The following example illustrates the problem.
 % {\small
 %\begin{verbatim}
-%dvipsone/dvips
+%dvips
 %LaTeX Source      As appears in PDF
 %var x = "\";  --> var x = "\";  (SyntaxError: Unterminated string literal)
 %var x = "\\"; --> var x = "\\"; (Correct)
@@ -761,7 +772,7 @@
 % `\verb+\\+' to get the single backslash.
 % {\small
 %\begin{verbatim}
-%pdftex/dvipdfm
+%pdftex/xetex
 %LaTeX Source        As appears in PDF
 %var x = "\";    --> var x = "";  (\" is the literal ")
 %var x = "\\";   --> var x = "\"; (SyntaxError: Unterminated string literal)
@@ -776,16 +787,17 @@
 % and to adjust their definitions depending on the driver option. As a result, of these
 % background definitions, the JavaScript writer does not worry too much about these details,
 % for example
-%\begin{verbatim}
-%\begin{insDLJS}[HelloWorld]{mydljs}{My Private DLJS}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{insDLJS}{mydljs}{My Private DLJS}
 %function HelloWorld()
 %{
-%    app.alert("\tugHello", 3);
-%    var x = "\\";
-%    app.alert("x = " + x);
+%*1app.alert("\tugHello", 3);
+%*1var x = "\\";
+%*1app.alert("x = " + x);
 %}
 %\end{insDLJS}
-%\end{verbatim}
+%\end{Verbatim}
 % So much for the complication.
 %
 %\subsection{Begin Code}
@@ -828,7 +840,7 @@
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\Thread}\hskip-\marginparsep\texttt{\darg{\ameta{thread-title}}}
-%   \changes{v2.4.9}{2020/07/09}{Added \string\Thread}
+%   \changes{v2.4.9}{2020/07/09}{Added \string\cs{Thread}}
 %    A thread action; this command is used in the \pkg{artthreads} package.
 %    \begin{macrocode}
 \providecommand{\Thread}[1]{/S/Thread/D(#1)}
@@ -841,7 +853,7 @@
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\Launch}\hskip-\marginparsep\texttt{\darg{\ameta{file-spec}}}
-% \changes{v2.5}{2020/12/20}{Added \string\Launch}
+% \changes{v2.5}{2020/12/20}{Added \string\cs{Launch}}
 %    A launch action
 %    \begin{macrocode}
 \providecommand{\Launch}[1]{/Launch/F(#1)}
@@ -894,7 +906,7 @@
 % A help macro to define \cs{dfnJSR} in a convenient way; \cs{dfnJSR} is
 % used in the \env{defineJS} environment.
 % \changes{v2.5}{2020/12/20}{Helper commands \string\cs{dfnJSCR} to define
-% \string\cs{defineJSjsR} and \cs{dfnJSCRDef} to set default.}
+% \string\cs{defineJSjsR} and \string\cs{dfnJSCRDef} to set default.}
 %    \begin{macrocode}
 \def\dfnJSCR#1{\gdef\dfnJSR{#1}\gdef\defineJSjsR{#1}}
 \def\dfnJSCRDef{\dfnJSCR{\string\r\eqbs^^J}}
@@ -903,7 +915,7 @@
 %    \end{macrocode}
 % \cs{r} is recognized by hyperref when \cs{pdfstringdef} is used. Hyperref
 % then modifies the expansion of \cs{r}. So, we'll use \cs{n} in those situations.
-% \changes{v2.0l}{2012/11/10}{Added \cs{jsN}}
+% \changes{v2.0l}{2012/11/10}{Added \string\cs{jsN}}
 %    \begin{macrocode}
 \def\jsN{\string\n}
 {\catcode`\^^I\active %
@@ -916,6 +928,12 @@
 %    \begin{macrocode}
 \newwrite\js@verbatim@out
 \def\iwvo#1{\immediate\write\js@verbatim@out{#1}}
+%    \end{macrocode}
+% \paragraph*{Convenience command\DescribeMacro{\dl@EForAF4} that support \opt{usealtadobe} option.} This helper
+% command make it convenient to switch from the `AF' to the `EF' versions.
+% \changes{v2.5.3}{2021/05/10}
+%    \begin{macrocode}
+\def\dl@EForAF4#1_{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi#1_}
 %    \end{macrocode}
 % \subsection{Some JavaScript Support}
 %
@@ -931,10 +949,10 @@
 % should the need arise.
 %\changes{v2.0b}{2008/06/19}
 %{
-%  A simple command for creating JS strings with unicode \cs{uXXXX}.
+%  A simple command for creating JS strings with unicode \string\cs{uXXXX}.
 %}
-% \changes{v2.0m}{2013/12/23}{Added \cs{jscsDflt} and \cs{jscsDLJS}, incorporated into \cs{dl@defJSStr}.}
-% Added \cs{jscsDflt} and \cs{jscsDLJS}, incorporated them into \cs{dl@defJSStr}.
+% \changes{v2.0m}{2013/12/23}{Added \string\cs{jscsDflt} and \string\cs{jscsDLJS}, incorporated into \string\cs{dl@defJSStr}.}
+% Added \string\cs{jscsDflt} and \string\cs{jscsDLJS}, incorporated them into \string\cs{dl@defJSStr}.
 %    \begin{macrocode}
 \def\dl@lparen{(}\def\dl@rparen{)}
 \def\genericNL{^^J}
@@ -1043,9 +1061,10 @@
 %    \begin{macro}{\db}\hskip-\marginparsep{\,\texttt{...\cs{db}}}
 % The \cs{db} macro can be used within the \texttt{insDLJS} to insert
 % addition JS commands to help debug the code. Usage:
-%\begin{verbatim}
-% \db console.println("myVal = " + myVal);\db%
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\db console.println("myVal = " + myVal);\db*%
+%\end{Verbatim}
 % Any material (on one line) that is between the two \verb+\db+ will either be
 % written to the DLJS (if \cmd{\dljs@debug} expands to \texttt y), or be removed from
 % the final output (if \cmd{\dljs@debug} does not expand to \texttt y).
@@ -1171,9 +1190,10 @@
 % direct (almost) all auxiliary files of insDLJS to the specified
 % path. The macro takes one parameter, a path on your local hard
 % disk.  Usage:
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
 %\insPath{c:/temp/}
-%\end{verbatim}
+%\end{Verbatim}
 % Be sure to use only forward slashes, and don't forget to finish
 % the string with a final forward slash, as illustrated above.
 %
@@ -1195,7 +1215,7 @@
 % or link (see \cs{eq@setButtonProps} and \cs{eq@setWidgetProps}).
 % They are used for formatting JavaScript code. The command
 % \cs{makespecialJS} is defined in \textsf{insdljs}.
-% \changes{v2.1}{2015/06/15}{Moved \cs{makeJSspecials} from \textsf{eforms}
+% \changes{v2.1}{2015/06/15}{Moved \string\cs{makeJSspecials} from \string\textsf{eforms}
 % to here.}
 %    \begin{macrocode}
 \begingroup
@@ -1207,13 +1227,13 @@
   \def\\{\eqbs\eqbs}%         % define \\ to be \\
   \let\jslit\string
 %    \end{macrocode}
-% \changes{v2.0n}{2014/05/20}{Remake the definition of \cs{\char`\{} and \cs{\char`\}}}
+% \changes{v2.0n}{2014/05/20}{Remake the definition of \string\cs{\char`\{} and \string\cs{\char`\}}}
 % In an attempt to avoid the use of \verb~\jslit\{~ and \verb~\jslit\}~, we remake
 % the definition of \verb~\{} and \verb~\}~.
 %    \begin{macrocode}
   \let\{\dl@lBrace\let\}\dl@rBrace
 %    \end{macrocode}
-% \changes{v2.1}{2015/07/12}{\cs{let} \cs{u} to \cs{@empty}.}
+% \changes{v2.1}{2015/07/12}{\string\cs{let} \string\cs{u} to \string\cs{@empty}.}
 % \cs{let} \cs{u} to \cs{@empty}.
 %    \begin{macrocode}
   \let\u\@empty
@@ -1226,8 +1246,8 @@
 % various action-types may be executed. These actions occur before the document JavaScripts
 % are read and before any pages are opened. We give support for this event, originally part
 % of the \textsf{aeb\_pro} package.
-%\changes{v2.1}{2015/06/15}{Moved definition of \cs{addToDocOpen} from
-% \textsf{aeb\_pro} to \textsf{insdljs}, added support for \texttt{pdftex} and \texttt{xetex}
+%\changes{v2.1}{2015/06/15}{Moved definition of \string\cs{addToDocOpen} from
+% \textsf{aeb\_pro} to \textsf{insdljs}, added support for \string\texttt{pdftex} and \string\texttt{xetex}
 % options.}
 % \paragraph*{Page views}
 % The view can be set when the page key is used. Possible values are
@@ -1263,10 +1283,11 @@
 % with different action-types. Must be executed in the preamble or it has no effect.
 % It populates the value of the key \textbf{/OpenAction} in the \textbf{Catalog} of the
 % PDF file.
-%\begin{verbatim}
-%   \addToDocOpen{\JS{console.println("Open the doc!");}}
-%   \addToDocOpen{/S/GoTo/D[\Page{2}\fitpage]}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\addToDocOpen{\JS{console.println("Open the doc!");}}
+%\addToDocOpen{/S/GoTo/D[\Page{2}\fitpage]}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\addToDocOpen}[1]{%
   \ifx\aebpFA\dl@NO
@@ -1309,7 +1330,7 @@
 % If \textsf{aeb\_pro} is not loaded, we set the open actions. If \textsf{aeb\_pro}
 % is loaded, we do nothing for \textsf{aeb\_pro} has its own contributions to the
 % PDF \textbf{Catalog}.
-%    \changes{v2.3d}{2017/01/08}{Use \cs{aebpFA} to detect open actions}
+%    \changes{v2.3d}{2017/01/08}{Use \string\cs{aebpFA} to detect open actions}
 %    \begin{macrocode}
 \@ifpackageloaded{aeb_pro}{}
   {\AtBeginDocument{\ifx\aebpFA\dl@YES\expandafter
@@ -1384,10 +1405,11 @@
 % Distiller (dvipsone and dvips users of the distiller), if additional open page action
 % is needed on the first page, you can insert this action using the \cmd{\nextOAction} command.
 %
-%\medskip\noindent Usage
-%\begin{verbatim}
-%   \OpenAction{\JS{app.beep(-1); app.alert("Welcome to my Page!",3);}}
-%\end{verbatim}
+%\paragraph*{Usage}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\OpenAction{\JS{app.beep(-1); app.alert("Welcome to my Page!",3);}}
+%\end{Verbatim}
 % The macro takes two parameters, the \cmd{\Next} followed by the desired action, in this
 % case it is a JavaScript action.
 %
@@ -1395,17 +1417,19 @@
 % is a \cmd{\Next}, additional code is entered into the open page action. Thus, for example, the
 % following code is effectively the same as the above example, but the individual lines are
 % listed separately in the GUI action dialog of Acrobat.
-%\begin{verbatim}
-%   \OpenAction{\JS{app.beep(-1);}}
-%   \Next{\JS{app.alert("Welcome to my Page!",3);}}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\OpenAction{\JS{app.beep(-1);}}
+%\Next{\JS{app.alert("Welcome to my Page!",3);}}
+%\end{Verbatim}
 % In the above example, several open page actions are  ``chained'' together.
 %
 % You are not restricted to JavaScript actions, for example, you can perform a \texttt{Named}
 % action:
-%\begin{verbatim}
-%   \OpenAction{/S/Named/N/Open}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={*~@},codes={\def\1{\quad}\catcode`\%=9}]
+%\OpenAction{/S/Named/N/Open}
+%\end{Verbatim}
 % There is a |\Named| command that expands to |/S /Named /N#1|, so the above
 % example can be written
 %\begin{verbatim}
@@ -1554,40 +1578,39 @@
 % within the environment, eventually ends up in the DLJS section of the
 % PDF document
 %
-% The environment takes the \texttt{<base\_name>} and writes the
-% file \texttt{<base\_name>.djs}. This file contains a verbatim
+% The environment takes the \texttt{\ameta{base\_name}} and writes the
+% file \texttt{\ameta{base\_name}.djs}. This file contains a verbatim
 % listing of the JS within the environment, plus some changing of
 % catcodes. This file is then input back into the document at
 % \cmd{\AtBeginDocument} with the necessary code for
 % \textsf{pdftex} and \textsf{dvipdfm} properly place the JS.
 %
 % The case of \textsf{dvipsone} and \textsf{dvips} is a little different. A
-% \texttt{<base\_name>.djs} is written and input back, and a second file
-% \texttt{<base\_name>.fdf} is written. This second file is later input
+% \texttt{\ameta{base\_name}.djs} is written and input back, and a second file
+% \texttt{\ameta{base\_name}.fdf} is written. This second file is later input
 % into the PDF document after distillation.
 %
 % The syntax of usage for this environment, which takes three
-% arguments, is given next.
-%\begin{verbatim}
-%   \begin{insDLJS}[<function>]{<base_name>}{<script_name>}
-%   <JavaScript functions or exposed code>
-%   ...
-%   ...
-%   \end{insDLJS}
-%\end{verbatim}
+% arguments, is given next.\goodbreak
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{insDLJS}[!ameta(function)]{!ameta(base_name)}{!ameta(script_name)}
+%!1!ameta(JavaScript functions or exposed code)
+%\end{insDLJS}
+%\end{Verbatim}
 % where,
 % \begin{description}
-% \item[\texttt{\#1:}] This optional parameter, \texttt{<function>},
-% is \emph{required} for the \texttt{dvipsone} and \texttt{dvips}
-% options; otherwise it is ignored. Its value must be the name of
+% \item[\texttt{\#1:}] This optional legacy parameter, its use is discouraged.
+% Its value must be the name of
 % one of the functions defined in the environment. This is used to
-% detect whether the DLJS has already be loaded by Acrobat.
-% \item[\texttt{\#2}:] This parameter, \texttt{<base\_name>}, is  an
+% detect whether the DLJS has already be loaded by Acrobat. This parameter
+% is now automatically created.
+% \item[\texttt{\#2}:] This parameter, \ameta{base\_name}, is  an
 % alphabetic word with no spaces and limited to eight characters. It
 % is used to build the names of auxiliary files and to build the
 % names of macros used by the environment.
-% \item[\texttt{\#3}:] The \texttt{<script\_name>} of your JavaScript.
-% This title will appear in the Documentlevel JavaScript dialog of
+% \item[\texttt{\#3}:] The \ameta{script\_name} of your JavaScript.
+% This title will appear in the document-level JavaScript dialog of
 % Acrobat.
 % \end{description}
 % Within the insDLJS environment, there are two types of comment characters:
@@ -1598,7 +1621,7 @@
 % the percent character in a JavaScript statement, for example
 % |app.alert("\%.2f", 3.14159);|, this statement will appear within your JavaScript
 % code as  |app.alert("%.2f", 3.14159);|.
-% \changes{v2.2c}{2015/11/13}{Turned \cs{Hy@unicodefalse} so unicode is not written
+% \changes{v2.2c}{2015/11/13}{Turned \string\cs{Hy@unicodefalse} so unicode is not written
 % in the name of the script.}
 %    \begin{macrocode}
 \let\insdljsloadVar\@empty
@@ -1625,20 +1648,20 @@
   \ifx\csname dljs\dljsBase\endcsname\relax
     \else\@insjserrDuplicate\fi
   \ifcase\dljs@drivernum
-    \let\insert@DLJS=\insert@DLJS@pdfmark
-    \let\endinsDLJS=\endinsert@DLJS@pdfmark
-    \let\newsegment=\newsegment@pdfmark
-    \let\endnewsegment=\endnewsegment@pdfmark
+    \let\insert@DLJS\insert@DLJS@pdfmark
+    \let\endinsDLJS\endinsert@DLJS@pdfmark
+    \let\newsegment\newsegment@pdfmark
+    \let\endnewsegment\endnewsegment@pdfmark
   \or
-    \let\insert@DLJS=\insert@DLJS@pdftex
-    \let\endinsDLJS=\endinsert@DLJS@pdftex
-    \let\newsegment=\newsegment@pdftex
-    \let\endnewsegment=\endnewsegment@pdftex
+    \let\insert@DLJS\insert@DLJS@pdftex
+    \let\endinsDLJS\endinsert@DLJS@pdftex
+    \let\newsegment\newsegment@pdftex
+    \let\endnewsegment\endnewsegment@pdftex
   \or
-    \let\insert@DLJS=\insert@DLJS@dvipdfm
-    \let\endinsDLJS=\endinsert@DLJS@dvipdfm
-    \let\newsegment=\newsegment@dvipdfm
-    \let\endnewsegment=\endnewsegment@dvipdfm
+    \let\insert@DLJS\insert@DLJS@dvipdfm
+    \let\endinsDLJS\endinsert@DLJS@dvipdfm
+    \let\newsegment\newsegment@dvipdfm
+    \let\endnewsegment\endnewsegment@dvipdfm
   \fi
   \insert@DLJS
 }{}
@@ -1659,23 +1682,22 @@
 % different \textsl{script names}.
 %
 % The syntax is
-%\begin{verbatim}
-%   \begin{insDLJS*}[<function>]{<base_name>}
-%   \begin{newsegment}{<script_name>}
-%       <JavaScript functions or exposed code>
-%   \end{newsegment}
-%   \begin{newsegment}{<script_name>}
-%       <JavaScript functions or exposed code>
-%   \end{newsegment}
-%   ...
-%   ...
-%   <JavaScript functions or exposed code>
-%   \end{newsegment}
-%   \begin{newsegment}{<name_name>}
-%       <JavaScript functions or exposed code>
-%   \end{newsegment}
-%   \end{insDLJS*}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{insDLJS*}[!ameta(function)]{!ameta(base_name)}
+%\begin{newsegment}{!ameta(script_name)}
+%!1!ameta(JavaScript functions or exposed code)
+%\end{newsegment}
+%\begin{newsegment}{!ameta(script_name)}
+%!1!ameta(JavaScript functions or exposed code)
+%\end{newsegment}
+%...
+%...
+%\begin{newsegment}{<script_name>}
+%!1!ameta(JavaScript functions or exposed code)
+%\end{newsegment}
+%\end{insDLJS*}
+%\end{Verbatim}
 % where,
 % \begin{description}
 % \item[\texttt{\#1:}] This optional parameter, \texttt{<function>},
@@ -1712,20 +1734,20 @@
   \expandafter\ifx\csname dljs\dljsBase\endcsname\relax
     \else\@insjserrDuplicate\fi
   \ifcase\dljs@drivernum
-    \let\insert@DLJS=\insert@DLJS@pdfmark\expandafter
+    \let\insert@DLJS\insert@DLJS@pdfmark\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdfmark
-    \let\newsegment=\newsegment@pdfmark
-    \let\endnewsegment=\endnewsegment@pdfmark
+    \let\newsegment\newsegment@pdfmark
+    \let\endnewsegment\endnewsegment@pdfmark
   \or
-    \let\insert@DLJS=\insert@DLJS@pdftex\expandafter
+    \let\insert@DLJS\insert@DLJS@pdftex\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@pdftex
-    \let\newsegment=\newsegment@pdftex
-    \let\endnewsegment=\endnewsegment@pdftex
+    \let\newsegment\newsegment@pdftex
+    \let\endnewsegment\endnewsegment@pdftex
   \or
-    \let\insert@DLJS=\insert@DLJS@dvipdfm\expandafter
+    \let\insert@DLJS\insert@DLJS@dvipdfm\expandafter
     \let\csname endinsDLJS*\endcsname\endinsert@DLJS@dvipdfm
-    \let\newsegment=\newsegment@dvipdfm
-    \let\endnewsegment=\endnewsegment@dvipdfm
+    \let\newsegment\newsegment@dvipdfm
+    \let\endnewsegment\endnewsegment@dvipdfm
   \fi
   \insert@DLJS
 }{}
@@ -1759,8 +1781,8 @@
 \endgroup
 \def\ckivspace#1{\if\noexpand#1\space\else\expandafter#1\fi}
 %    \end{macrocode}
-% \changes{v2.2b}{2015/08/03}{Added a hook \cs{DLspecialDefs} into the DJS file}
-% (2015/08/03) Added the \cs{DLspecialDefs} hook into the DJS file, used in
+% \changes{v2.2b}{2015/08/03}{Added a hook \string\cs{DLspecialDefs} into the DJS file}
+% (2015/08/03) Added the \string\cs{DLspecialDefs} hook into the DJS file, used in
 % \textsf{aeb\_pro}.
 %    \begin{macrocode}
 \let\DLspecialDefs\@empty
@@ -1778,8 +1800,8 @@
   \iwvo{endobj}
   \iwvo{2 0 obj}
 %    \end{macrocode}
-%    When a non-Distiller workflow, ensure execJSs are listed first.
-%    \changes{v2.2h}{2016/06/09}{When a non-Distiller workflow, ensure execJSs are listed first}
+%    When a non-Distiller workflow, ensure \env{execJS}s are listed first.
+%    \changes{v2.2h}{2016/06/09}{When a non-Distiller workflow, ensure \string\env{execJS}s are listed first}
 %    \begin{macrocode}
   \let\x\@empty
   \applydljs{\def\x{^^Jvar _thereisdjs=true;}}%
@@ -1953,7 +1975,7 @@
 %    \end{macrocode}
 %    \DescribeMacro{\dlcontig}\hskip-\marginparsep\texttt{(\#1)} Perhaps a better method than
 %    just described (\cs{dlcombine}) is to have a single argument delimited by parentheses.
-%    Thus \verb|@currQuiz@dlcontig(MyField)| also produces \texttt{q1MyField}.
+%    Thus |@currQuiz@dlcontig(MyField)| also produces \texttt{q1MyField}.
 %    \begin{macrocode}
 \def\dlcontig(#1){#1}
 %    \end{macrocode}
@@ -1990,27 +2012,30 @@
 %    need to be handled carefull so as not to produce any specious spaces. Normally, there is
 %    a comment character declared (|\makecmt\%|). Use the comment character to suppress the beginning
 %    of a new line until it is known whether there is content on that next line. Eg,
-%\begin{verbatim}
-%\begin{defineJS}[\makeesc\*\makecmt\%]{\X}
-%var w=1;%
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\def\1{\quad}\catcode`\%=9}]
+%\begin{defineJS}[\makeesc\*\makecmt\!%]{\X}
+%var w=1;!%
 %*ifx*Y*@empty*else
 %var x=1;
 %var y=1;*fi
 %var z=1;
 %\end{defineJS}
-%\end{verbatim}
-%When \cs{Y} is empty, the content expands to
-%\begin{verbatim}
+%\end{Verbatim}
+%When \cs{Y} is empty, the content expands to,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\def\1{\quad}\catcode`\%=9}]
 %var w=1;
 %var z=1;
-%\end{verbatim}
+%\end{Verbatim}
 %and when \cs{Y} is nonempty, it expands to,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\def\1{\quad}\catcode`\%=9}]
 %var w=1;
 %var x=1;
 %var y=1;
 %var z=1;
-%\end{verbatim}
+%\end{Verbatim}
 %    The following two commands are no longer used by this package.
 %    \changes{v2.4.8}{2019/10/30}{Added \string\cs{dlgobToFi} to help format
 %    \string\env{defineJS} code}
@@ -2030,7 +2055,7 @@
 %    The macro \cs{dl@typesetthis} defined here, is the external version of the local command
 %    \cs{typeset}. It globally sets the switch \cs{ifdlfortypeset} to true and defines the value
 %    of \cs{dfnJSR} and the legacy command \cs{defineJSjsR}. For \cs{dfnJSCR}, we use only {\TeX}
-%    primitives to maintain compatibilty with the now defunct YandY System, which I still use.
+%    primitives to maintain compatibility with the now defunct YandY System, which I still use.
 %    \begin{macrocode}
 \def\dl@typesetthis{\global\dlfortypesettrue
   \dfnJSCR{\hfil\break\null}}
@@ -2231,7 +2256,7 @@
 % If the user has not passed the optional
 % name, we generated one for him, now we insert it into the \texttt{stream}.
 %\changes{v2.0k}{2012/06/21}{If the user has not passed the optional
-% name, we generated one for him, now we insert it into the \texttt{stream}.}
+% name, we generated one for him, now we insert it into the \string\texttt{stream}.}
 %    \begin{macrocode}
   \ifx\insdljsloadVar\@empty\else
     \iwvo{\insdljsloadVar}
@@ -2363,14 +2388,6 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
   {\uccode`c=`\%\uppercase{%
     \iwvo{\string\obeyspaces\string\obeylines
       \string\let\string^\string^M=\string\jsR c}}}
-%    \end{macrocode}
-% (2014/08/09) For pdftex and xetex, this global let messages up
-% the \texttt{Verbatim} environment. Not sure why this is global anyway
-%\begin{verbatim}
-%   \iwvo{\string\obeyspaces\string\obeylines\string
-%     \global\string\let\string^\string^M=\string\jsR c}}}
-%\end{verbatim}
-%    \begin{macrocode}
   {\escapechar=-1 \lccode`C=`\%\lowercase{%
     \iwvo{\string\\catcode`\string\\"=12C}}}
 }
@@ -2387,7 +2404,7 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 \def\enddljs{\iwvo{\string\endgroup}}
 %    \end{macrocode}
 %\changes{v2.0j}{2011/06/27}{made some changes as suggested by Christian Feuersaenger, who reported some
-% problem clashes between \textsf{babel} (spanish) and \textsf{insdljs}.}
+% problem clashes between \string\textsf{babel} (spanish) and \string\textsf{insdljs}.}
 %    \begin{macrocode}
 \def\@roman#1{\romannumeral#1}
 \def\write@objs{%
@@ -2579,20 +2596,22 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 %
 % The \cs{ckivspace} (``check for space'') macro sees whether the next token is a space,
 % if yes, it absorbs it, if not, it replaces it. I implemented this in order to get
-% final output identical to the JavaScript. For example, the following is legal JavaScript
-%\begin{verbatim}
-% var str = "First line.\r\rSkip a line.     // (1)
-%\end{verbatim}
+% final output identical to the JavaScript. For example, the following is legal JavaScript:
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var str = "First line.\r\rSkip a line.     // (1)
+%\end{Verbatim}
 % This is a problem for \TeX. In order to delimit the macro, \TeX{} users need to write the
-% above line as
-%\begin{verbatim}
+% above line as,
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
 % var str = "First line.\r\r Skip a line.    // (2)
-%\end{verbatim}
+%\end{Verbatim}
 % which then introduces a spurious space into the JavaScript code. The \cs{ckivspace} solves this
 % problem, I hope. With the definition of \cs{r} given below, after expansion of the line (2)
 % occurs, we have line (1), the space following the second \cs{r} gets absorbed. Note: (2014/05/20)
 % I moved this to the main code thread of \textsf{insdljs}.
-% \changes{v2.0n}{2014/05/20}{Moved code for \cs{ckivspace} to main code thread of \textsf{insdljs}.}
+% \changes{v2.0n}{2014/05/20}{Moved code for \string\cs{ckivspace} to main code thread of \string\textsf{insdljs}.}
 %    \begin{macrocode}
 %\def\ckivspace#1{\if\noexpand#1\space\else\expandafter#1\fi}
 %    \end{macrocode}
@@ -2763,15 +2782,17 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 % Braces are a problem when they are unbalanced.  In a regular expression, |\{| works properly, but |\\{| works
 % for the distiller options but not otherwise. For example, if I wanted to replace every instance
 % of \texttt{\{} with \texttt{(}, we can do this by
-%\begin{verbatim}
-%     myString = myString.replace( /\{/, "\(");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%myString = myString.replace( /\{/, "\(");
+%\end{Verbatim}
 % This works for all options, even though the braces are not balanced. However, when the constructor
 % function is used, we must double-escape:
-%\begin{verbatim}
-%     var re = new RegExp("\\{", "g");
-%     myString = myString.replace( re, "\(");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\{", "g");
+%myString = myString.replace( re, "\(");
+%\end{Verbatim}
 % This works for the distiller options, but not for \texttt{pdftex/dvipdfm}. The reason |\{| works is that
 % it is a control sequence, defined by the \cmd{\definebraces} command below. Where as |\\{| consists
 % of the control sequence |\\|, which is defined below, followed by a left brace.
@@ -2789,16 +2810,18 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 % unbalanced braces, one workaround is to balance out the left
 % brace with a right brace in the form of a JavaScript comment.
 % This ``fools'' \TeX!  For example,
-%\begin{verbatim}
-%     var re = new RegExp("\\{", "g");           // }
-%     myString = myString.replace( re, "\(");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\{", "g");           // }
+%myString = myString.replace( re, "\(");
+%\end{Verbatim}
 % Finally, we have\par\medskip
 % \noindent\textbf{The Recommended Workaround:} Use |\\\{| and |\\\}|, e.g.,
-%\begin{verbatim}
-%     var re = new RegExp("\\\{", "g");
-%     myString = myString.replace( re, "\(");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\\{", "g");
+%myString = myString.replace( re, "\(");
+%\end{Verbatim}
 % This is more verbose than needed, but it works for all options! These comments are only for regular expression
 % strings within the constructor function. Note the replacement text, |\(|, is only escaped.
 %
@@ -2815,39 +2838,44 @@ if(typeof \detectdljs\space == "undefined")\jsR\jsT
 % once again \textsf{pdftex} and \textsf{dvipdfm} are causing (me) problems.
 %
 % No problems when the regular expression uses the literal string format
-%\begin{verbatim}
-%    myString = myString.replace(/\(/g, "\[");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%myString = myString.replace(/\(/g, "\[");
+%\end{Verbatim}
 % The above code works for all options. However, for the constructor function we have some problems
 % in non-distiller options. If we type instead
-%\begin{verbatim}
-%    var re = new RegExp("\\(", "g");
-%    myString = myString.replace(re, "\[");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\(", "g");
+%myString = myString.replace(re, "\[");
+%\end{Verbatim}
 % The above code works for the distiller folks, but not for the
 % others. In the case of \textsf{pdftex}, I cannot access the UI to
 % the document level JavaScripts, and the script is undefined. I suspect
 % the lack of balanced parentheses is the curprit.  For example,
 % consider the code
-%\begin{verbatim}
-%    var re = new RegExp("\\(|\\)", "g");
-%    myString = myString.replace(re, "\[");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\(|\\)", "g");
+%myString = myString.replace(re, "\[");
+%\end{Verbatim}
 % works. I can access the UI to the DLJS from Acrobat, and the script is defined.  Another
 % example, we can fool the JavaScript interpreter as we did the \TeX{} compiler:
-%\begin{verbatim}
-%    var re = new RegExp("\\(", "g");  // )
-%    myString = myString.replace(re, "\[");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\(", "g");  // )
+%myString = myString.replace(re, "\[");
+%\end{Verbatim}
 % Here I have placed a balancing right parenthesis as a JavaScript comment. Both sets of code
 % work correctly.
 %\par\medskip
 %\noindent\texttt{Recommended Workaround:} As in the case of parentheses, a more verbose version
 % of the script works of all options.
-%\begin{verbatim}
-%    var re = new RegExp("\\\(", "g");
-%    myString = myString.replace(re, "\[");
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%codes={\def\1{\quad}\catcode`\%=9}]
+%var re = new RegExp("\\\(", "g");
+%myString = myString.replace(re, "\[");
+%\end{Verbatim}
 % This is only for the case of the constructor function.
 %    \begin{macrocode}
 \def\({\eqesc\eqesci(}
@@ -2943,6 +2971,7 @@ var EFMergeChange=AFMergeChange;
 %    \begin{macrocode}
 %<*package>
 \inputAltAdbFncs
+\dl@restoreCats
 %</package>
 %    \end{macrocode}
 %  \Finale

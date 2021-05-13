@@ -21,11 +21,14 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{web}
-%<package> [2021/02/06 v6.1.5 web: A Screen Design Package (dps)]
+%<package> [2021/05/06 v6.1.7 web: A Screen Design Package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
 \usepackage{fancyvrb}
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\makeatother
 \gdef\darg#1{\texttt{\char123\relax#1\char125\relax}}
 \def\CMD#1{\textbackslash#1}
 \let\pkg\textsf
@@ -33,6 +36,8 @@
 \let\env\texttt
 \let\app\textsf
 \let\uif\textsf
+\def\STRUT{\rule{0pt}{14pt}}
+\def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
 \def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
 \def\visispace{\symbol{32}}
 \def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
@@ -85,7 +90,7 @@
 % \texttt{dvipdfm}, \texttt{dvipdfmx}, \texttt{xetex}, and \texttt{textures}.
 %\par\medskip\noindent
 % We introduce these two packages early. We use them to automatically
-% detect pdftex and xetex.
+% detect \app{pdf(la)tex} and \app{xe(la)tex}.
 %\changes{v4.2k}{2012/06/18}{New requirement \string\textsf{ifpdf}}%
 %    \begin{macrocode}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -128,10 +133,10 @@
 % Below is the original definition of \cs{web@set@paper}, this has now
 % changed with \texttt{v4.2j} to accommodate \cs{addtoWebHeight} and
 % \cs{addtoWebWidth}.
-%\begin{verbatim}
-%   \def\web@set@paper{%
-%     \special{papersize=\the\paperwidth,\the\paperheight}}%
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\def\web@set@paper{\special{papersize=\the\paperwidth,\the\paperheight}}%
+%\end{Verbatim}
 % \changes{v4.2j}{2012/05/11}{In support of \string\cs{addtoWebHeight}, we introduce
 % the pagesize special at the beginning of the document. Changes are in the
 % \string\texttt{dvipsone} and \string\texttt{dvips} options only.}
@@ -179,10 +184,11 @@
   \def\i@web@ddtoHyOpts{setpagesize=false}%
 %    \end{macrocode}
 % The old definition of \cs{web@set@paper}
-%\begin{verbatim}
-%    \def\web@set@paper{%
-%        \special{papersize=\the\paperwidth,\the\paperheight}}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\def\web@set@paper{!%
+%!quad\special{papersize=\the\paperwidth,\the\paperheight}}
+%\end{Verbatim}
 % New definitions (\texttt{v4.2j}). See comments for the \texttt{dvipsone} option.
 %    \begin{macrocode}
   \let\web@set@paper\@empty
@@ -441,9 +447,13 @@
 % \subsection{Miscellaneous Options}
 %
 % The \texttt{navibar}\IndexOpt{navibar} option places
-% a set of navigation buttons on footer.
+% a set of navigation buttons in footer. The \opt{navibar*}\IndexOpt{navibar*} places
+% the navigation buttons in footer if for screen, and does not place the navigation
+% buttons if for paper.
+% \changes{v6.1.7}{2021/05/06}{Added \opt{navibar*} option}
 %    \begin{macrocode}
 \DeclareOptionX{navibar}{\web@navibartrue}
+\DeclareOptionX{navibar*}{\AtEndOfPackage{\ifeqforpaper\else\web@navibartrue\fi}}
 %    \end{macrocode}
 %    The \texttt{tight}\IndexOpt{tight} option reduces
 %    the vertical spaces around equations and verbatim environments. The \texttt{tight*}\IndexOpt{tight*}
@@ -877,9 +887,10 @@
 %    \end{macrocode}
 % \subsection{Load Configuration File: web.cfg}
 % Look for configuration file, \texttt{web.cfg}, for example
-%\begin{verbatim}
-%    \ExecuteOptionsX{dvips}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\ExecuteOptionsX{dvips}
+%\end{Verbatim}
 % sets \texttt{dvips} as the default driver.
 %    \begin{macro}{\minPanelWidth}
 % This definition is moved here so a user can set the minimal
@@ -1026,7 +1037,7 @@
   \expandafter\w@isHyLoaded\fi
 \ifx\u@web@ddtoHySetup\@empty\else\edef\x{\noexpand\hypersetup
     {\u@web@ddtoHySetup}}\expandafter\x\fi
-%   \end{macrocode}
+%    \end{macrocode}
 %    We declare that `The AcroTeX eDucation Bundle' is the pdf creator.
 %    \begin{macrocode}
 \def\@pdfcreator{The AcroTeX eDucation Bundle}
@@ -1042,86 +1053,16 @@
 \AtBeginDocument{\web@commentChkMsg}
 %    \end{macrocode}
 % If the user specifies the use of templates, we assume they are going
-% to do some graphical work, so we include \textsf{graphicx}.
+% to do some graphical work, so we include \pkg{graphicx} and \pkg{eso-pic}
+% packages.
+% \changes{v6.1.6}{2021/02/28}{Removed legacy code concerning \pkg{everyshi}}
 %    \begin{macrocode}
-\ifnum\@usetemplates=\@ne\relax
-    \def\x{\RequirePackage{graphicx}}\expandafter\x\fi
+\ifnum\@usetemplates=\@ne\def\x{%
+  \RequirePackage{graphicx}
+  \RequirePackage{eso-pic}}\expandafter\x\fi
 %    \end{macrocode}
-% If the user specifies an option requiring templates, then we better
-% load \textsf{eso-pic}, which itself requires \textsf{everyshi} or \textsf{atbegshi}.
-%    \begin{macrocode}
-\ifnum\@usetemplates=\@ne
-  \RequirePackage{eso-pic}
-%    \end{macrocode}
-% Here is a fix for \textsf{dvipdfm}.  If using templates, then we need to
-% redefine the way we set the page size using \textsf{eso-pic}. We also need
-% to redefine the \textsf{eso-pic} macro \cs{@ShipoutPicture} so the order of
-% execution of \cs{ESO@HookI} \cs{ESO@HookII} are reversed. The paper
-% size special will be in the \cs{ESO@HookII} macro, it needs to
-% execute (once) before \cs{ESO@HookI} is executed.
-%    \begin{macrocode}
-  \ifnum\eq@drivernum=\tw@
-    \def\web@set@paper{\AddToShipoutPicture*{%
-      \special{papersize=\the\paperwidth,\the\paperheight}}}%
-%    \end{macrocode}
-% We use some code from \textsf{hyperref} to set the page size.
-%    \begin{macrocode}
-    \AtBeginShipoutFirst{%
-      \begingroup
-        \@ifundefined{stockwidth}{%
-          \ifx\special@paper\@empty
-            \special{papersize=\the\paperwidth,\the\paperheight}\else
-            \special{papersize=\special@paper}\fi
-        }{%
-          \ifdim\stockwidth=\z@\else
-            \special{papersize=\the\stockwidth,\the\stockheight}\fi
-        }%
-     \endgroup
-    }%
-%    \end{macrocode}
-% \changes{v4.2d}{2009/11/22}{Modifications to use
-%   new \string\textsf{eso-pic}}
-%    \begin{macrocode}
-    \@ifundefined{@ShipoutPicture}{}{%
-%    \end{macrocode}
-% The new version of \textsf{eso-pic} does not define \cs{@ShipoutPicture}.
-% If \cs{@Ship\-out\-Pic\-ture} defined, so we use some of the old code.
-%    \begin{macrocode}
-      \renewcommand{\@ShipoutPicture}{%
-        \bgroup
-          \@tempswafalse%
-          \ifx\ESO@HookI\@empty\else\@tempswatrue\fi%
-          \ifx\ESO@HookII\@empty\else\@tempswatrue\fi%
-          \if@tempswa%
-          \@tempdima=1in\@tempdimb=-\@tempdima%
-          \advance\@tempdimb\paperheight
-          \@ifundefined{stockwidth}{}{%
-            \advance\@tempdima+\trimedge%
-            \advance\@tempdima+\paperwidth%
-            \advance\@tempdima-\stockwidth%
-            \if@twoside\ifodd\c@page\else%
-            \advance\@tempdima-2\trimedge%
-            \advance\@tempdima-\paperwidth%
-            \advance\@tempdima+\stockwidth%
-            \fi\fi\advance\@tempdimb+\trimtop
-          }%
-          \unitlength=1pt%
-          \global\setbox\@cclv\vbox{%
-            \vbox{\let\protect\relax
-            \pictur@(0,0)%
-            (\strip@pt\@tempdima,\strip@pt\@tempdimb)%
-            \ESO@HookII\ESO@HookI\global\let\ESO@HookII\@empty%
-            \endpicture}%
-            \box\@cclv%
-          }%
-        \fi
-        \egroup
-      }% shipout
-    }% ifundefined shipout
-  \fi
-\fi
-%    \end{macrocode}
-% A useful command for separating two arguments. Use in \texttt{webpro} section, and by \texttt{aeb\_pro} as well.
+% A useful command for separating two arguments.
+% Used in \texttt{webpro} section, and by \texttt{aeb\_pro} as well.
 %    \begin{macrocode}
 \def\getargs#1#2{\def\aeb@argi{#1}\def\aeb@argii{#2}}
 \let\getargsii\getargs
@@ -1189,11 +1130,12 @@
     \addtolength{\textheight}{-\@Topmargin}
     \addtolength{\textheight}{-\@Bottommargin}
 %    \end{macrocode}
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!~$},codes={\catcode`\%=9}]
 %\topmargin = \web@Topmargin - 1in
 %\@Topmargin = \web@Topmargin + \headheight + \headsep
-% so \headsep = \@Topmargin - \headheight - \web@Topmargin (\topmargin)
-%\end{verbatim}
+%!textsf~so $\headsep = \@Topmargin - \headheight - \web@Topmargin (\topmargin)
+%\end{Verbatim}
 %    \begin{macrocode}
     \setlength{\headsep}{\@Topmargin}
     \addtolength\headsep{-\headheight}
@@ -1255,24 +1197,23 @@
 % \texttt{Oversized Pages\_20x20.joboptions}. However, the page size the distiller uses can be set
 % through the {\LaTeX} source file. For this purpose, we introduce the command
 % \DescribeMacro\setPageDevice\cmd\setPageDevice. The optional first argument is the resolution
-% in dots per inch. The standard joboptions file has 600 as this value; the high quality and
+% in dots per inch. The standard job-options file has 600 as this value; the high quality and
 % press quality have this parameter at 2400. The second and third parameters are the
 % width and height, respectively, of the \textbf{/PageSize}. For greatest accuracy, the values of
 % width and height should be entered in printers points (without dimensions). For example,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\setPageDevice{1400}{1400}
-%\end{verbatim}
-% is preferred to
-%\begin{verbatim}
+%!STRUT!negSTRUT!textsf(is preferred to)
 %\setPageDevice{20in}{20in}
-%\end{verbatim}
+%\end{Verbatim}
 % \texttt{20in} gets converted to \texttt{1439.9965}. The conversion, if necessary, is done
 % by \cs{@convLtoP}
 %
 % The command \cs{@convLtoP} is taken from the \textsf{graphics} package and is based on
 % \cs{Gin@defaultbp}.
 %
-% The commands seems only effect with the \textsf{dvipsone} driver.
+% The command is only needed with the \textsf{dvipsone} driver.
 %    \begin{macrocode}
 \def\@convLtoP#1#2{\afterassignment
   \@convLtoP@i\dimen@#2bp\relax{#1}{#2}}
@@ -1305,11 +1246,12 @@
 % and \cs{paperheight} will be the default values set by the class, but take \cs{textwidth} to be
 % the value of \#2. The second and third parameters are the width and height, respectively, as measured
 % in printer points ($72\,\mbox{points} = 1\,\mbox{inch}$, or measures in the \texttt{bp} points of \TeX.)
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %Parameters:
-%   #1 = \paperheight (height of the display screen to be created)
-%   #2 = \paperwidth (width of the display screen to be created)
-%\end{verbatim}
+%!quad#1 = \paperheight (height of the display screen to be created)
+%!quad#2 = \paperwidth (width of the display screen to be created)
+%\end{Verbatim}
 %    \begin{macrocode}
 \def\screensize#1#2{%
   \def\webSaveSSDim{{#1}{#2}}%
@@ -1348,22 +1290,24 @@
 % cannot be deformed to fit one of the standard designs. The solution is to
 % create a screen size matching the graphic, then using that graphic as a template.
 % Example usage,
-%\begin{verbatim}
-%    \margins{1in}{1in}{24pt}{.25in}
-%    \setScreensizeFromGraphic{acro_30}
-%    \template{acro_30}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%!quad\margins{1in}{1in}{24pt}{.25in}
+%!quad\setScreensizeFromGraphic{acro_30}
+%!quad\template{acro_30}
+%\end{Verbatim}
 % This command takes two arguments, the first is optional and is passed
 % to the \cs{includegraphics} command, the second it the path to the file.
 %
 % It may become necessary with some graphics to use the
 % \texttt{hiresbb} option for \cs{includegraphics}, both in
 % \cs{setScreensizeFromGraphic} and \cs{template} like so,
-%\begin{verbatim}
-%    \margins{1in}{1in}{24pt}{.25in}
-%    \setScreensizeFromGraphic[hiresbb]{acro_30}
-%    \template[hiresbb]{acro_30}
-%\end{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%!quad\margins{1in}{1in}{24pt}{.25in}
+%!quad\setScreensizeFromGraphic[hiresbb]{acro_30}
+%!quad\template[hiresbb]{acro_30}
+%\end{Verbatim}
 % \changes{v4.0f}{2007/06/11}
 % {
 %   This command measures the dimensions of an EPS file, and sets the
@@ -1454,7 +1398,8 @@
 %    \subsubsection{\texorpdfstring{\protect\cs{margins}}{\CMD{margins}}}
 %    \begin{macro}{\margins}
 % Sets the left, right, top and bottom margins.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %Parameters:
 % [#1] = width of panel to be used if a panel option
 %        is specified (default is 1in)
@@ -1462,7 +1407,7 @@
 %   #3 = right margin
 %   #4 = top margin
 %   #5 = bottom margin
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\@margins}[5][\web@minpanelwidth]{%
   \def\webSaveMargDim{[#1]{#2}{#3}{#4}{#5}}%
@@ -1489,9 +1434,10 @@
 % |\addtoWebWidth| and |\addtoWebHeight|, this command readjusts
 % the margins. Within the arguments \cs{incby}
 % refer to the current dimension.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\resetsmargins{\incby+.25in}{\incby+.25in}{}{}
-%\end{verbatim}
+%\end{Verbatim}
 % This line adds .25in to each of the side margins.
 %    \begin{macrocode}
 \newcommand\get@MargDim[5][]{%
@@ -2228,7 +2174,8 @@
 %    \begin{macro}{\@newNaviIconMenu}
 % This command uses the hyperref command \cs{Acrobatmenu} to create navigation link button. The
 % action for this type is restricted to named menu actions.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %Parameters
 %  [#1] = optional parameter for setting the highlight, N (none),
 %         I (invert, the default), O (outline), P (push, also called Inset)
@@ -2237,7 +2184,7 @@
 %   #4 = height of icon
 %   #5 = text to appear in the center of the icon.
 %   #6 = named menu action, e.g., NextPage, PrevPage, etc.
-%\end{verbatim}
+%\end{Verbatim}
 % The color of the text is controlled by \cs{navibarTextColor}, and the background color
 % is determined by \cs{@menuBgColor}.
 %    \begin{macrocode}
@@ -2255,7 +2202,8 @@
 %    \end{macro}
 %    \begin{macro}{\@newNaviIconJS}
 % Another navigation icon/button, but this one allows for arbitrary JavaScript actions.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %Parameters
 %  [#1] = optional parameter for setting the highlight, N (none),
 %         I (invert, the default) O (outline), P (push, also called Inset)
@@ -2264,7 +2212,7 @@
 %   #4 = height of icon
 %   #5 = text to appear in the center of the icon.
 %   #6 = JavaScript commands to be executed when the button is clicked.
-%\end{verbatim}
+%\end{Verbatim}
 % The color of the text is controlled by \cs{navibarTextColor}, and the background color
 % is determined by \cs{@menuBgColor}.
 %    \begin{macrocode}
@@ -2309,7 +2257,8 @@
 %    \end{macrocode}
 %    \end{macro}
 % Another navigation icon/button, this one allows jumping to a named destination.
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %Parameters
 %  [#1] = optional parameter for setting the highlight, N (none),
 %         I (invert, the default), O (outline), P (push, also called Inset)
@@ -2318,12 +2267,13 @@
 %   #4 = height of icon
 %   #5 = text to appear in the center of the icon.
 %   #6 = \hyperlink or \href with its first argument
-%\end{verbatim}
+%\end{Verbatim}
 % For example,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\newNaviIcon[l]{\Home}{40pt}{15pt}{\footnotesize Home}
 %   {\href{http://www.math.uakron.edu/}}
-%\end{verbatim}
+%\end{Verbatim}
 % The color of the text is controlled by \cs{navibarTextColor}, and the background color
 % is determined by \cs{@menuBgColor}.
 %    \begin{macrocode}
@@ -2519,9 +2469,10 @@
 %    \begin{macro}{\ArrowUp}
 %    \begin{macro}{\ArrowDown}
 % Pre-Fab Rule Icons \cs{Uparrow} and \cs{Downarrow}, for example,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\insertnaviiconhere{\ArrowUp{\href{http://www.adobe.com/}}}
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand\ArrowUp[1]{%
   \normalsize\ifeqforpaper
@@ -3134,11 +3085,12 @@
   \begingroup
 %    \end{macrocode}
 % Sample line from .aux
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %  \contentsline {section}{\numberline {1}Introduction}{4}{section.1}
 %  \contentsline {section}{\numberline {}References}{56}{section*.1}
 %                                #1                   #2     #3
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
     \global\let\isChapter\web@NO
     \parskip0pt\parindent\toc@indent\relax
@@ -3284,9 +3236,10 @@
 % is optional.  Use any  of the \emph{boolean keys} of the
 % \cs{includegraphics} command. Do not use the \texttt{width} or
 % \texttt{height} keys in this optional argument. For example,
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %  \template[hiresbb]{myBG}
-%\end{verbatim}
+%\end{Verbatim}
 % Causes the driver to import the graphic using the high resolution bounding
 % box.
 % It is assumed that a graphic defined by \cs{template} is intended to fill the entire
@@ -4015,8 +3968,9 @@
 % in the \texttt{web} package. This command should appear in the preamble.
 %
 %\medskip\noindent Example usage:
-%\begin{verbatim}
-%\DeclareDocInfo{%
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
+%\DeclareDocInfo{!%
 %    title=My First Presentation,
 %    author=D. P. Speaker,
 %    university=My University,
@@ -4025,7 +3979,7 @@
 %    talksite=The Talking University,
 %    subject=The Art of Talking
 %}
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\DeclareDocInfo}[1]{\setkeys{aebDocInfo}{#1}%
   \ifx\web@talkdate@value\@empty\else\let\webversion\webtalkdate\fi}
@@ -4115,15 +4069,16 @@
 % ignored when the \texttt{forpaper} option is in effect.
 %
 %\medskip\noindent Example usage:
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\DeclarePageLayout
-%{%
+%{!%
 %    screensizeOf=designv,
 %    margins={.75in}{.75in}{.75in}{.75in},
 %    topmargin=40pt,
 %    webfootskip=30pt
 %}
-%\end{verbatim}
+%\end{Verbatim}
 % This sets the \texttt{\texttt{screensize}} to the same as the
 % \texttt{screensize} of \texttt{designv}. We then adjust the
 % margins, the \texttt{topmargin} key is used to position the running
@@ -5253,9 +5208,10 @@
 % The \cs{selectColors} is a convenience command for setting
 % many of the colors involved in the design of an \textsf{APB} document.
 % The default colors are \dots
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\selectColors
-%{
+%{!%
 %    universityColor = blue,
 %    titleColor = black,
 %    authorColor = black,
@@ -5266,7 +5222,7 @@
 %    linkColor = webgreen,
 %    fileColor = webbrown
 %}
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\selectColors}[1]{\setkeys{aebcolordesign}{#1}}
 %    \end{macrocode}
@@ -5302,14 +5258,15 @@
 %    \begin{macro}{\selectTocDings}
 % This is an \textsf{xkeyval} interface to setting the dings used by
 % the structured lists and the table of contents. Usage:
-%\begin{verbatim}
+%\begin{Verbatim}[xleftmargin=\parindent,fontsize=\small,
+%commandchars={!()},codes={\catcode`\%=9}]
 %\selectTocDings
-%{
+%{!%
 %    dDing=\ding{082},
 %    ddDing=\ding{079},
 %    dddDing=\ding{254}
 %}
-%\end{verbatim}
+%\end{Verbatim}
 %    \begin{macrocode}
 \newcommand{\selectTocDings}[1]{\setkeys{aebDings}{#1}}
 %    \end{macrocode}
@@ -5332,10 +5289,8 @@
 % comment environments one \texttt{forpaper} and another for
 % \texttt{forscreen}.
 %    \begin{macrocode}
-  \includecomment{forpaper}\excludecomment{forscreen}
-\else
-  \includecomment{forscreen}\excludecomment{forpaper}
-\fi
+  \includecomment{forpaper}\excludecomment{forscreen}\else
+  \includecomment{forscreen}\excludecomment{forpaper}\fi
 %    \end{macrocode}
 %    \end{environment}
 %    \end{environment}

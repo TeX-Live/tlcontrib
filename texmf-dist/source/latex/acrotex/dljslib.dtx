@@ -2,7 +2,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% dljsLib.sty package,                                 %%
-%% Copyright (C) 2001-2018  D. P. Story                 %%
+%% Copyright (C) 2001-2021  D. P. Story                 %%
 %%   dpstory@uakron.edu                                 %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{dljslib}
-%<package> [2017/08/11 v2.1 Manage a Library of Document Level JavaScripts (dps)]
+%<package> [2021/04/04 v2.2 Manage a Library of Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -23,6 +23,23 @@
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\makeatother
+\def\darg#1{\texttt{\char123\relax#1\char125\relax}}
+\def\CMD#1{\textbackslash#1}
+\let\pkg\textsf
+\let\opt\texttt
+\let\env\texttt
+\let\app\textsf
+\let\uif\textsf
+\def\STRUT{\rule{0pt}{14pt}}
+\def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
+\def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{dljslib}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
      \PackageInfo{dljslib}{aebdocfmt.def cannot be found}}
@@ -88,12 +105,17 @@
 %    \begin{macrocode}
 \dljsRegister[y]{dljslib}
 %    \end{macrocode}
-% \subsection{Library Card Catalog}
-% \IndexOpt{equations}
-% \IndexOpt{vectors}
-% \IndexOpt{indefIntegral}
-% \IndexOpt{ImplMulti}
-% \IndexOpt{nodec}
+% \subsection{Library Card Catalog}\leavevmode
+% \IndexOpt{equations}^^A%
+% \IndexOpt{vectors}^^A%
+% \IndexOpt{indefIntegral}^^A%
+% \IndexOpt{ImplMulti}^^A%
+% \IndexOpt{nodec}^^A%
+% \IndexOpt{noBinFac}^^A%
+% \IndexOpt{limitArith}^^A%
+% \IndexOpt{combinatorics}^^A%
+% \IndexOpt{setSupport}^^A%
+% \noindent
 % The arguments of the \cs{DeclareAndRegister} command are the options of this package, and
 % their names represent JavaScript functions in the library.
 %    \begin{macrocode}
@@ -102,41 +124,38 @@
 \DeclareAndRegister{indefIntegral}
 \DeclareAndRegister{ImplMulti}
 \DeclareAndRegister{nodec}
-%    \end{macrocode}
-% \IndexOpt{noBinFac}
-% \IndexOpt{limitArith}
-% \IndexOpt{combinatorics}
-% \IndexOpt{setSupport}
-% More options.
-%    \begin{macrocode}
 \DeclareAndRegister{noBinFac}
 \DeclareAndRegister{limitArith}
 \DeclareAndRegister{combinatorics}
 \DeclareAndRegister{setSupport}
 %    \end{macrocode}
-% \IndexOpt{unordered}
-% \IndexOpt{complex}
-% \IndexOpt{satisfyEq}
-% \IndexOpt{useGermanNums}
-% \IndexOpt{factors}
-% More options still.
+% \leavevmode
+% Additional registered names.
+% \IndexOpt{unordered}^^A%
+% \IndexOpt{complex}^^A%
+% \IndexOpt{satisfyEq}^^A%
+% \IndexOpt{useGermanNums}^^A%
+% \IndexOpt{useDeNums}^^A%
+% \IndexOpt{useEnNums}^^A
+% \IndexOpt{factors}^^A%
+% \IndexOpt{point}^^A%
+% \IndexOpt{intervals}^^A%
 %    \begin{macrocode}
 \DeclareOption{unordered}{\PackageWarning{dljslib}
-    {The `unordered' option is now combined with the\MessageBreak
-    `setSupport' option, will use the `setSupport' option\MessageBreak
-    instead}\ExecuteOptions{setSupport}}
+  {The `unordered' option is now combined with the\MessageBreak
+  `setSupport' option, will use the `setSupport' option\MessageBreak
+  instead}\ExecuteOptions{setSupport}}
 %\DeclareAndRegister{unordered}
 \DeclareAndRegister{complex}
 \DeclareAndRegister{satisfyEq}
 \DeclareAndRegister{useGermanNums}
+\DeclareOption{useDeNums}{\ExecuteOptions{useGermanNums}}
+\DeclareAndRegister{useEnNums}
 \DeclareAndRegister{factors}
-%    \end{macrocode}
-% \IndexOpt{point}
-% \IndexOpt{intervals}
-% The final set of options.
-%    \begin{macrocode}
 \DeclareAndRegister{point}
 \DeclareAndRegister{intervals}
+%    \end{macrocode}
+%    \begin{macrocode}
 \def\includeOptions#1{\@for\@option:=#1\do{\dljsRegister[y]{\@option}}}
 \InputIfFileExists{libcusopt.opt}{}{}
 %    \end{macrocode}
@@ -238,6 +257,8 @@
 % this of this as the ``front wrapper'' or ``front cover'' of your library selections. It contains the
 % ``name'' of the library from which you checked out your selections.
 %    \begin{macrocode}
+\newcommand{\SyntaxErrorAuthor}{"Syntax error in author's answer!
+  Check console."}
 \begin{library@holding}{dljslib}
 \begin{insDLJS*}[dljslib]{dljslib}
 \begin{newsegment}{dljslib: AcroTeX DLJS Library}
@@ -333,7 +354,7 @@ function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
     }
     zCorrAns = ParseInput(zCorrAns);
     if (!ok2Continue) {
-        eqAppAlert("Syntax error in author's answer! Check console.", 3);
+        eqAppAlert(\SyntaxErrorAuthor,3);
         console.println("Syntax Error: " + CorrAns);
         return null;
     }
@@ -341,10 +362,10 @@ function ProcRespEq(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
     if (!ok2Continue) return null;
 %   convert vars to  new format, if needed
     indepVars = TypeParameters(indepVars);
-    var lambda = getNonZeroRatio (domain, indepVars, zCorrAns, zUserAns);
+    var lambda = getNonZeroRatio(domain,indepVars,zCorrAns,zUserAns);
     if ( lambda == null ) {
         eqAppAlert(\eqSyntaxErrorUndefVar,3); return null; };
-    if ( !ok2Continue ) return notifyField(false, flag, fieldname);
+    if ( !ok2Continue ) return notifyField(false,flag,fieldname);
     zCorrAns  = lambda + "*(" + zCorrAns + ")";
     success=randomPointCompare (n,domain,indepVars,epsilon,
         zCorrAns,zUserAns,comp)
@@ -508,7 +529,7 @@ typeof oComp.priorParse != "undefined" ) {
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
-            eqAppAlert("Author Syntax error!", 3);
+            eqAppAlert(\SyntaxErrorAuthor, 3);
             return null;
         }
         aUserAns[i] = ParseInput(aUserAns[i]);
@@ -1204,7 +1225,6 @@ domain,indepVars,oComp) {
 %    \end{macrocode}
 %     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
 %    \begin{macrocode}
-% dps17
     var UserAns=(arguments.length>7)?arguments[7]:event.value;
     var retn=_ProcRespEvalEq(false,flag,CorrAns,n,epsilon,
 indepVars,UserAns);
@@ -1273,7 +1293,6 @@ indepVars,oComp) {
 %    \end{macrocode}
 %     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
 %    \begin{macrocode}
-% dps17
     var UserAns=(arguments.length>7)?arguments[7]:event.value;
     var retn=_ProcRespEvalEqList(true,flag,CorrAns,n,epsilon,%
 indepVars,UserAns);
@@ -1446,15 +1465,74 @@ return syntaxError(), null;
 \end{newsegment}
 \end{library@holding}
 %    \end{macrocode}
-% \subsubsection{\texttt{useGermanNums}}
+% \subsubsection{\texttt{useGermanNums} (\texttt{useDeNums})}
+% \leavevmode
 % \IndexOpt{useGermanNums}A simple \texttt{ProcResp()} for processing numbers entered in a German format: 1234,56.
 % The Germans have a block delimiter of period or space (1.234,56 or 1 234,56).
 % The period is not supported and causes an alert box.
 %\changes{v1.9g}{2014/01/14}{Added a proc to accept the comma for the decimal mark}
+%\changes{v2.2}{2021/04/04}{Modified useGermanNums, created alias useDeNums}
+%\changes{v2.2}{2021/04/04}{Modified proc to warn about English decimal point only}
 %    \begin{macrocode}
 \@ifcheckedout{useGermanNums}
-\newcommand{\noDecPtGerMsg}{"A period (.) is not allowed in answer,
-    use German notation for numbers"}
+%    \end{macrocode}
+%\leavevmode\DescribeMacro{\noDecPtDeMsg} A general alert message for responses that
+% contain a point (.).
+%    \begin{macrocode}
+  \dlJSStr[noquotes]{\noDecPtDeMsg}{%
+    "German Notation Syntax Error: A point (.) was found
+     in your response \"" + UserAns + "\".
+     Please remove the point, or this answer will be marked as wrong."}
+%    \end{macrocode}
+%    \DescribeMacro{\MsgDei} An alert message when German decimal notation
+%    is expected.
+%    \begin{macrocode}
+  \flJSStr*[noquotes]{\MsgDei}{"German decimal notation is expected,
+for example: 12,3456."}
+  \flJSStr*[noquotes]{\MsgDeiAlt}{"German decimal notation is expected,
+for example: 12,3456." +((warnDecDeOnly)?"\n\n
+The English decimal notation (12.2345) is also accepted,
+however.":"")}
+%    \end{macrocode}
+%    \DescribeMacro{\MsgDeii} An alert message when two decimal places are expected.
+%    \begin{macrocode}
+  \flJSStr*[noquotes]{\MsgDeii}{"A decimal number is required,
+rounded to two decimal places, for example: 12,34"}
+%    \end{macrocode}
+%    When \DescribeMacro{\warnDecDeOnlyOn}\cs{warnDefDeOnlyOn} is declared in the preamble, the use of
+%    the decimal point (.) is accepted but a warning message appears. On the downside,
+%    the student can enter \texttt{1.00,10}, which will, no doubt, lead to an
+%    incorrect answer.
+%    \begin{macrocode}
+  \def\warnDecDeOnlyOn{\def\warnDecDeOnly{true}}
+  \def\warnDefDeOnlyOff{\def\warnDecDeOnly{false}}
+  \warnDefDeOnlyOff
+%    \end{macrocode}
+%    \DescribeMacro{\numDe}\nmpsep{\darg{\ameta{Msg}}} is a command that supports
+%    the German decimal notation point (,). For this command, the decimal point (,)
+%    is optional; that is, an integer response is accepted. \ameta{Msg} is a message
+%    that appears on error of syntax.
+%    \begin{macrocode}
+  \def\numDe#1{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*,?%
+    \redigit*\reestr/,(#1)))}}
+%    \end{macrocode}
+%    \DescribeMacro{\rndNumDeReq}\nmpsep{\darg{\ameta{nDec-pl}}\darg{\ameta{Msg}}}
+%   For numbers that are required to be rounded to \emph{exactly} \ameta{nDec-pl} decimal places.
+%   \ameta{Msg} is an error message. Decimal point (,) is required.
+%    \begin{macrocode}
+  \def\rndNumDeReq#1#2{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*,%
+    \redigit{#1}\reestr/,(#2)))}}
+%    \end{macrocode}
+%    \DescribeMacro{\rndNumDeOpt}\nmpsep{\darg{\ameta{nDec-pl}}\darg{\ameta{Msg}}}
+%   For numbers that are required to be rounded to \emph{at most} \ameta{nDec-pl} decimal places.
+%   \ameta{Msg} is an error message. Decimal point (,) optional (integer respose
+%   accepted).
+%    \begin{macrocode}
+  \def\rndNumDeOpt#1#2{{priorParse:\Array(% at most two decimal places
+    \preReqForm(/\rebstr\rechrclass{+-}?%
+    \redigit*,?\redigit{0,#1}\reestr/,(#2)))}}
 \fi
 \begin{library@holding}{useGermanNums}
 \begin{newsegment}
@@ -1463,6 +1541,7 @@ return syntaxError(), null;
 % \DescribeMacro{ProcRespNumsDe} This segment only has one ProcResp function in it,
 % this is named \texttt{ProcRespNumsDe}.
 %    \begin{macrocode}
+var warnDecDeOnly=\warnDecDeOnly;
 function ProcRespNumsDe (flag,CorrAns,n,epsilon,%
 domain,indepVars,oComp) {
     if (!ProcessIt) return null;
@@ -1471,8 +1550,7 @@ domain,indepVars,oComp) {
 %    \end{macrocode}
 %     Modified for multi-letter variables: remove one line, insert two. (2017/08/09)
 %    \begin{macrocode}
-%    var UserAns = event.value;
-    var bSubstVars=(arguments.length>7); // dps17
+    var bSubstVars=(arguments.length>7);
     var UserAns=(bSubstVars)?arguments[7]:event.value;
 %    \end{macrocode}
 % This is the only change over the \texttt{ProcResp}, we call
@@ -1489,7 +1567,7 @@ domain,indepVars,oComp) {
     ok2Continue = true;
     CorrAns = ParseInput(CorrAns);
     if (!ok2Continue) {
-        eqAppAlert("Syntax error in author's answer! Check console.", 3);
+        eqAppAlert(\SyntaxErrorAuthor,3);
         return null;
     }
 %    \end{macrocode}
@@ -1502,8 +1580,8 @@ domain,indepVars,oComp) {
 %    \end{macrocode}
 % Deny use of the traditional decimal point (.)
 %    \begin{macrocode}
-    if ( reDec.test(UserAns) ) {
-        eqAppAlert(\noDecPtGerMsg,3);
+    if ( (!warnDecDeOnly) && (reDec.test(UserAns)) ) {
+        eqAppAlert(\noDecPtDeMsg,3);
         return -1;
     }
 %    \end{macrocode}
@@ -1519,13 +1597,13 @@ domain,indepVars,oComp) {
 % We pass \texttt{UserAnsSave} in case author uses \texttt{priorParse} etc.
 %    \begin{macrocode}
         var retn=processSpecialParse(oComp.priorParse,UserAnsSave);
-        if (retn==null) return -1;
+        if ( (!warnDecDeOnly) && (retn==null) ) return -1;
     }
-    var reComma=/,/;
-    if ( reComma.test(UserAns) ) {
-        eqAppAlert(\eqSyntaxErrorComma,3);
-        return -1;
-    }
+%    var reComma=/,/;
+%    if ( reComma.test(UserAns) ) {
+%        eqAppAlert(\eqSyntaxErrorComma,3);
+%        return -1;
+%    }
     UserAns = ParseInput(UserAns);
     indepVars = TypeParameters(indepVars);
     if (!ok2Continue) return null;
@@ -1542,6 +1620,59 @@ epsilon,CorrAns,UserAns,comp);
 % The following functions, which are \texttt{ProcResp}-types, were written for an online
 % grading system being developed by Drs.\ Bruce Wagner and David Arnold, and Mr.
 % Jacob Miles-Prystowsky.  The descriptions given below were provided by the authors.
+%
+% \subsubsection{\texttt{useEnNums}}
+% \leavevmode
+% \IndexOpt{useEnNums}A simple \texttt{ProcResp()} for processing numbers entered in a EN-U format: 1234.56.
+%    \begin{macrocode}
+\@ifcheckedout{useEnNums}
+%    \end{macrocode}
+%\leavevmode\DescribeMacro{\noDecPtEnMsg} A general alert message for responses that
+% contain a comma (,).
+%    \begin{macrocode}
+  \dlJSStr[noquotes]{\noDecPtEnMsg}{%
+    "Syntax Error: A comma (,) was found
+     in your response \"" + UserAns + "\".
+     Please remove the comma, or this answer will be marked as wrong."}
+%    \end{macrocode}
+%    \DescribeMacro{\MsgEni} An alert message when German decimal notation
+%    is expected.
+%    \begin{macrocode}
+  \flJSStr*[noquotes]{\MsgEni}{"English decimal notation is expected,
+for example: 12.3456."}
+%    \end{macrocode}
+%    \DescribeMacro{\MsgEnii} An alert message when two decimal places are expected.
+%    \begin{macrocode}
+  \flJSStr*[noquotes]{\MsgEnii}{"A decimal number is required,
+rounded to two decimal places, for example: 12.34"}
+%    \end{macrocode}
+%    \DescribeMacro{\numEn}\nmpsep{\darg{\ameta{Msg}}} is a command that supports
+%    the En decimal notation point (.). For this command, the decimal point (.)
+%    is optional; that is, an integer response is accepted. \ameta{Msg} is a message
+%    that appears on error of syntax.
+%    \begin{macrocode}
+  \def\numEn#1{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*\\.?%
+    \redigit*\reestr/,(#1)))}}
+%    \end{macrocode}
+%    \DescribeMacro{\rndNumEnReq}\nmpsep{\darg{\ameta{nDec-pl}}\darg{\ameta{Msg}}}
+%   For numbers that are required to be rounded to \emph{exactly} \ameta{nDec-pl} decimal places.
+%   \ameta{Msg} is an error message. Decimal point (.) is required.
+%    \begin{macrocode}
+  \def\rndNumEnReq#1#2{{priorParse:\Array(%
+    \preReqForm(/\rebstr\rechrclass{+-}?\redigit*\\.%
+    \redigit{#1}\reestr/,(#2)))}}
+%    \end{macrocode}
+%    \DescribeMacro{\rndNumEnOpt}\nmpsep{\darg{\ameta{nDec-pl}}\darg{\ameta{Msg}}}
+%   For numbers that are required to be rounded to \emph{at most} \ameta{nDec-pl} decimal places.
+%   \ameta{Msg} is an error message. Decimal point (.) optional (integer response
+%   accepted).
+%    \begin{macrocode}
+  \def\rndNumEnOpt#1#2{{priorParse:\Array(% at most two decimal places
+    \preReqForm(/\rebstr\rechrclass{+-}?%
+    \redigit*\\.?\redigit{0,#1}\reestr/,(#2)))}}
+\fi
+%    \end{macrocode}
 %    \begin{macrocode}
 \begin{library@holding}{unordered}
 %    \end{macrocode}
@@ -1895,7 +2026,7 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
     for (i=0; i<aCorrAns.length; i++) {
         aCorrAns[i] = ParseInput(aCorrAns[i]);
         if (!ok2Continue) {
-            eqAppAlert("Author Syntax error!", 3);
+            eqAppAlert(\SyntaxErrorAuthor, 3);
             return null;
         }
         aUserAns[i] = ParseInput(aUserAns[i]);
@@ -1961,7 +2092,8 @@ function ProcPoint(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
 %\end{flushleft}
 %    \begin{macrocode}
 \begin{newsegment}{dljslib: Contrib - Processing Interval Responses}
-function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,indepVars,oComp)
+function ProcRespIntervals(flag,CorrAns,n,epsilon,domain,%
+indepVars,oComp)
 {
      ok2Continue = true;
      if (!ProcessIt) return null;
@@ -2341,57 +2473,56 @@ function NoExpAllowed (UserAns) {
 %    \begin{macrocode}
 function NoTrigAllowed (UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var aTrigfuncs = new Array
-    ( "acos","asin","atan","cos", "sin", "tan","sec","csc","cot",
-      "arcsin", "arccos", "arctan"
-    );
-    var re, regexp;
-    re = /[a-zA-Z]{2,}/g;
-    aF = UserAns.match(re);
-    if (  aF != null ) {
-        for (var i=0; i < aF.length; i++)
-        {
-            for(var j=0; j < aTrigfuncs.length; j++) {
-                if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
-                    return eqAppAlert(\NoTrigAllowedErrorMsg,3), null;
-            }
-        }
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var aTrigfuncs = new Array
+  ( "acos","asin","atan","cos", "sin", "tan","sec","csc","cot",
+    "arcsin", "arccos", "arctan"
+  );
+  var re, regexp;
+  re = /[a-zA-Z]{2,}/g;
+  aF = UserAns.match(re);
+  if (  aF != null ) {
+    for (var i=0; i < aF.length; i++) {
+      for(var j=0; j < aTrigfuncs.length; j++) {
+        if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
+          return eqAppAlert(\NoTrigAllowedErrorMsg,3), null;
+      }
     }
-    return true;
+  }
+  return true;
 }
 function NoPiAllowed(UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var re=/PI|pi/;
-    if ( re.test(UserAns) )
-        return eqAppAlert(\NoPiAllowedErrorMsg,3), null;
-    return true;
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var re=/PI|pi/;
+  if ( re.test(UserAns) )
+    return eqAppAlert(\NoPiAllowedErrorMsg,3), null;
+  return true;
 }
 function NoTrigLogAllowed (UserAns)
 {
-    UserAns  = stripWhiteSpace(UserAns);
-    if ( !ok2Continue ) return null;
-    var aTrigfuncs = new Array
-    ( "acos","asin","atan","cos", "sin",
-      "tan","sec","csc","cot", "arcsin", "arccos", "arctan",
-      "logc","log", "ln"
-    );
-    var re, regexp;
-    re = /[a-zA-Z]{2,}/g;
-    aF = UserAns.match(re);
-    if (  aF != null ) {
-        for (var i=0; i < aF.length; i++)
-        {
-            for(var j=0; j < aTrigfuncs.length; j++) {
-                if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
-                    return eqAppAlert(\NoTrigLogAllowedErrorMsg,3), null;
-            }
-        }
+  UserAns  = stripWhiteSpace(UserAns);
+  if ( !ok2Continue ) return null;
+  var aTrigfuncs = new Array
+  ( "acos","asin","atan","cos", "sin",
+    "tan","sec","csc","cot", "arcsin", "arccos", "arctan",
+    "logc","log", "ln"
+  );
+  var re, regexp;
+  re = /[a-zA-Z]{2,}/g;
+  aF = UserAns.match(re);
+  if (  aF != null ) {
+    for (var i=0; i < aF.length; i++)
+    {
+      for(var j=0; j < aTrigfuncs.length; j++) {
+        if ( aF[i].indexOf(aTrigfuncs[j]) != -1 )
+          return eqAppAlert(\NoTrigLogAllowedErrorMsg,3), null;
+      }
     }
-    return true;
+  }
+  return true;
 }
 %    \end{macrocode}
 %\changes{v1.9a}{2011/07/15}{Added \texttt{sciNotResp} and \texttt{SciNotResp}}

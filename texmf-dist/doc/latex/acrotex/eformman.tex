@@ -12,6 +12,7 @@
 
 \setlength{\marginparpush}{3pt}
 \setlength{\mathindent}{\the\parindent}
+
 %\previewOn\pmpvOn
 
 \usepackage{graphicx,array,longtable}
@@ -20,7 +21,6 @@
 \usepackage{xbmks}
 \DeclareInitView{layoutmag={navitab:UseOutlines}}
 \xbmksetup{colors={int=red},styles={intbf}}
-
 
 \def\STRUT{\rule{0pt}{14pt}}
 \def\negSTRUT{\rule[-8pt]{0pt}{0pt}}
@@ -72,16 +72,17 @@
 \def\tutpathi{tutorial}
 \def\expath{../examples}
 
+\let\tops\texorpdfstring
 \DeclareDocInfo
 {
     university={\AcroTeX.Net\protect\\[1ex]eforms and insdljs Documentation},
-    title={Support for AcroForms and Links, and for\texorpdfstring{\protect\\[2ex]}{ }Document JavaScript and Open Page Events},
+    title={Support for AcroForms and Links, and for\tops{\protect\\[2ex]}{ }Document JavaScript and Open Page Events},
     author={D. P. Story},
     email={dpstory@acrotex.net},
     subject={Documentation for the eforms and insdljs packages},
     talksite={\url{www.acrotex.net}},
     version={2.0},
-    prepared={2021/02/17},
+    prepared={2021/05/10},
     preparedLabel={Distribution Dated:},
     keywords={LaTeX, hyperref, PDF, exercises, quizzes},
     copyrightStatus=True,
@@ -103,7 +104,7 @@
 \sectionLayout{indent=-62.5pt,fontsize=large,color=aeb,fontfamily=sffamily}
 \subsectionLayout{indent=-31.25pt,color=aeb,fontfamily=sffamily}
 \subsubsectionLayout{indent=0pt,color=aeb,fontfamily=sffamily}
-\subsubDefaultDing{\texorpdfstring{$\bullet$}{\textrm\textbullet}}
+\subsubDefaultDing{\tops{$\bullet$}{\textrm\textbullet}}
 
 \def\verygoodbreak{%
 \vskip0pt plus1in\goodbreak\vskip0pt plus-1in}
@@ -118,7 +119,7 @@
 
 
 \makeatletter
-\let\bslash=\@backslashchar
+\let\bslash\@backslashchar
 \renewcommand{\paragraph}{\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}{\bfseries}}
 
 % Begin definition of \appendixsubsection
@@ -630,11 +631,12 @@ The push button is a button field that has no
 value, it is neither on nor off. Generally, push buttons are used
 to initiate some action, such as JavaScript action.
 
-\settowidth{\aebdimen}{\cs{pushButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{pushButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
+\bVerb\takeMeasure{\string\cs{pushButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \pushButton[#1]{#2}{#3}{#4}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -690,11 +692,12 @@ A check box is a type of button that has one of two values,
 ``off'' is \texttt{Off}; the value of the ``on'' state can be
 defined by the user.
 
-\settowidth{\aebdimen}{\cs{checkBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{checkBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\bVerb\takeMeasure{\cs{checkBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\begin{dCmd}{\bxSize}
 \checkBox[#1]{#2}{#3}{#4}{#5}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -745,11 +748,12 @@ the \pkg{eforms} package.
 A radio button field is similar to a check box, but is meant to be
 used in unison with one or more additional radio buttons.
 
-\settowidth{\aebdimen}{\cs{radioButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{radioButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\bVerb\takeMeasure{\cs{radioButton[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\begin{dCmd}{{\bxSize}}
 \radioButton[#1]{#2}{#3}{#4}{#5}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -824,11 +828,12 @@ of the choices are visible in a rectangle.  A scroll bar becomes
 available if any of the items in the list are not visible in the
 rectangle provided.
 
-\settowidth{\aebdimen}{\cs{listBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{listBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\bVerb\takeMeasure{\cs{listBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}%
+\begin{dCmd}{\bxSize}
 \listBox[#1]{#2}{#3}{#4}{#5}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -916,11 +921,12 @@ A combo box is a drop down list of items that can optionally have
 an editable text box for the user to type in a value other than
 the predefined choices.
 
-\settowidth{\aebdimen}{\cs{comboBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+%\settowidth{\aebdimen}{\cs{comboBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}
+\bVerb\takeMeasure{\cs{comboBox[\#1]\darg{\#2}\darg{\#3}\darg{\#4}\darg{\#5}}}%
 \begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
 \comboBox[#1]{#2}{#3}{#4}{#5}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -1014,11 +1020,12 @@ else
 
 A text field is the way a user can enter text into a form.
 
-\settowidth{\aebdimen}{\cs{textField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{textField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
+\bVerb\takeMeasure{\cs{textField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}%
+\begin{dCmd}{\bxSize}
 \textField[#1]{#2}{#3}{#4}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -1112,11 +1119,12 @@ Total:    & \textField[\AA{%
 
 A signature field is a field that can be digitally signed.
 
-\settowidth{\aebdimen}{\cs{sigField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
-\begin{dCmd}{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{sigField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}
+\bVerb\takeMeasure{\cs{sigField[\#1]\darg{\#2}\darg{\#3}\darg{\#4}}}%
+\begin{dCmd}{\bxSize}
 \sigField[#1]{#2}{#3}{#4}
 \end{dCmd}
-
+\endgroup
 \PD
 \begin{enumerate}
 \item[\texttt{\#1}:] optional, used to enter any modification of appearance/actions
@@ -1224,6 +1232,145 @@ is signed.
 \end{itemize}
 
 
+\subsection{Obtaining a uniform look across all workflows}\label{s:efuniformWF}
+
+In this section, several commands are
+presented that help you layout {\PDF} forms, as created by \pkg{eforms}, in a
+way that is consistent across all workflows (\app{dvips}/\penalty0
+\app{Distiller}, \app{pdflatex}, \app{lualatex}, and \app{xelatex}).
+
+\bVerb\takeMeasure{\string\makeXasPDOn\qquad\string\vcgBdry[\ameta{length}]}%
+\settowidth{\aebdimen}{\cs{makeXasPDOn}}%
+\def\1{\rlap{\ttfamily\hskip\aebdimen\qquad\string\cgBdry*[\ameta{length}]}}%
+\def\2{\rlap{\ttfamily\hskip\aebdimen\qquad\string\vcgBdry[\ameta{length}]}}%
+\def\3{\rlap{\hskip\linewidth\ding{182}}}
+\def\4{\rlap{\hskip\linewidth\ding{183}}}
+\def\5{\rlap{\hskip\linewidth\ding{184}}}
+\def\6{\rlap{\hskip\linewidth\ding{185}}}
+\def\7{\rlap{\hskip\linewidth\ding{186}}}
+\xdef\panelWidth{\the\linewidth}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!3\makeXasPDOn!qquad\makeXasPDOff
+!4\makePDasXOn!qquad\makePDasXOff
+!5!1\olBdry
+!6!2\volBdry
+!7\efKern{!ameta(length!SUB1)}{!ameta(length!SUB2)}
+\end{dCmd}
+\endgroup
+
+\paragraph*{Matching dimensions of form fields.}
+The form fields created by \app{xelatex} are smaller than the ones with the
+same dimensions created the other {\PDF} creators (\app{pdflatex},
+\app{lualatex}, or \app{dvips}/\penalty0\app{Distiller}). To obtain a uniform
+look across all workflows, you can either increase the size of the
+\app{xelatex} form fields, or decrease the size of the form fields created by
+non-\app{xelatex} workflows. The first two lines of the display (\ding{182}
+and \ding{183}) address the issue that different workflows produce different
+sized form fields even though their dimensions are the same.
+\begin{itemize}
+
+    \item Expanding the command \cs{makeXasPDOn} increases the size of the
+        form fields created by \app{xelatex} to make them the same size as
+        those created by the other applications\app{pdflatex} or; while
+        \cs{makeXasPDOff} turns off this feature, the fields created by
+        \app{xelatex} are smaller than the ones otherwise created by the
+        other workflows.
+
+        The \pkg{eforms} package expands \cs{makeXasPDOn} as the default behavior.
+
+    \item Expanding the command \cs{makePDasXOn} decreases the size of the
+        created by non-\app{xelatex} workflows to make them the same size
+        as those created by \app{xelatex}; while \cs{makeXasPDOff} turns
+        off this feature, the fields created by non-\app{xelatex} workflows
+        are larger than the ones created by \app{xelatex}.
+\end{itemize}
+
+\paragraph*{Setting the horizontal relationship between fields.} When one form field follows another
+on the same line, the space between them becomes an issue. There are three
+problems addressed in this paragraph:
+\begin{itemize}
+    \item You\FmtMP{\cs{olBdry} described, illustrated} want the two fields, which have the same border thickness
+        (usually 1\,bp), to overlap borders, like so,
+    \begin{quote} %\previewtrue
+    \textField{txt1}{30bp}{10bp}\olBdry\textField{txt2}{30bp}{10bp}\\[3pt]
+    \footnotesize\cs{textField\darg{txt1}\darg{30bp}\darg{10bp}}\textbf{\cs{olBdry}}\\
+    \cs{textField\darg{txt2}\darg{30bp}\darg{10bp}}
+    \end{quote}
+    use the \cs{olBdry} command (\textbf{o}ver\textbf{l}ay
+    \textbf{b}oun\textbf{d}a\textbf{ry}), as listed in line~\ding{184} in
+    the display above. Overlapping the border lines is only useful if the
+    border colors are the same.
+
+%\promoteNewPage[\baselineskip]
+
+    \item When\FmtMP{\cs{cgBdry} described, illustrated} the border colors
+        are different, you can place neighboring fields contiguously. To
+        make the field have contiguous border lines, use the \cs{cgBdry}
+        command (\textbf{c}onti\textbf{g}uous
+        \textbf{b}oun\textbf{d}a\textbf{ry}), as listed in line \ding{184}
+        in the above display.
+    \begin{aebQuote}
+    \def\ci{red}\def\cii{blue}
+    \textField[\BC{\ci}]{txt3}{30bp}{10bp}\cgBdry\textField[\BC{\cii}]{txt4}{30bp}{10bp}\\[3pt]
+    \footnotesize\cs{textField[\string\BC\darg{\ci}]\darg{txt3}\darg{30bp}\darg{10bp}}\textbf{\cs{cgBdry}}\\
+    \cs{textField[\string\BC\darg{\cii}]\darg{txt4}\darg{30bp}\darg{10bp}}
+    \end{aebQuote}
+
+    \item The\FmtMP{\cs{olBdry} continued} third case is where you want the field to be separated by a
+        nonzero length, in this case, the optional first argument
+        \cs{cgBdry[\ameta{length}]} is used; \cs{cgBdry} positions the two neighboring
+        field contiguously, then moves the right-field \ameta{length} to the right.
+    \begin{quote}
+    \textField{txt5}{30bp}{10bp}\cgBdry[1in]\textField{txt6}{30bp}{10bp}\\[3pt]
+    \footnotesize\cs{textField\darg{txt5}\darg{30bp}\darg{10bp}}\textbf{\cs{cgBdry[1in]}}\\
+    \cs{textField\darg{txt6}\darg{30bp}\darg{10bp}}
+    \end{quote}
+    The two fields are separated by 1\,inch.
+\end{itemize}
+
+\paragraph*{Setting the vertical relationship between fields.} In a similar
+manner, the space between two fields on consecutive lines may be precisely
+controlled. Both \cs{volBdry} and \cs{vcgBdry} (line~\ding{185} in the
+display) start a new paragraph. The \cs{volBdry}\FmtMP{\cs{volBdry}
+described} command positions the two fields so that their borders exactly
+overlap (assuming the same border width), while the \cs{vcgBdry} command
+positions them so the borders are contiguous. The optional argument for
+\cs{vcgBdry[\ameta{length}]}\FmtMP{\cs{vcgBdry} described} allows for a
+separation of exactly \ameta{length}, assuming \cs{parskip} is 0\,pt.
+\begin{quote}\def\ci{red}\def\cii{blue}
+\settowidth\aebdimen{\footnotesize\ttfamily\ameta{field\SUB1}\cs{vcgBdry[6pt]}\ameta{field\SUB2}}\edef\widthi{\the\aebdimen}%
+\def\1{\makebox[0pt][l]{\footnotesize\hskip\widthi\quad\vrbnormal(overlay borders)}}%
+\def\2{\makebox[0pt][l]{\footnotesize\hskip\widthi\quad\vrbnormal(contiguous borders)}}%
+\def\3{\makebox[0pt][l]{\footnotesize\hskip\widthi\quad\vrbnormal(6pt separation)}}%
+\parbox{36pt}{\textField{txt7}{30bp}{10bp}\volBdry\textField{txt8}{30bp}{10bp}}\quad
+\1\footnotesize\ameta{field\SUB1}\textbf{\cs{volBdry}}\ameta{field\SUB2}\\[6pt]
+\parbox{36pt}{\textField[\BC{\ci}]{txt8}{30bp}{10bp}\vcgBdry
+\textField[\BC{\cii}]{txt9}{30bp}{10bp}}\quad
+\2\footnotesize\ameta{field\SUB1}\textbf{\cs{vcgBdry}}\ameta{field\SUB2}\\[6pt]
+\parbox{36pt}{\textField{txt10}{30bp}{10bp}\vcgBdry[6pt]
+\textField{txt11}{30bp}{10bp}}\quad
+\3\footnotesize\ameta{field\SUB1}\textbf{\cs{vcgBdry[6pt]}}\ameta{field\SUB2}
+\end{quote}
+If \cs{parskip} is not 0\,pt, use the star form,
+\cs{vcgBdry*[\ameta{length}]}\FmtMP{\cs{vcgBdry*} described}, on the last line of form fields; when the star
+argument is present, \cs{vcgBdry} performs the subtraction
+\texttt{\ameta{length}-\cs{parskip}}, in that way, there is exactly
+\ameta{length} of vertical space between the last form field and the next paragraph.
+
+%\begin{example}%\recordExample{eforms/positioning-fields.pdf}
+%The commands of this section are illustrated in the sample file associated with the
+%example.\noexskip\eqfititin{\exrtnlabelformat}
+%\end{example}
+
+\paragraph*{On the \cs{efKern} command.} The \cs{efKern}
+command listed in above display, line~\ding{186}, is a general command that
+can be used to induce driver-dependent spacing. It is designed to provide
+spacing between fields and gives finer control over the ``intelligent'' and
+automatic spacing provided by \cs{olBdry} and \cs{cgBdry}. When \emph{not
+compiled} with the \texttt{xetex} option, \cs{efKern} expands to
+\cs{kern\ameta{length\SUB1}}, and when \emph{compiled with} the
+\texttt{xetex} option, \cs{efKern} expands to \cs{kern\ameta{length\SUB2}}.
+
 \verygoodbreak
 
 
@@ -1245,7 +1392,7 @@ is a named color. \cs{defaultlinkcolor} has a definition of
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand{\defaultlinkcolor}{\@linkcolor}
 \end{Verbatim}
-\noindent where \cs{@linkcolor} is a command defined in
+where \cs{@linkcolor} is a command defined in
 \textsf{hyperref}, and is defined to be \texttt{red}. This can be
 redefined as desired.\footnote{The {\Web} package redefines
 \cs{@linkcolor} to be a flavor of green.}
@@ -1254,12 +1401,14 @@ The first link command is a general link for text, or any
 {\LaTeX} content. It is used, for example, by the \textsf{aeb\_mlink}
 package to create multiple-line links.
 
-\settowidth{\aebdimen}{\cs{setLinkText[\meta{options}]\darg{\meta{link\_text}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{setLinkText[\meta{options}]\darg{\meta{link\_text}}}}
+\bVerb\takeMeasure{\cs{setLinkText[\meta{options}]\darg{\meta{link\_text}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \setLink[!meta(options)]{!meta(link_text)}
 !grayV(\setLinkText[!meta(options)]{!meta(link_text)})
 \end{dCmd}
-\newtopic Both link commands are the same, the use of the second one, \cs{setLinkText} (grayed out), is
+\eVerb
+Both link commands are the same, the use of the second one, \cs{setLinkText} (grayed out), is
 discouraged in favor of the use of \cs{setLink}.
 
 \PD The command has two arguments, the first is optional. The first
@@ -1273,12 +1422,10 @@ anything that takes up space, such as a graphic or \cs{parbox}.
 
 \Example \setLink[\A{\JS{app.alert("AcroTeX rocks!")}}
     \linktxtcolor{blue}\Color{0 0 1}\W1\S{U}\H{P}]{Push me!}
-\begingroup\obeyspaces\settowidth{\aebdimen}{\ttfamily%
-    \string\linktxtcolor\darg{blue}\string\Color\darg{0 0 1}\string\W1\string\S\darg{U}\string\H\darg{P}]\darg{Push me!}%
-}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\def\rB{]}\takeMeasure{\quad\string\linktxtcolor\darg{blue}\string\Color\darg{0 0 1}\string\W1\string\S\darg{U}\string\H\darg{P}\rB\darg{Push me!}}%
+\begin{dCmd*}[commandchars={~@$}]{\bxSize}
 \setLink[\A{\JS{app.alert("AcroTeX rocks!")}}
-    \linktxtcolor{blue}\Color{0 0 1}\W1\S{U}\H{P}]{Push me!}
+~quad\linktxtcolor{blue}\Color{0 0 1}\W1\S{U}\H{P}]{Push me!}
 \end{dCmd*}
 \endgroup
 
@@ -1290,11 +1437,13 @@ rather comprehensive article \textit{Support for Links in AeB/eForms},
 \newtopic\indent The next link command is a convenience command to put the link content into a parbox,
 the parameters enable you to set the width, height and position of material in the box.
 
-\settowidth{\aebdimen}{\cs{setLinkBbox[\meta{options}]\darg{\meta{width}}\darg{\meta{height}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\cs{setLinkBbox[\meta{options}]\darg{\meta{width}}\darg{\meta{height}}}}
+\bVerb\takeMeasure{\cs{setLinkBbox[\meta{options}]\darg{\meta{width}}\darg{\meta{height}}}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \setLinkBbox[!meta(options)]{!meta(width)}{!meta(height)}
-    [!meta(position)]{!meta(link_content)}
+!quad[!meta(position)]{!meta(link_content)}
 \end{dCmd}
+\endgroup
 \PD The command has five arguments, the first is optional.
 \begin{aebDescript}
 \item [\meta{options}] are optional key-value pairs to change the appearance or action
@@ -1306,13 +1455,10 @@ the parameters enable you to set the width, height and position of material in t
 \end{aebDescript}
 
 \Example \setLinkBbox[\W{1}\Color{1 0 0}\A{\JS{app.alert("Thank you for using AcroTeX!")}}]{50bp}{30bp}[c]{\centering Press Me!}
-\begingroup\obeyspaces%
-\settowidth{\aebdimen}{\ttfamily%
-    \string\A\darg{\string\JS\darg{app.alert("Thank you for using AcroTeX!")}}%
-}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{\quad\string\A\darg{\string\JS\darg{app.alert("Thank you for using AcroTeX!")}}}%
+\begin{dCmd*}[commandchars={~@$}]{\bxSize}
 \setLinkBbox[\W{1}\Color{1 0 0}
-    \A{\JS{app.alert("Thank you for using AcroTeX!")}}
+~quad\A{\JS{app.alert("Thank you for using AcroTeX!")}}
 ]{50bp}{30bp}[c]{\centering Press Me!}
 \end{dCmd*}
 \endgroup
@@ -1795,7 +1941,7 @@ documentation in the \textsf{insdljs} package, which is distributed with
 the {\cAcroB}.
 
 \subsubsection{The Convenience Command
-    \texorpdfstring{\protect\cs{JS}}{\CMD{JS}}}\label{convienceJS}
+    \tops{\protect\cs{JS}}{\CMD{JS}}}\label{convienceJS}
 
 The syntax for writing JavaScript actions is
 \begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!~@]
@@ -1948,23 +2094,39 @@ is found on the {\AcroBlog} website.
 
 
 \subsection{Defining JavaScript Strings with
-    \texorpdfstring{\protect\cs{defineJSStr}}{\CMD{defineJSStr}}}
+    \tops{\protect\cs}{\CMD}{flJSStr} and \tops{\protect\cs}{\CMD}{dlJSStr}}
 
-The command \Com{defineJSStr} is used to define JavaScript strings, such as in dialog boxes.
-The syntax for this command is
-\settowidth{\aebdimen}{\cs{defineJSStr\darg{\cs{\anglemeta{CMD}}}\darg{\anglemeta{JS\_string}}}}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
-\defineJSStr{\!anglemeta(CMD)}{!anglemeta(JS_string)}
+The \pkg{insdljs} package defines \cs{flJSStr} and \cs{dlJSStr} to
+help create JavaScript strings that contain Latin~1 glyphs (or for the
+general purpose of defining JavaScript strings).
+\bVerb\takeMeasure{\string\flJSStr*[\ameta{options}]\darg{\cs{\ameta{cmd}}}\darg{\ameta{JS\_string}}}%
+\def\1{\rlap{\hskip\linewidth\sffamily(Field level)}}%
+\def\2{\rlap{\hskip\linewidth\sffamily(Document level)}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
+!1\flJSStr*[!ameta(options)]{\!ameta(cmd)}{!ameta(JS_string)}
+!2\dlJSStr*[!ameta(options)]{\!ameta(cmd)}{!ameta(JS_string)}
 \end{dCmd}
-\PD Where \cs{\anglemeta{CMD}} is a command to be defined by
-\cs{defineJSStr}, for example, \cs{myMessage}, and \anglemeta{JS\_string} is
-the JavaScript string to be defined as the expansion of the
-\cs{\anglemeta{CMD}}.
+\eVerb The previously documented \cs{defineJSStr} command is now an alias for
+\cs{flJSStr}. Each command defines a new command \cs{\ameta{cmd}} with body
+\meta{JS\_string}. The command \cs{flJSStr} is designed to define JavaScript
+strings that are passed through the optional argument of a form field or link
+annotation, whereas \cs{dlJSStr} is used for a Document JavaScript string,
+that is, one that is inserted into a \env{insDLJS} environment of the
+\pkg{insdljs} package. Document JavaScript is implemented differently
+depending on the driver used, as a result, \cs{dlJSStr} is more driver
+dependent than is \cs{flJSStr}.
 
-\CmdDescription \cs{defineJSStr} executes \verb!\xdef#1{"#2"}!, so
-the JavaScript is expanded at the time of definition. (Note the
-enclosing double quotes) Before the expansion occurs, however, there
-are a number of definitions that occur locally:
+\paragraph*{Options discussed.} When the optional star (\texttt{*}) is present, the
+\meta{JS\_string} argument is passed to \cs{pdfstringdef} before the
+definition of \cs{\ameta{cmd}}. The \meta{options} argument may consist of
+one or more of the keywords \texttt{quotes}, \texttt{noquotes},
+\texttt{parens}, \texttt{noparens}. By default, \ameta{JS\_String} is enclosed
+in double quotes, unless the option \opt{noquotes} is taken.
+The \texttt{parens} option causes \pkg{insdljs} to enclose \meta{JS\_string} in parentheses; while
+\texttt{noparens} specifies not to enclose the string in parentheses. The default is \opt{noparens}.
+
+\CmdDescription Prior to defining \cs{\ameta{cmd}}, there are a number of
+definitions that occur locally:
 \begin{itemize}
   \item \cs{uXXXX} is recognized as a unicode escape sequence. So, within the JavaScript string,
   unicode can be entered directly, for example, \cs{u00FC} is the u-umlaut.
@@ -1984,67 +2146,19 @@ are a number of definitions that occur locally:
   a literal double quote, use \verb!\\"! to get a literal double quote
   to appear in a JavaScript string. For example,
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\defineJSStr{\myMessage}
+\flJSStr{\myMessage}
     {My name is \\"Stan\\" and I'm \\"the man.\\"}
 \end{Verbatim}
 
   \item The command \cs{jslit} is recognized within the JavaScript string. Using \cs{jslit}
   (short for JavaScript literal), you can insert, for example, unbalanced braces:
 \begin{Verbatim}[xleftmargin=\amtIndent]
-\defineJSStr{\myMessage}
+\flJSStr{\myMessage}
     {You forgot the left brace \\"\jslit\{\\",
      please insert it.}
 \end{Verbatim}
 The definition of \cs{jslit} is \verb!\let\jslit\string!.
-
-
 \end{itemize}
-
-\newtopic The design decision to automatically insert the double
-quotes in the definition of the string has its faults. When you want
-to break the string to insert dynamic content, you must always be
-aware of the definition \verb!\xdef#1{"#2"}! contained with the
-definition of \cs{defineJSStr}. To illustrate, we return to an
-earlier example presented in \nameref{lengthyJS}, on
-page~\pageref*{lengthyJS}.
-
-We begin by defining some JavaScript strings. Note that in each of
-these two definitions, the leading and trailing double quote
-(\texttt{"}) is missing (these are the ones inserted automatically).
-The definitions look a bit strange because we break the string to
-insert dynamic content (\texttt{f.value}, \texttt{f.getItemAt(a,
-false)}, etc.), then continue on with the string from there.
-
-\begin{Verbatim}[xleftmargin=\amtIndent]
-\defineJSStr\myAlerti{You've typed in \\"" + f.value +"\\".}
-\defineJSStr\myAlertii{Selection: " + f.getItemAt(a, false)
-   + " (export value: " + f.getItemAt(a, true)+").}
-\end{Verbatim}
-
-\newtopic We use the \texttt{defineJS} environment, after setting the escape code to \texttt{@}. The \texttt{defineJS}
-is a fully verbatim environment, the escape character cannot be changed to \verb!\!, but it
-may be changed to another character, such as \texttt{@}.
-
-\begin{Verbatim}[xleftmargin=\amtIndent]
-\begin{defineJS}[\catcode`\@=0\relax]{\getComboJS}
-var f = this.getField("myCombo");
-var a = f.currentValueIndices;
-if ( a == -1 )
-    app.alert(@myAlerti);
-else
-    app.alert(@myAlertii);
-\end{defineJS}
-\end{Verbatim}
-
-\newtopic Then again, the use of \cs{defineJSStr} is not required, it is a convenience for creating
-JavaScript strings, especially ones with embedded Unicode. The previous example could have been
-done by defining \cs{myAlerti} and \cs{myAlertii} by
-\begin{Verbatim}[xleftmargin=\amtIndent]
-\newcommand\myAlerti{"You've typed in \\"" + f.value +"\\"."}
-\newcommand\myAlertii{"Selection: " + f.getItemAt(a, false)
-   + " (export value: " + f.getItemAt(a, true)+")."}
-\end{Verbatim}
-\noindent Note the \emph{presence} of the leading and trailing double quotes.
 
 \section{The \texttt{useui} option: A User-Friendly Interface}\label{useui}
 
@@ -2056,17 +2170,16 @@ uptxt={Push Me}}
 
 To use the ``user-friendly'' interface, the \texttt{useui} option must be taken. The key-value pairs
 described below are enclosed as the argument of the special \cs{ui} key.  For example,
-\bgroup\obeyspaces\ttfamily%
-\settowidth{\aebdimen}{    bordercolor=\darg{1 0 0},bgcolor=\darg{0 1 0},}%
-\begin{dCmd*}{\aebdimen+2\fboxsep+2\fboxrule}
+\bVerb\takeMeasure{{\quad}bordercolor=\darg{1 0 0},bgcolor=\darg{0 1 0},}%
+\begin{dCmd*}[commandchars={!@^}]{\bxSize}
 \pushButton[\ui{%
-    bordercolor={1 0 0},bgcolor={0 1 0},
-    textcolor={1 0 0},align={right},
-    uptxt={Push Me},
-    js={app.alert("AcroTeX rocks!")}
+@!quad^bordercolor={1 0 0},bgcolor={0 1 0},
+@!quad^textcolor={1 0 0},align={right},
+@!quad^uptxt={Push Me},
+@!quad^js={app.alert("AcroTeX rocks!")}
 }]{pb1}{}{11bp}
 \end{dCmd*}
-\egroup\newtopic You can develop your own set of appearances and use the \texttt{presets} key to conveniently set these.
+\endgroup\newtopic You can develop your own set of appearances and use the \texttt{presets} key to conveniently set these.
 For example,
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \def\myFavFive{%
@@ -2094,10 +2207,12 @@ displayed in the margin. Some of the user-friendly are a combination of
 We present these key-value pairs to model the user-interface of \app{Acrobat}.
 
 
-\settowidth{\aebdimen}{\ttfamily border=visible|invisible}
-\begin{dCmd}[commandchars=!()]{\aebdimen+2\fboxsep+2\fboxrule}
+%\settowidth{\aebdimen}{\ttfamily border=visible|invisible}
+\bVerb\takeMeasure{border=visible|invisible}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 border=visible|invisible
 \end{dCmd}
+\endgroup
 \CmdDescription Used with link annotations and determines whether the border
 surrounding the bounding box of the link is visible. In the case of a link,
 this is the Link Type: \textsf{Visible Rectangle} or \textsf{Invisible
@@ -2759,7 +2874,7 @@ The \cs{setTabOrder} command is available for users of pdftex and dvipdfm, as we
 \setTabOrderByNumber
 \end{dCmd}
 
-\subsection{Using \texorpdfstring{\protect\cs{setTabOrderByList}}{\CMD{setTabOrderByList}}}
+\subsection{Using \tops{\protect\cs{setTabOrderByList}}{\CMD{setTabOrderByList}}}
 
 We illustrate with a simple example, followed by a verbatim listing of the code, and a discussion
 afterward. We begin by placing two text fields in a row; normally,we would tab from the first one created
@@ -2824,7 +2939,7 @@ b\hspace{9.5pt}}}}}}\texttt{\href{\urlAcroTeXBlog/?p=320}{settaborder.pdf}} for 
 including tabbing using structure, has its source file attached to the PDF file.
 The file is posted one the \href{\urlAcroTeXBlog}{AeB Blog}.
 
-\subsection{Using \texorpdfstring{\protect\cs{setTabOrderByNumber}}{\CMD{setTabOrderByNumber}}}
+\subsection{Using \tops{\protect\cs{setTabOrderByNumber}}{\CMD{setTabOrderByNumber}}}
 
 An alternate method for setting tab order by structure is to directly enter the tab order into the
 optional argument of the field, link, or comment annotation.
@@ -2916,16 +3031,37 @@ embedding of the JavaScripts.
 
 \newtopic Other options are discussed in the following paragraphs.
 \begin{description}\def\NH{\hspace{-\labelsep}}
-\item\NH\texttt{nodljs} turns off the embedding of the document level
+\item\NH\opt{nodljs} turns off the embedding of the document level
     JavaScript. This might be useful, for creating a paper document that is
     not interactive. For a non-interactive paper document, no JS is needed.
 
-\item\NH\texttt{execJS} is a very useful option/feature if you know  how to use
+\item\NH\opt{execJS} is a very useful option/feature if you know  how to use
     it.  Any JavaScript that is written in an \env{execJS} environment is
     executed once when the document is first opened in \app{Acrobat}, then
     discarded. AeB uses this for post-distillation document processing. The
     default is that the JavaScript in an \texttt{execJS} environment is not
     executed; using this option turns on this feature.
+
+\item\NH\opt{usealtadobe} imports alternate naming for most of Adobe's
+    built in functions. All of Adobe built in functions begin with `AF',
+    when this option is taken, the same functions are defined, but prefixed
+    with `EF'. For example, \texttt{AFNumber\_Keystroke()} has an alias of
+    \texttt{EFNumber\_Keystroke()}, when the \opt{usealtadobe} option is
+    specified.
+
+    \textbf{Developer's Note.} Use this option when developing new code
+    that use the Adobe built-in functions. For developers that have
+    \app{Acrobat}, it is useful to specify this option and to refer to the
+    built-in function using the special syntax,
+    \[\cs{dl@EForAF4\ameta{no-AF-function-name}}\]
+    For example, \cs{dl@EForAF4Number\_Keystroke(0,0,0,0,"",true)} expands to
+    \[\texttt{EFNumber\_Keystroke(0,0,0,0,"",true)}\] if \opt{usealtadobe} is taken,
+    and \[\texttt{AFNumber\_Keystroke(0,0,0,0,"",true)}\] otherwise.
+
+\item\NH\opt{debug} causes the document JavaScript created by the
+    {\AcroTeX} Bundle to generate more debugging messages to the JavaScript
+    console.
+
 \end{description}
 
 \section{The \texttt{insDLJS} and \texttt{insDLJS*} Environments}
@@ -3463,7 +3599,7 @@ Use \env{defineJS*} in the body of the document; the command argument \cs{\ameta
 used and redefined in a later \env{defineJS*} environment.
 The \env{@defineJS} environment is for package authors.
 
-\paragraph*{The \texorpdfstring{{\protect\env{defineJS}}}{defineJS}-type environments with arguments.}\label{para:defineJSwArgs}
+\paragraph*{The \tops{{\protect\env{defineJS}}}{defineJS}-type environments with arguments.}\label{para:defineJSwArgs}
 %\index{defineJS with arguments@\env{defineJS} with arguments}
 The \env{defineJS}-type environments do not have parameters/arguments as
 normal environments (or commands) do. To enable the ability to  modify the

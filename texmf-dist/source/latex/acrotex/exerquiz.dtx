@@ -22,7 +22,7 @@
 %<randomize>\ProvidesFile{aebrandom.def}
 %<sumrytbls>\ProvidesFile{aebsumrytbls.def}
 %<template>\ProvidesFile{template.def}
-%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/05/10 v8.7.7 %
+%<package|driver|aebjs|eqexam|randomize|sumrytbls|template> [2021/05/15 v8.8 %
 %<package> Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 %<driver> Exerquiz documentation driver file (dps)]
 %<aebjs> Exerquiz document level JavaScript (dps)]
@@ -74,6 +74,7 @@
   \let\env\texttt\let\pkg\textsf
   \let\app\textsf
   \let\tops\texorpdfstring
+  \let\key\texttt
   \GetFileInfo{exerquiz.sty}
   \title{Exerquiz: Exercises and Quizzes for \LaTeX/PDF}
   \author{D. P. Story\\
@@ -277,7 +278,7 @@
 \DeclareOption{nodljs}{\PassOptionsToPackage{nodljs}{insdljs}%
   \AtEndOfPackage{\let\importdljs\eq@YES}}
 %    \end{macrocode}
-%    \leavevmode\IndexOpt{execAfter}^^A
+%    \leavevmode\IndexOpt{execJS}^^A
 % Execute any JS defined within the \env{execJS} environment. Works only for
 % authors using Acrobat 5.0 or Acrobat Approval.
 %    \begin{macrocode}
@@ -3945,6 +3946,96 @@
 %
 %    \section{The \texttt{shortquiz} and \texttt{shortquiz*} Environments}
 %
+%     \subsection{Preliminaries}
+%     Beginning with 2021/05/15 v8.7, we introduce several changes that affect
+%     both \env{shortquiz} and \env{quiz} environments. These definitions are
+%     placed here.
+%     \changes{v8.7}{2021/05/15}{Enhanced control over placement of \string\cs{eq@answersEndHook}}
+%
+%     These definitions support the added control over the \ameta{content} placed by the
+%     command \cs{answersEndHook\darg{\ameta{content}}}. The \ameta{content} argument is
+%     usally a combination of \cs{sqTallyBox} and \cs{sqSolnBtn} commands, but can be anything.
+%
+%     Another aspect of the change is the \cs{setAnsEnvLinewidth}. Through this command, the
+%     value of \cs{linewidth} can be changed within the \env{answers} and \env{manswers} environmnts.
+%    \begin{macro}{\setAnsEnvLinewidth}\hskip-\marginparsep\,\texttt{\darg{\ameta{length}}} Sets the
+%    \cs{linewidth} of the \env{answers} and \env{manswers} for both the \env{list} and \env{tabular} modes.
+%    It it not shown here, but within each of these envioronments, before the change is made
+%    the ``natural'' \cs{linewidth} is saved as \DescribeMacro\natlinewidth\cs{natlinewidth},
+%    this value is available only locally, within the environments.
+%
+%    All changes corresponding to enhanced control over placement of \ameta{content} are marked in the source
+%    by \texttt{dps21-5-15}, \texttt{dps21-5-16}, and \texttt{dps21-5-17}.
+%    \begin{macrocode}
+\def\setAnsEnvLinewidth#1{\def\@nsLineWidth{#1}} % dps21-5-17
+\let\@nsLineWidth\@empty % dps21-5-17
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\answersEndHook}\hskip-\marginparsep\,\texttt{\darg{\ameta{content}}}
+%    Internally, defines the text macro \cs{eq@answersEndHook} to expand to \ameta{content}.
+%    The command also defines text macro \cs{insertAnsEndHookHere} to expand to \ameta{content}.
+%    \cs{eq@answsersEndHook} is used when placing \ameta{content} in the default location;
+%    while \cs{insertAnsEndHookHere} is used to place \ameta{content} at the location specified
+%    by the value of the \texttt{insertAt} key of the \cs{bChoices} command.
+%    \begin{macrocode}
+\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
+  \ifx\eq@answersEndHook\@empty\else
+    \def\insertAnsEndHookHere{#1}%
+  \fi
+} % dps21-5-15
+\let\eq@answersEndHook\@empty
+\let\insertAnsEndHookHere\@empty % dps21-5-15
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+%    \end{macrocode}
+%    At the end of each of the targeted envionments, we insert \ameta{content},
+%    provided a value for \texttt{insertAt} has not been specified; otherwise, we
+%    do nothing as \ameta{content} has been inserted according to the value
+%    of \texttt{insertAt}.
+%    \begin{macrocode}
+\def\@insertAndHookAtEndEnv{% dps21-5-16
+  \ifx\insertAnsHookAt\@empty
+      \eq@answersEndHook
+  \else % dps21-5-16
+    \ifnum\insertAnsHookAt>\aeb@RowCnt
+      \eq@answersEndHook
+      \PackageWarning{exerquiz}{insertAt=\insertAnsHookAt:
+      The value (\insertAnsHookAt) of insertAt is greater\MessageBreak
+      than the number of rows (\aeb@RowCnt).
+      Using the default\MessageBreak
+      positioning instead}
+    \else
+%    \end{macrocode}
+%    Reset the value of \cs{insertAnsHookAt} to its default value. The document
+%    author must specify \texttt{insertAt} for each \cs{eChoices} where a nondefault
+%    placement is wanted.
+%    \begin{macrocode}
+      \global\let\insertAnsHookAt\@empty
+    \fi
+  \fi
+}
+%    \end{macrocode}
+%    \cs{@insertAnsHookAt} is inserted at the end of \cs{Ans}/\cs{eAns} pair;
+%    the \ameta{content} is placed just after the text of this item.
+%    \begin{macrocode}
+\def\@insertAnsHookAt{% dps21-5-16
+  \let\eqe@next\relax
+  \ifx\insertAnsHookAt\@empty\else
+    \ifnum\insertAnsHookAt=\aeb@RowCnt
+      \def\eqe@next{\insertAnsEndHookHere}\fi
+  \fi\eqe@next
+}
+%    \end{macrocode}
+%    Repetitive code to increment the \cs{aeb@RowCnt} macro.
+%    \begin{macrocode}
+\def\@incRowCnt{{\@tempcnta\aeb@RowCnt\advance\@tempcnta\@ne
+  \xdef\aeb@RowCnt{\the\@tempcnta}}% dps21-5-16
+}
+%    \end{macrocode}
+%
+%     \subsection{The \texttt{shortquiz} environment}
+%
 % This \texttt{shortquiz} environment sets up multiple choice
 % questions, with immediate feedback whether the user clicked on the
 % right or wrong answer.  Solutions to the \texttt{shortquiz} may,
@@ -5921,6 +6012,13 @@ if (isEndQuizPushed("@eqBaseName")){
     \let\endanswers\endanswers@sq@list\else
     \let\endmanswers\endanswers@sq@list\fi
   \list{\strut\@Ans}{%
+%    \end{macrocode}
+% Save the natural width of the line, then readjust the
+% width if \cs{@nsLineWidth} is not empty.
+%    \begin{macrocode}
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
     \if\sqstar*\relax
       \settowidth{\labelwidth}{\eq@lw@f}\else
       \settowidth{\labelwidth}{\eq@lw@l}\fi
@@ -5959,14 +6057,14 @@ if (isEndQuizPushed("@eqBaseName")){
 % another for \texttt{exerquiz}.
 % to the following.
 %    \begin{macrocode}
-% Begin joint package and eqexam
+% End joint package and eqexam
 %</package|eqexam>
 %<package>    \setlength{\labelsep}{0pt}%
 %<eqexam>     \setlength{\labelsep}{0pt}%
 %<*package|eqexam>
     \def\Ans{\Ans@list}%
   }% list
-}{\eq@answersEndHook\endlist\setcounter{quizno}{0}}
+}{\@insertAndHookAtEndEnv\endlist\setcounter{quizno}{0}} % dps21-5-16
 %    \end{macrocode}
 % Answers environment for a tabular environment. This command picks
 % up the arguments of \cs{Ans}, then passes on the \cs{@Ans}
@@ -6010,13 +6108,19 @@ if (isEndQuizPushed("@eqBaseName")){
 % In the next line, we adjust \cs{linewidth}, \cs{eqemargin} is \texttt{0pt}
 % in \textsf{exerquiz} and nonzero otherwise.
 %    \begin{macrocode}
-%    \setlength{\linewidth}{\linewidth-\eqemargin}%
-    \eq@tmpdima=\linewidth
+%    \end{macrocode}
+% Save the natural width of the line, then readjust the
+% width if \cs{@nsLineWidth} is not empty.
+%    \begin{macrocode}
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
+    \eq@tmpdima\linewidth
     \@tempcnta#1\relax
 % n-1
-    \advance\@tempcnta-1\relax
+    \advance\@tempcnta\m@ne\relax
 % 2(n-1)
-    \multiply\@tempcnta by2
+    \multiply\@tempcnta\tw@
     \@tempdima\sq@tabsep\relax
 % 2*(n-1)*\eq@partstabcolsep
     \multiply\@tempdima\@tempcnta
@@ -6059,23 +6163,25 @@ if (isEndQuizPushed("@eqBaseName")){
 %    Close off \texttt{tabular} environment, and re-initialize the
 %    \texttt{quizno} counter. Added \cs{answersEndHook}.
 %    \begin{macrocode}
-\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
-  \ifx\eq@answersEndHook\@empty\else
-    \def\insertEndHookHere{#1}\fi}
-\let\eq@answersEndHook\@empty
 \def\endanswers@sq{\endtabular\setcounter{quizno}{0}%
-    \eq@answersEndHook\reset@doendpe{\the\everypar}%
-    \ifinner\else%\par
-        \removelastskip
-%        \removelastparskip
-        \vspace{\aboveanswersSkip}\@endpetrue\fi
+  \@insertAndHookAtEndEnv % dps21-5-16
+  \global\let\@nsLineWidth\@empty % dps21-5-17
+  \reset@doendpe{\the\everypar}%
+  \ifinner\else%\par
+    \removelastskip
+%   \removelastparskip
+    \vspace{\aboveanswersSkip}\@endpetrue
+  \fi
 }
 \def\endmanswers@sq{\endtabular\setcounter{quizno}{0}%
-    \eq@answersEndHook\reset@doendpe{\the\everypar}%
-    \ifinner\else%\par
-        \removelastskip
-%        \removelastparskip
-        \vspace{\aboveanswersSkip}\@endpetrue\fi
+  \@insertAndHookAtEndEnv % dps21-5-16
+  \global\let\@nsLineWidth\@empty % dps21-5-17
+  \reset@doendpe{\the\everypar}%
+  \ifinner\else%\par
+    \removelastskip
+%   \removelastparskip
+    \vspace{\aboveanswersSkip}\@endpetrue
+  \fi
 }
 \def\popiiictm{\special{CTM: pop pop pop}}
 %</package|eqexam>
@@ -6206,7 +6312,7 @@ false*fi;
 var f=this.getField("corr.*oField.*thequestionno");
 if (f==null) {
   if ((qzSolnDest!="") && !solnAfter) %
-  jmpToNamedDest("*oField","*@qzsolndest",%
+jmpToNamedDest("*oField","*@qzsolndest",%
   *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
   *ifx*eqAddAAMouseUpMC*empty*else
   *eqAddAAMouseUpMC*fi
@@ -6221,7 +6327,7 @@ if (f==null) {
 OnBlurRespBox(false,"*oField");
 *fi%
 var qzSolnDest="*@qzsolndest";
-if( qzSolnDest!="") updateTally("*oField.*thequestionno");%
+updateTally("*oField.*thequestionno");%
 *ifx*eqAddAAMouseUpMC*empty*else
 *eqAddAAMouseUpMC*fi
 \end{defineJS}
@@ -6561,6 +6667,13 @@ updateTally("*oField.*thequestionno");*fi%
     \let\endanswers\endanswers@q@list\else
     \let\endmanswers\endanswers@q@list\fi
   \list{\strut\@Ans}{%
+%    \end{macrocode}
+% Save the natural width of the line, then readjust the
+% width if \cs{@nsLineWidth} is not empty.
+%    \begin{macrocode}
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
     \if\qstar*\relax
       \if\aeb@FLOverride\eq@l
       \settowidth{\labelwidth}{\eq@lw@l}\else
@@ -6577,7 +6690,9 @@ updateTally("*oField.*thequestionno");*fi%
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }%
-}{\eq@answersEndHook\endlist\setcounter{quizno}{0}%
+}{\endlist\setcounter{quizno}{0}%
+  \@insertAndHookAtEndEnv % dps21-5-17
+  \global\let\@nsLineWidth\@empty % dps21-5-17
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
 %    \end{macrocode}
@@ -6603,7 +6718,14 @@ updateTally("*oField.*thequestionno");*fi%
 \def\qzTabPos#1{\def\qz@TabPos{[#1]}}\qzTabPos{}
 \def\answers@q@tabular#1{%
   \ifinner\else\par\removelastparskip\vspace{\aboveanswersSkip}\fi
-  \eq@tmpdima=\linewidth
+%    \end{macrocode}
+% Save the natural width of the line, then readjust the
+% width if \cs{@nsLineWidth} is not empty.
+%    \begin{macrocode}
+  \edef\natlinewidth{\the\linewidth}% dps21-5-17
+  \ifx\@nsLineWidth\@empty\else % dps21-5-17
+    \setlength{\linewidth}{\@nsLineWidth}\fi
+  \eq@tmpdima\linewidth
   \@tempcnta#1\relax
 % n-1
   \advance\@tempcnta\m@ne
@@ -6630,7 +6752,8 @@ updateTally("*oField.*thequestionno");*fi%
 %    \begin{macrocode}
 \def\endanswers@q@tabular{%
   \endtabular\setcounter{quizno}{0}%
-  \eq@answersEndHook
+  \@insertAndHookAtEndEnv % dps21-5-17
+  \global\let\@nsLineWidth\@empty % dps21-5-17
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
 %    \end{macrocode}
@@ -7100,12 +7223,39 @@ updateTally("*oField.*thequestionno");*fi%
 }
 %    \end{macrocode}
 % \changes{v6.3x}{2011/04/05}{%
-% Added \string\texttt{label} parameter to \string\cs{bChoices}.
+%   Added \string\texttt{label} parameter to \string\cs{bChoices}.
 %}
-% A new key, \IndexKey{label}\texttt{label}, if this label is specified, then we keep track of all the
+% A new key, \IndexKey{label}\texttt{label=\ameta{name}}, if this label is specified, then we keep track of all the
 % correct alternatives, put them into a commands to make them accessible by the user.
 %    \begin{macrocode}
 \define@key{bchoice}{label}[]{\xdef\bChoiceLabel{#1}}
+%    \end{macrocode}
+% New key, \IndexKey{insertAt}\texttt{insertAt=\ameta{n}} inserts the content of
+% the \cs{answersEndHook\darg{\ameta{content}}} at line \ameta{n}.
+%    \begin{macrocode}
+\def\rmFracPrt#1.#2\@nil{\gdef\intPrt{#1}}
+\define@key{bchoice}{insertAt}[]{%
+  \let\insertAtMsg\relax
+  \def\rmFr@cPrt##1.##2\@nil{\def\intP@rt{##1}}
+  \def\@rgi{#1}\ifx\@rgi\@empty
+    \def\insertAtMsg{\PackageWarning{exerquiz}
+      {An empty value for insertAt, will use\MessageBreak
+       the default positioning}}%
+  \else
+    \rmFr@cPrt#1.\@nil
+    \expandafter\@tempcnta\intP@rt\relax
+    \ifnum\@tempcnta<\@ne
+      \def\insertAtMsg{\PackageWarning{exerquiz}
+        {insertAt=#1: The value (#1) of insertAt must be\MessageBreak
+        greater than zero. Using the default\MessageBreak
+        positioning instead}}
+    \else
+      \xdef\insertAnsHookAt{\the\@tempcnta}
+    \fi
+  \fi
+  \insertAtMsg
+} % dps21-5-15
+\let\insertAnsHookAt\@empty
 %    \end{macrocode}
 % The \cs{bChoices} command is now processed by the \texttt{keyval} package. There
 % are two keys: \texttt{nCols} and \texttt{random}. The first key
@@ -7121,11 +7271,11 @@ updateTally("*oField.*thequestionno");*fi%
 %    \end{macrocode}
 % We initialize some variables that the new label option uses.
 %    \begin{macrocode}
-  \global\let\@tempholdSaveAns\@empty %4/5
-  \global\let\@tempholdSaveChoice\@empty %4/5
-  \global\let\bChoiceLabel\@empty %4/5
-  \setkeys{bchoice}{#1}%
-  \global\eq@tabColCnt=\z@
+  \global\let\@tempholdSaveAns\@empty
+  \global\let\@tempholdSaveChoice\@empty
+  \global\let\bChoiceLabel\@empty
+  \setkeys{bchoice}{#1}% dps21-5-15
+  \def\aeb@RowCnt{0}\global\eq@tabColCnt\z@
   \ifnum\aeb@numCols=\@ne % list mode
     \def\eq@next{\@layoutListAns}\else % tabular mode
     \def\eq@next{\@layoutTabularAns{\bChoiceNumCols}}\fi
@@ -7284,12 +7434,14 @@ updateTally("*oField.*thequestionno");*fi%
 % This command gets, and sets the list of alternatives
 %    \begin{macrocode}
 \long\def\@getListAns\Ans#1\eAns{%\@@par
+  \@incRowCnt  % dps21-5-16
 %    \end{macrocode}
 % We record the list as we process each item.
 %    \begin{macrocode}
   \eq@saveAns#1\eAns
-  \Ans#1\vspace{\@rowskip}%
-  \@layoutListAns
+  \Ans#1% dps21-5-15
+  \@insertAnsHookAt % dps21-5-16
+  \vspace{\@rowskip}\@layoutListAns
 }
 \long\def\@lookforendansChoices#1{%
   \@ifnextchar\eChoices{\rowsep{\rowsep@default}%
@@ -7301,8 +7453,17 @@ updateTally("*oField.*thequestionno");*fi%
 % environment.
 %    \begin{macrocode}
 \def\@layoutTabularAns#1{%
+  \@incRowCnt % dps21-5-16
   \let\eq@tabSep\@empty
   \xdef\numShortCols{#1}%
+%\typeout{!! compare #1 with \aeb@numCols}%
+  \@tempcnta\aeb@numCols % dps21-5-16
+  \advance\@tempcnta-#1
+%\typeout{!! need \the\@tempcnta\space more tabs}%
+  \global\let\nAddT@bs\@empty
+  \@whilenum\@tempcnta>\z@\do
+  {\g@addto@macro\nAddT@bs{&}\advance\@tempcnta\m@ne}%
+%\toks@=\expandafter{\nAddT@bs}\typeout{!! \the\toks@}%
   \ifnum#1>\aeb@numCols \xdef\numShortCols{\aeb@numCols}\fi
   \@@layoutTabularAns
 }
@@ -7323,16 +7484,21 @@ updateTally("*oField.*thequestionno");*fi%
 \def\rowsep@default{0pt}
 \long\def\@getTabAns\Ans#1\eAns{%
   \eq@saveAns#1\eAns
-  \global\advance\eq@tabColCnt1
-  \let\@save@tabSep=\eq@tabSep
+  \global\advance\eq@tabColCnt\@ne % dps21-5-16
+  \let\@save@tabSep\eq@tabSep % dps21-5-16
   \ifnum\eq@tabColCnt=\numShortCols
-    \global\eq@tabColCnt=0
-      \xdef\eq@tabSep{\noexpand\\\noalign{\kern\@rowskip\relax}}%
+    \global\eq@tabColCnt\z@ % dps21-5-16
+    \xdef\eq@tabSep{%
+      \noexpand\nAddT@bs
+      \noexpand\@insertAnsHookAt
+      \noexpand\\
+      \noalign{\kern\@rowskip\relax}\noexpand\@incRowCnt
+    }%
   \else
-      \gdef\eq@tabSep{&}%
+    \gdef\eq@tabSep{&}%
   \fi
-  \@ifnextchar\eChoices{\@save@tabSep\Ans#1\rowsep{\rowsep@default}
-    \expandafter\@findendans\@gobble}%
+  \@ifnextchar\eChoices{\@save@tabSep\Ans#1\rowsep{\rowsep@default}%
+    \nAddT@bs\@insertAnsHookAt\expandafter\@findendans\@gobble}%
     {\@save@tabSep\Ans#1\@@layoutTabularAns}%
 }
 %    \end{macrocode}
@@ -7472,7 +7638,7 @@ updateTally("*oField.*thequestionno");*fi%
 % that this list of choices should be randomized, a boolean.
 %
 % We redefine \cs{@ansChoices} above to take key-value optional arguments.
-% We allow for a global override of the random key. If random is true, we
+% We allow for a global override of the \key{random} key. If \key{random} is true, we
 % call \cs{@@bChoices}, which begins the process of randomization; otherwise
 % we call \cs{@@ansChoices} which is roughly equal to the earlier
 % \cs{@ansChoices}.
@@ -7483,6 +7649,8 @@ updateTally("*oField.*thequestionno");*fi%
 % }
 % \changes{v8.6.2}{2021/01/20}{Incorporated \string\cs{if@DoNotRandomize}
 % into the \string\cs{@ansChoices} macro for MC and MS questions}
+% \changes{v8.7}{2021/05/15}{Support for the \texttt{insertAt} key
+% of \cs{bChoices}; initialize macro \string\cs{aeb@numRows}}
 %    \begin{macrocode}
 \def\@ansChoices[#1]{%
   \global\let\@tempholdSaveAns\@empty
@@ -7491,7 +7659,8 @@ updateTally("*oField.*thequestionno");*fi%
   \ifeq@randomizeallChoices
     \setkeys{bchoice}{#1,random=true}\else
     \setkeys{bchoice}{#1}\fi
-  \global\eq@tabColCnt=\z@
+  \global\eq@tabColCnt\z@
+  \def\aeb@RowCnt{0}% dps21-5-15
   \if@DoNotRandomize\eq@randomizeChoicesfalse\fi
   \ifeq@randomizeChoices\expandafter\@@bChoices
   \else\expandafter\@@ansChoices\fi
@@ -9028,7 +9197,7 @@ if(event.willCommit) {
 %    \begin{macro}{\RespBoxEssay}
 % Here is a simple text field with a multi-line attribute for entering
 % essay-type questions. This question will not be graded by JavaScript,
-% of course; ideally, the response will be submitted to a CGI for storage
+% of course; ideally, the response will be submitted to a server-side script for storage
 % in a database. The instructor can later bring up the student's response
 % and assign a grade. Syntax:
 %\begin{quote}\ttfamily
@@ -9036,15 +9205,15 @@ if(event.willCommit) {
 %   \string\RespBoxEssay[\ameta{opts}]*\darg{\ameta{wd}}\darg{\ameta{ht}}
 % \end{quote}
 % The second argument declares the problem has a \env{solution} file; we define the target
-% of the solution twh ways: an explicit \ameta{dest} string, or an star (\texttt*), where
+% of the solution two ways: an explicit \ameta{dest} string or a star (\texttt*), where
 % the destination is automatically named. If you use \ameta{dest}, you must have
-% a frist optional, even if its only \texttt{[]}, to correctly parse this construction.
+% a first optional argument \ameta{opts}, even if its only empty (\texttt{[]}), to correctly
+% parse this construction.
 % \changes{v8.3}{2019/08/13}{\string\env{solution} environment now defined for
 % \string\cs{RespBoxEssay}}
 %    \begin{macrocode}
-\def\RespBoxEssayDefaults
-{%
-    \BC{0 0 0}\W{1}\S{S}\Ff{\FfMultiline}\rawPDF{}%
+\def\RespBoxEssayDefaults{%
+  \BC{0 0 0}\W{1}\S{S}\Ff{\FfMultiline}\rawPDF{}%
 }
 \def\@@RespBoxEssayActions{\AA{%
   \if\eqQuizType\isQZ
@@ -9061,7 +9230,9 @@ if(event.willCommit) {
     }%
   \fi}%
 }
-% \RespBoxEssay[opt][dest]|*{wd}{ht}
+%    \end{macrocode}
+%    Begin the \cs{RespBoxEassay} command.
+%    \begin{macrocode}
 \def\annot@subtype@rbe{rbe}
 \newcommand\RespBoxEssay[1][]{\edef\annot@subtype{\annot@subtype@rbe}%
   \def\rbe@rgi{#1}\RespBoxEssay@i}
@@ -9070,12 +9241,12 @@ if(event.willCommit) {
   {\@ifstar{\RespBoxEssay@ii[\curr@quiz.\thequestionno]}}%
   {\RespBoxEssay@ii[]}%
 }
-% \RespBoxEssay#1[dest]{wd}{ht}
 \newcommand\RespBoxEssay@ii[3][]{%
   \smallskip\addtocounter{eqpointvalue}{\eqPTs}%
 %    \end{macrocode}
 %    (2019/06/26) Added \cs{eq@AddProbToQzQuesList} for \cs{RespBoxEssay}
-%   \changes{v8.2.13}{2019/06/26}{Added \string\cs{eq@AddProbToQzQuesList} for \string\cs{RespBoxEssay}}
+%   \changes{v8.2.13}{2019/06/26}{Added \string\cs{eq@AddProbToQzQuesList}
+%   for \string\cs{RespBoxEssay}}
 %    \begin{macrocode}
   \eq@AddProbToQzQuesList
   \stepcounter{questionno}%
@@ -9100,14 +9271,8 @@ if(event.willCommit) {
 % question. This box is not required to appear.
 %    \begin{macrocode}
 \let\@@sqTallyBoxActions\@empty
-%\@ifundefined{calcOrder}{%
-%\ifpdf\def\@@sqTallyBoxActions{%
-%    \AA{\AAValidate{getTotalTally("\oField");}}}\fi}{}
-%\ifpdf\def\@@sqTallyBoxActions{%
-%  \AA{\AAValidate{getTotalTally("\oField");}}}\else
-%  \let\@@sqTallyBoxActions\@empty\fi
 \def\sqTallyBoxDefaults{%
-    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
+  \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
 \newcommand\sqTallyBox[1][]{%
   \mbox{\text@@Field{#1}{tally.\oField.\thequestionno}%
     {\TBW}{\DefaultHeightOfWidget}%
@@ -9119,7 +9284,7 @@ if(event.willCommit) {
 %    \subsubsection{The \tops{\protect\cs}{\textbackslash}{sqTallyTotal} command}
 %    \begin{macro}{\sqTallyTotal}\hskip-\marginparsep\texttt{[\ameta{options}]}
 % This text field stores the tally total. Only used within the
-% \texttt{shortquiz} environment. Takes on optional parameter; this
+% \env{shortquiz} environment. Takes on optional parameter; this
 % parameter can be used to modify the appearance of the fields. Two special
 % key-values are also recognized: \cs{weakpass\darg{\ameta{n}}} and \cs{strongpass\darg{\ameta{n}}}
 %    \begin{macrocode}
@@ -9144,10 +9309,11 @@ fewer errors and greater understanding.}
 %    \end{macrocode}
 %    The code that formats the field and if needed, responds to the weak-pass
 %    or strong-pass parameter.
+%    \changes{v8.7.8}{2021/05/13}{Use try/catch (\string\cs{dlTC}) in number format.}
 %    \begin{macrocode}
 \def\@@sqTallyTotalActions{\AA{%
   \AAKeystroke{\dl@EForAF4Number_Keystroke(0,0,0,0,"",true);}
-  \AAFormat{\dl@EForAF4Number_Format(0,0,0,0,"",true);}
+  \AAFormat{\dlTC{\dl@EForAF4Number_Format(0,0,0,0,"",true);}}
   \AACalculate{%
     \dl@EForAF4Simple_Calculate("SUM",new Array("tally.\oField"));\r
     var sqTlyTotl=event.value;
@@ -9216,10 +9382,9 @@ fewer errors and greater understanding.}
 % now, we say \string\texttt{this.getField("obj.\string\cs{oField}")}.
 %}
 %    \begin{macrocode}
-\def\sqClearButtonDefaults
-{%
-    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
-    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
+\def\sqClearButtonDefaults{%
+  \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
+  \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
 }
 %    \end{macrocode}
 % In an attempt to supply some custom colors for the shortquiz, we

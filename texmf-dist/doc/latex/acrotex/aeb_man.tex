@@ -17,7 +17,7 @@
 %%\usepackage{times}
 %\usepackage{timesNRMT}
 
-%\previewOn\pmpvOn
+% \previewOn\pmpvOn
 
 \usepackage{aeb_mlink}
 \usepackage{longtable,colortbl}
@@ -243,10 +243,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2021/05/10}
+\version{2021/05/15}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2021/05/10}
+\prepared{2021/05/15}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -4033,8 +4033,7 @@ this option.
 \subsection{Options passed through to the \tops{\protect\pkg}{}{insdljs} package}
 
 The following options are passed through to \pkg{insdljs}: \opt{nodljs},
-\opt{exercisesonly} (same as \opt{nodljs}), \opt{execAfter} (passes the
-option \opt{execJS}), and \opt{usealtadobe}.
+\opt{exercisesonly} (same as \opt{nodljs}), \opt{execJS}, and \opt{usealtadobe}.
 
 \begin{comment}
 If you are creating a document that is meant to be printed or your
@@ -5505,14 +5504,25 @@ command.
 
 The commands \cs{bChoices} and \cs{eChoices} can be used within the
 \env{answers} or \env{manswers} environment as part of a \texttt{shortquiz}
-or a \texttt{\hyperref[ss:GradedQuizzes]{quiz}} environment.
+or a \texttt{\hyperref[ss:GradedQuizzes]{quiz}} environment. The full syntax of \cs{bChoices}
+is as follows:
+\begin{Verbatim}[commandchars=!(),xleftmargin=\amtIndent]
+\bChoices[!ameta(n(!upshape|nCols=)n),random=!ameta(!upshape(true|false)),
+  insertAt=!ameta(n),label=!ameta(name)]
+\end{Verbatim}
+The \texttt{nCols} and \texttt{random} keys are discussed in
+Section~\ref{s:random}. Read about the key \texttt{insertAt} on the
+{\AcroTeX} Blog
+\href{http://www.acrotex.net/blog/?tag=enhanced-quizzes}{here}. The
+\texttt{label} key is used for cross referencing purposes and is not
+currently documented.
 
+\newtopic\indent
 Concerning the example above, the argument of the \texttt{answers}
-environment is 4 which means we are going to use the tabular
-environment with 4 columns. Now within those 4 columns we are
-going to only use the first 2 columns (this is the optional
-argument of \cs{bChoices}). If the optional argument is removed
-from \cs{bChoices}, the choices are typeset in the with 4
+environment is 4 which means we are going to use the tabular environment with
+4 columns. Now within those 4 columns we are going to only use the first 2
+columns (this is the optional argument of \cs{bChoices}). If the optional
+argument is removed from \cs{bChoices}, the choices are typeset in the with 4
 columns.
 
 If the argument of \texttt{answers} or \texttt{manswers} is changed to 1, the
@@ -5876,11 +5886,12 @@ In this section, several commands are discussed that enhance the user experience
 
 One way of making the short-quiz more interesting to the respondent is through
 the tally box.
-\bVerb\takeMeasure{\string\answersEndHook\darg{\ameta{content}}}%
+\bVerb\takeMeasure{\string\setAnsEnvLinewidth\darg{\ameta{length}}}%
 \begin{dCmd}[commandchars=!()]{\bxSize}
 \sqTallyBox[!ameta(options)]
 \sqTallyTotal[!ameta(options)]
 \answersEndHook{!ameta(content)}
+\setAnsEnvLinewidth{!ameta(length)}
 \sqClearButton[!ameta(options)]
 \end{dCmd}
 \eVerb The first (\cs{sqTallyBox}) tracks the number of times the respondent has
@@ -5896,7 +5907,7 @@ The example below illustrates all four of the commands. Within the
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
 \end{Verbatim}
-which means \cs{sqTallyBox} is insert to the right of the choice field, push
+which means \cs{sqTallyBox} is insert to the right of the choice field, pushed
 to the right margin, then moved to the left using the 0pt width \cs{makebox}.
 \begin{shortquiz*}
 Correctly respond to each, passing is not making a single incorrect choice.
@@ -5958,13 +5969,14 @@ in a \env{shortquiz} environment.
 \begin{aebQuote}
 \begin{enumerate}
 \item[MC] Nothing happens after the respondent selects the correct answer,
-    s/he must press the new \uif{Ans} button to jump to the solution page.
-    If the respondent presses the \uif{Ans} button before selecting the
-    correct answer, an alert box appears with message determined by \cs{sqSolnMCMsg}.
-\item[MS] When the user has selected \emph{all correct answers}, s/he must press
-    the new \uif{Ans} button in order to jump to the solution page. If the
-    user presses the \uif{Ans} button before selecting all correct
-    answers, an alert box appears with message determined by \cs{sqSolnMSMsg}.
+    the new \uif{Ans} button must be pressed to jump to the solution page. If
+    the respondent presses the \uif{Ans} button before selecting the correct
+    answer, an alert box appears with message determined by \cs{sqSolnMCMsg}.
+\item[MS] When the user has selected \emph{all correct answers}, the new
+    \uif{Ans} button must be pressed in order to jump to the solution page.
+    If the user presses the \uif{Ans} button before selecting all correct
+    answers, an alert box appears with message determined by
+    \cs{sqSolnMSMsg}.
 \end{enumerate}
 If a MC or MS question does not have a solution, the \uif{Ans} button is not
 typeset into the document.
@@ -5999,111 +6011,13 @@ also how \cs{sqTallyBox} is inserted. In this document,
 %!textsf( Alternate experience: Insert !cs(sqSolnBtn) and !cs(sqTallyBox))
 \answersEndHook{\hfill\makebox[0pt][r]{\sqSolnBtn\sqTallyBox}}
 \end{Verbatim}
-\begin{comment}
-The \cs{olBdry} is used to overlay the contiguous boundaries of the two
-button fields. Refer to the documentation, \texttt{eformman.pdf}, for the
-\pkg{eforms} and \pkg{insdljs} packages, which come with the \pkg{acrotex}
-bundle. \cs{answersEndHook} insert its content at the right margin, pushing
-it to the left; as a result, the content may overlay the text of the choice
-field. It is up to the document author, that's you, to design the layout of
-the choice field so the \cs{sqTallyBox} and/or the \cs{sqSolnBtn} does not
-overlay other content.
 
-\promoteNewPageHere[2\textheight]
-
-\paragraph*{A sample quiz to illustrate.}
-These new commands are illustrated in the following short-quiz.
-
-\begin{shortquiz*}
-Answer each of the following. Passing is to
-complete the quiz without selecting any wrong answers.
-
-\answersEndHook{\hfill\makebox[0pt][r]{\sqTallyBox}}
-
-\medskip\noindent
-Problems~1 and~2 are in the style \emph{traditional user experience} that has been
-used since the very beginning of \pkg{exerquiz}.
-
-\begin{questions}
-
-\item\label{MC} In what year did Columbus sail the ocean blue?
-\begin{answers}*{4}
-\bChoices
-\Ans0 1490\eAns
-\Ans0 1491\eAns
-\Ans1 1492\eAns
-\Ans0 1493\eAns
-\eChoices
-\end{answers}
-\begin{solution}
-Columbus sailed the ocean in 1492. It rhymes.
-\end{solution}
-
-\item\label{MS} Which of the following numbers are prime?
-\begin{manswers}*{4}\rowsep{3pt}
-\bChoices
-  \Ans0 1\eAns
-  \Ans1 2\eAns
-  \Ans1 3\eAns
-  \Ans0 4\eAns
-  \Ans1 5\eAns
-  \Ans0 6\eAns
-  \Ans1 7\eAns
-  \Ans0 8\eAns
-\eChoices
-\end{manswers}
-\begin{solution}
-Yes, 2, 3, 5, and 7; they are the first four prime numbers.
-\end{solution}
-
-\pushquestions Problems~3 and~4 are in the style \emph{alternate user experience}.
-
-\popquestions
-
-\answersEndHook{\hfill\makebox[0pt][r]{\sqSolnBtn\olBdry\sqTallyBox}}
-
-
-\item\label{Alt:MC} In what year did Columbus sail the ocean blue?
-\begin{answers}*{4}
-\bChoices
-\Ans0 1490\eAns
-\Ans0 1491\eAns
-\Ans1 1492\eAns
-\Ans0 1493\eAns
-\eChoices
-\end{answers}
-\begin{solution}
-Columbus sailed the ocean in 1492. It rhymes.
-\end{solution}
-
-\item\label{Alt:MS} Which of the following numbers are prime?
-\begin{manswers}*{4}\rowsep{3pt}
-\bChoices
-  \Ans0 1\eAns
-  \Ans1 2\eAns
-  \Ans1 3\eAns
-  \Ans0 4\eAns
-  \Ans1 5\eAns
-  \Ans0 6\eAns
-  \Ans1 7\eAns
-  \Ans0 8\eAns
-\eChoices
-\end{manswers}
-\begin{solution}
-Yes, 2, 3, 5, and 7; they are the first four prime numbers.
-\end{solution}
-\end{questions}
-\hfill\sqClearButton\olBdry\sqTallyTotal
-\end{shortquiz*}
-\end{comment}
 
 % ?? revise after publication
-\exAeBBlogPDF{p=803} The discussion of the alternate viewing experience discussed in this section
-as well as the source markup for the above short quiz, can be found in the {\AcroTeX} Blog titled
-
-%Use the source file for
-%\texttt{\href{\urlAcroTeXBlog/?p=803}{webeqtst.pdf}} as a prototype or
-%template for your own document.
+%\exAeBBlogPDF{p=1489} Additional information, as well as working
+%examples of alternate viewing experiences, can be found in the {\AcroTeX}
+%Blog article \emph{An alternate user experience for viewing solutions to MC/MS
+%questions in a short-quiz.}
 
 \subsubsection{The concept of weak and strong pass levels}
 
@@ -6123,18 +6037,18 @@ levels are set through the optional argument of \cs{sqTallyTotal}.
 \begin{description}
 \item[Weak passing level] Syntax: \cs{sqTallyTotal[\cs{weakpassing\darg{\ameta{n}}}]}\\[3pt]
   \textbf{User Experience.} As soon as the student makes more than
-\ameta{n} errors, the following message appears in an alert box:
+\ameta{n} errors, the following message appears in an alert dialog box:
 \begin{Verbatim}
 \flJSStr{\sqWeakMsg}{You have missed too many questions.
 After you finish, it is recommended you retake this quiz
 with fewer errors and greater understanding.}
 \end{Verbatim}
-The student is allowed to continue the quiz, but with the knowledge that s/he
-is not performing to the expected standard, as set by the instructor.
+The student is allowed to continue the quiz, but with the knowledge the
+performance is below the expected standard, as set by the instructor.
 
 \item[Strong passing level] Syntax: \cs{sqTallyTotal[\cs{strongpassing\darg{\ameta{n}}}]}\\[3pt]
 \textbf{User Experience.} As soon as the student makes more than \ameta{n}
-errors, the following message appears in an alert box:
+errors, the following message appears in an alert dialog box:
 \begin{Verbatim}
 \flJSStr{\sqStrongMsg}{You have missed too many questions.
 We are resetting the quiz. Start over, this time with
@@ -6142,14 +6056,23 @@ fewer errors and greater understanding.}
 \end{Verbatim}
 After the student dismisses the alert dialog box, the short-quiz s/he is
 working is cleared. Perhaps this condition will inspire the student to
-spend more time and think about his/her responses.
+spend more time and think about the responses.
 \end{description}
 \end{aebQuote}
 In both cases, \ameta{n} is a nonnegative integer.
 
 % ?? revise after publication
-\exAeBBlogPDF{p=803} The discussion of the alternate viewing experience discussed in this section
-as well as the source markup for the above short quiz, can be found in the {\AcroTeX} Blog titled
+%\exAeBBlogPDF{p=1493} The additional discussion of weak and strong passing,
+%as well as working examples of each, can be found in the {\AcroTeX} Blog titled
+%\emph{Setting the passing level in a short-quiz}.
+
+\exAeBBlogPDF{p=tag=enhanced-quizzes} There is a series of four articles on
+enhancing the short-quiz on the {\AcroTeX} Blog. Follow the link set around
+the icon in the margin to obtain a listing of these articles. Additionally,
+the articles document two features of \pkg{exerquiz}: the \texttt{insertAt}
+key of \cs{bChoices} and \cs{setAnsEnvLinewidth}.
+
+
 
 \subsection{Redesigning the
 \tops{\protect\texttt{shortquiz}}{shortquiz} Environment}\label{sss:redefinesq}
@@ -6162,7 +6085,7 @@ titles and form elements.
 
 You can temporarily change the title  for the \texttt{shortquiz}
 environment by redefining the macro \cs{sqlabel}; for example, the
-default definition of this macro is
+default definition of this macro is,
 \begin{Verbatim}[xleftmargin=\amtIndent]
 \newcommand\sqlabel{\textcolor{red}{Quiz.}}
 \end{Verbatim}
@@ -8064,17 +7987,19 @@ for posing a \textit{single} question and will be used in this
 section to discuss in detail the macros for posing mathematical
 and text open questions.
 
-The syntax for the \texttt{oQuestion} environment is
-\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
+The syntax for the \texttt{oQuestion} environment is,
+\bVerb\takeMeasure{\quad\ameta{A math or text open ended question}}%
+\begin{dCmd}[commandchars=!()]{\bxSize}
 \begin{oQuestion}{!ameta(field_name)}
-    !ameta(A math or text open ended question.)
+!quad!ameta(A math or text open ended question)
 \end{oQuestion}
-\end{Verbatim}
-\noindent The environment takes one required argument, a unique name for the
+\end{dCmd}
+\eVerb The environment takes one required argument, a unique name for the
 question. This name, \ameta{field\_name}, is used by other supporting macros.
-The \env{oQuestion} environment has one hook \cs{oqpriorhook} that is
-expanded just prior to the opening of the environment. If redefined, it is
-used once, then reset to its default empty definition.
+The \env{oQuestion} environment has one hook
+\FmtMP{\cs{oqpriorhook}}\cs{oqpriorhook} that is expanded just prior to the
+opening of the environment. If redefined, it is used once, then reset to its
+default empty definition.
 
 \subsubsection{\tops{\protect\cs{RespBoxMath}}
 {\textbackslash RespBoxMath}: The Math Question}\label{ss:respbox}
@@ -8842,7 +8767,7 @@ such a problem is marked by a human teacher, he/she may give full credit or
 may dock the credit slightly.
 
 Beginning with \pkg{exerquiz} dated 2020/11/11, the \cs{SpellCheck} command
-and the JavaScript function \texttt{checkTheSpelling()} are
+and the supporting JavaScript function \texttt{checkTheSpelling()} are
 defined.\footnote{This feature was suggested to me by Thorsten G.} This a
 feature allows the student to use the spell checking of \app{Adobe Reader} to
 inspect each word and to optionally change the word to one of the words
@@ -9252,7 +9177,7 @@ KV-pairs of the \pkg{eforms} package. It only accepts these four keys:
       its argument (\ameta{code}) to the keystroke event of all response boxes
       (\cs{RespBoxMath}, \cs{RespBoxTxt}, and \cs{RespBoxTxtPC}).
 
-      To distinguish between \env{shortquiz} (and \env{oQuestions}) and
+      To distinguish between \env{shortquiz} (and \env{oQuestion}) and
       \env{quiz} environments, use the methods explained below in the
       description of the \cs{AddAAMouseUpMC} key.
 

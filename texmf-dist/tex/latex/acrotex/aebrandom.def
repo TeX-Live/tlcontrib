@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebrandom.def}
- [2021/05/10 v8.7.7 %
+ [2021/05/15 v8.8 %
  Exerquiz support for randomization (dps)]
 \@ifundefined{nextrandom}{\input{random.tex}}{}
 \def\nextrandom{\begingroup
@@ -50,7 +50,8 @@
   \ifeq@randomizeallChoices
     \setkeys{bchoice}{#1,random=true}\else
     \setkeys{bchoice}{#1}\fi
-  \global\eq@tabColCnt=\z@
+  \global\eq@tabColCnt\z@
+  \def\aeb@RowCnt{0}% dps21-5-15
   \if@DoNotRandomize\eq@randomizeChoicesfalse\fi
   \ifeq@randomizeChoices\expandafter\@@bChoices
   \else\expandafter\@@ansChoices\fi

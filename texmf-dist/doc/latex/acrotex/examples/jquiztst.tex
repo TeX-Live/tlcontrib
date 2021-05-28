@@ -33,15 +33,14 @@ Department of Mathematics}
 % the quiz is evaluated.
 %\renewcommand\minQuizResp{highThreshold}
 
-\font\hv=cmtt10 \def\hvperk{\char`^}
-%\font\hv=hv at 9pt \def\hvperk{\char142 }
+% The following is to create a \js command in which JavaScript code
+% can be written, without the use of the \verb command. Merely cosmetic.
+\def\hvperk{\char`^}
 {\catcode`\^=\active
-  \gdef\js{\bgroup\hv\catcode`\^=\active \let^=\hvperk \jsi}
+  \gdef\js{\bgroup\ttfamily\catcode`\^=\active \let^=\hvperk \jsi}
 }\def\jsi#1{#1\egroup}
 
-\def\hr#1{\textcolor{red}{#1}}
-\def\hb#1{\textcolor{blue}{#1}}
-
+% Some convenience commands for differentiation.
 \def\D{\dfrac {\text{d}}{\text{d}x}}
 \def\dPose#1{$\D#1=$ }
 
@@ -115,7 +114,7 @@ typing error.  The JavaScript routines will also check for
 unbalanced parentheses; thus, \js{((x^4+1) + sin(x)^2} will be
 flagged as a syntax error.
 
-\medskip\noindent\hr{\textbf{Important:}} When you enter a function
+\medskip\noindent\textcolor{red}{\textbf{Important:}} When you enter a function
 of a single variable---the only type currently supported---use as
 the independent variable implied by the statement of the problem.
 If the problem statement involves the variable $x$, use \js{x} as
@@ -149,9 +148,12 @@ brief discussion.
 
 \subsection{Practice Example}
 
-\noindent\hb{\textbf{Example:}}  Consider the following sample question.
+\noindent\textcolor{blue}{\textbf{Example:}}  Consider the following sample question.
 Practice by typing in the answer:
-\js{2*x^3*(x^4+1)^(-1/2)}
+\js{2*x^3*(x^4+1)^(-1/2)}. 
+
+You can also type \js{2x^3(x^4+1)^(-1/2)} since the 
+\texttt{ImplMulti} option is taken with the \textsf{dljslib} package.
 
 \medskip
 \begin{oQuestion}{example}
@@ -162,17 +164,17 @@ Practice by typing in the answer:
 \noindent$\dfrac{\text{d}}{\text{d}x} {(x^4 + 1)^{1/2}} =
 \eqsanitize
 \underset{\text{\rotatebox{-45}{\rlap{The Response Box}}}}
-    {\underbrace{\STRUT\efKern{1bp}{0bp}
-    \RespBoxMath{2*x^3*(x^4+1)^(-1/2)}{4}{.0001}{[1,2]}\relax\efKern{1bp}{0bp}}}\kern-1bp
+    {\underbrace{\RespBoxMath{2*x^3*(x^4+1)^(-1/2)}{4}{.0001}{[1,2]}}}
 \underset{\text{\rotatebox{-45}{\rlap{Answer Button}}}}
-    {\underbrace{\STRUT\efKern{1bp}{0bp}\CorrAnsButton{2*x^3*(x^4+1)^(-1/2)}\efKern{1bp}{0bp}}}\kern-1bp
+    {\underbrace{\cgBdry\CorrAnsButton{2*x^3*(x^4+1)^(-1/2)}}}
 \underset{\text{\rotatebox{-45}{\rlap{Num.\ of incorrect tries}}}}
-    {\underbrace{\STRUT\efKern{1bp}{0bp}\sqTallyBox\relax\efKern{1bp}{0bp}}}\olBdry\efKern{-1bp}{0bp}\sqClearButton$
+    {\underbrace{\olBdry\sqTallyBox\relax}}\olBdry\sqClearButton$
 \end{oQuestion}
 
 
 \vspace{5\bigskipamount}
 
+\noindent
 When a correct answer is input into the response box, the color of
 the border surrounding the response box changes to \textcolor{webgreen}{green}.
 The answer can also be expressed correctly using the \js{sqrt}
@@ -227,11 +229,8 @@ Or, in the syntax of this quiz: \js{-2*t^(-3/2)}.
 \item $\displaystyle\int_0^\pi \sin(x)\,dx
     = \RespBoxMath{2}{1}{.0001}{[0,1]}$\hfill\CorrAnsButton{2}\olBdry\sqTallyBox
 \end{questions}
+\hfill\sqClearButton\olBdry\sqTallyTotal
 \end{shortquiz*}
-
-\begin{flushright}
-\sqClearButton\olBdry\sqTallyTotal
-\end{flushright}
 
 
 \subsection{Quiz Environment}\label{s:quiz}

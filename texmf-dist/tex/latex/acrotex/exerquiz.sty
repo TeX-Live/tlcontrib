@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2021/05/10 v8.7.7 %
+ [2021/05/15 v8.8 %
  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -1706,6 +1706,41 @@
   \begin{questions}[\csname quesOpts\@quesctr\endcsname]%
   \setcounter{\@quesctr}{\csname save\@quesctr\endcsname}%
   \@ifnextchar\popquestions{\item[]}{\@ifnextchar\begin{\item[]}{}}}
+\def\setAnsEnvLinewidth#1{\def\@nsLineWidth{#1}} % dps21-5-17
+\let\@nsLineWidth\@empty % dps21-5-17
+\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
+  \ifx\eq@answersEndHook\@empty\else
+    \def\insertAnsEndHookHere{#1}%
+  \fi
+} % dps21-5-15
+\let\eq@answersEndHook\@empty
+\let\insertAnsEndHookHere\@empty % dps21-5-15
+\def\@insertAndHookAtEndEnv{% dps21-5-16
+  \ifx\insertAnsHookAt\@empty
+      \eq@answersEndHook
+  \else % dps21-5-16
+    \ifnum\insertAnsHookAt>\aeb@RowCnt
+      \eq@answersEndHook
+      \PackageWarning{exerquiz}{insertAt=\insertAnsHookAt:
+      The value (\insertAnsHookAt) of insertAt is greater\MessageBreak
+      than the number of rows (\aeb@RowCnt).
+      Using the default\MessageBreak
+      positioning instead}
+    \else
+      \global\let\insertAnsHookAt\@empty
+    \fi
+  \fi
+}
+\def\@insertAnsHookAt{% dps21-5-16
+  \let\eqe@next\relax
+  \ifx\insertAnsHookAt\@empty\else
+    \ifnum\insertAnsHookAt=\aeb@RowCnt
+      \def\eqe@next{\insertAnsEndHookHere}\fi
+  \fi\eqe@next
+}
+\def\@incRowCnt{{\@tempcnta\aeb@RowCnt\advance\@tempcnta\@ne
+  \xdef\aeb@RowCnt{\the\@tempcnta}}% dps21-5-16
+}
 \newcommand{\priorsqhook}[1]{\def\sq@priorhook{#1}}
 \priorsqhook{}
 \newcommand{\abovesqskip}[1]{\def\sq@aboveskip{#1}}
@@ -2557,6 +2592,9 @@ if (isEndQuizPushed("@eqBaseName")){
     \let\endanswers\endanswers@sq@list\else
     \let\endmanswers\endanswers@sq@list\fi
   \list{\strut\@Ans}{%
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
     \if\sqstar*\relax
       \settowidth{\labelwidth}{\eq@lw@f}\else
       \settowidth{\labelwidth}{\eq@lw@l}\fi
@@ -2576,7 +2614,7 @@ if (isEndQuizPushed("@eqBaseName")){
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }% list
-}{\eq@answersEndHook\endlist\setcounter{quizno}{0}}
+}{\@insertAndHookAtEndEnv\endlist\setcounter{quizno}{0}} % dps21-5-16
 \newcommand\Ans@tabular[2][0]{\gdef\eq@pPTs{#1}\xdef\Ans@choice{#2}%
     \leavevmode\@Ans
 }
@@ -2592,10 +2630,13 @@ if (isEndQuizPushed("@eqBaseName")){
       \vskip\aboveanswersSkip\fi
     \noindent\ifnum\exerwparts@cols>1\relax\parshape=0\fi
     \tabcolsep=0pt
-    \eq@tmpdima=\linewidth
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
+    \eq@tmpdima\linewidth
     \@tempcnta#1\relax
-    \advance\@tempcnta-1\relax
-    \multiply\@tempcnta by2
+    \advance\@tempcnta\m@ne\relax
+    \multiply\@tempcnta\tw@
     \@tempdima\sq@tabsep\relax
     \multiply\@tempdima\@tempcnta
     \advance\eq@tmpdima-\@tempdima
@@ -2613,21 +2654,23 @@ if (isEndQuizPushed("@eqBaseName")){
             \everypar{}\@endpefalse}\the\eq@scratchtoks
     }%
 }
-\newcommand\answersEndHook[1]{\def\eq@answersEndHook{#1}%
-  \ifx\eq@answersEndHook\@empty\else
-    \def\insertEndHookHere{#1}\fi}
-\let\eq@answersEndHook\@empty
 \def\endanswers@sq{\endtabular\setcounter{quizno}{0}%
-    \eq@answersEndHook\reset@doendpe{\the\everypar}%
-    \ifinner\else%\par
-        \removelastskip
-        \vspace{\aboveanswersSkip}\@endpetrue\fi
+  \@insertAndHookAtEndEnv % dps21-5-16
+  \global\let\@nsLineWidth\@empty % dps21-5-17
+  \reset@doendpe{\the\everypar}%
+  \ifinner\else%\par
+    \removelastskip
+    \vspace{\aboveanswersSkip}\@endpetrue
+  \fi
 }
 \def\endmanswers@sq{\endtabular\setcounter{quizno}{0}%
-    \eq@answersEndHook\reset@doendpe{\the\everypar}%
-    \ifinner\else%\par
-        \removelastskip
-        \vspace{\aboveanswersSkip}\@endpetrue\fi
+  \@insertAndHookAtEndEnv % dps21-5-16
+  \global\let\@nsLineWidth\@empty % dps21-5-17
+  \reset@doendpe{\the\everypar}%
+  \ifinner\else%\par
+    \removelastskip
+    \vspace{\aboveanswersSkip}\@endpetrue
+  \fi
 }
 \def\popiiictm{\special{CTM: pop pop pop}}
 \def\sqWrongRespJS{OnBlurRespBox(false,"\oField");}
@@ -2689,7 +2732,7 @@ false*fi;
 var f=this.getField("corr.*oField.*thequestionno");
 if (f==null) {
   if ((qzSolnDest!="") && !solnAfter) %
-  jmpToNamedDest("*oField","*@qzsolndest",%
+jmpToNamedDest("*oField","*@qzsolndest",%
   *ifx*@sqTurnOffAlerts*eq@Zero0*else1*fi);%
   *ifx*eqAddAAMouseUpMC*empty*else
   *eqAddAAMouseUpMC*fi
@@ -2700,7 +2743,7 @@ if (f==null) {
 OnBlurRespBox(false,"*oField");
 *fi%
 var qzSolnDest="*@qzsolndest";
-if( qzSolnDest!="") updateTally("*oField.*thequestionno");%
+updateTally("*oField.*thequestionno");%
 *ifx*eqAddAAMouseUpMC*empty*else
 *eqAddAAMouseUpMC*fi
 \end{defineJS}
@@ -2920,6 +2963,9 @@ updateTally("*oField.*thequestionno");*fi%
     \let\endanswers\endanswers@q@list\else
     \let\endmanswers\endanswers@q@list\fi
   \list{\strut\@Ans}{%
+    \edef\natlinewidth{\the\linewidth}% dps21-5-17
+    \ifx\@nsLineWidth\@empty\else % dps21-5-17
+      \setlength{\linewidth}{\@nsLineWidth}\fi
     \if\qstar*\relax
       \if\aeb@FLOverride\eq@l
       \settowidth{\labelwidth}{\eq@lw@l}\else
@@ -2936,7 +2982,9 @@ updateTally("*oField.*thequestionno");*fi%
     \setlength{\labelsep}{0pt}%
     \def\Ans{\Ans@list}%
   }%
-}{\eq@answersEndHook\endlist\setcounter{quizno}{0}%
+}{\endlist\setcounter{quizno}{0}%
+  \@insertAndHookAtEndEnv % dps21-5-17
+  \global\let\@nsLineWidth\@empty % dps21-5-17
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
     \eq@recordCorrAns{\eq@ansChoiceArray}\ifwithinMCFI
@@ -2950,7 +2998,10 @@ updateTally("*oField.*thequestionno");*fi%
 \def\qzTabPos#1{\def\qz@TabPos{[#1]}}\qzTabPos{}
 \def\answers@q@tabular#1{%
   \ifinner\else\par\removelastparskip\vspace{\aboveanswersSkip}\fi
-  \eq@tmpdima=\linewidth
+  \edef\natlinewidth{\the\linewidth}% dps21-5-17
+  \ifx\@nsLineWidth\@empty\else % dps21-5-17
+    \setlength{\linewidth}{\@nsLineWidth}\fi
+  \eq@tmpdima\linewidth
   \@tempcnta#1\relax
   \advance\@tempcnta\m@ne
   \multiply\@tempcnta\tw@
@@ -2968,7 +3019,8 @@ updateTally("*oField.*thequestionno");*fi%
 }
 \def\endanswers@q@tabular{%
   \endtabular\setcounter{quizno}{0}%
-  \eq@answersEndHook
+  \@insertAndHookAtEndEnv % dps21-5-17
+  \global\let\@nsLineWidth\@empty % dps21-5-17
   \setdefault@Ans
   \ifx\aeb@answerType\aeb@answerType@r
     \eq@recordCorrAns{\eq@ansChoiceArray}\ifwithinMCFI
@@ -3273,13 +3325,36 @@ updateTally("*oField.*thequestionno");*fi%
   \else\eq@randomizeChoicesfalse\fi
 }
 \define@key{bchoice}{label}[]{\xdef\bChoiceLabel{#1}}
+\def\rmFracPrt#1.#2\@nil{\gdef\intPrt{#1}}
+\define@key{bchoice}{insertAt}[]{%
+  \let\insertAtMsg\relax
+  \def\rmFr@cPrt##1.##2\@nil{\def\intP@rt{##1}}
+  \def\@rgi{#1}\ifx\@rgi\@empty
+    \def\insertAtMsg{\PackageWarning{exerquiz}
+      {An empty value for insertAt, will use\MessageBreak
+       the default positioning}}%
+  \else
+    \rmFr@cPrt#1.\@nil
+    \expandafter\@tempcnta\intP@rt\relax
+    \ifnum\@tempcnta<\@ne
+      \def\insertAtMsg{\PackageWarning{exerquiz}
+        {insertAt=#1: The value (#1) of insertAt must be\MessageBreak
+        greater than zero. Using the default\MessageBreak
+        positioning instead}}
+    \else
+      \xdef\insertAnsHookAt{\the\@tempcnta}
+    \fi
+  \fi
+  \insertAtMsg
+} % dps21-5-15
+\let\insertAnsHookAt\@empty
 \def\bChoices{\@ifnextchar[{\@ansChoices}{\@ansChoices[\aeb@numCols]}}
 \def\@ansChoices[#1]{%
-  \global\let\@tempholdSaveAns\@empty %4/5
-  \global\let\@tempholdSaveChoice\@empty %4/5
-  \global\let\bChoiceLabel\@empty %4/5
-  \setkeys{bchoice}{#1}%
-  \global\eq@tabColCnt=\z@
+  \global\let\@tempholdSaveAns\@empty
+  \global\let\@tempholdSaveChoice\@empty
+  \global\let\bChoiceLabel\@empty
+  \setkeys{bchoice}{#1}% dps21-5-15
+  \def\aeb@RowCnt{0}\global\eq@tabColCnt\z@
   \ifnum\aeb@numCols=\@ne % list mode
     \def\eq@next{\@layoutListAns}\else % tabular mode
     \def\eq@next{\@layoutTabularAns{\bChoiceNumCols}}\fi
@@ -3369,17 +3444,25 @@ updateTally("*oField.*thequestionno");*fi%
 \newcommand{\useSavedNumAns}[1]{\@nameuse{NumAns#1}}
 \long\def\@@@SaveAnsGobbleAns#1\eAns{}
 \long\def\@getListAns\Ans#1\eAns{%\@@par
+  \@incRowCnt  % dps21-5-16
   \eq@saveAns#1\eAns
-  \Ans#1\vspace{\@rowskip}%
-  \@layoutListAns
+  \Ans#1% dps21-5-15
+  \@insertAnsHookAt % dps21-5-16
+  \vspace{\@rowskip}\@layoutListAns
 }
 \long\def\@lookforendansChoices#1{%
   \@ifnextchar\eChoices{\rowsep{\rowsep@default}%
     \expandafter\@findendans\@gobble}{\expandafter#1\@gobble}%
 }
 \def\@layoutTabularAns#1{%
+  \@incRowCnt % dps21-5-16
   \let\eq@tabSep\@empty
   \xdef\numShortCols{#1}%
+  \@tempcnta\aeb@numCols % dps21-5-16
+  \advance\@tempcnta-#1
+  \global\let\nAddT@bs\@empty
+  \@whilenum\@tempcnta>\z@\do
+  {\g@addto@macro\nAddT@bs{&}\advance\@tempcnta\m@ne}%
   \ifnum#1>\aeb@numCols \xdef\numShortCols{\aeb@numCols}\fi
   \@@layoutTabularAns
 }
@@ -3393,16 +3476,21 @@ updateTally("*oField.*thequestionno");*fi%
 \def\rowsep@default{0pt}
 \long\def\@getTabAns\Ans#1\eAns{%
   \eq@saveAns#1\eAns
-  \global\advance\eq@tabColCnt1
-  \let\@save@tabSep=\eq@tabSep
+  \global\advance\eq@tabColCnt\@ne % dps21-5-16
+  \let\@save@tabSep\eq@tabSep % dps21-5-16
   \ifnum\eq@tabColCnt=\numShortCols
-    \global\eq@tabColCnt=0
-      \xdef\eq@tabSep{\noexpand\\\noalign{\kern\@rowskip\relax}}%
+    \global\eq@tabColCnt\z@ % dps21-5-16
+    \xdef\eq@tabSep{%
+      \noexpand\nAddT@bs
+      \noexpand\@insertAnsHookAt
+      \noexpand\\
+      \noalign{\kern\@rowskip\relax}\noexpand\@incRowCnt
+    }%
   \else
-      \gdef\eq@tabSep{&}%
+    \gdef\eq@tabSep{&}%
   \fi
-  \@ifnextchar\eChoices{\@save@tabSep\Ans#1\rowsep{\rowsep@default}
-    \expandafter\@findendans\@gobble}%
+  \@ifnextchar\eChoices{\@save@tabSep\Ans#1\rowsep{\rowsep@default}%
+    \nAddT@bs\@insertAnsHookAt\expandafter\@findendans\@gobble}%
     {\@save@tabSep\Ans#1\@@layoutTabularAns}%
 }
 \def\@findendans{\@ifnextchar\end{%
@@ -4109,9 +4197,8 @@ if(event.willCommit) {
       \fi\r
       var splErrors=checkTheSpelling(targetFldName);\@fterSplChkActn
   }}]{spl.\curr@quiz.\thequestionno}{}{11bp}}
-\def\RespBoxEssayDefaults
-{%
-    \BC{0 0 0}\W{1}\S{S}\Ff{\FfMultiline}\rawPDF{}%
+\def\RespBoxEssayDefaults{%
+  \BC{0 0 0}\W{1}\S{S}\Ff{\FfMultiline}\rawPDF{}%
 }
 \def\@@RespBoxEssayActions{\AA{%
   \if\eqQuizType\isQZ
@@ -4150,7 +4237,7 @@ if(event.willCommit) {
 }
 \let\@@sqTallyBoxActions\@empty
 \def\sqTallyBoxDefaults{%
-    \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
+  \BC{0 0 0}\W{1}\textColor{1 0 0 rg}\S{I}\Q{2}\Ff{\FfReadOnly}}
 \newcommand\sqTallyBox[1][]{%
   \mbox{\text@@Field{#1}{tally.\oField.\thequestionno}%
     {\TBW}{\DefaultHeightOfWidget}%
@@ -4169,7 +4256,7 @@ We are resetting the quiz. Start over, this time with
 fewer errors and greater understanding.}
 \def\@@sqTallyTotalActions{\AA{%
   \AAKeystroke{\dl@EForAF4Number_Keystroke(0,0,0,0,"",true);}
-  \AAFormat{\dl@EForAF4Number_Format(0,0,0,0,"",true);}
+  \AAFormat{\dlTC{\dl@EForAF4Number_Format(0,0,0,0,"",true);}}
   \AACalculate{%
     \dl@EForAF4Simple_Calculate("SUM",new Array("tally.\oField"));\r
     var sqTlyTotl=event.value;
@@ -4201,10 +4288,9 @@ fewer errors and greater understanding.}
     {\sqTallyTotalDefaults\@@sqTallyTotalActions\every@eqTextField
      \every@sqTallyTotal}}%
 }
-\def\sqClearButtonDefaults
-{%
-    \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
-    \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
+\def\sqClearButtonDefaults{%
+  \CA{\eq@local@sqClearButton}\textColor{0 g}\F{\FPrint}
+  \BC{0 0 0}\BG{.7529 .7529 .7529}\W{1}\S{B}\Ff{\FfNoExport}
 }
 \begin{defineJS}[\makeesc\*\makecmt\%]{\@@sqClearButtonJSCode}
 ProcessIt = false;

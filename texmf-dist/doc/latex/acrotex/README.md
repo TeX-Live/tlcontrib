@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle (AeB)
 Author: D. P. Story 
-Dated: 2021-05-10
+Dated: 2021-05-15
 
 AeB contains the following:
 
@@ -18,6 +18,12 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eforms
    (including insdljs and dljslib).
+
+What's New (2021-05-15) 
+  exerquiz: Some bug fixes. 
+    Defined the new insertAt key of the \bChoices command. See
+    http://www.acrotex.net/blog/?tag=enhanced-quizzes for discussion 
+    and demo files.
 
 What's New (2021-05-10) 
   web: added navibar* option

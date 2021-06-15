@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle (AeB)
 Author: D. P. Story 
-Dated: 2021-05-15
+Dated: 2021-05-29
 
 AeB contains the following:
 
@@ -18,6 +18,11 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eforms
    (including insdljs and dljslib).
+
+What's New (2021-05-29)
+  exerquiz: Internal changes to Begin Quiz and End Quiz actions to
+    support eq-pin2corr package. Exerquiz now tracks duplication quiz names. 
+    Shift-Begin Quiz now clears the quiz without initializing it. 
 
 What's New (2021-05-15) 
   exerquiz: Some bug fixes. 

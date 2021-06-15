@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{exerquiz}
- [2021/05/15 v8.8 %
+ [2021/05/29 v8.8.2 %
  Exerquiz: Exercises and Quizzes for LaTeX/PDF package (dps)]
 \usepackage{keyval}
 \RequirePackage{ifpdf}[2006/02/20]
@@ -39,6 +39,8 @@
 \DeclareOption{preview}{\PassOptionsToPackage{preview}{eforms}}
 \DeclareOption{nosolutions}{\eq@nosolutionstrue\eq@nolinktrue}
 \DeclareOption{noquizsolutions}{\eq@noquizsolutionstrue\eq@nolinktrue}
+\DeclareOption{allowanswers}{\eq@answersallowedtrue}
+\newif\ifeq@answersallowed \eq@answersallowedfalse
 \let\eq@YES=y \let\eq@NO=n
 \let\eq@One=1 \let\eq@Zero=0
 \def\eq@r{r}\let\eq@f=f \let\eq@l=l
@@ -1805,7 +1807,14 @@ if (typeof !oField=="undefined")
   \S{S}\textSize{0}\Ff{\FfReadOnly}
   \AA{\AAFormat{\qzIDFmt}}]{qzID\oField}{2bp}{2bp}}}
 \let\eqQuizType\relax
-\def\@@shortquiz[#1]{%\begingroup
+\def\@@shortquiz[#1]{\csarg % dps5-29
+  \ifx{SQName-#1}\relax
+    \csarg\gdef{SQName-#1}{1}\else
+    \PackageWarning{exerquiz}{%
+      The short-quiz name '#1' is already used,\MessageBreak
+      please choose a quiz name unique throughout\MessageBreak
+      this document}\csarg\gdef{SQName-#1}{0}%
+  \fi
   \gdef\oField{#1}\gdef\curr@quiz{#1}\gdef\currQuiz{#1}%
   \edef\tmp@Exp{\noexpand\g@addto@macro\noexpand
     \ListOfSQuizNames{,#1}}\tmp@Exp
@@ -2076,7 +2085,14 @@ if (typeof !oField=="undefined")
 }{\aeb@endquiz}
 \def\@quizCnt{0}
 \let\ListOfQuizNames\@empty
-\def\@quiz*#1#2{%
+\def\@quiz*#1#2{\csarg % dps5-29
+  \ifx{QzName-#2}\relax
+    \csarg\gdef{QzName-#2}{1}\else
+    \PackageWarning{exerquiz}{%
+      The quiz name '#2' is already used,\MessageBreak
+      please choose a quiz name unique throughout\MessageBreak
+      this document}\csarg\gdef{QzName-#2}{0}%
+  \fi
   \xdef\eq@pageThisQ{\the\c@page}%
   \let\@currentQues\@empty
   \global\let\eqQzQuesList\@empty
@@ -2134,36 +2150,45 @@ if (typeof !oField=="undefined")
   {\renewcommand\eq@beginQuiz{\eq@BeginQuizLink}}
 \newcommand\useEndQuizLink
   {\renewcommand\eq@endQuiz{\eq@EndQuizLink}}
+\begingroup
+  \catcode`<=1 \catcode`\>=2 \@makeother\{ \@makeother\}
+  \gdef\jsLB<{>\gdef\jsRB<}>
+\endgroup
+\newcommand{\BeginQuizG@te}{if (true)}
+\def\Norm@lBeginQuiz{if (true)}
+\def\restorBeginQuiz{\let\BeginQuizG@te\Norm@lBeginQuiz}
 \newcommand\@initQuiz{%
-  var\eqSP\curr@quiz=new Object();\jsR
-  lstOfQuizzes["\curr@quiz"]=\curr@quiz;\jsR
-  \curr@quiz.oAlertCheck={bAfterValue:false};\jsR
-  \curr@quiz.Grp={};%
-  \ifx\defaultColorJSLoc\@empty\else\jsR
-  \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
-  \ifx\rghtColorJSLoc\@empty\else\jsR
-  \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
-  \ifx\wrngColorJSLoc\@empty\else\jsR
-  \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
-  \ifx\partialColorJSLoc\@empty\else\jsR
-  \oField.PartialColorJSLoc=\partialColorJSLoc;\fi
-  \ifx\rghtAnsSymbJSLoc\@empty\else\jsR
-  \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
-  \ifx\wrngAnsSymbJSLoc\@empty\else\jsR
-  \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
-  \ifx\corrAnsSymbJSLoc\@empty\else\jsR
-  \oField.CorrAnsSymbJSLoc=\corrAnsSymbJSLoc;\fi
-  \ifx\eqGradeScaleLoc\@empty\else\jsR
-  \oField.GradeScaleLoc=new Array(\eqGradeScaleLoc);\fi
-  \ifx\eqCorrLocalChoiceFully\@empty\else\jsR
-  \oField.fullyCorrectLoc=\eqCorrLocalChoiceFully;\fi
-  \if$\priorInitQuiz$\else\jsR\priorInitQuiz\fi\jsR
-  InitializeQuiz("\curr@quiz",\ifnocorrections0\else1\fi);%
-  \ifx\eq@CGI\@empty\jsR\curr@quiz.isSubmitted=false;\else
-  \jsR\curr@quiz.isSubmitted=true;\fi
-  \jsR\curr@quiz.initializeWith=%
-    'InitializeQuiz("\curr@quiz",\ifnocorrections0\else1\fi);';%
-  \if$\postInitQuiz$\else\jsR\postInitQuiz\fi%
+  \BeginQuizG@te\space\jsLB\jsR\jsT
+    var\eqSP\curr@quiz=new Object();\jsR\jsT
+    lstOfQuizzes["\curr@quiz"]=\curr@quiz;\jsR\jsT
+    \curr@quiz.oAlertCheck={bAfterValue:false};\jsR\jsT
+    \curr@quiz.Grp={};%
+    \ifx\defaultColorJSLoc\@empty\else\jsR\jsT
+    \oField.DefaultColorJSLoc=\defaultColorJSLoc;\fi
+    \ifx\rghtColorJSLoc\@empty\else\jsR\jsT
+    \oField.RightColorJSLoc=\rghtColorJSLoc;\fi
+    \ifx\wrngColorJSLoc\@empty\else\jsR\jsT
+    \oField.WrongColorJSLoc=\wrngColorJSLoc;\fi
+    \ifx\partialColorJSLoc\@empty\else\jsR\jsT
+    \oField.PartialColorJSLoc=\partialColorJSLoc;\fi
+    \ifx\rghtAnsSymbJSLoc\@empty\else\jsR\jsT
+    \oField.RightAnsSymbJSLoc=\rghtAnsSymbJSLoc;\fi
+    \ifx\wrngAnsSymbJSLoc\@empty\else\jsR\jsT
+    \oField.WrongAnsSymbJSLoc=\wrngAnsSymbJSLoc;\fi
+    \ifx\corrAnsSymbJSLoc\@empty\else\jsR\jsT
+    \oField.CorrAnsSymbJSLoc=\corrAnsSymbJSLoc;\fi
+    \ifx\eqGradeScaleLoc\@empty\else\jsR\jsT
+    \oField.GradeScaleLoc=new Array(\eqGradeScaleLoc);\fi
+    \ifx\eqCorrLocalChoiceFully\@empty\else\jsR\jsT
+    \oField.fullyCorrectLoc=\eqCorrLocalChoiceFully;\fi
+    \if$\priorInitQuiz$\else\jsR\jsT\priorInitQuiz\fi\jsR\jsT
+    InitializeQuiz("\curr@quiz",\ifnocorrections0\else1\fi);%
+    \ifx\eq@CGI\@empty\jsR\jsT\curr@quiz.isSubmitted=false;\else
+    \jsR\jsT\curr@quiz.isSubmitted=true;\fi
+    \jsR\jsT\curr@quiz.initializeWith=%
+      'InitializeQuiz("\curr@quiz",\ifnocorrections0\else1\fi);';%
+    \if$\postInitQuiz$\else\jsR\jsT\postInitQuiz\fi\jsR
+  \jsRB
 }
 \newcommand{\priorInitQuiz}{}
 \newcommand{\postInitQuiz}{}
@@ -2204,26 +2229,31 @@ if (typeof !oField=="undefined")
     {\eq@setButtonProps\eq@Button@driver}%
     {\BeginQuizButtonDefaults\eq@@BeginQuizButtonActions
      \every@ButtonField\every@BeginQuizButton}}}
+\newcommand{\EndQuizG@te}{if (true)}
+\def\Norm@lEndQuiz{if (true)}
+\def\restoreEndQuiz{\let\EndQuizG@te\Norm@lEndQuiz}
 \begin{defineJS}[\makeesc\*\makecmt\%]{\eQzBtnActns}
 if (!isQuizInitialized("*curr@quiz"))
   eqAppAlert(InitMsg("*bqlabelISO"),3);
 else {
   if (*minQuizResp(*thequestionno)&&_ModalNotOn){
-    *curr@quiz.PtValues=new Array(*pointValuesArray);
-    ProbType=[*ptypeArray];%
+    *EndQuizG@te {
+      *curr@quiz.PtValues=new Array(*pointValuesArray);
+      ProbType=[*ptypeArray];%
 *if@inclkey
-    *curr@quiz.CorrAns=new Array(*corrAnsArray);*fi
-    DisplayQuizResults("*curr@quiz",*theeqpointvalue,%
+      *curr@quiz.CorrAns=new Array(*corrAnsArray);*fi
+      DisplayQuizResults("*curr@quiz",*theeqpointvalue,%
 *thequestionno,bDisplaySilent);
-    bDisplaySilent=false;
-    var h=this.getField("ScoreData.*curr@quiz");
-    h.value=Score+";"+NQuestions+";"%
+      bDisplaySilent=false;
+      var h=this.getField("ScoreData.*curr@quiz");
+      h.value=Score+";"+NQuestions+";"%
 +ptScore+";"+NPointTotal;%
 *ifx*eq@submitURL*empty*else
-    *eq@submitURL*fi%
+      *eq@submitURL*fi%
 *if$*postSubmitQuiz$*else
-    *postSubmitQuiz*fi
-    resetQuiz("*curr@quiz");
+      *postSubmitQuiz*fi
+      resetQuiz("*curr@quiz");
+    }
   }
 }
 \end{defineJS}
@@ -3585,7 +3615,14 @@ updateTally("*oField.*thequestionno");*fi%
 }
 \let\useMCCRects\useMCRects
 \let\oqpriorhook\@empty
-\newenvironment{oQuestion}[1]{%
+\newenvironment{oQuestion}[1]{\csarg % dps5-29
+  \ifx{oQName-#1}\relax
+    \csarg\gdef{oQName-#1}{1}\else
+    \PackageWarning{exerquiz}{%
+      The quiz name '#1' is already used,\MessageBreak
+      please choose a quiz name unique throughout\MessageBreak
+      this document}\csarg\gdef{oQName-#1}{0}%
+  \fi
   \let\@currentQues\@empty
   \xdef\eq@pageThisQ{\the\c@page}\global
   \let\eqQzQuesList\@empty
@@ -4416,7 +4453,7 @@ else !processJSfunc("obj.!oField.!thequestionno","!CorrectAns",%
 \def\eq@@@CorrAnsButton#1#2#3{\gdef\CorrectAns{#2}%
   \def\processJSfunc{#3}\ifx\@qzsolndest\@empty\let\JST\@empty\else
   \let\JST\jsT\fi % dps17
-  \ifx\eq@ProcRespIntervals\g@processJSfunc % 01/11
+  \ifx\eq@ProcRespIntervals\g@processJSfunc
     \let\@inmathwarn@SAVE\@inmathwarn\let\@inmathwarn\@gobble
     \pdfstringdef{\CorrectAns}{\CorrectAns}%
     \let\@inmathwarn\@inmathwarn@SAVE\fi
@@ -4427,7 +4464,10 @@ else !processJSfunc("obj.!oField.!thequestionno","!CorrectAns",%
         \ifx\@qzsolndest\@empty%\noexpand\BC{\normalCABtnBC}%
         \else\noexpand\BC{\solution@Color}\fi
         \noexpand\A{\noexpand\qCorrAnsButtonActionHook}}%
-      \ifeq@noquizsolutions\else % dps17 (\let\rpl\eq@rpl)
+      \let\eq@insertFld\eq@YES
+      \ifeq@noquizsolutions\let\eq@insertFld\eq@NO
+        \ifeq@answersallowed\let\eq@insertFld\eq@YES\fi\fi
+      \ifx\eq@insertFld\eq@YES
         \mbox{\let\rpl\eq@rpl
         \push@@Button{#1}{\Fld@name}{}{\DefaultHeightOfWidget}%
           {\eq@protect\A}{\eq@setButtonProps\eq@Button@driver}%

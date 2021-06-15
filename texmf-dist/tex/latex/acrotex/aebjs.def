@@ -18,7 +18,7 @@
 %% License, or (at your option) any later version.      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \ProvidesFile{aebjs.def}
- [2021/05/15 v8.8 %
+ [2021/05/29 v8.8.2 %
  Exerquiz document level JavaScript (dps)]
 \def\aeb@array{new Array}
 \def\refac#1{\\(#1\\)}\def\regrp#1{(#1)}\def\rechrclass#1{[#1]}
@@ -873,7 +873,9 @@ function InitializeQuiz(qtfield,mark) {
     if (!isQuizInitialized(qtfield)&&!isAQuizUnfinished()) return null;
     neutralizeQuizzes();
     ProcessIt = false;
-    aQuizControl[qtfield] = 1;
+    if (arguments.length>2)
+      aQuizControl[qtfield] = arguments[2]; // 0 or 1 designed for 0
+    else aQuizControl[qtfield] = (event.shift)?0:1; // dps5-25
     this.resetForm(["ScoreField." + qtfield,"mc."+qtfield,
       "obj."+qtfield,"mck."+qtfield,"Ans."+qtfield,
       "PointsField."+qtfield,"PercentField."+qtfield,
@@ -886,7 +888,7 @@ function InitializeQuiz(qtfield,mark) {
     if ( f != null ) f.display = display.hidden;
     f = this.getField("promptButton."+qtfield);
     if (f != null) f.display=display.visible;
-    if (arguments.length<3)  {
+    if (arguments.length<4)  {
         f = this.getField("obj." + qtfield);
         if ( f != null ) f.readonly = false;
     }
@@ -996,12 +998,11 @@ function GrpRight( a, nProb, qtfield )
     for ( var i=1; i <= l; i++) prod *= !!a[i];
     return prod;
 }
-function DisplayQuizResults(qtfield,nPointTotal,nQuestions)
-{
+function DisplayQuizResults(qtfield,nPointTotal,nQuestions) {
     Score = 0; ptScore = 0;
     NPointTotal=nPointTotal; NQuestions=nQuestions;
-    for (var i=1; i < RightWrong.length; i++)
-    {
+    var l=(typeof RightWrong=="undefined")?0:RightWrong.length;
+    for (var i=1; i < l; i++) {
         if ( (typeof RightWrong[i] == "object" ) && %
 ( RightWrong[i][0] == "grp" ) ) {
             // grouped question
@@ -1220,7 +1221,8 @@ display.visible:display.hidden;
       var rbmuname = a[i].name.replace(re,"rbmarkup\.");
       var oRBMarkup = this.getField(rbmuname);
       var bRBMU = ( oRBMarkup != null );
-      if ( RightWrong[probno] == 1 ) {
+      if ( (typeof RightWrong!="undefined") && % // dps5-24
+(RightWrong[probno] == 1) ) {
         a[i].strokeColor = rightColor;
         if (bRBMU) {
             oRBMarkup.textColor=rightColor;
@@ -1281,7 +1283,9 @@ display.visible:display.hidden;
             if ( h != null ) break;
         }
         var g = f.getArray();
-        var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
+        if (typeof ProbDist == "undefined" ) var qpts=0; // dps5-24
+        else
+          var qpts=(ProbDist[i]==undefined) ? 0 : ProbDist[i];
         if ( !negPointsMarkupAllowed && (qpts < 0) ) qpts=0;
         g[0].value = qpts + (( qpts == 1 ) ? " \eqptLabel\space"
             : " \eqptsLabel");

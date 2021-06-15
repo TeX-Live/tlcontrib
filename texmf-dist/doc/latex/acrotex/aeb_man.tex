@@ -243,10 +243,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2021/05/15}
+\version{2021/05/29}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2021/05/15}
+\prepared{2021/05/29}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -4030,7 +4030,7 @@ this option.
 \textsf{pdftex} does not (normally) produce a dvi file.
 
 %\subsection{The \texttt{nodljs} Option}\label{sss:nodljs}
-\subsection{Options passed through to the \tops{\protect\pkg}{}{insdljs} package}
+\subsection{Options passed through to the \tops{\protect\pkg}{}{insdljs} package}\label{ss:passthru}
 
 The following options are passed through to \pkg{insdljs}: \opt{nodljs},
 \opt{exercisesonly} (same as \opt{nodljs}), \opt{execJS}, and \opt{usealtadobe}.
@@ -6166,7 +6166,7 @@ Prior to the short quiz below, the following command was executed
 \sqTurnOffAlerts %\sqCorrections
 \everysqRadioButton{\BC{.690 .769 .871}\BG{.941 1 .941}}
 
-\begin{shortquiz*}[KublaKhan3]
+\begin{shortquiz*}[KublaKhan4]
 Was it in Xanadu did Kubla Kahn a stately pleasure dome decree?
 \begin{answers}{4}
 \Ans1 True & \Ans0 False
@@ -6526,15 +6526,22 @@ page~\pageref{sss:exampltextfield}.
 In addition to the options listed in the section \ref{sq:opts}, page \pageref*{sq:opts}, the following is
 designed for quizzes.
 
-\subsubsection{The option
-\tops{\protect\texttt{noquiz\-solutions}}{noquizsolutions}}\label{sss:noquizsolutions}
+\subsubsection{The
+\tops{\protect\texttt{noquizsolutions}}{noquizsolutions} option}\label{sss:noquizsolutions}
 
-For online quizzing, where results are stored in some way (database,
-e-mail, text file) the presence of the solutions in the same file as the
-questions is a breach in security of the quiz.  Using the
-\texttt{noquizsolutions} removes the solutions to a \texttt{quiz} and
-\texttt{shortquiz} from the document under construction.
+For online quizzing, where results are stored in some way (database, e-mail,
+text file) the presence of the solutions in the same file as the questions is
+a breach in security of the quiz.  Using the \texttt{noquizsolutions} removes
+the solutions to a \texttt{quiz} and \texttt{shortquiz} from the document
+under construction. In the case of \env{quiz} environments, any
+\cs{CorrAnsButton} command placed in the quiz \emph{is not typeset} into the document.
 
+\subsubsection{The
+\tops{\protect\texttt{allowanswers}}{allowanswers} option}\label{sss:allowanswers}
+
+This option is effective only when the \texttt{noquizsolutions} option is
+also taken. When present in the option list, any \cs{CorrAnsButton} command
+\emph{is typeset} into the document.
 
 \subsection{The \texttt{answers} Environment}\label{answersQuiz}
 
@@ -6551,22 +6558,21 @@ is
 
 \newtopic The \anglemeta{dest}, an optional argument, is a name used to create a hypertext jump to
 the solution; it has two forms: \texttt{[\meta{named\_dest}]}, an explicit
-``named destination.''; and the \texttt{*}-form, \textsf{exerquiz} automatically
-generates the name. Use \meta{named\_dest} when you want to refer to a solution
-in another part of the document; otherwise, use \texttt{*}, for convenience.
+``named destination.''; and the star-form (\texttt{*}), \pkg{exerquiz}
+automatically generates the name. Use \meta{named\_dest} when you want to
+refer to a solution in another part of the document; otherwise, use
+\texttt{*}, for convenience. If either the \texttt{[\meta{named\_dest}]} or
+\texttt{*} is used, a \texttt{solution} environment should follow.
 
-If either the \texttt{[\meta{named\_dest}]} or \texttt{*} is used, a
-\texttt{solution} environment should follow.
+\newtopic The \meta{num\_cols} argument is the number of columns to
+typeset the answers in. When \meta{num\_cols} is 1, the answers are set in a
+list environment; otherwise, a tabular environment is used. In the latter
+case, the usual table syntax is used: use \texttt{\&} to separate columns,
+and \verb!\\! to terminate a row.
 
-\newtopic The \meta{num\_cols} is the number of columns to
-typeset the answers in. When \meta{num\_cols} is 1, the answers are set
-in a list environment; otherwise, a tabular environment is used. In the latter case,
-the usual table syntax is used. (Use \texttt{\&} to separate columns, and \verb!\\! to
-terminate a row.)
-
-\newtopic The \cs{Ans} command has one required argument, a 1 to mark that this
-answer is a correct answer, and a 0 to mark that this answer is not true.  \cs{Ans}
-also has an optional argument to pass partial points rewarded for a wrong answer.
+\newtopic The \cs{Ans} command has one required argument, a 1 to mark the choice
+as correct, and a 0 to mark it as incorrect.  \cs{Ans} also has an optional
+argument to pass partial points rewarded for a wrong answer.
 
 \newtopic This environment is illustrated extensively in this section. See also the
 \texttt{manswers} environment, \Nameref{manswersQuiz}, for posting questions with multiple
@@ -6781,7 +6787,7 @@ restores the next multiple choice/selection question back to the default determi
 by the quiz environment (\texttt{quiz} versus \texttt{quiz*}), or as set by the
 \cs{quiztype} command.
 
-\subsubsection{The BeginQuiz and EndQuiz Form Buttons}\label{sss:FormButton}
+\subsubsection{The \tops{\protect\uif}{}{Begin Quiz} and \tops{\protect\uif}{}{End Quiz} Form Buttons}\label{sss:FormButton}
 
 The default setup the \texttt{quiz} environment is to have
 hypertext links for the `Begin Quiz' and `End Quiz'. You can also
@@ -6791,6 +6797,9 @@ Prior to your quiz, use the following code, if desired.
 \useBeginQuizButton
 \useEndQuizButton
 \end{Verbatim}
+Clicking the \uif{Begin Quiz} button clears all fields in the quiz and initializes it for the user
+to respond to each question. Shift-clicking the \uif{Begin Quiz} button clears all fields, but does not
+initialize the quiz.
 
 \useBeginQuizButton\useEndQuizButton
 %\makeatletter
@@ -6825,8 +6834,10 @@ is 100\%.
 \noindent The commands \cs{useBeginQuizButton} and \cs{useEndQuizButton} each
 have an optional argument that can be used to modify the appearance
 of the buttons.
-\begin{Verbatim}[xleftmargin=\amtIndent]
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars=!()]
 \useBeginQuizButton[\textColor{0 0 1}]
+!makebox[0pt](!textsf(or)!hskip!amtIndent)
+\useBeginQuizButton[\textColor{blue}] %!textsf( if xcolor package is loaded)
 \end{Verbatim}
 \noindent would create a `Begin Quiz' button with blue text for the button label.
 
@@ -11602,7 +11613,7 @@ Sameshima)\\
                                           used with \pkg{web}\\
 \hyperref[sss:preview]{preview}         & shows the outline of all form fields
                                             in the dvi previewer \\
-\hyperref[sss:nodljs]{nodljs}           & turns off the insertion of DLJS \\
+\hyperref[ss:passthru]{nodljs}           & turns off the insertion of DLJS \\
 %\hyperref[sss:acrobativ]{acrobativ}    & equivalent to \texttt{nodljs}\\
 \hyperref[sss:noquizzes]{exercisesonly} & if document has only exercises, no doc level JS needed\\
 %\hyperref[sss:debug]{debug}             & this option is passed on to the \texttt{insdljs} package\\

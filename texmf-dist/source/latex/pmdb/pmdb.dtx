@@ -4,7 +4,7 @@
 %<*copyright>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% pmdb.sty package,,                                    %%
-%% Copyright (C) 2019  D. P. Story                       %%
+%% Copyright (C) 2019-2021  D. P. Story                       %%
 %%   dpstory@uakron.edu  dpstory@acrotex.net             %%
 %%                                                       %%
 %% This program can redistributed and/or modified under  %%
@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{pmdb}
-%<package> \ProvidesPackage{pmdb}[2019/12/09 v0.4 Mark for input files]
+%<package> \ProvidesPackage{pmdb}[2021/06/07 v1.0 Mark for input files]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
@@ -48,6 +48,7 @@
 \renewcommand{\subparagraph}
     {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
     {\normalfont\normalsize\bfseries}}
+  \let\@latex@warning\@gobble
 \makeatother
 \InputIfFileExists{aebdocfmt.def}{\PackageInfo{pmdb}{Inputting aebdocfmt.def}}
     {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
@@ -117,6 +118,7 @@
 %\paragraph*{The production stage:} After the document has been assembled (using \pkg{pmdb}), and you build your final document
 %(perhaps an \pkg{exerquiz} quiz), the end user can use an appropriate PDF reader. If an \pkg{exerquiz} quiz is used, then
 %a minimum of \app{Adobe Acrobat Reader} is required.
+%\changes{v1.0}{2021/06/07}{Upgrading v0.6 to  v1.0 for publication}
 %    \section{The main code}
 %    \begin{macrocode}
 \edef\th@dquoteCat{\the\catcode`\"}
@@ -125,23 +127,27 @@
 %    \end{macrocode}
 %\subsection{Package options and package requirements}
 %
-%\leavevmode\IndexOpt{dbmode} The default option is \opt{dbmode}. When in effect, check boxes
-%appear in the margins at each \cs{pmInput} point.
+%\leavevmode\IndexOpt{dbmode}^^A
+% The default option is \opt{dbmode}. When in effect, check boxes
+% appear in the margins at each \cs{pmInput} point.
 %    \begin{macrocode}
 \DeclareOption{dbmode}{\pmdbmodetrue}
 %    \end{macrocode}
-%\leavevmode\IndexOpt[\protect\EXCL]{!dbmode} A convenient way to turn off the creation of the check boxes
-%is to simply place an exclamation point (!) in front of the \opt{dbmode} option.
+%\leavevmode\IndexOpt[\protect\EXCL]{!dbmode}^^A
+% A convenient way to turn off the creation of the check boxes
+% is to simply place an exclamation point (!) in front of the \opt{dbmode} option.
 %    \begin{macrocode}
 \DeclareOption{!dbmode}{\pmdbmodefalse}
 %    \end{macrocode}
-%\leavevmode\IndexOpt{tight} When this option is taken, the checkboxes are tight against the text box
-%area.
+%\leavevmode\IndexOpt{tight}^^A
+% When this option is taken, the checkboxes are tight against the text box
+% area.
 %    \begin{macrocode}
 \newif\ifpmdbtight \pmdbtightfalse
 \DeclareOption{tight}{\pmdbtighttrue}
 %    \end{macrocode}
-%\leavevmode\IndexOpt[\protect\EXCL]{!tight} The default for the package, the checkboxes are placed
+%\leavevmode\IndexOpt[\protect\EXCL]{!tight}^^A
+%The default for the package, the checkboxes are placed
 %to extreme left (or right) in the margins.
 %    \begin{macrocode}
 \DeclareOption{!tight}{\pmdbtightfalse}
@@ -152,50 +158,105 @@
 % One motivation for this package is to support the \pkg{thorshammer} package, to that end
 % we make the following assignment, if Thor is not present.
 % This is to prevent stoppage:
-% if your are inputting a \cs{RespBoxEssay} question that is accompanied by the
-% \cs{essayQ} command, defined in \pkg{thorshammer}.\medskip
+% if you are inputting a \cs{RespBoxEssay} question that is accompanied by the
+% \cs{essayQ} command, defined in \pkg{thorshammer}.
 %    \begin{macrocode}
 \def\pmdb@ckThor{\@ifundefined{essayQ}{\let\essayQ\@gobble}{}}
 \AtBeginDocument{\pmdb@ckThor}
 %    \end{macrocode}
-%\subsection{Form field creation}
-% \textbf{Some Booleans and counters}
+%\subsection{Some switches}
+% \textbf{Some Booleans and counters.}
+% The \cs{ifpmdbFP} switch is set to true when the path to the resource is a full path; otherwise, it is set to false.
+% The \cs{ifpmdbDQs} switch is set to true of double-quotes are detected; otherwise it is false.
 %    \begin{macrocode}
 \newif\ifpmdbFP \pmdbFPfalse
 \newif\ifpmdbDQs \pmdbDQsfalse
+%    \end{macrocode}
+%\subsection{Form field creation}
+%  In version dated 2021/01/03, we introduce a button to edit the resource directly in the default application.
+%  If can be turned on with \DescribeMacro\editSourceOn\cs{editSourceOn} and off again with \DescribeMacro\editSourceOff
+%  \cs{editSourceOff}. The default is off. These commands can be placed
+% anywhere in the document and affect all subsequent insertions of \cs{cbSelectInput}.
+%    \changes{v0.6}{2021/01/03}{Added \string\cs{editSourceOn} and \string\cs{editSourceOff}}
+%    \begin{macrocode}
+\newif\ifeditSource \editSourcefalse
+\def\editSourceOn{\editSourcetrue}
+\def\editSourceOff{\editSourcefalse}
 \newcount\pmdb@Cnt
 %    \end{macrocode}
 %
-%\subsubsection{Check box creation}
+%\subsubsection{Marginal edit source creation}
 %
+%    First up is the design for the edit pushbutton or link annotation.
+%    \begin{macro}{\editSourceBtn}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
+%    The button to show the current referenced content in the default application.
+%    \changes{v0.6}{2021/01/03}{Added \string\cs{editSourceBtn}}
+%    \begin{macrocode}
+\newcommand{\editSourceBtn}[3][]{\def\@editSourceBtn##1{%
+    \pushButton[\A{/S/Launch/F(##1)}\protect\A#1
+    ]{editPb.\the\pmdb@Cnt}{#2}{#3}}}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\editSourceBtn}\hskip-\marginparsep\texttt{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}\darg{\ameta{txt}}}
+%    The link version of the button.
+%    \changes{v0.6}{2021/01/03}{Added \string\cs{editSourceLnk}}
+%    \begin{macrocode}
+\newcommand{\editSourceLnk}[4][]{\def\@editSourceLnk##1{%
+    \raisebox{1bp}{\setLinkBbox[\A{/S/Launch/F(##1)}
+      \protect\A#1]{#2}{#3}[c]{\makebox[#2][l]{\thinspace#4}}}}}
+%    \end{macrocode}
+%    Declare the appearance of this push button and link
+%    \begin{macrocode}
+\editSourceBtn[\TU{View in default editor}\S{S}]{11bp}{11bp}
+\editSourceLnk[\linktxtcolor{red}\H{N}]{11bp}{11bp}{E}
+%    \end{macrocode}
+%    We provide a control for setting the annot used to edit the source:
+%    \DescribeMacro\useEditBtn\cs{useEditBtn}, a pushbutton is used;
+%    \DescribeMacro\useEditLnk\cs{useEditLnk}, a link is used. The default
+%    is to use a pushbutton.
+%    \changes{v0.6}{2021/01/03}{Added \string\cs{useEditBtn} and \string\cs{useEditLnk}}
+%    \begin{macrocode}
+\def\useEditBtn{\def\@editSourceBorL{\@editSourceBtn}}
+\def\useEditLnk{\def\@editSourceBorL{\@editSourceLnk}}
+\useEditBtn
+%    \end{macrocode}
+%\subsubsection{Marginal checkbox creation}
 %\DescribeMacro\cbSelectInput\nmpsep{\darg{\ameta{path}}} creates a check box with a tool tip of \ameta{path}
 %The mouse up action \cs{ccBoxMU} fixes up relative paths, and defines a \uif{Ctrl+Click} action. When the check box
-%is so clicked, the \ameta{path} is opened in the default TEX editor. The \ameta{path} can be relative or absolute.
+%is so clicked, the \ameta{path} is opened in the default browser. The \ameta{path} can be relative or absolute.
 %This command is used within \cs{insertCkBx}; its \ameta{path} argument is passed to it from \cs{insertCkBx}.
+%\changes{v0.6}{2021/01/03}{Added hard wired action to launch the default application.}
 %    \begin{macrocode}
 \def\pmCBPresets#1{\def\pm@CBPresets{#1}}
 \pmCBPresets{}
-\def\cbSelectInput#1{\checkBox[\TU{#1}\presets{\pm@CBPresets}
-    \cmd{\bParams{#1}{\the\pmdb@Cnt}\eParams}
-    \AAmouseup{\ccBoxMU}
-  ]{pmdbCkBx.\the\pmdb@Cnt}{11bp}{11bp}{On}%
-  \global\advance\pmdb@Cnt\@ne}
 %    \end{macrocode}
-%\leavevmode\DescribeMacro\insertCkBx\nmpsep{\darg{\ameta{method}}} The argument of this macro describes the method
+%    Here is the check box that appears in the margins and the edit source button
+%    \cs{ifeditSource} is true.
+%    \begin{macrocode}
+\def\cbSelectInput#1{\mbox{\checkBox[\TU{#1}\presets{\pm@CBPresets}
+  \cmd{\bParams{#1}{\the\pmdb@Cnt}\eParams}
+  \AAmouseup{\ccBoxMU}]{pmdbCkBx.\the\pmdb@Cnt}{11bp}{11bp}{On}%
+  \ifeditSource\olBdry\@editSourceBorL{#1}\fi}\global
+  \advance\pmdb@Cnt\@ne
+}
+%    \end{macrocode}
+%    \end{macro}
+%\leavevmode\DescribeMacro\insertCkBx\nmpsep{\darg{\ameta{method}}}
+% The argument of this macro describes the method
 %of inserting the checkbox. The default definition works well for a straightforward document, where you are inputting
 %ordinary {\LaTeX} code (such as sections or chapters).\smallskip
 %    \begin{macrocode}
 \def\insertCkBx#1{\def\@insertCkBx##1{#1}}
 %    \end{macrocode}
 %    Placement of check boxes in the margin. \DescribeMacro\pmAlignCB\cs{pmAlignCB} controls the marginpar placement.
-%    \DescribeMacro\normalCBMargins\cs{normalCBMargins} places it according to the rules of \cs{marginpar};
 %    \DescribeMacro\altCBMargins\cs{altCBMargins} alternates the margin placement, forces the check box to the
 %    extreme left (on odd pages) and extreme right (on even pages).
 %    \begin{macrocode}
 \def\setCBsMarg{%
   \ifpmdbtight
     \if@reversemargin
-      \def\pmAlignCBAlt{\ifodd\value{page}\leavevmode\hfill\else\fi}\else
+      \def\pmAlignCBAlt{\ifodd\value{page}\leavevmode
+        \hfill\else\fi}\else
       \def\pmAlignCBAlt{\ifodd\value{page}\else\hfill\fi}\fi
   \else
     \if@reversemargin
@@ -216,27 +277,47 @@
 % This is the default declaration. It works well when you are inputting content
 % that goes into horizontal mode. We insert the check box at the beginning of the
 % first paragraph. When you are inputting files that come into a list environment, this method
-% does not work satisfactory.\medskip\par\noindent
-%\DescribeMacro\InputParas declares that the next \cs{pmInput} macros are for paragraph content.
-%This is the default state of the package. %\par\medskip
-%\paragraph*{pmInput states}
+% does not work satisfactory.
+%
+%\section{\tops{\cs}{\textbackslash}{pmInput} states}
+%    The switch \cs{ifqzInput} is set to true when \cs{InputQuizItems} is expanded;
+%    otherwise, it is set to false.
 %    \begin{macrocode}
-\def\InputParas{%\let\pmAlignCB\relax
+\newif\ifqzInput \qzInputfalse
+%    \end{macrocode}
+% \DescribeMacro\InputParas This macro declares that the next \cs{pmInput} macros are for paragraph content.
+%This is the default state of the package.
+%    \begin{macrocode}
+\def\InputParas{\global\qzInputfalse
   \insertCkBx{\ifpmdbmode
-  \everypar{\marginpar{\pmAlignCB\cbSelectInput{##1}}\global\everypar{}}\fi}}
+  \everypar{\marginpar{\pmAlignCB
+    \cbSelectInput{##1}}\global\everypar{}}\fi}}
+%    \end{macrocode}
+%    Set the default to be \cs{InputParas}
+%    \begin{macrocode}
 \InputParas
 %    \end{macrocode}
+%    The \DescribeMacro\InputProbs\cs{InputProbs} is a command that declares
+%    the next \cs{pmInput} is for questions for an \pkg{eqexam}
+%    document. Currently this command is still under development.
+%    \begin{macrocode}
+\def\InputProbs{\global\qzInputfalse
+  \insertCkBx{\ifpmdbmode
+  \def\prior@questionsHook{\marginpar
+    {\pmAlignCB\cbSelectInput{##1}}}\fi}}
+%    \end{macrocode}
 %\leavevmode
-%\DescribeMacro\InputQuizItems declares that the next \cs{pmInput} macros are for items in
+%\DescribeMacro\InputQuizItems The macro declares that the next \cs{pmInput} is for items in
 %a \env{quiz} environment of \pkg{exerquiz}
 %\changes{v0.4}{2019/12/09}{Modified to work when no points are specified}
 %    \begin{macrocode}
 \newcount\saveQNo \saveQNo\z@
 \def\pmHook@qzItems{%
   \let\item@pmOld\item
-  \def\item@pnNew{\item@pmOld\itemhook\let\item\item@pmOld}%
-  \let\item\item@pnNew}
-\def\InputQuizItems{\let\pmHook\pmHook@qzItems
+  \def\item@pmNew{\item@pmOld\itemhook\let\item\item@pmOld}%
+  \let\item\item@pmNew}
+\def\InputQuizItems{\global\qzInputtrue
+  \let\pmHook\pmHook@qzItems
   \saveQNo\z@
   \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
   \ItemHook{\leavevmode\ifpmdbmode
@@ -245,7 +326,7 @@
   \saveQNo=\arabic{eqquestionnoi}\fi}}
 %    \end{macrocode}
 %\leavevmode
-%\DescribeMacro\InputItems declares that the next \cs{pmInput} macros are for items in
+%\DescribeMacro\InputItems This command declares that the next \cs{pmInput} macros are for items in
 %an list environment 2019/12/09 v0.4
 %\changes{v0.4}{2019/12/09}{Added \string\cs{InputItems}}
 %    \begin{macrocode}
@@ -262,12 +343,14 @@
   \let\item\item@pmNew
 }
 \def\ItemHook#1{\def\itemhook{#1}}
-\def\InputItems{\let\pmHook\pmHook@item
+\def\InputItems{\global\qzInputfalse
+  \let\pmHook\pmHook@item
   \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
   \ItemHook{\leavevmode\ifpmdbmode
   \marginpar{\pmAlignCB\cbInQzMargin}\fi}}
 %    \end{macrocode}
-%\paragraph*{Place check box and input \ameta{path}}\leavevmode\par\medskip
+%
+%\paragraph*{Place checkbox and input \ameta{path}}\leavevmode\par\medskip
 %\noindent
 %\DescribeMacro\ckBxInput\nmpsep{\darg{\ameta{path}}} Places the check box and inputs the \ameta{path}.
 %    \begin{macrocode}
@@ -277,42 +360,61 @@
     \def\donext{\pmHook\input{#1}}\fi
   \donext}
 %    \end{macrocode}
-%\subsubsection{Push button creation}
+%\subsection{Other pushbutton creations}
 %This package provides two form fields that are used for the DB step.\par\medskip
 %\noindent
 %\DescribeMacro\displayChoices\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} inserts a push button
 %whose action is to display the selections in the console window. The argument \ameta{wd} can be empty, in which
 %case, the width of the field is determined from the \cs{CA} key.
 %    \begin{macrocode}
-\def\displayChoiceCA#1{\def\displayChoice@CA{#1}}
-\def\displayChoiceTU#1{\def\displayChoice@TU{#1}}
-\displayChoiceCA{Display Choices}
-\displayChoiceTU{Lists all choices in the console window}
 \newcommand{\displayChoices}[3][]{\pushButton[\TU{\displayChoice@TU}
   \CA{\displayChoice@CA}#1\AAmouseup{\sldInputs}\protect\AA
 ]{sldInputs}{#2}{#3}}
+%    \end{macrocode}
+%    Easy access to the \cs{CA} and \cs{TU} keys, for language localization, are provided.
+%    These are \DescribeMacro\displayChoiceCA\cs{displayChoiceCA\darg{\ameta{text}}} and
+%    \DescribeMacro\displayChoiceTU\cs{displayChoiceTU\darg{\ameta{text}}}.
+%    \begin{macrocode}
+\def\displayChoiceCA#1{\def\displayChoice@CA{#1}}
+\def\displayChoiceTU#1{\def\displayChoice@TU{#1}}
+\displayChoiceCA{Display Choices}
+\displayChoiceTU{Display all choices in the console window}
 %    \end{macrocode}
 %\DescribeMacro\clrChoices\nmpsep{[\ameta{options}]\darg{\ameta{wd}}\darg{\ameta{ht}}} inserts a push button
 % whose action is to clear all check boxes (and underlying JavaScript variables) created by this package.
 % The argument \ameta{wd} can be empty, in which
 % case, the width of the field is determined from the \cs{CA} key.
 %    \begin{macrocode}
-\def\clrChoicesCA#1{\def\clrChoices@CA{#1}}
-\def\clrChoicesTU#1{\def\clrChoices@TU{#1}}
-\clrChoicesCA{Clear Choices}
-\clrChoicesTU{Clears all check boxes created by pmdb}
 \newcommand{\clrChoices}[3][]{\pushButton[\TU{\clrChoices@TU}
   \CA{\clrChoices@CA}#1\AAmouseup{\clrAction}\protect\AA
-]{sldInputs}{#2}{#3}}
+]{Inputs}{#2}{#3}}
+%    \end{macrocode}
+%    Easy access to the \cs{CA} and \cs{TU} keys, for language localization, are provided.
+%    These are \DescribeMacro\clrChoicesCA\cs{clrChoicesCA\darg{\ameta{text}}} and
+%    \DescribeMacro\clrChoicesTU\cs{clrChoicesTU\darg{\ameta{text}}}.
+%    \begin{macrocode}
+\def\clrChoicesCA#1{\def\clrChoices@CA{#1}}
+\def\clrChoicesTU#1{\def\clrChoices@TU{#1}}
+%    \end{macrocode}
+%    The default declarations for these two.
+%    \begin{macrocode}
+\clrChoicesCA{Clear Choices}
+\clrChoicesTU{Clear all check boxes created by pmdb}
 %    \end{macrocode}
 %
-%\subsection{Defining the \cs{pmInput} command}
+%\subsection{Defining the \tops{\protect\cs}{}{pmInput} command}
 %
-%\DescribeMacro\pmInput\nmpsep{[\ameta{arg}]\darg{\ameta{path}}} is the main user-interface for inputting a file; here,
-%the macros name is \cs{pmInput}, ultimately it calls \cs{input} with the same path. Paths with spaces
+%\DescribeMacro\pmInput\nmpsep{*[\ameta{arg}]\darg{\ameta{path}}} is the main user-interface for inputting a file; here,
+%the macro's name is \cs{pmInput}, ultimately it calls \cs{input} with the same path. Paths with spaces
 %must be enclosed in double quotes (|\pmInput{my cool problem.tex}|) and the extensions must always be used.
+%It the \texttt* option is specified, \cs{pmInput} gobbles up all remaining arguments and does nothing otherwise.
+%The optional argument \ameta{arg} is only obeyed when \cs{InputItems} is in affect; it is passed on to
+%the underlying \cs{item}, as in \cs{item[\ameta{arg}]}. The \ameta{path} argument is the path to the content to be input;
+%if the \ameta{path} contains spaces, then the path must be enclosed in double quotes (\texttt{"my cool path/file.tex"}).
 %    \begin{macrocode}
-\def\pmInput{\@ifnextchar[%]
+\newcommand\@gobbleOR[2][]{}
+\def\pmInput{\@ifstar{\@gobbleOR}{\pmInput@i}}
+\def\pmInput@i{\@ifnextchar[%]
   {\let\pm@Brk\ef@YES\inputConta}
   {\let\pm@Brk\ef@NO\inputConta}}
 \let\pm@Brk\ef@NO
@@ -352,16 +454,20 @@
 %    in other package, in particular in the \pkg{srcltx}. So we allow the use of \cs{Input}
 %    if \cs{Input} is not otherwise defined.
 %    \begin{macrocode}
-\def\pmInputWarni{\PackageWarningNoLine{pmdb}{The command \string\Input\space
-  is already defined.\MessageBreak
+\def\pmInputWarni{\PackageWarningNoLine{pmdb}{The command
+  \string\Input\space is already defined.\MessageBreak
   The checkboxes may not appear in the margins.\MessageBreak
   Use the supported command \string\pmInput\space instead}}
 \def\pmInputWarnii{\PackageWarningNoLine{pmdb}{Letting
   \string\Input\space to \string\pmInput. You are \MessageBreak
   encouraged to use the supported\MessageBreak
   command \string\pmInput\space instead}}
-\def\pmInputChk{\@ifundefined{Input}{\let\Input\pmInput\pmInputWarnii}
-  {\pmInputWarni}}
+\def\pmInputChk{%
+  \@ifundefined{Input}{%
+  \gdef\Input{\pmInputWarnii
+    \global\let\pmInputWarnii\relax
+    \global\let\pmInputWarni\relax
+    \pmInput}}{\pmInputWarni}}
 \AtBeginDocument{\pmInputChk}
 %    \end{macrocode}
 %
@@ -369,8 +475,9 @@
 % \leavevmode
 %\DescribeMacro\ccBoxMU
 % This is the JavaScript action of the check box, used in \cs{cbSelectInput}
+% This code uses two parameters \cs{p(1)=\ameta{path}} and \cs{p(2)=\ameta{cnt}} (|\the\pmdb@Cnt|).
 %    \begin{macrocode}
-\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\ccBoxMU}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\ccBoxMU}
 @ifpmdbFP%
 event.target.userName=("@p(1)");
 @else%
@@ -382,28 +489,48 @@ event.target.userName=("@p(1)");
 var pos=this.path.lastIndexOf("/");
 var thispath=this.path.substring(0,pos+1);
 %    \end{macrocode}
-%    \enspace\verb|/<drive>/user/documents/.../myfolder/|
+%    \enspace|/<drive>/user/documents/.../myfolder/|
 %    \begin{macrocode}
-pos=this.path.indexOf("/",1);
-var drive=thispath.substring(0,pos);
+pos=thispath.indexOf("/",1);
+var drive=thispath.substring(1,pos);
 var platform=app.platform;
+%    \end{macrocode}
+%    \uif{Windows} platform
+%    \begin{macrocode}
 if (platform=="WIN")
 %    \end{macrocode}
-%    \hskip\parindent\enspace\verb|/<drive>:/user/documents/.../myfolder/|
+%    \enspace|<drive>:/user/documents/.../myfolder/|
 %    \begin{macrocode}
   thispath=drive+":/"+thispath.substring(pos+1);
-event.target.userName=thispath+("@p(1)");
-@fi%
+%    \end{macrocode}
+%    \uif{MacOS} platform: I'm not familiar with the \uif{MacOS} file system, so we'll just
+%    assume it is the same as with Windows.
+%    \begin{macrocode}
+if (platform=="MAC")
+%    \end{macrocode}
+%    \enspace|<drive>/user/documents/.../myfolder/|
+%    \begin{macrocode}
+  thispath=drive+"/"+thispath.substring(pos+1);
+event.target.userName=thispath+("@p(1)");@fi
 if (event.modifier){
-  var _to=app.setTimeOut("_restoreCCState('pmdbCkBx.@p(2)');",.05);
+  event.target.checkThisBox(0,!event.target.isBoxChecked(0));
   try {
-  aebTrustedFunctions(this,aebLaunchURL,
-    {cURL: "file://"+event.target.userName});
+    aebTrustedFunctions(this,aebLaunchURL,%
+{cURL: "file:///"+event.target.userName});
   } catch(e) {
     console.show();
     console.println("The Ctrl+Click action is not supported, %
-installation of aeb\_pro.js is required.");
+installation of aeb\_pro.js or aeb-reader.js is required.");
   }
+%    \end{macrocode}
+%     (2020/04/29)  Add a shift event for quizzes.
+%    \changes{v0.5}{2020/04/29}{Added \string\texttt{event.shift} for quizzes}
+%    \begin{macrocode}
+}
+if (event.shift) {
+	event.target.checkThisBox(0,!event.target.isBoxChecked(0));%
+@ifqzInput
+  this.gotoNamedDest("@currQuiz."+(@p(2)+1));@fi
 } else {
   if (event.target.isBoxChecked(0)){
     _oSPaths["pmdbCkBx.@p(2)"]=%
@@ -425,18 +552,18 @@ installation of aeb\_pro.js is required.");
 % and displays them in the console window of \app{Acrobat/Reader}, used in
 % \cs{displayChoices}.
 %    \begin{macrocode}
-\begin{defineJS}[\catcode`\%=14\relax]{\sldInputs}
+\begin{defineJS}[\makecmt\%]{\sldInputs}
 console.clear();console.show();
 if (_numInputs==0) console.println("No inputs selected");
 else {
   for(var i=0;i<_aInputs.length;i++){
     if (!!_aInputs[i]){
       if(_oSPaths["pmdbCkBx."+i][1])
-        console.println(%
-'\\\\input\{\\"'+(_oSPaths["pmdbCkBx."+i][0])+'\\"\}');
+        console.println('\\\\input\{\\"'+(_oSPaths["pmdbCkBx."+i][0])%
++'\\"\}');
       else
-        console.println(%
-'\\\\input\{'+(_oSPaths["pmdbCkBx."+i][0])+'\}');
+        console.println('\\\\input\{'+(_oSPaths["pmdbCkBx."+i][0])%
++'\}');
     }
   }
 }
@@ -444,7 +571,7 @@ else {
 %    \end{macrocode}
 %\leavevmode
 %\DescribeMacro\clrAction
-% Mouse up action to clear the check boxes and to re-initialize internal
+% Mouse up action to clear the checkboxes and to re-initialize internal
 % internal JS variables. Used in \cs{clrChoices}.
 %    \begin{macrocode}
 \begin{defineJS}{\clrAction}
@@ -460,13 +587,6 @@ this.resetForm("pmdbCkBx");
 var _oSPaths=new Object;
 var _aInputs=new Array;
 var _numInputs=0;
-function _restoreCCState(fName){
-  var f=this.getField(fName);
-  var _ccState=%
-(typeof f["_boxState"]=="undefined")?false:f["_boxState"];
-  f["_boxState"]=_ccState;
-  return f.checkThisBox(0,_ccState);
-}
 \end{insDLJS}
 %    \end{macrocode}
 %    \begin{macrocode}

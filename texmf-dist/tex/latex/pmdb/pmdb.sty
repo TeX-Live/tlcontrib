@@ -8,7 +8,7 @@
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% pmdb.sty package,,                                    %%
-%% Copyright (C) 2019  D. P. Story                       %%
+%% Copyright (C) 2019-2021  D. P. Story                       %%
 %%   dpstory@uakron.edu  dpstory@acrotex.net             %%
 %%                                                       %%
 %% This program can redistributed and/or modified under  %%
@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{pmdb}
- \ProvidesPackage{pmdb}[2019/12/09 v0.4 Mark for input files]
+ \ProvidesPackage{pmdb}[2021/06/07 v1.0 Mark for input files]
 \edef\th@dquoteCat{\the\catcode`\"}
 \catcode`\"=12\relax
 \newif\ifpmdbmode \pmdbmodetrue
@@ -34,19 +34,35 @@
 \AtBeginDocument{\pmdb@ckThor}
 \newif\ifpmdbFP \pmdbFPfalse
 \newif\ifpmdbDQs \pmdbDQsfalse
+\newif\ifeditSource \editSourcefalse
+\def\editSourceOn{\editSourcetrue}
+\def\editSourceOff{\editSourcefalse}
 \newcount\pmdb@Cnt
+\newcommand{\editSourceBtn}[3][]{\def\@editSourceBtn##1{%
+    \pushButton[\A{/S/Launch/F(##1)}\protect\A#1
+    ]{editPb.\the\pmdb@Cnt}{#2}{#3}}}
+\newcommand{\editSourceLnk}[4][]{\def\@editSourceLnk##1{%
+    \raisebox{1bp}{\setLinkBbox[\A{/S/Launch/F(##1)}
+      \protect\A#1]{#2}{#3}[c]{\makebox[#2][l]{\thinspace#4}}}}}
+\editSourceBtn[\TU{View in default editor}\S{S}]{11bp}{11bp}
+\editSourceLnk[\linktxtcolor{red}\H{N}]{11bp}{11bp}{E}
+\def\useEditBtn{\def\@editSourceBorL{\@editSourceBtn}}
+\def\useEditLnk{\def\@editSourceBorL{\@editSourceLnk}}
+\useEditBtn
 \def\pmCBPresets#1{\def\pm@CBPresets{#1}}
 \pmCBPresets{}
-\def\cbSelectInput#1{\checkBox[\TU{#1}\presets{\pm@CBPresets}
-    \cmd{\bParams{#1}{\the\pmdb@Cnt}\eParams}
-    \AAmouseup{\ccBoxMU}
-  ]{pmdbCkBx.\the\pmdb@Cnt}{11bp}{11bp}{On}%
-  \global\advance\pmdb@Cnt\@ne}
+\def\cbSelectInput#1{\mbox{\checkBox[\TU{#1}\presets{\pm@CBPresets}
+  \cmd{\bParams{#1}{\the\pmdb@Cnt}\eParams}
+  \AAmouseup{\ccBoxMU}]{pmdbCkBx.\the\pmdb@Cnt}{11bp}{11bp}{On}%
+  \ifeditSource\olBdry\@editSourceBorL{#1}\fi}\global
+  \advance\pmdb@Cnt\@ne
+}
 \def\insertCkBx#1{\def\@insertCkBx##1{#1}}
 \def\setCBsMarg{%
   \ifpmdbtight
     \if@reversemargin
-      \def\pmAlignCBAlt{\ifodd\value{page}\leavevmode\hfill\else\fi}\else
+      \def\pmAlignCBAlt{\ifodd\value{page}\leavevmode
+        \hfill\else\fi}\else
       \def\pmAlignCBAlt{\ifodd\value{page}\else\hfill\fi}\fi
   \else
     \if@reversemargin
@@ -63,16 +79,23 @@
   \fi
 }
 \@ifundefined{chapter}{}{\AtBeginDocument{\setCBsMarg\altCBMargins}}
-\def\InputParas{%\let\pmAlignCB\relax
+\newif\ifqzInput \qzInputfalse
+\def\InputParas{\global\qzInputfalse
   \insertCkBx{\ifpmdbmode
-  \everypar{\marginpar{\pmAlignCB\cbSelectInput{##1}}\global\everypar{}}\fi}}
+  \everypar{\marginpar{\pmAlignCB
+    \cbSelectInput{##1}}\global\everypar{}}\fi}}
 \InputParas
+\def\InputProbs{\global\qzInputfalse
+  \insertCkBx{\ifpmdbmode
+  \def\prior@questionsHook{\marginpar
+    {\pmAlignCB\cbSelectInput{##1}}}\fi}}
 \newcount\saveQNo \saveQNo\z@
 \def\pmHook@qzItems{%
   \let\item@pmOld\item
-  \def\item@pnNew{\item@pmOld\itemhook\let\item\item@pmOld}%
-  \let\item\item@pnNew}
-\def\InputQuizItems{\let\pmHook\pmHook@qzItems
+  \def\item@pmNew{\item@pmOld\itemhook\let\item\item@pmOld}%
+  \let\item\item@pmNew}
+\def\InputQuizItems{\global\qzInputtrue
+  \let\pmHook\pmHook@qzItems
   \saveQNo\z@
   \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
   \ItemHook{\leavevmode\ifpmdbmode
@@ -92,7 +115,8 @@
   \let\item\item@pmNew
 }
 \def\ItemHook#1{\def\itemhook{#1}}
-\def\InputItems{\let\pmHook\pmHook@item
+\def\InputItems{\global\qzInputfalse
+  \let\pmHook\pmHook@item
   \insertCkBx{\def\cbInQzMargin{\cbSelectInput{##1}}}%
   \ItemHook{\leavevmode\ifpmdbmode
   \marginpar{\pmAlignCB\cbInQzMargin}\fi}}
@@ -101,21 +125,23 @@
   \ifpmdbDQs\def\donext{\pmHook\input{"#1"}}\else
     \def\donext{\pmHook\input{#1}}\fi
   \donext}
-\def\displayChoiceCA#1{\def\displayChoice@CA{#1}}
-\def\displayChoiceTU#1{\def\displayChoice@TU{#1}}
-\displayChoiceCA{Display Choices}
-\displayChoiceTU{Lists all choices in the console window}
 \newcommand{\displayChoices}[3][]{\pushButton[\TU{\displayChoice@TU}
   \CA{\displayChoice@CA}#1\AAmouseup{\sldInputs}\protect\AA
 ]{sldInputs}{#2}{#3}}
+\def\displayChoiceCA#1{\def\displayChoice@CA{#1}}
+\def\displayChoiceTU#1{\def\displayChoice@TU{#1}}
+\displayChoiceCA{Display Choices}
+\displayChoiceTU{Display all choices in the console window}
+\newcommand{\clrChoices}[3][]{\pushButton[\TU{\clrChoices@TU}
+  \CA{\clrChoices@CA}#1\AAmouseup{\clrAction}\protect\AA
+]{Inputs}{#2}{#3}}
 \def\clrChoicesCA#1{\def\clrChoices@CA{#1}}
 \def\clrChoicesTU#1{\def\clrChoices@TU{#1}}
 \clrChoicesCA{Clear Choices}
-\clrChoicesTU{Clears all check boxes created by pmdb}
-\newcommand{\clrChoices}[3][]{\pushButton[\TU{\clrChoices@TU}
-  \CA{\clrChoices@CA}#1\AAmouseup{\clrAction}\protect\AA
-]{sldInputs}{#2}{#3}}
-\def\pmInput{\@ifnextchar[%]
+\clrChoicesTU{Clear all check boxes created by pmdb}
+\newcommand\@gobbleOR[2][]{}
+\def\pmInput{\@ifstar{\@gobbleOR}{\pmInput@i}}
+\def\pmInput@i{\@ifnextchar[%]
   {\let\pm@Brk\ef@YES\inputConta}
   {\let\pm@Brk\ef@NO\inputConta}}
 \let\pm@Brk\ef@NO
@@ -135,41 +161,51 @@
   \ifpmdbDQs\def\donext{\input{"#1"}}\else
     \def\donext{\input{#1}}\fi\fi
   \donext}
-\def\pmInputWarni{\PackageWarningNoLine{pmdb}{The command \string\Input\space
-  is already defined.\MessageBreak
+\def\pmInputWarni{\PackageWarningNoLine{pmdb}{The command
+  \string\Input\space is already defined.\MessageBreak
   The checkboxes may not appear in the margins.\MessageBreak
   Use the supported command \string\pmInput\space instead}}
 \def\pmInputWarnii{\PackageWarningNoLine{pmdb}{Letting
   \string\Input\space to \string\pmInput. You are \MessageBreak
   encouraged to use the supported\MessageBreak
   command \string\pmInput\space instead}}
-\def\pmInputChk{\@ifundefined{Input}{\let\Input\pmInput\pmInputWarnii}
-  {\pmInputWarni}}
+\def\pmInputChk{%
+  \@ifundefined{Input}{%
+  \gdef\Input{\pmInputWarnii
+    \global\let\pmInputWarnii\relax
+    \global\let\pmInputWarni\relax
+    \pmInput}}{\pmInputWarni}}
 \AtBeginDocument{\pmInputChk}
-\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\ccBoxMU}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\ccBoxMU}
 @ifpmdbFP%
 event.target.userName=("@p(1)");
 @else%
 // device independent path
 var pos=this.path.lastIndexOf("/");
 var thispath=this.path.substring(0,pos+1);
-pos=this.path.indexOf("/",1);
-var drive=thispath.substring(0,pos);
+pos=thispath.indexOf("/",1);
+var drive=thispath.substring(1,pos);
 var platform=app.platform;
 if (platform=="WIN")
   thispath=drive+":/"+thispath.substring(pos+1);
-event.target.userName=thispath+("@p(1)");
-@fi%
+if (platform=="MAC")
+  thispath=drive+"/"+thispath.substring(pos+1);
+event.target.userName=thispath+("@p(1)");@fi
 if (event.modifier){
-  var _to=app.setTimeOut("_restoreCCState('pmdbCkBx.@p(2)');",.05);
+  event.target.checkThisBox(0,!event.target.isBoxChecked(0));
   try {
-  aebTrustedFunctions(this,aebLaunchURL,
-    {cURL: "file://"+event.target.userName});
+    aebTrustedFunctions(this,aebLaunchURL,%
+{cURL: "file:///"+event.target.userName});
   } catch(e) {
     console.show();
     console.println("The Ctrl+Click action is not supported, %
-installation of aeb\_pro.js is required.");
+installation of aeb\_pro.js or aeb-reader.js is required.");
   }
+}
+if (event.shift) {
+event.target.checkThisBox(0,!event.target.isBoxChecked(0));%
+@ifqzInput
+  this.gotoNamedDest("@currQuiz."+(@p(2)+1));@fi
 } else {
   if (event.target.isBoxChecked(0)){
     _oSPaths["pmdbCkBx.@p(2)"]=%
@@ -184,18 +220,18 @@ installation of aeb\_pro.js is required.");
   event.target["_boxState"]=!!event.target.isBoxChecked(0);
 }
 \end{defineJS}
-\begin{defineJS}[\catcode`\%=14\relax]{\sldInputs}
+\begin{defineJS}[\makecmt\%]{\sldInputs}
 console.clear();console.show();
 if (_numInputs==0) console.println("No inputs selected");
 else {
   for(var i=0;i<_aInputs.length;i++){
     if (!!_aInputs[i]){
       if(_oSPaths["pmdbCkBx."+i][1])
-        console.println(%
-'\\\\input\{\\"'+(_oSPaths["pmdbCkBx."+i][0])+'\\"\}');
+        console.println('\\\\input\{\\"'+(_oSPaths["pmdbCkBx."+i][0])%
++'\\"\}');
       else
-        console.println(%
-'\\\\input\{'+(_oSPaths["pmdbCkBx."+i][0])+'\}');
+        console.println('\\\\input\{'+(_oSPaths["pmdbCkBx."+i][0])%
++'\}');
     }
   }
 }
@@ -210,13 +246,6 @@ this.resetForm("pmdbCkBx");
 var _oSPaths=new Object;
 var _aInputs=new Array;
 var _numInputs=0;
-function _restoreCCState(fName){
-  var f=this.getField(fName);
-  var _ccState=%
-(typeof f["_boxState"]=="undefined")?false:f["_boxState"];
-  f["_boxState"]=_ccState;
-  return f.checkThisBox(0,_ccState);
-}
 \end{insDLJS}
 \catcode`\"=\th@dquoteCat
 \endinput

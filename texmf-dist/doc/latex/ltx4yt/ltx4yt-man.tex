@@ -85,7 +85,7 @@
     email={dpstory@acrotex.net},
     subject={Playing YouTube Videos in PDF},
     talksite={\url{www.acrotex.net}},
-    version={0.7, 2020/07/30},
+    version={1.0, 2021/06/08},
     keywords={AcroTeX, PDF, YouTube, Browser},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -301,8 +301,8 @@ this document are brown.
 \paragraph*{An example.} There are two ``Kung-Fu Fighting'' videos of interest: \texttt{GZ9e3Dy7obA} and
 \texttt{jhUkGIsKvn0}; we set up likes for the first and twice for the second:
 \begin{quote}
-    \ytvId{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}\\
-    \verb~\ytvId{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}~\\[3pt]
+    \ytvId*{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}\\
+    \verb~\ytvId*{GZ9e3Dy7obA}{Kung-Fu Fighting (Bruce Lee)}~\\[3pt]
     \ytvId{jhUkGIsKvn0}{Kung-Fu Fighting (Carl Douglas)}\\
     \verb~\ytvId{jhUkGIsKvn0}{Kung-Fu Fighting (Carl Douglas)}~\\[3pt]
     \ytvId*{jhUkGIsKvn0}{Kung-Fu Fighting* (Carl Douglas)}\\
@@ -419,8 +419,8 @@ on to the field names of these two field; The pair \cs{ytComboList} and
 Below is an abbreviated example, more extensive examples are found in the demo files sited at the beginning of this section.
 
 \declarePlayList{\playList}{% note: put parentheses within braces
-  \ytIdTitle{Kung-Fu Fighting {(Bruce Lee)}}{GZ9e3Dy7obA}
-  \ytIdTitle{Kung-Fu Fighting* {(Carl Douglas)}}{jhUkGIsKvn0}
+  \ytIdTitle{Kung-Fu Fighting* {(Bruce Lee)}}{GZ9e3Dy7obA}
+  \ytIdTitle{Kung-Fu Fighting {(Carl Douglas)}}{jhUkGIsKvn0}
   \ytIdTitle{J\"{u}rgen's "favorite" song*}{mLDF5MBMWHE}
   \ytIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
 }
@@ -433,8 +433,8 @@ Below is an abbreviated example, more extensive examples are found in the demo f
 \def\2{\llap{\rlap{\ding{183}}\hskip\amtIndent\relax}}\relax
 \begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars={!~@}]
 \declarePlayList{\playList}{% note: put parentheses within braces
-!quad\ytIdTitle{Kung-Fu Fighting {(Bruce Lee)}}{GZ9e3Dy7obA}
-!quad\ytIdTitle{Kung-Fu Fighting* {(Carl Douglas)}}{jhUkGIsKvn0}
+!quad\ytIdTitle{Kung-Fu Fighting* {(Bruce Lee)}}{GZ9e3Dy7obA}
+!quad\ytIdTitle{Kung-Fu Fighting {(Carl Douglas)}}{jhUkGIsKvn0}
 !1!quad\ytIdTitle{J\"{u}rgen's "favorite" song*}{mLDF5MBMWHE}
 !2!quad\ytIdTitle{Learn \cs{LaTeX} in one video}{VhmkLrOjLsw}
 }
@@ -566,7 +566,8 @@ constructing links is to use the \cs{ytLink} command.
 \def\3{\rlap{\hskip\ytlength\relax\ding{184}}}%
 \def\4{\rlap{\hskip\ytlength\relax\ding{185}}}%
 \def\5{\rlap{\hskip\ytlength\relax\ding{186}}}%
-\def\6{\rlap{\hskip\ytlength\relax\llap{\sffamily(presets for \cs{ytvId})\hskip2\fboxsep\hskip2\fboxrule}}}%
+\def\6{\rlap{\hskip\ytlength\relax\ding{187}}}%
+\def\7{\rlap{\hskip\ytlength\relax\llap{\sffamily(presets for \cs{ytvId})\hskip2\fboxsep\hskip2\fboxrule}}}%
 \begin{minipage}{\bxSize}
 \begin{Verbatim}[frame=single,commandchars=!(),rulecolor=\color{red}]
 !1\ytLink{\embedId{!ameta(ytvId)}\params{!ameta(params)}}{!ameta(text)}
@@ -575,7 +576,8 @@ constructing links is to use the \cs{ytLink} command.
 !4\ytLink{!ameta(spec)}{!ameta(text)}
 !5\ytLink{\channel{!ameta(name)}}{!ameta(text)}
 !5\ytLink{\user{!ameta(name)}}{!ameta(text)}
-!6\ytvIdPresets{!ameta(KV-pairs)}
+!6\ytLink{\search{!ameta(search-string)}}{!ameta(text)}
+!7\ytvIdPresets{!ameta(KV-pairs)}
 \end{Verbatim}
 \end{minipage}\eVerb Each of these has an optional first argument \ameta{KV-pairs} that is not shown above.
 Let's take a look at each of these in turn and illustrate with examples. Yes,
@@ -609,16 +611,19 @@ for a discussion.
     \verb!\ytLink{\watchId{5y9-EVmreU4}!\\
     \null\qquad\verb!\params{autoplay=1}}{Lori's Corner: Episode \#1}!
 
-  \item[\ding{184}] A more general form that allows you to formulate general URLs. For example, we \emph{search}
-    for {\YT} videos on \app{Adobe Acrobat DC}:\\[3pt]
-    \ytLink{\embed{listType=search&list=Adobe Acrobat DC}}{Search for Adobe Acrobat DC}\\
-    \verb!\ytLink{\embed{listType=search&list=Adobe Acrobat DC}}!\\
-    \null\qquad\verb!{Search for Adobe Acrobat DC}!
+  \item[\ding{184}] A more general form that allows you to formulate general URLs. For example, we display
+    a play list for Adobe Acrobat Pro training:\goodbreak
+    \ytLink{\embed{listType=playlist&list=PL_dhPga7ruudhQiL-dqVhGcCqDpH1KqR_}}{Adobe Acrobat Pro Training}\\
+    \verb!\ytLink{\embed{%!\\
+    \null\qquad\verb!listType=playlist&list=PL_dhPga7ruudhQiL-dqVhGcCqDpH1KqR_}}!\\
+    \null\qquad\verb!{Adobe Acrobat Pro Training}!\\[3pt]
+  Look for the playlist control in the upper right corner of the window.
   \item[\ding{185}] The most general form, \ameta{spec} is simply appended, ie,
   \texttt{https://www.youtube.com/\ameta{spec}}\\[3pt]
-  \ytLink{embed?listType=search&list=LaTeX typesetting}{Totally custom search link}\\
-  \verb|\ytLink{embed?listType=search&list=LaTeX typesetting}|\\
-  \null\qquad\verb|{Totally custom search link}|
+  \ytLink{embed?listType=playlist&list=PL01A18BBA5912B01F}{{\LaTeX} Tutorial}\\
+  \verb|\ytLink{embed?listType=playlist&list=PL01A18BBA5912B01F}|\\
+  \null\qquad\verb|{{\LaTeX} Tutorial}|\\[3pt]
+  Look for the playlist control in the upper right corner of the window.
   \item[\ding{186}] There are a couple of URLs for displaying a channel on \YT, at least there are a couple
   that I have discovered.
   Use this form to see channel of a particular contributor to {\YT}. For example,\\[3pt]
@@ -630,6 +635,28 @@ for a discussion.
   To get the true \ameta{name} of a channel, go to {\YT} and search for that channel. For example,
   search for \textsf{RocketJump}. On the resulting page, click on a RocketJump link and look at the
   location bar in the browser to see the path, it may come up \texttt{c/rocketjump} or \texttt{user/freddiew}.
+
+\item[\ding{187}] In the previous version of this package, the syntax for
+    making a {\YT} search was presented as,
+  \[
+    \verb!\ytLink{\embed{listType=search&list=Adobe Acrobat DC}}!
+  \]
+  However, according to the
+  \href{https://developers.google.com/youtube/player_parameters}{Google
+  developers web site} the \texttt{listType=search} key-value is no longer
+  supported as of Nov.\ 15, 2020. Use the \cs{search} key to make this same search,
+  \begin{align*}
+    &\text{\ytLink{\search{Adobe Acrobat DC}}{Adobe Acrobat DC}}\\&
+    \cs{ytLink\darg{\cs{search}\darg{Adobe Acrobat DC}}\darg{Search for Adobe Acrobat DC}}
+  \end{align*}
+  The above link expands to the URL
+  \[
+  \texttt{https://www.youtube.com/results?search\_query=Adobe Acrobat DC}
+  \]
+  Once on the {\YT} web site, there are controls to further filter the
+  search.
+
+
 \end{enumerate}
 
 \newtopic\noindent There is a multi-line version of \cs{ytLink}.

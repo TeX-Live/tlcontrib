@@ -14,11 +14,11 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{ltx4yt}
-%<package> [2020/07/30 v0.7 ltx4yt: Play YouTube videos in the default browser (dps)]
+%<package> [2021/06/08 v1.0 ltx4yt: Play YouTube videos in the default browser (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
-\hypersetup{pdfpagemode=useNone}
+\hypersetup{pdfpagemode=UseNone}
 \usepackage{fancyvrb}
 %\def\texorpdfstring#1#2{#1}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
@@ -54,7 +54,7 @@
 \def\meta#1{\textsl{\texttt{#1}}}
 \def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
 \def\ltag{<}\def\rtag{>}
-\def\EXCL{!}
+\def\EXCL{!}\def\QMRK{?}\def\EQU{=}
 \let\app\textsf\let\pkg\textsf
 \begin{document}
   \GetFileInfo{ltx4yt.sty}
@@ -92,11 +92,13 @@
 % course is to develop some basic commands for playing YouTube videos in the default browser, preferably
 % without any annoying advertisements. This can be done for some videos, but for others it cannot be done.
 %
+%\changes{v1.0}{2021/06/08}{Modify search-type macro to conform with new YouTube player parameters}
 %\changes{v0.1}{2020/07/17}{Begin new package \string\pkg{ltx4yt}}
 %\changes{v0.2}{2020/07/17}{Commands to pass arguments to urls}
 %\changes{v0.6}{2020/07/25}{Final version before first publication}
 %\changes{v0.7}{2020/07/30}{Corrected upload}
-%    \begin{macrocode}
+%\changes{v0.8}{2020/08/01}{Added catcode protection}
+%\begin{macrocode}
 \RequirePackage{xkeyval}
 %    \end{macrocode}
 %    \leavevmode\IndexOpt{usepopup} When this option is taken, additional code to support
@@ -110,6 +112,13 @@
 \let\lo@dpu\relax
 \AtEndOfPackage{\lo@dpu}
 \ProcessOptions
+\edef\yt@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\'=\the\catcode`\'\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\'\@makeother\,\@makeother\!
 \RequirePackage{xcolor}
 \RequirePackage{eforms}
 %    \end{macrocode}
@@ -169,15 +178,22 @@
 %   \item[{\ameta{text}}:] The text that displays the link.
 %\end{itemize}
 %\end{quote}
+%\changes{v0.8}{2020/08/01}{added \string\cs{ytIdParams}}
 %    \begin{macrocode}
+\def\ytvIdParams#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\ytvIdP@rams\@empty\else\def\ytvIdP@rams{#1}\fi}
+\let\ytvIdP@rams\@empty
 \newcommand{\ytvId}{\@ifstar{\def\yt@ask{*}\yt@@vId}
   {\let\yt@ask\@empty\yt@@vId}}
-\newcommand{\yt@@vId}[3][]{%
+\newcommand{\yt@@vId}[3][]{\begingroup
+  \ifx\ytvIdP@rams\@empty\let\ques\@empty\else
+    \ifx\yt@ask\@empty\def\ques{?}\else\def\ques{&}\fi
+  \fi
   \ifx\yt@ask\@empty
-    \def\yt@lnk@hash{embed/#2}\else
-    \def\yt@lnk@hash{watch?v=#2}\fi
+    \def\yt@lnk@hash{embed/#2\ques\ytvIdP@rams}\else
+    \def\yt@lnk@hash{watch?v=#2\ques\ytvIdP@rams}\fi
   \setLink[\presets{\yt@vIdPresets}#1
-    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}\endgroup
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -188,12 +204,15 @@
 %    \begin{macrocode}
 \newcommand{\ytvIdML}{\@ifstar{\def\yt@ask{*}\yt@@vIdML}
   {\let\yt@ask\@empty\yt@@vIdML}}
-\newcommand{\yt@@vIdML}[3][]{%
+\newcommand{\yt@@vIdML}[3][]{\begingroup
+  \ifx\ytvIdP@rams\@empty\let\ques\@empty\else
+    \ifx\yt@ask\@empty\def\ques{?}\else\def\ques{&}\fi
+  \fi
   \ifx\yt@ask\@empty
-    \def\yt@lnk@hash{embed/#2}\else
-    \def\yt@lnk@hash{watch?v=#2}\fi
+    \def\yt@lnk@hash{embed/#2\ques\ytvIdP@rams}\else
+    \def\yt@lnk@hash{watch?v=#2\ques\ytvIdP@rams}\fi
   \mlsetLink[\presets{\yt@vIdPresets}#1
-    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}\endgroup
 }
 %    \end{macrocode}
 %    \end{macro}
@@ -217,6 +236,8 @@
 %     A form that does not specify a video ID. It is useful for more general actions, such as
 %     searches, for example,
 %     \begin{flushleft}
+%       \textcolor{red}{\textbf{Note:} \texttt{listType=search} is deprecated and will no longer be supported
+%       as of 15 November, 2020.}
 %       |\ytLink{\embed{listType=search&list=Adobe Acrobat DC}}|\\
 %       \qquad|{Search for Adobe Acrobat DC}|
 %     \end{flushleft}
@@ -226,6 +247,8 @@
 %    \item |\ytLink{|\ameta{spec}|}{|\ameta{text}|}|\\[3pt] The most general form. The action of this
 %    link is |\URI{\ytURL/|\ameta{spec}|}|; for example,
 %     \begin{flushleft}
+%       \textcolor{red}{\textbf{Note:} \texttt{listType=search} is deprecated and will no longer be supported
+%       as of 15 November, 2020.}
 %       |\ytLink{embed?listType=search&list=Adobe Acrobat DC}|\\
 %       \qquad|{Search for Adobe Acrobat DC}|
 %     \end{flushleft}
@@ -242,7 +265,7 @@
 %   As was illustrated above, the custom link \cs{ytLink} can pass various recognizable
 %   parameters to YouTube. After reviewing,
 %   \begin{flushleft}
-%   \url{https://developers.google.com/youtube/player_parameters#Parameters}
+%   \url{https://developers.google.com/youtube/player_parameters}
 %   \end{flushleft}
 %   the following parameters are recommended, some of them are illustrated in the
 %   sample document \texttt{ltx4yt-1.tex}:
@@ -252,7 +275,9 @@
 %     \item \texttt{fs=\ameta{\upshape{0\string|1}}} (default \texttt{1})
 %     \item \texttt{modestbranding=\ameta{\upshape{0\string|0}}}
 %     \item \texttt{playlist=\ameta{list}}
-%     \item \texttt{listType=search\&list=\ameta{query}}
+%     \item \texttt{listType=search\&list=\ameta{query}}\\
+%       \textcolor{red}{\textbf{Note:} \texttt{listType=search} is deprecated and will no longer be supported
+%       as of 15 November, 2020.}
 %   \end{itemize}
 %   The specialized needs of the document author is most easily accommodated through the use
 %   of the \cs{ytLink} command, for example,
@@ -263,7 +288,7 @@
 %    \begin{macrocode}
 \newif\ifytwatch \ytwatchfalse
 %    \end{macrocode}
-%    \paragraph*{The \cs{ytLink} command.} Before getting to \cs{ytLink} an d\cs{ytLinkML},
+%    \paragraph*{The \cs{ytLink} command.} Before getting to \cs{ytLink} and \cs{ytLinkML},
 %    there is a long stream of commands to parse the \ameta{spec} argument of \cs{ytLink}.
 %    It goes through looking for \cs{watchId}, \cs{embedId}, \cs{embed}, and \cs{params}.
 %    As it progresses, it adds code to the macro \cs{ytspec}, which at the end of things
@@ -302,6 +327,7 @@
   \def\embedId##1{embed/##1}%
   \def\params##1{##1}\def\embed##1{embed?##1}%
   \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\search##1{results?search_query=##1}%
   \def\user##1{user/##1}%
   \yt@@parse#2\@nil % returns arg in \ytspec
   \def\URLArg{\ytURL/\ytspec}%
@@ -318,6 +344,7 @@
   \def\embedId##1{embed/##1}%
   \def\params##1{##1}\def\embed##1{embed?##1}%
   \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\search##1{results?search_query=##1}%
   \def\user##1{user/##1}%
   \yt@@parse#2\@nil % returns arg in \ytspec
   \def\URLArg{\ytURL/\ytspec}%
@@ -551,14 +578,18 @@
 %    \end{macro}
 %    \begin{macro}{\ytSearch}\nmpsep{[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
 %    A push button what will search YouTube based on the query string.
+%   \textcolor{red}{\textbf{Note:} \texttt{listType=search} is deprecated and will
+%   no longer be supported as of 15 November, 2020.}
+%    \changes{v1.0}{2021/06/08}{Replace \string\texttt{embed\string\QMRK} in search with
+%    \string\texttt{results\string\QMRK\space search\string\_query\string\EQU}}
 %    \begin{macrocode}
 \newcommand{\ytSearch}[3][]{%
   \pushButton[\CA{Search}#1\AAmouseup{%
     var f=this.getField("ytSearchTxt");\r
     var v=f.value;\r
-    if ( v.replace(/\string\s/g,"") != "" )\r\t
-      app.launchURL("\ytURL/embed?listType=search&list="+v);}
-  ]{ytSearchBtn}{#2}{#3}}
+    if ( (v=v.replace(/\string\\s/g,"+")) != "" )\r\t
+      app.launchURL("\ytURL/results?search_query="+v);
+  }]{ytSearchBtn}{#2}{#3}}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\ytClearQuery}\nmpsep{[\ameta{opts}]\darg{\ameta{wd}}\darg{\ameta{ht}}}
@@ -643,9 +674,8 @@ console.println("will launch url: https://www.youtube.com/"+_hash);
 %    \begin{macrocode}
 %<*pujs>
 %<*package>
+\yt@restoreCats
 %</package>
 %    \end{macrocode}
 %  \Finale
 \endinput
-
-https://developers.google.com/youtube/iframe_api_reference?csw=1

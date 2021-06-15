@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{ltx4yt}
- [2020/07/30 v0.7 ltx4yt: Play YouTube videos in the default browser (dps)]
+ [2021/06/08 v1.0 ltx4yt: Play YouTube videos in the default browser (dps)]
 \RequirePackage{xkeyval}
 \DeclareOption{usepopup}{\def\lo@dpu{\InputIfFileExists{ytpu.def}
   {\PackageInfo{ltx4yt}{Loading ytpu.def}}
@@ -28,6 +28,13 @@
 \let\lo@dpu\relax
 \AtEndOfPackage{\lo@dpu}
 \ProcessOptions
+\edef\yt@restoreCats{%
+  \catcode`\noexpand\"=\the\catcode`\"\relax
+  \catcode`\noexpand\'=\the\catcode`\'\relax
+  \catcode`\noexpand\,=\the\catcode`\,\relax
+  \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\'\@makeother\,\@makeother\!
 \RequirePackage{xcolor}
 \RequirePackage{eforms}
 \ifx\lo@dpu\relax\else
@@ -39,23 +46,32 @@
 \providecommand{\URI}[1]{/S/URI/URI(#1)}
 \def\ytNF{false}
 \def\ytURL{https://www.youtube.com}
+\def\ytvIdParams#1{\def\@rgi{#1}\ifx\@rgi\@empty
+  \let\ytvIdP@rams\@empty\else\def\ytvIdP@rams{#1}\fi}
+\let\ytvIdP@rams\@empty
 \newcommand{\ytvId}{\@ifstar{\def\yt@ask{*}\yt@@vId}
   {\let\yt@ask\@empty\yt@@vId}}
-\newcommand{\yt@@vId}[3][]{%
+\newcommand{\yt@@vId}[3][]{\begingroup
+  \ifx\ytvIdP@rams\@empty\let\ques\@empty\else
+    \ifx\yt@ask\@empty\def\ques{?}\else\def\ques{&}\fi
+  \fi
   \ifx\yt@ask\@empty
-    \def\yt@lnk@hash{embed/#2}\else
-    \def\yt@lnk@hash{watch?v=#2}\fi
+    \def\yt@lnk@hash{embed/#2\ques\ytvIdP@rams}\else
+    \def\yt@lnk@hash{watch?v=#2\ques\ytvIdP@rams}\fi
   \setLink[\presets{\yt@vIdPresets}#1
-    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}\endgroup
 }
 \newcommand{\ytvIdML}{\@ifstar{\def\yt@ask{*}\yt@@vIdML}
   {\let\yt@ask\@empty\yt@@vIdML}}
-\newcommand{\yt@@vIdML}[3][]{%
+\newcommand{\yt@@vIdML}[3][]{\begingroup
+  \ifx\ytvIdP@rams\@empty\let\ques\@empty\else
+    \ifx\yt@ask\@empty\def\ques{?}\else\def\ques{&}\fi
+  \fi
   \ifx\yt@ask\@empty
-    \def\yt@lnk@hash{embed/#2}\else
-    \def\yt@lnk@hash{watch?v=#2}\fi
+    \def\yt@lnk@hash{embed/#2\ques\ytvIdP@rams}\else
+    \def\yt@lnk@hash{watch?v=#2\ques\ytvIdP@rams}\fi
   \mlsetLink[\presets{\yt@vIdPresets}#1
-    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}%
+    \A{\URI{\ytURL/\yt@lnk@hash}}]{#3}\endgroup
 }
 \newif\ifytwatch \ytwatchfalse
 \def\yt@@parse{\let\ytspec\@empty\yt@parse}
@@ -83,6 +99,7 @@
   \def\embedId##1{embed/##1}%
   \def\params##1{##1}\def\embed##1{embed?##1}%
   \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\search##1{results?search_query=##1}%
   \def\user##1{user/##1}%
   \yt@@parse#2\@nil % returns arg in \ytspec
   \def\URLArg{\ytURL/\ytspec}%
@@ -93,6 +110,7 @@
   \def\embedId##1{embed/##1}%
   \def\params##1{##1}\def\embed##1{embed?##1}%
   \def\watchId##1{watch?v=##1}\def\channel##1{c/##1}%
+  \def\search##1{results?search_query=##1}%
   \def\user##1{user/##1}%
   \yt@@parse#2\@nil % returns arg in \ytspec
   \def\URLArg{\ytURL/\ytspec}%
@@ -159,9 +177,9 @@
   \pushButton[\CA{Search}#1\AAmouseup{%
     var f=this.getField("ytSearchTxt");\r
     var v=f.value;\r
-    if ( v.replace(/\string\s/g,"") != "" )\r\t
-      app.launchURL("\ytURL/embed?listType=search&list="+v);}
-  ]{ytSearchBtn}{#2}{#3}}
+    if ( (v=v.replace(/\string\\s/g,"+")) != "" )\r\t
+      app.launchURL("\ytURL/results?search_query="+v);
+  }]{ytSearchBtn}{#2}{#3}}
 \newcommand{\ytClearQuery}[3][]{%
   \pushButton[\CA{Clear}#1
     \AAmouseup{this.resetForm("ytSearchTxt");}

@@ -243,10 +243,10 @@
 \university{{\AcroT} Software Development Team}
 \email{dpstory@acrotex.net}
 \versionLabel{Dated:}
-\version{2021/05/29}
+\version{2021/06/19}
 \copyrightyears{1999-\the\year}
 \nocopyright
-\prepared{2021/05/29}
+\prepared{2021/06/19}
 \revisionLabel{Distribution Dated:}
 
 \copyrightStatus{True}
@@ -477,9 +477,10 @@ instructions on how to get up and running.
 \section{Getting Started}\label{s:start}
 
 The distribution for the {\cAcroB} comes in a single ZIP file
-  \texttt{acrotex.zip}. This ZIP file contains program files
-      (\pkg{web}, \pkg{exerquiz}, \pkg{eforms}, \pkg{insdljs},
-      \pkg{dljslib}, \pkg{taborder}, and \texttt{aeb.js}), this manual, and the
+  \texttt{acrotex.zip}.\footnote{Must modern {\TeX} have a mechanism for downloading and installing packages; consequently,
+  the ZIP file may ever been seen.} This ZIP file contains program files
+      (\pkg{web}, \pkg{exerquiz}, \pkg{eforms}, \pkg{insdljs}, \pkg{dljslib},
+      and \pkg{taborder}), this manual, and the
         \href{eformman.pdf}{\pkg{eforms}} reference manual
         (\texttt{\href{\bUrl/eformman.pdf}{eformman.pdf}}).
 
@@ -577,8 +578,19 @@ discuss the use of \app{Acrobat}, first to install the folder JavaScript file
 \subsubsection{Installing \texttt{aeb.js}}
 
 The JavaScript file \texttt{aeb.js} is only needed if you use the workflow of
-\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}
-and \uif{Document JavaScripts} are needed to be embedded.
+\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}} (page~\pageref{eq:AcrobatWF})
+and if \uif{Document JavaScripts} are needed in the document.\footnote{\pkg{exerquiz} makes heavy use of \uif{Document JavaScripts}}
+
+The JavaScript file \texttt{aeb.js} used to be distributed by the
+\pkg{acrotex} package (\AEB), now it is available through the
+\pkg{\href{https://ctan.org/pkg/acrotex-js}{acrotex-js}}
+package, dated 2021/06/19 or later.\footnote{\url{https://ctan.org/pkg/acrotex-js}} Some {\TeX} systems
+automatically download required packages, if that is so for your system,
+\pkg{acrotex-js} may be already on your system. Find the folder containing
+the \pkg{acrotex-js} distribution to locate the \texttt{aeb.js} file. Under
+the \texttt{docs} folder of the distribution, find and read the file
+\texttt{install\_jsfiles.pdf} for instructions on how to install
+\texttt{aeb.js}.
 
 Increased security for the \app{Acrobat} application makes it necessary to
 install a folder JavaScript file. The JavaScript within \texttt{aeb.js}
@@ -589,24 +601,14 @@ installation of this file is not needed if you use \app{pdftex},
 \app{lualatex}, or \app{xelatex} (or any of its variants), or if you use
 a version of \app{Acrobat} prior to version 8.1.
 
-The instructions for installing \texttt{aeb.js} are in the
-\texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, which resides in
-the \texttt{doc} folder of the \texttt{acrotex} installation. if you use the workflow of
-\hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}, please refer to that document.
-
-After you've installed the JavaScript file, as directed by the
-\texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, validate the
-installation of the JavaScript files by navigating to the \texttt{examples}
-subfolder and opening the file \texttt{test\_install.pdf} in \app{Acrobat};
-follow the directions contained on that one page document.
-
 \subsubsection{Configuring \tops{\app}{}{Acrobat}}
 
-If you have \app{Acrobat DC} that was purchased or updated after December 2020,
-\app{Acrobat} needs to be configured for the workflow
+If you have \app{Acrobat DC} that was purchased or updated after December
+2020, \app{Acrobat} needs to be configured for the workflow
 \hyperref[eq:AcrobatWF]{display~\begin{NoHyper}\eqref{eq:AcrobatWF}\end{NoHyper}}
 to function correctly. For detailed discussion, refer to the document
-\texttt{\href{acrobat-in-workflow.pdf}{acrobat-in-workflow.pdf}}.
+\texttt{acrobat-in-workflow.pdf}, available from the \pkg{acrotex-js}
+package.
 
 
 \subsection{Language Localizations}

@@ -1,6 +1,6 @@
 The AcroTeX eDucation Bundle (AeB)
 Author: D. P. Story 
-Dated: 2021-05-29
+Dated: 2021-06-19
 
 AeB contains the following:
 
@@ -18,6 +18,11 @@ AeB contains the following:
 
 6) Documentation for AeB (AcroTeX eDucatation Bundle) and eforms
    (including insdljs and dljslib).
+
+What's New (2021-06-19) Move files out of this distribution to the 
+  acrotex-js package, dated 2021/06/19 or later. The folder JavaScript
+  file aeb.js (and aeb_pro.js) are now distributed with acrotex-js. Installation
+  instructions are now included with that package.
 
 What's New (2021-05-29)
   exerquiz: Internal changes to Begin Quiz and End Quiz actions to

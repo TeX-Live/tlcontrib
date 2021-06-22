@@ -16,7 +16,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{insdljs}
-%<package> [2021/05/13 v2.5.4 Insert Document Level JavaScripts (dps)]
+%<package> [2021/06/19 v2.5.5 Insert Document Level JavaScripts (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -610,6 +610,28 @@
 \ifpdf\ifx\pdfextension\@undefined\else
   \protected\def\pdfnames{\pdfextension names }
   \def\pdfpageref{\pdffeedback pageref}\fi\fi
+%    \end{macrocode}
+%     The critical JavaScript files are no longer distributed with this package,
+%     but are distributed by the \pkg{acrotex-js} package. This package must be
+%     installed, and the instructions in the \texttt{docs} folder followed to
+%     propery install the critical JavaScript file \texttt{aeb.js}.
+%     \changes{v2.5.5}{2021/06/19}{Require acrotex-js when dvips is used}
+%    \begin{macrocode}
+\ifpdfmarkup
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+%    \end{macrocode}
+%    If the style file \texttt{acrotex-js.sty} is detected, we assume the document
+%    author has correctly installed \texttt{aeb.js}, if not, we require
+%    this package, which may be automatically installed on some {\TeX} systems.
+%    \begin{macrocode}
+  {\PackageWarningNoLine{insdljs}{%
+      The acrotex-js package is required.\MessageBreak
+      Before continuing, install this package,\MessageBreak
+      read the documentation, and place\MessageBreak
+      aeb.js in the expected folder
+    }\def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\expandafter\reqpkg\fi
 \RequirePackage{verbatim}
 %    \end{macrocode}
 %\changes{v2.4.1}{2019/02/11}{Save \string\cs{comment}\space as \string\cs{dlcomment}}
@@ -856,7 +878,7 @@
 % \changes{v2.5}{2020/12/20}{Added \string\cs{Launch}}
 %    A launch action
 %    \begin{macrocode}
-\providecommand{\Launch}[1]{/Launch/F(#1)}
+\providecommand{\Launch}[1]{/S/Launch/F(#1)}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macrocode}
@@ -935,7 +957,8 @@
 % \changes{v2.5.4}{2021/05/13}{Added \string\cs{dl@EForAFMergeChange}}
 %    \begin{macrocode}
 \def\dl@EForAF4#1_{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi#1_}
-\def\dl@EForAFMergeChange{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi MergeChange}
+\def\dl@EForAFMergeChange{%
+  \ifx\usedAdbFuncs\dl@YES EF\else AF\fi MergeChange}
 %    \end{macrocode}
 % \subsection{Some JavaScript Support}
 %

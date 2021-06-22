@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{insdljs}
- [2021/05/13 v2.5.4 Insert Document Level JavaScripts (dps)]
+ [2021/06/19 v2.5.5 Insert Document Level JavaScripts (dps)]
 \usepackage{xkeyval}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
@@ -110,6 +110,16 @@
 \ifpdf\ifx\pdfextension\@undefined\else
   \protected\def\pdfnames{\pdfextension names }
   \def\pdfpageref{\pdffeedback pageref}\fi\fi
+\ifpdfmarkup
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+  {\PackageWarningNoLine{insdljs}{%
+      The acrotex-js package is required.\MessageBreak
+      Before continuing, install this package,\MessageBreak
+      read the documentation, and place\MessageBreak
+      aeb.js in the expected folder
+    }\def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\expandafter\reqpkg\fi
 \RequirePackage{verbatim}
 \let\dlcomment\comment
 \let\enddlcomment\endcomment
@@ -168,7 +178,7 @@
 \providecommand{\GoToR}{/S/GoToR}
 \providecommand{\Thread}[1]{/S/Thread/D(#1)}
 \providecommand{\URI}[1]{/S/URI/URI(#1)}
-\providecommand{\Launch}[1]{/Launch/F(#1)}
+\providecommand{\Launch}[1]{/S/Launch/F(#1)}
 \def\previewMiKTeX{\def\jsR{\string\r}\def\jsT{\string\t}}
 {\obeylines %
 \gdef\js@@R{\noexpand
@@ -198,7 +208,8 @@
 \newwrite\js@verbatim@out
 \def\iwvo#1{\immediate\write\js@verbatim@out{#1}}
 \def\dl@EForAF4#1_{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi#1_}
-\def\dl@EForAFMergeChange{\ifx\usedAdbFuncs\dl@YES EF\else AF\fi MergeChange}
+\def\dl@EForAFMergeChange{%
+  \ifx\usedAdbFuncs\dl@YES EF\else AF\fi MergeChange}
 \def\dl@lparen{(}\def\dl@rparen{)}
 \def\genericNL{^^J}
 \def\defjsLB{\gobiv}

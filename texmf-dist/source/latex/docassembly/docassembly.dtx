@@ -1,0 +1,538 @@
+%\iffalse
+%<*copyright>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% docassembly.sty package,                             %%
+%% Copyright (C) 2021  D. P. Story                      %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%</copyright>
+%<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+%<package>\ProvidesPackage{docassembly}
+%<package> [2021/06/19 v1.2 docassembly: Post PDF creation assembly (dps)]
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{amstext}
+\usepackage[colorlinks,hyperindex=false]{hyperref}
+\pdfstringdefDisableCommands{\let\\\textbackslash}
+\def\CMD#1{\textbackslash{#1}}\def\EXCL{!}
+\let\opt\texttt \let\app\textsf \let\pkg\textsf \let\env\texttt
+\OnlyDescription  % comment out for implementation details
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\bgroup\ttfamily
+\gdef\brpr#1{\char123\relax#1\char125\relax}\egroup
+\let\darg\brpr
+\let\env\texttt
+\let\opt\texttt
+\let\app\textsf
+\let\uif\textsf
+\def\visispace{\symbol{32}}
+\def\ameta#1{\ensuremath{\langle\textit{\texttt{#1}}\rangle}}
+\def\meta#1{\textsl{\texttt{#1}}}
+\def\SUB#1{\ensuremath{{}_{\mbox{\scriptsize\ttfamily#1}}}}
+\let\tops\texorpdfstring
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\makeatother
+\InputIfFileExists{aebdocfmt.def}{\PackageInfo{docassembly}{Inputting aebdocfmt.def}}
+    {\def\IndexOpt{\DescribeMacro}\def\IndexKey{\DescribeMacro}\let\setupFullwidth\relax
+     \PackageInfo{docassembly}{aebdocfmt.def cannot be found}}
+\begin{document}
+  \GetFileInfo{docassembly.sty}
+  \title{The \pkg{docassembly} package}
+  \author{D. P. Story\\
+    Email: \texttt{dpstory@acrotex.net}}
+  \date{processed \today}
+  \maketitle
+  \tableofcontents
+  \DocInput{docassembly.dtx}
+\IfFileExists{\jobname.ind}{\newpage\setupFullwidth\par\PrintIndex}{\paragraph*{Index} The index goes here. Execute
+    \[\texttt{makeindex -s gind.ist -o docassembly.ind docassembly.idx}\] on the command line and recompile
+    \texttt{docassembly.dtx}.}
+\IfFileExists{\jobname.gls}{\PrintChanges}{\paragraph*{Change History} The list of changes goes here.\\Execute
+    \[\texttt{makeindex -s gglo.ist -o docassembly.gls docassembly.glo}\] on the command line and recompile
+    \texttt{docassembly.dtx}.}
+\end{document}
+%</driver>
+% \fi
+% \MakeShortVerb{|}
+% \InputIfFileExists{aebdonotindex.def}{\PackageInfo{docassembly}{Inputting aebdonotindex.def}}
+%    {\PackageInfo{docassembly}{cannot find aebdonotindex.def}}
+%    \begin{macrocode}
+%<*package>
+%    \end{macrocode}
+% \section{Introduction}
+%
+%    The \pkg{docassembly} package provides access some security related features of the
+%    Acrobat JavaScript API.
+%    The content of this package was extracted from \pkg{aeb\_pro}
+%    so these important and useful methods can be available to document authors that own
+%    \app{Acrobat}, but enjoy the use of \app{pdflatex}, \app{xelatex}, \app{lualatex},
+%    \app{ps2pdf}, or (in the worst case scenario) \app{Adobe Distiller} as PDF creators.
+%    \begin{center}
+%    \fbox{\begin{minipage}{.67\linewidth}
+%       \textbf{Important:} Run for your lives! This package requires
+%       \app{Adobe Acrobat}! Run! Do not look back!. However, if it makes you feel better,
+%       you can use any of the usual
+%       PDF creators (\app{pdflatex}, \app{lualatex}, \app{xelatex}, \app{dvips \texttt{->} ps2pdf},
+%       or even the much hated \app{dvips \texttt{->} Adobe Distiller}).
+%    \end{minipage}}
+%    \end{center}
+%    This package requires \pkg{insdljs}\marginpar{\raggedleft\itshape\pkg{insdljs} pkg},\footnote{Part of the \pkg{acrotex} bundle} which loads \pkg{hyperref}. It also requires
+%    the successful installation of the file \texttt{aeb\_pro.js}, which is distributed
+%    by the \pkg{acrotex-js} package\marginpar{\raggedleft\itshape\pkg{acrotex-js} pkg}, dated 2021/06/19 or later. Version 1.6.1 of
+%    \texttt{aeb\_pro.js} is required\marginpar{\raggedleft\itshape Version 1.6.1 required}.\footnote{If you already have \pkg{aeb\_pro} installed on your
+%    system, be sure you have Version 1.6.1 of \texttt{aeb\_pro.js}, if not, use the version
+%    of \texttt{aeb\_pro.js} that comes with \pkg{acrotex-js}.} Installation of \texttt{aeb\_pro.js}
+%    is explained in \texttt{install\_jsfiles.pdf}, found in the \texttt{docs} folder of the \pkg{acrotex-js} package.
+%
+%    \changes{v1.2}{2021/06/19}{Revise documentation to reflect changes in changes in the \string\pkg{acrotex-js} package}
+%    \changes{v1.1}{2021/06/18}{The \string\texttt{aeb\_pro.js} file is now distributed by the
+%     \string\pkg{acrotex-js} package}
+%    \changes{v1.0}{2021/06/11}{First publication version of this package}
+%
+%    \section{Documentation}
+%
+%    The documentation of this file is minimal. Most of
+%    the ``teaching'' of how to use the methods supported by this package is contained
+%    in the demo files.
+%
+%    The package defines one environment, the \env{docassembly} environment, and several
+%    ``helper'' commands that are used within the \env{docassembly} environment. Refer
+%    to \hyperref[s:DAM]{Section~\ref*{s:DAM}} for details.
+%
+%
+%    \paragraph*{Installation of \texttt{aeb\_pro.js}.} This file is essential to the
+%    correct functioning of this package. It is important, therefore, to correctly
+%    install it. If \texttt{aeb\_pro.js} is not already installed, download (if not already on your system)
+%    and install the \pkg{acrotex-js} package (dated 2021/06/19 or later);\footnote{\url{https://www.ctan.org/pkg/acrotex-js}} \texttt{aeb\_pro.js} is located
+%    in the \texttt{js-files} folder. Refer to the documentation of the \pkg{acrotex-js} package,
+%    \texttt{docs/install\_jsfiles.pdf}, for information on how to install \texttt{aeb\_pro.js}.
+%    The current version of \texttt{aeb\_pro.js} is  Version 1.6.1.
+%
+%    \paragraph*{Demo files.} Demo files are contained in the \texttt{examples} folder.
+%    They illustrate all the security restricted methods of this package.
+%    Most of the demo files have a minimal preamble.
+%     Several of the files also uses \pkg{eforms}, since form fields
+%     are used in those demo files.
+%
+%     \paragraph*{End this package early.}
+%     If \pkg{aeb\_pro} is already loaded, terminate this package early
+%     since \pkg{aeb\_pro} contains the content of this package already.
+%    \begin{macrocode}
+\@ifpackageloaded{aeb_pro}{\PackageInfo{docassembly}
+  {aeb_pro detected, early exit from\MessageBreak
+   the docassembly package}\endinput}{}
+\edef\da@restoreCats{%
+    \catcode`\noexpand\"=\the\catcode`\"\relax
+    \catcode`\noexpand\,=\the\catcode`\,\relax
+    \catcode`\noexpand\(=\the\catcode`\(\relax
+    \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\,\@makeother\(\@makeother\!
+%    \end{macrocode}
+% \section{Package requirements}
+%    Require \pkg{insdljs} for this little exercise.
+%    \begin{macrocode}
+\RequirePackage{insdljs}
+\execJSOn
+%    \end{macrocode}
+%     The critical JavaScript files are no longer distributed with this package,
+%     but are distributed by the \pkg{acrotex-js} package. This package must be
+%     installed, and the instructions in the \texttt{docs} folder followed to
+%     propery install the critical JavaScript file \texttt{aeb\_pro.js}.
+%    \begin{macrocode}
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+%    \end{macrocode}
+%    If the style file \texttt{acrotex-js.sty} is detected, we assume the document
+%    author has correctly installed \texttt{aeb\_pro.js}, if not, we require
+%    this package, which may be automatically installed on some {\TeX} systems.
+%    \begin{macrocode}
+  {\PackageWarningNoLine{docassembly}
+   {The acrotex-js package is required.\MessageBreak
+    Before continuing, install this package,\MessageBreak
+    read the documentation, and place\MessageBreak
+    aeb_pro.js in the expected folder}
+    \def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\reqpkg
+%    \end{macrocode}
+%
+% \section{Document Assembly Methods}\label{s:DAM}
+%    Special ``helper'' commands and one environment are defined to take advantage of \app{Acrobat}'s extensive
+%    library of security restricted methods. It is assumed the document author has properly
+%    installed \texttt{aeb\_pro.js}.
+%
+% \subsection{The \texttt{docassembly} environment}
+%
+%    \begin{environment}{docassembly}
+% This is a wrapper environment for the \texttt{execJS} environment of the
+% \textsf{insDLJS} Package. Place JavaScript lines in this environment and
+% the script will execute one time after the PDF has been created and opened
+% in \app{Acrobat Pro} for the first time.
+%    \begin{macrocode}
+\newenvironment{docassembly}{\execJS{docassembly}}{\endexecJS}
+%    \end{macrocode}
+%    \end{environment}
+% \subsection{Supported Assembly JS API}
+%
+%    These are convenience commands -- called JavaScript helper commands -- to
+%    executing security restricted JavaScript. The JS methods are defined in the
+%    \texttt{aeb\_pro.js} file, kept as folder JavaScript. These commands are
+%    executed in a verbatim environment where `\verb!\!' is still the escape
+%    character. Each of the JavaScript helper commands expects a left
+%    parenthesis `\texttt{(}' following the command name \emph{on the
+%    same line} as the command name.\footnote{This requirement is consistent
+%    with JavaScript function usage.}
+%    See the example below for correct usage.
+%\begin{verbatim}
+%\begin{docassembly}
+%\addWatermarkFromFile({
+%    bOnTop:false,
+%    cDIPath:"/C/AcroTeX/AcroPackages/ManualBGs/Manual_BG_Print_AeB.pdf"
+%});
+%\end{docassembly}
+%\end{verbatim}
+% For each of the methods below, see the \textsl{JavaScript for Acrobat API Reference}.
+%
+%\medskip\noindent The command \cs{theDocObject} is normally set to \texttt{this}, meaning
+% the current document. You may need to set it to some other doc object if you are trying to
+% access a doc object other than the current one.
+% The following are support commands for changing \cs{theDocObject}
+% from within the \texttt{docassembly} environment.
+%    \begin{macro}{\chngDocObjectTo}
+%    All the JavaScript helper commands use \cs{theDocObject}, which is defined to be the \texttt{this}
+%    object. To change it within the \env{docassembly} environment is difficult. The next command
+%    aids in that problem.
+%    \begin{macrocode}
+\let\ap@mrk\@empty
+\def\ap@gobtocomma#1,{}
+\providecommand\chngDocObjectTo[2]{%
+    \def#1##1\ap@mrk{#2,\ap@gobtocomma##1}}
+%    \end{macrocode}
+%    \end{macro}
+%    The above defines a new command given by \texttt{\#1}. The command has one argument which is all content
+%    up to the terminating mark \cs{ap@mrk}. The trick to removing \cs{thisDocObject} and replacing it with
+%    \texttt{\#2}, in the above definition, we insert `\texttt{(\#2}' followed by \cs{ap@gobtocomma}, which absorbs
+%    \cs{thisDocObject,} (absorbs everything through the first comma), followed by all content (\texttt{\#\#1});
+%    the second \cs{@gobble} absorbs the left
+%    parenthesis that opens the argument.
+%    \begin{macrocode}
+\def\ap@TF{aebTrustedFunctions}
+%    \end{macrocode}
+% An example of usage of \cs{chngDocObject} is \verb~\chngDocObjectTo{\newDO}{doc}~
+% expanded above the \texttt{docassembly} environment. Later, we can say,
+%\begin{verbatim}
+%   \chngDocObjectTo{\newDO}{doc}
+%   \begin{docassembly}
+%   ...
+%   \docSaveAs\newDO({ cPath: _path });
+%   ...
+%   \end{docassembly}
+%\end{verbatim}
+%That is, it is placed immediately after any of the commands below that uses \cs{theDocObject}.
+%    \begin{macro}{\theDocObject}
+%    This command is used in the definition of all JavaScript helper commands, as seen in the
+%    definition of \cs{DeclareJSHelper} below. It is set to the doc object \texttt{this}. It can
+%    be changed using \cs{chngDocObjectTo}, as described above.
+%    \begin{macrocode}
+\def\theDocObject{this}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\DeclareJSHelper}
+%    A general purpose command for defining what I am calling JavaScript helper commands.
+%    \begin{macrocode}
+\providecommand\DeclareJSHelper[2]{%
+    \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+%    \end{macrocode}
+%    For example, we declare |\DeclareJSHelper{\docSaveAs}{aebDocSaveAs}| below, the declaration defines a new command,
+%    \cs{docSaveAs}:
+%\begin{verbatim}
+%    \def\docSaveAs#1({\ap@TF(#1\theDocObject,aebDocSaveAs,\ap@mrk}}
+%\end{verbatim}
+%    Note that the argument of \cs{docSaveAs} is delimited by the left parenthesis, thus \texttt{\#1} is everything through that opening
+%    parenthesis. This approach allows more flexibility in the definition, there can be spaces following the
+%    command name |\docSaveAs ({path: _path})|, for example.
+%    \end{macro}
+%    \begin{macro}{\retnAbsPathAs}
+%    Several methods require an absolute path to the current folder. The code is,
+%\begin{verbatim}
+%var _path=this.path;
+%var pos=_path.lastIndexOf("/");
+%_path=_path.substring(0,pos);
+%\end{verbatim}
+%We simplify this code for the document author in the form of the
+%command \cs{rtnAbsPathAs(\ameta{js-var});}, where \ameta{js-var} is a JavaScript
+%variable that will hold the absolute path to the current folder; eg, |\rtnAbsPathAs(_path);|
+%expands to the above code.
+%    \begin{macrocode}
+\def\retnAbsPathAs(#1){var #1=this.path;^^J%
+  var pos=#1.lastIndexOf("/");^^J%
+  #1=#1.substring(0,pos)}
+%    \end{macrocode}
+%    \end{macro}
+%    We new begin the documentation of the ``helper'' commands. For documentation
+%    of the arguments of these commands, refer to the \textsl{\href{https://opensource.adobe.com/dc-acrobat-sdk-docs/acrobatsdk/documentation.html}{JavaScript${}^{\text{\textsc{tm}}}$ for Acrobat${}^{\text{\copyright}}$ API Reference}}.
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{addWatermarkFromFile}}
+%    \begin{macro}{\addWatermarkFromFile}
+% This is the method \texttt{\textsl{Doc}.addWatermarkFromFile}.\\
+% \textbf{Demo file:} \texttt{watermark-file.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\addWatermarkFromFile}{aebAddWatermarkFromFile}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{addWatermarkFromText}}
+%    \begin{macro}{\addWatermarkFromText}
+% This is the method \texttt{\textsl{Doc}.addWatermarkFromText}.\\
+% \textbf{Demo file:} \texttt{watermark-text.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\addWatermarkFromText}{aebAddWatermarkFromText}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{importIcon}}
+%    \begin{macro}{\importIcon}
+% This is the method \texttt{\textsl{Doc}.importIcon}.\\
+% \textbf{Demo file:} \texttt{import-icons.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\importIcon}{aebImportIcon}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{importSound}}
+%    \begin{macro}{\importSound}
+% This is the method \texttt{\textsl{Doc}.importSound}.\\
+% \textbf{Demo file:} \texttt{import-sound.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\importSound}{aebImportSound}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{appopenDoc}}
+%    \begin{macro}{\appopenDoc}
+% This is the method \texttt{app.openDoc}. Opens a document and return
+% a \texttt{Doc} object.\\
+% \textbf{Demo file:} \texttt{open-doc.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\appopenDoc}{aebAppOpenDoc}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{docSaveAs}}
+%    \begin{macro}{\docSaveAs}
+% This is the method \texttt{\textsl{Doc}.saveAs}. Saves a PDF or converts a PDF
+% to another format to a specified path.\\
+% \textbf{Demo file:} \texttt{doc-saveas.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\docSaveAs}{aebDocSaveAs}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{insertPages}}
+%    \begin{macro}{\insertPages}
+% This is the method \texttt{\textsl{Doc}.insertPages}.\\
+% \textbf{Demo file:} \texttt{insert-pages.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\insertPages}{aebInsertPages}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{extractPages}}
+%    \begin{macro}{\extractPages}
+% This is the method \texttt{\textsl{Doc}.extractPages}.\\
+% \textbf{Demo file:} \texttt{extract-pages.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\extractPages}{aebExtractPages}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{createTemplate}}
+%    \begin{macro}{\createTemplate}
+% This is the method \texttt{\textsl{Doc}.createTemplate}. This is a feature that I had great
+% hopes for. With templates, you can create hidden pages that can be made visible (in \app{AA});
+% once a template is created, it can be spawned and deleted in \uif{AR}.
+%    \begin{macrocode}
+\DeclareJSHelper{\createTemplate}{aebCreateTemplate}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{importDataObject}}
+%    \begin{macro}{\importDataObject}
+% This is the method \texttt{\textsl{Doc}.importDataObject}, used to attach files to a PDF; alternately,
+% \cs{attachFile} is a more intuitive name for the operation performed.\DescribeMacro
+% \attachFile\\
+% \textbf{Demo file:} \texttt{attach-files.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\importDataObject}{aebImportDataObject}
+\DeclareJSHelper{\attachFile}{aebImportDataObject}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{executeSave}}
+%    \begin{macro}{\executeSave}
+% To save the document, use at the \emph{end of the doc assembly environment}. Usage:
+% \verb!\executeSave()!. The \cs{@gobble} used below absorbs the comma that is placed immediately
+% after the second argument by \cs{DeclareJSHelper}.
+%    \begin{macrocode}
+\DeclareJSHelper{\executeSave}{aebSaveAs,"Save"\@gobble}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{\tops{\protect\cs}{\textbackslash}{mailDoc}}
+%    \begin{macro}{\mailDoc}
+% This is the method \texttt{\textsl{Doc}.mailDoc}.
+% Attach the current PDF and email it someone. Must have a default mail client
+% registered by \app{Acrobat} under \uif{Edit \texttt> Preferences \texttt> Mail Accounts}.\\
+% \textbf{Demo file:} \texttt{mail-doc.tex}
+%    \begin{macrocode}
+\DeclareJSHelper{\mailDoc}{aebMailDoc}
+%    \end{macrocode}
+%    \end{macro}
+%    \subsubsection{Signature related commands}
+% \textbf{Demo files:} \texttt{sign.tex}, \texttt{certifyinvisible.tex}\par\medskip
+% \noindent
+% The \cs{sigInfo} command is used for entering signing formation into what will
+% become an object. \cs{signatureSign} takes no arguments, but uses the info
+% entered by \cs{sigInfo}. An example is
+%\begin{verbatim}
+%\begin{docassembly}
+%\sigInfo{
+%    cSigFieldName: "sigOfDPS",
+%    ohandler: security.PPKLiteHandler,
+%    cert: "<name>.pfx", password: "<password>",
+%    oInfo: { location: "Niceville, FL",
+%      reason: "I am approving this document",
+%      contactInfo: "dpstory@acrotex.net",
+%      appearance: "My Signature" }
+%};
+%\signatureSign
+%\end{docassembly}
+%\end{verbatim}
+%    \begin{macro}{\sigInfo}
+% The \cs{sigInfo} command is a latex interface to creating the
+% \texttt{oSigInfo} object.
+%    \begin{macrocode}
+\newcommand{\sigInfo}{var oSigInfo=}
+\def\sigFieldObj(#1){var oSigField=this.getField(#1)}
+%    \end{macrocode}
+%    \end{macro}
+% For the \cs{signatureSetSeedValue}, the field object is required.
+% This function assumes that the JavaScript variable \texttt{oSigField}
+% is the field object. For examle,
+%\begin{verbatim}
+%\begin{docassembly}
+%\sigFieldObj("sigOfDPS");
+%\signatureSetSeedValue({
+%    lockDocument:true,
+%    appearanceFilter:"My Signature",
+%    reasons: ["This is a reason", "This is a better reason"],
+%    flags:0x80|0x100|0x8
+%});
+%\end{docassembly}
+%\end{verbatim}
+% The \texttt{signatureSetSeedValue()} method seeds a signature field with various default values
+% available to the signer.
+%\begin{verbatim}
+%\begin{docassembly}
+%var sv={
+%    mdp: "defaultAndComments",
+%    reasons: ["This is a reason", "This is a better reason"],
+%    flags:0x80|0x100|0x8
+%};
+%\sigFieldObj("sigOfDPS");
+%\signatureSetSeedValue(sv);
+%\end{docassembly}
+%\end{verbatim}
+%    \begin{macro}{\signatureSetSeedValue}
+%    This is the \texttt{\textsl{Field}.signatureSetSeedValue} method. The field name
+%    is passed to this method through the \texttt{cSigFieldName} property of the \texttt{oSigField} object.
+%    \begin{macrocode}
+\def\signatureSetSeedValue#1{%
+    \ap@TF( oSigField, aebSignatureSetSeedValue, }
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\signatureSign}
+%    This is the \texttt{\textsl{Field}.signatureSign} method. The field name
+%    is passed to this method through the \texttt{cSigFieldName} property of the \texttt{oSigField} object.
+%    The function \cs{signatureSign} takes the info in the \texttt{oSigInfo} object,
+%    gets the security handler object, logs into the handler, calls
+%    \texttt{signatureSetSeedValue} if the \texttt{sv} property is in the
+%    \texttt{oSigInfo} object, and signs the field.
+%
+%    \begin{macrocode}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\signatureSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,%
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ? %
+aebTrustedFunctions( this, aebAppGetPath,%
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert : %
+oSigInfo.path2Cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,%
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
+var oSigField = this.getField(oSigInfo.cSigFieldName);
+oSigInfo.oInfo.password=oSigInfo.password;
+if ( typeof oSigInfo.sv!="undefined" ) {
+  for (var o in oSigInfo.sv )
+    oSigInfo.oInfo[o]=oSigInfo.sv[o];
+}
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+  oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
+\end{defineJS}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\certifyInvisibleSign}
+% This is the \texttt{\textsl{Doc}.certifyInvisibleSign} method.
+% This command uses the trusted version of \texttt{certifyInvisibleSign} to sign. The command
+% requires that \cs{sigInfo} is populated appropriately.
+%\begin{verbatim}
+%\begin{docassembly}
+%\sigInfo{
+%    cert: "<name>.pfx",
+%    password: "<password>",
+%    cLegalAttest: "Certified using JavaScript",
+%    bUI:false,
+%    oInfo: {
+%      location: "Niceville, FL",
+%      reason: "I am certifying this document",
+%      mdp: "defaultAndComments",
+%    }
+%};
+%\certifyInvisibleSign
+%\end{docassembly}
+%\end{verbatim}
+%    \begin{macrocode}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\certifyInvisibleSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security, %
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert=aebTrustedFunctions( this, aebAppGetPath, %
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin, %
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
+oSigInfo.oInfo.password=oSigInfo.password;
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+  oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
+\end{defineJS}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macrocode}
+\da@restoreCats
+%</package>
+%    \end{macrocode}
+%  \Finale
+\endinput

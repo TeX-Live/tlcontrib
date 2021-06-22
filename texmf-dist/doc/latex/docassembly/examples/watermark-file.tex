@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the addWatermarkFromFile to see all the possible parameters.
+\begin{docassembly}
+\retnAbsPathAs(_path);
+_path += "/graphics/AeB_Logo.pdf";
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    nOpacity: 0.2,
+    nRotation: 90,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

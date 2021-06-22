@@ -1,0 +1,27 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.saveAs() to see all the possible parameters.
+\begin{docassembly}
+% save a copy of this PDF for the archives
+var retn=\docSaveAs({
+  cPath: "\jobname-copy.pdf",
+  bCopy: true
+});
+% This method can also be used to make conversions, for example, you can save a PDF as a PNG
+% Here, we make a PNG image of each page in this document.
+var retn=\docSaveAs({
+  cConvID: "com.adobe.acrobat.png",
+  cPath: "\jobname.png"
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

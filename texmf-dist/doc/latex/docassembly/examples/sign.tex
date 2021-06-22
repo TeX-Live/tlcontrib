@@ -1,0 +1,206 @@
+% C:\Users\dpstory\AppData\Roaming\Adobe\Acrobat\Beta\Security\DonStory.pfx
+\documentclass[12pt]{article}
+\usepackage{eforms}
+\usepackage{docassembly}
+\usepackage{fancyvrb}
+
+\hypersetup{pdfpagemode=UseNone}
+
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\pagestyle{empty}
+\parskip\medskipamount
+\parindent0pt
+
+% Do not compile until you have a digital ID and password
+% Actually, you can compile, but do not bring the PDF into Acrobat until you have a digital ID and password.
+% You can view the PDF in other PDF viewers such as SumatraPDF.
+\begin{docassembly}
+\sigInfo{
+    cSigFieldName: "sigOfDPS",
+    cert: "D_P_Speaker.pfx", 
+    password: "password",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am approving this document for distribution",
+      contactInfo: "dpspeaker@talking.edu",
+      appearance: "My Signature"
+%      appearance: "My Image"
+    }
+};
+\signatureSign
+\end{docassembly}
+
+\begin{document}
+
+
+%\maketitle
+
+\hfill\smash{\raisebox{-\baselineskip}{March 23, 2009}}
+
+\begin{tabular}{@{}ll}
+To:         &Honorable Barrister Maxwell Frimpong\\
+From:       &D. P. Speaker\\
+Subject:    &On Business Proposal\\
+\end{tabular}
+
+\vspace{2\baselineskip}
+
+Dear Mr.\ Frimpong;
+
+Thank you for thinking of me concerning an ``important business proposal'' in
+your recent and brief email to me on March 23, 2009. Recovering \$12,000,000
+(twelve million US dollars) in claims sounds intriguing and exciting to me.
+Such a large amount of money would certainly come in handy in these tough
+times. Yet, regrettably, I must decline your kind offer; though I am in
+retirement, I am, none-the-less, quite busy lately sorting my button
+collection, and don't really have the time to pick up all this easy money.
+
+Thank you again, Barrister Frimpong, for your offer. Please keep me
+in mind should future opportunities arise.
+
+
+\vspace{2\baselineskip}
+
+Best regards,\\
+\sigField{sigOfDPS}{2.5in}{4\baselineskip}\\[3pt]
+Dr.\ D. P. Speaker\\
+Department of Rhetoric,\\
+Talking University\\
+Talkville, FL 12345\\
+\texttt{dpspeaker@talking.edu}
+
+
+\newpage
+
+\section{Creating and Signing a Signature Field}
+
+The \textsf{eforms} package can create a signature field with the \cs{sigField} command, and
+using the \textsf{aeb\_pro} package with its \texttt{docassembly} environment, can also sign the field
+from a {\LaTeX} source.
+
+The {\LaTeX} code for creating the signature field of this document is
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\small]
+Best regards,\\
+\sigField{sigOfDPS}{2.5in}{4\baselineskip}\\[3pt]
+Dr.\ D. P. Speaker\\
+Department of Rhetoric,\\
+Talking University\\
+Talkville, FL 12345\\
+\texttt{dpspeaker@talking.edu}
+\end{Verbatim}
+The \cs{sigField} command appears in the second line, and uses the usual
+syntax for form fields, as defined in the \textsf{eforms} package.
+Here's what the field looks like when it is unsigned.
+
+\sigField{sigOfDPS1}{2.5in}{4\baselineskip}
+
+Once the field is created, it can be signed using the Acrobat or Adobe
+Reader (version 10.0.1 or later) user interface.
+
+A signature field may also be signed programmatically from the {\LaTeX}
+source file using AeB Pro. The first signature field of this document
+was automatically signed when the newly created PDF is brought into
+Acrobat.
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\footnotesize]
+\begin{docassembly}
+\sigInfo{
+    cSigFieldName: "sigOfDPS",
+    cert: "<name>.pfx", password: "<password>",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am approving this document for distribution",
+      contactInfo: "dpspeaker@talking.edu",
+      appearance: "My Signature" }
+};
+\signatureSign
+\end{docassembly}
+\end{Verbatim}
+The script above was used to programmatically sign the signature field
+with field name of \texttt{sigOfDPS}. The value of the \texttt{password}
+key to protect my secrets. The first command, \cs{sigInfo}, creates an
+JavaScript object, \texttt{oSigInfo}. The command \cs{signatureSign} uses
+the information in this object to sign the field designated by the
+\texttt{cSigFieldName} property.
+
+The general syntax of the argument of \cs{sigInfo} is displayed below.
+\def\meta#1{$\langle\textsl{\texttt{#1}}\rangle$}
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\footnotesize,commandchars={!()}]
+\sigInfo{
+    cSigFieldName: "!meta(sigFldName)",
+    oHandler: !meta(securityHandlerObj),
+    path2Cert: !meta(path),
+    cert: "!meta(certName).pfx",
+    password: "!meta(password)",
+    bUI: true|false;
+    oInfo: {
+        !meta(various properties)
+    }
+}
+\end{Verbatim}
+The first five keys are used by AeB Pro to build the proper information
+needed sign the field.
+\begin{description}
+  \item[\normalfont\texttt{cSigFieldName} (required)] The
+      name of the signature field to be signed.
+  \item[\normalfont\texttt{oHandler} (optional)] The security
+      handler to be used. If this key is  not present,
+      \texttt{security.PPKLiteHandler} is used.
+  \item[\normalfont\texttt{path2Cert} (optional)] The
+      device-independent path to the PFX file to be used. If not
+      present, AeB Pro uses the name provided by the \texttt{cert} key
+      and builds the path to where Acrobat normally saves digital IDs.
+  \item[\normalfont\texttt{cert} (optional)] The name of the digital
+      ID to be used for signing. Optional if \texttt{path2Cert} is
+      provided, required otherwise.
+  \item[\normalfont\texttt{password} (required)] The password for the PFX file
+      provided, necessary to login to the security handler (\texttt{oHandler}).
+  \item [\normalfont\texttt{bUI} (optional)] A Boolean, if
+      \texttt{true} the security handler displays the user interface
+      when signing. The default is \texttt{false}.
+  \item[\normalfont\texttt{oInfo} (optional)] The \texttt{oInfo} property key is
+      one that appears in the argument property list of the
+      \texttt{\textsl{Field}.signatureSign()} method. It is passed to
+      the argument of this JavaScript method. See the documentation of
+      \texttt{\textsl{Field}.signatureSign()} in the
+      \emph{JavaScript for Acrobat API Reference} for more information.
+\end{description}
+
+Additional information on signatures is found at the
+\textbf{Acrobat Developer Center}.\footnote{\url{http://www.adobe.com/go/acrobat_developer}}
+Refer to the \emph{JavaScript for Acrobat API Reference}, also found at the \textbf{Acrobat Developer Center},
+for details on these methods and their parameters. Adobe is
+notorious for moving its reference documents and renaming them, year after
+year. Good luck searching the Adobe web site for the references you need.
+
+\section{Compiling this file}
+
+In the preamble of this document, the \texttt{docassembly} environment is found:
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\small]
+\begin{docassembly}
+\sigInfo{
+    cert: "<name>.pfx", password: "<password>",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am certifying this document",
+      mdp: "defaultAndComments",
+      contactInfo: "dpspeaker@talking.edu"
+    }
+};
+\certifyInvisibleSign
+\end{docassembly}
+\end{Verbatim}
+To compile this document yourself, you need to create a digital ID using
+\textsf{Acrobat}. Replace \texttt{<name>} with the file name of your digital
+ID. and of course replace \texttt{<password>} with the password you selected
+when you created your digital ID. Modify the \texttt{oInfo} property as
+designed.
+
+
+Now, back to my retirement.
+
+\end{document}
+
+Digital Signatures Workflow Guide
+http://www.adobe.com/devnet-docs/acrobatetk/tools/DigSig/index.html

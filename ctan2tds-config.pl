@@ -41,6 +41,7 @@ $special{'popupmenu'}   = '&MAKEdps';
 $special{'ltx4yt'}      = '&MAKEdps';
 $special{'rmannot'}     = '&MAKEdps';
 $special{'eq-fetchbbl'} = '&MAKEdps';
+$special{'docassembly'} = '&MAKEdps';
 
 
 sub MAKEdps {

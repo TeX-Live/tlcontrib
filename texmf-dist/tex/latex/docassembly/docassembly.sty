@@ -1,0 +1,121 @@
+%%
+%% This is file `docassembly.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% docassembly.dtx  (with options: `copyright,package')
+%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% docassembly.sty package,                             %%
+%% Copyright (C) 2021  D. P. Story                      %%
+%%   dpstory@acrotex.net                                %%
+%%                                                      %%
+%% This program can redistributed and/or modified under %%
+%% the terms of the LaTeX Project Public License        %%
+%% Distributed from CTAN archives in directory          %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{docassembly}
+ [2021/06/19 v1.2 docassembly: Post PDF creation assembly (dps)]
+\@ifpackageloaded{aeb_pro}{\PackageInfo{docassembly}
+  {aeb_pro detected, early exit from\MessageBreak
+   the docassembly package}\endinput}{}
+\edef\da@restoreCats{%
+    \catcode`\noexpand\"=\the\catcode`\"\relax
+    \catcode`\noexpand\,=\the\catcode`\,\relax
+    \catcode`\noexpand\(=\the\catcode`\(\relax
+    \catcode`\noexpand\!=\the\catcode`\!\relax
+}
+\@makeother\"\@makeother\,\@makeother\(\@makeother\!
+\RequirePackage{insdljs}
+\execJSOn
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+  {\PackageWarningNoLine{docassembly}
+   {The acrotex-js package is required.\MessageBreak
+    Before continuing, install this package,\MessageBreak
+    read the documentation, and place\MessageBreak
+    aeb_pro.js in the expected folder}
+    \def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\reqpkg
+\newenvironment{docassembly}{\execJS{docassembly}}{\endexecJS}
+\let\ap@mrk\@empty
+\def\ap@gobtocomma#1,{}
+\providecommand\chngDocObjectTo[2]{%
+    \def#1##1\ap@mrk{#2,\ap@gobtocomma##1}}
+\def\ap@TF{aebTrustedFunctions}
+\def\theDocObject{this}
+\providecommand\DeclareJSHelper[2]{%
+    \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+\def\retnAbsPathAs(#1){var #1=this.path;^^J%
+  var pos=#1.lastIndexOf("/");^^J%
+  #1=#1.substring(0,pos)}
+\DeclareJSHelper{\addWatermarkFromFile}{aebAddWatermarkFromFile}
+\DeclareJSHelper{\addWatermarkFromText}{aebAddWatermarkFromText}
+\DeclareJSHelper{\importIcon}{aebImportIcon}
+\DeclareJSHelper{\importSound}{aebImportSound}
+\DeclareJSHelper{\appopenDoc}{aebAppOpenDoc}
+\DeclareJSHelper{\docSaveAs}{aebDocSaveAs}
+\DeclareJSHelper{\insertPages}{aebInsertPages}
+\DeclareJSHelper{\extractPages}{aebExtractPages}
+\DeclareJSHelper{\createTemplate}{aebCreateTemplate}
+\DeclareJSHelper{\importDataObject}{aebImportDataObject}
+\DeclareJSHelper{\attachFile}{aebImportDataObject}
+\DeclareJSHelper{\executeSave}{aebSaveAs,"Save"\@gobble}
+\DeclareJSHelper{\mailDoc}{aebMailDoc}
+\newcommand{\sigInfo}{var oSigInfo=}
+\def\sigFieldObj(#1){var oSigField=this.getField(#1)}
+\def\signatureSetSeedValue#1{%
+    \ap@TF( oSigField, aebSignatureSetSeedValue, }
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\signatureSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security,%
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert = (typeof oSigInfo.path2Cert == "undefined") ? %
+aebTrustedFunctions( this, aebAppGetPath,%
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert : %
+oSigInfo.path2Cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin,%
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
+var oSigField = this.getField(oSigInfo.cSigFieldName);
+oSigInfo.oInfo.password=oSigInfo.password;
+if ( typeof oSigInfo.sv!="undefined" ) {
+  for (var o in oSigInfo.sv )
+    oSigInfo.oInfo[o]=oSigInfo.sv[o];
+}
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+  oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( oSigField, aebSignatureSign, oSigArgs );
+\end{defineJS}
+\begin{defineJS}[\makecmt\%\dfnJSCR{^^J}]{\certifyInvisibleSign}
+if ( typeof oSigInfo.oHandler=="undefined" )
+  oSigInfo.oHandler=security.PPKLiteHandler;
+var engine=aebTrustedFunctions( security, %
+aebSecurityGetHandler, oSigInfo.oHandler );
+var path2Cert=aebTrustedFunctions( this, aebAppGetPath, %
+{cCategory:"user"} )+"/Security"+"/"+oSigInfo.cert;
+aebTrustedFunctions( engine, aebSecurityHandlerLogin, %
+{ cPassword: oSigInfo.password, cDIPath: path2Cert});
+oSigInfo.oInfo.password=oSigInfo.password;
+var oSigArgs={ oSig: engine, oInfo: oSigInfo.oInfo };
+if ( typeof oSigInfo.cLegalAttest!="undefined" )
+  oSigArgs.cLegalAttest=oSigInfo.cLegalAttest;
+if ( typeof oSigInfo.cDIPath!="undefined")
+  oSigArgs.cDIPath=oSigInfo.cDIPath;
+if ( typeof oSigInfo.bUI!="undefined")
+  oSigArgs.bUI=oSigInfo.bUI;
+aebTrustedFunctions( this, aebCertifyInvisibleSign, oSigArgs );
+\end{defineJS}
+\da@restoreCats
+\endinput
+%%
+%% End of file `docassembly.sty'.

@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.extractPages to see all the possible parameters.
+% nStart and nEnd are 0-based page numbers, so nStart:1 and nEnd:2 extracts pages 2 and 3
+\begin{docassembly}
+\retnAbsPathAs(_path);
+_path += "/extracted-pages.pdf";
+\extractPages({
+  nStart: 1,
+  nEnd: 2,
+  cPath: _path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

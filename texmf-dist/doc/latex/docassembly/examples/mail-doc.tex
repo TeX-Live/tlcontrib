@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.mailDoc to see all the possible parameters.
+\begin{docassembly}
+% Prior to sending this document, you can attach files this this PDF
+% Refer to attach-files.tex
+var retn = \attachFile({
+  cName: "AdobeDon",
+  cDIPath: "graphics/AdobeDon.pdf"
+});
+% The next line creates a meaningful description of the attachment
+if (retn) this.getDataObject("AdobeDon").description="The one and only AdobeDon";
+\executeSave();
+\mailDoc({
+  bUI: false,
+  cTo: "dpstory@hotmail.com",
+  cSubject: "I'm testing things out",
+  cMsg: "Good to hear from you again Don. I'm emailing this PDF, attached, for your review."
+});
+%\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

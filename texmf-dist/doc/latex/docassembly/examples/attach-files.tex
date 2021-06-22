@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseAttachments}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.importDataObject to see all the possible parameters.
+\begin{docassembly}
+% Or use \attachFile instead of \importDataObject
+var retn = \importDataObject({
+  cName: "job",
+  cDIPath: "\jobname.tex"
+});
+% The next line creates a meaningful description of the attachment
+if (retn) this.getDataObject("job").description="Source file for this PDF";
+% You can have more than one file attachments  
+var retn = \attachFile({
+  cName: "AdobeDon",
+  cDIPath: "graphics/AdobeDon.pdf"
+});
+% The next line creates a meaningful description of the attachment
+if (retn) this.getDataObject("AdobeDon").description="The one and only AdobeDon";
+% ...  
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

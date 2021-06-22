@@ -1,0 +1,151 @@
+\documentclass[12pt]{article}
+\usepackage{eforms}
+\usepackage{docassembly}
+\usepackage{fancyvrb}
+
+\hypersetup{pdfpagemode=UseNone}
+
+\newcommand{\cs}[1]{\texttt{\char`\\#1}}
+
+\pagestyle{empty}
+\parskip\medskipamount
+\parindent0pt
+
+% Do not compile until you have a digital ID and password
+% Actually, you can compile, but do not bring the PDF into Acrobat until you have a digital ID and password.
+% You can view the PDF in other PDF viewers such as SumatraPDF.
+\begin{docassembly}
+\sigInfo{
+    cert: "<name>.pfx",
+    password: "<password>",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am certifying this document",
+      mdp: "defaultAndComments",
+      contactInfo: "dpspeaker@talking@edu"
+    }
+};
+\certifyInvisibleSign
+\end{docassembly}
+
+\begin{document}
+
+
+%\maketitle
+
+\hfill\smash{\raisebox{-\baselineskip}{March 23, 2009}}
+
+\begin{tabular}{@{}ll}
+To:         &Honorable Barrister Maxwell Frimpong\\
+From:       &D. P. Speaker\\
+Subject:    &On Business Proposal\\
+\end{tabular}
+
+\vspace{2\baselineskip}
+
+Dear Mr.\ Frimpong;
+
+Thank you for thinking of me concerning an ``important business proposal'' in
+your recent and brief email to me on March 23, 2009. Recovering \$12,000,000
+(twelve million  Us dollars) in claims sounds intriguing and exciting to me.
+Such a large amount of money would certainly come in handy in these tough
+times. Yet, regrettably, I must decline your kind offer; though I am in
+retirement, I am, none-the-less, quite busy lately sorting my button
+collection and don't really have the time to pick up all this easy money.
+
+Thank you again, Barrister Frimpong, for your offer. Please keep me
+in mind should future opportunities arise.
+
+
+\vspace{2\baselineskip}
+
+Best regards,\\
+\sigField{sigOfDPS}{2.5in}{4\baselineskip}\\[3pt]
+Dr.\ D. P. Speaker\\
+Department of Rhetoric\\
+Talking University\\
+Talkville, FL 12345\\
+\texttt{dpspeaker@talking.edu}
+
+\newpage
+
+\section{Creating and Signing a Certified Invisible Signature}
+
+The \textsf{docassembly} package can create a \emph{certified invisible
+signature}. You create an certified invisible signature either through the
+user-interface of \textsf{Acrobat} or programmatically using JavaScript. With
+JavaScript (and \textsf{docassembly}, a trusted version of the
+\texttt{\textsl{Doc}.certifyInvisibleSign()} method is used to certify the
+document. The certification can be seen by opening the Signature panel
+(part of the left-hand panel system of the user-interface).
+
+Also included is an approval signature, as usual, at the end of the letter. Open
+this PDF and sign using your own digital ID. Signing should not invalidate
+the certification.
+
+The certify invisible sign is done within the \texttt{docassembly}
+environment, the script follows:
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\small]
+\begin{docassembly}
+\sigInfo{
+    cert: "<name>.pfx", password: "<password>",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am certifying this document",
+      mdp: "defaultAndComments",
+      contactInfo: "dpspeaker@talking.edu"
+    }
+};
+\certifyInvisibleSign
+\end{docassembly}
+\end{Verbatim}
+The setup is similar to certify sign, but without the key
+\texttt{cSigFieldName}, used to specify a particular field to be signed.
+An invisible signature field \emph{is created and signed} using the method
+\texttt{\textsl{Doc}.certifyInvisibleSign()}.
+
+
+The \cs{sigInfo} contains the usual property list, excluding
+\texttt{cSigFieldName}. The command \cs{certifyInvisibleSign}
+uses the information in this object and calls the trusted version
+of \texttt{\textsl{Doc}.certifyInvisibleSign()}, which is defined in
+\texttt{aeb\_pro.js}.
+
+Additional information on signatures is found at the
+\textbf{Acrobat Developer Center}.\footnote{\url{http://www.adobe.com/go/acrobat_developer}}
+Refer to the \emph{JavaScript for Acrobat API Reference}, also found at the \textbf{Acrobat Developer Center},
+for details on these methods and their parameters. Adobe is
+notorious for moving its reference documents and renaming them, year after
+year. Good luck searching the Adobe web site for the references you need.
+
+\section{Compiling this file}
+
+In the preamble of this document, the \texttt{docassembly} environment is found:
+\begin{Verbatim}[xleftmargin=20pt,fontsize=\small]
+\begin{docassembly}
+\sigInfo{
+    cert: "<name>.pfx", password: "<password>",
+    oInfo: {
+      location: "AcroTeX Central, FL",
+      reason: "I am certifying this document",
+      mdp: "defaultAndComments",
+      contactInfo: "dpspeaker@talking.edu"
+    }
+};
+\certifyInvisibleSign
+\end{docassembly}
+\end{Verbatim}
+To compile this document yourself, you need to create a digital ID using
+\textsf{Acrobat}. Replace \texttt{<name>} with the file name of your digital
+ID. and of course replace \texttt{<password>} with the password you selected
+when you created your digital ID. Modify the \texttt{oInfo} property as
+designed.
+
+
+Now, back to my retirement.
+
+\end{document}
+
+References: Try
+Digital Signatures Workflow Guide
+http://www.adobe.com/devnet-docs/acrobatetk/tools/DigSig/index.html

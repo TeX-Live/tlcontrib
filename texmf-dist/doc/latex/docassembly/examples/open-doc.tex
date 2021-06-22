@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the app.openDoc() to see all the possible parameters.
+\begin{docassembly}
+% Open supportDoc.pdf, but hide it
+var doc=\appopenDoc({
+  oDoc:  this,
+  cPath: "resources/supportDoc.pdf",
+  bHidden: true
+});
+console.clear(); console.show();
+console.println("Opening " + doc.documentFileName);
+% Get the field object, for the text field that has title of "Name"
+console.println("Getting the field value of \"Name\"");
+var f=doc.getField("Name");
+% Show the value of that text field and display it in the console
+console.println("The value of \"Name\" is "+f.value);
+% Close the hidden doc
+console.println("Closing " + doc.documentFileName);
+doc.closeDoc();
+% Save the current document
+console.println("Saving the current document " + this.documentFileName);
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\lipsum[1-30]
+
+\end{document} 

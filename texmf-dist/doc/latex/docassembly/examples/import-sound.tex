@@ -1,0 +1,24 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{eforms}
+%\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.importSound to see all the possible parameters.
+\begin{docassembly}
+\importSound({cName: "StarTrek", cDIPath: "sounds/trek.wav" });
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+
+\begin{center}
+\pushButton[\CA{Star Trek}\S{S}\W{0}\AAmouseup{%
+    var s = this.getSound("StarTrek");\r
+    s.play();
+}]{stSound}{}{11bp}
+
+\end{center}
+\end{document} 

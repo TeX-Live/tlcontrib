@@ -1,0 +1,56 @@
+\documentclass{article}
+\usepackage{docassembly}
+\usepackage{eforms}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone}
+
+% Look in the Adobe Acrobat JavaScript manual under the doc.importIcon to see all the possible parameters.
+\begin{docassembly}
+  var retn=\importIcon({cName:"A man",cDIPath:"graphics/man1.pdf"});
+  if ( retn < 0 ) console.println("The file man1.pdf could not be opened or is invalid");
+  var retn=\importIcon({cName:"A girl",cDIPath:"graphics/girl.pdf"});
+  if ( retn < 0 ) console.println("The file girl.pdf could not be opened or is invalid");
+  var retn=\importIcon({cName:"A scotsman",cDIPath:"graphics/scot.pdf"});
+  if ( retn < 0 ) console.println("The file scot.pdf could not be opened or is invalid");
+  var retn=\importIcon({cName:"AdobeDon",cDIPath:"graphics/AdobeDonIcon.pdf"});
+  if ( retn < 0 ) console.println("The file AdobeDonIcon.pdf could not be opened or is invalid");
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\begin{defineJS}{\cycleJS}
+if (typeof indexIcon == "undefined") var indexIcon=0;
+var oIconName=this.icons[indexIcon].name;
+var f=this.getField("iconContainer");
+var oIcon=this.getIcon(oIconName);
+f.buttonPosition=position.iconTextV;
+f.buttonSetIcon(oIcon);
+f.buttonSetCaption(oIconName);
+indexIcon = (indexIcon+1) \% (this.icons.length);
+\end{defineJS}
+% define a clear button feature, it clears the button iconContainer
+% so it no longer displays an icon; pressing the Cycle button resumes
+% the display as before.
+\begin{defineJS}{\clearJS}
+f=this.getField("iconContainer")
+// save
+var sv=f.buttonPosition;
+var cptn=f.buttonGetCaption();
+// clear
+f.buttonPosition=position.textOnly;
+f.buttonSetCaption("");
+\end{defineJS}
+
+\begin{center}\Large\bfseries
+A slide show of Icons and Photos
+\end{center}
+
+\begin{center}
+\pushButton[\BG{}\TP{2}\S{S}]{iconContainer}{100bp}{100bp}\vcgBdry[6bp]
+\pushButton[\CA{Cycle}\AAmouseup{\cycleJS}]{cycleBtn}{}{11bp}\cgBdry[3bp]
+\pushButton[\CA{Clear}\AAmouseup{\clearJS}]{clearBtn}{}{11bp}
+\end{center}
+\end{document} 
+

@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage{xcolor}
+\usepackage{docassembly}
+\usepackage{eforms}
+\usepackage{lipsum}
+
+\hypersetup{pdfpagemode=UseNone,colorlinks}
+
+\begin{defineJS}{\ADActn}
+if (typeof tmplObj != "object")
+  tmplObj=this.getTemplate("AdobeDon");
+tmplObj.spawn({
+  nPage: 0,
+  bOverlay:false,
+  oXObject: tmplObj
+});
+\end{defineJS}
+\begin{defineJS}{\contActn}
+if (typeof tmplObjSpawn != "object") {
+  var tmplObjSpawn=this.getTemplate("myStory");
+  tmplObjSpawn.spawn({
+    nPage: this.pageNum+1,
+    bOverlay:false,
+    oXObject: tmplObjSpawn
+  });
+  this.pageNum++;
+}
+\end{defineJS}
+
+% Look in the Adobe Acrobat JavaScript manual under the Doc.createTemplate to see all the possible parameters.
+\begin{docassembly}
+\insertPages({
+  nPage: -1,
+  cPath: "graphics/AdobeDon-btn.pdf"
+});
+var tmplObj=\createTemplate({cName: "AdobeDon", nPage: 0});
+tmplObj.hidden=true;
+\insertPages({
+  nPage: -1,
+  cPath: "resources/myStory.pdf"
+});
+var tmplObj1=\createTemplate({cName: "myStory", nPage: 0});
+tmplObj1.hidden=true;
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\noindent
+\pushButton[\CA{View author}\AAmouseup{\ADActn}]{vTmpl}{}{11bp}\medskip
+
+\noindent
+\lipsum[1-4]\medskip
+
+\noindent
+Write a short history of your life. Press the \textsf{Continue} link if you need more space for your story, and then continue on the
+next page.\medskip
+
+\noindent
+\textField[\Ff\FfMultiline]{myStory}{\linewidth}{3\baselineskip}\\[6bp]\null
+\hfill\setLink[\A{\JS{\contActn}}\linktxtcolor{red}]{Continue on next page as needed}
+
+\newpage
+\noindent\lipsum[5-10]
+
+\end{document}

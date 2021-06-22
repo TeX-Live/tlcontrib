@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2016
 depend release/2100-nonfree
-depend revision/327
+depend revision/332
 
 name 00texlive.installation
 category TLCore
@@ -212,7 +212,7 @@ catalogue-version 1.6.1
 
 name acrotex
 category Package
-revision 326
+revision 330
 shortdesc The AcroTeX education bundle
 longdesc The bundle contains: the web package to redefine page layout to
 longdesc web-friendly dimensions; the exerquiz package for defining
@@ -222,11 +222,8 @@ longdesc inserting document-level JavaScript in LaTeX documents; the
 longdesc dljslib library of JavaScript functions for use with exerquiz;
 longdesc and the eq2db package for converting an exerquiz quiz for
 longdesc processing by a ASP server-side script.
-docfiles size=1466
+docfiles size=1155
  texmf-dist/doc/latex/acrotex/README.md details="Readme"
- texmf-dist/doc/latex/acrotex/acrobat-in-workflow.pdf
- texmf-dist/doc/latex/acrotex/acrobat-in-workflow.tex
- texmf-dist/doc/latex/acrotex/aeb.js
  texmf-dist/doc/latex/acrotex/aeb_man.pdf details="Bundle documentation"
  texmf-dist/doc/latex/acrotex/aeb_man.tex
  texmf-dist/doc/latex/acrotex/contsolns.pdf
@@ -237,13 +234,9 @@ docfiles size=1466
  texmf-dist/doc/latex/acrotex/examples/jquiztst.tex
  texmf-dist/doc/latex/acrotex/examples/jtxttst.pdf
  texmf-dist/doc/latex/acrotex/examples/jtxttst.tex
- texmf-dist/doc/latex/acrotex/examples/test_install.pdf
- texmf-dist/doc/latex/acrotex/examples/test_install.tex
  texmf-dist/doc/latex/acrotex/examples/webeqtst.pdf
  texmf-dist/doc/latex/acrotex/examples/webeqtst.tex
- texmf-dist/doc/latex/acrotex/install_jsfiles.pdf
- texmf-dist/doc/latex/acrotex/install_jsfiles.tex
-srcfiles size=333
+srcfiles size=334
  texmf-dist/source/latex/acrotex/acrotex.ins
  texmf-dist/source/latex/acrotex/contsolns.dtx
  texmf-dist/source/latex/acrotex/dljslib.dtx
@@ -304,6 +297,36 @@ catalogue-contact-home http://www.acrotex.net
 catalogue-ctan /macros/latex/contrib/acrotex
 catalogue-license lppl
 catalogue-topics collection pdf-forms
+
+name acrotex-js
+category Package
+revision 331
+shortdesc JavaScript files used by acrotex and other packages
+longdesc In the distribution of this package are two critical JavaScript
+longdesc files (aeb.js and aeb_pro.js) used by the packages insdljs,
+longdesc aeb-pro, thorshammer, and docassembly. Previously these JS
+longdesc files where distributed with the individual packages, now they
+longdesc are distributed by this package and must be installed according
+longdesc to the instructions in the docs folder.
+docfiles size=221
+ texmf-dist/doc/latex/acrotex-js/README.md details="Readme"
+ texmf-dist/doc/latex/acrotex-js/acrobat-in-workflow.pdf
+ texmf-dist/doc/latex/acrotex-js/acrobat-in-workflow.tex
+ texmf-dist/doc/latex/acrotex-js/acrotex-js.pdf details="Package documentation"
+ texmf-dist/doc/latex/acrotex-js/install_jsfiles.pdf
+ texmf-dist/doc/latex/acrotex-js/install_jsfiles.tex
+ texmf-dist/doc/latex/acrotex-js/js-files/aeb.js
+ texmf-dist/doc/latex/acrotex-js/js-files/aeb_pro.js
+ texmf-dist/doc/latex/acrotex-js/js-test/test_install.pdf
+ texmf-dist/doc/latex/acrotex-js/js-test/test_install.tex
+srcfiles size=3
+ texmf-dist/source/latex/acrotex-js/acrotex-js.dtx
+ texmf-dist/source/latex/acrotex-js/acrotex-js.ins
+runfiles size=1
+ texmf-dist/tex/latex/acrotex-js/acrotex-js.sty
+catalogue-ctan /macros/latex/contrib/acrotex-js
+catalogue-license lppl
+catalogue-topics pdf-feat acrobat
 
 name adobecaslon
 category Package
@@ -1418,7 +1441,7 @@ catalogue-version 0.6
 
 name collection-contrib
 category Collection
-revision 318
+revision 332
 shortdesc tlcontrib packages
 longdesc collections of all packages in contrib.texlive.info
 depend acmtrans
@@ -1426,6 +1449,7 @@ depend acroflex
 depend acromemory
 depend acrosort
 depend acrotex
+depend acrotex-js
 depend adobecaslon
 depend aeb-minitoc
 depend aeb-mlink
@@ -1446,6 +1470,7 @@ depend comicsans
 depend cowfont
 depend datepicker-pro
 depend digicap-pro
+depend docassembly
 depend dps
 depend ecards
 depend eq-fetchbbl
@@ -1744,6 +1769,53 @@ runfiles size=5
 catalogue-ctan /macros/latex/contrib/digicap-pro
 catalogue-license lppl1.2
 catalogue-topics caption adobe-distiller
+
+name docassembly
+category Package
+revision 329
+shortdesc Use the Acrobat JavaScript API
+longdesc This package defines the docassembly environment in which
+longdesc JavaScript code can be written to execute once and only once
+longdesc the newly created PDF in the Acrobat application. The package
+longdesc also defines a series of helper commands to execute security
+longdesc restricted JavaScript methods. The package depends on
+longdesc acrotex-js.
+docfiles size=587
+ texmf-dist/doc/latex/docassembly/README.md details="Readme"
+ texmf-dist/doc/latex/docassembly/docassembly.pdf details="Package documentation"
+ texmf-dist/doc/latex/docassembly/examples/attach-files.tex
+ texmf-dist/doc/latex/docassembly/examples/certifyinvisible.pdf
+ texmf-dist/doc/latex/docassembly/examples/certifyinvisible.tex
+ texmf-dist/doc/latex/docassembly/examples/create-templates.tex
+ texmf-dist/doc/latex/docassembly/examples/doc-saveas.tex
+ texmf-dist/doc/latex/docassembly/examples/extract-pages.tex
+ texmf-dist/doc/latex/docassembly/examples/graphics/AdobeDon-btn.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/AdobeDon.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/AdobeDonIcon.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/AeB_Logo.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/girl.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/man1.pdf
+ texmf-dist/doc/latex/docassembly/examples/graphics/scot.pdf
+ texmf-dist/doc/latex/docassembly/examples/import-icons.tex
+ texmf-dist/doc/latex/docassembly/examples/import-sound.tex
+ texmf-dist/doc/latex/docassembly/examples/insert-pages.tex
+ texmf-dist/doc/latex/docassembly/examples/mail-doc.tex
+ texmf-dist/doc/latex/docassembly/examples/open-doc.tex
+ texmf-dist/doc/latex/docassembly/examples/resources/myStory.pdf
+ texmf-dist/doc/latex/docassembly/examples/resources/supportDoc.pdf
+ texmf-dist/doc/latex/docassembly/examples/sign.pdf
+ texmf-dist/doc/latex/docassembly/examples/sign.tex
+ texmf-dist/doc/latex/docassembly/examples/sounds/trek.wav
+ texmf-dist/doc/latex/docassembly/examples/watermark-file.tex
+ texmf-dist/doc/latex/docassembly/examples/watermark-text.tex
+srcfiles size=7
+ texmf-dist/source/latex/docassembly/docassembly.dtx
+ texmf-dist/source/latex/docassembly/docassembly.ins
+runfiles size=2
+ texmf-dist/tex/latex/docassembly/docassembly.sty
+catalogue-ctan /macros/latex/contrib/docassembly
+catalogue-license lppl1.2
+catalogue-topics pdf-feat
 
 name dps
 category Package

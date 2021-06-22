@@ -1,0 +1,332 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+%
+% the driver line is not necessary if you
+% have aebpro.cfg configured to your driver.
+%
+\usepackage[web]{aeb_pro}
+\usepackage{eforms}
+\usepackage{pifont}
+\usepackage{fancyvrb}
+
+\ifpdf\def\x{%
+  \usepackage[T1]{fontenc}
+  \usepackage[altbullet]{lucidabr}}
+  \let\copyright\textcopyright
+\else\def\x{%
+  \usepackage[altbullet]{lucidbry}}
+  \usepackage[active]{srcltx}
+\fi\x
+
+
+
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\mathindent\parindent
+
+\def\AEBP{\app{AeB Pro}}
+\def\AEB{\app{AeB}}
+\def\app#1{\textsf{#1}}
+\def\amtIndent{\parindent}
+\def\meta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\def\SC#1{{\small#1}}
+\def\PDF{\SC{PDF}}
+\let\opt\texttt
+\let\pkg\textsf
+
+\def\copyGetPath{\qquad\pushButton[\TU{Copy app.getPath to console}
+\CA{getPath}\A{\JS{console.show();\r
+console.println('\\napp.getPath("user");');
+}}]{cpyGtPth}{}{11bp}}
+
+\def\copyGetPathJS{\qquad\pushButton[\TU{Copy app.getPath to console}
+\CA{getPath}\A{\JS{console.show();\r
+console.println('\\napp.getPath("user", "javascript");');
+}}]{cpyGtPthJS}{}{11bp}}
+
+%\reversemarginpar
+\def\jsSupInstr{How to install JavaScript support files}
+\title{\jsSupInstr}
+\author{D. P. Story}
+\version{1.0}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="How to install JavaScript files";
+var manualfilename="Manual_BG_Print_jsfiles.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+\retnAbsPathAs(_path);
+_path += "/"+manualfilename;
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Because some of the \app{Acrobat} JavaScript methods have security
+restrictions, they can be only executed in the console window, or as part
+of a batch sequence, or from the JavaScript folder reserved by
+\app{Acrobat} for that use. The developer (of {\LaTeX} packages or {\PDF}
+form documents) may want to use these restricted JavaScript methods as
+part of document assembly. To use the restricted methods, they must be
+called from the \emph{user JavaScript folder}. The scripts are contained in a
+\SC{JS} file that \app{Acrobat} reads when it first starts up.
+
+In this article, we provide detailed steps for locating the user JavaScript
+folder of \app{Acrobat} and for installing JavaScript files in that folder.
+Various packages distributed by package author D. P. Story (notably
+\pkg{acrotex}, \pkg{aeb\_pro}, \pkg{thorshammer}, and \pkg{docassembly}), use
+the JavaScript files \texttt{aeb.js} and \texttt{aeb\_pro.js}, which are
+placed in the user JavaScript folder. It is important to correctly install
+these files for the packages listed above to function as expected.
+
+Other JavaScript files may be placed in the folder as well, for example, the
+\texttt{config.js} file is one that is commonly used for general purposes.
+
+Before we get started, if you are using a version of \app{Acrobat} prior
+to version~8.1, you need not read any further. The security restrictions
+described below were not in effect for those versions.
+
+\section{Installing the JavaScript support files}
+
+The functionality of {\AEB} (\pkg{acrotex}) and {\AEBP} (\pkg{aeb\_pro}, as
+well as other packages, depends, to some extent, on the proper installation
+of their JavaScript support files.
+\begin{itemize}
+    \item \AEB: For authors using the $\app{dvips}+\app{Acrobat Distiller}$
+        workflow, \texttt{aeb.js} is required; this file is not used by
+        \app{pdflatex} or \app{xelatex} users.
+
+    \item \AEBP: For authors using the $\app{dvips}+\app{Acrobat
+        Distiller}$ workflow, \texttt{aeb\_pro.js} is required; for authors
+        that prefer \app{pdflatex}, \app{lualatex}, or \app{xelatex} as the
+        {\PDF} creator \emph{and who own} the \app{Acrobat} application,
+        the \texttt{aeb\_pro.js} is required with the \opt{useacrobat}
+        option of \AEBP. When using the \opt{nopro} option of \AEBP, the
+        JavaScript file \texttt{aeb\_pro.js} is not used.
+    \item For \pkg{thorshammer} and \pkg{docassembly}, \pkg{aeb\_pro.js} is
+        required to be installed.
+
+\end{itemize}
+The placement of the JavaScript files has changed over the years and is a
+function of the version number \meta{ver}. Start \app{Acrobat} and open the
+console debugger window by pressing \texttt{Ctrl+J} (for \app{Windows OS})
+or \texttt{Cmd+J} (for \app{Mac OS}). Now execute the code
+\texttt{app.getPath("user")} in the console window. To do this, press the
+\textsf{getPath} button provided below, which copies the necessary code to
+the console window.
+\begin{equation}
+\begin{minipage}{.8\linewidth}
+\begin{Verbatim}[commandchars={!~@}]
+app.getPath("user");!copyGetPath
+\end{Verbatim}
+\end{minipage}\label{display:getPath}
+\end{equation}
+With the cursor on the line containing the script, press the
+\texttt{Ctrl+Enter} (for \app{Windows OS}) or \texttt{Cmd+Enter} (for
+\app{Mac~OS}) key. This will execute the JavaScript and return the `root'
+path to the user's application data for \app{Acrobat}.
+
+The rest of the instructions depend on your operating system,
+\app{Windows} or \app{Mac}.
+
+\subsection{For users of \app{Windows OS}}
+
+There are several cases, jump to the numbered paragraph that describes your
+version (\meta{ver}) of \app{Acrobat}.
+
+%/C/Users/D. P. Story/AppData/Roaming/Adobe/Acrobat/11.0
+%/C/Users/D. P. Story/AppData/Roaming/Adobe/Acrobat/Privileged/11.0/JavaScripts
+
+\def\Stepi{\ding{182}\enspace}
+\def\Stepii{\ding{183}\enspace}
+\def\Stepiii{\ding{184}\enspace}
+
+\paragraph*{{\Stepi}For $\mathbf{\text{\meta{ver}}}$, $\mathbf{8.1 \le
+\text{\meta{ver}} < 10.1.1}$.} For the \app{Windows OS}, executing the script
+in display~\eqref{display:getPath} returns a string of the
+form:\footnote{This string is for \app{Windows OS} beyond \app{WinXP}.}
+\begin{equation}
+\begin{minipage}{.8\linewidth}
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/Acrobat/!meta(ver)
+\end{Verbatim}
+\end{minipage}\label{display:path}
+\end{equation}
+Navigate to this folder location. The correct location for the \SC{JS}
+files is in the \texttt{JavaScripts} subfolder. If the folder does not
+exist, create it. The final path for the JavaScript support files is then
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/
+    Acrobat/!meta(ver)/JavaScripts
+\end{Verbatim}
+Finally, copy \texttt{aeb.js} (if applicable) and/or \texttt{aeb\_pro.js} (if
+applicable) into this folder. Close \app{Acrobat}, the next time
+\app{Acrobat} is started, it will read in the \SC{JS} files.
+
+\paragraph*{{\Stepii}For $\mathbf{\text{\meta{ver}}}$, $\mathbf{10.1.1 \le
+\text{\meta{ver}} < 12}$.} For these versions of \app{Acrobat} security has
+have tightened up even more; the \texttt{JavaScripts} folder is now a
+subfolder of a special \texttt{Privileged} folder. Execute
+\texttt{app.getPath("user")} in the console window, as in
+display~\eqref{display:getPath}. The method brings back a string similar to
+the one in display~\eqref{display:path}. The correct path is obtained by
+simply inserting \texttt{Privileged} into the path in
+display~\eqref{display:path}, between \texttt{Acrobat} and \meta{ver}, as
+displayed below.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/
+    Acrobat/!textbf(Privileged)/!meta(ver)/JavaScripts
+\end{Verbatim}
+But this is a mere description of the correct location, the path must
+exist! The path must be created, if it does not already exist.
+
+Navigate to the folder, one folder above the path shown in
+display~\eqref{display:path}, that is, navigate to,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/Acrobat/
+\end{Verbatim}
+If a \texttt{Privileged} folder exists, enter into it; otherwise, create
+it, then enter it.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/Acrobat/Privileged
+\end{Verbatim}
+Now create a folder named \meta{ver}, unless it already exists, and enter
+it. The version is always the major release \texttt{8.0}, \texttt{9.0},
+\texttt{10.0}, or \texttt{11.0}.
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/
+    Acrobat/Privileged/!meta(ver)
+\end{Verbatim}
+Finally, create the \texttt{JavaScript} folder, unless it already exists,
+to obtain the final path to the user folder JavaScripts:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/
+    Acrobat/Privileged/!meta(ver)/JavaScripts
+\end{Verbatim}
+Copy \texttt{aeb.js} (if applicable) and/or \texttt{aeb\_pro.js} (if
+applicable) into this folder. Close \textsf{Acrobat}, the next time
+\textsf{Acrobat} is started, it will read in the \SC{JS} files.
+
+\paragraph*{{\Stepiii}For $\mathbf{\text{\meta{ver}}}$, $\mathbf{
+\text{\meta{ver}} > 12} $.} Beginning with the next major version following
+version~11, Adobe changed its versioning scheme. There are now two tracks,
+\emph{subscription} and \emph{classic} (also called \emph{perpetual}). For
+subscription, the version, as I understand it, will always be \texttt{DC}
+(Document Cloud), and for the classic, for which you've purchased a
+\emph{perpetual license}, the \meta{ver} is a calendar year. The first
+classic version is \texttt{2015}, the next one is most likely \texttt{2017},
+since major releases occur about every two years.
+
+Execute the code of display~\eqref{display:getPath} by pressing the button
+provided to obtain a path of the form,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/Acrobat/DC
+\end{Verbatim}
+for the subscription license or,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/C/Users/!meta(username)/AppData/Roaming/Adobe/Acrobat/2015
+\end{Verbatim}
+for the classic (or perpetual) license. Of course, this last path is for
+the first classic version.
+
+Now, to obtain the path to the \texttt{JavaScripts} folder, follow the
+instructions for numbered paragraph \ding{183}, but with \meta{ver} equal
+to either \texttt{DC} or \texttt{2015} (a calendar year).
+
+%/C/Users/D. P. Story/AppData/Roaming/Adobe/Acrobat/Privileged/11.0/JavaScripts
+
+\subsection{For users of \app{Mac OS}}
+
+\app{Mac OS} does not have the security restrictions that \app{Windows OS}
+does, as described in paragraphs \ding{183} and \ding{184}.
+
+Follow the instructions of paragraph \ding{182}, by first pressing the button
+provided in display~\eqref{display:getPath}, then, in the console window,
+execute this script as described in the paragraph following
+display~\eqref{display:getPath}. After working through \ding{182}, one
+obtains any of the following paths depending on the version (\meta{ver}) you
+are using:\medskip
+
+\noindent
+For $\text{\meta{ver}} = \texttt{8.0}, \texttt{9.0}, \texttt{10.0},
+\texttt{11.0}$:
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/Users/!meta(user)/Library/Application\ Support/Adobe/
+    Acrobat/!meta(ver)/JavaScripts
+\end{Verbatim}
+\medskip
+
+\noindent
+For $\text{\meta{ver}} > 12$, the path is,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/Users/!meta(user)/Library/Application\ Support/Adobe/
+    Acrobat/DC/JavaScripts
+\end{Verbatim}
+for a subscription license, and,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/Users/!meta(user)/Library/Application\ Support/Adobe/
+    Acrobat/2015/JavaScripts
+\end{Verbatim}
+or more generally,
+\begin{Verbatim}[xleftmargin=\amtIndent,fontsize=\small,commandchars=!()]
+/Users/!meta(user)/Library/Application\ Support/Adobe/
+    Acrobat/!meta(year)/JavaScripts
+\end{Verbatim}
+for the perpetual license.
+
+In all cases, if the \texttt{JavaScripts} folder does not exist, it must
+be created. Copy any \SC{JS} support files into the \texttt{JavaScripts}
+folder. The script files are read the next time \app{Acrobat} is started.
+
+\section{Testing the placement of the JavaScript support files}
+
+Assuming you have successfully followed the instructions and created the
+\texttt{JavaScripts} folder, test the validity of what you have done by
+closing \app{Acrobat} then opening it again. Open the console window
+(\texttt{Ctrl+J} or \texttt{Cmd+J}, for \app{Mac OS}) and execute this
+command in the console window:
+\begin{Verbatim}[xleftmargin=\amtIndent,commandchars={!~@}]
+app.getPath("user","javascript");!quad!copyGetPathJS
+\end{Verbatim}
+If you have followed the instructions, the return string should read the
+complete path to the \texttt{JavaScripts} folder.
+\end{document}

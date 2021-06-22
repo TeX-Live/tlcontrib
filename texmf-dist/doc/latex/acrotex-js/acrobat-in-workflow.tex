@@ -1,0 +1,238 @@
+\RequirePackage[!use=preview,!use=efpmca,!use=usebw,!use=finalbuild]{spdef}
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+\usepackage[web={designv,forcolorpaper},useacrobat]{aeb_pro}
+\usepackage{eforms}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+
+\ifpdf\def\x{%
+  \usepackage[T1]{fontenc}
+  \usepackage{lucidabr}}
+\else\def\x{%
+  \usepackage[altbullet]{lucidbry}
+  \usepackage[active]{srcltx}
+}\fi\x
+
+\usepackage{pifont}
+
+%\usepackage{fancyvrb}
+
+\reversemarginpar
+
+\let\uif\textsf
+\let\env\texttt
+\def\cs#1{\texttt{\eqbs#1}}
+\let\tops\texorpdfstring
+
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\def\parboxValign{t}
+\newcommand{\FmtMP}[2][0pt]{\mbox{}\marginpar{%
+    \raisebox{.5\baselineskip+#1}{%
+    \expandafter\parbox\expandafter[\parboxValign]%
+        {\marginparwidth}{\aebbkFmtMp#2}}}}
+\def\aebbkFmtMp{\kern0pt\itshape\small
+    \ifusebw\color{gray}\else\color{blue}\fi
+    \raggedleft\hspace{0pt}}
+\newcommand{\BlogArticle}{%
+    \makebox[0pt][l]{\hspace{-1pt}\color{blue}\Pisymbol{webd}{254}%
+    }\raisebox{.5pt}{\ifusebw\color{black}\else
+    \color{red}\fi\ding{045}}}
+\def\dps{$\mbox{$\mathfrak D$\kern-.3em\mbox{$\mathfrak P$}%
+   \kern-.6em \hbox{$\mathcal S$}}$}
+
+\makeatother
+
+\setlength{\mathindent}{\the\parindent}
+
+\def\AEBP{\app{AeB Pro}}
+\def\AEB{\app{AeB}}
+\let\app\textsf
+\let\pkg\textsf
+\def\amtIndent{\parindent}
+\def\meta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\def\SC#1{{\small#1}}
+\def\PDF{\SC{PDF}}
+\let\opt\texttt
+
+%\reversemarginpar
+\def\jsSupInstr{\tops{{\AEB} and {\AEBP}\\[1ex]}{AeB and AeB Pro: }Including
+  \tops{\app}{}{Acrobat} in the \tops{\LaTeX}{LaTeX} workflow}
+\title{\jsSupInstr}
+\author{D. P. Story}
+\version{1.0}
+
+\chngDocObjectTo{\newDO}{doc}
+\begin{docassembly}
+var titleOfManual="Acrobat workflow";
+var manualfilename="Manual_BG_Print_acrobat.pdf";
+var manualtemplate="Manual_BG_Brown.pdf"; // Blue, Green, Brown
+var _pathToBlank="C:/Users/Public/Documents/ManualBGs/"+manualtemplate;
+var doc;
+var buildIt=false;
+if ( buildIt ) {
+    console.println("Creating new " + manualfilename + " file.");
+    doc = \appopenDoc({cPath: _pathToBlank, bHidden: true});
+    var _path=this.path;
+    var pos=_path.lastIndexOf("/");
+    _path=_path.substring(0,pos)+"/"+manualfilename;
+    \docSaveAs\newDO ({ cPath: _path });
+    doc.closeDoc();
+    doc = \appopenDoc({cPath: manualfilename, oDoc:this, bHidden: true});
+    f=doc.getField("ManualTitle");
+    f.value=titleOfManual;
+    doc.flattenPages();
+    \docSaveAs\newDO({ cPath: manualfilename });
+    doc.closeDoc();
+} else {
+    console.println("Using the current "+manualfilename+" file.");
+}
+var _path=this.path;
+var pos=_path.lastIndexOf("/");
+_path=_path.substring(0,pos)+"/"+manualfilename;
+\addWatermarkFromFile({
+    bOnTop:false,
+    bOnPrint:false,
+    cDIPath:_path
+});
+\executeSave();
+\end{docassembly}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\app{Adobe Acrobat} (\app{AA}) is a desktop application that has many
+powerful features beyond the functionality of a PDF viewer. In this article
+the focus is a {\LaTeX} workflow that includes \app{AA} in its workflow.
+
+{\AEB} and {\AEBP}, as well as other packages written under the {\AEB}
+banner, use FDF files in various situations (as described in
+Section~4).\footnote{An FDF file is a file type that was created by
+\app{Adobe}. The \app{Acrobat} and \app{Adobe Reader} applications can use
+FDF files in various ways.} These packages use \app{Acrobat} to import the
+FDF files to perform designated JavaScript actions as required by the package
+or document author. The importing of FDF files is only needed during the PDF
+creation stage of document development; once the PDF file is created, the
+document can be viewed by \app{Adobe Reader} or any other PDF viewer.
+
+For FDF files to be imported, the \app{Acrobat} application may need to be
+configured.
+
+\section{Configuration of \tops{\app}{}{Acrobat}}\label{s:config}
+
+The current version of \app{AA} is \app{Adobe Acrobat DC}. In this and
+previous versions of \app{AA} no special configuration is needed; however if
+you purchased \app{AA} after December 2020, or you updated your \app{AA}
+after December 2020, you need to make one change in the \uif{Preferences}.
+
+\begin{figure}[htb]\fboxsep0pt\relax\centering
+  \fbox{\includegraphics[width=.5\linewidth]{figures/SecurityPrefs}}
+  \caption{\tops{\protect\uif}{}{Security (Enhanced) Preferences}}\label{fig:SP}
+\end{figure}
+
+Start \app{Acrobat} and open the menu \uif{Edit \ifpdf\texttt{>} \else> \fi
+Preferences} (\uif{Ctrl+K}). In the \uif{Preferences} dialog box, select
+\uif{Security (Enhanced)} category from the left panel; the top most line of
+the right panel is a checkbox labeled \uif{Enable Protected Mode at startup}.
+\emph{Clear this checkbox.}{\def\parboxValign{c}\FmtMP{\app{Acrobat DC}
+users, action required!}}\footnote{When the box is checked, importing FDF
+files, as described in the next two sections, is \emph{prohibited}. We want
+FDF files imported, so we clear the checkbox.} Refer to
+\hyperref[fig:SP]{Figure~\ref*{fig:SP}} for a visual. If this checkbox is not
+present in your \app{Acrobat}, there is nothing to do until this checkbox
+appears in a future updated version of your \uif{AA} application.
+
+\section{When FDF files are imported}
+
+It is important to be aware of when and how FDF files are imported, and to
+understand the actions required of the document author in response to this
+``import FDF event.''
+
+For a document that uses FDF files to perform tasks, the files are imported
+\emph{after} PDF creation when the newly created PDF document is \emph{first
+opened} in \app{Acrobat}, and \emph{before the PDF file is moved to another
+location and before any auxiliary files (the FDF files) are deleted}. Once
+the FDF files are imported, it is important \emph{to save}\FmtMP{Save the
+PDF} the PDF file, this incorporates the results of the actions taken by the
+imported FDF files into the document, actions, such as the embedding of
+document JavaScript.
+
+Another important point to realize is that the use of FDF files is not
+restricted to the
+\app{dvips\ifpdf\texttt{->}\,\else->\,\fi\app{Distiller}\,\ifpdf\texttt{->}\,\ignorespaces
+\else->\,\fi\app{Acrobat}} method of creating a PDF; indeed, any PDF creator
+used by the {\LaTeX} community may be used, for example,
+\app{pdftex\ifpdf\texttt{->}\allowbreak\,\else->\,\fi\app{Acrobat}}.  The
+only prerequisite is to use {\LaTeX} markup that initiates the ``import FDF
+event.'' This markup is available through packages that support it; this
+includes, but not restricted to, {\AEB} and {\AEBP}.
+
+\section{Applications of FDF files to a \tops{\LaTeX}{LaTeX} workflow}
+
+With regard to producing a PDF file through a {\LaTeX} workflow, there are
+two important applications to importing FDF files: importing document
+JavaScript and post-PDF creation actions. These two applications to FDF files
+are covered in the next two subsections.
+
+\subsection{Document JavaScript}
+
+In this case, FDF files are required only for the \app{dvips\,\ignorespaces
+\ifpdf\texttt{->}\,\else->\,\fi\app{Distiller}\,\ifpdf\texttt{->}\,\else->\,\ignorespaces
+\fi\app{Acrobat}} workflow; the other PDF creators (\app{pdflatex},
+\app{lualatex}, and \app{xelatex}) have primitives that facilitate the
+creation of document JavaScript without FDF files or \app{Acrobat}.
+
+For the \pkg{exerquiz} package, part of the {Acro\!\TeX} eDucation Bundle
+(\AEB), creation of Document JavaScript is automatic and invisible for all
+PDF creators; it is only in the
+\texttt{tex\,->\,dvi\,->\,\app{dvips}\,->\,\ignorespaces
+\app{Distiller}\,->\,\app{Acrobat}} workflow that FDF files are used.
+
+Document JavaScript, by the way, is code that is embedded in the PDF and is
+available to be called throughout the document. Usually, Document JavaScript
+is general code that is repeatedly used.
+
+
+\subsection{Post PDF Creation actions}
+
+The {\AEBP} Bundle has many ``post PDF creation'' actions, such as auto
+saving the document, importing sounds, attaching documents, inserting pages,
+extracting pages, and many more. With proper {\LaTeX} markup, when the
+document is compiled, FDF files are written to the hard drive, when the
+document is then first opened in \app{Acrobat}, the FDF files are imported
+and the actions are executed. Again, for the FDF files to be imported, they
+must not have already been deleted, and \app{Acrobat} must be correctly
+configured (\hyperref[s:config]{Section~\ref*{s:config}}). One very simple
+example, is automatic saving of the document when \app{Acrobat} is first
+opened. For example, an \pkg{aeb\_pro} document has a \env{docassembly}
+environment that is placed in the preamble. Within this environment, place
+any post PDF creation JavaScript actions:
+\begin{Verbatim}[xleftmargin=\parindent]
+\begin{docassembly}
+console.show();
+console.println("Saving document");
+\executeSave();
+\end{docassembly}
+\end{Verbatim}
+The \verb~\executeSave~ command is defined by \pkg{aeb\_pro} and its action
+is to save the document. It is the \env{docassembly} environment that writes
+the FDF file that contains its contents. \app{Acrobat} inputs this command on
+opening and the PDF is saved.\footnote{\cs{executeSave} must be the last post PDF
+creation action; otherwise, as later actions may not be executed.}
+
+\paragraph*{The \pkg{docassembly} package.} This package uses the post PDF creation actions
+described above, but is a stand alone package and is available to all {\LaTeX} workflows who own
+the \app{Acrobat} application. The \pkg{docassembly} package defines the
+\env{docassembly} environment and supports the same functionality of as {\AEBP}. The \pkg{docassembly}
+package may be downloaded from CTAN at \url{https://ctan.org/pkg/docassembly}.
+
+\end{document}

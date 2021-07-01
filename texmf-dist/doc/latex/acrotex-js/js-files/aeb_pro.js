@@ -5,8 +5,9 @@
     D. P. Story
     http://www.acrotex.net
     
-    Version 1.6.1
+    Version 1.6.2
 
+    v1.6.2 Modified aebDocSaveAs for thorshammer
     v1.6.1 aebCreateTemplate now returns an object
     v1.6 Added aebAddWatermarkFromText, aebLaunchURL
     v1.5 Added aebCertifyInvisibleSign 
@@ -76,16 +77,18 @@ aebSaveAs = app.trustPropagatorFunction( function ( oArgs, doc )
         app.execMenuItem("Save");
     app.endPriv();
 });
+// Version 1.7.2
 aebDocSaveAs = app.trustPropagatorFunction( function ( oArgs, doc )
 {
     var Msg=function(e){return (aebDocSaveAs.msg==undefined)?("Doc SaveAs Error: " + e.toString()):aebDocSaveAs.msg;}
+    var Action=function(){return ((aebDocSaveAs.action==undefined)?null:eval(aebDocSaveAs.action));}
     app.beginPriv();
     try { 
-        return doc.saveAs(oArgs); 
-    } catch(e){console.println(Msg(e));}
+        return retn = doc.saveAs(oArgs); 
+    } catch(e){console.println(Msg(e));Action();}
     app.endPriv();
     aebDocSaveAs.msg=undefined;
-
+    aebDocSaveAs.action=undefined;
 });
 aebExtractPages = app.trustPropagatorFunction( function ( oArgs, doc )
 {

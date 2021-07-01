@@ -14,7 +14,7 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}[1997/12/01]
 %<package>\ProvidesPackage{aeb_pro}
-%<package> [2021/04/27 v2.11 aeb_pro: A support package (dps)]
+%<package> [2021/06/20 v2.14 aeb_pro: A support package (dps)]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false]{hyperref}
@@ -43,7 +43,8 @@
      \PackageInfo{aeb_pro}{aebdocfmt.def cannot be found}}
 \begin{document}
   \GetFileInfo{aeb_pro.sty}
-  \title{\pkg{aeb\_pro}\\as suggested by J\"{u}rgen Gilg}
+  \title{The \pkg{aeb\_pro} package\\[3pt] \normalsize
+    as suggested by J\"{u}rgen Gilg}
   \author{D. P. Story\\
     Email: \texttt{dpstory@acrotex.net}}
   \date{processed \today}
@@ -76,12 +77,14 @@
 \RequirePackage{xkeyval}
 \DeclareOptionX*{\PassOptionsToPackage{\CurrentOption}{aeb_pro}}
 \ProcessOptionsX\relax
-\RequirePackage{aeb_pro}
+%\RequirePackage{aeb_pro}
 %    \end{macrocode}
 %    \begin{macrocode}
 %</altpkgname>
 %<*package>
 %    \end{macrocode}
+% \changes{v2.12}{2021/06/08}{Updated \string\texttt{aeb\_pro.js} to Version 1.6, this
+%    version includes aebLaunchURL}
 % \changes{v2.11}{2021/04/27}{Added \string\texttt{aebCertifyInvisibleSign} to
 %   \string\texttt{aeb\_pro.js} (Version 1.5)}
 % \changes{v2.9.7}{2021/02/04}{Updated documentation to reflect new Acrobat security restriction,
@@ -108,7 +111,12 @@
 %
 %    We declare some options for this package.
 %\changes{v2.2}{2016/07/26}{Removed the generation of \string\texttt{fsprodef.js} from the INS file.}
+%\changes{v2.13}{2021/06/11}{Cannot have docassembly package loaded}
 %    \begin{macrocode}
+\@ifpackageloaded{docassembly}{%
+  \PackageError{aeb_pro}{The docassembly package is loaded.\MessageBreak
+    Functionality of this package is included in aeb\_pro.\MessageBreak
+    Please remove the docassembly package and recompile}{}}{}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{xkeyval}
@@ -130,6 +138,7 @@
 %    \IndexOpt{hyperref}^^A
 %    \IndexOpt{graphicxsp}^^A
 %    \IndexOpt{rmannot}^^A
+%    \IndexOpt{aeb\_mlink}^^A
 % \vskip-\baselineskip\noindent AeB control central
 % is simply a set of options for including the
 % other members of the AeB family.  This assures that the package are
@@ -142,6 +151,7 @@
 %   \usepackage[web={designi,forpaper,req=2016/11/03}]{aeb_pro}
 %\end{verbatim}
 %    The version takes a key of \texttt{req}, as shown above.
+%    \changes{v2.12}{2021/06/08}{Include \string\pkg{aeb\_mlnk} in AeB Central}
 %    \changes{v0.8f}{2008/06/15}{Added \textsf{graphicxsp} to the list of support packages}
 %    \changes{v2.7}{2016/12/10}{Incorporate the version argument into package specification}
 %    \par\medskip\noindent
@@ -163,7 +173,7 @@
 %    \texttt{eq2db}, \texttt{aebxmp}, \texttt{hyperref}, \texttt{graphicxsp}, and \texttt{rmannot}.
 %    \begin{macrocode}
 \@tfor\aeb@pcks:={web}{exerquiz}{dljslib}%
-{eforms}{insdljs}{eq2db}{aebxmp}{hyperref}{graphicxsp}{rmannot}\do
+{eforms}{insdljs}{eq2db}{aebxmp}{hyperref}{graphicxsp}{rmannot}{aeb_mlink}\do
 {%
     \ap@csarg\let{aeb@\aeb@pcks @req}\@empty
     \ap@csarg\let{aeb@\aeb@pcks @opts}\relax
@@ -247,7 +257,6 @@
     {\PackageInfo{aeb_pro}{Inputting code for the pro option}}%
     {\PackageInfo{aeb_pro}{Cannot find aebpro.def.
         Reinstall or refresh your file name database, as needed.}}}
-%\AtEndOfPackage{\aeb@InputAeBPro}
 %    \end{macrocode}
 %
 % \subsection{\texttt{uselayers} option}
@@ -596,7 +605,33 @@
     {\edef\temp@exp{\ifpdfmarkup\noexpand\ap@RP{rmannot}\else
         \noexpand\aebp@PkgWarningii{rmannot}\fi}\temp@exp}
 }
+\@ifpackageloaded{aeb_mlink}{\aebp@PkgWarningi{aeb_mlink}}
+{%
+    \@ifundefined{aeb@aeb_mlink@opts}{}
+    {\edef\temp@exp{\ifpdfmarkup\noexpand\ap@RP{aeb_mlink}\else
+        \noexpand\aebp@PkgWarningii{aeb_mlink}\fi}\temp@exp}
+}
 \let\execjs\aebp@YES
+%    \end{macrocode}
+%    (2021/06/20)
+%    Move the JavaScript file \texttt{aeb\_pro.js} to the \pkg{acrotex-js} package, dated
+%    2021/06/19 or later.
+%\changes{v2.14}{2021/06/20}{Require \string\pkg{acrotex-js} dated 2021/06/19 or later}
+%    \begin{macrocode}
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+%    \end{macrocode}
+%    If the style file \texttt{acrotex-js.sty} is detected, we assume the document
+%    author has correctly installed \texttt{aeb\_pro.js}, if not, we require
+%    this package, which may be automatically installed on some {\TeX} systems.
+%    \begin{macrocode}
+  {\PackageWarningNoLine{aeb_pro}{%
+      The acrotex-js package is required.\MessageBreak
+      Before continuing, install this package,\MessageBreak
+      read the documentation, and place\MessageBreak
+      aeb_pro.js in the expected folder
+    }\def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\reqpkg
 %    \end{macrocode}
 %\changes{v2.9.4}{2018/12/02}{Require aeb-comment (version 3.2 of comment)}
 %    \begin{macrocode}
@@ -3366,17 +3401,17 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 %    \end{macrocode}
 %
 % \section{Document Assembly Methods}
-%    Special commands and environment to take advantage of \app{Acrobat}'s extensive
+%    Special ``helper'' commands and one environment are defined to take advantage of \app{Acrobat}'s extensive
 %    library of security restricted methods. It is assumed the document author has properly
 %    installed \texttt{aeb\_pro.js}.
 %
-% \subsection{The \texttt{docassembly} Environment}
+% \subsection{The \texttt{docassembly} environment}
 %
 %    \begin{environment}{docassembly}
 % This is a wrapper environment for the \texttt{execJS} environment of the
 % \textsf{insDLJS} Package. Place JavaScript lines in this environment and
-% the script will execute one time after the file has been distilled and opened
-% in Acrobat Pro for the fist time.
+% the script will execute one time after the PDF has been created and opened
+% in \app{Acrobat Pro} for the first time.
 %    \begin{macrocode}
 \newenvironment{docassembly}{%
 \execJS{docassembly}
@@ -3423,7 +3458,7 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 %    \end{macrocode}
 %    \end{macro}
 %    The above defines a new command given by \texttt{\#1}. The command has one argument which is all content
-%    up to the terminating mark \cs{sp@mrk}. The trick to removing \cs{thisDocObject} and replacing it with
+%    up to the terminating mark \cs{ap@mrk}. The trick to removing \cs{thisDocObject} and replacing it with
 %    \texttt{\#2}, in the above definition, we insert `\texttt{(\#2}' followed by \cs{ap@gobtocomma}, which absorbs
 %    \cs{thisDocObject,} (absorbs everything through the first comma), followed by all content (\texttt{\#\#1}); the second \cs{@gobble} absorbs the left
 %    parenthesis that opens the argument.
@@ -3464,6 +3499,26 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 %    parenthesis. This approach allows more flexibility in the definition, there can be spaces following the
 %    command name |\docSaveAs ({path: _path})|, for example.
 %    \end{macro}
+%    \begin{macro}{\retnAbsPathAs}\hskip-\marginparsep\texttt{(\ameta{js-var})}
+%    Several methods require an absolute path to the current folder. The code is,
+%\changes{v2.13}{2021/06/11}{Added \string\cs{retnAbsPathAs}}
+%\begin{verbatim}
+%var _path=this.path;
+%var pos=_path.lastIndexOf("/");
+%_path=_path.substring(0,pos);
+%\end{verbatim}
+%We simplify this code for the document author in the form of the
+%command \cs{rtnAbsPathAs(\ameta{js-var})}, where \ameta{js-var} is a JavaScript
+%variable that will hold the absolute path to the current folder; eg, |\rtnAbsPathAs(_path);|
+%expands to the above code.
+%    \begin{macrocode}
+\def\retnAbsPathAs(#1){%
+  var #1=this.path;^^J%
+  var pos=#1.lastIndexOf("/");^^J%
+  #1=#1.substring(0,pos)}
+%    \end{macrocode}
+%Notice the argument \ameta{js-var} is delimited by \emph{parentheses}, not braces.
+%    \end{macro}
 %    \begin{macrocode}
 % End aebpro and createicon segments
 %</aebpro|createicon>
@@ -3473,6 +3528,12 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 % This is the method \texttt{Doc.addWatermarkFromFile}.
 %    \begin{macrocode}
 \DeclareJSHelper{\addWatermarkFromFile}{aebAddWatermarkFromFile}
+%    \end{macrocode}
+%    \end{macro}
+%    \begin{macro}{\addWatermarkFromText}
+% This is the method \texttt{Doc.addWatermarkFromText}.
+%    \begin{macrocode}
+\DeclareJSHelper{\addWatermarkFromText}{aebAddWatermarkFromText}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macrocode}
@@ -3533,10 +3594,13 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 \DeclareJSHelper{\createTemplate}{aebCreateTemplate}
 %    \end{macrocode}
 %    \end{macro}
-%    \begin{macro}{\importDataObject}
-% This is the method \texttt{Doc.importDataObject}.
+%    \begin{macro}{\importDataObject} This is the method
+%    \texttt{Doc.importDataObject}. \cs{attachFile} is a
+%    more intuitive name for the operation performed.
+%   \DescribeMacro\attachFile
 %    \begin{macrocode}
 \DeclareJSHelper{\importDataObject}{aebImportDataObject}
+\DeclareJSHelper{\attachFile}{aebImportDataObject}
 %    \end{macrocode}
 %    \end{macro}
 %    \begin{macro}{\executeSave}
@@ -3562,12 +3626,12 @@ nLaunch: \ahref@launch@type})}}]{\ahypercolor{#3}}%
 %    \begin{macro}{\sigInfo}
 %    \begin{macro}{\signatureSign}
 %    \begin{macro}{\signatureSetSeedValue}
-% The \cs{signInfo} command is used for entering signing formation into what will
+% The \cs{sigInfo} command is used for entering signing formation into what will
 % become an object. \cs{signatureSign} takes no arguments, but uses the info
-% entered by \cs{signInfo}. An example is
+% entered by \cs{sigInfo}. An example is
 %\begin{verbatim}
 %\begin{docassembly}
-%\signInfo{
+%\sigInfo{
 %    cSigFieldName: "sigOfDPS", ohandler: security.PPKLiteHandler,
 %    cert: "D_P_Story.pfx", password: "dps017",
 %    oInfo: { location: "Niceville, FL",

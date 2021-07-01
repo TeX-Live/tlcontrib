@@ -1027,7 +1027,12 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 \def\theDocObject{this}
 \providecommand\DeclareJSHelper[2]{%
     \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+\def\retnAbsPathAs(#1){%
+  var #1=this.path;^^J%
+  var pos=#1.lastIndexOf("/");^^J%
+  #1=#1.substring(0,pos)}
 \DeclareJSHelper{\addWatermarkFromFile}{aebAddWatermarkFromFile}
+\DeclareJSHelper{\addWatermarkFromText}{aebAddWatermarkFromText}
 \DeclareJSHelper{\importIcon}{aebImportIcon}
 \DeclareJSHelper{\importSound}{aebImportSound}
 \DeclareJSHelper{\appopenDoc}{aebAppOpenDoc}
@@ -1036,6 +1041,7 @@ var pkto=app.setTimeOut("app.clearTimeOut(pkto);"
 \DeclareJSHelper{\insertPages}{aebInsertPages}
 \DeclareJSHelper{\createTemplate}{aebCreateTemplate}
 \DeclareJSHelper{\importDataObject}{aebImportDataObject}
+\DeclareJSHelper{\attachFile}{aebImportDataObject}
 \DeclareJSHelper{\executeSave}{aebSaveAs,"Save"\@gobble}
 \DeclareJSHelper{\extractPages}{aebExtractPages}
 \DeclareJSHelper{\mailDoc}{aebMailDoc}

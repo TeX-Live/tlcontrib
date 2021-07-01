@@ -1,11 +1,12 @@
 \documentclass{article}
 \usepackage[fleqn]{amsmath}
-\usepackage[
-    web={centertitlepage,designv,
-    forcolorpaper,latextoc,pro},
-    eforms,linktoattachments,aebxmp
+\usepackage[%
+    web={centertitlepage,designv,forcolorpaper,latextoc,pro},
+    eforms,
+    aebxmp,aeb_mlink,
+    linktoattachments
 ]{aeb_pro}
-\usepackage{aeb_mlink}
+%\usepackage{aeb_mlink}
 \usepackage{graphicx,array}
 %\usepackage{myriadpro}
 %\usepackage[usecmtt]{myriadpro}
@@ -36,7 +37,7 @@
     email={dpstory@acrotex.net},
     subject={Documentation for {\AEBP} from AcroTeX},
     talksite={\url{www.acrotex.net}},
-    version={2.11, 2021/04/27},
+    version={2.14, 2021/06/20},
     Keywords={XMP, E4X, Adobe Acrobat, JavaScript},
     copyrightStatus=True,
     copyrightNotice={Copyright (C) \the\year, D. P. Story},
@@ -612,9 +613,11 @@ for MiK\TeX, this might be at
 \begin{Verbatim}[xleftmargin=\amtIndent]
 C:\Program Files (x86)\MiKTeX 2.9\doc\latex\aeb-pro
 \end{Verbatim}
-(This path assumes the use of \textbf{MiK\TeX~2.9}.) The folder contains documentation and example files. If also contains the two
-JavaScript files, \texttt{aeb.js} and \texttt{aeb\_pro.js}. Refer to
-\nhNameref{ss:aebpjs} for more information on the installation of these two files.
+(This path assumes the use of \textbf{MiK\TeX~2.9}.) The folder contains documentation and example files.
+
+%If also contains the two
+%JavaScript files, \texttt{aeb.js} and \texttt{aeb\_pro.js}. Refer to
+%\nhNameref{ss:aebpjs} for more information on the installation of these two files.
 
 \subsubsection{Manual installation}
 
@@ -658,7 +661,7 @@ already installed, the install the contents of \texttt{aebpro.zip}.
 
 \item[] Users of \textbf{MiK\!\TeX} need to refresh the filename database.
 
-\item Install the JavaScript file, \texttt{aeb\_pro.js}, as explained in the next subsection.
+\item Install the JavaScript file, \texttt{aeb\_pro.js}, as explained in the \hyperref[ss:aebpjs]{next subsection}.
 \end{enumerate}
 
 \noindent{\AEB} (\AcroEB) is also required, installation instructions are contained
@@ -697,16 +700,26 @@ in the {\AEB} reference document, the instructions are reproduced here for your 
 
 \subsubsection{Installing \texttt{aeb\_pro.js} and \texttt{aeb.js}}\label{ss:aebpjs}
 
+In previous versions of this package, the JavaScript support files
+\texttt{aeb\_pro.js} and \texttt{aeb.js} where distributed with
+\pkg{aeb\_pro}. Now they are distributed through the package
+\pkg{\href{https://www.ctan.org/pkg/acrotex-js}{acrotex-js}}\FmtMP{\pkg{acrotex-js} pkg};\footnote{\url{https://www.ctan.org/pkg/acrotex-js}}
+these JavaScript support files are found in the \texttt{js-files} folder of the
+\pkg{acrotex-js} distribution. The \pkg{acrotex-js} package, dated 2021/06/19 or later,
+is required by \pkg{aeb\_pro}; you will have to install it, or,
+some {\TeX} systems automatically download and install the package for you,
+since it is required.
+
 The instructions for installing the JavaScript support files
-\texttt{aeb\_pro.js} and \texttt{aeb.js} are in the
-\texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, which resides in
-the \texttt{doc} folder of the \texttt{aeb\_pro} installation.
+\texttt{aeb\_pro.js} and \texttt{aeb.js} are in the document
+\texttt{install\_jsfiles.pdf}, which resides in
+the \texttt{docs} folder of the \pkg{acrotex-js} installation.
 
 After you've installed the JavaScript files, as directed by the
-\texttt{\href{install_jsfiles.pdf}{install\_jsfiles.pdf}}, validate the
-installation of the JavaScript files by navigating to the \texttt{examples}
-subfolder and opening the file \texttt{test\_install.pdf} in \app{Acrobat};
-follow the directions contained on that one page document.
+\texttt{install\_jsfiles.pdf} document, validate the installation of the
+JavaScript files by navigating to the \texttt{js-test} folder of the
+\pkg{acrotex-js} package and opening the file \texttt{test\_install.pdf} in
+\app{Acrobat}; follow the directions contained therein.
 
 \paragraph*{\app{Adobe Acrobat DC} authors.} If you have \app{Acrobat DC} that was purchased or updated after December 2020,
 \app{Acrobat} needs to be configured\FmtMP{Configure \app{Acrobat DC}} to
@@ -895,9 +908,9 @@ now list the members of the {\AEB} family you wish to use, along with
 their optional parameters you wish to use.
 The {\AEB} components supported by {\AEBP} are listed below.
 \begin{equation}
-\begin{tabular}{lllll}
+\begin{tabular}{llllll}
 \pkg{web}&\pkg{exerquiz}&\pkg{dljslib}&\pkg{eforms}&\pkg{insdljs}\\\relax
-\pkg{eq2db}&\pkg{aebxmp}&\pkg{hyperref}&\pkg{graphicxsp}&\pkg{rmannot}
+\pkg{eq2db}&\pkg{aebxmp}&\pkg{hyperref}&\pkg{graphicxsp}&\pkg{rmannot}&\pkg{aeb\_mlink}
 \end{tabular}\label{display:ACCopts}
 \end{equation}
 The phrase `\app{{\AEB} Control Central}' refers to using these package names
@@ -2187,14 +2200,25 @@ on these methods and their parameters.
 
 \Ex{} Demonstrate \cs{addWatermarkFromFile}: The following code places a
 background graphic on every page the document. This is the kind of code
-that is executed for this document.
+that is executed for this document. The value of the \uif{cDIPath} parameter
+requires an absolute path to the watermark file.
 \bgroup\small\obeyspaces%
 \settowidth{\aebdimen}{\small\ttfamily\quad{cDIPath: "/C/AcroPackages/ManualBGs/Manual\_BG\_DesignV\_AeB.pdf"}}%
 \begin{dCmd*}[fontsize=\small,commandchars={!~@}]{\aebdimen+2\fboxsep+2\fboxrule}
+% !textsf~Add a watermark from a folder different from the source file@
 \begin{docassembly}
 \addWatermarkFromFile({
 !quad~bOnTop:false,@
 !quad~cDIPath: "/C/AcroPackages/ManualBGs/Manual_BG_DesignV_AeB.pdf"@
+});
+\end{docassembly}
+% !textsf~Add a watermark from the source folder@
+\begin{docassembly}
+\retnAbsPathAs(_path); % !textsf~Helper command that acquires the abs path@
+_path += "myWaterMark.pdf";
+\addWatermarkFromFile({
+!quad~bOnTop:false,@
+!quad~cDIPath: _path@
 });
 \end{docassembly}
 \end{dCmd*}

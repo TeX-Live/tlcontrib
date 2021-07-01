@@ -28,6 +28,10 @@
 \def\theDocObject{this}
 \providecommand\DeclareJSHelper[2]{%
     \def#1##1({\ap@TF(##1\theDocObject,#2,\ap@mrk}}
+\def\retnAbsPathAs(#1){%
+  var #1=this.path;^^J%
+  var pos=#1.lastIndexOf("/");^^J%
+  #1=#1.substring(0,pos)}
 \DeclareJSHelper{\importIcon}{aebImportIcon}
 \let\predocassemJS\@empty
 \def\aeb@image@cnt{0}

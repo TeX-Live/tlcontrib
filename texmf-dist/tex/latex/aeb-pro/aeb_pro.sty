@@ -19,7 +19,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}[1997/12/01]
 \ProvidesPackage{aeb_pro}
- [2021/04/27 v2.11 aeb_pro: A support package (dps)]
+ [2021/06/20 v2.14 aeb_pro: A support package (dps)]
+\@ifpackageloaded{docassembly}{%
+  \PackageError{aeb_pro}{The docassembly package is loaded.\MessageBreak
+    Functionality of this package is included in aeb\_pro.\MessageBreak
+    Please remove the docassembly package and recompile}{}}{}
 \RequirePackage{ifpdf}[2006/02/20]
 \RequirePackage{ifxetex}[2006/08/21]
 \RequirePackage{xkeyval}
@@ -30,7 +34,7 @@
 \def\aebp@setCCOptions#1#2{%#1=package #2=options
     \ap@csarg\edef{aeb@#1@opts}{#2}}
 \@tfor\aeb@pcks:={web}{exerquiz}{dljslib}%
-{eforms}{insdljs}{eq2db}{aebxmp}{hyperref}{graphicxsp}{rmannot}\do
+{eforms}{insdljs}{eq2db}{aebxmp}{hyperref}{graphicxsp}{rmannot}{aeb_mlink}\do
 {%
     \ap@csarg\let{aeb@\aeb@pcks @req}\@empty
     \ap@csarg\let{aeb@\aeb@pcks @opts}\relax
@@ -290,7 +294,22 @@
     {\edef\temp@exp{\ifpdfmarkup\noexpand\ap@RP{rmannot}\else
         \noexpand\aebp@PkgWarningii{rmannot}\fi}\temp@exp}
 }
+\@ifpackageloaded{aeb_mlink}{\aebp@PkgWarningi{aeb_mlink}}
+{%
+    \@ifundefined{aeb@aeb_mlink@opts}{}
+    {\edef\temp@exp{\ifpdfmarkup\noexpand\ap@RP{aeb_mlink}\else
+        \noexpand\aebp@PkgWarningii{aeb_mlink}\fi}\temp@exp}
+}
 \let\execjs\aebp@YES
+\IfFileExists{acrotex-js.sty}{\let\reqpkg\relax}
+  {\PackageWarningNoLine{aeb_pro}{%
+      The acrotex-js package is required.\MessageBreak
+      Before continuing, install this package,\MessageBreak
+      read the documentation, and place\MessageBreak
+      aeb_pro.js in the expected folder
+    }\def\reqpkg{\usepackage{acrotex-js}[2021/06/19]}
+  }
+\reqpkg
 \RequirePackage{aeb-comment}
 \RequirePackage{calc}
 \RequirePackage{eso-pic}

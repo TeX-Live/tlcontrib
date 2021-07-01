@@ -7,15 +7,15 @@
 %% aeb_pro.dtx  (with options: `copyright,fsdefjs')
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% aeb_pro.sty package,                      2016-05-15 %%
-%% Copyright (C) 2006--2016  D. P. Story                %%
+%% aeb_pro.sty package,                                 %%
+%% Copyright (C) 2006--2021  D. P. Story                %%
 %%   dpstory@acrotex.net                                %%
 %%                                                      %%
 %% This program can redistributed and/or modified under %%
 %% the terms of the LaTeX Project Public License        %%
 %% Distributed from CTAN archives in directory          %%
-%% macros/latex/base/lppl.txt; either version 1 of the  %%
-%% License, or (at your option) any later version.      %%
+%% macros/latex/base/lppl.txt; either version 1.2 of    %%
+%% the License, or (at your option) any later version.  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{insDLJS}[_fsDefaults]{fsdef}{AeB Pro: Presentation Defaults}
 var _fsDefaults = true;

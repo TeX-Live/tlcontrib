@@ -16,11 +16,14 @@
 %</copyright>
 %<package>\NeedsTeXFormat{LaTeX2e}
 %<package>\ProvidesPackage{thorshammer}
-%<package> [2020/01/13 v1.5.7 Support commands for Thor's way]
+%<package> [2021/06/24 v1.5.11 Support commands for Thor's way]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage[colorlinks,hyperindex=false,linktocpage,bookmarksnumbered]{hyperref}
 \usepackage{calc}
+\makeatletter
+\let\@latex@warning@no@line\@gobble
+\makeatother
 %\def\texorpdfstring#1#2{#1}
 %\pdfstringdefDisableCommands{\let\\\textbackslash}
 \OnlyDescription  % comment out for implementation details
@@ -33,6 +36,7 @@
 \let\opt\texttt
 \let\app\textsf
 \let\pkg\textsf
+\let\uif\textsf
 \let\tops\texorpdfstring
 \def\EXCL{!}
 \def\nmpsep#1{\hskip-\marginparsep\texttt{#1}}
@@ -99,6 +103,8 @@ questions, bug detecting, and motivation. High regards and respect to both. D. P
 %    This package supports the Thorsten's workflow by providing the necessary form elements and JavaScript
 %    to carry out his(her) plan. What happens to the quiz after that, I do not know.
 %
+%\changes{v1.5.8}{2020/01/21}{Published password of \string\texttt{"acrotex"} for the two
+%security related action sequences}
 %\changes{v1.4}{2019/08/11}{Begin major change to this package, leaving v1.3.8 as our best working
 % version prior to this update. }
 %
@@ -166,11 +172,13 @@ questions, bug detecting, and motivation. High regards and respect to both. D. P
 %    \end{macrocode}
 % \subsection{Required packages}
 %    \begin{macrocode}
-\RequirePackage{insdljs}[2019/08/06]
+\RequirePackage{insdljs}[2021/06/19]
 %    \end{macrocode}
 % We use the \opt{usealtadobe} option of \pkg{insdljs}, but not directly. If \cs{inputAltAdbFncs}
 % is \cs{relax} than the functions have not already been input above \pkg{thorshammer}.
 % \changes{v1.3.5}{2019/08/06}{Use \string\cs{usedAdbFuncs} to detect \string\opt{usealtadobe} option}
+% \changes{v1.5.11}{2021/06/24}{Require \string\pkg{insdljs} dated 2021/06/19 or later, which
+% itself requires \string\pkg{acrotex-js}.}
 %    \begin{macrocode}
 \ifx\usedAdbFuncs\dl@NO
   \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}%
@@ -182,8 +190,8 @@ questions, bug detecting, and motivation. High regards and respect to both. D. P
   \let\inputAltAdbFncs\relax
 \fi
 \inputAltAdbFncs
-\RequirePackage{exerquiz}[2019/08/13]
-\RequirePackage{eq-save}[2019/08/07]
+\RequirePackage{exerquiz}[2021/05/29]
+\RequirePackage{eq-save}[2021/04/27]
 \let\execjs\dl@YES
 \@ifundefined{CommentStream}{\newwrite\CommentStream}{}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -918,14 +926,14 @@ new Array("PointsField.\currQuiz","EssayField.\currQuiz"));\r
 % name (\cmd\currQuiz); \texttt{@p(2)} is the number of questions; and \texttt{@p(3)} is
 % the password.
 %    \begin{macrocode}
-\begin{defineJS}[\catcode`\@=0\relax]{\pwdKeyJS}
+\begin{defineJS}[\makeesc\@]{\pwdKeyJS}
 if (event.willCommit) {
   if (event.value==@p(3)) {
     @commonPassKey
   }
 }
 \end{defineJS}
-\begin{defineJS}[\catcode`\@=0\relax]{\commonPassKey}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\commonPassKey}
 %    \end{macrocode}
 %    Added code from \cs{qz@IDTxtField} to avoid the dreaded `q1 is undefined'
 %    JavaScript error message. This happends when the \textsf{Mark It} control
@@ -941,8 +949,9 @@ if (typeof @oField=="undefined")
   var @oField=new Object;
 restoreQuizData();
 this.calculate=true;
+@ifthtestmode@else%
 var f=this.getField("postQzMsg");
-if (f!=null) f.display=display.hidden;
+if (f!=null) f.display=display.hidden;@fi
 var f=this.getField("pbStuSvCl");
 if (f!=null) f.display=display.hidden;
 var f=this.getField("ScoreField.@p(1)");
@@ -993,7 +1002,7 @@ problem, assigning the maximum instead"}
 %    \changes{v1.1.3}{2019/07/03}{Remove lines not needed since \string\cs{LngPtsFld} became
 %    a calculation field}
 %    \begin{macrocode}
-\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\essayQKey}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\essayQKey}
 if (event.willCommit) {
   var qpts=(1*event.value);
   if (isNaN(qpts)) {
@@ -1163,7 +1172,7 @@ cFilenameInit: cSave });
 if(\instrAutoClose&&bOK) this.closeDoc(true);
 }
 \end{insDLJS}
-\begin{defineJS}[\catcode`\@=0\relax]{\freezeQuizMU}
+\begin{defineJS}[\makeesc\@]{\freezeQuizMU}
 var f, fname;
 var bOK=true;
 if(@instrAutoSave) {
@@ -1277,7 +1286,8 @@ if(bOk)}
 \toks@=\expandafter{\postSubmitQuiz\t\t
   oRecordOfQuizData["ProbDist.\oField"]=ProbDist;\r\t\t
   oRecordOfQuizData["RightWrong.\oField"]=RightWrong;\r\t\t
-  var f=this.getField("postQzMsg");\r\t\t
+  \ifthtestmode\else
+  var f=this.getField("postQzMsg");\r\t\t\fi
   if (f!=null) f.display=display.visible;\r\t\t
   var f=this.getField("pbStuSvCl");\r\t\t
   if (\stuAutoSave&&f!=null)f.display=display.visible;} %\r\t\t
@@ -1298,10 +1308,10 @@ beginning.\n\n Press \\"Yes\\" to end the quiz."}
 \def\ThorsAlertTitle#1{\flJSStr*[noquotes]{\ThorsAlert@Title}{#1}}
 \ThorsAlertTitle{"Thor's Hammer"}
 %    \end{macrocode}
-%    \DescribeMacro\eq@EndQzBtnScript The modified script for the end of the
+%    \DescribeMacro\eq@EndQzBtnScriptThor The modified script for the end of the % dps0624
 %    quiz button. We rework the script of \cs{eq@@EndQuizButtonActions}, taken from \pkg{exerquiz}.
 %    \begin{macrocode}
-\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\eq@EndQzBtnScript}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\eq@EndQzBtnScriptThor}
 if (!isQuizInitialized("*currQuiz"))
   eqAppAlert(InitMsg("*bqlabelISO"),3);
 else {
@@ -1312,7 +1322,7 @@ cTitle: *ThorsAlert@Title, nIcon: 2, nType: 2});
       *currQuiz.PtValues=(new %
 Array(*pointValuesArray));
       ProbType=[*ptypeArray];
-*if@inclkey%
+*if@inclkey
       *currQuiz.CorrAns=(new %
 Array(*corrAnsArray));
 *fi%
@@ -1331,7 +1341,16 @@ Array(*corrAnsArray));
 %    \end{macrocode}
 %    Now, we redefine \cs{eq@@EndQuizButtonActions} of \pkg{exerquiz}.
 %    \begin{macrocode}
-\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScript}}}
+\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScriptThor}}} % dps0624
+\let\eq@@EndQuizButtonActionsThorSave\eq@@EndQuizButtonActions % dps0624
+%    \end{macrocode}
+%    Define \DescribeMacro\useEndQuizThor\cs{useEndQuizThor} to restore the \uif{End Quiz}
+%    control to the action defined in this package. (Other packages may removed this
+%    \uif{End Quiz} action.)
+%    \changes{v1.5.11}{2021/06/24}{Define \string\cs{useEndQuizThor}}
+%    \begin{macrocode}
+\def\useEndQuizThor{\let\eq@@EndQuizButtonActions
+  \eq@@EndQuizButtonActionsThorSave}
 %    \end{macrocode}
 %    Add a \textsf{SaveAs} menu item to end of the quiz
 %    \changes{v1.1.4}{2019/07/04}{Add a SaveAs menu item to end of the quiz}
@@ -1403,7 +1422,7 @@ Array(*corrAnsArray));
 \newif\ifUseStuSaveAsDialog\UseStuSaveAsDialogfalse
 \def\useStuSaveAsDialogOn{\UseStuSaveAsDialogtrue}
 \def\useStuSaveAsDialogOff{\UseStuSaveAsDialogfalse}
-\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\autoSaveStuJS}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\autoSaveStuJS}
   var bOK=true;
   global.bOkClose=true;
   var _path=this.path;
@@ -1773,9 +1792,14 @@ Array(*corrAnsArray));
 %    under the name of \texttt{\ameta{name}.cut}.
 %    \changes{v1.4}{2019/08/11}{Changes to \string\cs{InputBodyQuiz}
 %    to support solution sets}
+%    \changes{v1.5.9}{2020/05/29}{Defined public \string\cs{qzLtr} version
+%    of \string\cs{theth@qzCnt}}
+%    \changes{v1.5.10}{2021/05/31}{Added \string\cs{qzLtr} the public version of
+%    \string\cs{theth@qzCnt}}
 %    \begin{macrocode}
 \newcounter{th@qzCnt}
 \def\theth@qzCnt{\alph{th@qzCnt}}
+\let\qzLtr\theth@qzCnt % dps5-29
 \newcommand{\InputQuizBody}[1]{\newpage %\thPageOne
   \@ifundefined{thisQuizOrig}{\edef\thisQuizOrig{\thisQuiz}
   \let\Hy@EveryPageAnchor\relax}{}\stepcounter{th@qzCnt}%
@@ -1806,13 +1830,15 @@ Array(*corrAnsArray));
 %    so the another rendition to write solutions to a fresh file.
 %    \begin{macrocode}
   \immediate\openout \quiz@solns \jobname.qsl
-  \@ifundefined{ps@webheadings}{%
-    \def\th@QzHeaderL{\th@QzHeaderLQ}%
-    \def\th@QzHeaderC{\th@QzHeaderCQ}%
-  }{%
-    \lheader{\th@QzHeaderLQ}%
-    \cheader{\th@QzHeaderCQ}%
-  }%
+  \ifthordinary\else
+    \@ifundefined{ps@webheadings}{%
+      \def\th@QzHeaderL{\th@QzHeaderLQ}%
+      \def\th@QzHeaderC{\th@QzHeaderCQ}%
+    }{%
+      \lheader{\th@QzHeaderLQ}%
+      \cheader{\th@QzHeaderCQ}%
+    }%
+  \fi
 }
 %    \end{macrocode}
 %   \subsection{Building quizzes with \tops{\protect\env}{}{makeClassFiles} \& \tops{\protect\cs}{\textbackslash}{sadQuizzes}}
@@ -1855,8 +1881,10 @@ Array(*corrAnsArray));
 \def\setArrayLength{\ifbasicmethods0\else lst.length\fi}
 \def\setfilesuffix{\ifuseclassOpt"-"+fN+"_"+lN\else
   \ifbasicmethods""\else"-"+(i+1)\fi\fi+".pdf"}
-\begin{defineJS}[\def\defineJSjsR{^^J}\let\u\relax
-  \catcode`\@=0\relax]{\sadQuizzes}
+%    \end{macrocode}
+%    Begin \cs{sadQuizzes} here.
+%    \begin{macrocode}
+\begin{defineJS}[\dfnJSCR{^^J}\let\u\relax\makeesc\@]{\sadQuizzes}
 %    \end{macrocode}
 %   If \cs{autoCopyOff}, then this script does nothing
 %    \begin{macrocode}
@@ -2165,7 +2193,7 @@ app.clearTimeOut(toSa);",50);
 %    \begin{macrocode}
 \documentclass{article}
 \usepackage[designi]{web}
-\usepackage{eforms}
+\usepackage{eforms}[2020/12/14]
 \hypersetup{pdfpagemode=UseAttachments}
 %% \previewOn\pmpvOn
 \parindent0pt \parskip6pt

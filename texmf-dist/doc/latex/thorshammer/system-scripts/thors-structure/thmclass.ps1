@@ -1,3 +1,11 @@
+# Version 1.4 changes
+# =====================================================================================================
+# small modifications of tex template
+# remove some comments
+# added partial support for cntdwn package, not fully working here to keep tex template small
+# interested users should refer to Acrotex blog for further explanations
+# anyway the template compiles without errors
+# =====================================================================================================
 # Version 1.3 changes
 # =====================================================================================================
 # copyka.ps1 allows a comment character (#)
@@ -415,7 +423,7 @@ New-Item "tex-template.tex" -ItemType file
 If ($locale -like "*$myLocale*") {
 # German ######################################
 Set-Content "tex-template.tex" '%% Customize template ! %%
-\documentclass[fontsize=11pt]{scrartcl}
+\documentclass[fontsize=12pt]{scrartcl}
 \usepackage[%
 german,
 pro,
@@ -424,17 +432,19 @@ navibar,
 forcolorpaper
 %forpaper
 ]{web}
+% Page layout
 \usepackage[top=20mm,left=20mm,right=20mm,bottom=25mm]{geometry}
+%\useFullWidthForPaper
 \usepackage[usesumrytbls,allowrandomize]{exerquiz}
 \usepackage{ran_toks}
 \usepackage[%
 % usebatch    % copy to class folder
-batchdistr    % only copy to instructors folder
-% testmode    % testing quizzes
+% batchdistr  % only copy to instructors folder
+testmode      % testing quizzes
 ]{thorshammer}
 \hypersetup{pdfencoding=auto}          % include or remove hyperref options
 %\usepackage{thorshammerConf}          % place your own sty file here
-\usepackage[autostyle=true]{csquotes}  % change quotes globally
+%\usepackage[autostyle=true]{csquotes}  % change quotes globally
 
 \DeclareQuiz{q#number}
 \setInitMag{fitwidth}
@@ -454,8 +464,8 @@ batchdistr    % only copy to instructors folder
 %\DeclareCoverPage{0}
 
 % Header settings
-\thQzName{#theme}                   % Thema
-\thQzHeaderL{#class}                % Klasse
+\thQzName{#theme} 
+\thQzHeaderL{#class}
 \thQzHeaderCQ{#subject: \thqzname}
 \thQzHeaderCS{Lösungen: \thqzname}
 
@@ -464,7 +474,7 @@ batchdistr    % only copy to instructors folder
 \subject{#subject}
 \author{#instrName}
 \keywords{#time}
-\university{Freiherr-vom-Stein-Berufskolleg} % change to your institution
+\university{Freiherr-vom-Stein-Berufskolleg}
 \version{#number}
 \copyrightyears{#date}
 
@@ -475,9 +485,26 @@ batchdistr    % only copy to instructors folder
 \sadMultQuizzes
 \end{makeClassFiles}
 
+% Timer settings, this are personal settings for a timer in the quiz, if you want that, refer to
+% http://www.acrotex.net/blog/?p=450
+% with \usepackage[shortcount]{cntdwn}
+
+% \newcommand{\thorTimer}[2]{%
+% \setShortCntDwn{CntDwnTimer1}
+% {%
+%     length=#1*\minutes,         
+%     notify1=#2*\minutes,        
+%     event1=AllowEndQuiz1,
+%     event2=NoAction,
+%     event3=NoAction,
+%     endEvent=EndTheQuiz1
+%   }
+% }
+%\thorTimer{#time}{10} % original command \setShortCntDwn
+
 \begin{document}
+
 \makeinlinetitle
-% Instructions
 
 % Declare Quiz bodys
 \declareQuizBody{qzbody1}
@@ -487,11 +514,22 @@ batchdistr    % only copy to instructors folder
 
 \begin{qzbody1}
 \bRTVToks{\currQuiz}
-% Change margin settings for summary tables, and set it back after
-% \thQuizHeader execution
-\newgeometry{top=20mm,left=30mm,right=20mm,bottom=25mm}
 \thQuizHeader
-\newgeometry{top=20mm,left=20mm,right=20mm,bottom=25mm}
+
+% priorInitQuiz for the timer, see Timer settings
+\begin{defineJS}[\makeesc\!]{\priorInitQuiz}
+this.getField("endQuiz.!thisQuiz").display=display.hidden;
+qtypesReadOnly("!thisQuiz",false);
+\end{defineJS}
+
+% postInitQuiz for timer, see Timer settings
+\begin{defineJS}[\makeesc\!]{\postInitQuiz}
+AllowEndQuiz1.arg="!currQuiz";
+EndTheQuiz1.arg="!currQuiz";
+sStartTimer(_oCntDwnTimer1);
+\end{defineJS}
+
+% Instructions here
 
 \begin{quiz*}{\currQuiz}
 % Bearbeiten Sie folgende Aufgaben.
@@ -526,7 +564,11 @@ Set-Content "tex-template.tex" '%% Customize template ! %%
 \usepackage{web}
 \usepackage[usesumrytbls,allowrandomize]{exerquiz}
 \usepackage{ran_toks}
-\usepackage[usebatch]{thorshammer}
+\usepackage[% 
+% usebatch    % copy to class folder
+% batchdistr  % only copy to instructors folder
+testmode      % testing quizzes
+]{thorshammer}
 
 \DeclareQuiz{q#number}
 
@@ -560,8 +602,8 @@ Set-Content "tex-template.tex" '%% Customize template ! %%
 %\DeclareCoverPage{0}
 
 % Header settings
-\thQzName{#theme}                   % topic
-\thQzHeaderL{#class}                % class
+\thQzName{#theme}
+\thQzHeaderL{#class}
 \thQzHeaderCQ{#subject: \thqzname}
 \thQzHeaderCS{Solutions: \thqzname}
 
@@ -581,13 +623,50 @@ Set-Content "tex-template.tex" '%% Customize template ! %%
 \sadMultQuizzes
 \end{makeClassFiles}
 
+% Timer settings, this are personal settings
+% for a timer in the quiz, if you want that, refer to %
+% http://www.acrotex.net/blog/?p=450
+
+% \newcommand{\thorTimer}[2]{%
+% \setShortCntDwn{CntDwnTimer1}
+% {%
+%     length=#1*\minutes,         
+%     notify1=#2*\minutes,        
+%     event1=AllowEndQuiz1,
+%     event2=NoAction,
+%     event3=NoAction,
+%     endEvent=EndTheQuiz1
+%   }
+% }
+%\thorTimer{#time}{10} % original command \setShortCntDwn
+
+
 \begin{document}
+
+% Declare quiz bodies
 \declareQuizBody{qzbody1}
+%\declareQuizBody{qzbody2}
+%\declareQuizBody{qzbody3}
+%\declareQuizBody{qzbody4}
+
 \begin{qzbody1}
 
 \bRTVToks{\currQuiz}
 
 \thQuizHeader
+
+% priorInitQuiz for the timer, see Timer settings
+\begin{defineJS}[\makeesc\!]{\priorInitQuiz}
+this.getField("endQuiz.!thisQuiz").display=display.hidden;
+qtypesReadOnly("!thisQuiz",false);
+\end{defineJS}
+
+% postInitQuiz for timer, see Timer settings
+\begin{defineJS}[\makeesc\!]{\postInitQuiz}
+AllowEndQuiz1.arg="!currQuiz";
+EndTheQuiz1.arg="!currQuiz";
+sStartTimer(_oCntDwnTimer1);
+\end{defineJS}
 
 % Instructions
 \begin{quiz*}{\currQuiz}

@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage[fleqn]{amsmath}
+%
+% the driver line is not necessary if you
+% have aebpro.cfg configured to your driver.
+%
+\usepackage[web]{aeb_pro}
+\usepackage{eforms}
+\usepackage[altbullet]{lucidbry}
+\usepackage{pifont}
+\usepackage{graphicx}
+
+\usepackage{fancyvrb}
+
+\usepackage{xbmks}
+\xbmksetup{colors={int=red},styles={intbf}}
+%\DeclareInitView{layoutmag={navitab:UseOutlines}}
+\hypersetup{pdfpagemode=UseOutlines}
+
+\makeatletter
+\renewcommand{\paragraph}
+    {\@startsection{paragraph}{4}{0pt}{6pt}{-3pt}
+    {\normalfont\normalsize\bfseries}}
+\renewcommand{\subparagraph}
+    {\@startsection{subparagraph}{5}{\parindent}{6pt}{-3pt}%
+    {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\mathindent\parindent
+
+\def\AEBP{\app{AeB Pro}}
+\def\AEB{\app{AeB}}
+\def\APB{\app{APB}}
+\def\app#1{\textsf{#1}}
+\def\amtIndent{\parindent}
+\def\meta#1{$\langle\textit{\texttt{#1}}\rangle$}
+\def\SC#1{{\small#1}}
+\def\PDF{\SC{PDF}}
+\let\uif\textsf
+\let\opt\texttt
+
+%\reversemarginpar
+\def\acInstr{How to install Action sequences in \textsf{Acrobat}}
+\title{\acInstr}
+\author{D. P. Story}
+\email{dpstory@acrotex.net}
+\version{1.0}
+\revisionLabel{Published:}
+
+\begin{document}
+
+\maketitle
+
+\pdfbookmarkx[1]{The thorshammer package}[action={\GoToR/F(thors-the-man.pdf)/D[0 /Fit]},color=blue,style={bf}]{thorhammer}
+\pdfbookmarkx[1]{Documentation of the system scripts}[action={\GoToR/F(thmclass.pdf)/D[0 /Fit]},color=blue,style={bf}]{sysscripts}
+
+\thispagestyle{empty}
+
+\begin{center}\large\bfseries
+  How to install action sequences
+\end{center}
+
+\noindent \app{Acrobat XI} or later is required. Open \app{Acrobat} and
+select \uif{Tools > Action Wizard}. Now select \uif{Manage Actions} to view
+the \uif{Manage Actions} dialog box, refer to
+\hyperref[fig:MA]{Figure~\ref*{fig:MA}} below.
+
+\begin{figure}[htb]\centering
+\includegraphics[width=.67\linewidth]{graphics/manage-actions}
+\caption{Manage Actions dialog box}\label{fig:MA}
+\end{figure}
+
+\noindent \textbf{To import an Action sequence,} press the \uif{Import}
+control and browse for the action sequence to be imported. Once you've
+located the targeted action sequence, press the \uif{Open} control. This
+imports the targeted sequence into the list the action sequences back in the
+\uif{Manage Actions} dialog box. Press \uif{Close} to close this dialog box.
+Before closing the \uif{Manage Actions} dialog box, you can, of course,
+import additional action sequences.
+
+\end{document}

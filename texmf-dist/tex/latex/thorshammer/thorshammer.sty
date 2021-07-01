@@ -19,7 +19,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{thorshammer}
- [2020/01/13 v1.5.7 Support commands for Thor's way]
+ [2021/06/24 v1.5.11 Support commands for Thor's way]
 \RequirePackage{xkeyval}
 \edef\th@dquoteCat{\the\catcode`\"}
 \catcode`\"=12\relax
@@ -44,7 +44,7 @@
   \let\distrToStudentsOff\relax\let\distrToStudentsOff\relax}}
 \ProcessOptionsX
 \edef\thOrdQz{\ifthordinary true\else false\fi}
-\RequirePackage{insdljs}[2019/08/06]
+\RequirePackage{insdljs}[2021/06/19]
 \ifx\usedAdbFuncs\dl@NO
   \def\inputAltAdbFncs{\InputIfFileExists{altadbfncs.def}%
     {\PackageInfo{insdljs}{Inputting code for usealtadobe option}}%
@@ -55,8 +55,8 @@
   \let\inputAltAdbFncs\relax
 \fi
 \inputAltAdbFncs
-\RequirePackage{exerquiz}[2019/08/13]
-\RequirePackage{eq-save}[2019/08/07]
+\RequirePackage{exerquiz}[2021/05/29]
+\RequirePackage{eq-save}[2021/04/27]
 \let\execjs\dl@YES
 \@ifundefined{CommentStream}{\newwrite\CommentStream}{}
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -342,14 +342,14 @@ new Array("PointsField.\currQuiz","EssayField.\currQuiz"));\r
   \addtocounter{questionno}{-1}}}}\global
   \let\qMark@Hook\qMark@HookSave}}
 \def\essayitem#1{\essayQ{#1}\item\PTs{#1}}
-\begin{defineJS}[\catcode`\@=0\relax]{\pwdKeyJS}
+\begin{defineJS}[\makeesc\@]{\pwdKeyJS}
 if (event.willCommit) {
   if (event.value==@p(3)) {
     @commonPassKey
   }
 }
 \end{defineJS}
-\begin{defineJS}[\catcode`\@=0\relax]{\commonPassKey}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\commonPassKey}
 if(typeof aQuizzesInDoc=="undefined")
   var aQuizzesInDoc=new Array();
 if (aQuizzesInDoc.indexOf("@oField"))
@@ -358,8 +358,9 @@ if (typeof @oField=="undefined")
   var @oField=new Object;
 restoreQuizData();
 this.calculate=true;
+@ifthtestmode@else%
 var f=this.getField("postQzMsg");
-if (f!=null) f.display=display.hidden;
+if (f!=null) f.display=display.hidden;@fi
 var f=this.getField("pbStuSvCl");
 if (f!=null) f.display=display.hidden;
 var f=this.getField("ScoreField.@p(1)");
@@ -390,7 +391,7 @@ enter a nonnegative number only"}
 \def\TooMuchCreditMsg#1{\flJSStr*[noquotes]{\cTooMuchCredit}{#1}}
 \TooMuchCreditMsg{"You've assigned too much credit for this %
 problem, assigning the maximum instead"}
-\begin{defineJS}[\makeesc\@\catcode`\%=14\relax]{\essayQKey}
+\begin{defineJS}[\makeesc\@\makecmt\%]{\essayQKey}
 if (event.willCommit) {
   var qpts=(1*event.value);
   if (isNaN(qpts)) {
@@ -496,7 +497,7 @@ cFilenameInit: cSave });
 if(\instrAutoClose&&bOK) this.closeDoc(true);
 }
 \end{insDLJS}
-\begin{defineJS}[\catcode`\@=0\relax]{\freezeQuizMU}
+\begin{defineJS}[\makeesc\@]{\freezeQuizMU}
 var f, fname;
 var bOK=true;
 if(@instrAutoSave) {
@@ -568,7 +569,8 @@ if(bOk)}
 \toks@=\expandafter{\postSubmitQuiz\t\t
   oRecordOfQuizData["ProbDist.\oField"]=ProbDist;\r\t\t
   oRecordOfQuizData["RightWrong.\oField"]=RightWrong;\r\t\t
-  var f=this.getField("postQzMsg");\r\t\t
+  \ifthtestmode\else
+  var f=this.getField("postQzMsg");\r\t\t\fi
   if (f!=null) f.display=display.visible;\r\t\t
   var f=this.getField("pbStuSvCl");\r\t\t
   if (\stuAutoSave&&f!=null)f.display=display.visible;} %\r\t\t
@@ -579,7 +581,7 @@ any of your answers without starting the quiz over from the
 beginning.\n\n Press \\"Yes\\" to end the quiz."}
 \def\ThorsAlertTitle#1{\flJSStr*[noquotes]{\ThorsAlert@Title}{#1}}
 \ThorsAlertTitle{"Thor's Hammer"}
-\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\eq@EndQzBtnScript}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\eq@EndQzBtnScriptThor}
 if (!isQuizInitialized("*currQuiz"))
   eqAppAlert(InitMsg("*bqlabelISO"),3);
 else {
@@ -590,7 +592,7 @@ cTitle: *ThorsAlert@Title, nIcon: 2, nType: 2});
       *currQuiz.PtValues=(new %
 Array(*pointValuesArray));
       ProbType=[*ptypeArray];
-*if@inclkey%
+*if@inclkey
       *currQuiz.CorrAns=(new %
 Array(*corrAnsArray));
 *fi%
@@ -605,7 +607,10 @@ Array(*corrAnsArray));
   }
 }
 \end{defineJS}
-\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScript}}}
+\def\eq@@EndQuizButtonActions{\A{\JS{\eq@EndQzBtnScriptThor}}} % dps0624
+\let\eq@@EndQuizButtonActionsThorSave\eq@@EndQuizButtonActions % dps0624
+\def\useEndQuizThor{\let\eq@@EndQuizButtonActions
+  \eq@@EndQuizButtonActionsThorSave}
 \let\stuASOn\ef@YES
 \def\stuAutoSaveOn{\let\stuASOn\ef@YES
   \def\stuAutoSaveScript{\t app.execMenuItem("SaveAs");\r}%
@@ -630,7 +635,7 @@ Array(*corrAnsArray));
 \newif\ifUseStuSaveAsDialog\UseStuSaveAsDialogfalse
 \def\useStuSaveAsDialogOn{\UseStuSaveAsDialogtrue}
 \def\useStuSaveAsDialogOff{\UseStuSaveAsDialogfalse}
-\begin{defineJS}[\makeesc\*\catcode`\%=14\relax]{\autoSaveStuJS}
+\begin{defineJS}[\makeesc\*\makecmt\%]{\autoSaveStuJS}
   var bOK=true;
   global.bOkClose=true;
   var _path=this.path;
@@ -804,6 +809,7 @@ Array(*corrAnsArray));
     \immediate\closeout\CommentStream}}
 \newcounter{th@qzCnt}
 \def\theth@qzCnt{\alph{th@qzCnt}}
+\let\qzLtr\theth@qzCnt % dps5-29
 \newcommand{\InputQuizBody}[1]{\newpage %\thPageOne
   \@ifundefined{thisQuizOrig}{\edef\thisQuizOrig{\thisQuiz}
   \let\Hy@EveryPageAnchor\relax}{}\stepcounter{th@qzCnt}%
@@ -826,13 +832,15 @@ Array(*corrAnsArray));
   \renewcommand\sqslsecrunhead{\eq@sqslsecrunhead}%
   \eq@noformstrue
   \immediate\openout \quiz@solns \jobname.qsl
-  \@ifundefined{ps@webheadings}{%
-    \def\th@QzHeaderL{\th@QzHeaderLQ}%
-    \def\th@QzHeaderC{\th@QzHeaderCQ}%
-  }{%
-    \lheader{\th@QzHeaderLQ}%
-    \cheader{\th@QzHeaderCQ}%
-  }%
+  \ifthordinary\else
+    \@ifundefined{ps@webheadings}{%
+      \def\th@QzHeaderL{\th@QzHeaderLQ}%
+      \def\th@QzHeaderC{\th@QzHeaderCQ}%
+    }{%
+      \lheader{\th@QzHeaderLQ}%
+      \cheader{\th@QzHeaderCQ}%
+    }%
+  \fi
 }
 \def\mkClFlsSpcls{\let\oct\eqbs\let\u\relax}
 \newenvironment{makeClassFiles}{%
@@ -842,8 +850,7 @@ Array(*corrAnsArray));
 \def\setArrayLength{\ifbasicmethods0\else lst.length\fi}
 \def\setfilesuffix{\ifuseclassOpt"-"+fN+"_"+lN\else
   \ifbasicmethods""\else"-"+(i+1)\fi\fi+".pdf"}
-\begin{defineJS}[\def\defineJSjsR{^^J}\let\u\relax
-  \catcode`\@=0\relax]{\sadQuizzes}
+\begin{defineJS}[\dfnJSCR{^^J}\let\u\relax\makeesc\@]{\sadQuizzes}
 if(@bFlattenState)
   this.addScript({
     cName: "thorshammer: Do not flatten",

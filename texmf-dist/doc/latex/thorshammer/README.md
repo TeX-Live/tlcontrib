@@ -1,6 +1,6 @@
 The thorshammer Package
 Author: D. P. Story
-Dated: 2020-01-13
+Dated: 2021-06-24
 
 WARNING: Adobe Acrobat DC or Adobe Acrobat XI is required for 
 post PDF-creation. Any PDF-creator application is supported. 
@@ -19,6 +19,12 @@ into a larger spreadsheet.
 Note: Unzip action-sequences.zip to obtain the action-sequences folder.
 
 If intriguing, install thorshammer and try this workflow.
+
+What's New (2021-06-24) Moved aeb_pro.js to the acrotex.js package, which is
+  now required. Other minor changes and fixes.
+
+What's New (2020-01-21) Published password of action sequences.
+
 
 Enjoy!
 

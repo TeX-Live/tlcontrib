@@ -1,0 +1,181 @@
+\documentclass{article}
+\usepackage{amstext}
+\usepackage[designi]{web}
+\usepackage{exerquiz}[2021/06/24]
+\usepackage[!showscore]{eq-pin2corr}[2021/06/24]
+
+%\previewOn\pmpvOn
+
+\usepackage[ordinary]{thorshammer}
+
+\thQzHeaderL{Secured Quiz}
+\thQzHeaderCQ{Quiz 1}
+
+% Thor's hammer modifies this definition, we restore it to its
+% 'ordinary' definition.
+\renewcommand\eqQuizPointsMsg{%
+"\eqptScore\space"+ptScore+" \eqOutOf\space"+nPointTotal}
+
+\let\app\textsf
+\let\pkg\textsf
+\let\uif\textsf
+\let\env\texttt
+\let\opt\texttt
+\def\cs#1{\texttt{\char`\\#1}}
+
+
+\execJSOn
+\useBeginQuizButton[\CA{Begin}]
+\useEndQuizButton[\CA{End}]
+
+% the default PIN number for eq-pin2corr is 5243
+%
+% When building your own quiz document, decide on a PIN number
+% then use the utility document get-hash-string.pdf to acquire
+% the corresponding hash string. Place your own PIN and hash string
+% in the two arguments of \declPINId.
+\declPINId{5243}{02JRVZdRgYgCA-Rtje8VkD} % PIN number, hash string
+% So instructor can bypass entering the PIN.
+\classPINVar{_PinCode1}
+
+\DeclareQuiz{qz1}
+
+\begin{document}
+
+\section{Introduction}
+
+\noindent\textbf{Goal:} Make the \uif{Correct} button password protected.
+This revised file now uses the
+\pkg{\href{https://ctan.org/pkg/eq-pin2corr}{eq-pin2corr}} package to make
+things simpler. Additional commands are introduced here to manage the smooth
+transition from password PIN protection, to an ordinary quiz, and back to a
+PIN protected quiz.\medskip
+
+\noindent\textbf{Discussion:} This file illustrates the methods for
+protecting the \uif{Correct} button with a password. To create a PIN
+protected \uif{Correct} button, expand \cs{usePINCorrBtn} (\pkg{eq-pin2corr})
+prior to the quiz. Following the quiz, use the commands \cs{restoreNormalEndQuiz}
+(\pkg{exerquiz}) and \cs{restoreCorrBtn} (\pkg{eq-pin2corr}). The latter
+restores the default action of the \uif{End Quiz} control, this is needed
+because \pkg{thorshammer} changes this action to a custom action;
+\cs{restoreCorrBtn} removes the PIN security of the \uif{Correct} control.
+
+There is another command \cs{useEndQuizThor} (\pkg{thorshammer}) is used to
+modify the \uif{End Quiz} control to the action as defined by the
+\pkg{thorshammer} package. Read additional comments found in the body and
+source of this file.
+
+
+\newpage
+
+\section{Quiz with PIN to correct}
+
+% require students to answer all questions
+\renewcommand\minQuizResp{highThreshold} % 1
+
+For the quiz below, the \uif{Correct} button has an encrypted
+password. The password appears in parentheses for the convenience of the casual reader.
+
+% use password version of \CorrButton action
+\usePINCorrBtn
+
+\begin{quiz*}{\currQuiz}
+Solve each
+\begin{questions}
+    \item The sum of 1 and 1 is\dots
+\begin{answers}{5}
+\bChoices
+  \Ans0 0\eAns
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans0 3\eAns
+  \Ans0 4\eAns
+\eChoices
+\end{answers}
+\item $9+8=\RespBoxMath{17}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{17}$
+\end{questions}
+\end{quiz*}\quad\PointsField{\currQuiz}\olBdry\CorrButton{\currQuiz} (PIN: \numPINId)\vcgBdry
+
+\AnswerField{\currQuiz}
+
+\newpage
+
+\thQzHeaderL{Ordinary Quiz}
+\thQzHeaderCQ{Quiz 2}
+
+
+\section{Quiz without PIN to correct}
+
+Now we try to create an ordinary \pkg{exerquiz} quiz without password protection.
+
+
+% Now do an ordinary quiz
+\restoreNormalEndQuiz
+\restoreCorrBtn
+
+\renewcommand\minQuizResp{lowThreshold}
+
+\begin{quiz*}{qz2}
+Solve each
+\begin{questions}
+    \item The sum of 1 and 1 is\dots
+\begin{answers}{5}
+\bChoices
+  \Ans0 0\eAns
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans0 3\eAns
+  \Ans0 4\eAns
+\eChoices
+\end{answers}
+\item $9+8=\RespBoxMath{17}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{17}$
+\end{questions}
+\end{quiz*}\quad\PointsField{\currQuiz}\olBdry\CorrButton{\currQuiz}\vcgBdry
+
+\AnswerField{\currQuiz}
+
+
+\newpage
+
+\thQzHeaderL{Secured Quiz}
+\thQzHeaderCQ{Quiz 3}
+
+
+\section{Another quiz with PIN to correct}
+
+It is possible to have a different PIN number for this quiz (multiple PINs in one document), but
+I see no need for this.
+
+The previous quiz was a normal \pkg{exerquiz} quiz. We now want another PIN protected quiz, so
+prior to this next quiz we expand \cs{usePINBtn} and \cs{useEndQuizThor}. The latter is a new
+command that restores the default action of the \pkg{thorshammer} package to the \uif{End Quiz} event.
+
+\DeclareQuiz{qz3}
+
+\usePINCorrBtn
+\useEndQuizThor
+
+% require students to answer all questions
+\renewcommand\minQuizResp{highThreshold}
+
+\begin{quiz*}{qz3}
+Solve each
+\begin{questions}
+    \item The sum of 1 and 1 is\dots
+\begin{answers}{5}
+\bChoices
+  \Ans0 0\eAns
+  \Ans0 1\eAns
+  \Ans1 2\eAns
+  \Ans0 3\eAns
+  \Ans0 4\eAns
+\eChoices
+\end{answers}
+\item $9+8=\RespBoxMath{17}{1}{.0001}{[0,1]}\cgBdry\CorrAnsButton{17}$
+\end{questions}
+\end{quiz*}\quad\PointsField{\currQuiz}\olBdry\CorrButton{\currQuiz} (PIN: \numPINId)\vcgBdry
+
+\AnswerField{\currQuiz}
+
+
+\end{document}

@@ -1,0 +1,111 @@
+This is the README for the notocondensed package, version 2021-09-06.
+
+This package provides pdfLaTeX, XeLaTeX and LuaLaTeX support
+for the condensed variants of the NotoSerif, NotoSans and
+NotoSansMono families of fonts, designed by Steve Matteson
+for Google. The "legacy" processing path LaTeX -> dvips
+will not work (because the condensed fonts are not a proper
+font-family as far as dvips is concerned).
+
+To install this package on a TDS-compliant
+TeX system download the file
+"tex-archive"/install/fonts/notocondensed.tds.zip, where the
+preferred URL for "tex-archive" is http://mirror.ctan.org.
+Unzip the archive at the root of an appropriate texmf tree,
+likely a personal or local tree. If necessary, update the
+file-name database (e.g., texhash). Update the font-map
+files by enabling the Map file notocondensed.map.
+
+To use, add
+
+\usepackage{notocondensed}
+
+to the preamble of your document. This will activate
+NotoSerif-Condensed as the main (serifed) text
+font, NotoSans-Condensed as the sans font and
+NotoSansMono-Condensed as the fixed-width font.
+
+To activate NotoSerif-Condensed without NotoSans-Condensed,
+use
+
+\usepackage[rm]{notocondensed}
+
+Similarly, to activate NotoSans-Condensed without
+NotoSerif-Condensed use
+
+\usepackage[sf]{notocondensed} 
+
+To use NotoSans-Condensed as the main text font, use the
+
+  sfdefault
+
+option.
+
+This re-defines \familydefault, not \rmdefault. LuaLaTeX and
+xeLaTeX users who might prefer type1 fonts or who wish to
+avoid fontspec may use the type1 option. Use option nott to
+avoid activating NotoMono as the fixed-width font.
+
+To active just NotoSansMono-Condensed, use
+
+\usepackage{notocondensed-mono}
+
+Options scaled=<number> or scale=<number> may be used to
+scale the NotoSans-Condensed and NotoSansMono-Condensed
+fonts; the serifed variants are not affected.
+
+Font encodings supported are OT1, T1, TS1, LY1, LGR and
+T2A/B/C.
+
+The following options may be used:
+
+  pf proportional
+  osf oldstyle
+  lf lining
+  tf tabular
+
+The default figures are lining-tabular. 
+
+Superior numbers (for footnote markers) are available
+using \sufigures or \textsu{...}.
+
+  thin
+  extralight
+  light
+  regular
+  medium
+
+The default weight is Regular.
+
+  semibold
+  bold
+  extrabold
+  black
+
+The default bold weight is Bold.
+
+  semicondensed
+  extracondensed
+
+These options activate variants with less or more, respectively, condensing.
+
+Commands 
+
+  \notoserifcondensed, \notosanscondensed, \notomonocondensed, 
+  \notoserifsemicondensed, \notosanssemicondensed, \notomonosemicondensed,
+  \notoserifextracondensed, \notosansextracondensed and \notomonoextracondensed 
+
+select those families and 
+
+  \notoserifcondensedlgr, \notosanscondensedlgr and \notomonocondensedlgr
+
+activate the LGR encoding.
+
+The original fonts are available at
+https://www.google.com/get/noto and are licensed under the
+SIL Open Font License, (version 1.1); the text may be found
+in the doc directory. The type1 versions were created using
+ccftot1. The support files were created using autoinst and
+are licensed under the terms of the LaTeX Project Public
+License. The maintainer of this package is Bob Tennent (rdt
+at cs.queensu.ca)

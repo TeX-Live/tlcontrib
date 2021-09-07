@@ -1,0 +1,461 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{notocondensed}
+    [2021/09/06 (Bob Tennent)  Supports condensed Noto fonts for all LaTeX engines.]
+
+\RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
+
+\newif\ifnotocondensed@ttf 
+\ifxetex
+  \notocondensed@ttftrue
+\else\ifluatex
+  \notocondensed@ttftrue
+\else  % [pdf]LaTeX
+  \notocondensed@ttffalse
+\fi\fi
+
+\newif\ifnotocondensed@sfdefault \notocondensed@sfdefaultfalse
+\newif\ifnotocondensed@sf \notocondensed@sftrue
+\newif\ifnotocondensed@rm \notocondensed@rmtrue
+\newif\ifnotocondensed@tt \notocondensed@tttrue
+
+
+\newcommand*{\NotoSans@scale}{1}
+\newcommand*{\NotoSansMono@scale}{1}
+\DeclareOptionX{scaled}{\renewcommand*{\NotoSans@scale}{#1}\renewcommand*{\NotoSansMono@scale}{#1}}
+\DeclareOptionX{scale}{\renewcommand*{\NotoSans@scale}{#1}\renewcommand*{\NotoSansMono@scale}{#1}}
+
+
+\DeclareOptionX{sf}{\notocondensed@sftrue\notocondensed@rmfalse}
+\DeclareOptionX{rm}{\notocondensed@rmtrue\notocondensed@sffalse}
+\DeclareOptionX{nott}{\notocondensed@ttfalse}
+
+\DeclareOptionX{sfdefault}{\notocondensed@sfdefaulttrue}
+\DeclareOptionX{type1}{\notocondensed@ttffalse}
+
+
+\newif\ifnotocondensed@oldstyle \notocondensed@oldstylefalse
+\newif\ifnotocondensed@proportional \notocondensed@proportionalfalse
+
+\DeclareOptionX{lining}{\notocondensed@oldstylefalse}
+\DeclareOptionX{lf}{\notocondensed@oldstylefalse}
+\DeclareOptionX{tabular}{\notocondensed@proportionalfalse}
+\DeclareOptionX{tf}{\notocondensed@proportionalfalse}
+\DeclareOptionX{proportional}{\notocondensed@proportionaltrue}
+\DeclareOptionX{pf}{\notocondensed@proportionaltrue}
+\DeclareOptionX{oldstyle}{\notocondensed@oldstyletrue}
+\DeclareOptionX{osf}{\notocondensed@oldstyletrue}
+
+\newif\ifnotocondensed@thin \notocondensed@thinfalse
+\newif\ifnotocondensed@extralight \notocondensed@extralightfalse
+\newif\ifnotocondensed@light \notocondensed@lightfalse
+\newif\ifnotocondensed@medium \notocondensed@mediumfalse
+\newif\ifnotocondensed@semibold \notocondensed@semiboldfalse
+\newif\ifnotocondensed@extrabold \notocondensed@extraboldfalse
+\newif\ifnotocondensed@black \notocondensed@blackfalse
+
+\newif\ifnotocondensed@semicondensed \notocondensed@semicondensedfalse
+\newif\ifnotocondensed@extracondensed \notocondensed@extracondensedfalse
+
+\DeclareOptionX{thin}{\notocondensed@thintrue}
+\DeclareOptionX{extralight}{\notocondensed@extralighttrue}
+\DeclareOptionX{light}{\notocondensed@lighttrue}
+\DeclareOptionX{regular}{\notocondensed@lightfalse\notocondensed@thinfalse\notocondensed@extralightfalse\notocondensed@mediumfalse}
+\DeclareOptionX{medium}{\notocondensed@mediumtrue}
+\DeclareOptionX{semibold}{\notocondensed@semiboldtrue}
+\DeclareOptionX{extrabold}{\notocondensed@extraboldtrue}
+\DeclareOptionX{black}{\notocondensed@blacktrue}
+\DeclareOptionX{bold}{\notocondensed@blackfalse\notocondensed@semiboldfalse\notocondensed@extraboldfalse}
+\DeclareOptionX{semicondensed}{\notocondensed@semicondensedtrue}
+\DeclareOptionX{extracondensed}{\notocondensed@extracondensedtrue}
+
+
+\ProcessOptionsX\relax
+
+\ifnotocondensed@ttf
+  \def\notocondensed@boldstyle{Bold}
+  \ifnotocondensed@semibold\def\notocondensed@boldstyle{SemiBold}\fi
+  \ifnotocondensed@extrabold\def\notocondensed@boldstyle{ExtraBold}\fi
+  \ifnotocondensed@black\def\notocondensed@boldstyle{Black}\fi
+  \def\notocondensed@regstyle{Regular}
+  \ifnotocondensed@thin\def\notocondensed@regstyle{Thin}\fi
+  \ifnotocondensed@extralight\def\notocondensed@regstyle{ExtraLight}\fi
+  \ifnotocondensed@light\def\notocondensed@regstyle{Light}\fi
+  \ifnotocondensed@medium\def\notocondensed@regstyle{Medium}\fi
+
+\else % type1
+
+  \ifnotocondensed@sf\def\bfseries@sf{bc}\def\mdseries@sf{c}\fi
+  \ifnotocondensed@rm\def\bfseries@rm{bc}\def\mdseries@rm{c}\fi
+  \ifnotocondensed@tt\def\bfseries@tt{bc}\def\mdseries@tt{c}\fi
+  \ifnotocondensed@semibold
+    \ifnotocondensed@sf\def\bfseries@sf{sbc}\fi
+    \ifnotocondensed@rm\def\bfseries@rm{sbc}\fi
+    \ifnotocondensed@tt\def\bfseries@tt{sbc}\fi
+  \fi
+  \ifnotocondensed@extrabold
+    \ifnotocondensed@sf\def\bfseries@sf{ebc}\fi
+    \ifnotocondensed@rm\def\bfseries@rm{ebc}\fi
+    \ifnotocondensed@tt\def\bfseries@tt{ebc}\fi
+  \fi
+  \ifnotocondensed@black
+    \ifnotocondensed@sf\def\bfseries@sf{ubc}\fi
+    \ifnotocondensed@rm\def\bfseries@rm{ubc}\fi
+    \ifnotocondensed@tt\def\bfseries@tt{ubc}\fi
+  \fi
+  \ifnotocondensed@thin
+    \ifnotocondensed@sf\def\mdseries@sf{ulc}\fi
+    \ifnotocondensed@rm\def\mdseries@rm{ulc}\fi
+    \ifnotocondensed@tt\def\mdseries@tt{ulc}\fi
+  \fi
+  \ifnotocondensed@extralight
+    \ifnotocondensed@sf\def\mdseries@sf{elc}\fi
+    \ifnotocondensed@rm\def\mdseries@rm{elc}\fi
+    \ifnotocondensed@tt\def\mdseries@tt{elc}\fi
+  \fi
+  \ifnotocondensed@light
+    \ifnotocondensed@sf\def\mdseries@sf{lc}\fi
+    \ifnotocondensed@rm\def\mdseries@rm{lc}\fi
+    \ifnotocondensed@tt\def\mdseries@tt{lc}\fi
+  \fi
+  \ifnotocondensed@medium
+    \ifnotocondensed@sf\def\mdseries@sf{mediumcondensed}\fi
+    \ifnotocondensed@rm\def\mdseries@rm{mediumcondensed}\fi
+    \ifnotocondensed@tt\def\mdseries@tt{mediumcondensed}\fi
+  \fi
+
+  \ifnotocondensed@semicondensed
+    \ifnotocondensed@rm\def\bfseries@rm{bsc}\def\mdseries@rm{sc}\fi
+    \ifnotocondensed@sf\def\bfseries@sf{bsc}\def\mdseries@sf{sc}\fi
+    \ifnotocondensed@tt\def\bfseries@tt{bsc}\def\mdseries@tt{sc}\fi
+    \ifnotocondensed@semibold
+      \ifnotocondensed@rm\def\bfseries@rm{sbsc}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{sbsc}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{sbsc}\fi
+    \fi
+    \ifnotocondensed@extrabold
+      \ifnotocondensed@rm\def\bfseries@rm{ebsc}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{ebsc}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{ebsc}\fi
+    \fi
+    \ifnotocondensed@black
+      \ifnotocondensed@rm\def\bfseries@rm{ubsc}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{ubsc}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{ubsc}\fi
+    \fi
+    \ifnotocondensed@thin
+      \ifnotocondensed@rm\def\mdseries@rm{ulsc}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{ulsc}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{ulsc}\fi
+    \fi
+    \ifnotocondensed@extralight
+      \ifnotocondensed@rm\def\mdseries@rm{elsc}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{elsc}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{elsc}\fi
+    \fi
+    \ifnotocondensed@light
+      \ifnotocondensed@rm\def\mdseries@rm{lsc}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{lsc}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{lsc}\fi
+    \fi
+    \ifnotocondensed@medium
+      \ifnotocondensed@rm\def\mdseries@rm{mediumsemicondensed}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{mediumsemicondensed}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{mediumsemicondensed}\fi
+    \fi
+  \else\ifnotocondensed@extracondensed
+    \ifnotocondensed@rm\def\bfseries@rm{bec}\def\mdseries@rm{ec}\fi
+    \ifnotocondensed@sf\def\bfseries@sf{bec}\def\mdseries@sf{ec}\fi
+    \ifnotocondensed@tt\def\bfseries@tt{bec}\def\mdseries@tt{ec}\fi
+    \ifnotocondensed@semibold
+      \ifnotocondensed@rm\def\bfseries@rm{sbec}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{sbec}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{sbsc}\fi
+    \fi
+    \ifnotocondensed@extrabold
+      \ifnotocondensed@rm\def\bfseries@rm{ebec}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{ebec}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{ebec}\fi
+    \fi
+    \ifnotocondensed@black
+      \ifnotocondensed@rm\def\bfseries@rm{ubec}\fi
+      \ifnotocondensed@sf\def\bfseries@sf{ubec}\fi
+      \ifnotocondensed@tt\def\bfseries@tt{ubsc}\fi
+    \fi
+    \ifnotocondensed@thin
+      \ifnotocondensed@rm\def\mdseries@rm{ulec}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{ulec}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{ulec}\fi
+    \fi
+    \ifnotocondensed@extralight
+      \ifnotocondensed@rm\def\mdseries@rm{elec}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{elec}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{elec}\fi
+    \fi
+    \ifnotocondensed@light
+      \ifnotocondensed@rm\def\mdseries@rm{lec}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{lec}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{lec}\fi
+    \fi
+    \ifnotocondensed@medium
+      \ifnotocondensed@rm\def\mdseries@rm{mediumsemicondensed}\fi
+      \ifnotocondensed@sf\def\mdseries@sf{mediumsemicondensed}\fi
+      \ifnotocondensed@tt\def\mdseries@tt{mediumsemicondensed}\fi
+    \fi
+  \fi\fi
+
+  \def\seriesdefault{\mdseries@rm}
+
+\fi
+  
+\ifnotocondensed@ttf
+  
+  \def\notocondensed@figurestyle{Lining}
+  \ifnotocondensed@oldstyle\def\notocondensed@figurestyle{OldStyle}\fi
+  \def\notocondensed@figurealign{Monospaced}
+  \ifnotocondensed@proportional\def\notocondensed@figurealign{Proportional}\fi
+
+\else % type1
+
+  \def\notocondensed@figurestyle{LF}
+  \ifnotocondensed@oldstyle\def\notocondensed@figurestyle{OsF}\fi
+  \def\notocondensed@figurealign{T}
+  \ifnotocondensed@proportional\def\notocondensed@figurealign{}\fi
+
+\fi
+
+\ifnotocondensed@ttf
+  \RequirePackage{fontspec}
+\else
+  \RequirePackage{fontenc,fontaxes,mweights}
+  \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
+  \fa@naming@exception{figures}{{superior}{tabular}}{Sup}
+  \def\sufigures{\@nomath\sufigures
+      \fontfigurestyle{superior}\selectfont}
+\fi
+
+\ifnotocondensed@ttf
+  \def\notocondensed@regular{Regular}
+  \ifxetex\XeTeXtracingfonts=1\fi
+  \defaultfontfeatures{
+        Ligatures = TeX ,
+        Extension = .ttf }
+  \ifnotocondensed@sf
+    \ifnotocondensed@semicondensed
+      \setsansfont
+        [ Scale     = \NotoSans@scale ,
+          Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSans-SemiCondensed}
+    \else\ifnotocondensed@extracondensed
+      \setsansfont
+        [ Scale     = \NotoSans@scale ,
+          Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSans-ExtraCondensed}
+    \else
+      \setsansfont
+          [ Scale     = \NotoSans@scale ,
+            Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+            SmallCapsFeatures={Letters=SmallCaps} ,
+            UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+            ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+            BoldFont       = *\notocondensed@boldstyle , 
+            BoldItalicFont = *\notocondensed@boldstyle Italic ,
+          ]
+          {NotoSans-Condensed}
+    \fi\fi
+    \let\notocondensedsansfamily\sfdefault  
+  \fi
+
+  \ifnotocondensed@rm
+    \ifnotocondensed@semicondensed
+      \setmainfont
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSerif-SemiCondensed}
+    \else\ifnotocondensed@extracondensed
+      \setmainfont
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSerif-ExtraCondensed}
+    \else
+      \setmainfont
+          [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+            SmallCapsFeatures={Letters=SmallCaps} ,
+            UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+            ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+            BoldFont       = *\notocondensed@boldstyle , 
+            BoldItalicFont = *\notocondensed@boldstyle Italic ,
+          ]
+          {NotoSerif-Condensed}
+    \fi\fi
+  \fi
+
+  \ifnotocondensed@tt
+     \ifnotocondensed@semicondensed
+        \setmonofont 
+          [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+            Scale     = \NotoSansMono@scale ,
+            HyphenChar=None,
+            UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+            BoldFont       = *\notocondensed@boldstyle ,
+          ]
+          {NotoSansMono-SemiCondensed}
+    \else\ifnotocondensed@extracondensed
+        \setmonofont 
+          [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+            Scale     = \NotoSansMono@scale ,
+            HyphenChar=None,
+            UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+            BoldFont       = *\notocondensed@boldstyle ,
+          ]
+          {NotoSansMono-ExtraCondensed}
+     \else
+        \setmonofont 
+          [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+            Scale     = \NotoSansMono@scale ,
+            HyphenChar=None,
+            UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+            BoldFont       = *\notocondensed@boldstyle , 
+          ]
+          {NotoSansMono-Condensed}
+      \fi\fi
+    \let\notocondensedmonofamily\ttdefault  
+  \fi
+  \ifnotocondensed@sfdefault\renewcommand*\familydefault{\notocondensedsansfamily}\fi
+  \newfontfamily\notosanscondensed
+        [ Scale     = \NotoSans@scale ,
+          Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSans-Condensed}
+  \newfontfamily\notosanssemicondensed
+        [ Scale     = \NotoSans@scale ,
+          Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSans-SemiCondensed}
+  \newfontfamily\notosansextracondensed
+        [ Scale     = \NotoSans@scale ,
+          Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic  ,
+        ]
+        {NotoSans-ExtraCondensed}
+  \newfontfamily\notoserifcondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSerif-Condensed}
+  \newfontfamily\notoserifsemicondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic ,
+        ]
+        {NotoSerif-SemiCondensed}
+  \newfontfamily\notoserifextracondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          SmallCapsFeatures={Letters=SmallCaps} ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi ,
+          ItalicFont     = *\ifx\notocondensed@regstyle\notocondensed@regular Italic\else\notocondensed@regstyle Italic\fi ,
+          BoldFont       = *\notocondensed@boldstyle , 
+          BoldItalicFont = *\notocondensed@boldstyle Italic  ,
+        ]
+        {NotoSerif-ExtraCondensed}
+  \defaultfontfeatures{Extension=.ttf,HyphenChar=None}
+  \newfontfamily\notomonocondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+          BoldFont       = *\notocondensed@boldstyle ,
+        ]
+        {NotoSansMono-Condensed}
+  \newfontfamily\notomonosemicondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+          BoldFont       = *\notocondensed@boldstyle ,
+        ]
+        {NotoSansMono-SemiCondensed}
+  \newfontfamily\notomonoextracondensed
+        [ Numbers   = {\notocondensed@figurealign, \notocondensed@figurestyle} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensed@regstyle\notocondensed@regular\else\notocondensed@regstyle\fi,
+          BoldFont       = *\notocondensed@boldstyle ,
+        ]
+        {NotoSansMono-ExtraCondensed}
+
+  \providecommand\sufigures{\addfontfeatures{VerticalPosition=Superior}}
+
+\else % type1
+
+  \def\notosanscondensedfamily{NotoSans-\notocondensed@figurealign\notocondensed@figurestyle}
+  \def\notoserifcondensedfamily{NotoSerif-\notocondensed@figurealign\notocondensed@figurestyle}
+  \def\notomonocondensedfamily{NotoSansMono-\notocondensed@figurealign\notocondensed@figurestyle}
+  \newcommand*\notoserifcondensed{\fontfamily{\notoserifcondensedfamily}\selectfont}
+  \newcommand*\notosanscondensed{\fontfamily{\notosanscondensedfamily}\selectfont}
+  \newcommand*\notomonocondensed{\fontfamily{\notomonocondensedfamily}\selectfont}
+  \ifnotocondensed@rm \def\rmdefault{\notoserifcondensedfamily} \fi
+  \ifnotocondensed@sf \def\sfdefault{\notosanscondensedfamily} \fi 
+  \ifnotocondensed@tt \def\ttdefault{\notomonocondensedfamily} \fi 
+  \ifnotocondensed@sfdefault\edef\familydefault{\sfdefault}\fi
+\fi
+
+\DeclareTextFontCommand{\textsu}{\sufigures}
+
+% LGR
+
+\def\notocondensed@figurestyle{LF}
+\ifnotocondensed@oldstyle\def\notocondensed@figurestyle{OsF}\fi
+\def\notocondensed@figurealign{T}
+\ifnotocondensed@proportional\def\notocondensed@figurealign{}\fi
+
+\newcommand*\notoserifcondensedlgr{\fontencoding{LGR}\fontfamily{NotoSerif-\notocondensed@figurealign\notocondensed@figurestyle}\fontseries{c}\selectfont}
+\newcommand*\notosanscondensedlgr{\fontencoding{LGR}\fontfamily{NotoSans-\notocondensed@figurealign\notocondensed@figurestyle}\fontseries{c}\selectfont}
+\newcommand*\notomonocondensedlgr{\fontencoding{LGR}\fontfamily{NotoSansMono-\notocondensed@figurealign\notocondensed@figurestyle}\fontseries{c}\selectfont}
+
+
+\ifnotocondensed@ttf
+  % turn off defaults in case other fonts are selected:
+  \defaultfontfeatures{}
+\fi
+
+\endinput

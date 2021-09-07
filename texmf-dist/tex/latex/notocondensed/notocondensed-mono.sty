@@ -1,0 +1,220 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{notocondensed-mono}
+    [2021/09/06 (Bob Tennent)  Supports condensed NotoSansMono fonts for all LaTeX engines.]
+
+\RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
+
+\newif\ifnotocondensedmono@ttf 
+\ifxetex
+  \notocondensedmono@ttftrue
+\else\ifluatex
+  \notocondensedmono@ttftrue
+\else  % [pdf]LaTeX
+  \notocondensedmono@ttffalse
+\fi\fi
+
+\newcommand*{\NotoSansMono@scale}{1}
+\DeclareOptionX{scaled}{\renewcommand*{\NotoSansMono@scale}{#1}}
+\DeclareOptionX{scale}{\renewcommand*{\NotoSansMono@scale}{#1}}
+
+
+\DeclareOptionX{type1}{\notocondensedmono@ttffalse}
+
+\newif\ifnotocondensedmono@oldstyle \notocondensedmono@oldstylefalse
+\newif\ifnotocondensedmono@proportional \notocondensedmono@proportionalfalse
+
+\DeclareOptionX{lining}{\notocondensedmono@oldstylefalse}
+\DeclareOptionX{lf}{\notocondensedmono@oldstylefalse}
+\DeclareOptionX{tabular}{\notocondensedmono@proportionalfalse}
+\DeclareOptionX{tf}{\notocondensedmono@proportionalfalse}
+\DeclareOptionX{proportional}{\notocondensedmono@proportionaltrue}
+\DeclareOptionX{pf}{\notocondensedmono@proportionaltrue}
+\DeclareOptionX{oldstyle}{\notocondensedmono@oldstyletrue}
+\DeclareOptionX{osf}{\notocondensedmono@oldstyletrue}
+
+\newif\ifnotocondensedmono@thin \notocondensedmono@thinfalse
+\newif\ifnotocondensedmono@extralight \notocondensedmono@extralightfalse
+\newif\ifnotocondensedmono@light \notocondensedmono@lightfalse
+\newif\ifnotocondensedmono@medium \notocondensedmono@mediumfalse
+\newif\ifnotocondensedmono@semibold \notocondensedmono@semiboldfalse
+\newif\ifnotocondensedmono@extrabold \notocondensedmono@extraboldfalse
+\newif\ifnotocondensedmono@black \notocondensedmono@blackfalse
+
+\newif\ifnotocondensedmono@semicondensed \notocondensedmono@semicondensedfalse
+\newif\ifnotocondensedmono@extracondensed \notocondensedmono@extracondensedfalse
+
+\DeclareOptionX{thin}{\notocondensedmono@thintrue}
+\DeclareOptionX{extralight}{\notocondensedmono@extralighttrue}
+\DeclareOptionX{light}{\notocondensedmono@lighttrue}
+\DeclareOptionX{regular}{\notocondensedmono@lightfalse\notocondensedmono@thinfalse\notocondensedmono@extralightfalse\notocondensedmono@mediumfalse}
+\DeclareOptionX{medium}{\notocondensedmono@mediumtrue}
+\DeclareOptionX{semibold}{\notocondensedmono@semiboldtrue}
+\DeclareOptionX{extrabold}{\notocondensedmono@extraboldtrue}
+\DeclareOptionX{black}{\notocondensedmono@blacktrue}
+\DeclareOptionX{bold}{\notocondensedmono@blackfalse\notocondensedmono@semiboldfalse\notocondensedmono@extraboldfalse}
+\DeclareOptionX{semicondensed}{\notocondensedmono@semicondensedtrue}
+\DeclareOptionX{extracondensed}{\notocondensedmono@extracondensedtrue}
+
+
+\ProcessOptionsX\relax
+
+\ifnotocondensedmono@ttf
+  \def\notocondensedmono@boldstyle{Bold}
+  \ifnotocondensedmono@semibold\def\notocondensedmono@boldstyle{SemiBold}\fi
+  \ifnotocondensedmono@extrabold\def\notocondensedmono@boldstyle{ExtraBold}\fi
+  \ifnotocondensedmono@black\def\notocondensedmono@boldstyle{Black}\fi
+  \def\notocondensedmono@regstyle{Regular}
+  \ifnotocondensedmono@thin\def\notocondensedmono@regstyle{Thin}\fi
+  \ifnotocondensedmono@extralight\def\notocondensedmono@regstyle{ExtraLight}\fi
+  \ifnotocondensedmono@light\def\notocondensedmono@regstyle{Light}\fi
+  \ifnotocondensedmono@medium\def\notocondensedmono@regstyle{Medium}\fi
+
+\else % type1
+  \def\bfseries@tt{bold}\def\mdseries@tt{m}
+  \ifnotocondensedmono@semibold\def\bfseries@tt{sb}\fi
+  \ifnotocondensedmono@extrabold\bfseries@tt{eb}\fi
+  \ifnotocondensedmono@black\def\bfseries@tt{ub}\fi
+  \ifnotocondensedmono@thin\def\mdseries@tt{ul}\fi
+  \ifnotocondensedmono@extralight\def\mdseries@tt{el}\fi
+  \ifnotocondensedmono@light\def\mdseries@tt{l}\fi
+  \ifnotocondensedmono@medium\def\mdseries@tt{medium}\fi
+
+    \def\bfseries@tt{boldcondensed}\def\mdseries@tt{c}
+    \ifnotocondensedmono@semibold\def\bfseries@tt{sbc}\fi
+    \ifnotocondensedmono@extrabold\def\bfseries@tt{ebc}\fi
+    \ifnotocondensedmono@black\def\bfseries@tt{ubc}\fi
+    \ifnotocondensedmono@thin\def\mdseries@tt{ulc}\fi
+    \ifnotocondensedmono@extralight\def\mdseries@tt{elc}\fi
+    \ifnotocondensedmono@light\def\mdseries@tt{lc}\fi
+    \ifnotocondensedmono@medium\def\mdseries@tt{mediumcondensed}\fi
+
+  \ifnotocondensedmono@semicondensed
+    \def\bfseries@tt{boldsemicondensed}\def\mdseries@tt{sc}
+    \ifnotocondensedmono@semibold\def\bfseries@tt{sbsc}\fi
+    \ifnotocondensedmono@extrabold\def\bfseries@tt{ebsc}\fi
+    \ifnotocondensedmono@black\def\bfseries@tt{ubsc}\fi
+    \ifnotocondensedmono@thin\def\mdseries@tt{ulsc}\fi
+    \ifnotocondensedmono@extralight\def\mdseries@tt{elsc}\fi
+    \ifnotocondensedmono@light\def\mdseries@tt{lsc}\fi
+    \ifnotocondensedmono@medium\def\mdseries@rm{mediumsemicondensed}\fi
+  \else\ifnotocondensedmono@extracondensed
+    \def\bfseries@tt{boldextracondensed}\def\mdseries@tt{ec}
+    \ifnotocondensedmono@semibold\def\bfseries@tt{sbec}\fi
+    \ifnotocondensedmono@extrabold\def\bfseries@tt{ebec}\fi
+    \ifnotocondensedmono@black\def\bfseries@tt{ubec}\fi
+    \ifnotocondensedmono@thin\def\mdseries@tt{ulec}\fi
+    \ifnotocondensedmono@extralight\def\mdseries@tt{elec}\fi
+    \ifnotocondensedmono@light\def\mdseries@tt{lec}\fi
+    \ifnotocondensedmono@medium\def\mdseries@rm{mediumextracondensed}\fi
+  \fi\fi
+
+  \def\ttdefault{\notocondensedmonofamily}
+  
+\fi
+
+\ifnotocondensedmono@ttf
+  
+  \def\notocondensedmono@figurestyle{Lining}
+  \ifnotocondensedmono@oldstyle\def\notocondensedmono@figurestyle{OldStyle}\fi
+  \def\notocondensedmono@figurealign{Monospaced}
+  \ifnotocondensedmono@proportional\def\notocondensedmono@figurealign{Proportional}\fi
+
+\else % type1
+
+  \def\notocondensedmono@figurestyle{LF}
+  \ifnotocondensedmono@oldstyle\def\notocondensedmono@figurestyle{OsF}\fi
+  \def\notocondensedmono@figurealign{T}
+  \ifnotocondensedmono@proportional\def\notocondensedmono@figurealign{}\fi
+
+\fi
+
+\ifnotocondensedmono@ttf
+  \RequirePackage{fontspec}
+\else
+  \RequirePackage{fontenc,fontaxes,mweights}
+  \fa@naming@exception{figures}{{superior}{proportional}}{Sup}
+  \fa@naming@exception{figures}{{superior}{tabular}}{Sup}
+  \def\sufigures{\@nomath\sufigures
+      \fontfigurestyle{superior}\selectfont}
+\fi
+
+\ifnotocondensedmono@ttf
+  \def\notocondensedmono@regular{Regular}
+  \ifxetex\XeTeXtracingfonts=1\fi
+  \defaultfontfeatures{
+        HyphenChar=None, 
+        Extension = .ttf }
+  \def\notocondensedmono@Lining{Lining}
+    \ifnotocondensedmono@semicondensed
+        \setmonofont 
+          [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+            Scale     = \NotoSansMono@scale ,
+            UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+            BoldFont       = *\notocondensedmono@boldstyle ,
+          ]
+          {NotoSansMono-SemiCondensed}
+    \else\ifnotocondensedmono@extracondensed
+        \setmonofont 
+          [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+            Scale     = \NotoSansMono@scale ,
+            UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+            BoldFont       = *\notocondensedmono@boldstyle ,
+          ]
+          {NotoSansMono-ExtraCondensed}
+     \else
+        \setmonofont 
+          [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+            Scale     = \NotoSansMono@scale ,
+            UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+            BoldFont       = *\notocondensedmono@boldstyle , 
+          ]
+          {NotoSansMono-Condensed}
+      \fi\fi
+    \let\notocondensedmonofamily\ttdefault  
+  \newfontfamily\notocondensedmono
+        [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+          BoldFont       = *\notocondensedmono@boldstyle ,
+        ]
+        {NotoSansMono-Condensed}
+  \newfontfamily\notomonocondensedsemicondensed
+        [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+          BoldFont       = *\notocondensedmono@boldstyle ,
+        ]
+        {NotoSansMono-SemiCondensed}
+  \newfontfamily\notocondensedmonoextracondensed
+        [ Numbers   = {\ifx\notocondensedmono@figurestyle\notocondensedmono@Lining\else\notocondensedmono@figurestyle\fi} ,
+          Scale     = \NotoSansMono@scale ,
+          UprightFont    = *\ifx\notocondensedmono@regstyle\notocondensedmono@regular\else\notocondensedmono@regstyle\fi,
+          BoldFont       = *\notocondensedmono@boldstyle ,
+        ]
+        {NotoSansMono-ExtraCondensed}
+   \providecommand\sufigures{\addfontfeatures{VerticalPosition=Superior}}
+\else % type1
+  \def\notocondensedmonofamily{NotoSansMono-\notocondensedmono@figurealign\notocondensedmono@figurestyle}
+  \newcommand*\notocondensedmono{\fontfamily{\notocondensedmonofamily}\fontseries{c}\selectfont}
+  \newcommand*\notocondensedmonosemicondensed{\fontfamily{\notocondensedmonofamily}\fontseries{sc}\selectfont}
+  \newcommand*\notocondensedmonoextracondensed{\fontfamily{\notocondensedmonofamily}\fontseries{ec}\selectfont}
+  \def\ttdefault{\notocondensedmonofamily} 
+\fi
+
+\DeclareTextFontCommand{\textsu}{\sufigures}
+
+% LGR
+
+  \def\notocondensedmono@figurestyle{LF}
+  \ifnotocondensedmono@oldstyle\def\notocondensedmono@figurestyle{OsF}\fi
+  \def\notocondensedmono@figurealign{T}
+  \ifnotocondensedmono@proportional\def\notocondensedmono@figurealign{}\fi
+  \newcommand*\notomonocondensedlgr{\fontencoding{LGR}\fontfamily{NotoSansMono-\notocondensedmono@figurealign\notocondensedmono@figurestyle}\fontseries{c}\selectfont}
+
+
+\ifnotocondensedmono@ttf
+  % turn off defaults in case other fonts are selected:
+  \defaultfontfeatures{}
+\fi
+
+\endinput

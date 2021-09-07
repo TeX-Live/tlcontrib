@@ -1,4 +1,3 @@
-
 $special{'acmtrans'}    = '&MAKEflatten';
 $special{'adobecaslon'} = '&donormal';
 delete $special{'comicsans'}; # need to delete to get -tds ready try
@@ -15,6 +14,8 @@ $special{'pcarl'}       = '&donormal';
 $special{'mathstone'}   = '&MAKEflatten';
 $special{'spark-otf'}   = '&MAKEflatten';
 $special{'opacity-pro'} = '&donormal';
+$special{'notocjksc'}   = '&donormal';
+$specialfoundry{'notocjksc'} = "google";
 $special{'eq-save'}     = '&MAKEdps';
 $special{'fetchbibpes'} = '&MAKEdps';
 $special{'mkstmpdad'}   = '&MAKEdps';

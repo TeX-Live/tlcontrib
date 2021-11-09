@@ -8,16 +8,17 @@ tlpsetvar fmtcomm ${global_latex_deps},latex
 tlpsetvar nonluafmtdeps dehyph,hyph-utf8,latexconfig
 tlpsetvar luafmtdeps lm,luaotfload
 
-execute AddFormat name=latex-dev-dev engine=pdftex-dev \
+execute AddFormat name=devlatex engine=pdftex-dev \
           patterns=language.dat \
           options="-translate-file=cp227.tcx *latex.ini" \
           fmttriggers=${fmtcomm},${nonluafmtdeps}
-execute AddFormat name=pdflatex-dev-dev engine=pdftex-dev \
+execute AddFormat name=devpdflatex engine=pdftex-dev \
           patterns=language.dat \
           options="-translate-file=cp227.tcx *pdflatex.ini" \
           fmttriggers=${fmtcomm},${nonluafmtdeps}
 
 
 binpattern f bin/${ARCH}/pdftex-dev
-binpattern f bin/${ARCH}/pdflatex-dev-dev
-binpattern f bin/${ARCH}/latex-dev-dev
+binpattern f bin/${ARCH}/devpdflatex
+binpattern f bin/${ARCH}/devlatex
+

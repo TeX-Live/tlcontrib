@@ -50,7 +50,7 @@ if $do_collection ; then
   for i in `ls tlpkg/tlpsrc/*.tlpsrc | sort` ; do
     bn=`basename $i .tlpsrc`
     if [ "$bn" = "00texlive.autopatterns" -o "$bn" = "00texlive.config" -o "$bn" = 00texlive.installation \
-       -o "$bn" = collection-contrib -o "$bn" = "ketcindy" ] ; then
+       -o "$bn" = collection-contrib -o "$bn" = "ketcindy" -o "$bn" = "pdftex-dev" ] ; then
       continue
     fi
     echo "depend $bn" >> $col
@@ -66,7 +66,7 @@ if $do_collection ; then
     read REPLY <&2
     case $REPLY in
       y*|Y*) git commit -m "collection-contrib updated" ;;
-      *) echo "Ok, leave it for now!" ;;
+      *) echo "Ok, leave it for now!" ; git restore --staged $col ;;
     esac
   fi
 fi

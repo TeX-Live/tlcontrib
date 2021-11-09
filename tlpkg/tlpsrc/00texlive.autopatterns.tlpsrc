@@ -1,11 +1,57 @@
 category TLCore
-shortdesc Defines category patterns used by tlpsrc-to-tlpdb conversion
-longdesc As can be seen, the syntax here is slightly different than a
+shortdesc defines per-category patterns used by tlpsrc-to-tlpdb conversion
+longdesc As can be seen, the syntax here is rather different from a
 longdesc normal tlpsrc file: an additional first argument specifies the
 longdesc category for this pattern, and a final %NAME% is replaced with
-longdesc the package.  Defining new categories merely by adding them
-longdesc here is not currently implemented, though it could be done if
-longdesc it proves useful.  See the TeXLive::TLPSRC documentation for more.
+longdesc the package.
+longdesc 
+longdesc In addition, global TLPSRC variables can be defined, which
+longdesc can be used in any .tlpsrc variable. Their names must start
+longdesc with "global_".
+longdesc 
+longdesc Defining new categories merely by adding them here is not
+longdesc currently implemented, though it could be done if useful.
+longdesc 
+longdesc See the TeXLive::TLPSRC documentation for more.
+
+# These ${global_latex_deps} packages are used by (nearly) all LaTeX variants.
+# 
+# l3backend is not actually read when the .fmt is made (by design), but
+# it is used by the l3kernel code that is in the .fmt. It seems safer in
+# practice to just rebuild the fmt anyway. It's also nice to have it
+# (l3backend) as an implicit dependency, by listing it here.
+# 
+# tex-ini-files is not used by the e(u)ptex-based formats or eplain, but
+# it seems too painful to exclude it here and thus have to include it
+# everywhere else, or set up yet more variables. Seems fairly harmless.
+# 
+# Similarly, eplain does not (at this writing) need l3kernel for its
+# .fmt, but again, seems more maintainable to just use the variable as it is.
+# 
+# These special cases are also embedded in the tl-check-fmttriggers
+# code, so we don't get repeatedly warned about them. Maybe someday a
+# better approach will come to mind.
+# 
+tlpsetvar global_latex_deps \
+atbegshi,atveryend,babel,cm,everyshi,firstaid,hyphen-base,\
+l3backend,l3kernel,l3packages,latex,latex-fonts,tex-ini-files,unicode-data
+#
+# These packages are used by all LuaTeX variants - luatex, luajittex, luahbtex.
+tlpsetvar global_luatex_deps \
+cm,etex,hyphen-base,knuth-lib,plain,tex-ini-files,unicode-data
+#
+# Platforms that don't support jit.
+tlpsetvar global_no_luajit_platforms x86_64-solaris
+#
+# We define the Windows platform names here, so we can use ${wndws} in
+# the patterns, in preparation for supporting w64 in addition to w32,
+# and perhaps others in the future. The name ${global_wndws} was just
+# too long, so there is a super-special case in the code.
+tlpsetvar wndws win32
+
+# It would be ideal to be able to specify the non-jit platforms here,
+# but it's not crucial, so we haven't implemented ${global_} expansion
+# in binpatterns.
 
 # auto patterns for category Package
 runpattern Package t texmf-dist bibtex %NAME%
@@ -19,12 +65,19 @@ runpattern Package t texmf-dist mft %NAME%
 runpattern Package t texmf-dist omega %NAME%
 runpattern Package t texmf-dist scripts %NAME%
 runpattern Package t texmf-dist tex %NAME%
+runpattern Package d texmf-dist/tex/context/third/%NAME%
+runpattern Package d texmf-dist/fonts/misc/xetex/fontmapping/%NAME%
+runpattern Package d texmf-dist/scripts/context/lua/third/%NAME%
+#
 srcpattern Package t texmf-dist source %NAME%
+#
 docpattern Package t texmf-dist doc %NAME%
 docpattern Package f texmf-dist/doc/man/man1/%NAME%.*
+docpattern Package d texmf-dist/doc/context/third/%NAME%
 
 # auto patterns for category TLCore
 docpattern TLCore t texmf-dist doc %NAME%
+docpattern TLCore f texmf-dist/doc/man/man1/%NAME%.*
 
 # auto patterns for category ConTeXt, with special expansion type:
 # general form:   %[str:]NAME[:str]%
@@ -38,5 +91,7 @@ runpattern ConTeXt f texmf-dist/tex/context/interface/third/t-%NAME%.xml
 runpattern ConTeXt d texmf-dist/tex/context/third/%context-:NAME%
 runpattern ConTeXt d texmf-dist/scripts/context/lua/third/%context-:NAME%
 runpattern ConTeXt d texmf-dist/metapost/context/third/%context-:NAME%
+#
 docpattern ConTeXt d texmf-dist/doc/context/third/%context-:NAME%
+#
 srcpattern ConTeXt d texmf-dist/source/context/third/%context-:NAME%

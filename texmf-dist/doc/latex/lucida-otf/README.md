@@ -31,3 +31,5 @@ Following font files are supported:
 - LucidaSansTypewriterOT-Bold.otf
 - LucidaSansTypewriterOT-Oblique.otf
 - LucidaSansTypewriterOT.otf
+
+Herbert Voß 2023 -

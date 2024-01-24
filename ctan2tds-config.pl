@@ -51,6 +51,9 @@ $special{'eq-fetchbbl'} = '&MAKEdps';
 $special{'docassembly'} = '&MAKEdps';
 $special{'siam'}        = '&MAKEsiam';
 
+$special{'fontsetup-nonfree'} = '&donormal';
+$posthook{'fontsetup-nonfree'} = '&POST_onelevel';
+
 
 sub MAKEdps {
   print "\t SPECIAL $package";

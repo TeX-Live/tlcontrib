@@ -7,7 +7,7 @@ depend container_split_src_files/1
 depend frozen/0
 depend minrelease/2023
 depend release/2100-nonfree
-depend revision/382
+depend revision/383
 
 name 00texlive.installation
 category TLCore
@@ -293,7 +293,7 @@ runfiles size=182
  texmf-dist/tex/latex/acrotex/web.sty
  texmf-dist/tex/latex/acrotex/webpro.def
  texmf-dist/tex/latex/acrotex/websec.def
-catalogue-contact-home http://www.acrotex.net
+catalogue-contact-home https://www.math.uakron.edu/~dpstory/acrotex.html
 catalogue-ctan /macros/latex/contrib/acrotex
 catalogue-license lppl
 catalogue-topics collection pdf-forms
@@ -301,11 +301,18 @@ catalogue-topics collection pdf-forms
 name acrotex-js
 category Package
 revision 335
+shortdesc JavaScript files used by acrotex and other packages
+longdesc In the distribution of this package are two critical JavaScript
+longdesc files (aeb.js and aeb_pro.js) used by the packages insdljs,
+longdesc aeb-pro, thorshammer, and docassembly. Previously these JS
+longdesc files where distributed with the individual packages, now they
+longdesc are distributed by this package and must be installed according
+longdesc to the instructions in the docs folder.
 docfiles size=223
- texmf-dist/doc/latex/acrotex-js/README.md
+ texmf-dist/doc/latex/acrotex-js/README.md details="Readme"
  texmf-dist/doc/latex/acrotex-js/acrobat-in-workflow.pdf
  texmf-dist/doc/latex/acrotex-js/acrobat-in-workflow.tex
- texmf-dist/doc/latex/acrotex-js/acrotex-js.pdf
+ texmf-dist/doc/latex/acrotex-js/acrotex-js.pdf details="Package documentation"
  texmf-dist/doc/latex/acrotex-js/install_jsfiles.pdf
  texmf-dist/doc/latex/acrotex-js/install_jsfiles.tex
  texmf-dist/doc/latex/acrotex-js/js-files/aeb-reader.js
@@ -318,6 +325,9 @@ srcfiles size=3
  texmf-dist/source/latex/acrotex-js/acrotex-js.ins
 runfiles size=1
  texmf-dist/tex/latex/acrotex-js/acrotex-js.sty
+catalogue-ctan /macros/latex/contrib/acrotex-js
+catalogue-license lppl
+catalogue-topics pdf-feat acrobat
 
 name adobecaslon
 category Package
@@ -1384,7 +1394,7 @@ runfiles size=389
  texmf-dist/tex/latex/classico/ts1uop.fd
 catalogue-ctan /fonts/urw/classico
 catalogue-license nocommercial
-catalogue-topics font font-sans font-type1 font-otf font-supp
+catalogue-topics font font-body font-proportional font-sans font-type1 font-otf font-supp font-t1enc
 
 name cntdwn
 category Package
@@ -1758,9 +1768,16 @@ catalogue-topics caption adobe-distiller
 name docassembly
 category Package
 revision 329
+shortdesc Use the Acrobat JavaScript API
+longdesc This package defines the docassembly environment in which
+longdesc JavaScript code can be written to execute once and only once
+longdesc the newly created PDF in the Acrobat application. The package
+longdesc also defines a series of helper commands to execute security
+longdesc restricted JavaScript methods. The package depends on
+longdesc acrotex-js.
 docfiles size=587
- texmf-dist/doc/latex/docassembly/README.md
- texmf-dist/doc/latex/docassembly/docassembly.pdf
+ texmf-dist/doc/latex/docassembly/README.md details="Readme"
+ texmf-dist/doc/latex/docassembly/docassembly.pdf details="Package documentation"
  texmf-dist/doc/latex/docassembly/examples/attach-files.tex
  texmf-dist/doc/latex/docassembly/examples/certifyinvisible.pdf
  texmf-dist/doc/latex/docassembly/examples/certifyinvisible.tex
@@ -1791,6 +1808,9 @@ srcfiles size=7
  texmf-dist/source/latex/docassembly/docassembly.ins
 runfiles size=2
  texmf-dist/tex/latex/docassembly/docassembly.sty
+catalogue-ctan /macros/latex/contrib/docassembly
+catalogue-license lppl1.2
+catalogue-topics pdf-feat
 
 name dps
 category Package
@@ -2283,9 +2303,12 @@ catalogue-version 0.6
 name fontsetup-nonfree
 category Package
 revision 378
+shortdesc A front-end to fontspec, for selected non-free fonts
+longdesc This package accompanies fontsetup and includes support for
+longdesc nonfree fonts.
 docfiles size=152
- texmf-dist/doc/latex/fontsetup-nonfree/README
- texmf-dist/doc/latex/fontsetup-nonfree/fontsetup-nonfree-doc.pdf
+ texmf-dist/doc/latex/fontsetup-nonfree/README details="Readme"
+ texmf-dist/doc/latex/fontsetup-nonfree/fontsetup-nonfree-doc.pdf details="Package documentation"
  texmf-dist/doc/latex/fontsetup-nonfree/fontsetup-nonfree-doc.tex
  texmf-dist/doc/latex/fontsetup-nonfree/fspsample-cambria.pdf
  texmf-dist/doc/latex/fontsetup-nonfree/fspsample-lucida.pdf
@@ -2301,6 +2324,10 @@ runfiles size=5
  texmf-dist/tex/latex/fontsetup-nonfree/fspminion.tex
  texmf-dist/tex/latex/fontsetup-nonfree/fspmsgaramondot.tex
  texmf-dist/tex/latex/fontsetup-nonfree/fsppalatinoot.tex
+catalogue-ctan /macros/unicodetex/latex/fontsetup-nonfree
+catalogue-license gpl3
+catalogue-topics font-sel font-supp xetex luatex maths
+catalogue-version 2.0
 
 name futurans
 category Package
@@ -3977,7 +4004,7 @@ runfiles size=1011
 catalogue-ctan /fonts/garamondx
 catalogue-license nosell
 catalogue-topics font font-maths font-serif font-type1 font-t1enc
-catalogue-version 1.21
+catalogue-version 1.22
 
 name getnonfreefonts
 category Package
@@ -4864,7 +4891,6 @@ runfiles size=3
 catalogue-ctan /macros/latex/contrib/ltx4yt
 catalogue-license lppl
 catalogue-topics multimedia pdf-feat
-catalogue-version 0.7
 
 name lucida-otf
 category Package
@@ -4872,7 +4898,7 @@ revision 380
 shortdesc Support for the Lucida Bright fonts (OpenType)
 longdesc This package supports the non-free fonts from Bigelow & Holmes
 longdesc which are available from the TUG office for a special price for
-longdesc members of any TeX user group. See http://tug.org/lucida
+longdesc members of any TeX user group. See https://tug.org/lucida
 docfiles size=61
  texmf-dist/doc/latex/lucida-otf/Changes
  texmf-dist/doc/latex/lucida-otf/README.md details="Readme"
@@ -4889,7 +4915,7 @@ catalogue-contact-support https://tug.org/mailman/listinfo/lucida
 catalogue-ctan /fonts/lucida-otf
 catalogue-license lppl1.3
 catalogue-topics font-absent font-otf font-use font-serif font-sans font-mono font-gothic font-calligraphic font-maths
-catalogue-version 0.08
+catalogue-version 0.10
 
 name lucidabr
 category Package
@@ -4930,7 +4956,7 @@ runfiles size=48
  texmf-dist/tex/latex/lucidabr/omxhlcv.fd
 catalogue-alias psnfssx-luc
 catalogue-also lucida
-catalogue-contact-home http://tug.org/lucida/
+catalogue-contact-home https://tug.org/lucida/
 catalogue-ctan /macros/latex/contrib/psnfssx/lucidabr
 catalogue-license lppl1.3
 catalogue-topics font-supp font-use
@@ -5309,12 +5335,17 @@ catalogue-version 1.004
 name notocondensed
 category Package
 revision 349
+shortdesc Support for the condensed variants of the Noto fonts
+longdesc This package provides pdfLaTeX, XeLaTeX and LuaLaTeX support
+longdesc for the condensed variants of the NotoSerif, NotoSans and
+longdesc NotoSansMono families of fonts, designed by Steve Matteson for
+longdesc Google.
 depend noto
 execute addMap notocondensed.map
 docfiles size=90
  texmf-dist/doc/fonts/notocondensed/LICENSE_OFL.txt
- texmf-dist/doc/fonts/notocondensed/README
- texmf-dist/doc/fonts/notocondensed/notocondensed-samples.pdf
+ texmf-dist/doc/fonts/notocondensed/README details="Readme"
+ texmf-dist/doc/fonts/notocondensed/notocondensed-samples.pdf details="Font samples"
  texmf-dist/doc/fonts/notocondensed/notocondensed-samples.tex
 runfiles size=64926
  texmf-dist/fonts/map/dvips/notocondensed/notocondensed.map
@@ -21871,6 +21902,10 @@ runfiles size=64926
  texmf-dist/fonts/vf/google/notocondensed/NotoSerif-SemiCondensedThinItalic-tosf-ts1.vf
  texmf-dist/tex/latex/notocondensed/notocondensed-mono.sty
  texmf-dist/tex/latex/notocondensed/notocondensed.sty
+catalogue-contact-home https://www.google.com/get/noto/
+catalogue-ctan /fonts/notocondensed
+catalogue-license ofl lppl
+catalogue-topics font font-body font-proportional font-mono font-multilingual font-greek font-sans font-serif font-ttf font-type1 font-supp font-t1enc
 
 name opacity-pro
 category Package
@@ -22008,7 +22043,7 @@ longdesc content is loaded into the default application, possibly a
 longdesc LaTeX editor. For the Ctrl+Click feature to work, the file
 longdesc aeb-reader.js needs to be installed. As the filename suggests,
 longdesc this file will work for Adobe Acrobat Reader (DC), as well as
-longdesc for Adobe Acrobat itself.
+longdesc for the magnificent Adobe Acrobat itself.
 docfiles size=418
  texmf-dist/doc/latex/pmdb/README.md details="Readme"
  texmf-dist/doc/latex/pmdb/examples/chapters/doc1.tex
@@ -22310,7 +22345,7 @@ runfiles size=19
  texmf-dist/tex/latex/rmannot/rmannot.sty
 catalogue-contact-home http://www.math.uakron.edu/~dpstory/rmannot.html
 catalogue-ctan /macros/latex/contrib/rmannot
-catalogue-license lppl1
+catalogue-license lppl
 catalogue-topics pdf-feat pdf-forms adobe-distiller
 
 name siam
@@ -22684,6 +22719,10 @@ catalogue-version 1.2b
 name vntex-nonfree
 category Package
 revision 14
+shortdesc URW Classico and URW Garamond extended for Vietnamese
+longdesc This package contains URW Classico and URW Garamond No.8 fonts
+longdesc extended for Vietnamese. It can be installed with
+longdesc getnonfreefonts.
 execute addMap classicovn.map
 execute addMap garamondvn.map
 docfiles size=6
@@ -22731,6 +22770,10 @@ runfiles size=312
  texmf-dist/fonts/vf/vntex/garamondvn/ugmrc8v.vf
  texmf-dist/tex/latex/vntex/t5ugm.fd
  texmf-dist/tex/latex/vntex/t5uop.fd
+catalogue-ctan /fonts/vntex-nonfree
+catalogue-license nosell
+catalogue-topics vietnamese font font-type1 font-supp
+catalogue-version 3.2.2
 
 name webomints
 category Package

@@ -54,6 +54,8 @@ $special{'siam'}        = '&MAKEsiam';
 $special{'fontsetup-nonfree'} = '&donormal';
 $posthook{'fontsetup-nonfree'} = '&POST_onelevel';
 
+delete($special{'garamondx'});
+$posthook{'garamondx'} = '&POSTmove_subdirs';
 
 sub MAKEdps {
   print "\t SPECIAL $package";
@@ -66,5 +68,42 @@ sub MAKEdps {
   # now do the normal thing
   &xchdir($RAW_DIR);
   &donormal();
+}
+
+sub POSTmove_subdirs {
+  print "POSTmove_subdirs - just move directories around\n";
+  &conditionally_rename_with_mkdir ("afm", "$DEST/fonts/afm/public/$package");
+  &conditionally_rename_with_mkdir ("enc", "$DEST/fonts/enc/dvips/$package");
+  &conditionally_rename_with_mkdir ("latex", "$DEST/tex/latex/$package");
+  &conditionally_rename_with_mkdir ("tex", "$DEST/tex/latex/$package");
+  &conditionally_rename_with_mkdir ("map/dvips", "$DEST/fonts/map/dvips/$package");
+  &conditionally_rename_with_mkdir ("map/pdftex", "$DEST/fonts/map/pdftex/$package");
+  &conditionally_rename_with_mkdir ("map", "$DEST/fonts/map/dvips/$package");
+  &conditionally_rename_with_mkdir ("source", "$DEST/source/fonts/$package");
+  &conditionally_rename_with_mkdir ("src", "$DEST/source/fonts/$package");
+  &conditionally_rename_with_mkdir ("tfm", "$DEST/fonts/tfm/public/$package");
+  &conditionally_rename_with_mkdir ("truetype", "$DEST/fonts/truetype/public/$package");
+  &conditionally_rename_with_mkdir ("type1", "$DEST/fonts/type1/public/$package");
+  &conditionally_rename_with_mkdir ("vf", "$DEST/fonts/vf/public/$package");
+  if (-l "README") {
+    &SYSTEM("rm README"); # symlink, should be removed already, but to be sure
+  }
+  &SYSTEM("$MV doc/* .");
+  &SYSTEM("rmdir doc");
+}
+
+sub conditionally_rename_with_mkdir {
+  my ($from,$to) = @_;
+  if (! -e $from) { return }
+  die "rename_with_mkdir needs exactly two args (got @_)" if @_ != 2;
+  if (-e $to) {
+    rmdir ($to); # ignore errors.
+    die ("rename_with_mkdir destination exists: $to\n"
+         . `ls $to`)
+      if -e $to;
+  }
+  (my $parent = $to) =~ s,/[^/]*$,,;
+  &xmkdir ($parent);
+  &xsystem ("$MV $from $to");
 }
 

@@ -1,0 +1,68 @@
+%Filename: t1minzgm.fd
+%Created by: msharpe
+%Created using fontinst v1.933
+
+%THIS FILE SHOULD BE PUT IN A TEX INPUTS DIRECTORY
+
+\ProvidesFile{t1minzgm.fd}
+   [2022/01/20 Fontinst v1.933 font definitions for T1/minzgm.]
+
+\def\@textscalefactor{.94} 
+%garamondx must be reduced by factor .93 to match xheight of newtxmath
+
+\@ifundefined{ntxmath@scale}{\let\ntxmath@scaled\@empty}
+{\@tempdima\@textscalefactor\p@
+\@tempdima\ntxmath@scale\@tempdima
+\edef\ntxmath@scaled{s*[\strip@pt\@tempdima]}}% locally, not globally
+
+\def\zgm@tmp{\ifzgm@swq \def\zgm@@swq{-swq}\fi}
+\let\zgm@@swq\@empty
+\ifdefined\zgm@swqtrue
+  \zgm@tmp
+\fi
+
+
+\DeclareFontFamily{T1}{minzgm}{}
+
+\DeclareFontShape{T1}{minzgm}{m}{n}{
+   <-> \ntxmath@scaled  T1-zgm-r-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{m}{sc}{
+   <-> \ntxmath@scaled  T1-zgm-r-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{b}{sc}{
+   <-> \ntxmath@scaled  T1-zgm-b-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{m}{scit}{
+   <-> \ntxmath@scaled  T1-zgm-ri-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{b}{scit}{
+   <-> \ntxmath@scaled  T1-zgm-bi-lf-sc\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{b}{n}{
+   <-> \ntxmath@scaled  T1-zgm-b-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{m}{it}{
+   <-> \ntxmath@scaled  T1-zgm-ri-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{b}{it}{
+   <-> \ntxmath@scaled  T1-zgm-bi-lf\zgm@@swq
+}{}
+
+\DeclareFontShape{T1}{minzgm}{bx}{sc}{<->ssub * minzgm/b/sc}{}
+\DeclareFontShape{T1}{minzgm}{bx}{scit}{<->ssub * minzgm/b/scit}{}
+\DeclareFontShape{T1}{minzgm}{bx}{n}{<->ssub * minzgm/b/n}{}
+\DeclareFontShape{T1}{minzgm}{m}{sl}{<->ssub * minzgm/m/it}{}
+\DeclareFontShape{T1}{minzgm}{bx}{it}{<->ssub * minzgm/b/it}{}
+\DeclareFontShape{T1}{minzgm}{b}{sl}{<->ssub * minzgm/b/it}{}
+\DeclareFontShape{T1}{minzgm}{bx}{sl}{<->ssub * minzgm/b/sl}{}
+\DeclareFontShape{T1}{minzgm}{m}{fscn}{<->ssub * minzgm/m/sc}{} % needed with mathdesign[ugm]
+\DeclareFontShape{T1}{minzgm}{b}{fscn}{<->ssub * minzgm/b/sc}{}
+\endinput

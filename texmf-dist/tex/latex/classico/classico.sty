@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{classico}
-    [2014/08/28 (Bob Tennent)  Supports URW Classico fonts for all LaTeX engines.]
+    [2025/01/08 (Bob Tennent)  Supports URW Classico fonts for all LaTeX engines.]
 
 \RequirePackage{ifxetex,ifluatex,xkeyval,textcomp}
 
@@ -31,7 +31,6 @@
 \fi
 
 \ifclassico@otf
-  \ifxetex\XeTeXtracingfonts=1\fi
   \defaultfontfeatures{
         Ligatures = TeX ,
         Scale     = \URWClassico@scale ,
@@ -52,7 +51,7 @@
         BoldItalicFont = *-BoldItalic ]
       {URWClassico}
 \else % type1
-  \def\classicofamily{URWClassico-LF}
+  \def\classicofamily{URWClassico-TLF}
   \newcommand*\classico{\fontfamily{\classicofamily}\selectfont}
   \def\sfdefault{\classicofamily}
   \ifclassico@default\edef\familydefault{\sfdefault}\fi

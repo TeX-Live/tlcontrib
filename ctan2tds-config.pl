@@ -50,6 +50,7 @@ $special{'rmannot'}     = '&MAKEdps';
 $special{'eq-fetchbbl'} = '&MAKEdps';
 $special{'docassembly'} = '&MAKEdps';
 $special{'siam'}        = '&MAKEsiam';
+$special{'classico'}    = '&donormal';
 
 $special{'fontsetup-nonfree'} = '&donormal';
 $posthook{'fontsetup-nonfree'} = '&POST_onelevel';

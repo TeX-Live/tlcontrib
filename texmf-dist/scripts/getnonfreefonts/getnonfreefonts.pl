@@ -1,37 +1,36 @@
 #!/usr/bin/env perl
 
-## getnonfreefonts
-## Copyright 2006-2016 Reinhard Kotucha <reinhard.kotucha@web.de>
-#
-# This work may be distributed and/or modified under the
-# conditions of the LaTeX Project Public License, either version 1.3
-# of this license or (at your option) any later version.
-# The latest version of this license is in
-#   http://www.latex-project.org/lppl.txt
-# 
-# The current maintainer is Reinhard Kotucha.
+# $Id: $
 
-my $TL_version='2016';  
-my $revision='2016-11-08';
+# Copyright (C) 2006-2025 Reinhard Kotucha <reinhard.kotucha@gmx.de>
+# 
+# You may freely use, modify, and/or distribute this file.
+
+my $revision='2025-01-14';
 
 use Getopt::Long;
 $Getopt::Long::autoabbrev=0;
 Getopt::Long::Configure ("bundling");
 
-$opt_lsfonts=0;
-$opt_force=0;
+my $getfont_url='https://www.tug.org/~kotucha/getnonfreefonts/getfont.pl';
+my $banner="This is getnonfreefonts, revision $revision.\n\n";
 
-sub usage {
-    print <<'EOF';
+# messages
+
+my $usage = <<'ENDUSAGE';
 Usage:
-    getnonfreefonts[-sys] [-a|--all] [-d|--debug] [-f|--force]
-        [-l|--lsfonts] [-r|--refreshmap] [-v|--verbose] [--version] 
-        [-H|--http] [font1] [font2] ...
+    getnonfreefonts --sys|--user [options] [font1] [font2] ...
 
-    getnonfreefonts installs fonts in $TEXMFHOME.
-    getnonfreefonts-sys installs fonts in $TEXMFLOCAL.
+    getnonfreefonts --sys installs fonts in $TEXMFLOCAL.
+    getnonfreefonts --user installs fonts in $TEXMFHOME.
+
+    In nearly all cases you should use getnonfreefonts --sys.
+    For special cases see 
+
+        http://tug.org/texlive/scripts-sys-user.html
 
     Options:
+
         -a|--all        Install all fonts.
 
         -d|--debug      Provide additional messages for debugging.
@@ -46,15 +45,45 @@ Usage:
 
         -v|--verbose    Be more verbose.
 
-        -H|--http       Use http instead of ftp (see manual).
-
         --version       Print version number.
 
+ENDUSAGE
+
+
+my $sys_user_err = <<'EOF';
+ERROR: You have to invoke getnonfreefonts with either --sys or --user.
+
+In nearly all cases you should use getnonfreefonts --sys.
+For special cases see 
+
+   http://tug.org/texlive/scripts-sys-user.html
+
 EOF
-;
+
+
+# system specific stuff
+
+my %sys=(
+  w32     => 0,
+  dirsep  => '/',
+  pathsep => ':',
+  exe     => '',
+  dollar  => '\$',
+  nulldev => '>/dev/null 2>/dev/null' 
+    );
+
+if ($^O=~/^MSWin/i) {
+  %sys=(
+    w32     => 1,
+    dirsep  => '\\',
+    pathsep => ';',
+    exe     => '.exe',
+    dollar  => '$',
+    nulldev => '>NUL 2>NUL' 
+      );
 }
 
-# GetOptions destroys @ARGV.
+# GetOptions removes optional arguments from @ARGV.
 # We have to create a new array because assignments create references.
 
 my @ARGS;
@@ -62,35 +91,24 @@ foreach my $arg (@ARGV) {
   push (@ARGS, $arg);
 }
 
+$opt_lsfonts=0;
+$opt_force=0;
+$opt_sys=0;
+$opt_user=0;
+
 $done=GetOptions 
     "all|a",
     "debug|d",
     "force|f",
     "help|h",
-    "http|H",
     "lsfonts|l",
     "refreshmap|r",
     "verbose|v",
-    "version",
-    "sys";
+    "version|V",
+    "sys|s",
+    "user|u";
 
-unless ($done) {
-  print "\n"; usage; exit 1;
-}
-
-$^W=1 if $opt_debug;
-
-my $pathsep;
-
-sub win32 {
-  if ($^O=~/^MSWin(32|64)/i) {
-    $pathsep="\\";
-    return 1;
-  } else {
-    $pathsep="/";
-    return 0;
-  }
-}
+@allpackages=@ARGV;
 
 
 # ANSI colors
@@ -116,7 +134,6 @@ if ($ENV{'TERM'}) {
   }
 }
 
-
 sub colored {
   my $text=shift;
   my $color=shift;
@@ -136,6 +153,9 @@ sub colored {
   }
 }
 
+# messages
+
+my $msglen=0;
 
 sub msg {
   my $message=shift;
@@ -143,32 +163,25 @@ sub msg {
   print $message;
 }
 
-
 sub status {
   my $status=shift;
   my $color=shift;
 
+  
   my $spaces=79-2-$msglen-length($status);
   $spaces=1 if ($spaces < 1);
   print ' ' x $spaces;
   print ('[' . colored($status, $color) . "]\n");
 }
 
-
-sub expand_var {
-  my $var=shift;
-
-  if (win32) {
-    open KPSEWHICH, 'kpsewhich --expand-var=$'  . "$var |";
-  } else {
-    open KPSEWHICH, 'kpsewhich --expand-var=\$' . "$var |";
+sub debug_msg {
+  my $message=shift;
+  if ($opt_debug) {
+    print STDERR "DEBUG: $message\n";
   }
-  while (<KPSEWHICH>) {
-    chop;
-    return "$_";
-  }
-  close KPSEWHICH;
 }
+
+# kpathsea stuff
 
 sub var_value {
   my $var=shift;
@@ -179,133 +192,21 @@ sub var_value {
   return $ret;
 }
 
-
-@allpackages=@ARGV;
-
-print "$TL_version\n" and exit 0 if $opt_version; 
-
-if ($opt_help or !@ARGS) {
-  print "\nThis is getnonfreefonts";
-  print '-sys' if ($sys);
-  print ", version $TL_version, revision $revision.\n\n";
-  usage; 
+sub expand_var {
+  my $var=shift;
+  my $ret;
+  my $dollar=$sys{'dollar'};
+  $ret=`kpsewhich --expand-var=$dollar$var`;
+  chomp($ret);
+  return $ret;
 }
-
-
-sub message {
-  my $message=shift;
-  if ($message=~/^\[/) {
-    print "$message\n";
-  } else {
-    printf "%-60s", $message;
-  }
-}
-
-
-sub debug_msg {
-  my $message=shift;
-  if ($opt_debug) {
-    print STDERR "DEBUG: $message\n";
-  }
-}
-
-
-sub get_tmpdir {
-  if ($opt_debug) {
-    for my $var (qw(TMPDIR TEMP TMP)) {
-      if (defined $ENV{$var}) {
-        debug_msg "Environment variable $var='$ENV{$var}'.";
-      } else {
-        debug_msg "Environment variable $var not set.";
-      }
-    }
-  }
-  # get TMPDIR|TEMP|TMP environment variable
-
-  my $SYSTMP=undef;
-  $SYSTMP||=$ENV{'TMPDIR'};
-  $SYSTMP||=$ENV{'TEMP'};
-  $SYSTMP||=$ENV{'TMP'};
-  $SYSTMP||='/tmp';
-  return "$SYSTMP";
-}
-
-sub which {
-  my $prog=shift;
-  my @PATH;
-  my $PATH=$ENV{'PATH'};
-  if (&win32) {
-    my @PATHEXT=split ';', $ENV{'PATHEXT'};
-    push @PATHEXT, '';  # if argument contains an extension
-    @PATH=split ';', $PATH;
-    for my $dir (@PATH) {
-	    $dir=~s/\\/\//g;
-	    for my $ext (@PATHEXT) {
-        if (-f "$dir/$prog$ext") {
-          return "$dir/$prog$ext";
-        }
-	    }
-    }
-  } else {
-    @PATH=split ':', $PATH;
-    for my $dir (@PATH) {
-	    if (-x "$dir/$prog") {
-        return "$dir/$prog";
-	    }
-    }
-  }
-  return 0;
-}
-
-sub show_path {
-  if ($opt_debug) {
-    my @PATH;
-    if (win32) {
-      @PATH=split ';', $ENV{'PATH'};
-    } else {
-      @PATH=split ':', $ENV{'PATH'};
-    }
-    my $index=0;
-    
-    foreach my $dir (@PATH) {
-      debug_msg "PATH\[$index\]: '$dir'.";
-      ++$index;
-    }
-  }
-}
-
-sub signals {
-  my @signals;
-  my @common_signals=qw(INT ILL FPE SEGV TERM ABRT);
-  my @signals_UNIX=qw(QUIT BUS PIPE);
-  my @signals_Win32=qw(BREAK);
-
-  if (win32) {
-    @signals=(@common_signals, @signals_Win32);
-  } else {
-    @signals=(@common_signals, @signals_UNIX);
-  }
-  debug_msg "Supported signals: @signals.";
-  return @signals;
-}
-
-
-sub getfont_url {
-  my $getfont_url;
-  my $HTTPS='https://www.tug.org/~kotucha/getnonfreefonts';
-  debug_msg 'Download method: HTTPS.';
-  $getfont_url="$HTTPS/getfont.pl";
-  debug_msg "Using script '$getfont_url'.";
-  return $getfont_url;
-}
-
 
 sub expand_braces {
   my $var=shift;
   my $pathsep;
   my $retstring;
   my @retlist;
-  if (win32) {
+  if ($sys{'w32'}) {
     open KPSEWHICH, 'kpsewhich --expand-braces=$'  . "$var |";
     $pathsep=';';
   } else {
@@ -327,6 +228,83 @@ sub expand_braces {
   }
   return "$retlist[0]";
 }
+
+sub get_tmpdir {
+  if ($opt_debug) {
+    for my $var (qw(TMPDIR TEMP)) {
+      if (defined $ENV{$var}) {
+        debug_msg "Environment variable $var='$ENV{$var}'.";
+      } else {
+        debug_msg "Environment variable $var not set.";
+      }
+    }
+  }
+  # get TMPDIR|TEMP environment variable, use /tmp as fallback.
+
+  my $SYSTMP=undef;
+  $SYSTMP||=$ENV{'TMPDIR'};
+  $SYSTMP||=$ENV{'TEMP'};
+  $SYSTMP||='/tmp';
+  return "$SYSTMP";
+}
+
+sub which {
+  my $prog=shift;
+  my @PATH;
+  my $PATH=$ENV{'PATH'};
+  if ($sys{'w32'}) {
+    my @PATHEXT=split ';', $ENV{'PATHEXT'};
+    push @PATHEXT, '';  # if argument contains an extension
+    @PATH=split ';', $PATH;
+    for my $dir (@PATH) {
+      $dir=~s/\\/\//g;
+      for my $ext (@PATHEXT) {
+        if (-f "$dir/$prog$ext") {
+          return "$dir/$prog$ext";
+        }
+      }
+    }
+  } else {
+    @PATH=split ':', $PATH;
+    for my $dir (@PATH) {
+      if (-x "$dir/$prog") {
+        return "$dir/$prog";
+      }
+    }
+  }
+  return 0;
+}
+
+sub show_path {
+  my @PATH;
+  @PATH=split($sys{'pathsep'}, $ENV{'PATH'});
+  my $index=0;
+  
+  foreach my $dir (@PATH) {
+    debug_msg "PATH\[$index\]: '$dir'.";
+    ++$index;
+  }
+}
+
+sub signals {
+  # Signals supposed to be supported by Windows are derived from the
+  # sources of the Microsoft C runtime library.  It's a matter of fact
+  # that not everything described there really works.  Furthermore,
+  # the behavior depends heavily on the version of Windows you are
+  # using.  Don't expect too much.
+  my @signals;
+  my @common_signals=qw(INT ILL FPE SEGV TERM ABRT);
+  my @signals_UNIX=qw(QUIT BUS PIPE);
+  my @signals_Win32=qw(BREAK);
+
+  if ($sys{'w32'}) {
+    @signals=(@common_signals, @signals_Win32);
+  } else {
+    @signals=(@common_signals, @signals_UNIX);
+  }
+  return @signals;
+}
+
 
 sub check_tmpdir{
   my $SYSTMP=shift;
@@ -363,7 +341,10 @@ sub check_binary {
   }
 }
 
-debug_msg "getnonfreefonts rev. $revision (TL $TL_version).";
+
+### main ####
+
+debug_msg "getnonfreefonts rev. $revision.";
 
 debug_msg ("argv[0]: '$0'");
 my $nargs=@ARGS+0;
@@ -374,44 +355,16 @@ for (0..$#ARGS) {
   debug_msg ("argv[$i]: '$arg'");
 }
 
+debug_msg("opt_sys=$opt_sys");
+debug_msg("opt_user=$opt_user");
 
-my $sys=($0=~/-sys$/)? 1:0;
-if ($sys==1) {
-  debug_msg("sys=true, determined by filename");
-} else {
-  debug_msg("sys=false, determined by filename");
-}
-
-$sys=1 if $opt_sys;
-debug_msg("sys=true, determined by option") if $opt_sys;
-
-##$sys=1 if (defined $ENV{'TEX_SYS_PROG'});
-
-if (win32) {
-# ugly workaround for --sys detection in runscript wrapper.
-  my $TEXMFVAR=var_value('TEXMFVAR');
-  my $TEXMFSYSVAR=var_value('TEXMFSYSVAR');
-  debug_msg("TEXMFVAR=$TEXMFVAR");
-  debug_msg("TEXMFSYSVAR=$TEXMFSYSVAR");
-
-  if ($TEXMFVAR eq $TEXMFSYSVAR) {
-    $sys=1;
-    debug_msg("sys=true, determined by kpathsea vars");
-  }
-}
-
-# Determine the URL.
-my $getfont_url=getfont_url;
-
-my $SYSTMP=get_tmpdir;
-
-debug_msg "Internal variable SYSTMP set to '$SYSTMP'.";
+show_path() if ($opt_debug);
 
 check_binary 'kpsewhich';
 
 # Determine INSTALLROOT.
 
-$INSTALLROOTNAME=($sys)? 'TEXMFLOCAL':'TEXMFHOME';
+$INSTALLROOTNAME=($opt_sys)? 'TEXMFLOCAL':'TEXMFHOME';
 
 $INSTALLROOT=expand_braces "$INSTALLROOTNAME";
 
@@ -425,28 +378,64 @@ $INSTALLROOT=~s/\/\/$//;
 
 debug_msg "INSTALLROOT='$INSTALLROOT'.";
 
-($sys)? debug_msg "sys=true.":debug_msg "sys=false.";
+my $SYSTMP=get_tmpdir;
 
-if ($opt_help or !@ARGS) {
-  print <<"ENDUSAGE";
-  Directories:
+debug_msg "Internal variable SYSTMP set to '$SYSTMP'.";
+
+$^W=1 if $opt_debug;
+
+unless ($done) {
+  print STDERR "\n$banner$usage";
+  exit 1;
+}
+
+if ($opt_version) {
+  print "$revision\n";
+  exit 0;
+}
+
+if ($opt_sys and $opt_user) {
+  print STDERR "$sys_user_err";
+  exit 1;
+}
+
+if ($opt_help) {
+  print ($banner);
+  print ($usage);
+
+  if ($opt_sys or $opt_user) {
+    print <<"ENDUSAGE";
+    Directories:
        temporary: '$SYSTMP/getfont-<PID>'
        install:   '$INSTALLROOT'
 
 ENDUSAGE
-check_tmpdir $SYSTMP;
-check_installroot "$INSTALLROOTNAME", "$INSTALLROOT";
-exit 0;
+  } else {
+    print "$sys_user_err";
+  }
+  exit 0;
 }
 
+  
+unless ($opt_sys or $opt_user) {
+  print "$sys_user_err";
+  exit 1;
+}
+
+if ($opt_sys and $opt_user) {
+  print "$sys_user_err";
+  exit 1;
+}
+
+
 check_tmpdir $SYSTMP;
 check_installroot "$INSTALLROOTNAME", "$INSTALLROOT";
 
-my $tmpdir="$SYSTMP" . $pathsep . "getfont-$$";
+my $tmpdir="$SYSTMP" . $sys{'dirsep'} . "getfont-$$";
 debug_msg "Internal variable tmpdir set to '$tmpdir'.";
 
-mkdir "$tmpdir" or die "! ERROR: Can't mkdir '$tmpdir'.";
-chdir "$tmpdir" or die "! ERROR: Can't cd '$tmpdir'.";
+mkdir "$tmpdir" or die "ERROR: Can't mkdir '$tmpdir'.";
+chdir "$tmpdir" or die "ERROR: Can't cd '$tmpdir'.";
 
 #install_signal_handlers $SYSTMP, $tmpdir;
 
@@ -473,19 +462,21 @@ foreach my $signal (signals) {
 debug_msg 
     "Signal handlers installed. Don't expect too much on Windows.";
 
-my $TLROOT=expand_var 'SELFAUTOPARENT';
+my $TLROOT=expand_var 'SELFAUTOPARENT'; ### only used on Windows,
+                                        ### hence no portability
+                                        ### problem
 my $BINDIR=expand_var 'SELFAUTOLOC';
 
 my $has_wget=0;
 my $WGET;
 
-if (win32) {
-  $has_wget=1; ## shipped with TL.
+if ($sys{'w32'}) { ## wget is shipped with TL.
+  $has_wget=1;
   if (-f "$TLROOT\\tlpkg\\installer\\wget\\wget.exe") {
-	# TL-2008+
+    # TL-2008+
     $WGET="$TLROOT\\tlpkg\\installer\\wget\\wget.exe";
   } elsif (-f "$BINDIR\\wget.exe") {
-	# TL-2005...TL-2007
+    # TL-2005...TL-2007
     $WGET="$BINDIR\\wget.exe";
   } else {
     die "ERROR: No wget binary found.\n";
@@ -495,7 +486,6 @@ if (win32) {
   $has_wget=1; ## wget is in PATH.
 }
 
-show_path;
 
 debug_msg "No wget binary found on your system, trying curl." 
     unless ($has_wget);
@@ -518,10 +508,10 @@ push @getfont, '--lsfonts' if $opt_lsfonts;
 push @getfont, '--force' if $opt_force;
 push @getfont, '--debug' if $opt_debug;
 push @getfont, '--verbose' if $opt_verbose;
-push @getfont, '--sys' if $sys;
+push @getfont, '--sys' if $opt_sys;
 push @getfont, '--refreshmap' if $opt_refreshmap;
 push @getfont, '--all' if $opt_all;
-push @getfont, '--http' if $opt_http;
+
 if ($has_wget) {
   push @getfont, "--wget_bin=$WGET";
 } else {
@@ -541,30 +531,41 @@ system @getfont;
 my $exit_code=$?;
 my $exit_status=int($exit_code/256);
 
-if ($sys) {	     
+my $has_updmap_user=0;
+if (-f var_value('SELFAUTOLOC').'/updmap-user'.$sys{'exe'}) {
+  $has_updmap_user=1;
+}
+
+if ($opt_sys) {	     
   debug_msg "Info: Execute updmap-sys if exit status is 2.";
 } else {
-  debug_msg "Info: Execute updmap if exit status is 2.";
+  if ($has_updmap_user) {
+    debug_msg "Info: Execute updmap-user if exit status is 2.";
+  } else {
+    debug_msg "Info: Execute updmap if exit status is 2.";
+  }
 }
 
 debug_msg "Exit status of getfont.pl is $exit_status.";
 
 if ($exit_status==2) {
   print "\n";
-  msg "Running 'mktexlsr $INSTALLROOT'...";
-  if (0) { 
-    my $ret=system "mktexlsr $INSTALLROOT >NUL 2>NUL";
-  } else {
-    my $ret=system "mktexlsr $INSTALLROOT >/dev/null 2>/dev/null";
-  }
-  if ($ret) {
-    status 'failed', 'red';
-  } else {
-    status 'done', 'green';
-  }
+  msg "Running 'mktexlsr $INSTALLROOT $sys{'nulldev'}' ...";
+#  if ($sys{'w32'}) {
+    my $ret=system "mktexlsr $INSTALLROOT $sys{'nulldev'}";
+#  } else {
+#    my $ret=system "mktexlsr $INSTALLROOT >/dev/null 2>/dev/null";
+#  }
   
+  $ret ? status 'failed', 'red' : status 'done', 'green';
+   
   
-  $updmap_command=($sys)? 'updmap-sys':'updmap';
+  my $updmap_command;
+  if ($has_updmap_user) {
+    $updmap_command=($opt_sys)? 'updmap-sys':'updmap-user';
+  } else {
+    $updmap_command=($opt_sys)? 'updmap-sys':'updmap';
+  }
   @updmap=("$updmap_command");
   push @updmap, '--quiet' unless $opt_verbose;
   print "\n";
@@ -578,9 +579,10 @@ remove_tmpdir;
 
 __END__
 
-#  Local Variables:
-#    perl-indent-level: 2
-#    tab-width: 2
-#    indent-tabs-mode: nil
-#  End:
-#  vim:set tabstop=2 expandtab:
+# Local Variables:
+#  mode: Perl
+#  perl-indent-level: 2
+#  indent-tabs-mode: nil
+#  coding: utf-8-unix
+# End:
+# vim:set tabstop=2 expandtab:

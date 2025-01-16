@@ -1,16 +1,19 @@
-.TH getnonfreefonts 1 "December 2009" "TeX Live" "TeX Live"
+.TH getnonfreefonts 1 "Jan 2025" "TeX Live" "TeX Live"
 .SH NAME
 getnonfreefonts \- download and install fonts which cannot be
-distributed on a CD
-.LP
-getnonfreefonts-sys \- download and install fonts system\-wide which
-cannot be distributed on a CD
+distributed on a CD/DVD because the license doesn't allow to charge
+money for the distribution.
 
 .SH SYNOPSIS
 
-.BI "getnonfreefonts [" options "] [" fontlist ]
+.BI "getnonfreefonts --sys [" options "] [" font1 "] [" font2 "] [" font... ]
 .sp
-.BI "getnonfreefonts-sys [" options "] [" fontlist ]
+.BI "getnonfreefonts --user [" options "] [" font1 "] [" font2 "] [" font... ]
+
+In nearly all cases you should use getnonfreefonts --sys.  For special cases see 
+.br
+    http://tug.org/texlive/scripts-sys-user.html
+.br
 
 .SH DESCRIPTION
 Some font suppliers provide fonts which can be used freely but they
@@ -19,34 +22,27 @@ distributions on CD or DVD it is usually impossible to include
 these fonts.
 
 .B "getnonfreefonts"
-is a script which downloads and installs these fonts.  Actually, it
-first downloads the program
-.BI "getfont"<year>
-from tug.org which is then executed.
-.BI "getfont"<year>
-does the real work.  It will be updated occasionally to support more
-fonts.  
-.I <year>
-denotes the TeXLive release.
+downloads and installs these fonts.
 
-.B getnonfreefonts
+.B "getnonfreefonts --sys" 
+installs files to $TEXMFLOCAL
 and
-.B getnonfreefonts-sys
-are identical except that
-.B getnonfreefonts
+.B "getnonfreefonts --user"
 installs files to $TEXMFHOME
-while
-.B getnonfreefonts-sys
-installs files to $TEXMFLOCAL.
 
-.BI "getfont"<year>
-will not be installed permanently on your system.  It only
-exists in a temporary directory while 
-.BI getnonfreefonts
-is running.
+.BI "getnonfreefonts"
+downloads and executes a helper script each time it is invoked.  This
+script is not installed permanently on your system and only exists in
+a temporary directory while
+.BI "getnonfreefonts"
+is running.  It allows 
+.BI "getnonfreefonts"
+to be aware of updates and new fonts.
 
 Run
-.B getnonfreefonts --lsfonts
+.B "getnonfreefonts --sys --lsfonts"
+or
+.B "getnonfreefonts --user --lsfonts"
 to get a list of supported fonts.
 
 .SH OPTIONS
@@ -77,13 +73,6 @@ will be replaced by the process ID of the current
 process. 
 
 .TP
-.BR "-H" , " --http"
-.rg
-Use HTTP instead of FTP.  This is useful if you are behind a firewall
-which is blocking FTP.  However, you can't install fonts which are on
-FTP servers.  Currently this is only "Adobe Euro".
-
-.TP
 .BR "-l" , " --lsfonts"
 .rg
 List all available fonts and tell whether they are installed already. 
@@ -98,50 +87,23 @@ files for already installed fonts and run
 This is needed after upgrading TeX Live to a newer release.
 
 .TP
-.B --sys
+.BR "-v", " --verbose"
 .rg
-If you call
-.B getnonfreefonts
-with the
-.B --sys
-option, it behaves exactly as
-.BR "getnonfreefonts-sys".
+Be more verbose.
 
 .TP
-.BR "-v" , " --verbose"
-.rg
-Be more verbose.  This option is only needed for debugging.
-
-.TP
-.BR "--version"
+.BR "-V", " --version"
 .rg
 Print version number.
 
-.SH ENVIRONMENT
-One of the environment variables
-.BR "TMP" , " TEMP" ,
-or 
-.B  TMPDIR 
-must exist.  They are used to determine where to put the temporary
-files.  The directory must exist and must be writable.
-.B /tmp
-will be used if none of the variables is defined.
-
 .SH REQUIREMENTS
-Though this program is supposed to be used with 
-.B TeX Live
-it might work with other TeX distributions too.  The programs
+On Unix systems
+.BR "unzip"
+and either
 .BR "wget"
 or 
-.BR "curl" ,
-.BR "unzip" , 
-and
-.B kpsewhich
-as well as a recent version of
-.B updmap 
-which supports the 
-.B --enable
-option are required.
+.BR "curl"
+must exist.
 
 .SH BUGS
-Please send bug reports to Reinhard Kotucha <reinhard.kotucha@web.de>.
+Please send bug reports to Reinhard Kotucha <reinhard.kotucha@gmx.de>.

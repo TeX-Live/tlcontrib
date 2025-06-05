@@ -1,0 +1,310 @@
+local common  = fonts.goodies.load("common-math.lfg")
+local presets = common.mathematics.tweaks.presets
+
+local integral_variants = {  bottomright = -0.20 }
+----- integral_top      = {  topright    =  0.05 }
+local integral_bottom   = {  bottomright = -0.45 }
+
+return {
+    name = "lucida-opentype-math",
+    version = "1.00",
+    comment = "Goodies that complement lucida opentype.",
+    author = "Hans Hagen & Mikael Sundqvist",
+    copyright = "ConTeXt development team",
+    mathematics = {
+        parameters = {
+            FractionRuleThickness             =  55,
+-- FractionDenominatorGapMin = 100,
+         -- AccentBaseDepth                   = 250,
+            FlattenedAccentBaseHeight         = 710,-- slightly too large in the font
+            DelimiterPercent                  =  85,
+            DelimiterShortfall                = 400,
+            DelimiterDisplayPercent           =  90, -- MS
+            DelimiterDisplayShortfall         = 400,
+            SuperscriptBottomMaxWithSubscript = 325,
+            PrimeShiftUp                      = "1.3*SuperscriptShiftUp",
+            PrimeShiftUpCramped               = "1.3*SuperscriptShiftUp",
+            PrimeBaselineDropMax              = "0.5*SuperscriptBaselineDropMax",
+            RadicalDisplayStyleVerticalGap    = "RadicalVerticalGap", --172, 50
+-- RadicalKernBeforeExtensible       = 100,
+-- RadicalKernAfterExtensible        = 100,
+        },
+        scales = {
+            scriptxscale       = 1025,
+            scriptyscale       =  975,
+            scriptscriptxscale = 1050,
+            scriptscriptyscale =  950,
+            scriptweight       =   20,
+            scriptscriptweight =   40,
+        },
+        tweaks = {
+         -- beforepassing = {
+         --     {
+         --         tweak              = "scales",
+         --         scriptxscale       = 1100,
+         --         scriptyscale       =  900,
+         --         scriptscriptxscale = 1100,
+         --         scriptscriptyscale =  900,
+         --     },
+         -- },
+            aftercopying = {
+                {
+                    tweak    = "version",
+                    expected = "Version 1.901",
+                },
+                {
+                    tweak   = "fixoldschool",
+                    version = "Version 1.802",
+                },
+                {
+                    tweak   = "parameters",
+                    feature = "boldmath",
+                    list    = {
+                        RadicalRuleThickness  = 60,
+                     -- RadicalRuleThickness  = "1.09*RadicalRuleThickness",
+                     -- FractionRuleThickness = 65,
+                     -- OverRuleThickness     = 65,
+                     -- UnderRuleThickness    = 65,
+                    }
+                },
+                {
+                    tweak = "addmirrors",
+                },
+                presets.smalldigits          { factor  = 0.90 },
+                presets.scripttocalligraphic { },
+                presets.rsfstoscript         { rscale  = 1    },
+                presets.rsfsuprighttoscript  { rscale  = 1    },
+                presets.moderntocalligraphic { rscale  = 1    },
+                presets.eulertocalligraphic  { rscale  = 1    },
+                presets.xitsarabic           { rscale  = 1.05 },
+                presets.fallbacks            { },
+                presets.moveitalics          { correct = true },
+                presets.moveitalics          { correct = true, letters = true },
+                presets.moveintegrals        { factor = 1.5 },
+                presets.wipeitalics          { },
+                {
+                    tweak    = "replacealphabets",
+                    filename = "lucidabrightot.otf",
+                    keep     = true,
+                    list     = {
+                        { source = "latinsupplement" },
+                     -- { source = "latinextendeda" },
+                     -- { source = "latinextendedadditional" },
+                     -- { source = "latinextendedb" },
+                     -- { source = "latinextendedc" },
+                     -- { source = "latinextendedd" },
+                     -- { source = "latinextendede" },
+                     -- { source = "latinextendedf" },
+                     -- { source = "latinextendedg" },
+                    },
+                },
+                {
+                    tweak   = "replacealphabets",
+                    list    = {
+                        {
+                            source   = "uppercasescript",
+                            target   = "uppercasecalligraphic",
+                            feature  = "ss04",
+                        },
+                        {
+                            source   = "lowercasescript",
+                            target   = "lowercasecalligraphic",
+                            feature  = "ss04",
+                        },
+                        {
+                            source   = "uppercaseboldscript",
+                            target   = "uppercaseboldcalligraphic",
+                            feature  = "ss04",
+                        },
+                        -- No lowercase bold calligraphic/script in font
+                    },
+                },
+                {
+                    tweak   = "dimensions",
+                    version = "Version 1.802",
+                    list    = {
+                        -- The < and > are slightly too small. We scale them by 867/795
+                        ["0x003C"] = { scale = 1.09057, width = 1.09057, height = 1.09057 },
+                        ["0x003E"] = { scale = 1.09057, width = 1.09057, height = 1.09057 },
+                    },
+                },
+                {
+                    tweak   = "dimensions",
+                    version = "Version 1.802",
+                    list    = {
+                        -- these we fix here. Remove when we have new version of Lucida
+                        ["0x23DC.parts.1"]  = { xoffset = -0.075, height = 0.4,  yoffset = -0.6  },
+                        ["0x23DC.parts.2"]  = {                   height = 0.4,  yoffset = -0.6  },
+                        ["0x23DC.parts.3"]  = { xoffset =  0.075, height = 0.4,  yoffset = -0.6  },
+                        ["0x23DD.parts.1"]  = { xoffset = -0.075, depth  = 0.8,  yoffset =  0.2  },
+                        ["0x23DD.parts.2"]  = {                   depth  = 0.8,  yoffset =  0.2  },
+                        ["0x23DD.parts.3"]  = { xoffset =  0.075, depth  = 0.8,  yoffset =  0.2  },
+                        ["0x7C.variants.3"] = { squeeze =  0.90,  height = 0.90, depth   =  0.90 },
+                        ["0x7C.variants.4"] = { squeeze =  0.80,  height = 0.80, depth   =  0.80 },
+                    },
+                },
+                -- Accents are a mess. We migrate the extensibles from the combiners to the base accent
+                -- and then need to tweak the width (which is auto set because it was zero with a large
+                -- accent anchor offset). First we copy and fix.
+                {
+                    tweak = "checkaccents",
+                },
+                {
+                    tweak = "extendaccents",
+                },
+                {
+                    tweak = "flattenaccents",
+                },
+                {
+                    tweak = "fixaccents",
+                },
+{
+    tweak = "keepbases",
+    list  = { 0x302 }
+},
+                {
+                    tweak = "radicaldegreeanchors",
+                    list  = {
+                        ["0x221A.variants.3"]   = { location = "left", hfactor = 0,    vfactor = .55  },
+                        ["0x221A.variants.4"]   = { location = "left", hfactor = 0,    vfactor = .50  },
+                        ["0x221A.parts.bottom"] = { location = "left", hfactor = 0,    vfactor = .85  },
+                    }
+                },
+                -- First we set the dimensions of the initial accent which started out as zero but we want
+                -- a proper width. Not in lucida
+                -- Then we deal with all offsets and heights in one go. So we treat the initial accent
+                -- as well as the variants here. Not in lucida.
+                -- We now copy these to the not wide slots so that we can set these to stretch as well,
+                -- if only because it is less confusing and more consistent.
+                {
+                    tweak = "copyaccents",
+                },
+                -- So far for the accents.
+                {
+                    tweak = "fixslashes",
+                },
+                {
+                    tweak = "addbreve",
+                },
+                {
+                    tweak = "kerns",
+                    list  = {
+                        [0x002F]                = { topleft  = -0.2,  bottomright = -0.2  },
+                        ["0x007D.parts.top"]    = { topright = -0.15                      }, -- right brace top
+                        ["0x007D.parts.bottom"] = {                   bottomright = -0.15 }, -- right brace bottom
+                        ["0x007D.variants.*"]   = { topright = -0.15, bottomright = -0.15 }, -- right brace variants
+                        ["0x0029.parts.top"]    = { topright = -0.25                      }, -- right parenthesis top
+                        ["0x0029.parts.bottom"] = {                   bottomright = -0.25 }, -- right parenthesis bottom
+                        ["0x0029.variants.*"]   = { topright = -0.2,  bottomright = -0.2  }, -- right parenthesis variants
+                        ["0x221A.parts.top"]    = { topright =  0.2                       }, -- right radical top
+                        ["0x221A.parts.bottom"] = {                   bottomright =  0.2  }, -- right radical bottom
+                        ["0x221A.variants.*"]   = { topright =  0.2,  bottomright =  0.2  }, -- right radical variants
+                        [0x27E9]                = { topright = -0.2,  bottomright = -0.2  }, -- angle
+                        ["0x27E9.variants.*"]   = { topright = -0.3,  bottomright = -0.3  },
+                        [0x27EB]                = { topright = -0.2,  bottomright = -0.2  },
+                        ["0x27EB.variants.*"]   = { topright = -0.3,  bottomright = -0.3  },
+                    },
+                },
+                {
+                   tweak   = "fixprimes",
+                   factor  = 0.7,  -- accent base height
+                   fake    = 0.65, -- replace multiples with this width proportion
+                },
+                {
+                    tweak = "checkspacing",
+                },
+                {
+                    tweak = "addscripts",
+                },
+                {
+                    tweak = "accentdimensions",
+                },
+                {
+                    tweak = "addrules",
+                },
+                {
+                    tweak    = "replacerules",
+                    minus    = {
+                        leftoffset  = .12,
+                        rightoffset = .12,
+                    },
+                    fraction = {
+                        height  = .2,
+                        yoffset = .825,
+                    },
+                    radical  = {
+                        height      = .13,
+                        yoffset     = .825,
+                        leftoffset  = .124,
+                        rightoffset = .124,
+                        yscale      = .940,
+                    },
+radical  = {
+    height      = .140,
+    yoffset     = .610,
+    yscale      = .720,
+    leftoffset  = .124,
+    rightoffset = .124,
+},
+                    stacker  = {
+                        height  = .2,
+                        yoffset = .825,
+                    },
+                },
+                {
+                    tweak = "addactuarian",
+                },
+                {
+                    tweak   = "addfourier",
+                    variant = 1,
+                },
+                {
+                    tweak = "addprimed",
+                },
+                {
+                    tweak = "addarrows",
+                    left  = 0.1,
+                    right = 0.1,
+                    slack = 0.20,
+                    list  = {
+                        [0x21A9] = false,
+                        [0x21AA] = false,
+                        [0x2190] = false,
+                        [0x2192] = false,
+                        [0x219E] = false,
+                        [0x21A0] = false,
+                    }
+                },
+                -- fix a bug (todo: version)
+                {
+                    tweak       = "sortvariants",
+                    list        = { 0x23DE },
+                    orientation = "horizontal",
+                },
+                -- this is the mkiv section
+                {
+                    tweak   = "emulatelmtx",
+                    feature = "emulatelmtx",
+                    comment = "this is for mkiv",
+                },
+            },
+        },
+        alternates = {
+            textitalic   = { feature = 'ss01', value = 1, comment = "Mathematical Alternative Lowercase Italic" },
+            arrow        = { feature = 'ss02', value = 1, comment = "Mathematical Alternative Smaller Arrows" },
+            operator     = { feature = 'ss03', value = 1, comment = "Mathematical Alternative Smaller Operators" },
+            calligraphic = { feature = 'ss04', value = 1, comment = "Mathematical Alternative Calligraphic Characters" },
+            zero         = { feature = 'ss05', value = 1, comment = "Mathematical Alternative Zero" },
+            multipledots = { feature = 'ss06', value = 1, comment = "Mathematical Alternative Multiple Dots" },
+            ldots        = { feature = 'ss07', value = 1, comment = "Mathematical Alternative Ellipsis" },
+        },
+        bigslots = {
+            1, 2, 3, 4
+        },
+        --
+        -- experimental fixes for mkiv:
+        --
+        dimensions = dimensions,
+        kerns = kerns,
+    },
+}

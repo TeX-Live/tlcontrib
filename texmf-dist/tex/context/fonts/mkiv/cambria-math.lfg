@@ -1,0 +1,197 @@
+local common  = fonts.goodies.load("common-math.lfg")
+local presets = common.mathematics.tweaks.presets
+
+return {
+    name = "cambria-math",
+    version = "1.00",
+    comment = "Goodies that complement cambria.",
+    author = "Hans Hagen & Mikael Sundqvist",
+    copyright = "ConTeXt development team",
+    mathematics = {
+        parameters = {
+            AccentBaseDepth          =  300,
+            DelimiterPercent         =   90,
+            DelimiterShortfall       =  400,
+            DisplayOperatorMinHeight = 2800, -- 2500 in font
+            PrimeShiftUp             = "1.25*SuperscriptShiftUp",
+            PrimeShiftUpCramped      = "1.25*SuperscriptShiftUp",
+            RadicalVerticalGap             = 100, -- "RadicalVerticalGap", --345, 166
+            RadicalDisplayStyleVerticalGap = 200, -- "RadicalVerticalGap", --345, 166
+        },
+        tweaks = {
+            aftercopying = {
+                {
+                    tweak = "addmirrors",
+                },
+                {
+                    tweak = "addcomposites",
+                },
+                presets.scripttocalligraphic { },
+                presets.rsfstoscript         { rscale  = 0.97 },
+                presets.rsfsuprighttoscript  { rscale  = 0.97 },
+                presets.moderntocalligraphic { rscale  = 0.97 },
+                presets.eulertocalligraphic  { rscale  = 0.97 },
+                presets.xitsarabic           { rscale  = 0.95 },
+                presets.fallbacks            { },
+                presets.moveitalics          { correct = true },
+                presets.moveitalics          { correct = true, letters = true },
+                presets.moveintegrals        { factor = 1.5}, -- needs checking
+                presets.wipeitalics          { },
+                presets.pagellaradical       { },
+                {
+                    tweak = "simplifykerns",
+                },
+                {
+                    tweak = "kerns",
+                    list  = {
+                        [0x002F]                = { topleft  = -0.2,  bottomright = -0.2 },
+                        ["0x002F.variants.*"]   = { topleft  = -0.2,  bottomright = -0.2 },
+                        --
+                        [0x007D]                = { topright = -0.05, bottomright = -0.05 }, -- right brace variants
+                        ["0x7D.variants.*"]     = { topright = -0.10, bottomright = -0.10 }, -- right brace variants
+                        ["0x7D.parts.top"]      = { topright = -0.10,                     }, -- right brace top
+                        ["0x7D.parts.bottom"]   = {                   bottomright = -0.10 }, -- right brace bottom
+                        [0x0029]                = { topright = -0.15, bottomright = -0.15 }, -- right parenthesis variants
+                        ["0x29.variants.*"]     = { topright = -0.15, bottomright = -0.15 }, -- right parenthesis variants
+                        ["0x29.parts.top"]      = { topright = -0.15,                     }, -- right parenthesis top
+                        ["0x29.parts.bottom"]   = {                   bottomright = -0.15 }, -- right parenthesis bottom
+                        [0x221A]                = { topright =  0.2,  bottomright =  0.2  }, -- radical
+                        ["0x221A.variants.*"]   = { topright =  0.2,  bottomright =  0.2  },
+                        ["0x221A.parts.top"]    = { topright =  0.2,                      },
+                        ["0x221A.parts.bottom"] = {                   bottomright =  0.2  },
+                        [0x27E9]                = { topright = -0.1,  bottomright = -0.1  }, -- angle
+                        ["0x27E9.variants.*"]   = { topright = -0.3,  bottomright = -0.3  },
+                        [0x27EB]                = { topright = -0.1,  bottomright = -0.1  },
+                        ["0x27EB.variants.*"]   = { topright = -0.2,  bottomright = -0.2  },
+                        -- Keep as example. not needed in cambria (after all it is the reference):
+                        [0x2A0C] = { bottomright = -0.1 }, -- iiiint does not have any ic
+                    },
+                },
+
+                -- Accents are a mess. We migrate the extensibles from the combiners to the base accent
+                -- and then need to tweak the width (which is auto set because it was zero with a large
+                -- accent anchor offset). First we copy and fix.
+                {
+                    tweak = "extendaccents",
+                },
+                {
+                    tweak = "fixaccents",
+                },
+                {
+                    tweak   = "radicaldegreeanchors",
+                    list = {
+                        [0x221A]                = { location = "left", hfactor  = -0.15, vfactor  = 0.75 },
+                        ["0x221A.variants.*"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.15 },
+                        ["0x221A.variants.1"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.55 },
+                        ["0x221A.variants.2"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.375 },
+                        ["0x221A.variants.3"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.275 },
+                        ["0x221A.variants.4"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.22 },
+                        ["0x221A.variants.5"]   = { location = "left", hfactor  = -0.1,  vfactor  = 0.175 },
+                        ["0x221A.parts.bottom"] = { location = "left", hfactor  = -0.1,  vfactor  = 0.95 },
+                    }
+                },
+{
+    tweak = "wipevariants",
+    list = {
+        [0x221A] = 1,
+    },
+},
+                -- First we set the dimensions of the initial accent which started out as zero but we want
+                -- a proper width.
+                -- {
+                --     tweak = "dimensions",
+                --     list  = {
+                --         [0x00302] = { width = 2, anchor = 1.5, xoffset = .25 }, -- widehat
+                --         [0x00303] = { width = 2, anchor = 1.5, xoffset = .25 }, -- widetilde
+                --         [0x00306] = { width = 2, anchor = 1.5, xoffset = .25 }, -- widebreve
+                --         [0x0030C] = { width = 2, anchor = 1.5, xoffset = .25 }, -- widecheck
+                --     },
+                -- },
+                -- Then we deal with all offsets and heights in one go. So we treat the initial accent
+                -- as well as the variants here.
+                {
+                    tweak = "dimensions",
+                    list  = {
+                        -- here we want to apply to all
+                        [0x020DB] = { yoffset =  -0.03,    height = .95, all = true }, -- widedddot : 0x20DB (self)
+                    },
+                },
+                -- We now copy these to the not wide slots so that we can set these to stretch as well,
+                -- if only because it is less confusing and more consistent.
+                {
+                    tweak = "copyaccents",
+                },
+                -- So far for the accents.
+
+                {
+                    tweak   = "fixprimes",
+                    factor  = 0.83,
+                    fake    = 0.8,
+                },
+                {
+                    tweak = "checkspacing",
+                },
+                {
+                    tweak = "addscripts",
+                },
+                {
+                    tweak = "accentdimensions",
+                    list  = { "over", "under" },
+                },
+                {
+                    tweak = "addrules",
+                },
+                {
+                    tweak    = "replacerules",
+                    minus = {
+                        leftoffset  = .0925,
+                        rightoffset = .0925,
+                    },
+                    fraction = {
+                        height  = .204,
+                        yoffset = .796,
+                    },
+                    radical  = {
+                        height     = .204,
+                        yoffset    = .796,
+                        leftoffset  = .0925,
+                        rightoffset = .0925,
+                    },
+                    stacker  = {
+                        height  = .204,
+                        yoffset = .796,
+                    },
+                },
+                {
+                    tweak = "wipecues",
+                },
+                {
+                    tweak = "addarrows",
+                },
+                {
+                    tweak = "fixslashes",
+                },
+                {
+                    tweak   = "addbars",
+                    advance = 0.33,
+                },
+                {
+                    tweak = "addactuarian",
+                },
+                {
+                    tweak = "addequals",
+                },
+                {
+                    tweak = "addfourier",
+                    variant = 2,
+                },
+                {
+                    tweak   = "addprimed",
+                },
+            },
+        },
+        bigslots = {
+            1, 2, 3, 4
+        },
+    },
+}
